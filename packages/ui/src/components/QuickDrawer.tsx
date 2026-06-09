@@ -174,9 +174,9 @@ function QuickDrawerRoot({
           willChange: 'transform',
           visibility: isOpen ? 'visible' : 'hidden',
           transition: panelTransition,
-          background: 'var(--v2-bg-surface, rgb(var(--background-primary)))',
-          borderLeft: mode === 'side' ? '1px solid var(--v2-border-default, rgb(var(--border-secondary)))' : 'none',
-          borderTop: mode === 'sheet' ? '1px solid var(--v2-border-default, rgb(var(--border-secondary)))' : 'none',
+          background: 'rgb(var(--background-secondary))',
+          borderLeft: mode === 'side' ? '1px solid rgb(var(--border-primary) / 0.35)' : 'none',
+          borderTop: mode === 'sheet' ? '1px solid rgb(var(--border-primary) / 0.35)' : 'none',
           borderRadius: mode === 'sheet' ? '14px 14px 0 0' : undefined,
           boxShadow: isOpen
             ? (mode === 'side' ? '-14px 0 44px rgba(0,0,0,0.5)' : '0 -12px 40px rgba(0,0,0,0.4)')
@@ -189,7 +189,7 @@ function QuickDrawerRoot({
           <div className="flex justify-center py-2 flex-shrink-0">
             <div
               className="w-8 h-1 rounded-full"
-              style={{ background: 'var(--v2-text-ghost, rgba(255,255,255,0.2))' }}
+              style={{ background: 'rgb(var(--text-disabled))' }}
             />
           </div>
         )}
@@ -208,7 +208,7 @@ function Header({ children, className }: QuickDrawerHeaderProps) {
   return (
     <div
       className={cn('flex-shrink-0', className)}
-      style={{ borderBottom: '1px solid var(--v2-border-default, rgba(255,255,255,0.06))' }}
+      style={{ borderBottom: '1px solid rgb(var(--border-primary) / 0.35)' }}
     >
       {children}
     </div>
@@ -222,7 +222,7 @@ function Body({ children, className }: QuickDrawerBodyProps) {
         'flex-1 overflow-y-auto',
         '[&::-webkit-scrollbar]:w-1',
         '[&::-webkit-scrollbar-track]:bg-transparent',
-        '[&::-webkit-scrollbar-thumb]:bg-[var(--v2-scrollbar-thumb,rgba(255,255,255,0.1))]',
+        '[&::-webkit-scrollbar-thumb]:bg-[rgb(var(--border-primary)/0.4)]',
         '[&::-webkit-scrollbar-thumb]:rounded-full',
         className,
       )}
@@ -237,8 +237,8 @@ function Footer({ children, className }: QuickDrawerFooterProps) {
     <div
       className={cn('flex-shrink-0', className)}
       style={{
-        borderTop: '1px solid var(--v2-border-default, rgba(255,255,255,0.07))',
-        background: 'var(--v2-bg-surface, rgb(var(--background-primary)))',
+        borderTop: '1px solid rgb(var(--border-primary) / 0.35)',
+        background: 'rgb(var(--background-secondary))',
       }}
     >
       {children}

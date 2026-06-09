@@ -25,11 +25,11 @@ function courseColor(name: string): string {
 }
 
 function gradeTokenColor(letter?: string | null): string {
-  if (!letter) return 'var(--v2-grade-none)'
+  if (!letter) return 'rgb(var(--text-tertiary))'
   const first = letter.charAt(0).toUpperCase()
-  if (first === 'A' || first === 'B') return 'var(--v2-grade-high)'
-  if (first === 'C') return 'var(--v2-grade-mid)'
-  return 'var(--v2-grade-low)'
+  if (first === 'A' || first === 'B') return 'rgb(var(--state-success-fg))'
+  if (first === 'C') return 'rgb(var(--state-warning-fg))'
+  return 'rgb(var(--state-danger-fg))'
 }
 
 export interface CourseCardCategory {
@@ -77,8 +77,8 @@ export const CourseCard = forwardRef<HTMLDivElement, CourseCardProps>(
           className
         )}
         style={{
-          background: 'var(--v2-bg-surface)',
-          borderColor: 'var(--v2-border-default)',
+          background: 'rgb(var(--background-secondary))',
+          borderColor: 'rgb(var(--border-primary) / 0.35)',
         }}
         {...props}
       >
@@ -92,14 +92,14 @@ export const CourseCard = forwardRef<HTMLDivElement, CourseCardProps>(
               {courseCode && (
                 <p
                   className="text-xs font-mono uppercase tracking-[0.06em] mb-0.5"
-                  style={{ color: 'var(--v2-text-hint)' }}
+                  style={{ color: 'rgb(var(--text-tertiary))' }}
                 >
                   {courseCode}
                 </p>
               )}
               <h3
                 className="font-display text-base font-medium italic truncate"
-                style={{ color: 'var(--v2-text-primary)' }}
+                style={{ color: 'rgb(var(--text-primary))' }}
               >
                 {courseName}
               </h3>
@@ -111,13 +111,13 @@ export const CourseCard = forwardRef<HTMLDivElement, CourseCardProps>(
               style={{
                 background: hasGrade
                   ? `color-mix(in srgb, ${gradeTokenColor(letterGrade)} 12%, transparent)`
-                  : 'var(--v2-surface-inset)',
-                border: hasGrade ? 'none' : '1px dashed var(--v2-border-default)',
+                  : 'rgb(var(--background-tertiary) / 0.5)',
+                border: hasGrade ? 'none' : '1px dashed rgb(var(--border-primary) / 0.35)',
               }}
             >
               <span
                 className="text-base font-bold"
-                style={{ color: hasGrade ? gradeTokenColor(letterGrade) : 'var(--v2-text-hint)' }}
+                style={{ color: hasGrade ? gradeTokenColor(letterGrade) : 'rgb(var(--text-tertiary))' }}
               >
                 {letterGrade ?? '—'}
               </span>
@@ -127,14 +127,14 @@ export const CourseCard = forwardRef<HTMLDivElement, CourseCardProps>(
           {/* Score row */}
           {hasGrade && (
             <div className="flex items-center gap-4 text-xs mb-3">
-              <span style={{ color: 'var(--v2-text-muted)' }}>
-                <span className="font-mono tabular-nums" style={{ color: 'var(--v2-text-secondary)' }}>
+              <span style={{ color: 'rgb(var(--text-tertiary))' }}>
+                <span className="font-mono tabular-nums" style={{ color: 'rgb(var(--text-secondary))' }}>
                   {numericGrade != null ? numericGrade.toFixed(1) : '—'}
                 </span>
                 /100
               </span>
-              <span style={{ color: 'var(--v2-text-muted)' }}>
-                <span className="font-mono tabular-nums" style={{ color: 'var(--v2-text-secondary)' }}>
+              <span style={{ color: 'rgb(var(--text-tertiary))' }}>
+                <span className="font-mono tabular-nums" style={{ color: 'rgb(var(--text-secondary))' }}>
                   {gpaPoints != null ? gpaPoints.toFixed(2) : '—'}
                 </span>
                 {' GPA'}
@@ -142,8 +142,8 @@ export const CourseCard = forwardRef<HTMLDivElement, CourseCardProps>(
               <span
                 className="text-xs px-1.5 py-0.5 rounded-full"
                 style={{
-                  background: isFinal ? 'var(--v2-success-bg)' : 'var(--v2-info-bg)',
-                  color: isFinal ? 'var(--v2-brand-primary)' : 'var(--v2-info)',
+                  background: isFinal ? 'rgb(var(--state-success-bg))' : 'rgb(var(--state-info-bg))',
+                  color: isFinal ? '#1D9E75' : 'rgb(var(--state-info-fg))',
                 }}
               >
                 {isFinal ? 'Final' : 'In Progress'}
@@ -155,7 +155,7 @@ export const CourseCard = forwardRef<HTMLDivElement, CourseCardProps>(
           {!hasGrade && (
             <p
               className="text-xs mb-3"
-              style={{ color: 'var(--v2-text-hint)' }}
+              style={{ color: 'rgb(var(--text-tertiary))' }}
             >
               Not graded yet
             </p>
@@ -185,7 +185,7 @@ export const CourseCard = forwardRef<HTMLDivElement, CourseCardProps>(
               <DashedDivider className="my-3" />
               <p
                 className="text-xs"
-                style={{ color: 'var(--v2-text-muted)' }}
+                style={{ color: 'rgb(var(--text-tertiary))' }}
               >
                 {teacherName}
               </p>

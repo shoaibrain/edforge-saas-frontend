@@ -33,27 +33,27 @@ export interface AttendanceHeatmapProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 const STATUS_COLORS: Record<HeatmapStatus, { bg: string; border?: string }> = {
-  present: { bg: 'var(--v2-status-present-bg)' },
-  absent: { bg: 'var(--v2-status-absent-bg)' },
-  late: { bg: 'var(--v2-status-late-bg)' },
-  excused: { bg: 'var(--v2-status-excused-bg)' },
+  present: { bg: 'rgb(var(--state-success-bg))' },
+  absent: { bg: 'rgb(var(--state-danger-bg))' },
+  late: { bg: 'rgb(var(--state-warning-bg))' },
+  excused: { bg: 'rgb(var(--state-info-bg))' },
   holiday: {
-    bg: 'repeating-linear-gradient(-45deg, transparent, transparent 3px, var(--v2-border-default) 3px, var(--v2-border-default) 4px)',
+    bg: 'repeating-linear-gradient(-45deg, transparent, transparent 3px, rgb(var(--border-primary) / 0.35) 3px, rgb(var(--border-primary) / 0.35) 4px)',
   },
-  weekend: { bg: 'var(--v2-surface-inset)' },
+  weekend: { bg: 'rgb(var(--background-tertiary) / 0.5)' },
   future: { bg: 'transparent' },
   none: { bg: 'transparent' },
 }
 
 const STATUS_TEXT: Record<HeatmapStatus, string> = {
-  present: 'var(--v2-status-present)',
-  absent: 'var(--v2-status-absent)',
-  late: 'var(--v2-status-late)',
-  excused: 'var(--v2-status-excused)',
-  holiday: 'var(--v2-text-hint)',
-  weekend: 'var(--v2-text-ghost)',
-  future: 'var(--v2-text-ghost)',
-  none: 'var(--v2-text-ghost)',
+  present: 'rgb(var(--state-success-fg))',
+  absent: 'rgb(var(--state-danger-fg))',
+  late: 'rgb(var(--state-warning-fg))',
+  excused: 'rgb(var(--state-info-fg))',
+  holiday: 'rgb(var(--text-tertiary))',
+  weekend: 'rgb(var(--text-disabled))',
+  future: 'rgb(var(--text-disabled))',
+  none: 'rgb(var(--text-disabled))',
 }
 
 const DEFAULT_HEADERS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -108,7 +108,7 @@ export const AttendanceHeatmap = forwardRef<HTMLDivElement, AttendanceHeatmapPro
           <button
             onClick={() => onMonthChange(prevMonth(yearMonth))}
             className={cn('p-1.5 rounded-lg transition-colors', focusRingInset)}
-            style={{ color: 'var(--v2-text-muted)' }}
+            style={{ color: 'rgb(var(--text-tertiary))' }}
             aria-label="Previous month"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -117,14 +117,14 @@ export const AttendanceHeatmap = forwardRef<HTMLDivElement, AttendanceHeatmapPro
           </button>
           <span
             className="text-sm font-medium"
-            style={{ color: 'var(--v2-text-primary)' }}
+            style={{ color: 'rgb(var(--text-primary))' }}
           >
             {monthLabel}
           </span>
           <button
             onClick={() => onMonthChange(nextMonth(yearMonth))}
             className={cn('p-1.5 rounded-lg transition-colors', focusRingInset)}
-            style={{ color: 'var(--v2-text-muted)' }}
+            style={{ color: 'rgb(var(--text-tertiary))' }}
             aria-label="Next month"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -139,7 +139,7 @@ export const AttendanceHeatmap = forwardRef<HTMLDivElement, AttendanceHeatmapPro
             <div
               key={h}
               className="text-center text-xs font-medium py-1"
-              style={{ color: 'var(--v2-text-hint)' }}
+              style={{ color: 'rgb(var(--text-tertiary))' }}
             >
               {h}
             </div>
@@ -165,7 +165,7 @@ export const AttendanceHeatmap = forwardRef<HTMLDivElement, AttendanceHeatmapPro
                 style={{
                   background: colors.bg,
                   border: cell.isToday
-                    ? '2px solid var(--v2-brand-primary)'
+                    ? '2px solid #1D9E75'
                     : colors.border ?? 'none',
                   color: STATUS_TEXT[cell.status],
                 }}
@@ -187,12 +187,12 @@ export const AttendanceHeatmap = forwardRef<HTMLDivElement, AttendanceHeatmapPro
                 className="w-3 h-3 rounded"
                 style={{
                   background: STATUS_COLORS[status].bg,
-                  border: STATUS_COLORS[status].border ?? '1px solid var(--v2-border-default)',
+                  border: STATUS_COLORS[status].border ?? '1px solid rgb(var(--border-primary) / 0.35)',
                 }}
               />
               <span
                 className="text-xs capitalize"
-                style={{ color: 'var(--v2-text-hint)' }}
+                style={{ color: 'rgb(var(--text-tertiary))' }}
               >
                 {status}
               </span>

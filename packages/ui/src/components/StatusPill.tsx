@@ -3,44 +3,44 @@ import { cn } from '../utils'
 
 const STATUS_STYLES = {
   present: {
-    bg: 'var(--v2-status-present-bg)',
-    text: 'var(--v2-status-present)',
-    border: 'var(--v2-success-border)',
+    bg: 'rgb(var(--state-success-bg))',
+    text: 'rgb(var(--state-success-fg))',
+    border: 'rgb(var(--state-success-border))',
   },
   absent: {
-    bg: 'var(--v2-status-absent-bg)',
-    text: 'var(--v2-status-absent)',
-    border: 'var(--v2-danger-border)',
+    bg: 'rgb(var(--state-danger-bg))',
+    text: 'rgb(var(--state-danger-fg))',
+    border: 'rgb(var(--state-danger-border))',
   },
   late: {
-    bg: 'var(--v2-status-late-bg)',
-    text: 'var(--v2-status-late)',
-    border: 'var(--v2-warning-border)',
+    bg: 'rgb(var(--state-warning-bg))',
+    text: 'rgb(var(--state-warning-fg))',
+    border: 'rgb(var(--state-warning-border))',
   },
   excused: {
-    bg: 'var(--v2-status-excused-bg)',
-    text: 'var(--v2-status-excused)',
-    border: 'var(--v2-info-border)',
+    bg: 'rgb(var(--state-info-bg))',
+    text: 'rgb(var(--state-info-fg))',
+    border: 'rgb(var(--state-info-border))',
   },
   paid: {
-    bg: 'var(--v2-status-paid-bg)',
-    text: 'var(--v2-status-paid)',
-    border: 'var(--v2-success-border)',
+    bg: 'rgb(var(--state-success-bg))',
+    text: 'rgb(var(--state-success-fg))',
+    border: 'rgb(var(--state-success-border))',
   },
   overdue: {
-    bg: 'var(--v2-status-overdue-bg)',
-    text: 'var(--v2-status-overdue)',
-    border: 'var(--v2-danger-border)',
+    bg: 'rgb(var(--state-danger-bg))',
+    text: 'rgb(var(--state-danger-fg))',
+    border: 'rgb(var(--state-danger-border))',
   },
   pending: {
-    bg: 'var(--v2-status-pending-bg)',
-    text: 'var(--v2-status-pending)',
-    border: 'var(--v2-border-default)',
+    bg: 'rgb(var(--background-tertiary) / 0.5)',
+    text: 'rgb(var(--text-tertiary))',
+    border: 'rgb(var(--border-primary) / 0.35)',
   },
   upcoming: {
-    bg: 'var(--v2-status-upcoming-bg)',
-    text: 'var(--v2-status-upcoming)',
-    border: 'var(--v2-warning-border)',
+    bg: 'rgb(var(--state-warning-bg))',
+    text: 'rgb(var(--state-warning-fg))',
+    border: 'rgb(var(--state-warning-border))',
   },
 } as const
 

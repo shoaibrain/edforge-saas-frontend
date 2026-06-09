@@ -99,7 +99,7 @@ export function V2AlertItem({
         </p>
         <p
           className="text-xs mt-0.5 truncate"
-          style={{ color: 'var(--v2-text-faint)' }}
+          style={{ color: 'rgb(var(--text-disabled))' }}
         >
           {subtitle}
         </p>

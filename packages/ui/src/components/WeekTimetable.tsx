@@ -122,7 +122,7 @@ export const WeekTimetable = forwardRef<HTMLDivElement, WeekTimetableProps>(
                   className="text-center py-2 rounded-lg"
                   style={{
                     background: isToday
-                      ? 'color-mix(in srgb, var(--v2-brand-primary) 10%, transparent)'
+                      ? 'color-mix(in srgb, #1D9E75 10%, transparent)'
                       : 'transparent',
                   }}
                 >
@@ -130,12 +130,12 @@ export const WeekTimetable = forwardRef<HTMLDivElement, WeekTimetableProps>(
                     {isToday && (
                       <span
                         className="w-1.5 h-1.5 rounded-full shrink-0"
-                        style={{ background: 'var(--v2-brand-primary)' }}
+                        style={{ background: '#1D9E75' }}
                       />
                     )}
                     <p
                       className="text-xs font-medium"
-                      style={{ color: isToday ? 'var(--v2-brand-primary)' : 'var(--v2-text-muted)' }}
+                      style={{ color: isToday ? '#1D9E75' : 'rgb(var(--text-tertiary))' }}
                     >
                       {label}
                     </p>
@@ -143,7 +143,7 @@ export const WeekTimetable = forwardRef<HTMLDivElement, WeekTimetableProps>(
                   {weekStartDate && (
                     <p
                       className="text-xs"
-                      style={{ color: isToday ? 'var(--v2-brand-primary)' : 'var(--v2-text-hint)' }}
+                      style={{ color: isToday ? '#1D9E75' : 'rgb(var(--text-tertiary))' }}
                     >
                       {dayDate(weekStartDate, i)}
                     </p>
@@ -163,13 +163,13 @@ export const WeekTimetable = forwardRef<HTMLDivElement, WeekTimetableProps>(
               <div className="flex flex-col justify-center pr-2 text-right">
                 <span
                   className="text-xs font-mono tabular-nums leading-tight"
-                  style={{ color: 'var(--v2-text-muted)' }}
+                  style={{ color: 'rgb(var(--text-tertiary))' }}
                 >
                   {period.startTime}
                 </span>
                 <span
                   className="text-xs font-mono tabular-nums"
-                  style={{ color: 'var(--v2-text-ghost)' }}
+                  style={{ color: 'rgb(var(--text-disabled))' }}
                 >
                   {period.endTime}
                 </span>
@@ -200,7 +200,7 @@ export const WeekTimetable = forwardRef<HTMLDivElement, WeekTimetableProps>(
                       {block.room && (
                         <p
                           className="text-xs truncate mt-0.5"
-                          style={{ color: 'var(--v2-text-muted)' }}
+                          style={{ color: 'rgb(var(--text-tertiary))' }}
                         >
                           {block.room}
                         </p>
@@ -215,11 +215,11 @@ export const WeekTimetable = forwardRef<HTMLDivElement, WeekTimetableProps>(
                     <div
                       key={dow}
                       className="rounded-lg p-2 min-h-14 flex items-center justify-center"
-                      style={{ background: 'var(--v2-surface-inset)' }}
+                      style={{ background: 'rgb(var(--background-tertiary) / 0.5)' }}
                     >
                       <span
                         className="text-xs italic"
-                        style={{ color: 'var(--v2-text-ghost)' }}
+                        style={{ color: 'rgb(var(--text-disabled))' }}
                       >
                         {period.periodName}
                       </span>
@@ -232,7 +232,7 @@ export const WeekTimetable = forwardRef<HTMLDivElement, WeekTimetableProps>(
                   <div
                     key={dow}
                     className="rounded-lg min-h-14 border border-dashed"
-                    style={{ borderColor: 'var(--v2-border-default)' }}
+                    style={{ borderColor: 'rgb(var(--border-primary) / 0.35)' }}
                   />
                 )
               })}
