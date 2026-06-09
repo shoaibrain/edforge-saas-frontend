@@ -78,7 +78,7 @@ function InsightStrip({
     return (
       <div
         className="h-5 rounded-lg v2-skeleton-pulse"
-        style={{ background: 'var(--v2-bg-elevated)', width: '60%' }}
+        style={{ background: 'rgb(var(--background-tertiary))', width: '60%' }}
       />
     )
   }
@@ -96,7 +96,7 @@ function InsightStrip({
   }
 
   return (
-    <p className="text-xs leading-relaxed" style={{ color: 'var(--v2-text-hint)' }}>
+    <p className="text-xs leading-relaxed" style={{ color: 'rgb(var(--text-tertiary))' }}>
       {parts.join(' · ')}
     </p>
   )
@@ -111,16 +111,16 @@ function EmptyRecentSection({ title, message }: { title: string; message: string
     <div
       className="rounded-xl border flex flex-col items-center justify-center py-8"
       style={{
-        background: 'var(--v2-bg-surface)',
-        borderColor: 'var(--v2-border-default)',
+        background: 'rgb(var(--background-secondary))',
+        borderColor: 'rgb(var(--border-primary) / 0.35)',
         padding: 18,
       }}
     >
-      <Inbox className="w-7 h-7 mb-2" style={{ color: 'var(--v2-text-hint)', opacity: 0.35 }} />
-      <h3 className="text-xs font-medium mb-0.5" style={{ color: 'var(--v2-text-hint)' }}>
+      <Inbox className="w-7 h-7 mb-2" style={{ color: 'rgb(var(--text-tertiary))', opacity: 0.35 }} />
+      <h3 className="text-xs font-medium mb-0.5" style={{ color: 'rgb(var(--text-tertiary))' }}>
         {title}
       </h3>
-      <p className="text-xs" style={{ color: 'var(--v2-text-faint)' }}>
+      <p className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>
         {message}
       </p>
     </div>
@@ -139,9 +139,9 @@ export function Overview() {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
-          <DollarSign className="w-12 h-12 mx-auto mb-4 opacity-30" style={{ color: 'var(--v2-text-hint)' }} />
-          <h2 className="text-lg font-semibold" style={{ color: 'var(--v2-text-primary)' }}>Select a School</h2>
-          <p className="text-sm mt-1" style={{ color: 'var(--v2-text-hint)' }}>
+          <DollarSign className="w-12 h-12 mx-auto mb-4 opacity-30" style={{ color: 'rgb(var(--text-tertiary))' }} />
+          <h2 className="text-lg font-semibold" style={{ color: 'rgb(var(--text-primary))' }}>Select a School</h2>
+          <p className="text-sm mt-1" style={{ color: 'rgb(var(--text-tertiary))' }}>
             Choose a school from the top navigation to view financial data.
           </p>
         </div>
@@ -193,13 +193,13 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
               className="w-7 h-7 rounded-[7px] flex items-center justify-center"
               style={{ background: 'rgba(29, 158, 117, 0.12)' }}
             >
-              <DollarSign className="w-4 h-4" style={{ color: 'var(--v2-brand-primary)' }} />
+              <DollarSign className="w-4 h-4" style={{ color: '#1D9E75' }} />
             </div>
-            <h1 className="text-sm font-semibold" style={{ color: 'var(--v2-text-primary)' }}>
+            <h1 className="text-sm font-semibold" style={{ color: 'rgb(var(--text-primary))' }}>
               Finance
             </h1>
-            <span className="text-xs" style={{ color: 'var(--v2-text-ghost)' }}>|</span>
-            <span className="text-xs" style={{ color: 'var(--v2-text-faint)' }}>
+            <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>|</span>
+            <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>
               {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
             </span>
           </div>
@@ -208,11 +208,11 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
             <button
               onClick={() => navigate({ to: '/invoices/bulk-generate' })}
               aria-label="Bulk invoice generation"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40"
               style={{
-                background: 'var(--v2-bg-elevated)',
-                borderColor: 'var(--v2-border-default)',
-                color: 'var(--v2-text-secondary)',
+                background: 'rgb(var(--background-tertiary))',
+                borderColor: 'rgb(var(--border-primary) / 0.35)',
+                color: 'rgb(var(--text-secondary))',
               }}
             >
               <FileStack className="w-3.5 h-3.5" />
@@ -221,9 +221,9 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
             <button
               onClick={() => navigate({ to: '/payments/record' })}
               aria-label="Record a payment"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[var(--v2-brand-primary)]/40"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40"
               style={{
-                background: 'var(--v2-brand-primary)',
+                background: '#1D9E75',
                 color: '#fff',
               }}
             >
@@ -282,9 +282,9 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
             value={formatCompact(kpi.totalInvoiced)}
             icon={DollarSign}
             accentColor="rgba(29, 158, 117, 0.12)"
-            iconColor="var(--v2-brand-primary)"
-            barColor="var(--v2-brand-primary)"
-            tag={tagPill(`${kpi.totalInvoiceCount} invoices`, 'var(--v2-brand-primary)')}
+            iconColor="#1D9E75"
+            barColor="#1D9E75"
+            tag={tagPill(`${kpi.totalInvoiceCount} invoices`, '#1D9E75')}
             loading={isLoading}
           />
         </motion.div>

@@ -403,9 +403,9 @@ export default function InvoicesPage() {
               onClick={() => navigate({ to: '/invoices/bulk-generate' })}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80"
               style={{
-                background: 'var(--v2-bg-elevated)',
-                borderColor: 'var(--v2-border-default)',
-                color: 'var(--v2-text-secondary)',
+                background: 'rgb(var(--background-tertiary))',
+                borderColor: 'rgb(var(--border-primary) / 0.35)',
+                color: 'rgb(var(--text-secondary))',
               }}
             >
               <Users className="w-3.5 h-3.5" />
@@ -416,7 +416,7 @@ export default function InvoicesPage() {
               onClick={() => setShowGenerateForm(true)}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90"
               style={{
-                background: 'var(--v2-brand-primary)',
+                background: '#1D9E75',
                 color: '#fff',
               }}
             >

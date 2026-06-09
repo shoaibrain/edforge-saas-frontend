@@ -50,14 +50,14 @@ export function FeeStructureList({
               <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <span style={{
                   width: 6, height: 6, borderRadius: '50%',
-                  background: fee.isActive !== false ? '#1D9E75' : 'var(--v2-text-ghost, #2a3045)',
+                  background: fee.isActive !== false ? '#1D9E75' : 'rgb(var(--text-disabled))',
                   flexShrink: 0, display: 'inline-block'
                 }} />
-                <span style={{ fontSize: '12px', fontWeight: 500, color: 'var(--v2-text-primary, #e8eaf0)' }}>
+                <span style={{ fontSize: '12px', fontWeight: 500, color: 'rgb(var(--text-primary))' }}>
                   {fee.name}
                 </span>
               </div>
-              <span style={{ fontSize: '10px', color: 'var(--v2-text-hint, #4a5068)' }}>
+              <span style={{ fontSize: '10px', color: 'rgb(var(--text-tertiary))' }}>
                 {fee.description}
                 {fee.autoApplyOnEnrollment && (
                   <> · <span style={{ color: '#1D9E75' }}>Auto-apply on enrollment</span></>
@@ -82,10 +82,10 @@ export function FeeStructureList({
           const fee = row.original
           return (
             <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', gap: 3 }}>
-              <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--v2-text-primary, #e8eaf0)' }}>
+              <span style={{ fontSize: '13px', fontWeight: 600, color: 'rgb(var(--text-primary))' }}>
                 {formatCompact(fee.amount)}
               </span>
-              <span style={{ fontSize: '9px', color: 'var(--v2-text-ghost, #2a3045)' }}>
+              <span style={{ fontSize: '9px', color: 'rgb(var(--text-disabled))' }}>
                 {settings.currency} · {fee.frequency?.replace(/_/g, ' ').toLowerCase() ?? ''}
               </span>
             </div>

@@ -39,12 +39,12 @@ function FeedSkeleton() {
     <div className="space-y-3">
       {[1, 2, 3, 4, 5].map((i) => (
         <div key={i} className="flex items-center gap-3">
-          <div className="w-2 h-7 rounded-sm v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
+          <div className="w-2 h-7 rounded-sm v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
           <div className="flex-1 space-y-1">
-            <div className="h-3 w-28 rounded v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
-            <div className="h-2.5 w-20 rounded v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
+            <div className="h-3 w-28 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
+            <div className="h-2.5 w-20 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
           </div>
-          <div className="h-3 w-16 rounded v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
+          <div className="h-3 w-16 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
         </div>
       ))}
     </div>
@@ -60,19 +60,19 @@ export function RecentInvoicesCard({ invoices, isLoading }: RecentInvoicesCardPr
     <div
       className="rounded-xl border flex flex-col"
       style={{
-        background: 'var(--v2-bg-surface)',
-        borderColor: 'var(--v2-border-default)',
+        background: 'rgb(var(--background-secondary))',
+        borderColor: 'rgb(var(--border-primary) / 0.35)',
         padding: 18,
       }}
     >
-      <h3 className="text-sm font-medium mb-3" style={{ color: 'var(--v2-text-secondary)' }}>
+      <h3 className="text-sm font-medium mb-3" style={{ color: 'rgb(var(--text-secondary))' }}>
         Recent invoices
       </h3>
 
       {isLoading ? (
         <FeedSkeleton />
       ) : top5.length === 0 ? (
-        <p className="text-xs py-4" style={{ color: 'var(--v2-text-hint)' }}>No invoices yet.</p>
+        <p className="text-xs py-4" style={{ color: 'rgb(var(--text-tertiary))' }}>No invoices yet.</p>
       ) : (
         <div className="space-y-1">
           {top5.map((invoice) => {
@@ -92,7 +92,7 @@ export function RecentInvoicesCard({ invoices, isLoading }: RecentInvoicesCardPr
                 {/* Details */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-medium truncate" style={{ color: 'var(--v2-text-secondary)' }}>
+                    <span className="text-xs font-medium truncate" style={{ color: 'rgb(var(--text-secondary))' }}>
                       {invoice.invoiceNumber}
                     </span>
                     <span
@@ -102,14 +102,14 @@ export function RecentInvoicesCard({ invoices, isLoading }: RecentInvoicesCardPr
                       {formatInvoiceStatus(invoice.status)}
                     </span>
                   </div>
-                  <div className="text-xs truncate" style={{ color: 'var(--v2-text-faint)' }}>
+                  <div className="text-xs truncate" style={{ color: 'rgb(var(--text-disabled))' }}>
                     {invoice.studentName || 'Unknown'} · {formatRelativeDate(invoice.createdAt)}
                   </div>
                 </div>
 
                 {/* Amount */}
                 <div className="text-right flex-shrink-0">
-                  <div className="text-xs font-semibold" style={{ color: 'var(--v2-text-secondary)' }}>
+                  <div className="text-xs font-semibold" style={{ color: 'rgb(var(--text-secondary))' }}>
                     {format(invoice.grandTotal, { decimals: 0 })}
                   </div>
                   {invoice.amountDue > 0 && invoice.status !== 'paid' && (
