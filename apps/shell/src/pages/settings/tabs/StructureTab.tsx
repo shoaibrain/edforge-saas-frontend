@@ -168,7 +168,7 @@ function DepartmentsColumn({ schoolId }: { schoolId: string }) {
       </div>
 
       {/* Department list card */}
-      <div className="bg-[rgb(var(--background-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl overflow-hidden">
+      <div className="bg-[rgb(var(--background-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl">
         <div className="px-4 py-3 border-b border-[rgba(255,255,255,0.05)] flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-lg bg-[rgba(127,119,221,0.1)] flex items-center justify-center text-sm">🏛️</div>
