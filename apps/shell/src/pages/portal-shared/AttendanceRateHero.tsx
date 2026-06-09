@@ -37,7 +37,7 @@ export function AttendanceRateHero({
   if (loading) {
     return (
       <ContentSection staggerIndex={staggerIndex}>
-        <div className="rounded-xl p-6" style={{ background: 'var(--v2-bg-elevated)' }}>
+        <div className="rounded-xl p-6" style={{ background: 'rgb(var(--background-tertiary))' }}>
           <div className="flex flex-col sm:flex-row gap-6">
             <Skeleton className="h-24 w-32" />
             <div className="flex-1 grid grid-cols-2 gap-2">
@@ -60,8 +60,8 @@ export function AttendanceRateHero({
       <div
         className="rounded-2xl p-6 sm:p-8 border"
         style={{
-          background: 'linear-gradient(135deg, var(--v2-bg-elevated) 0%, color-mix(in srgb, var(--v2-brand-primary) 6%, var(--v2-bg-elevated)) 100%)',
-          borderColor: 'var(--v2-border-default)',
+          background: 'linear-gradient(135deg, rgb(var(--background-tertiary)) 0%, color-mix(in srgb, #1D9E75 6%, rgb(var(--background-tertiary))) 100%)',
+          borderColor: 'rgb(var(--border-primary) / 0.35)',
         }}
       >
         <div className="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
@@ -69,20 +69,20 @@ export function AttendanceRateHero({
           <div className="text-center sm:text-left shrink-0">
             <p
               className="font-display text-5xl font-medium tabular-nums tracking-tight"
-              style={{ color: 'var(--v2-text-primary)' }}
+              style={{ color: 'rgb(var(--text-primary))' }}
             >
               {displayRate}
             </p>
             <p
               className="text-xs uppercase tracking-[0.04em] mt-1"
-              style={{ color: 'var(--v2-text-muted)' }}
+              style={{ color: 'rgb(var(--text-tertiary))' }}
             >
               {t('attendance.yearToDate')}
             </p>
             {hasData && (
               <p
                 className="text-xs mt-2 max-w-52"
-                style={{ color: 'var(--v2-text-secondary)' }}
+                style={{ color: 'rgb(var(--text-secondary))' }}
               >
                 {attendanceRate >= 95
                   ? 'Excellent attendance so far.'
@@ -96,7 +96,7 @@ export function AttendanceRateHero({
             {!hasData && (
               <p
                 className="text-xs mt-2"
-                style={{ color: 'var(--v2-text-hint)' }}
+                style={{ color: 'rgb(var(--text-tertiary))' }}
               >
                 {t('attendance.noRecords')}
               </p>

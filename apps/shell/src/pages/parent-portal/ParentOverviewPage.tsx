@@ -124,8 +124,8 @@ export default function ParentOverviewPage() {
       value: gpaInsight.display,
       subtitle: gpaInsight.subtitle,
       icon: <GraduationCap size={18} />,
-      iconBgColor: 'var(--v2-status-excused-bg)',  // soft indigo
-      iconColor: 'var(--v2-status-excused)',
+      iconBgColor: 'rgb(var(--state-info-bg))',  // soft indigo
+      iconColor: 'rgb(var(--state-info-fg))',
       loading: gradesLoading,
       error: gradesError,
       onRetry: () => refetchGrades(),
@@ -135,8 +135,8 @@ export default function ParentOverviewPage() {
       value: attendanceInsight.display,
       subtitle: attendanceInsight.subtitle,
       icon: <CalendarCheck2 size={18} />,
-      iconBgColor: 'var(--v2-status-present-bg)',  // soft sage
-      iconColor: 'var(--v2-status-present)',
+      iconBgColor: 'rgb(var(--state-success-bg))',  // soft sage
+      iconColor: 'rgb(var(--state-success-fg))',
       loading: attendanceLoading,
       error: attendanceError,
       onRetry: () => refetchAttendance(),
@@ -146,8 +146,8 @@ export default function ParentOverviewPage() {
       value: assignmentsInsight.display,
       subtitle: assignmentsInsight.subtitle,
       icon: <FileText size={18} />,
-      iconBgColor: 'var(--v2-status-late-bg)',     // soft butter
-      iconColor: 'var(--v2-status-late)',
+      iconBgColor: 'rgb(var(--state-warning-bg))',     // soft butter
+      iconColor: 'rgb(var(--state-warning-fg))',
       loading: classworkLoading || sectionsLoading,
     },
     {
@@ -155,8 +155,8 @@ export default function ParentOverviewPage() {
       value: balanceInsight.display,
       subtitle: balanceInsight.subtitle,
       icon: <Wallet size={18} />,
-      iconBgColor: 'var(--v2-status-absent-bg)',   // soft terracotta
-      iconColor: 'var(--v2-status-absent)',
+      iconBgColor: 'rgb(var(--state-danger-bg))',   // soft terracotta
+      iconColor: 'rgb(var(--state-danger-fg))',
       loading: invoicesLoading,
     },
   ]

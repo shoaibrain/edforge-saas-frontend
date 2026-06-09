@@ -26,22 +26,22 @@ function AlertsSkeleton() {
           className="flex items-center gap-3 rounded-[10px] border"
           style={{
             padding: '11px 14px',
-            background: 'var(--v2-bg-surface)',
-            borderColor: 'var(--v2-border-default)',
+            background: 'rgb(var(--background-secondary))',
+            borderColor: 'rgb(var(--border-primary) / 0.35)',
           }}
         >
           <div
             className="w-7 h-7 rounded-[7px] flex-shrink-0 v2-skeleton-pulse"
-            style={{ background: 'var(--v2-bg-elevated)' }}
+            style={{ background: 'rgb(var(--background-tertiary))' }}
           />
           <div className="flex-1 space-y-1.5">
             <div
               className="h-3.5 w-48 rounded v2-skeleton-pulse"
-              style={{ background: 'var(--v2-bg-elevated)' }}
+              style={{ background: 'rgb(var(--background-tertiary))' }}
             />
             <div
               className="h-3 w-32 rounded v2-skeleton-pulse"
-              style={{ background: 'var(--v2-bg-elevated)' }}
+              style={{ background: 'rgb(var(--background-tertiary))' }}
             />
           </div>
         </div>

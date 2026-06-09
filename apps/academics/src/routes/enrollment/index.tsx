@@ -91,7 +91,7 @@ function YearProgressBar({ startDate, endDate }: { startDate: string; endDate: s
           style={{ width: `${progress}%`, background: '#1D9E75' }}
         />
       </div>
-      <span className="text-xs" style={{ color: 'var(--v2-text-hint)' }}>
+      <span className="text-xs" style={{ color: 'rgb(var(--text-tertiary))' }}>
         {progress}%
       </span>
     </div>
@@ -225,8 +225,8 @@ export function EnrollmentModule() {
       <div
         className="px-6 py-4"
         style={{
-          borderBottom: '1px solid var(--v2-border-default)',
-          background: 'var(--v2-bg-surface)',
+          borderBottom: '1px solid rgb(var(--border-primary) / 0.35)',
+          background: 'rgb(var(--background-secondary))',
         }}
       >
         <div className="flex items-center justify-between">
@@ -247,7 +247,7 @@ export function EnrollmentModule() {
               className="font-semibold"
               style={{
                 fontSize: 18,
-                color: 'var(--v2-text-primary)',
+                color: 'rgb(var(--text-primary))',
                 letterSpacing: '-0.3px',
               }}
             >
@@ -280,7 +280,7 @@ export function EnrollmentModule() {
                   style={{
                     background: 'rgba(255, 255, 255, 0.04)',
                     border: '1px solid rgba(255, 255, 255, 0.08)',
-                    color: 'var(--v2-text-secondary)',
+                    color: 'rgb(var(--text-secondary))',
                   }}
                 >
                   {academicYears.map((year: { yearId: string; name: string; status: string }) => (
@@ -297,7 +297,7 @@ export function EnrollmentModule() {
                     style={{
                       background: 'transparent',
                       border: '1px solid rgba(255, 255, 255, 0.1)',
-                      color: 'var(--v2-text-hint)',
+                      color: 'rgb(var(--text-tertiary))',
                     }}
                     title="Export enrollments as CSV"
                   >
@@ -331,7 +331,7 @@ export function EnrollmentModule() {
         {!summaryLoading && (
           <p
             className="mt-2"
-            style={{ fontSize: 11, color: 'var(--v2-text-hint)' }}
+            style={{ fontSize: 11, color: 'rgb(var(--text-tertiary))' }}
           >
             Registering a new student
             {activeYearObj ? ` · Academic year ${activeYearObj.name}` : ''}
@@ -341,7 +341,7 @@ export function EnrollmentModule() {
       </div>
 
       {/* Tab Navigation */}
-      <div className="px-6" style={{ background: 'var(--v2-bg-surface)' }}>
+      <div className="px-6" style={{ background: 'rgb(var(--background-secondary))' }}>
         <nav className="flex items-center gap-1" aria-label="Enrollment tabs">
           {tabItems
             .filter((tab) => tab.id !== 'registration' || enrollPerms.create)
@@ -363,7 +363,7 @@ export function EnrollmentModule() {
                       className="text-xs font-semibold px-1.5 py-0.5 rounded-full"
                       style={{
                         background: isActive ? 'rgba(29, 158, 117, 0.12)' : 'rgba(255, 255, 255, 0.06)',
-                        color: isActive ? '#1D9E75' : 'var(--v2-text-hint)',
+                        color: isActive ? '#1D9E75' : 'rgb(var(--text-tertiary))',
                       }}
                     >
                       {tab.count}
@@ -421,15 +421,15 @@ export function EnrollmentModule() {
                       startDate={activeYearObj.startDate}
                       endDate={activeYearObj.endDate}
                     />
-                    <div className="ml-auto flex items-center gap-3 text-xs" style={{ color: 'var(--v2-text-muted)' }}>
+                    <div className="ml-auto flex items-center gap-3 text-xs" style={{ color: 'rgb(var(--text-tertiary))' }}>
                       <span>
-                        <strong style={{ color: 'var(--v2-text-primary)' }}>{summary?.totalEnrolled ?? '--'}</strong> enrolled
+                        <strong style={{ color: 'rgb(var(--text-primary))' }}>{summary?.totalEnrolled ?? '--'}</strong> enrolled
                       </span>
                       <span>
-                        <strong style={{ color: 'var(--v2-text-primary)' }}>{activeCount}</strong> active
+                        <strong style={{ color: 'rgb(var(--text-primary))' }}>{activeCount}</strong> active
                       </span>
                       <span>
-                        <strong style={{ color: 'var(--v2-text-primary)' }}>{gradeLevelCount}</strong> grade levels
+                        <strong style={{ color: 'rgb(var(--text-primary))' }}>{gradeLevelCount}</strong> grade levels
                       </span>
                     </div>
                   </div>

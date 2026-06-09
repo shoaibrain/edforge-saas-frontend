@@ -97,7 +97,7 @@ export function InvoiceLedger({
       <ContentSection heading={t('fees.invoices')} staggerIndex={staggerIndex}>
         <div className="space-y-2 mt-3">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="h-14 rounded-xl v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
+            <div key={i} className="h-14 rounded-xl v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
           ))}
         </div>
       </ContentSection>
@@ -115,15 +115,15 @@ export function InvoiceLedger({
       </div>
 
       {filtered.length === 0 ? (
-        <p className="text-sm py-6" style={{ color: 'var(--v2-text-muted)' }}>
+        <p className="text-sm py-6" style={{ color: 'rgb(var(--text-tertiary))' }}>
           {t('empty.noData')}
         </p>
       ) : (
         <div
           className="rounded-xl border overflow-hidden"
           style={{
-            background: 'var(--v2-bg-surface)',
-            borderColor: 'var(--v2-border-default)',
+            background: 'rgb(var(--background-secondary))',
+            borderColor: 'rgb(var(--border-primary) / 0.35)',
           }}
         >
           {filtered.map((inv, i) => (
@@ -134,7 +134,7 @@ export function InvoiceLedger({
                 className="w-full text-left flex items-center gap-3 px-4 py-3 transition-colors"
                 style={{ background: 'transparent' }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'var(--v2-surface-interactive-hover)'
+                  e.currentTarget.style.background = 'rgb(var(--background-tertiary) / 0.7)'
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = 'transparent'
@@ -144,16 +144,16 @@ export function InvoiceLedger({
                 <div className="flex-1 min-w-0">
                   <p
                     className="text-sm font-medium truncate"
-                    style={{ color: 'var(--v2-text-primary)' }}
+                    style={{ color: 'rgb(var(--text-primary))' }}
                   >
                     {inv.invoiceNumber}
                     {inv.billingPeriod && (
-                      <span style={{ color: 'var(--v2-text-hint)' }}> — {inv.billingPeriod}</span>
+                      <span style={{ color: 'rgb(var(--text-tertiary))' }}> — {inv.billingPeriod}</span>
                     )}
                   </p>
                   <p
                     className="text-xs"
-                    style={{ color: 'var(--v2-text-hint)' }}
+                    style={{ color: 'rgb(var(--text-tertiary))' }}
                   >
                     {formatDate(inv.dueDate)}
                   </p>
@@ -162,7 +162,7 @@ export function InvoiceLedger({
                 {/* Amount */}
                 <span
                   className="text-sm font-semibold font-mono tabular-nums shrink-0"
-                  style={{ color: 'var(--v2-text-primary)' }}
+                  style={{ color: 'rgb(var(--text-primary))' }}
                 >
                   {formatCurrency(inv.grandTotal ?? 0)}
                 </span>
@@ -182,7 +182,7 @@ export function InvoiceLedger({
                     }}
                     className="text-xs font-medium px-2.5 py-1 rounded-lg shrink-0 transition-colors"
                     style={{
-                      background: 'var(--v2-brand-primary)',
+                      background: '#1D9E75',
                       color: '#fff',
                     }}
                   >

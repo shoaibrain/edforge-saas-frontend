@@ -90,12 +90,12 @@ export function MedicalStep({
         <div
           className="flex items-start gap-3 rounded-lg p-3"
           style={{
-            background: 'var(--v2-info-bg)',
-            border: '1px solid var(--v2-info-border)',
+            background: 'rgb(var(--state-info-bg))',
+            border: '1px solid rgb(var(--state-info-border))',
           }}
         >
-          <Info className="w-4 h-4 shrink-0 mt-0.5" style={{ color: 'var(--v2-info)' }} />
-          <p style={{ fontSize: 12, color: 'var(--v2-text-secondary)' }}>
+          <Info className="w-4 h-4 shrink-0 mt-0.5" style={{ color: 'rgb(var(--state-info-fg))' }} />
+          <p style={{ fontSize: 12, color: 'rgb(var(--text-secondary))' }}>
             All fields on this page are optional. You can skip this step and add information later.
           </p>
         </div>

@@ -135,7 +135,7 @@ function StandardsContent() {
         style={{
           fontSize: 14,
           fontWeight: 500,
-          color: 'var(--v2-text-primary, var(--text-primary, #e8eaf0))',
+          color: 'rgb(var(--text-primary))',
           marginBottom: 6,
         }}
       >
@@ -146,7 +146,7 @@ function StandardsContent() {
       <p
         style={{
           fontSize: 12,
-          color: 'var(--v2-text-faint, var(--text-muted, #5a6070))',
+          color: 'rgb(var(--text-disabled))',
           maxWidth: 320,
           lineHeight: 1.5,
           marginBottom: 16,
@@ -303,7 +303,7 @@ export function CurriculumModule() {
           {/* Title */}
           <h1
             className="text-lg font-semibold"
-            style={{ color: 'var(--v2-text-primary, var(--text-primary, #e8eaf0))', letterSpacing: -0.3 }}
+            style={{ color: 'rgb(var(--text-primary))', letterSpacing: -0.3 }}
           >
             Curriculum
           </h1>
@@ -312,7 +312,7 @@ export function CurriculumModule() {
           <span style={{ color: 'rgba(255,255,255,0.12)', fontSize: 13 }}>|</span>
           <span
             className="text-sm"
-            style={{ color: 'var(--v2-text-faint, var(--text-muted, #4a5068))' }}
+            style={{ color: 'rgb(var(--text-disabled))' }}
           >
             {today}
           </span>
@@ -331,7 +331,7 @@ export function CurriculumModule() {
                 fontSize: 12,
                 fontWeight: 500,
                 borderRadius: 8,
-                background: 'var(--v2-brand-primary, #1D9E75)',
+                background: '#1D9E75',
                 color: '#fff',
                 border: 'none',
                 cursor: 'pointer',
@@ -348,7 +348,7 @@ export function CurriculumModule() {
       <p
         className="text-xs"
         style={{
-          color: 'var(--v2-text-faint, var(--text-muted, #4a5068))',
+          color: 'rgb(var(--text-disabled))',
           marginBottom: 14,
         }}
       >

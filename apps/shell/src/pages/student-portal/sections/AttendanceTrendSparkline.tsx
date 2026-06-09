@@ -56,7 +56,7 @@ export function AttendanceTrendSparkline({
   if (loading) {
     return (
       <ContentSection heading={t('attendance.monthlyTrend')} staggerIndex={staggerIndex}>
-        <div className="h-32 rounded bg-[var(--v2-bg-elevated)] v2-skeleton-pulse mt-3" />
+        <div className="h-32 rounded bg-[rgb(var(--background-tertiary))] v2-skeleton-pulse mt-3" />
       </ContentSection>
     )
   }
@@ -64,7 +64,7 @@ export function AttendanceTrendSparkline({
   if (data.length < 2) {
     return (
       <ContentSection heading={t('attendance.monthlyTrend')} staggerIndex={staggerIndex}>
-        <p className="text-sm py-4" style={{ color: 'var(--v2-text-muted)' }}>
+        <p className="text-sm py-4" style={{ color: 'rgb(var(--text-tertiary))' }}>
           {t('attendance.noDataToGraph')}
         </p>
       </ContentSection>
@@ -78,31 +78,31 @@ export function AttendanceTrendSparkline({
           <AreaChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: 0 }}>
             <defs>
               <linearGradient id="rateGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="var(--v2-brand-primary)" stopOpacity={0.2} />
-                <stop offset="95%" stopColor="var(--v2-brand-primary)" stopOpacity={0} />
+                <stop offset="5%" stopColor="#1D9E75" stopOpacity={0.2} />
+                <stop offset="95%" stopColor="#1D9E75" stopOpacity={0} />
               </linearGradient>
             </defs>
             <XAxis
               dataKey="month"
-              tick={{ fontSize: 10, fill: 'var(--v2-text-hint)' }}
+              tick={{ fontSize: 10, fill: 'rgb(var(--text-tertiary))' }}
               axisLine={false}
               tickLine={false}
             />
             <YAxis domain={[0, 100]} hide />
             <Tooltip
               contentStyle={{
-                background: 'var(--v2-bg-elevated)',
-                border: '1px solid var(--v2-border-default)',
+                background: 'rgb(var(--background-tertiary))',
+                border: '1px solid rgb(var(--border-primary) / 0.35)',
                 borderRadius: 8,
                 fontSize: 12,
               }}
-              labelStyle={{ color: 'var(--v2-text-primary)' }}
+              labelStyle={{ color: 'rgb(var(--text-primary))' }}
               formatter={(value) => [`${value}%`, 'Rate']}
             />
             <Area
               type="monotone"
               dataKey="rate"
-              stroke="var(--v2-brand-primary)"
+              stroke="#1D9E75"
               strokeWidth={2}
               fill="url(#rateGradient)"
             />

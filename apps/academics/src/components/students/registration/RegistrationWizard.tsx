@@ -320,7 +320,7 @@ function RegistrationFooter() {
     <div
       className="sticky bottom-0 z-10 backdrop-blur-sm"
       style={{
-        background: 'var(--v2-bg-surface)',
+        background: 'rgb(var(--background-secondary))',
         borderTop: '1px solid rgba(255, 255, 255, 0.05)',
         marginTop: 20,
         paddingTop: 16,
@@ -354,7 +354,7 @@ function RegistrationFooter() {
               type="button"
               onClick={() => goToNext()}
               className="px-4 py-2 text-xs font-medium transition-colors hover:opacity-80"
-              style={{ color: 'var(--v2-text-hint)' }}
+              style={{ color: 'rgb(var(--text-tertiary))' }}
             >
               Skip
             </button>
@@ -433,7 +433,7 @@ function ContextSidebar() {
       <div style={sidebarCardStyle}>
         <div className="flex items-center gap-2 mb-3">
           <BookOpen className="w-3.5 h-3.5" style={{ color: '#1D9E75' }} />
-          <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--v2-text-secondary)' }}>
+          <span style={{ fontSize: 11, fontWeight: 500, color: 'rgb(var(--text-secondary))' }}>
             Enrollment Context
           </span>
         </div>
@@ -463,7 +463,7 @@ function ContextSidebar() {
       <div style={sidebarCardStyle}>
         <div className="flex items-center gap-2 mb-3">
           <Shield className="w-3.5 h-3.5" style={{ color: '#1D9E75' }} />
-          <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--v2-text-secondary)' }}>
+          <span style={{ fontSize: 11, fontWeight: 500, color: 'rgb(var(--text-secondary))' }}>
             Required for EdFi
           </span>
         </div>
@@ -494,7 +494,7 @@ function ContextSidebar() {
       <div style={sidebarCardStyle}>
         <div className="flex items-center gap-2 mb-3">
           <ListChecks className="w-3.5 h-3.5" style={{ color: '#1D9E75' }} />
-          <span style={{ fontSize: 11, fontWeight: 500, color: 'var(--v2-text-secondary)' }}>
+          <span style={{ fontSize: 11, fontWeight: 500, color: 'rgb(var(--text-secondary))' }}>
             Progress
           </span>
         </div>
@@ -551,7 +551,7 @@ function ContextSidebar() {
                       status === 'completed'
                         ? '#1D9E75'
                         : status === 'current'
-                          ? 'var(--v2-text-hint)'
+                          ? 'rgb(var(--text-tertiary))'
                           : '#3a4055',
                   }}
                 >
@@ -632,8 +632,8 @@ function WizardLayout({
         <div className="flex-1 min-w-0">
           <div
             style={{
-              background: 'var(--v2-bg-surface)',
-              border: '1px solid var(--v2-border-default)',
+              background: 'rgb(var(--background-secondary))',
+              border: '1px solid rgb(var(--border-primary) / 0.35)',
               borderRadius: 12,
               padding: 24,
             }}
@@ -649,7 +649,7 @@ function WizardLayout({
                 className="font-semibold"
                 style={{
                   fontSize: 13,
-                  color: 'var(--v2-text-primary)',
+                  color: 'rgb(var(--text-primary))',
                   letterSpacing: '-0.2px',
                 }}
               >
@@ -658,7 +658,7 @@ function WizardLayout({
               {currentStepData.description && (
                 <p
                   className="mt-1"
-                  style={{ fontSize: 11, color: 'var(--v2-text-muted)' }}
+                  style={{ fontSize: 11, color: 'rgb(var(--text-tertiary))' }}
                 >
                   {currentStepData.description}
                 </p>

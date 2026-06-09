@@ -53,7 +53,7 @@ export function HeroGreeting({
           style={{
             fontSize: 11,
             letterSpacing: '0.14em',
-            color: 'var(--v2-accent-purple, #6B3A6B)',
+            color: '#7F77DD',
             gap: 8,
           }}
         >
@@ -62,7 +62,7 @@ export function HeroGreeting({
             style={{
               width: 7,
               height: 7,
-              background: 'var(--v2-accent-purple, #6B3A6B)',
+              background: '#7F77DD',
             }}
           />
           {eyebrow}
@@ -73,7 +73,7 @@ export function HeroGreeting({
       <h1
         className="font-display-hero font-light tracking-tight"
         style={{
-          color: 'var(--v2-text-primary)',
+          color: 'rgb(var(--text-primary))',
           fontSize: 'clamp(38px, 5vw, 56px)',
           lineHeight: 0.98,
           letterSpacing: '-0.035em',
@@ -88,7 +88,7 @@ export function HeroGreeting({
         <p
           className="font-display italic font-light tracking-tight"
           style={{
-            color: 'var(--v2-text-secondary)',
+            color: 'rgb(var(--text-secondary))',
             fontSize: 'clamp(20px, 2.4vw, 28px)',
             lineHeight: 1.2,
             marginTop: 8,
@@ -103,7 +103,7 @@ export function HeroGreeting({
       {contextLine && (
         <p
           style={{
-            color: 'var(--v2-text-muted)',
+            color: 'rgb(var(--text-tertiary))',
             fontSize: 15,
             lineHeight: 1.55,
             marginTop: 14,

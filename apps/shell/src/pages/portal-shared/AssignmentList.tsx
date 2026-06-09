@@ -88,11 +88,11 @@ export function AssignmentList({
         <div
           className="border mt-4"
           style={{
-            background: 'var(--v2-bg-surface)',
-            borderColor: 'var(--v2-border-default)',
+            background: 'rgb(var(--background-secondary))',
+            borderColor: 'rgb(var(--border-primary) / 0.35)',
             borderRadius: 22,
             padding: '40px 30px',
-            boxShadow: 'var(--v2-shadow-card, 0 1px 3px rgba(0,0,0,0.06))',
+            boxShadow: 'var(--elevation-raised)',
             textAlign: 'center',
           }}
         >
@@ -101,14 +101,14 @@ export function AssignmentList({
             style={{
               fontSize: 18,
               fontWeight: 400,
-              color: 'var(--v2-text-secondary)',
+              color: 'rgb(var(--text-secondary))',
               marginBottom: 6,
             }}
           >
             {emptyMessage?.line1 ?? t('home.noAssignmentsThisWeek')}
           </p>
           {emptyMessage?.line2 && (
-            <p style={{ fontSize: 13, color: 'var(--v2-text-muted)' }}>
+            <p style={{ fontSize: 13, color: 'rgb(var(--text-tertiary))' }}>
               {emptyMessage.line2}
             </p>
           )}
@@ -117,11 +117,11 @@ export function AssignmentList({
         <div
           className="border mt-4 overflow-hidden"
           style={{
-            background: 'var(--v2-bg-surface)',
-            borderColor: 'var(--v2-border-default)',
+            background: 'rgb(var(--background-secondary))',
+            borderColor: 'rgb(var(--border-primary) / 0.35)',
             borderRadius: 22,
             padding: '20px 30px',
-            boxShadow: 'var(--v2-shadow-card, 0 1px 3px rgba(0,0,0,0.06))',
+            boxShadow: 'var(--elevation-raised)',
           }}
         >
           {thisWeekItems.map((item, i) => {
@@ -137,7 +137,7 @@ export function AssignmentList({
                         fontSize: 17,
                         fontWeight: 500,
                         letterSpacing: '-0.005em',
-                        color: 'var(--v2-text-primary)',
+                        color: 'rgb(var(--text-primary))',
                       }}
                     >
                       {item.title}
@@ -148,7 +148,7 @@ export function AssignmentList({
                         style={{
                           fontSize: 10,
                           letterSpacing: '0.08em',
-                          color: 'var(--v2-text-muted)',
+                          color: 'rgb(var(--text-tertiary))',
                           marginTop: 3,
                         }}
                       >
@@ -168,7 +168,7 @@ export function AssignmentList({
         <a
           href={viewAllHref}
           className="inline-block text-xs font-medium mt-2"
-          style={{ color: 'var(--v2-brand-primary)' }}
+          style={{ color: '#1D9E75' }}
         >
           {t('home.viewAll')} →
         </a>

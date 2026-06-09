@@ -71,16 +71,16 @@ function DonutSkeleton() {
     <div className="flex items-start gap-4">
       <div
         className="w-28 h-28 rounded-full v2-skeleton-pulse flex-shrink-0"
-        style={{ background: 'var(--v2-bg-elevated)' }}
+        style={{ background: 'rgb(var(--background-tertiary))' }}
       />
       <div className="flex-1 space-y-2.5 pt-2">
         {[1, 2, 3].map((i) => (
           <div key={i} className="flex justify-between">
             <div className="flex items-center gap-1.5">
-              <div className="w-2 h-2 rounded-full v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
-              <div className="h-3 w-16 rounded v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
+              <div className="w-2 h-2 rounded-full v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
+              <div className="h-3 w-16 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
             </div>
-            <div className="h-3 w-8 rounded v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
+            <div className="h-3 w-8 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
           </div>
         ))}
       </div>
@@ -92,10 +92,10 @@ function AttendanceSkeleton() {
   return (
     <div className="space-y-3">
       <div className="flex items-end gap-4">
-        <div className="h-8 w-16 rounded v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
-        <div className="flex-1 h-10 rounded v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
+        <div className="h-8 w-16 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
+        <div className="flex-1 h-10 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
       </div>
-      <div className="h-3 w-48 rounded v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
+      <div className="h-3 w-48 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
     </div>
   )
 }
@@ -109,13 +109,13 @@ function DonutTooltip({ active, payload }: any) {
     <div
       className="rounded-lg border px-3 py-2 text-xs shadow-lg"
       style={{
-        background: 'var(--v2-bg-surface)',
-        borderColor: 'var(--v2-border-default)',
-        color: 'var(--v2-text-secondary)',
+        background: 'rgb(var(--background-secondary))',
+        borderColor: 'rgb(var(--border-primary) / 0.35)',
+        color: 'rgb(var(--text-secondary))',
       }}
     >
       <div className="font-semibold">{d.name}</div>
-      <div style={{ color: 'var(--v2-text-faint)' }}>
+      <div style={{ color: 'rgb(var(--text-disabled))' }}>
         {d.value} student{d.value !== 1 ? 's' : ''} · {d.payload.pct}%
       </div>
     </div>
@@ -162,14 +162,14 @@ export function AcademicsHealthCard({
     <div
       className="rounded-xl border flex flex-col"
       style={{
-        background: 'var(--v2-bg-surface)',
-        borderColor: 'var(--v2-border-default)',
+        background: 'rgb(var(--background-secondary))',
+        borderColor: 'rgb(var(--border-primary) / 0.35)',
         padding: 18,
       }}
     >
       {/* ── Header ── */}
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium" style={{ color: 'var(--v2-text-secondary)' }}>
+        <h3 className="text-sm font-medium" style={{ color: 'rgb(var(--text-secondary))' }}>
           Academics health
         </h3>
         {!isLoading && hasEnrollmentData && todayAttendanceRate != null && todayAttendanceRate >= 90 && (
@@ -188,11 +188,11 @@ export function AcademicsHealthCard({
         <DonutSkeleton />
       ) : !hasEnrollmentData ? (
         <div className="flex flex-col items-center py-6">
-          <CheckCircle2 className="w-8 h-8 mb-2" style={{ color: 'var(--v2-text-hint)', opacity: 0.4 }} />
-          <p className="text-xs font-medium" style={{ color: 'var(--v2-text-hint)' }}>
+          <CheckCircle2 className="w-8 h-8 mb-2" style={{ color: 'rgb(var(--text-tertiary))', opacity: 0.4 }} />
+          <p className="text-xs font-medium" style={{ color: 'rgb(var(--text-tertiary))' }}>
             No enrollment data yet
           </p>
-          <p className="text-xs mt-0.5" style={{ color: 'var(--v2-text-faint)' }}>
+          <p className="text-xs mt-0.5" style={{ color: 'rgb(var(--text-disabled))' }}>
             Enroll students to see enrollment health data.
           </p>
         </div>
@@ -223,10 +223,10 @@ export function AcademicsHealthCard({
                 </PieChart>
               </ResponsiveContainer>
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <span className="text-sm font-semibold leading-none" style={{ color: 'var(--v2-text-primary)' }}>
+                <span className="text-sm font-semibold leading-none" style={{ color: 'rgb(var(--text-primary))' }}>
                   {total}
                 </span>
-                <span className="text-xs mt-0.5" style={{ color: 'var(--v2-text-faint)' }}>
+                <span className="text-xs mt-0.5" style={{ color: 'rgb(var(--text-disabled))' }}>
                   students
                 </span>
               </div>
@@ -238,15 +238,15 @@ export function AcademicsHealthCard({
                 <div key={item.name} className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
                     <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: item.color }} />
-                    <span className="text-xs" style={{ color: 'var(--v2-text-secondary)' }}>
+                    <span className="text-xs" style={{ color: 'rgb(var(--text-secondary))' }}>
                       {item.name}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs tabular-nums" style={{ color: 'var(--v2-text-faint)' }}>
+                    <span className="text-xs tabular-nums" style={{ color: 'rgb(var(--text-disabled))' }}>
                       {item.pct}%
                     </span>
-                    <span className="text-xs font-medium tabular-nums" style={{ color: 'var(--v2-text-secondary)' }}>
+                    <span className="text-xs font-medium tabular-nums" style={{ color: 'rgb(var(--text-secondary))' }}>
                       {item.value}
                     </span>
                   </div>
@@ -256,19 +256,19 @@ export function AcademicsHealthCard({
           </div>
 
           {/* ── Divider ── */}
-          <div className="my-4" style={{ height: 1, background: 'var(--v2-border-default)' }} />
+          <div className="my-4" style={{ height: 1, background: 'rgb(var(--border-primary) / 0.35)' }} />
 
           {/* ── Section 2: Attendance Health ── */}
           {isLoading ? (
             <AttendanceSkeleton />
           ) : todayAttendanceRate == null ? (
             <div className="flex items-center gap-3 py-3">
-              <ClipboardCheck className="w-5 h-5 flex-shrink-0" style={{ color: 'var(--v2-text-hint)', opacity: 0.5 }} />
+              <ClipboardCheck className="w-5 h-5 flex-shrink-0" style={{ color: 'rgb(var(--text-tertiary))', opacity: 0.5 }} />
               <div>
-                <p className="text-xs font-medium" style={{ color: 'var(--v2-text-hint)' }}>
+                <p className="text-xs font-medium" style={{ color: 'rgb(var(--text-tertiary))' }}>
                   No attendance data yet
                 </p>
-                <p className="text-xs mt-0.5" style={{ color: 'var(--v2-text-faint)' }}>
+                <p className="text-xs mt-0.5" style={{ color: 'rgb(var(--text-disabled))' }}>
                   Start recording attendance to see health metrics.
                 </p>
               </div>
@@ -277,11 +277,11 @@ export function AcademicsHealthCard({
             <div>
               {/* Section header */}
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium" style={{ color: 'var(--v2-text-secondary)' }}>
+                <span className="text-xs font-medium" style={{ color: 'rgb(var(--text-secondary))' }}>
                   Attendance health
                 </span>
                 {todayAttendanceSummary && (
-                  <span className="text-xs tabular-nums" style={{ color: 'var(--v2-text-faint)' }}>
+                  <span className="text-xs tabular-nums" style={{ color: 'rgb(var(--text-disabled))' }}>
                     {todayAttendanceSummary.totalRecorded ?? 0} of {todayAttendanceSummary.totalStudents} recorded
                   </span>
                 )}
@@ -303,7 +303,7 @@ export function AcademicsHealthCard({
                   >
                     %
                   </span>
-                  <p className="text-xs mt-1" style={{ color: 'var(--v2-text-faint)' }}>
+                  <p className="text-xs mt-1" style={{ color: 'rgb(var(--text-disabled))' }}>
                     today
                   </p>
                 </div>
@@ -330,7 +330,7 @@ export function AcademicsHealthCard({
                         />
                       </AreaChart>
                     </ResponsiveContainer>
-                    <p className="text-xs text-right mt-0.5" style={{ color: 'var(--v2-text-ghost)' }}>
+                    <p className="text-xs text-right mt-0.5" style={{ color: 'rgb(var(--text-disabled))' }}>
                       7-day trend
                     </p>
                   </div>
@@ -340,15 +340,15 @@ export function AcademicsHealthCard({
               {/* Summary text */}
               {todayAttendanceSummary && (
                 <div className="flex items-center gap-3 mt-3 flex-wrap">
-                  <span className="text-xs" style={{ color: 'var(--v2-text-faint)' }}>
+                  <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>
                     {todayAttendanceSummary.present} present
                   </span>
-                  <span className="text-xs" style={{ color: 'var(--v2-text-ghost)' }}>·</span>
-                  <span className="text-xs" style={{ color: todayAttendanceSummary.absent > 0 ? '#E24B4A' : 'var(--v2-text-faint)' }}>
+                  <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>·</span>
+                  <span className="text-xs" style={{ color: todayAttendanceSummary.absent > 0 ? '#E24B4A' : 'rgb(var(--text-disabled))' }}>
                     {todayAttendanceSummary.absent} absent
                   </span>
-                  <span className="text-xs" style={{ color: 'var(--v2-text-ghost)' }}>·</span>
-                  <span className="text-xs" style={{ color: todayAttendanceSummary.late > 0 ? '#EF9F27' : 'var(--v2-text-faint)' }}>
+                  <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>·</span>
+                  <span className="text-xs" style={{ color: todayAttendanceSummary.late > 0 ? '#EF9F27' : 'rgb(var(--text-disabled))' }}>
                     {todayAttendanceSummary.late} late
                   </span>
                 </div>
@@ -356,7 +356,7 @@ export function AcademicsHealthCard({
 
               {/* At-risk insight */}
               {atRiskCount > 0 && (
-                <p className="text-xs mt-2.5 leading-relaxed" style={{ color: 'var(--v2-text-hint)' }}>
+                <p className="text-xs mt-2.5 leading-relaxed" style={{ color: 'rgb(var(--text-tertiary))' }}>
                   {atRiskCount} student{atRiskCount !== 1 ? 's' : ''} below 90% attendance threshold over the past 90 days.
                 </p>
               )}

@@ -23,19 +23,19 @@ export function EnrollmentDashboard({ isLoading, activeYear }: EnrollmentDashboa
         style={{
           borderRadius: 10,
           border: '2px dashed rgba(239, 159, 39, 0.3)',
-          background: 'var(--v2-warning-bg)',
+          background: 'rgb(var(--state-warning-bg))',
         }}
       >
         <AlertTriangle className="w-10 h-10 mx-auto mb-3" style={{ color: '#EF9F27' }} />
         <h3
           className="font-semibold mb-2"
-          style={{ fontSize: 14, color: 'var(--v2-text-primary)' }}
+          style={{ fontSize: 14, color: 'rgb(var(--text-primary))' }}
         >
           No active academic year for this school
         </h3>
         <p
           className="max-w-md mx-auto"
-          style={{ fontSize: 12, color: 'var(--v2-text-muted)' }}
+          style={{ fontSize: 12, color: 'rgb(var(--text-tertiary))' }}
         >
           Set up and activate an academic year in School Settings to begin enrolling students and viewing enrollment data.
         </p>

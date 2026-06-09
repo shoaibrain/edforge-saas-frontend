@@ -34,25 +34,25 @@ const STATE_STYLES: Record<BillingState, {
   bg: string; border: string; borderLeft: string; text: string; eyebrowColor: string
 }> = {
   current: {
-    bg: 'linear-gradient(135deg, var(--v2-success-bg) 0%, color-mix(in srgb, var(--v2-brand-primary) 4%, var(--v2-bg-surface)) 100%)',
-    border: 'var(--v2-brand-primary)',
-    borderLeft: '6px solid var(--v2-brand-primary)',
-    text: 'var(--v2-brand-primary)',
-    eyebrowColor: 'var(--v2-brand-primary)',
+    bg: 'linear-gradient(135deg, rgb(var(--state-success-bg)) 0%, color-mix(in srgb, #1D9E75 4%, rgb(var(--background-secondary))) 100%)',
+    border: '#1D9E75',
+    borderLeft: '6px solid #1D9E75',
+    text: '#1D9E75',
+    eyebrowColor: '#1D9E75',
   },
   due: {
-    bg: 'var(--v2-bg-surface)',
-    border: 'var(--v2-border-default)',
-    borderLeft: '6px solid var(--v2-warning)',
-    text: 'var(--v2-text-primary)',
-    eyebrowColor: 'var(--v2-warning)',
+    bg: 'rgb(var(--background-secondary))',
+    border: 'rgb(var(--border-primary) / 0.35)',
+    borderLeft: '6px solid rgb(var(--state-warning-fg))',
+    text: 'rgb(var(--text-primary))',
+    eyebrowColor: 'rgb(var(--state-warning-fg))',
   },
   overdue: {
-    bg: 'linear-gradient(135deg, var(--v2-danger-bg) 0%, color-mix(in srgb, var(--v2-danger) 4%, var(--v2-bg-surface)) 100%)',
-    border: 'var(--v2-danger)',
-    borderLeft: '6px solid var(--v2-danger)',
-    text: 'var(--v2-danger)',
-    eyebrowColor: 'var(--v2-danger)',
+    bg: 'linear-gradient(135deg, rgb(var(--state-danger-bg)) 0%, color-mix(in srgb, rgb(var(--state-danger-fg)) 4%, rgb(var(--background-secondary))) 100%)',
+    border: 'rgb(var(--state-danger-fg))',
+    borderLeft: '6px solid rgb(var(--state-danger-fg))',
+    text: 'rgb(var(--state-danger-fg))',
+    eyebrowColor: 'rgb(var(--state-danger-fg))',
   },
 }
 
@@ -103,17 +103,17 @@ export function BillingCallout({
           borderLeft: styles.borderLeft,
           borderRadius: 22,
           padding: '26px 30px',
-          boxShadow: 'var(--v2-shadow-card, 0 1px 3px rgba(0,0,0,0.06))',
+          boxShadow: 'var(--elevation-raised)',
           display: 'grid',
           gridTemplateColumns: '1fr auto',
           alignItems: 'center',
           gap: 24,
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.boxShadow = 'var(--v2-shadow-hover, 0 4px 12px rgba(0,0,0,0.10))'
+          e.currentTarget.style.boxShadow = 'var(--elevation-overlay)'
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.boxShadow = 'var(--v2-shadow-card, 0 1px 3px rgba(0,0,0,0.06))'
+          e.currentTarget.style.boxShadow = 'var(--elevation-raised)'
         }}
       >
         <div>
@@ -137,7 +137,7 @@ export function BillingCallout({
           style={{
             fontSize: 11,
             letterSpacing: '0.1em',
-            color: 'var(--v2-text-muted)',
+            color: 'rgb(var(--text-tertiary))',
           }}
         >
           {t('fees.invoices')} →

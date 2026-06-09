@@ -25,7 +25,7 @@ export function ViewSwitcher({ activeView, onChange }: ViewSwitcherProps) {
   return (
     <div
       className="inline-flex rounded-lg p-0.5"
-      style={{ background: 'var(--v2-surface-interactive)' }}
+      style={{ background: 'rgb(var(--background-tertiary) / 0.6)' }}
       role="tablist"
     >
       {views.map(({ key, label }) => (
@@ -36,8 +36,8 @@ export function ViewSwitcher({ activeView, onChange }: ViewSwitcherProps) {
           aria-selected={activeView === key}
           className="px-3.5 py-1.5 rounded-md text-xs font-medium transition-colors"
           style={{
-            background: activeView === key ? 'var(--v2-bg-surface)' : 'transparent',
-            color: activeView === key ? 'var(--v2-text-primary)' : 'var(--v2-text-muted)',
+            background: activeView === key ? 'rgb(var(--background-secondary))' : 'transparent',
+            color: activeView === key ? 'rgb(var(--text-primary))' : 'rgb(var(--text-tertiary))',
             boxShadow: activeView === key ? '0 1px 2px rgba(0,0,0,0.06)' : 'none',
           }}
         >

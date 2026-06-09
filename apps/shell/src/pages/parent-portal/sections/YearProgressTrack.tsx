@@ -31,22 +31,22 @@ interface ProgressNode {
 
 const NODE_STYLES: Record<NodeStatus, { bg: string; border: string; text: string; icon: string }> = {
   paid: {
-    bg: 'var(--v2-success-bg)',
-    border: 'var(--v2-brand-primary)',
-    text: 'var(--v2-brand-primary)',
-    icon: 'var(--v2-brand-primary)',
+    bg: 'rgb(var(--state-success-bg))',
+    border: '#1D9E75',
+    text: '#1D9E75',
+    icon: '#1D9E75',
   },
   upcoming: {
-    bg: 'var(--v2-bg-surface)',
-    border: 'var(--v2-border-strong)',
-    text: 'var(--v2-text-muted)',
-    icon: 'var(--v2-text-muted)',
+    bg: 'rgb(var(--background-secondary))',
+    border: 'rgb(var(--border-tertiary))',
+    text: 'rgb(var(--text-tertiary))',
+    icon: 'rgb(var(--text-tertiary))',
   },
   overdue: {
-    bg: 'var(--v2-danger-bg)',
-    border: 'var(--v2-danger)',
-    text: 'var(--v2-danger)',
-    icon: 'var(--v2-danger)',
+    bg: 'rgb(var(--state-danger-bg))',
+    border: 'rgb(var(--state-danger-fg))',
+    text: 'rgb(var(--state-danger-fg))',
+    icon: 'rgb(var(--state-danger-fg))',
   },
 }
 
@@ -97,7 +97,7 @@ export function YearProgressTrack({
     >
       <p
         className="text-sm font-medium mb-4"
-        style={{ color: 'var(--v2-text-secondary)' }}
+        style={{ color: 'rgb(var(--text-secondary))' }}
       >
         {formatCurrency(totalAmount)} total
       </p>
@@ -114,8 +114,8 @@ export function YearProgressTrack({
                   className="w-8 sm:w-12 h-0.5"
                   style={{
                     background: node.status === 'paid' || nodes[i - 1].status === 'paid'
-                      ? 'var(--v2-brand-primary)'
-                      : 'var(--v2-border-default)',
+                      ? '#1D9E75'
+                      : 'rgb(var(--border-primary) / 0.35)',
                   }}
                 />
               )}
@@ -150,7 +150,7 @@ export function YearProgressTrack({
                 </span>
                 <span
                   className="text-xs font-mono tabular-nums"
-                  style={{ color: 'var(--v2-text-hint)' }}
+                  style={{ color: 'rgb(var(--text-tertiary))' }}
                 >
                   {formatCurrency(node.amount)}
                 </span>

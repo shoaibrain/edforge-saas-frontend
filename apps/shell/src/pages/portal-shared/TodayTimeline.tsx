@@ -137,11 +137,11 @@ export function TodayTimeline({
         <div
           className="border mt-4"
           style={{
-            background: 'var(--v2-bg-surface)',
-            borderColor: 'var(--v2-border-default)',
+            background: 'rgb(var(--background-secondary))',
+            borderColor: 'rgb(var(--border-primary) / 0.35)',
             borderRadius: 22,
             padding: '40px 30px',
-            boxShadow: 'var(--v2-shadow-card, 0 1px 3px rgba(0,0,0,0.06))',
+            boxShadow: 'var(--elevation-raised)',
             textAlign: 'center',
           }}
         >
@@ -150,14 +150,14 @@ export function TodayTimeline({
             style={{
               fontSize: 18,
               fontWeight: 400,
-              color: 'var(--v2-text-secondary)',
+              color: 'rgb(var(--text-secondary))',
               marginBottom: 6,
             }}
           >
             {emptyMessage?.line1 ?? t('schedule.noClassesToday')}
           </p>
           {emptyMessage?.line2 && (
-            <p style={{ fontSize: 13, color: 'var(--v2-text-muted)' }}>
+            <p style={{ fontSize: 13, color: 'rgb(var(--text-tertiary))' }}>
               {emptyMessage.line2}
             </p>
           )}
@@ -177,11 +177,11 @@ export function TodayTimeline({
       <div
         className="border mt-4"
         style={{
-          background: 'var(--v2-bg-surface)',
-          borderColor: 'var(--v2-border-default)',
+          background: 'rgb(var(--background-secondary))',
+          borderColor: 'rgb(var(--border-primary) / 0.35)',
           borderRadius: 22,
           padding: '28px 30px',
-          boxShadow: 'var(--v2-shadow-card, 0 1px 3px rgba(0,0,0,0.06))',
+          boxShadow: 'var(--elevation-raised)',
         }}
       >
         {entries.map((entry, i) => (
@@ -204,7 +204,7 @@ export function TodayTimeline({
                   style={{
                     fontSize: 12,
                     letterSpacing: '0.02em',
-                    color: 'var(--v2-text-muted)',
+                    color: 'rgb(var(--text-tertiary))',
                   }}
                 >
                   {entry.startTime.slice(0, 5)} – {entry.endTime.slice(0, 5)}
@@ -217,10 +217,10 @@ export function TodayTimeline({
                   className="w-2.5 h-2.5 rounded-full shrink-0"
                   style={{
                     background: entry.status === 'now'
-                      ? 'var(--v2-brand-primary)'
-                      : 'var(--v2-text-muted)',
+                      ? '#1D9E75'
+                      : 'rgb(var(--text-tertiary))',
                     boxShadow: entry.status === 'now'
-                      ? '0 0 0 3px var(--v2-success-bg)'
+                      ? '0 0 0 3px rgb(var(--state-success-bg))'
                       : 'none',
                   }}
                 />
@@ -231,14 +231,14 @@ export function TodayTimeline({
                       fontSize: 20,
                       fontWeight: 500,
                       letterSpacing: '-0.01em',
-                      color: 'var(--v2-text-primary)',
+                      color: 'rgb(var(--text-primary))',
                     }}
                   >
                     {entry.courseName}
                   </p>
                   {(entry.teacherName || entry.room) && (
                     <p
-                      style={{ fontSize: 12, color: 'var(--v2-text-muted)', marginTop: 2 }}
+                      style={{ fontSize: 12, color: 'rgb(var(--text-tertiary))', marginTop: 2 }}
                     >
                       {entry.teacherName}
                       {entry.teacherName && entry.room ? ' · ' : ''}
@@ -255,8 +255,8 @@ export function TodayTimeline({
                     className="inline-flex items-center gap-1.5 font-mono uppercase"
                     style={{
                       padding: '5px 10px',
-                      background: 'var(--v2-bg-elevated)',
-                      color: 'var(--v2-brand-primary)',
+                      background: 'rgb(var(--background-tertiary))',
+                      color: '#1D9E75',
                       borderRadius: 999,
                       fontSize: 10,
                       letterSpacing: '0.1em',
@@ -265,7 +265,7 @@ export function TodayTimeline({
                   >
                     <span
                       className="w-1.5 h-1.5 rounded-full animate-pulse"
-                      style={{ background: 'var(--v2-brand-primary)' }}
+                      style={{ background: '#1D9E75' }}
                     />
                     Now
                   </span>
@@ -276,7 +276,7 @@ export function TodayTimeline({
                     style={{
                       fontSize: 10,
                       letterSpacing: '0.1em',
-                      color: 'var(--v2-text-hint)',
+                      color: 'rgb(var(--text-tertiary))',
                     }}
                   >
                     Done

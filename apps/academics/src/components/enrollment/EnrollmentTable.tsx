@@ -138,7 +138,7 @@ function ActionMenu({
         type="button"
         onClick={() => setOpen(!open)}
         className="p-1.5 rounded-md transition-colors hover:opacity-80"
-        style={{ color: 'var(--v2-text-hint)' }}
+        style={{ color: 'rgb(var(--text-tertiary))' }}
       >
         <MoreHorizontal className="w-4 h-4" />
       </button>
@@ -148,8 +148,8 @@ function ActionMenu({
           <div
             className="absolute right-0 z-20 mt-1 w-44 rounded-lg py-1 overflow-hidden shadow-lg"
             style={{
-              background: 'var(--v2-bg-elevated)',
-              border: '1px solid var(--v2-border-default)',
+              background: 'rgb(var(--background-tertiary))',
+              border: '1px solid rgb(var(--border-primary) / 0.35)',
             }}
           >
             <button
@@ -229,7 +229,7 @@ export function EnrollmentTable({
         cell: ({ getValue, row }) => (
           <span
             className="font-medium"
-            style={{ fontSize: 12, color: 'var(--v2-text-primary)' }}
+            style={{ fontSize: 12, color: 'rgb(var(--text-primary))' }}
           >
             {getValue<string>() || <UuidBadge value={row.original.studentId} />}
           </span>
@@ -240,7 +240,7 @@ export function EnrollmentTable({
         header: 'Grade Level',
         enableSorting: true,
         cell: ({ getValue }) => (
-          <span style={{ fontSize: 12, color: 'var(--v2-text-secondary)' }}>
+          <span style={{ fontSize: 12, color: 'rgb(var(--text-secondary))' }}>
             {getValue<string>()}
           </span>
         ),
@@ -257,7 +257,7 @@ export function EnrollmentTable({
         header: 'Entry Date',
         enableSorting: true,
         cell: ({ getValue }) => (
-          <span style={{ fontSize: 12, color: 'var(--v2-text-secondary)' }}>
+          <span style={{ fontSize: 12, color: 'rgb(var(--text-secondary))' }}>
             {formatDate(getValue<string | null>())}
           </span>
         ),
@@ -273,7 +273,7 @@ export function EnrollmentTable({
             <span
               style={{
                 fontSize: 12,
-                color: val ? 'var(--v2-text-secondary)' : 'var(--v2-text-ghost)',
+                color: val ? 'rgb(var(--text-secondary))' : 'rgb(var(--text-disabled))',
               }}
             >
               {formatDate(val)}
@@ -286,7 +286,7 @@ export function EnrollmentTable({
         header: 'Type',
         enableSorting: true,
         cell: ({ getValue }) => (
-          <span style={{ fontSize: 12, color: 'var(--v2-text-secondary)' }}>
+          <span style={{ fontSize: 12, color: 'rgb(var(--text-secondary))' }}>
             {formatEnrollmentType(getValue<string>())}
           </span>
         ),
@@ -340,7 +340,7 @@ export function EnrollmentTable({
       }
       searchPlaceholder="Search students..."
       emptyState={{
-        icon: <Users className="w-10 h-10" style={{ color: 'var(--v2-text-ghost)', opacity: 0.4 }} />,
+        icon: <Users className="w-10 h-10" style={{ color: 'rgb(var(--text-disabled))', opacity: 0.4 }} />,
         title: 'No enrollments found',
         description: 'Try adjusting your filters or search term.',
       }}
@@ -374,7 +374,7 @@ export function EnrollmentTable({
               style={{
                 background: 'rgba(255, 255, 255, 0.04)',
                 border: '1px solid rgba(255, 255, 255, 0.08)',
-                color: 'var(--v2-text-hint)',
+                color: 'rgb(var(--text-tertiary))',
               }}
             >
               <X className="w-3 h-3" />

@@ -33,8 +33,8 @@ const QUICK_ACTIONS: QuickAction[] = [
     description: 'Enroll a new student',
     icon: UserPlus,
     href: '/academics/students',
-    iconBg: 'var(--v2-accent-enrollment)',
-    iconColor: 'var(--v2-brand-primary)',
+    iconBg: 'rgb(var(--accent-enrollment) / 0.12)',
+    iconColor: '#1D9E75',
   },
   {
     id: 'attendance',
@@ -42,8 +42,8 @@ const QUICK_ACTIONS: QuickAction[] = [
     description: 'Mark daily attendance',
     icon: ClipboardCheck,
     href: '/academics/classrooms?tab=attendance',
-    iconBg: 'var(--v2-accent-academics)',
-    iconColor: 'var(--v2-info)',
+    iconBg: 'rgb(var(--accent-academics) / 0.12)',
+    iconColor: 'rgb(var(--state-info-fg))',
   },
   {
     id: 'generate-invoice',
@@ -51,8 +51,8 @@ const QUICK_ACTIONS: QuickAction[] = [
     description: 'Bill enrolled students',
     icon: Receipt,
     href: '/finance/billing/invoices',
-    iconBg: 'var(--v2-accent-attendance)',
-    iconColor: 'var(--v2-warning)',
+    iconBg: 'rgb(var(--accent-attendance) / 0.12)',
+    iconColor: 'rgb(var(--state-warning-fg))',
   },
   {
     id: 'view-reports',
@@ -60,8 +60,8 @@ const QUICK_ACTIONS: QuickAction[] = [
     description: 'Analytics & insights',
     icon: Monitor,
     href: '/academics',
-    iconBg: 'var(--v2-accent-reports)',
-    iconColor: 'var(--v2-accent-purple)',
+    iconBg: 'rgb(var(--accent-reports) / 0.12)',
+    iconColor: '#7F77DD',
   },
   {
     id: 'manage-staff',
@@ -69,8 +69,8 @@ const QUICK_ACTIONS: QuickAction[] = [
     description: 'People & HR',
     icon: Users,
     href: '/people/staff',
-    iconBg: 'var(--v2-accent-staff)',
-    iconColor: 'var(--v2-coral)',
+    iconBg: 'rgb(var(--accent-coral) / 0.10)',
+    iconColor: 'rgb(var(--accent-coral))',
   },
   {
     id: 'settings',
@@ -78,8 +78,8 @@ const QUICK_ACTIONS: QuickAction[] = [
     description: 'Configure school',
     icon: Settings,
     href: '/settings',
-    iconBg: 'var(--v2-accent-settings)',
-    iconColor: 'var(--v2-text-hint)',
+    iconBg: 'rgb(var(--accent-settings) / 0.15)',
+    iconColor: 'rgb(var(--text-tertiary))',
   },
 ]
 
@@ -88,8 +88,8 @@ export function QuickActionsGridV2() {
     <div
       className="rounded-xl border"
       style={{
-        background: 'var(--v2-bg-surface)',
-        borderColor: 'var(--v2-border-default)',
+        background: 'rgb(var(--background-secondary))',
+        borderColor: 'rgb(var(--border-primary) / 0.35)',
         padding: 18,
       }}
     >
@@ -97,7 +97,7 @@ export function QuickActionsGridV2() {
       <div className="mb-3.5">
         <span
           className="text-sm font-medium"
-          style={{ color: 'var(--v2-text-secondary)' }}
+          style={{ color: 'rgb(var(--text-secondary))' }}
         >
           Quick actions
         </span>
@@ -111,17 +111,17 @@ export function QuickActionsGridV2() {
             to={action.href as any}
             className="flex flex-col gap-1.5 rounded-[9px] border p-3 no-underline"
             style={{
-              background: 'var(--v2-bg-app)',
-              borderColor: 'var(--v2-border-default)',
-              transition: 'background var(--v2-transition-fast), border-color var(--v2-transition-fast)',
+              background: 'rgb(var(--background-primary))',
+              borderColor: 'rgb(var(--border-primary) / 0.35)',
+              transition: 'background 150ms ease, border-color 150ms ease',
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'var(--v2-bg-surface)'
-              e.currentTarget.style.borderColor = 'var(--v2-border-hover)'
+              e.currentTarget.style.background = 'rgb(var(--background-secondary))'
+              e.currentTarget.style.borderColor = 'rgb(var(--border-primary) / 0.5)'
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'var(--v2-bg-app)'
-              e.currentTarget.style.borderColor = 'var(--v2-border-default)'
+              e.currentTarget.style.background = 'rgb(var(--background-primary))'
+              e.currentTarget.style.borderColor = 'rgb(var(--border-primary) / 0.35)'
             }}
           >
             <div
@@ -137,11 +137,11 @@ export function QuickActionsGridV2() {
             </div>
             <span
               className="text-xs font-medium"
-              style={{ color: 'var(--v2-text-secondary)' }}
+              style={{ color: 'rgb(var(--text-secondary))' }}
             >
               {action.label}
             </span>
-            <span className="text-xs" style={{ color: 'var(--v2-text-faint)' }}>
+            <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>
               {action.description}
             </span>
           </Link>

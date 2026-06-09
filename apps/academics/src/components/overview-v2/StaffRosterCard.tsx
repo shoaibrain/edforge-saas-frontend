@@ -90,13 +90,13 @@ function StaffSkeleton() {
         <div key={i} className="flex items-center gap-3">
           <div
             className="w-8 h-8 rounded-full v2-skeleton-pulse flex-shrink-0"
-            style={{ background: 'var(--v2-bg-elevated)' }}
+            style={{ background: 'rgb(var(--background-tertiary))' }}
           />
           <div className="flex-1 space-y-1">
-            <div className="h-3 w-20 rounded v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
-            <div className="h-2.5 w-28 rounded v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
+            <div className="h-3 w-20 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
+            <div className="h-2.5 w-28 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
           </div>
-          <div className="h-4 w-14 rounded-full v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
+          <div className="h-4 w-14 rounded-full v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
         </div>
       ))}
     </div>
@@ -130,8 +130,8 @@ export function StaffRosterCard({
     <div
       className="rounded-xl border flex flex-col"
       style={{
-        background: 'var(--v2-bg-surface)',
-        borderColor: 'var(--v2-border-default)',
+        background: 'rgb(var(--background-secondary))',
+        borderColor: 'rgb(var(--border-primary) / 0.35)',
         padding: 18,
       }}
     >
@@ -139,11 +139,11 @@ export function StaffRosterCard({
       <div className="flex items-center justify-between mb-3">
         <h3
           className="text-sm font-medium"
-          style={{ color: 'var(--v2-text-secondary)' }}
+          style={{ color: 'rgb(var(--text-secondary))' }}
         >
           Staff roster
         </h3>
-        <span className="text-xs font-medium" style={{ color: 'var(--v2-text-hint)' }}>
+        <span className="text-xs font-medium" style={{ color: 'rgb(var(--text-tertiary))' }}>
           {activeCount} active
         </span>
       </div>
@@ -153,11 +153,11 @@ export function StaffRosterCard({
         {isLoading ? (
           <StaffSkeleton />
         ) : isError ? (
-          <div className="text-sm py-4 text-center" style={{ color: 'var(--v2-text-hint)' }}>
+          <div className="text-sm py-4 text-center" style={{ color: 'rgb(var(--text-tertiary))' }}>
             Unable to load staff data
           </div>
         ) : displayStaff.length === 0 ? (
-          <div className="text-sm py-4 text-center" style={{ color: 'var(--v2-text-hint)' }}>
+          <div className="text-sm py-4 text-center" style={{ color: 'rgb(var(--text-tertiary))' }}>
             No staff members
           </div>
         ) : (
@@ -170,10 +170,10 @@ export function StaffRosterCard({
                   <StaffAvatar staff={s} />
                   {/* Info */}
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium truncate" style={{ color: 'var(--v2-text-secondary)' }}>
+                    <p className="text-xs font-medium truncate" style={{ color: 'rgb(var(--text-secondary))' }}>
                       {getDisplayName(s)}
                     </p>
-                    <p className="text-xs truncate" style={{ color: 'var(--v2-text-faint)' }}>
+                    <p className="text-xs truncate" style={{ color: 'rgb(var(--text-disabled))' }}>
                       {getRole(s)} · {getDepartment(s)}
                     </p>
                   </div>
@@ -197,11 +197,11 @@ export function StaffRosterCard({
       {/* Department coverage */}
       {departments.length > 0 && (
         <>
-          <div className="my-3" style={{ height: 1, background: 'var(--v2-border-default)' }} />
+          <div className="my-3" style={{ height: 1, background: 'rgb(var(--border-primary) / 0.35)' }} />
           <div className="space-y-1.5">
             {departments.slice(0, 4).map((dept) => (
               <div key={dept.name} className="flex items-center justify-between">
-                <span className="text-xs" style={{ color: 'var(--v2-text-faint)' }}>
+                <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>
                   {dept.name}
                 </span>
                 <span className="text-xs font-medium" style={{ color: '#1D9E75' }}>

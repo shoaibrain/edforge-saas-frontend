@@ -22,10 +22,10 @@ const TILES: Array<{
   color: string
   bg: string
 }> = [
-  { key: 'present', i18nKey: 'stats.presentDays', icon: CalendarCheck, color: 'var(--v2-status-present)', bg: 'var(--v2-status-present-bg)' },
-  { key: 'absent', i18nKey: 'stats.absentDays', icon: CalendarX2, color: 'var(--v2-status-absent)', bg: 'var(--v2-status-absent-bg)' },
-  { key: 'late', i18nKey: 'stats.lateDays', icon: Clock, color: 'var(--v2-status-late)', bg: 'var(--v2-status-late-bg)' },
-  { key: 'excused', i18nKey: 'stats.excusedDays', icon: ShieldCheck, color: 'var(--v2-status-excused)', bg: 'var(--v2-status-excused-bg)' },
+  { key: 'present', i18nKey: 'stats.presentDays', icon: CalendarCheck, color: 'rgb(var(--state-success-fg))', bg: 'rgb(var(--state-success-bg))' },
+  { key: 'absent', i18nKey: 'stats.absentDays', icon: CalendarX2, color: 'rgb(var(--state-danger-fg))', bg: 'rgb(var(--state-danger-bg))' },
+  { key: 'late', i18nKey: 'stats.lateDays', icon: Clock, color: 'rgb(var(--state-warning-fg))', bg: 'rgb(var(--state-warning-bg))' },
+  { key: 'excused', i18nKey: 'stats.excusedDays', icon: ShieldCheck, color: 'rgb(var(--state-info-fg))', bg: 'rgb(var(--state-info-bg))' },
 ]
 
 export function StatusTileGrid(props: StatusTileGridProps) {
@@ -51,7 +51,7 @@ export function StatusTileGrid(props: StatusTileGridProps) {
             </p>
             <p
               className="text-xs mt-0.5"
-              style={{ color: 'var(--v2-text-muted)' }}
+              style={{ color: 'rgb(var(--text-tertiary))' }}
             >
               {t(i18nKey)}
             </p>

@@ -25,8 +25,8 @@ function SnapshotSkeleton() {
     <div className="space-y-3">
       {[1, 2, 3, 4, 5, 6].map((i) => (
         <div key={i} className="flex items-center justify-between">
-          <div className="h-3 w-20 rounded v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
-          <div className="h-3 w-10 rounded v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
+          <div className="h-3 w-20 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
+          <div className="h-3 w-10 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
         </div>
       ))}
     </div>
@@ -47,14 +47,14 @@ function MetricRow({
   return (
     <div
       className="flex items-center justify-between py-1.5"
-      style={{ borderBottom: '1px solid var(--v2-border-default)' }}
+      style={{ borderBottom: '1px solid rgb(var(--border-primary) / 0.35)' }}
     >
-      <span className="text-xs" style={{ color: 'var(--v2-text-faint)' }}>
+      <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>
         {label}
       </span>
       <span
         className="text-xs font-medium"
-        style={{ color: valueColor || 'var(--v2-text-primary)' }}
+        style={{ color: valueColor || 'rgb(var(--text-primary))' }}
       >
         {valuePrefix}{value ?? '—'}
       </span>
@@ -76,15 +76,15 @@ export function EnrollmentSnapshotCard({
     <div
       className="rounded-xl border flex flex-col"
       style={{
-        background: 'var(--v2-bg-surface)',
-        borderColor: 'var(--v2-border-default)',
+        background: 'rgb(var(--background-secondary))',
+        borderColor: 'rgb(var(--border-primary) / 0.35)',
         padding: 18,
       }}
     >
       {/* Header */}
       <h3
         className="text-sm font-medium mb-3"
-        style={{ color: 'var(--v2-text-secondary)' }}
+        style={{ color: 'rgb(var(--text-secondary))' }}
       >
         Enrollment snapshot
       </h3>
@@ -98,7 +98,7 @@ export function EnrollmentSnapshotCard({
             <MetricRow
               label="Total enrolled"
               value={totalEnrolled?.toLocaleString() ?? '—'}
-              valueColor="var(--v2-text-primary)"
+              valueColor="rgb(var(--text-primary))"
             />
             <MetricRow
               label="Active status"
@@ -114,7 +114,7 @@ export function EnrollmentSnapshotCard({
             <MetricRow
               label="Withdrawals"
               value={withdrawals ?? 0}
-              valueColor="var(--v2-text-faint)"
+              valueColor="rgb(var(--text-disabled))"
             />
             <MetricRow
               label="Active sections"
@@ -140,7 +140,7 @@ export function EnrollmentSnapshotCard({
           <p className="text-xs font-medium" style={{ color: '#1D9E75' }}>
             Academic year on track
           </p>
-          <p className="text-xs mt-0.5" style={{ color: 'var(--v2-text-faint)' }}>
+          <p className="text-xs mt-0.5" style={{ color: 'rgb(var(--text-disabled))' }}>
             {academicYear.name} · {new Date(academicYear.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} – {new Date(academicYear.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
           </p>
         </div>

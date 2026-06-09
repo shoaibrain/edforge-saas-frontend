@@ -17,26 +17,26 @@ import { useTranslation } from '@edforge/i18n'
 
 const SEVERITY_CONFIG = {
   critical: {
-    bg: 'var(--v2-danger-bg)',
-    border: 'var(--v2-danger-border)',
+    bg: 'rgb(var(--state-danger-bg))',
+    border: 'rgb(var(--state-danger-border))',
     ctaBorder: 'rgba(226, 75, 74, 0.30)',
-    ctaBg: 'var(--v2-danger-bg)',
-    titleColor: 'var(--v2-danger)',
-    ctaColor: 'var(--v2-danger)',
+    ctaBg: 'rgb(var(--state-danger-bg))',
+    titleColor: 'rgb(var(--state-danger-fg))',
+    ctaColor: 'rgb(var(--state-danger-fg))',
     icon: AlertTriangle,
-    iconBg: 'var(--v2-danger-bg)',
-    iconColor: 'var(--v2-danger)',
+    iconBg: 'rgb(var(--state-danger-bg))',
+    iconColor: 'rgb(var(--state-danger-fg))',
   },
   warning: {
-    bg: 'var(--v2-warning-bg)',
-    border: 'var(--v2-warning-border)',
+    bg: 'rgb(var(--state-warning-bg))',
+    border: 'rgb(var(--state-warning-border))',
     ctaBorder: 'rgba(239, 159, 39, 0.30)',
-    ctaBg: 'var(--v2-warning-bg)',
-    titleColor: 'var(--v2-warning)',
-    ctaColor: 'var(--v2-warning)',
+    ctaBg: 'rgb(var(--state-warning-bg))',
+    titleColor: 'rgb(var(--state-warning-fg))',
+    ctaColor: 'rgb(var(--state-warning-fg))',
     icon: AlertTriangle,
-    iconBg: 'var(--v2-warning-bg)',
-    iconColor: 'var(--v2-warning)',
+    iconBg: 'rgb(var(--state-warning-bg))',
+    iconColor: 'rgb(var(--state-warning-fg))',
   },
 }
 
@@ -56,27 +56,27 @@ function AlertSkeleton() {
       className="flex items-center gap-3 rounded-[10px] border"
       style={{
         padding: '11px 14px',
-        background: 'var(--v2-bg-surface)',
-        borderColor: 'var(--v2-border-default)',
+        background: 'rgb(var(--background-secondary))',
+        borderColor: 'rgb(var(--border-primary) / 0.35)',
       }}
     >
       <div
         className="w-7 h-7 rounded-[7px] flex-shrink-0 v2-skeleton-pulse"
-        style={{ background: 'var(--v2-bg-elevated)' }}
+        style={{ background: 'rgb(var(--background-tertiary))' }}
       />
       <div className="flex-1 space-y-1.5">
         <div
           className="h-3.5 w-64 rounded v2-skeleton-pulse"
-          style={{ background: 'var(--v2-bg-elevated)' }}
+          style={{ background: 'rgb(var(--background-tertiary))' }}
         />
         <div
           className="h-3 w-44 rounded v2-skeleton-pulse"
-          style={{ background: 'var(--v2-bg-elevated)' }}
+          style={{ background: 'rgb(var(--background-tertiary))' }}
         />
       </div>
       <div
         className="h-6 w-20 rounded-md flex-shrink-0 v2-skeleton-pulse"
-        style={{ background: 'var(--v2-bg-elevated)' }}
+        style={{ background: 'rgb(var(--background-tertiary))' }}
       />
     </div>
   )
@@ -152,7 +152,7 @@ export function AlertsRow({ alerts, loading }: AlertsRowProps) {
                     </p>
                     <p
                       className="text-xs mt-0.5 truncate"
-                      style={{ color: 'var(--v2-text-faint)' }}
+                      style={{ color: 'rgb(var(--text-disabled))' }}
                     >
                       {alert.description}
                     </p>

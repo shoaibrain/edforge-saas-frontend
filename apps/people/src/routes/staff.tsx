@@ -328,11 +328,11 @@ export default function StaffPage() {
 
       {/* CONTEXT BANNER */}
       <Text variant="caption" className="mb-5">
-        <em className="font-medium not-italic text-[var(--v2-brand-accent,#D85A30)]">
+        <em className="font-medium not-italic text-[rgb(var(--accent-coral))]">
           {totalLoaded} active staff member{totalLoaded !== 1 ? 's' : ''}
         </em>
         {' · '}
-        <span className="font-medium text-[var(--v2-success)]">
+        <span className="font-medium text-[rgb(var(--state-success-fg))]">
           {teacherCount} teacher{teacherCount !== 1 ? 's' : ''}
         </span>
         {' · '}
@@ -375,12 +375,12 @@ export default function StaffPage() {
             value={isLoading ? '—' : supportCount.toString()}
             icon={Briefcase}
             accentColor={supportCount > 0 ? 'rgba(55,138,221,0.10)' : 'rgba(255,255,255,0.06)'}
-            iconColor={supportCount > 0 ? '#378ADD' : 'var(--v2-text-hint, #4a5068)'}
-            barColor={supportCount > 0 ? '#378ADD' : 'var(--v2-text-ghost, #2a3045)'}
-            valueColor={supportCount > 0 ? '#378ADD' : 'var(--v2-text-hint, #4a5068)'}
+            iconColor={supportCount > 0 ? '#378ADD' : 'rgb(var(--text-tertiary))'}
+            barColor={supportCount > 0 ? '#378ADD' : 'rgb(var(--text-disabled))'}
+            valueColor={supportCount > 0 ? '#378ADD' : 'rgb(var(--text-tertiary))'}
             tag={{
               text: supportCount > 0 ? 'active' : 'none yet',
-              color: supportCount > 0 ? '#378ADD' : 'var(--v2-text-hint, #4a5068)',
+              color: supportCount > 0 ? '#378ADD' : 'rgb(var(--text-tertiary))',
               bg: supportCount > 0 ? 'rgba(55,138,221,0.10)' : 'rgba(255,255,255,0.05)',
             }}
             loading={isLoading}

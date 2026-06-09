@@ -36,41 +36,41 @@ export interface StudentQuickProfileProps {
 
 const STATUS_STYLES: Record<string, { pill: string; dot: string }> = {
   active: {
-    pill: 'bg-[var(--v2-success-bg)] text-[var(--v2-success)]',
-    dot: 'bg-[var(--v2-success)]',
+    pill: 'bg-[rgb(var(--state-success-bg))] text-[rgb(var(--state-success-fg))]',
+    dot: 'bg-[rgb(var(--state-success-fg))]',
   },
   pending: {
-    pill: 'bg-[var(--v2-warning-bg)] text-[var(--v2-warning)]',
-    dot: 'bg-[var(--v2-warning)]',
+    pill: 'bg-[rgb(var(--state-warning-bg))] text-[rgb(var(--state-warning-fg))]',
+    dot: 'bg-[rgb(var(--state-warning-fg))]',
   },
   inactive: {
-    pill: 'bg-[rgb(var(--background-tertiary))] text-[var(--v2-text-hint)]',
-    dot: 'bg-[var(--v2-text-hint)]',
+    pill: 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]',
+    dot: 'bg-[rgb(var(--text-tertiary))]',
   },
   withdrawn: {
-    pill: 'bg-[var(--v2-danger-bg)] text-[var(--v2-danger)]',
-    dot: 'bg-[var(--v2-danger)]',
+    pill: 'bg-[rgb(var(--state-danger-bg))] text-[rgb(var(--state-danger-fg))]',
+    dot: 'bg-[rgb(var(--state-danger-fg))]',
   },
   suspended: {
-    pill: 'bg-[var(--v2-danger-bg)] text-[var(--v2-danger)]',
-    dot: 'bg-[var(--v2-danger)]',
+    pill: 'bg-[rgb(var(--state-danger-bg))] text-[rgb(var(--state-danger-fg))]',
+    dot: 'bg-[rgb(var(--state-danger-fg))]',
   },
   graduated: {
-    pill: 'bg-[var(--v2-info-bg)] text-[var(--v2-info)]',
-    dot: 'bg-[var(--v2-info)]',
+    pill: 'bg-[rgb(var(--state-info-bg))] text-[rgb(var(--state-info-fg))]',
+    dot: 'bg-[rgb(var(--state-info-fg))]',
   },
   transferred: {
-    pill: 'bg-[var(--v2-warning-bg)] text-[var(--v2-warning)]',
-    dot: 'bg-[var(--v2-warning)]',
+    pill: 'bg-[rgb(var(--state-warning-bg))] text-[rgb(var(--state-warning-fg))]',
+    dot: 'bg-[rgb(var(--state-warning-fg))]',
   },
 }
 const DEFAULT_STATUS = STATUS_STYLES.inactive
 
 function attColor(r: number | undefined) {
-  if (r == null) return 'var(--v2-text-ghost)'
-  if (r < 80) return 'var(--v2-danger)'
-  if (r < 90) return 'var(--v2-warning)'
-  return 'var(--v2-success)'
+  if (r == null) return 'rgb(var(--text-disabled))'
+  if (r < 80) return 'rgb(var(--state-danger-fg))'
+  if (r < 90) return 'rgb(var(--state-warning-fg))'
+  return 'rgb(var(--state-success-fg))'
 }
 
 // ============================================================================
@@ -127,13 +127,13 @@ export function StudentQuickProfile({
             <h2
               id="sqp-name"
               className="text-sm font-semibold truncate"
-              style={{ color: 'var(--v2-text-primary)', letterSpacing: '-0.2px', lineHeight: 1.25 }}
+              style={{ color: 'rgb(var(--text-primary))', letterSpacing: '-0.2px', lineHeight: 1.25 }}
             >
               {student.fullName}
             </h2>
             <div className="flex items-center gap-2 mt-[3px]">
               {student.studentNumber && (
-                <span className="font-mono text-xs" style={{ color: 'var(--v2-text-hint)' }}>
+                <span className="font-mono text-xs" style={{ color: 'rgb(var(--text-tertiary))' }}>
                   #{student.studentNumber}
                 </span>
               )}
@@ -150,10 +150,10 @@ export function StudentQuickProfile({
           <button
             type="button"
             onClick={onClose}
-            className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md border border-[var(--v2-border-default)] bg-[var(--v2-surface-interactive)] transition-colors hover:opacity-80 ${focusRingInset}`}
+            className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md border border-[rgb(var(--border-primary) / 0.35)] bg-[rgb(var(--background-tertiary) / 0.6)] transition-colors hover:opacity-80 ${focusRingInset}`}
             aria-label="Close"
           >
-            <X className="w-3.5 h-3.5" style={{ color: 'var(--v2-text-hint)' }} />
+            <X className="w-3.5 h-3.5" style={{ color: 'rgb(var(--text-tertiary))' }} />
           </button>
         </div>
       </QuickDrawer.Header>
@@ -165,11 +165,11 @@ export function StudentQuickProfile({
           {/* ── At-risk banner ── */}
           {isAtRisk && (
             <div
-              className="flex items-center gap-2 rounded-lg border border-[var(--v2-danger-border)] bg-[var(--v2-danger-bg)] px-3 py-2"
+              className="flex items-center gap-2 rounded-lg border border-[rgb(var(--state-danger-border))] bg-[rgb(var(--state-danger-bg))] px-3 py-2"
               role="alert"
             >
-              <AlertTriangle className="h-3.5 w-3.5 flex-shrink-0 text-[var(--v2-danger)]" />
-              <span className="text-xs font-medium text-[var(--v2-danger)]">
+              <AlertTriangle className="h-3.5 w-3.5 flex-shrink-0 text-[rgb(var(--state-danger-fg))]" />
+              <span className="text-xs font-medium text-[rgb(var(--state-danger-fg))]">
                 At-risk &middot; {attendanceRate!.toFixed(0)}% attendance (30-day)
               </span>
             </div>
@@ -192,14 +192,14 @@ export function StudentQuickProfile({
             />
             <div
               className="relative overflow-hidden flex flex-col items-center justify-center gap-0.5 py-2"
-              style={{ background: 'var(--v2-surface-inset)', border: '1px solid var(--v2-border-default)', borderRadius: 9 }}
+              style={{ background: 'rgb(var(--background-tertiary) / 0.5)', border: '1px solid rgb(var(--border-primary) / 0.35)', borderRadius: 9 }}
             >
               {attendanceRate != null ? (
                 <AttendanceDonutRing rate={attendanceRate} size={36} strokeWidth={3} showLabel />
               ) : (
-                <div className="w-5 h-5 rounded-full" style={{ border: '2px solid var(--v2-text-ghost)' }} />
+                <div className="w-5 h-5 rounded-full" style={{ border: '2px solid rgb(var(--text-disabled))' }} />
               )}
-              <div className="text-xs font-semibold uppercase tracking-[0.5px] mt-[2px]" style={{ color: 'var(--v2-text-ghost)' }}>
+              <div className="text-xs font-semibold uppercase tracking-[0.5px] mt-[2px]" style={{ color: 'rgb(var(--text-disabled))' }}>
                 Attendance
               </div>
               <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{ background: accent, opacity: 0.7 }} />
@@ -209,15 +209,15 @@ export function StudentQuickProfile({
           {/* ── Enrollment card ── */}
           <div
             style={{
-              background: 'var(--v2-surface-inset)',
-              border: '1px solid var(--v2-border-default)',
+              background: 'rgb(var(--background-tertiary) / 0.5)',
+              border: '1px solid rgb(var(--border-primary) / 0.35)',
               borderRadius: 10,
               padding: '12px 14px 14px',
             }}
           >
             <div
               className="text-xs font-bold uppercase tracking-[0.6px] mb-[10px] pb-[6px]"
-              style={{ color: 'var(--v2-text-ghost)', borderBottom: '1px solid var(--v2-border-default)' }}
+              style={{ color: 'rgb(var(--text-disabled))', borderBottom: '1px solid rgb(var(--border-primary) / 0.35)' }}
             >
               Enrollment
             </div>
@@ -234,8 +234,8 @@ export function StudentQuickProfile({
             className="flex gap-2 px-3 py-2"
             style={{ background: 'rgba(55,138,221,0.04)', border: '1px solid rgba(55,138,221,0.10)', borderRadius: 7 }}
           >
-            <Lock className="flex-shrink-0 mt-[1px]" style={{ width: 11, height: 11, color: 'var(--v2-info, #378ADD)' }} />
-            <span className="text-xs leading-snug" style={{ color: 'var(--v2-text-muted)' }}>
+            <Lock className="flex-shrink-0 mt-[1px]" style={{ width: 11, height: 11, color: 'rgb(var(--state-info-fg))' }} />
+            <span className="text-xs leading-snug" style={{ color: 'rgb(var(--text-tertiary))' }}>
               Demographics, contact info, and guardian details are on the full profile page.
             </span>
           </div>
@@ -276,16 +276,16 @@ function Tile({
   return (
     <div
       className="relative overflow-hidden flex flex-col items-center gap-1 py-2.5"
-      style={{ background: 'var(--v2-surface-inset)', border: '1px solid var(--v2-border-default)', borderRadius: 9 }}
+      style={{ background: 'rgb(var(--background-tertiary) / 0.5)', border: '1px solid rgb(var(--border-primary) / 0.35)', borderRadius: 9 }}
     >
       {icon}
       <div
         className="text-lg font-semibold leading-none"
-        style={{ color: muted ? 'var(--v2-text-hint)' : 'var(--v2-text-primary)', letterSpacing: '-0.4px' }}
+        style={{ color: muted ? 'rgb(var(--text-tertiary))' : 'rgb(var(--text-primary))', letterSpacing: '-0.4px' }}
       >
         {value}
       </div>
-      <div className="text-xs font-semibold uppercase tracking-[0.5px]" style={{ color: 'var(--v2-text-ghost)' }}>
+      <div className="text-xs font-semibold uppercase tracking-[0.5px]" style={{ color: 'rgb(var(--text-disabled))' }}>
         {label}
       </div>
       <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{ background: accent, opacity: muted ? 0.3 : 0.6 }} />
@@ -297,17 +297,17 @@ function Field({ label, value, sub }: { label: string; value: string; sub?: stri
   const empty = !value || value === '—'
   return (
     <div className="flex flex-col gap-0.5">
-      <div className="text-xs font-semibold uppercase tracking-[0.5px]" style={{ color: 'var(--v2-text-ghost)' }}>
+      <div className="text-xs font-semibold uppercase tracking-[0.5px]" style={{ color: 'rgb(var(--text-disabled))' }}>
         {label}
       </div>
       <div
         className="text-xs font-medium leading-tight"
-        style={{ color: empty ? 'var(--v2-text-hint)' : 'var(--v2-text-secondary)' }}
+        style={{ color: empty ? 'rgb(var(--text-tertiary))' : 'rgb(var(--text-secondary))' }}
       >
         {value}
       </div>
       {sub && (
-        <div className="text-xs" style={{ color: 'var(--v2-text-hint)' }}>{sub}</div>
+        <div className="text-xs" style={{ color: 'rgb(var(--text-tertiary))' }}>{sub}</div>
       )}
     </div>
   )

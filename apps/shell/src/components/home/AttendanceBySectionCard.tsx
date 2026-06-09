@@ -39,9 +39,9 @@ interface AttendanceBySectionCardProps {
 
 // Ticket 2.2: color coding for attendance rate
 function getRateColor(rate: number): string {
-  if (rate >= 90) return 'var(--v2-brand-primary)'
-  if (rate >= 75) return 'var(--v2-warning)'
-  return 'var(--v2-danger)'
+  if (rate >= 90) return '#1D9E75'
+  if (rate >= 75) return 'rgb(var(--state-warning-fg))'
+  return 'rgb(var(--state-danger-fg))'
 }
 
 function SectionSkeleton() {
@@ -55,7 +55,7 @@ function SectionSkeleton() {
                 key={h}
                 className="text-left text-xs font-medium pb-2 px-2"
                 scope="col"
-                style={{ color: 'var(--v2-text-hint)', borderBottom: '1px solid var(--v2-border-default)' }}
+                style={{ color: 'rgb(var(--text-tertiary))', borderBottom: '1px solid rgb(var(--border-primary) / 0.35)' }}
               >
                 {h}
               </th>
@@ -65,20 +65,20 @@ function SectionSkeleton() {
         <tbody>
           {Array.from({ length: 5 }).map((_, i) => (
             <tr key={i}>
-              <td className="py-2.5 px-2" style={{ borderBottom: i < 4 ? '1px solid var(--v2-border-default)' : 'none' }}>
-                <div className="h-3 rounded v2-skeleton-pulse" style={{ width: `${100 + Math.random() * 80}px`, background: 'var(--v2-bg-elevated)' }} />
+              <td className="py-2.5 px-2" style={{ borderBottom: i < 4 ? '1px solid rgb(var(--border-primary) / 0.35)' : 'none' }}>
+                <div className="h-3 rounded v2-skeleton-pulse" style={{ width: `${100 + Math.random() * 80}px`, background: 'rgb(var(--background-tertiary))' }} />
               </td>
-              <td className="py-2.5 px-2" style={{ borderBottom: i < 4 ? '1px solid var(--v2-border-default)' : 'none' }}>
-                <div className="h-3 w-8 rounded v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
+              <td className="py-2.5 px-2" style={{ borderBottom: i < 4 ? '1px solid rgb(var(--border-primary) / 0.35)' : 'none' }}>
+                <div className="h-3 w-8 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
               </td>
-              <td className="py-2.5 px-2" style={{ borderBottom: i < 4 ? '1px solid var(--v2-border-default)' : 'none' }}>
-                <div className="h-3 w-10 rounded v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
+              <td className="py-2.5 px-2" style={{ borderBottom: i < 4 ? '1px solid rgb(var(--border-primary) / 0.35)' : 'none' }}>
+                <div className="h-3 w-10 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
               </td>
-              <td className="py-2.5 px-2" style={{ borderBottom: i < 4 ? '1px solid var(--v2-border-default)' : 'none' }}>
-                <div className="h-3 w-10 rounded v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
+              <td className="py-2.5 px-2" style={{ borderBottom: i < 4 ? '1px solid rgb(var(--border-primary) / 0.35)' : 'none' }}>
+                <div className="h-3 w-10 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
               </td>
-              <td className="py-2.5 px-2" style={{ borderBottom: i < 4 ? '1px solid var(--v2-border-default)' : 'none' }}>
-                <div className="h-5 w-16 rounded-md v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
+              <td className="py-2.5 px-2" style={{ borderBottom: i < 4 ? '1px solid rgb(var(--border-primary) / 0.35)' : 'none' }}>
+                <div className="h-5 w-16 rounded-md v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
               </td>
             </tr>
           ))}
@@ -125,8 +125,8 @@ export function AttendanceBySectionCard({
     <div
       className="rounded-xl border"
       style={{
-        background: 'var(--v2-bg-surface)',
-        borderColor: 'var(--v2-border-default)',
+        background: 'rgb(var(--background-secondary))',
+        borderColor: 'rgb(var(--border-primary) / 0.35)',
         padding: 18,
       }}
     >
@@ -134,12 +134,12 @@ export function AttendanceBySectionCard({
       <div className="flex items-center justify-between mb-1">
         <span
           className="text-sm font-medium"
-          style={{ color: 'var(--v2-text-secondary)' }}
+          style={{ color: 'rgb(var(--text-secondary))' }}
         >
           {t('homeV2.attendance.classroomAttendance')}
         </span>
         {todayRate != null && (
-          <span className="text-xs font-medium" style={{ color: 'var(--v2-warning)' }}>
+          <span className="text-xs font-medium" style={{ color: 'rgb(var(--state-warning-fg))' }}>
             {todayRate.toFixed(1)}% today
           </span>
         )}
@@ -149,16 +149,16 @@ export function AttendanceBySectionCard({
       {!isLoading && sections.length > 0 && (
         <div
           className="flex items-center gap-3 mb-3 text-xs"
-          style={{ color: 'var(--v2-text-hint)' }}
+          style={{ color: 'rgb(var(--text-tertiary))' }}
         >
           <span>{sections.length} section{sections.length !== 1 ? 's' : ''} total</span>
-          <span style={{ color: 'var(--v2-border-default)' }}>·</span>
-          <span style={{ color: takenCount === sections.length ? 'var(--v2-brand-primary)' : undefined }}>
+          <span style={{ color: 'rgb(var(--border-primary) / 0.35)' }}>·</span>
+          <span style={{ color: takenCount === sections.length ? '#1D9E75' : undefined }}>
             {recordedCount}/{sections.length} recorded
           </span>
           {todayRate != null && (
             <>
-              <span style={{ color: 'var(--v2-border-default)' }}>·</span>
+              <span style={{ color: 'rgb(var(--border-primary) / 0.35)' }}>·</span>
               <span style={{ color: getRateColor(todayRate) }}>
                 {todayRate.toFixed(1)}% overall
               </span>
@@ -170,14 +170,14 @@ export function AttendanceBySectionCard({
       {/* Ticket 2.5: Empty state for no academic year */}
       {!isLoading && !academicYearId ? (
         <div className="flex flex-col items-center gap-2 py-8">
-          <Settings className="w-5 h-5" style={{ color: 'var(--v2-text-faint)' }} />
-          <p className="text-sm text-center" style={{ color: 'var(--v2-text-hint)' }}>
+          <Settings className="w-5 h-5" style={{ color: 'rgb(var(--text-disabled))' }} />
+          <p className="text-sm text-center" style={{ color: 'rgb(var(--text-tertiary))' }}>
             {t('homeV2.attendance.noAcademicYear')}
           </p>
           <a
             href="/settings/organization"
             className="text-xs font-medium transition-opacity hover:opacity-80"
-            style={{ color: 'var(--v2-brand-primary)' }}
+            style={{ color: '#1D9E75' }}
           >
             {t('homeV2.attendance.setupAcademicYear')}
           </a>
@@ -185,7 +185,7 @@ export function AttendanceBySectionCard({
       ) : isLoading ? (
         <SectionSkeleton />
       ) : sections.length === 0 ? (
-        <p className="text-sm py-6 text-center" style={{ color: 'var(--v2-text-hint)' }}>
+        <p className="text-sm py-6 text-center" style={{ color: 'rgb(var(--text-tertiary))' }}>
           {t('homeV2.attendance.noSectionsToday')}
         </p>
       ) : (
@@ -200,21 +200,21 @@ export function AttendanceBySectionCard({
                 <th
                   scope="col"
                   className="text-left text-xs font-medium pb-2 px-2"
-                  style={{ color: 'var(--v2-text-hint)', borderBottom: '1px solid var(--v2-border-default)' }}
+                  style={{ color: 'rgb(var(--text-tertiary))', borderBottom: '1px solid rgb(var(--border-primary) / 0.35)' }}
                 >
                   {t('homeV2.attendance.section')}
                 </th>
                 <th
                   scope="col"
                   className="text-center text-xs font-medium pb-2 px-2"
-                  style={{ color: 'var(--v2-text-hint)', borderBottom: '1px solid var(--v2-border-default)', width: 80 }}
+                  style={{ color: 'rgb(var(--text-tertiary))', borderBottom: '1px solid rgb(var(--border-primary) / 0.35)', width: 80 }}
                 >
                   {t('homeV2.attendance.students')}
                 </th>
                 <th
                   scope="col"
                   className="text-center text-xs font-medium pb-2 px-2"
-                  style={{ color: 'var(--v2-text-hint)', borderBottom: '1px solid var(--v2-border-default)', width: 80 }}
+                  style={{ color: 'rgb(var(--text-tertiary))', borderBottom: '1px solid rgb(var(--border-primary) / 0.35)', width: 80 }}
                 >
                   {t('homeV2.attendance.recordedCol')}
                 </th>
@@ -222,14 +222,14 @@ export function AttendanceBySectionCard({
                 <th
                   scope="col"
                   className="text-center text-xs font-medium pb-2 px-2"
-                  style={{ color: 'var(--v2-text-hint)', borderBottom: '1px solid var(--v2-border-default)', width: 70 }}
+                  style={{ color: 'rgb(var(--text-tertiary))', borderBottom: '1px solid rgb(var(--border-primary) / 0.35)', width: 70 }}
                 >
                   {t('homeV2.attendance.rate')}
                 </th>
                 <th
                   scope="col"
                   className="text-right text-xs font-medium pb-2 px-2"
-                  style={{ color: 'var(--v2-text-hint)', borderBottom: '1px solid var(--v2-border-default)', width: 90 }}
+                  style={{ color: 'rgb(var(--text-tertiary))', borderBottom: '1px solid rgb(var(--border-primary) / 0.35)', width: 90 }}
                 >
                   {t('homeV2.attendance.status')}
                 </th>
@@ -252,56 +252,56 @@ export function AttendanceBySectionCard({
                     tabIndex={0}
                     role="link"
                     style={{ cursor: 'pointer' }}
-                    className="transition-colors hover:bg-[var(--v2-bg-elevated)] focus-visible:bg-[var(--v2-bg-elevated)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--v2-brand-primary)]"
+                    className="transition-colors hover:bg-[rgb(var(--background-tertiary))] focus-visible:bg-[rgb(var(--background-tertiary))] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#1D9E75]"
                   >
                     <td
                       className="py-2.5 px-2"
                       style={{
-                        borderBottom: i < sections.length - 1 ? '1px solid var(--v2-border-default)' : 'none',
+                        borderBottom: i < sections.length - 1 ? '1px solid rgb(var(--border-primary) / 0.35)' : 'none',
                       }}
                     >
-                      <span className="text-xs" style={{ color: 'var(--v2-text-muted)' }}>
+                      <span className="text-xs" style={{ color: 'rgb(var(--text-tertiary))' }}>
                         {section.name}
                       </span>
                     </td>
                     <td
                       className="text-center py-2.5 px-2"
                       style={{
-                        borderBottom: i < sections.length - 1 ? '1px solid var(--v2-border-default)' : 'none',
+                        borderBottom: i < sections.length - 1 ? '1px solid rgb(var(--border-primary) / 0.35)' : 'none',
                       }}
                     >
                       {section.studentCount != null ? (
-                        <span className="inline-flex items-center gap-1 text-xs" style={{ color: 'var(--v2-text-hint)' }}>
+                        <span className="inline-flex items-center gap-1 text-xs" style={{ color: 'rgb(var(--text-tertiary))' }}>
                           <Users className="w-2.5 h-2.5" />
                           {section.studentCount}
                         </span>
                       ) : (
-                        <span className="text-xs" style={{ color: 'var(--v2-text-faint)' }}>—</span>
+                        <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>—</span>
                       )}
                     </td>
                     <td
                       className="text-center py-2.5 px-2"
                       style={{
-                        borderBottom: i < sections.length - 1 ? '1px solid var(--v2-border-default)' : 'none',
+                        borderBottom: i < sections.length - 1 ? '1px solid rgb(var(--border-primary) / 0.35)' : 'none',
                       }}
                     >
                       {section.recordedCount != null && section.studentCount != null ? (
                         <span className="text-xs" style={{
                           color: section.recordedCount === section.studentCount
-                            ? 'var(--v2-brand-primary)'
-                            : 'var(--v2-text-hint)',
+                            ? '#1D9E75'
+                            : 'rgb(var(--text-tertiary))',
                         }}>
                           {section.recordedCount}/{section.studentCount}
                         </span>
                       ) : (
-                        <span className="text-xs" style={{ color: 'var(--v2-text-faint)' }}>—</span>
+                        <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>—</span>
                       )}
                     </td>
                     {/* Ticket 2.2: Rate cell with color coding */}
                     <td
                       className="text-center py-2.5 px-2"
                       style={{
-                        borderBottom: i < sections.length - 1 ? '1px solid var(--v2-border-default)' : 'none',
+                        borderBottom: i < sections.length - 1 ? '1px solid rgb(var(--border-primary) / 0.35)' : 'none',
                       }}
                     >
                       {rate != null ? (
@@ -312,21 +312,21 @@ export function AttendanceBySectionCard({
                           {rate.toFixed(0)}%
                         </span>
                       ) : (
-                        <span className="text-xs" style={{ color: 'var(--v2-text-faint)' }}>—</span>
+                        <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>—</span>
                       )}
                     </td>
                     <td
                       className="text-right py-2.5 px-2"
                       style={{
-                        borderBottom: i < sections.length - 1 ? '1px solid var(--v2-border-default)' : 'none',
+                        borderBottom: i < sections.length - 1 ? '1px solid rgb(var(--border-primary) / 0.35)' : 'none',
                       }}
                     >
                       {section.status === 'taken' ? (
                         <span
                           className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-md"
                           style={{
-                            background: 'var(--v2-accent-enrollment)',
-                            color: 'var(--v2-brand-primary)',
+                            background: 'rgb(var(--accent-enrollment) / 0.12)',
+                            color: '#1D9E75',
                           }}
                           aria-label="Attendance taken"
                         >
@@ -337,7 +337,7 @@ export function AttendanceBySectionCard({
                         <span
                           className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-md"
                           style={{
-                            background: 'var(--v2-accent-academics)',
+                            background: 'rgb(var(--accent-academics) / 0.12)',
                             color: '#378ADD',
                           }}
                           aria-label="Attendance partially taken"
@@ -349,8 +349,8 @@ export function AttendanceBySectionCard({
                         <span
                           className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-md"
                           style={{
-                            background: 'var(--v2-accent-attendance)',
-                            color: 'var(--v2-warning)',
+                            background: 'rgb(var(--accent-attendance) / 0.12)',
+                            color: 'rgb(var(--state-warning-fg))',
                           }}
                           aria-label="Attendance pending"
                         >

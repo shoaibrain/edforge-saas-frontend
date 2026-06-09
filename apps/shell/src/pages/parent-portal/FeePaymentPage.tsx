@@ -120,8 +120,8 @@ export default function FeePaymentPage() {
   if (!schoolId) {
     return (
       <div className="text-center py-16">
-        <CreditCard className="w-10 h-10 mx-auto mb-3 opacity-40" style={{ color: 'var(--v2-text-hint)' }} />
-        <p className="text-sm" style={{ color: 'var(--v2-text-hint)' }}>
+        <CreditCard className="w-10 h-10 mx-auto mb-3 opacity-40" style={{ color: 'rgb(var(--text-tertiary))' }} />
+        <p className="text-sm" style={{ color: 'rgb(var(--text-tertiary))' }}>
           Select a school to view fee payments.
         </p>
       </div>
@@ -135,11 +135,11 @@ export default function FeePaymentPage() {
   if (invoicesError && (invoicesError as any)?.response?.status === 403) {
     return (
       <div className="text-center py-16">
-        <ShieldX className="w-10 h-10 mx-auto mb-3" style={{ color: 'var(--v2-warning)' }} />
-        <p className="text-sm font-medium" style={{ color: 'var(--v2-text-primary)' }}>
+        <ShieldX className="w-10 h-10 mx-auto mb-3" style={{ color: 'rgb(var(--state-warning-fg))' }} />
+        <p className="text-sm font-medium" style={{ color: 'rgb(var(--text-primary))' }}>
           You don't have permission to view billing information.
         </p>
-        <p className="text-xs mt-1" style={{ color: 'var(--v2-text-hint)' }}>
+        <p className="text-xs mt-1" style={{ color: 'rgb(var(--text-tertiary))' }}>
           Please contact your school administrator if you believe this is an error.
         </p>
       </div>
@@ -150,8 +150,8 @@ export default function FeePaymentPage() {
   if (invoicesError) {
     return (
       <div className="text-center py-16">
-        <AlertTriangle className="w-10 h-10 mx-auto mb-3" style={{ color: 'var(--v2-danger)' }} />
-        <p className="text-sm font-medium" style={{ color: 'var(--v2-text-primary)' }}>
+        <AlertTriangle className="w-10 h-10 mx-auto mb-3" style={{ color: 'rgb(var(--state-danger-fg))' }} />
+        <p className="text-sm font-medium" style={{ color: 'rgb(var(--text-primary))' }}>
           {t('error.failedToLoad')}
         </p>
       </div>
