@@ -15,7 +15,7 @@ import {
   ToggleRight,
   Users,
 } from 'lucide-react'
-import { TanstackDataTable, createActionsColumn, type ColumnDef } from '@edforge/ui'
+import { TanstackDataTable, createActionsColumn, StatusBadge, type ColumnDef } from '@edforge/ui'
 import type { SectionResponseDto } from '@aibrains/shared-types'
 import {
   getCapacityColor,
@@ -266,16 +266,9 @@ export function SectionTable({
         size: 80,
         enableSorting: false,
         cell: ({ row }) => (
-          <div className="flex items-center gap-1.5">
-            <div
-              className={`w-2 h-2 rounded-full ${
-                row.original.isActive ? 'bg-[rgb(var(--state-success-bg)/0.18)]0' : 'bg-[rgb(var(--text-tertiary))]'
-              }`}
-            />
-            <span className="text-xs text-text-secondary">
-              {row.original.isActive ? 'Active' : 'Inactive'}
-            </span>
-          </div>
+          <StatusBadge tone={row.original.isActive ? 'success' : 'neutral'} dot>
+            {row.original.isActive ? 'Active' : 'Inactive'}
+          </StatusBadge>
         ),
       },
       createActionsColumn<SectionResponseDto>({

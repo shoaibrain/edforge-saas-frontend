@@ -2,12 +2,13 @@
  * SectionForm Component
  *
  * Form for creating/editing a class section.
- * Uses @edforge/forms components + custom teacher/course selectors.
+ * Uses react-hook-form context + @edforge/ui form primitives.
  */
 
 import { useEffect } from 'react'
-import { useFormContext } from 'react-hook-form'
+import { useFormContext, Controller } from 'react-hook-form'
 import { User, BookOpen, MapPin } from 'lucide-react'
+import { Field, Input, Select } from '@edforge/ui'
 import { useCourses, flattenCoursePages } from '../../hooks/useCourses'
 import { useCourseOfferings, flattenOfferingPages } from '../../hooks/useCourseOfferings'
 import { useSchoolStaff, flattenStaffData, getStaffDisplayName } from '../../hooks/useStaff'
@@ -49,33 +50,6 @@ function FormSection({
 }
 
 // ============================================================================
-// FIELD WRAPPER
-// ============================================================================
-
-function Field({
-  label,
-  required,
-  error,
-  children,
-}: {
-  label: string
-  required?: boolean
-  error?: string
-  children: React.ReactNode
-}) {
-  return (
-    <div className="space-y-1.5">
-      <label className="block text-sm font-medium text-text-secondary">
-        {label}
-        {required && <span className="text-[rgb(var(--state-danger-fg))] ml-0.5">*</span>}
-      </label>
-      {children}
-      {error && <p className="text-xs text-[rgb(var(--state-danger-fg))]">{error}</p>}
-    </div>
-  )
-}
-
-// ============================================================================
 // SECTION FORM
 // ============================================================================
 
@@ -87,6 +61,7 @@ export function SectionForm({ isEdit }: SectionFormProps) {
   const schoolId = useActiveSchoolId() || ''
   const {
     register,
+    control,
     setValue,
     watch,
     formState: { errors },
@@ -138,10 +113,6 @@ export function SectionForm({ isEdit }: SectionFormProps) {
     }
   }, [academicYears, academicYearId, isEdit, setValue])
 
-  const inputClass =
-    'w-full px-3 py-2 text-sm bg-surface-primary border border-border-primary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors'
-  const selectClass = inputClass
-
   return (
     <div className="space-y-6">
       {/* Section Identity */}
@@ -151,46 +122,33 @@ export function SectionForm({ isEdit }: SectionFormProps) {
         icon={BookOpen}
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Field
-            label="Course"
-            required
-            error={errors.courseId?.message}
-          >
-            <select
-              {...register('courseId')}
-              disabled={isEdit}
-              className={selectClass}
-            >
-              <option value="">Select a course...</option>
-              {courses.map((c) => (
-                <option key={c.courseId} value={c.courseId}>
-                  {c.courseCode} — {c.courseName}
-                </option>
-              ))}
-            </select>
-          </Field>
+          <Controller
+            name="courseId"
+            control={control}
+            render={({ field, fieldState }) => (
+              <Select
+                label="Course"
+                required
+                value={field.value ?? ''}
+                onChange={field.onChange}
+                disabled={isEdit}
+                error={fieldState.error?.message}
+                placeholder="Select a course..."
+                options={courses.map((c) => ({
+                  value: c.courseId,
+                  label: `${c.courseCode} — ${c.courseName}`,
+                }))}
+              />
+            )}
+          />
 
-          <Field
-            label="Section Number"
-            required
-            error={errors.sectionNumber?.message}
-          >
-            <input
-              type="text"
-              placeholder="e.g., 001"
-              {...register('sectionNumber')}
-              className={inputClass}
-            />
+          <Field label="Section Number" required error={errors.sectionNumber?.message}>
+            <Input placeholder="e.g., 001" {...register('sectionNumber')} />
           </Field>
         </div>
 
-        <Field label="Section Name" error={errors.sectionName?.message}>
-          <input
-            type="text"
-            placeholder="e.g., Algebra I - Period 3 (optional)"
-            {...register('sectionName')}
-            className={inputClass}
-          />
+        <Field label="Section Name" optionalText={null} error={errors.sectionName?.message}>
+          <Input placeholder="e.g., Algebra I - Period 3 (optional)" {...register('sectionName')} />
         </Field>
       </FormSection>
 
@@ -200,23 +158,24 @@ export function SectionForm({ isEdit }: SectionFormProps) {
         description="Assign the primary instructor for this section."
         icon={User}
       >
-        <Field
-          label="Primary Teacher"
-          required
-          error={errors.primaryTeacherId?.message}
-        >
-          <select
-            {...register('primaryTeacherId')}
-            className={selectClass}
-          >
-            <option value="">Select a teacher...</option>
-            {teachers.map((t) => (
-              <option key={t.staffId} value={t.staffId}>
-                {getStaffDisplayName(t)}
-              </option>
-            ))}
-          </select>
-        </Field>
+        <Controller
+          name="primaryTeacherId"
+          control={control}
+          render={({ field, fieldState }) => (
+            <Select
+              label="Primary Teacher"
+              required
+              value={field.value ?? ''}
+              onChange={field.onChange}
+              error={fieldState.error?.message}
+              placeholder="Select a teacher..."
+              options={teachers.map((t) => ({
+                value: t.staffId,
+                label: getStaffDisplayName(t),
+              }))}
+            />
+          )}
+        />
       </FormSection>
 
       {/* Logistics & Schedule */}
@@ -226,91 +185,116 @@ export function SectionForm({ isEdit }: SectionFormProps) {
         icon={MapPin}
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Field label="Location / Room" error={errors.locationId?.message}>
-            <select {...register('locationId')} className={selectClass}>
-              <option value="">No room assigned</option>
-              {locations.map((l) => (
-                <option key={l.locationId} value={l.locationId}>
-                  {l.roomNumber}{l.buildingName ? ` (${l.buildingName})` : ''}
-                  {l.capacity ? ` — ${l.capacity} seats` : ''}
-                </option>
-              ))}
-            </select>
-          </Field>
+          <Controller
+            name="locationId"
+            control={control}
+            render={({ field, fieldState }) => (
+              <Select
+                label="Location / Room"
+                optionalText={null}
+                clearable
+                value={field.value ?? ''}
+                onChange={(v) => field.onChange(v ?? '')}
+                error={fieldState.error?.message}
+                placeholder="No room assigned"
+                options={locations.map((l) => ({
+                  value: l.locationId,
+                  label: `${l.roomNumber}${l.buildingName ? ` (${l.buildingName})` : ''}${l.capacity ? ` — ${l.capacity} seats` : ''}`,
+                }))}
+              />
+            )}
+          />
 
-          <Field
-            label="Max Enrollment"
-            required
-            error={errors.maxEnrollment?.message}
-          >
-            <input
-              type="number"
-              min={1}
-              max={500}
-              {...register('maxEnrollment')}
-              className={inputClass}
-            />
+          <Field label="Max Enrollment" required error={errors.maxEnrollment?.message}>
+            <Input type="number" min={1} max={500} {...register('maxEnrollment')} />
           </Field>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Field
-            label="Academic Year"
-            required
-            error={errors.academicYearId?.message}
-          >
-            <select
-              {...register('academicYearId')}
-              disabled={isEdit}
-              className={selectClass}
-            >
-              <option value="">Select year...</option>
-              {(academicYears || []).map((y) => (
-                <option key={y.yearId} value={y.yearId}>
-                  {y.name} {y.isCurrent ? '(Current)' : ''}
-                </option>
-              ))}
-            </select>
-          </Field>
+          <Controller
+            name="academicYearId"
+            control={control}
+            render={({ field, fieldState }) => (
+              <Select
+                label="Academic Year"
+                required
+                value={field.value ?? ''}
+                onChange={field.onChange}
+                disabled={isEdit}
+                error={fieldState.error?.message}
+                placeholder="Select year..."
+                options={(academicYears || []).map((y) => ({
+                  value: y.yearId,
+                  label: `${y.name}${y.isCurrent ? ' (Current)' : ''}`,
+                }))}
+              />
+            )}
+          />
 
-          <Field label="Term" error={errors.termId?.message}>
-            <select {...register('termId')} className={selectClass}>
-              <option value="">All terms / Full year</option>
-              {(gradingPeriods || []).map((p) => (
-                <option key={p.periodId} value={p.periodId}>
-                  {p.name}
-                </option>
-              ))}
-            </select>
-          </Field>
+          <Controller
+            name="termId"
+            control={control}
+            render={({ field, fieldState }) => (
+              <Select
+                label="Term"
+                optionalText={null}
+                clearable
+                value={field.value ?? ''}
+                onChange={(v) => field.onChange(v ?? '')}
+                error={fieldState.error?.message}
+                placeholder="All terms / Full year"
+                options={(gradingPeriods || []).map((p) => ({
+                  value: p.termId ?? p.periodId ?? '',
+                  label: p.name,
+                }))}
+              />
+            )}
+          />
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Field label="Class Period" error={errors.classPeriodId?.message}>
-            <select {...register('classPeriodId')} className={selectClass}>
-              <option value="">No period assigned</option>
-              {classPeriods
-                .sort((a, b) => a.sortOrder - b.sortOrder)
-                .map((p) => (
-                  <option key={p.periodId} value={p.periodId}>
-                    {p.classPeriodName} ({p.startTime} - {p.endTime})
-                  </option>
-                ))}
-            </select>
-          </Field>
+          <Controller
+            name="classPeriodId"
+            control={control}
+            render={({ field, fieldState }) => (
+              <Select
+                label="Class Period"
+                optionalText={null}
+                clearable
+                value={field.value ?? ''}
+                onChange={(v) => field.onChange(v ?? '')}
+                error={fieldState.error?.message}
+                placeholder="No period assigned"
+                options={[...classPeriods]
+                  .sort((a, b) => a.sortOrder - b.sortOrder)
+                  .map((p) => ({
+                    value: p.periodId,
+                    label: `${p.classPeriodName} (${p.startTime} - ${p.endTime})`,
+                  }))}
+              />
+            )}
+          />
 
           {courseId && (
-            <Field label="Course Offering" error={errors.courseOfferingId?.message}>
-              <select {...register('courseOfferingId')} className={selectClass}>
-                <option value="">No offering linked</option>
-                {offerings.map((o) => (
-                  <option key={o.courseOfferingId} value={o.courseOfferingId}>
-                    {o.courseName || o.courseCode} — {o.sessionName || o.academicSessionId}
-                    {o.localCourseCode ? ` (${o.localCourseCode})` : ''}
-                  </option>
-                ))}
-              </select>
-            </Field>
+            <Controller
+              name="courseOfferingId"
+              control={control}
+              render={({ field, fieldState }) => (
+                <Select
+                  label="Course Offering"
+                  optionalText={null}
+                  clearable
+                  value={field.value ?? ''}
+                  onChange={(v) => field.onChange(v ?? '')}
+                  error={fieldState.error?.message}
+                  placeholder="No offering linked"
+                  options={offerings.map((o) => ({
+                    value: o.courseOfferingId,
+                    label: `${o.courseName || o.courseCode} — ${o.sessionName || o.academicSessionId}${o.localCourseCode ? ` (${o.localCourseCode})` : ''}`,
+                  }))}
+                />
+              )}
+            />
           )}
         </div>
       </FormSection>
