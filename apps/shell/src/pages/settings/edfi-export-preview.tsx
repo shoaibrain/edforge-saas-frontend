@@ -18,9 +18,8 @@ import {
   Download,
   CheckCircle2,
   AlertCircle,
-  ChevronDown,
 } from 'lucide-react'
-import { Button } from '@edforge/ui'
+import { Button, Select } from '@edforge/ui'
 import { toast } from 'sonner'
 import {
   toEdFiStateEducationAgency,
@@ -209,22 +208,14 @@ function EntityPicker<T>({
   }
 
   return (
-    <div className="relative">
-      <select
-        value={selectedId || ''}
-        onChange={(e) => onSelect(e.target.value)}
-        aria-label="Select an entity to preview"
-        className="w-full px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors appearance-none pr-8"
-      >
-        <option value="">Select an entity to preview...</option>
-        {items.map((item) => (
-          <option key={getId(item)} value={getId(item)}>
-            {getLabel(item)}
-          </option>
-        ))}
-      </select>
-      <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[rgb(var(--text-tertiary))] pointer-events-none" />
-    </div>
+    <Select
+      aria-label="Select an entity to preview"
+      className="w-full"
+      placeholder="Select an entity to preview..."
+      value={selectedId || null}
+      onChange={(v) => onSelect(v ?? '')}
+      options={items.map((item) => ({ value: getId(item), label: getLabel(item) }))}
+    />
   )
 }
 

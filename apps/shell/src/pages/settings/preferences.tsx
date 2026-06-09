@@ -13,6 +13,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
+import { Select } from '@edforge/ui'
 import {
   Palette,
   Sun,
@@ -167,18 +168,14 @@ function SchoolSelector({ value, onChange, schools }: SchoolSelectorProps) {
   }
 
   return (
-    <select
-      value={value || ''}
-      onChange={(e) => onChange(e.target.value)}
-      className="px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))]/50 focus:border-[rgb(var(--border-focus))] min-w-52"
-    >
-      <option value="">Select default school</option>
-      {schools.map((school) => (
-        <option key={school.id} value={school.id}>
-          {school.name}
-        </option>
-      ))}
-    </select>
+    <Select
+      aria-label="Default school"
+      className="min-w-52"
+      placeholder="Select default school"
+      value={value || null}
+      onChange={(v) => onChange(v ?? '')}
+      options={schools.map((school) => ({ value: school.id, label: school.name }))}
+    />
   )
 }
 

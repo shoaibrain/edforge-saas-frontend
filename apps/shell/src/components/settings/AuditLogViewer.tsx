@@ -8,6 +8,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { Clock, Shield, AlertTriangle, ChevronDown, ChevronUp } from 'lucide-react'
+import { Select } from '@edforge/ui'
 import { tenantService } from '@/services/tenant.service'
 import type { AuditLogEntry } from '@/services/tenant.service'
 
@@ -68,18 +69,20 @@ export function AuditLogViewer({ schoolId }: AuditLogViewerProps) {
     <div className="space-y-4">
       {/* Filter bar */}
       <div className="flex items-center gap-3">
-        <select
+        <Select
+          aria-label="Filter by action"
+          className="w-44"
           value={actionFilter}
-          onChange={(e) => setActionFilter(e.target.value)}
-          className="px-3 py-2 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)]"
-        >
-          <option value="">All Actions</option>
-          <option value="create">Create</option>
-          <option value="update">Update</option>
-          <option value="delete">Delete</option>
-          <option value="status_change">Status Change</option>
-          <option value="version_change">Version Change</option>
-        </select>
+          onChange={(v) => setActionFilter(v ?? '')}
+          options={[
+            { value: '', label: 'All Actions' },
+            { value: 'create', label: 'Create' },
+            { value: 'update', label: 'Update' },
+            { value: 'delete', label: 'Delete' },
+            { value: 'status_change', label: 'Status Change' },
+            { value: 'version_change', label: 'Version Change' },
+          ]}
+        />
         <span className="text-xs text-[rgb(var(--text-tertiary))]">
           {entries.length} entries
         </span>
