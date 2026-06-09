@@ -443,7 +443,7 @@ function SectionsTab({
         <button
           type="button"
           onClick={() => navigate({ to: '/classrooms', search: { tab: undefined } })}
-          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-bg)/0.18)]0 rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--action-primary-bg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
         >
           <Plus className="w-4 h-4" />
           Go to Scheduling
@@ -636,7 +636,7 @@ export function CourseDetailPage() {
           <button
             type="button"
             onClick={() => navigate({ to: '/curriculum' })}
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-bg)/0.18)]0 rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--action-primary-bg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Curriculum

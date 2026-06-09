@@ -312,7 +312,7 @@ export function SectionRosterPage() {
           <button
             type="button"
             onClick={() => navigate({ to: '/classrooms', search: { tab: undefined } })}
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-bg)/0.18)]0 rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--action-primary-bg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Scheduling
@@ -375,7 +375,7 @@ export function SectionRosterPage() {
                     type="button"
                     onClick={handleBulkEnroll}
                     disabled={isEnrolling || spotsRemaining <= 0}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-bg)/0.18)]0 rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors disabled:opacity-50"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--action-primary-bg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors disabled:opacity-50"
                   >
                     {isEnrolling ? (
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
