@@ -8,11 +8,10 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { School, ArrowRight, Building2 } from 'lucide-react'
-import { Button, Modal, ModalFooter } from '@edforge/ui'
+import { Button, Modal, ModalFooter, Select } from '@edforge/ui'
 import { useQueryClient, useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { extractApiErrorMessage } from '@edforge/api-client'
-import { cn } from '@/lib/utils'
 import { apiPatch } from '@/lib/api'
 import { useLocalEducationAgencies, edOrgKeys } from '@/hooks/useEducationOrgs'
 
@@ -146,26 +145,15 @@ export function QuickSchoolReassign({
               </p>
             </div>
           ) : (
-            <select
-              value={selectedLeaId}
-              onChange={(e) => setSelectedLeaId(e.target.value)}
+            <Select
+              aria-label="New District Assignment"
+              options={leas.map((lea) => ({ value: lea.id, label: lea.nameOfInstitution }))}
+              value={selectedLeaId || null}
+              onChange={(v) => setSelectedLeaId(v ?? '')}
+              placeholder="None (Unassign)"
+              clearable
               disabled={isPending}
-              className={cn(
-                'w-full px-3 py-2 rounded-lg border',
-                'bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary))]',
-                'text-sm text-[rgb(var(--text-primary))]',
-                'focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]',
-                'disabled:opacity-50 disabled:cursor-not-allowed',
-                'transition-colors'
-              )}
-            >
-              <option value="">None (Unassign)</option>
-              {leas.map((lea) => (
-                <option key={lea.id} value={lea.id}>
-                  {lea.nameOfInstitution}
-                </option>
-              ))}
-            </select>
+            />
           )}
 
           <p className="mt-1.5 text-xs text-[rgb(var(--text-tertiary))]">
