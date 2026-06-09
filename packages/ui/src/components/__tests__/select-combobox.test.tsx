@@ -55,14 +55,15 @@ describe('Select', () => {
     // Guards the narrow-trigger truncation bug: a fit-content trigger (e.g. the
     // wizard "Address Type" select) must not clip option labels. The panel grows
     // to fit content (w-max) while staying at least as wide as the trigger
-    // (min-w-full) — never a plain w-full that locks to a narrow trigger.
+    // (min-w-[var(--button-width)], the Headless UI v2 anchor var) — never a
+    // plain w-full that locks to a narrow trigger.
     const user = userEvent.setup()
     render(<SelectHarness />)
 
     await user.click(screen.getByRole('button', { name: /School type/ }))
     const panel = screen.getByRole('listbox')
     expect(panel.className).toContain('w-max')
-    expect(panel.className).toContain('min-w-full')
+    expect(panel.className).toContain('min-w-[var(--button-width)]')
     expect(panel.className.split(/\s+/)).not.toContain('w-full')
   })
 
