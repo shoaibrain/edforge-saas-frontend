@@ -1,6 +1,6 @@
 # Students Table — Guardian, Location & Attendance-Trend Enhancement — Sprint Plan
 
-**Status:** v2 — adversarial review incorporated (see §0 changelog).
+**Status:** v2 — adversarial review incorporated (see §0 changelog). **Sprints 0–1 + D-8 + D-1 implemented** (see §0.1 implementation status).
 **Surface:** `/academics/students` (Academics MFE)
 **Author basis:** Direct codebase trace (render path, data layer, design tokens, ABAC) + production screenshot + prototype reference + live API payloads + a verification pass that corrected several first-draft claims.
 **Branch:** `claude/bold-curie-tunpf2` (frontend) / `claude/bold-curie-tunpf2` (backend — Sprint 2 endpoint only).
@@ -24,6 +24,25 @@ The first draft was well-grounded but carried real errors. Folded in:
 - **Sorting semantics were missing (D1/D2).** Grade sorts as strings (`"10" < "2"`). No `sortingFn` precedent in the repo. → explicit sort task + no-regression invariant.
 - **Sprint-1 attendance honesty (A8/B2).** The FE `AttendanceAlert` type **already parses** `trend`/`totalDays`/`absentDays` — Sprint-1 caret is a pure map-widening. The header stays **"Attendance"** (not "trend") until Sprint 2. "—" for non-flagged rows is **honest** (absence from alerts conflates *healthy ≥ threshold* with *no records*; only the Sprint-2 endpoint disambiguates).
 - **Task splits & descopes (C2/C3/E1/E2/E3):** split column-rebalance vs ABAC gating; split toolbar-introduction vs responsive visibility; cut wide-mode, cut cell "Add guardian" CTA (an `AddGuardianModal` already exists on the profile), mark drawer-parity optional.
+
+---
+
+## 0.1 Implementation status (this branch)
+
+Branch `claude/students-table-enhancement` (cut from `main`) in **both** repos.
+
+**Done + validated** (typecheck, unit tests, lint all green):
+
+- **Sprint 0 — `AttendanceTrend`** (`packages/ui`): pure-SVG sparkline → bar → "—", trend caret, locale %; 8 tests. **Correction:** uses the **80/90** at-risk thresholds (matching `AttendanceDonutRing`), *not* `@edforge/types getAttendanceColor` which is **60/80** — the E4 "converge" note was a threshold mismatch.
+- **Sprint 1 — table re-architecture** (`apps/academics`): `GradeChip` (numeric-aware sort via `@edforge/types gradeSort` — fixes the `"10" < "2"` regression), `AttendanceTrend` cell (degraded: at-risk rate + trend; header stays "Attendance"), `GuardianCell` (primary-on-top stacked avatars + brand ring, `+N`, portal/pickup badges, **keyboard popover**, empty state), `StudentLocationCell` + shared `formatStudentLocation`/`isNepalAddress` util, ABAC gating (`guardians.view` / `students.view`), responsive visibility (Columns menu; Enrolled xl-only, Guardian/Location < lg via synchronous `matchMedia` initial), `TableSkeleton` resynced + migrated off `--v2-*`. 15 cell/util tests.
+- **D-8 — local DiceBear** (`apps/academics/src/lib/avatar.ts`): `@dicebear/core` + `@dicebear/collection` (9.4.2, pinned-compatible) generate `data:` URIs client-side — no `api.dicebear.com` fetch (resilient on filtered school networks), memo-cached; `UserAvatar` gains an explicit `seed` prop for collision-resistant guardian avatars.
+- **D-1 — slim list DTO** (backend `edforge`): `guardianListItemSchema` + `studentListItemSchema`; list mapper/service/controller drop guardian PII (email/phone/address/employer/occupation) from `GET /students`; single-student GET keeps full detail. 3 new mapper tests; `nest build academics` clean.
+
+**Not yet done (follow-ups):**
+
+- **Sprint 2** — backend `GET /academics/attendance/student-trends` batch endpoint + `useAttendanceStudentTrends` + real full-roster sparkline (the cell already accepts `series`; wiring pending). Until then non-flagged rows render "—" (honest — see §5).
+- **Frontend type-tightening** — type list items as `StudentListItemDto` (needs a `@aibrains/shared-types` version bump + publish; runtime already correct since slim ⊂ full).
+- **D-2 drawer parity, resize-reactive visibility (ResizeObserver), e2e/a11y smoke, telemetry, i18n string externalization, realistic fixtures.**
 
 ---
 
