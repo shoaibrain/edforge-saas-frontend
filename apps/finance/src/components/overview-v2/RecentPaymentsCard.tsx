@@ -52,12 +52,12 @@ function FeedSkeleton() {
     <div className="space-y-3">
       {[1, 2, 3, 4, 5].map((i) => (
         <div key={i} className="flex items-center gap-3">
-          <div className="w-7 h-7 rounded-md v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
+          <div className="w-7 h-7 rounded-md v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
           <div className="flex-1 space-y-1">
-            <div className="h-3 w-24 rounded v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
-            <div className="h-2.5 w-16 rounded v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
+            <div className="h-3 w-24 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
+            <div className="h-2.5 w-16 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
           </div>
-          <div className="h-3 w-16 rounded v2-skeleton-pulse" style={{ background: 'var(--v2-bg-elevated)' }} />
+          <div className="h-3 w-16 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
         </div>
       ))}
     </div>
@@ -73,19 +73,19 @@ export function RecentPaymentsCard({ payments, isLoading }: RecentPaymentsCardPr
     <div
       className="rounded-xl border flex flex-col"
       style={{
-        background: 'var(--v2-bg-surface)',
-        borderColor: 'var(--v2-border-default)',
+        background: 'rgb(var(--background-secondary))',
+        borderColor: 'rgb(var(--border-primary) / 0.35)',
         padding: 18,
       }}
     >
-      <h3 className="text-sm font-medium mb-3" style={{ color: 'var(--v2-text-secondary)' }}>
+      <h3 className="text-sm font-medium mb-3" style={{ color: 'rgb(var(--text-secondary))' }}>
         Recent payments
       </h3>
 
       {isLoading ? (
         <FeedSkeleton />
       ) : top5.length === 0 ? (
-        <p className="text-xs py-4" style={{ color: 'var(--v2-text-hint)' }}>No payments yet.</p>
+        <p className="text-xs py-4" style={{ color: 'rgb(var(--text-tertiary))' }}>No payments yet.</p>
       ) : (
         <div className="space-y-1">
           {top5.map((payment) => {
@@ -116,10 +116,10 @@ export function RecentPaymentsCard({ payments, isLoading }: RecentPaymentsCardPr
 
                 {/* Details */}
                 <div className="flex-1 min-w-0">
-                  <div className="text-xs font-medium truncate" style={{ color: 'var(--v2-text-secondary)' }}>
+                  <div className="text-xs font-medium truncate" style={{ color: 'rgb(var(--text-secondary))' }}>
                     <EntityIdDisplay entity="payment" data={payment} variant="inline" />
                   </div>
-                  <div className="text-xs" style={{ color: 'var(--v2-text-faint)' }}>
+                  <div className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>
                     {formatGatewayLabel(payment.gateway)} · {formatRelativeDate(dateStr)}
                   </div>
                 </div>
@@ -127,7 +127,7 @@ export function RecentPaymentsCard({ payments, isLoading }: RecentPaymentsCardPr
                 {/* Amount */}
                 <span
                   className="text-xs font-semibold flex-shrink-0"
-                  style={{ color: 'var(--v2-brand-primary)' }}
+                  style={{ color: '#1D9E75' }}
                 >
                   {format(payment.amount, { decimals: 0 })}
                 </span>

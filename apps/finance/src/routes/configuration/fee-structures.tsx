@@ -294,7 +294,7 @@ export default function FeeStructuresPage() {
             onClick={() => setShowForm(true)}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90"
             style={{
-              background: 'var(--v2-brand-primary)',
+              background: '#1D9E75',
               color: '#fff',
             }}
           >

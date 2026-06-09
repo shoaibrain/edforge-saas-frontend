@@ -779,7 +779,7 @@ export default function PaymentsPage() {
             onClick={() => navigate({ to: '/payments/record' })}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90"
             style={{
-              background: 'var(--v2-brand-primary)',
+              background: '#1D9E75',
               color: '#fff',
             }}
           >
@@ -827,8 +827,8 @@ export default function PaymentsPage() {
             value={String(kpi.cancelledCount)}
             icon={AlertTriangle}
             accentColor="rgba(128, 128, 128, 0.12)"
-            iconColor="var(--v2-text-hint)"
-            barColor="var(--v2-text-hint)"
+            iconColor="rgb(var(--text-tertiary))"
+            barColor="rgb(var(--text-tertiary))"
             loading={isLoading}
           />
         </div>

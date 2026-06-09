@@ -28,7 +28,7 @@ function AgingSkeleton() {
         <div
           key={i}
           className="rounded-lg p-3 space-y-2"
-          style={{ background: 'var(--v2-bg-elevated)', border: '1px solid var(--v2-border-default)' }}
+          style={{ background: 'rgb(var(--background-tertiary))', border: '1px solid rgb(var(--border-primary) / 0.35)' }}
         >
           <div className="h-2.5 w-12 rounded v2-skeleton-pulse" style={{ background: 'rgba(255,255,255,0.06)' }} />
           <div className="h-4 w-8 rounded v2-skeleton-pulse" style={{ background: 'rgba(255,255,255,0.06)' }} />
@@ -58,13 +58,13 @@ export function AgingReportCard({ agingReport, isLoading }: AgingReportCardProps
     <div
       className="rounded-xl border flex flex-col"
       style={{
-        background: 'var(--v2-bg-surface)',
-        borderColor: 'var(--v2-border-default)',
+        background: 'rgb(var(--background-secondary))',
+        borderColor: 'rgb(var(--border-primary) / 0.35)',
         padding: 18,
       }}
     >
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-medium" style={{ color: 'var(--v2-text-secondary)' }}>
+        <h3 className="text-sm font-medium" style={{ color: 'rgb(var(--text-secondary))' }}>
           Overdue aging report
         </h3>
         {!isLoading && !hasAnyOverdue && (
@@ -87,25 +87,25 @@ export function AgingReportCard({ agingReport, isLoading }: AgingReportCardProps
                 role="group"
                 aria-label={`${bucket.label}: ${bucket.count} invoices, ${formatShort(bucket.amount)}`}
                 style={{
-                  background: isActive ? 'rgba(226, 75, 74, 0.08)' : 'var(--v2-bg-elevated)',
-                  border: `1px solid ${isActive ? 'rgba(226, 75, 74, 0.25)' : 'var(--v2-border-default)'}`,
+                  background: isActive ? 'rgba(226, 75, 74, 0.08)' : 'rgb(var(--background-tertiary))',
+                  border: `1px solid ${isActive ? 'rgba(226, 75, 74, 0.25)' : 'rgb(var(--border-primary) / 0.35)'}`,
                 }}
               >
                 <div
                   className="text-xs font-medium mb-1.5"
-                  style={{ color: isActive ? '#E24B4A' : 'var(--v2-text-faint)' }}
+                  style={{ color: isActive ? '#E24B4A' : 'rgb(var(--text-disabled))' }}
                 >
                   {bucket.label}
                 </div>
                 <div
                   className="text-lg font-bold leading-tight"
-                  style={{ color: isActive ? '#E24B4A' : 'var(--v2-text-hint)' }}
+                  style={{ color: isActive ? '#E24B4A' : 'rgb(var(--text-tertiary))' }}
                 >
                   {bucket.count}
                 </div>
                 <div
                   className="text-xs mt-1"
-                  style={{ color: isActive ? 'rgba(226, 75, 74, 0.7)' : 'var(--v2-text-faint)' }}
+                  style={{ color: isActive ? 'rgba(226, 75, 74, 0.7)' : 'rgb(var(--text-disabled))' }}
                 >
                   {formatShort(bucket.amount)}
                 </div>
