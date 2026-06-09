@@ -16,7 +16,7 @@ import {
   ToggleLeft,
   ToggleRight,
 } from 'lucide-react'
-import { TanstackDataTable, createActionsColumn, type ColumnDef } from '@edforge/ui'
+import { TanstackDataTable, createActionsColumn, StatusBadge, type ColumnDef } from '@edforge/ui'
 import type { CourseResponseDto } from '@aibrains/shared-types'
 import { getDurationLabel } from '../../schemas/course.form'
 import { formatCourseType } from '../../utils/course-type'
@@ -198,16 +198,9 @@ function GradeLevelChips({ grades }: { grades: string[] }) {
 
 function StatusDot({ isActive }: { isActive: boolean }) {
   return (
-    <div className="flex items-center gap-1.5">
-      <div
-        className={`w-2 h-2 rounded-full ${
-          isActive ? 'bg-[rgb(var(--state-success-bg)/0.18)]0' : 'bg-[rgb(var(--text-tertiary))]'
-        }`}
-      />
-      <span className="text-xs text-text-secondary">
-        {isActive ? 'Active' : 'Inactive'}
-      </span>
-    </div>
+    <StatusBadge tone={isActive ? 'success' : 'neutral'} size="sm" dot>
+      {isActive ? 'Active' : 'Inactive'}
+    </StatusBadge>
   )
 }
 
