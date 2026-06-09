@@ -14,6 +14,7 @@ import {
   TextareaField,
   FormSection,
 } from '@edforge/forms'
+import { Input } from '@edforge/ui'
 import {
   Hash,
   BookOpen,
@@ -159,10 +160,8 @@ function ObjectivesInput() {
           </div>
         ))}
         {objectives.length < 20 && (
-          <input
-            type="text"
+          <Input
             placeholder="Type an objective and press Enter"
-            className="w-full px-3 py-2 text-sm bg-surface-primary border border-border-primary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors"
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 e.preventDefault()
@@ -185,7 +184,7 @@ function ObjectivesInput() {
 // ============================================================================
 
 function MaterialsList() {
-  const { control, register } = useFormContext()
+  const { control } = useFormContext()
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'textbooks',
@@ -241,53 +240,32 @@ function MaterialsList() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="col-span-2 sm:col-span-1">
-                  <label className="block text-xs font-medium text-text-secondary mb-1">
-                    Type
-                  </label>
-                  <select
-                    {...register(`textbooks.${index}.type`)}
-                    className="w-full px-3 py-2 text-sm bg-surface-primary border border-border-primary rounded-lg text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
-                  >
-                    {MATERIAL_TYPE_OPTIONS.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
+                  <SelectField
+                    name={`textbooks.${index}.type`}
+                    label="Type"
+                    options={MATERIAL_TYPE_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
+                  />
                 </div>
 
                 <div className="col-span-2 sm:col-span-1">
-                  <label className="block text-xs font-medium text-text-secondary mb-1">
-                    Title *
-                  </label>
-                  <input
-                    {...register(`textbooks.${index}.title`)}
+                  <TextField
+                    name={`textbooks.${index}.title`}
+                    label="Title"
                     placeholder="Material title"
-                    className="w-full px-3 py-2 text-sm bg-surface-primary border border-border-primary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-xs font-medium text-text-secondary mb-1">
-                    Author
-                  </label>
-                  <input
-                    {...register(`textbooks.${index}.author`)}
-                    placeholder="Author name"
-                    className="w-full px-3 py-2 text-sm bg-surface-primary border border-border-primary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
-                  />
-                </div>
+                <TextField
+                  name={`textbooks.${index}.author`}
+                  label="Author"
+                  placeholder="Author name"
+                />
 
-                <div>
-                  <label className="block text-xs font-medium text-text-secondary mb-1">
-                    ISBN
-                  </label>
-                  <input
-                    {...register(`textbooks.${index}.isbn`)}
-                    placeholder="ISBN-13"
-                    className="w-full px-3 py-2 text-sm bg-surface-primary border border-border-primary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
-                  />
-                </div>
+                <TextField
+                  name={`textbooks.${index}.isbn`}
+                  label="ISBN"
+                  placeholder="ISBN-13"
+                />
               </div>
             </div>
           ))}
