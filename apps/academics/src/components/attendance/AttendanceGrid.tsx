@@ -28,6 +28,7 @@ import {
   ChevronUp,
   ChevronDown,
 } from 'lucide-react'
+import { Input } from '@edforge/ui'
 import type { AttendanceStatus } from '../../services/academics.service'
 import type { StudentSectionResponseDto } from '@aibrains/shared-types'
 import { AttendanceRow, type AttendanceRowRef } from './AttendanceRow'
@@ -487,26 +488,27 @@ export function AttendanceGrid({
 
       {/* Task 4.2: Search + Filter — Task 5.5: full-width on mobile */}
       <div className="flex items-center gap-3">
-        <div className="relative flex-1 sm:max-w-xs">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-tertiary" />
-          <input
+        <div className="flex-1 sm:max-w-xs">
+          <Input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search students..."
-            className="w-full pl-9 pr-8 py-2 text-sm bg-surface-secondary border border-border-secondary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
             aria-label="Search students by name or number"
+            prefix={<Search className="w-4 h-4" />}
+            suffix={
+              searchQuery ? (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="p-0.5 text-text-tertiary hover:text-text-primary transition-colors"
+                  aria-label="Clear search"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              ) : undefined
+            }
           />
-          {searchQuery && (
-            <button
-              type="button"
-              onClick={() => setSearchQuery('')}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 text-text-tertiary hover:text-text-primary transition-colors"
-              aria-label="Clear search"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          )}
         </div>
         {searchQuery && (
           <span className="text-xs text-text-tertiary">

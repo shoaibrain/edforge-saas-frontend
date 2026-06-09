@@ -46,16 +46,19 @@ type SortDir = 'asc' | 'desc'
 // V2 DESIGN TOKENS
 // ============================================================================
 
+// Routed through the canonical semantic tokens (always present + theme-aware),
+// retiring the redundant `--v2-*` family and its dark-only hex fallbacks that
+// washed out in light mode. Vivid brand accents stay as literals.
 const V2 = {
-  bgSurface: 'var(--v2-bg-surface, #161b27)',
-  borderDefault: 'var(--v2-border-default, rgba(255,255,255,0.06))',
-  borderSeparator: 'rgba(255,255,255,0.05)',
-  borderRow: 'rgba(255,255,255,0.04)',
-  textPrimary: 'var(--v2-text-primary, #e8eaf0)',
-  textSecondary: 'var(--v2-text-secondary, #c8ccd8)',
-  textMuted: 'var(--v2-text-muted, #7a8099)',
-  textHint: 'var(--v2-text-hint, #4a5068)',
-  textGhost: 'var(--v2-text-ghost, #2a3045)',
+  bgSurface: 'rgb(var(--background-secondary))',
+  borderDefault: 'rgb(var(--border-primary) / 0.35)',
+  borderSeparator: 'rgb(var(--border-primary) / 0.3)',
+  borderRow: 'rgb(var(--border-primary) / 0.15)',
+  textPrimary: 'rgb(var(--text-primary))',
+  textSecondary: 'rgb(var(--text-secondary))',
+  textMuted: 'rgb(var(--text-tertiary))',
+  textHint: 'rgb(var(--text-disabled))',
+  textGhost: 'rgb(var(--text-disabled))',
   success: '#1D9E75',
   info: '#378ADD',
   warning: '#EF9F27',
