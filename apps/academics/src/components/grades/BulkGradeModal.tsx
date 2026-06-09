@@ -2,11 +2,15 @@
  * BulkGradeModal Component
  *
  * Modal for entering grades for an entire class on a single assignment.
+ * Score entry mirrors the exams Scores-tab pattern: avatar rows, `/ max`
+ * inputs, a name search, and a live entered-count.
  */
 
 import { useState, useMemo, useEffect } from 'react'
-import { X, Loader2, Save } from 'lucide-react'
+import { Loader2, Save, Search } from 'lucide-react'
+import { Modal, ModalFooter, Button, Field, Input, Select } from '@edforge/ui'
 import { useRecordBulkGrades } from '../../hooks/useGrades'
+import { ScoreEntryRow } from './ScoreEntryRow'
 import type { AssessmentCategory } from '../../services/academics.service'
 import type { StudentSectionResponseDto } from '@aibrains/shared-types'
 
@@ -42,6 +46,12 @@ const DEFAULT_CATEGORIES = [
   { id: 'projects', label: 'Projects' },
 ]
 
+const PURPOSE_OPTIONS = [
+  { value: '', label: 'Auto-detect' },
+  { value: 'formative', label: 'Formative' },
+  { value: 'summative', label: 'Summative' },
+]
+
 // ============================================================================
 // COMPONENT
 // ============================================================================
@@ -67,6 +77,7 @@ export function BulkGradeModal({
   const [assessmentPurpose, setAssessmentPurpose] = useState<AssessmentCategory | ''>('')
   const [possiblePoints, setPossiblePoints] = useState('100')
   const [entries, setEntries] = useState<StudentGradeEntry[]>([])
+  const [search, setSearch] = useState('')
 
   // Update entries when students are loaded or change
   useEffect(() => {
@@ -87,6 +98,14 @@ export function BulkGradeModal({
     () => entries.filter((e) => e.earnedPoints !== '' && !isNaN(Number(e.earnedPoints))),
     [entries]
   )
+
+  const filteredEntries = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    if (!q) return entries
+    return entries.filter((e) => e.studentName.toLowerCase().includes(q))
+  }, [entries, search])
+
+  const maxPoints = Number(possiblePoints) || 0
 
   const handlePointsChange = (studentId: string, value: string) => {
     setEntries((prev) =>
@@ -121,146 +140,118 @@ export function BulkGradeModal({
     onClose()
   }
 
-  if (!open) return null
-
   const isStudentsLoading = students.length === 0 && entries.length === 0
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgb(var(--background-overlay)/0.50)]">
-      <div className="bg-surface-primary rounded-xl border border-border-secondary shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border-secondary">
-          <h3 className="text-lg font-semibold text-text-primary">
-            Record Grades
-          </h3>
-          <button type="button" onClick={onClose} className="p-1.5 rounded-md text-text-tertiary hover:text-text-primary hover:bg-surface-hover transition-colors">
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        <div className="px-6 py-5 space-y-5">
-          {/* Assignment Info */}
-          <div className="grid grid-cols-3 gap-4">
-            <div className="col-span-2">
-              <label className="block text-sm font-medium text-text-primary mb-1">
-                Assignment Name *
-              </label>
-              <input
-                type="text"
+    <Modal open={open} onClose={onClose} title="Record Grades" size="2xl">
+      <div className="space-y-5">
+        {/* Assignment Info */}
+        <div className="grid grid-cols-3 gap-4">
+          <div className="col-span-2">
+            <Field label="Assignment Name" required>
+              <Input
                 value={assignmentName}
                 onChange={(e) => setAssignmentName(e.target.value)}
                 placeholder="e.g., Chapter 3 Quiz"
-                className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
               />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-text-primary mb-1">
-                Points Possible
-              </label>
-              <input
-                type="number"
-                value={possiblePoints}
-                onChange={(e) => setPossiblePoints(e.target.value)}
-                min={1}
-                className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
-              />
-            </div>
+            </Field>
           </div>
-
-          <div className="flex items-end gap-4">
-            <div>
-              <label className="block text-sm font-medium text-text-primary mb-1">
-                Category
-              </label>
-              <select
-                value={categoryId}
-                onChange={(e) => setCategoryId(e.target.value)}
-                className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
-              >
-                {displayCategories.map((opt) => (
-                  <option key={opt.id} value={opt.id}>{opt.label}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-text-primary mb-1">
-                Assessment Purpose
-              </label>
-              <select
-                value={assessmentPurpose}
-                onChange={(e) => setAssessmentPurpose(e.target.value as AssessmentCategory | '')}
-                className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
-              >
-                <option value="">Auto-detect</option>
-                <option value="formative">Formative</option>
-                <option value="summative">Summative</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Student Grade Entries */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <h4 className="text-sm font-semibold text-text-primary">Student Scores</h4>
-              <span className="text-xs text-text-tertiary">
-                {validEntries.length} / {entries.length} entered
-              </span>
-            </div>
-            <div className="rounded-xl border border-border-secondary overflow-hidden divide-y divide-border-secondary">
-              {isStudentsLoading ? (
-                /* Loading skeleton */
-                Array.from({ length: 5 }).map((_, i) => (
-                  <div key={i} className="flex items-center justify-between px-4 py-2.5 animate-pulse">
-                    <div className="h-4 w-32 bg-surface-hover rounded" />
-                    <div className="h-8 w-20 bg-surface-hover rounded" />
-                  </div>
-                ))
-              ) : entries.length === 0 ? (
-                <div className="px-4 py-8 text-center text-sm text-text-tertiary">
-                  No students enrolled in this section.
-                </div>
-              ) : (
-                entries.map((entry) => (
-                  <div
-                    key={entry.studentId}
-                    className="flex items-center justify-between px-4 py-2.5"
-                  >
-                    <span className="text-sm text-text-primary">{entry.studentName}</span>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="number"
-                        value={entry.earnedPoints}
-                        onChange={(e) => handlePointsChange(entry.studentId, e.target.value)}
-                        placeholder="—"
-                        min={0}
-                        max={Number(possiblePoints) * 1.5}
-                        className="w-20 px-2 py-1.5 bg-surface-secondary border border-border-secondary rounded text-sm text-center text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
-                      />
-                      <span className="text-xs text-text-tertiary">/ {possiblePoints}</span>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
+          <Field label="Points Possible" optionalText={null}>
+            <Input
+              type="number"
+              value={possiblePoints}
+              onChange={(e) => setPossiblePoints(e.target.value)}
+              min={1}
+            />
+          </Field>
         </div>
 
-        {/* Footer */}
-        <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-border-secondary">
-          <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-medium text-text-secondary hover:text-text-primary bg-surface-secondary hover:bg-surface-hover rounded-lg transition-colors">
-            Cancel
-          </button>
-          <button
-            type="button"
-            onClick={handleSubmit}
-            disabled={bulkMutation.isPending || !assignmentName.trim() || validEntries.length === 0}
-            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-bg)/0.18)]0 hover:bg-[rgb(var(--action-primary-bg-hover))] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {bulkMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-            Save Grades ({validEntries.length})
-          </button>
+        <div className="grid grid-cols-2 gap-4">
+          <Select
+            label="Category"
+            optionalText={null}
+            value={categoryId}
+            onChange={(v) => setCategoryId(v ?? 'homework')}
+            options={displayCategories.map((c) => ({ value: c.id, label: c.label }))}
+          />
+          <Select
+            label="Assessment Purpose"
+            optionalText={null}
+            value={assessmentPurpose}
+            onChange={(v) => setAssessmentPurpose((v ?? '') as AssessmentCategory | '')}
+            options={PURPOSE_OPTIONS}
+          />
+        </div>
+
+        {/* Student Grade Entries */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="text-sm font-semibold text-text-primary">Student Scores</h4>
+            <span className="text-xs text-text-tertiary tabular-nums">
+              {validEntries.length} / {entries.length} entered
+            </span>
+          </div>
+
+          {!isStudentsLoading && entries.length > 8 && (
+            <div className="mb-2">
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search students by name…"
+                prefix={<Search className="w-4 h-4" />}
+              />
+            </div>
+          )}
+
+          <div className="rounded-xl border border-border-secondary overflow-hidden divide-y divide-border-secondary max-h-[40vh] overflow-y-auto">
+            {isStudentsLoading ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="flex items-center justify-between px-4 py-2.5 animate-pulse">
+                  <div className="h-7 w-40 bg-surface-hover rounded" />
+                  <div className="h-8 w-20 bg-surface-hover rounded" />
+                </div>
+              ))
+            ) : entries.length === 0 ? (
+              <div className="px-4 py-8 text-center text-sm text-text-tertiary">
+                No students enrolled in this section.
+              </div>
+            ) : filteredEntries.length === 0 ? (
+              <div className="px-4 py-8 text-center text-sm text-text-tertiary">
+                No students match “{search}”.
+              </div>
+            ) : (
+              filteredEntries.map((entry) => (
+                <ScoreEntryRow
+                  key={entry.studentId}
+                  studentId={entry.studentId}
+                  studentName={entry.studentName}
+                  value={entry.earnedPoints}
+                  onChange={(v) => handlePointsChange(entry.studentId, v)}
+                  maxPoints={maxPoints}
+                />
+              ))
+            )}
+          </div>
         </div>
       </div>
-    </div>
+
+      <ModalFooter>
+        <Button type="button" variant="outline" onClick={onClose}>
+          Cancel
+        </Button>
+        <Button
+          type="button"
+          onClick={handleSubmit}
+          disabled={bulkMutation.isPending || !assignmentName.trim() || validEntries.length === 0}
+        >
+          {bulkMutation.isPending ? (
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+          ) : (
+            <Save className="w-4 h-4 mr-2" />
+          )}
+          Save Grades ({validEntries.length})
+        </Button>
+      </ModalFooter>
+    </Modal>
   )
 }
