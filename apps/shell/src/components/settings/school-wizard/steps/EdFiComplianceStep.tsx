@@ -10,6 +10,7 @@ import { useEffect, useMemo, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Plus, Trash2, Check } from 'lucide-react'
 import type { WizardStepProps } from '@edforge/wizard'
+import { Select } from '@edforge/ui'
 import { AnimatedInput, AnimatedSelect } from './BasicInfoStep'
 import {
   SCHOOL_CATEGORY_DESCRIPTORS,
@@ -326,17 +327,15 @@ export function EdFiComplianceStep({ data, updateData, clearError }: WizardStepP
                     key={index}
                     className="flex items-start gap-3 p-3 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]"
                   >
-                    <select
+                    <Select
+                      aria-label="Identification system"
+                      className="w-48 shrink-0"
                       value={code.educationOrganizationIdentificationSystemDescriptor}
-                      onChange={(e) =>
-                        updateIdCode(index, 'educationOrganizationIdentificationSystemDescriptor', e.target.value)
+                      onChange={(v) =>
+                        updateIdCode(index, 'educationOrganizationIdentificationSystemDescriptor', v ?? '')
                       }
-                      className="w-48 shrink-0 px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors"
-                    >
-                      {EDUCATION_ORGANIZATION_IDENTIFICATION_SYSTEM_DESCRIPTORS.map((d) => (
-                        <option key={d.value} value={d.value}>{d.label}</option>
-                      ))}
-                    </select>
+                      options={EDUCATION_ORGANIZATION_IDENTIFICATION_SYSTEM_DESCRIPTORS}
+                    />
                     <input
                       type="text"
                       value={code.identificationCode}
@@ -388,17 +387,15 @@ export function EdFiComplianceStep({ data, updateData, clearError }: WizardStepP
                     key={index}
                     className="flex items-start gap-3 p-3 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]"
                   >
-                    <select
+                    <Select
+                      aria-label="Phone number type"
+                      className="w-40 shrink-0"
                       value={phone.institutionTelephoneNumberTypeDescriptor}
-                      onChange={(e) =>
-                        updatePhone(index, 'institutionTelephoneNumberTypeDescriptor', e.target.value)
+                      onChange={(v) =>
+                        updatePhone(index, 'institutionTelephoneNumberTypeDescriptor', v ?? '')
                       }
-                      className="w-40 shrink-0 px-3 py-2 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors"
-                    >
-                      {INSTITUTION_TELEPHONE_NUMBER_TYPE_DESCRIPTORS.map((d) => (
-                        <option key={d.value} value={d.value}>{d.label}</option>
-                      ))}
-                    </select>
+                      options={INSTITUTION_TELEPHONE_NUMBER_TYPE_DESCRIPTORS}
+                    />
                     <input
                       type="tel"
                       value={phone.telephoneNumber}

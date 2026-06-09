@@ -21,7 +21,7 @@ import {
   Layers,
 } from 'lucide-react'
 import { toast } from 'sonner'
-import { Button, Drawer, DrawerFooter, Dropdown } from '@edforge/ui'
+import { Button, Drawer, DrawerFooter, Dropdown, Select } from '@edforge/ui'
 import type { DropdownOption } from '@edforge/ui'
 import type { CalendarDateResponseDto } from '@aibrains/shared-types'
 import { tenantService } from '@/services/tenant.service'
@@ -528,14 +528,14 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">Event Type</label>
             {/* Sprint C4-FE §3.7 — curated dropdown (operator-friendly labels).
                 Mirrors the active DateEditPanel in AcademicSetupTab.tsx.
                 "Other" reveals the raw eventType picker as an escape hatch. */}
-            <select
+            <Select
+              label="Event Type"
               value={editCuratedKey}
-              onChange={(e) => {
-                const newKey = e.target.value as CuratedSingleDayKey
+              onChange={(v) => {
+                const newKey = (v ?? '') as CuratedSingleDayKey
                 setEditCuratedKey(newKey)
                 // Update underlying editEventType for state-consistency +
                 // the save-button-enabled check (`editEventType` is the
@@ -546,13 +546,11 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
                   setEditIsInstructional(meta.autoInstructional)
                 }
               }}
-              className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-primary))] px-3 py-2.5"
-            >
-              {CURATED_OPTIONS_FOR_DROPDOWN.map(opt => (
-                <option key={opt.key} value={opt.key}>{opt.label}</option>
-              ))}
-              <option value="other">Other (advanced)…</option>
-            </select>
+              options={[
+                ...CURATED_OPTIONS_FOR_DROPDOWN.map(opt => ({ value: opt.key, label: opt.label })),
+                { value: 'other', label: 'Other (advanced)…' },
+              ]}
+            />
             {editCuratedKey !== 'other' && (
               <p className="mt-1 text-xs text-[rgb(var(--text-tertiary))] leading-tight">
                 {getCuratedMeta(editCuratedKey).description}
@@ -564,20 +562,16 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
               options don't fit. */}
           {editCuratedKey === 'other' && (
             <div>
-              <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">Raw Event Type</label>
-              <select
-                value={editEventType}
-                onChange={(e) => {
-                  setEditEventType(e.target.value)
-                  setEditIsInstructional(e.target.value === 'instructional_day')
+              <Select
+                label="Raw Event Type"
+                placeholder="Select..."
+                value={editEventType || null}
+                onChange={(v) => {
+                  setEditEventType(v ?? '')
+                  setEditIsInstructional((v ?? '') === 'instructional_day')
                 }}
-                className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-primary))] px-3 py-2.5"
-              >
-                <option value="">Select...</option>
-                {EVENT_TYPE_OPTIONS.map(o => (
-                  <option key={o.value} value={o.value}>{o.label}</option>
-                ))}
-              </select>
+                options={EVENT_TYPE_OPTIONS}
+              />
             </div>
           )}
           <div>

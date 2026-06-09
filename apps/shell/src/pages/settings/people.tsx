@@ -26,7 +26,7 @@ import {
   Clock,
   ShieldAlert,
 } from 'lucide-react'
-import { Button, TanstackDataTable, createActionsColumn, type ColumnDef } from '@edforge/ui'
+import { Button, Select, TanstackDataTable, createActionsColumn, type ColumnDef } from '@edforge/ui'
 import { useAuthStore } from '@/stores/auth.store'
 import { useAppStore } from '@/stores/app.store'
 import { can } from '@edforge/abac'
@@ -156,15 +156,13 @@ function ChangeRoleModal({
           Change role for <strong>{user.firstName} {user.lastName}</strong>
         </p>
 
-        <select
+        <Select
+          aria-label="Role"
+          className="w-full mb-6"
           value={newRole}
-          onChange={(e) => setNewRole(e.target.value as GlobalRole)}
-          className="w-full px-3 py-2.5 bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-secondary))] rounded-lg text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] mb-6"
-        >
-          {ROLE_OPTIONS.map((opt) => (
-            <option key={opt.value} value={opt.value}>{opt.label}</option>
-          ))}
-        </select>
+          onChange={(v) => { if (v) setNewRole(v as GlobalRole) }}
+          options={ROLE_OPTIONS}
+        />
 
         <div className="flex justify-end gap-3">
           <Button variant="outline" onClick={onClose}>Cancel</Button>
@@ -565,27 +563,21 @@ export default function PeopleSettingsPage() {
             />
           </div>
 
-          <select
+          <Select
+            aria-label="Filter by role"
+            className="w-44"
             value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value)}
-            className="px-3 py-2.5 bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-secondary))] rounded-lg text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
-          >
-            <option value="">All Roles</option>
-            {ROLE_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
+            onChange={(v) => setRoleFilter(v ?? '')}
+            options={[{ value: '', label: 'All Roles' }, ...ROLE_OPTIONS]}
+          />
 
-          <select
+          <Select
+            aria-label="Filter by status"
+            className="w-44"
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-2.5 bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-secondary))] rounded-lg text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
-          >
-            <option value="">All Statuses</option>
-            {STATUS_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
+            onChange={(v) => setStatusFilter(v ?? '')}
+            options={[{ value: '', label: 'All Statuses' }, ...STATUS_OPTIONS]}
+          />
         </motion.div>
 
         {/* Data Table */}

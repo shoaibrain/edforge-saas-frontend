@@ -18,7 +18,7 @@ import {
   AlertTriangle,
 } from 'lucide-react'
 import { tenantService, type Holiday, type CreateHolidayDto } from '@/services/tenant.service'
-import { Button } from '@edforge/ui'
+import { Button, Select } from '@edforge/ui'
 
 // ============================================================================
 // CONSTANTS
@@ -142,20 +142,12 @@ function CreateHolidayModal({ isOpen, onClose, onSubmit, isLoading }: CreateHoli
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">
-              Holiday Type
-            </label>
-            <select
-              value={holidayType}
-              onChange={(e) => setHolidayType(e.target.value as Holiday['holidayType'])}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all"
-            >
-              {HOLIDAY_TYPE_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
-          </div>
+          <Select
+            label="Holiday Type"
+            value={holidayType}
+            onChange={(v) => { if (v) setHolidayType(v as Holiday['holidayType']) }}
+            options={HOLIDAY_TYPE_OPTIONS}
+          />
 
           {/* Affects toggles */}
           <div className="space-y-3">

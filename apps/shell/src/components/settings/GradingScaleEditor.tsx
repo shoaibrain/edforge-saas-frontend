@@ -7,6 +7,7 @@
 
 import { Plus, Trash2, GripVertical } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { Select } from '@edforge/ui'
 
 export interface GradeLevelConfig {
   letter: string
@@ -81,21 +82,13 @@ export function GradingScaleEditor({
     <div className="space-y-4">
       {/* Scale Type Selector */}
       {onScaleTypeChange && (
-        <div>
-          <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-2">
-            Grading Scale Type
-          </label>
-          <select
-            value={scaleType}
-            onChange={(e) => onScaleTypeChange(e.target.value as typeof scaleType)}
-            disabled={disabled}
-            className="w-full px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all disabled:opacity-50"
-          >
-            {SCALE_TYPE_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
-        </div>
+        <Select
+          label="Grading Scale Type"
+          value={scaleType}
+          onChange={(v) => { if (v) onScaleTypeChange(v as typeof scaleType) }}
+          disabled={disabled}
+          options={SCALE_TYPE_OPTIONS}
+        />
       )}
 
       {/* Grade Scale Table */}
