@@ -12,7 +12,17 @@
   --font-sans: 'Inter', system-ui, sans-serif;
   --font-display: 'Fraunces', Georgia, 'Noto Serif Devanagari', serif;
   --font-devanagari: 'Noto Sans Devanagari', 'Inter', system-ui, sans-serif;
-  
+
+  /* Micro-type scale — sub-text-xs sizes for dense operator dashboards.
+     Tailwind ships no built-in font-size token below text-xs (12px). These
+     fill the 9–11px range that the analytics/attendance dashboards rely on,
+     so dense data tables/strips can use real scale tokens (text-2xs/3xs/4xs)
+     instead of arbitrary text-[Npx] — which no-arbitrary-tailwind-values
+     forbids as a hard error on apps/**. */
+  --text-2xs: 0.6875rem; /* 11px */
+  --text-3xs: 0.625rem; /* 10px */
+  --text-4xs: 0.5625rem; /* 9px */
+
   /* Edforge Brand Colors - Coolors Palette
      https://coolors.co/palette/001219-005f73-0a9396-94d2bd-e9d8a6-ee9b00-ca6702-bb3e03-ae2012-9b2226 
   */

@@ -13,6 +13,12 @@
  *  - Full-width: Attendance Alerts table (CLS-019)
  *
  * Data source: single useAttendanceOverview aggregate endpoint.
+ *
+ * Presentation: static type/spacing/color live in Tailwind classes (semantic
+ * tokens + the text-2xs/3xs/4xs micro-scale). Genuinely per-datum colors and
+ * chart geometry stay inline, marked `allow-presentation-style`. Off-scale
+ * fixed pixel widths/heights stay inline (width/height aren't presentation
+ * keys); off-scale padding is snapped to the 4px scale.
  */
 
 import { useState, useMemo } from 'react'
@@ -46,9 +52,10 @@ type SortDir = 'asc' | 'desc'
 // V2 DESIGN TOKENS
 // ============================================================================
 
-// Routed through the canonical semantic tokens (always present + theme-aware),
-// retiring the redundant `--v2-*` family and its dark-only hex fallbacks that
-// washed out in light mode. Vivid brand accents stay as literals.
+// Vivid brand accents kept as literals for SVG stroke/fill and per-datum
+// chart/legend colors (these stay inline + marked, never moved to className).
+// The neutral text/surface/border members feed inline non-presentation styles
+// (borderLeft/borderBottom ternaries) and dynamic per-datum color choices.
 const V2 = {
   bgSurface: 'rgb(var(--background-secondary))',
   borderDefault: 'rgb(var(--border-primary) / 0.35)',
@@ -67,24 +74,13 @@ const V2 = {
   orange: '#D85A30',
 }
 
-const cardStyle: React.CSSProperties = {
-  background: V2.bgSurface,
-  border: `1px solid ${V2.borderDefault}`,
-  borderRadius: 10,
-  overflow: 'hidden',
-}
-
-const cardHeaderStyle: React.CSSProperties = {
-  padding: '12px 16px',
-  borderBottom: `1px solid ${V2.borderSeparator}`,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-}
-
-const cardBodyStyle: React.CSSProperties = {
-  padding: 16,
-}
+// Shared card chrome as class strings (semantic tokens) — de-dupes the former
+// cardStyle/cardHeaderStyle/cardBodyStyle inline objects.
+const CARD =
+  'bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary)/0.35)] rounded-[10px] overflow-hidden'
+const CARD_HEADER =
+  'px-4 py-3 border-b border-[rgb(var(--border-primary)/0.3)] flex items-center justify-between'
+const CARD_BODY = 'p-4'
 
 // ============================================================================
 // SVG ICON COMPONENTS
@@ -157,14 +153,18 @@ function CardHeader({
   right?: React.ReactNode
 }) {
   return (
-    <div style={cardHeaderStyle}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <div style={{ width: 22, height: 22, borderRadius: 5, background: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div className={CARD_HEADER}>
+      <div className="flex items-center gap-2">
+        <div
+          // allow-presentation-style: per-card icon tint passed as prop + fixed 22px chip
+          className="rounded-[5px] flex items-center justify-center"
+          style={{ width: 22, height: 22, background: iconBg }}
+        >
           {icon}
         </div>
         <div>
-          <div style={{ fontSize: 12, fontWeight: 600, color: V2.textPrimary }}>{title}</div>
-          <div style={{ fontSize: 10, color: V2.textGhost, marginTop: 1 }}>{subtitle}</div>
+          <div className="text-xs font-semibold text-[rgb(var(--text-primary))]">{title}</div>
+          <div className="text-3xs text-[rgb(var(--text-disabled))] mt-px">{subtitle}</div>
         </div>
       </div>
       {right}
@@ -178,11 +178,11 @@ function CardHeader({
 
 function SkeletonStrip() {
   return (
-    <div style={{ ...cardStyle, padding: '14px 16px', display: 'flex', gap: 0 }}>
+    <div className={`${CARD} px-4 py-3.5 flex gap-0`}>
       {Array.from({ length: 5 }).map((_, i) => (
-        <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-          <div style={{ width: 32, height: 20, background: 'rgba(255,255,255,0.04)', borderRadius: 4 }} />
-          <div style={{ width: 48, height: 8, background: 'rgba(255,255,255,0.04)', borderRadius: 3 }} />
+        <div key={i} className="flex-1 flex flex-col items-center gap-1">
+          <div className="w-8 h-5 rounded bg-[rgb(var(--background-tertiary))]" />
+          <div className="w-12 h-2 rounded-[3px] bg-[rgb(var(--background-tertiary))]" />
         </div>
       ))}
     </div>
@@ -191,9 +191,9 @@ function SkeletonStrip() {
 
 function SkeletonCard() {
   return (
-    <div style={{ ...cardStyle, padding: 16 }}>
-      <div style={{ width: '50%', height: 12, background: 'rgba(255,255,255,0.04)', borderRadius: 4, marginBottom: 12 }} />
-      <div style={{ height: 120, background: 'rgba(255,255,255,0.04)', borderRadius: 6 }} />
+    <div className={`${CARD} p-4`}>
+      <div className="w-1/2 h-3 rounded bg-[rgb(var(--background-tertiary))] mb-3" />
+      <div className="rounded-md bg-[rgb(var(--background-tertiary))]" style={{ height: 120 }} />
     </div>
   )
 }
@@ -222,45 +222,53 @@ function TodaySummaryStrip({
   const sevenDayUp = periodAverages.last7Days > periodAverages.last30Days
 
   return (
-    <div style={{ ...cardStyle, padding: '14px 16px', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 0 }}>
+    <div className={`${CARD} px-4 py-3.5 mb-3 flex items-center gap-0`}>
       {stats.map((s, i) => (
         <div
           key={s.label}
-          style={{
-            display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, gap: 2,
-            borderLeft: i > 0 ? `1px solid ${V2.borderDefault}` : 'none',
-          }}
+          className="flex flex-col items-center flex-1 gap-0.5"
+          style={{ borderLeft: i > 0 ? `1px solid ${V2.borderDefault}` : 'none' }}
         >
-          <span style={{ fontSize: 20, fontWeight: 700, lineHeight: 1, color: s.color }}>{s.value}</span>
-          <span style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: V2.textGhost }}>{s.label}</span>
-          <span style={{ fontSize: 9, color: V2.textGhost }}>{s.sub}</span>
+          <span
+            // allow-presentation-style: per-stat accent color
+            className="text-xl font-bold leading-none"
+            style={{ color: s.color }}
+          >{s.value}</span>
+          <span className="text-4xs font-bold uppercase tracking-[0.5px] text-[rgb(var(--text-disabled))]">{s.label}</span>
+          <span className="text-4xs text-[rgb(var(--text-disabled))]">{s.sub}</span>
         </div>
       ))}
 
       {/* Divider */}
-      <div style={{ width: 1, height: 48, background: V2.borderDefault, flexShrink: 0, margin: '0 16px' }} />
+      <div className="w-px h-12 bg-[rgb(var(--border-primary)/0.35)] shrink-0 mx-4" />
 
       {/* School Average */}
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1.5, gap: 2 }}>
-        <span style={{ fontSize: 20, fontWeight: 700, color: V2.success, lineHeight: 1 }}>
+      <div className="flex flex-col items-center gap-0.5" style={{ flex: 1.5 }}>
+        <span className="text-xl font-bold leading-none text-[#1D9E75]">
           {periodAverages.academicYear.toFixed(1)}%
         </span>
-        <span style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: V2.textGhost }}>
+        <span className="text-4xs font-bold uppercase tracking-[0.5px] text-[rgb(var(--text-disabled))]">
           School Average
         </span>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
-          <span style={{
-            fontSize: 9, fontWeight: 500, padding: '1px 5px', borderRadius: 4,
-            background: sevenDayUp ? 'rgba(29,158,117,0.10)' : 'rgba(226,75,74,0.10)',
-            color: sevenDayUp ? V2.success : V2.danger,
-          }}>
+        <div className="flex items-center gap-1.5 mt-0.5">
+          <span
+            // allow-presentation-style: up/down trend accent (success/danger)
+            className="text-4xs font-medium px-1.5 py-px rounded"
+            style={{
+              background: sevenDayUp ? 'rgba(29,158,117,0.10)' : 'rgba(226,75,74,0.10)',
+              color: sevenDayUp ? V2.success : V2.danger,
+            }}
+          >
             7-day: {periodAverages.last7Days.toFixed(1)}%
           </span>
-          <span style={{
-            fontSize: 9, fontWeight: 500, padding: '1px 5px', borderRadius: 4,
-            background: !sevenDayUp ? 'rgba(29,158,117,0.10)' : 'rgba(226,75,74,0.10)',
-            color: !sevenDayUp ? V2.success : V2.danger,
-          }}>
+          <span
+            // allow-presentation-style: up/down trend accent (success/danger)
+            className="text-4xs font-medium px-1.5 py-px rounded"
+            style={{
+              background: !sevenDayUp ? 'rgba(29,158,117,0.10)' : 'rgba(226,75,74,0.10)',
+              color: !sevenDayUp ? V2.success : V2.danger,
+            }}
+          >
             30-day: {periodAverages.last30Days.toFixed(1)}%
           </span>
         </div>
@@ -292,25 +300,27 @@ function AbsenceBreakdownCard({
   const dateLabel = new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 
   return (
-    <div style={cardStyle}>
+    <div className={CARD}>
       <CardHeader
         icon={<AlertCircleIcon />}
         iconBg="rgba(226,75,74,0.08)"
         title="Today's Absence Breakdown"
         subtitle={`${dateLabel} — ${total === 0 ? 'no absences recorded yet' : `${total} absences`}`}
       />
-      <div style={cardBodyStyle}>
+      <div className={CARD_BODY}>
         {categories.map((cat, i) => (
           <div
             key={cat.label}
-            style={{
-              display: 'flex', alignItems: 'center', padding: '7px 0', gap: 8,
-              borderBottom: i < categories.length - 1 ? `1px solid ${V2.borderRow}` : 'none',
-            }}
+            className="flex items-center gap-2 py-2"
+            style={{ borderBottom: i < categories.length - 1 ? `1px solid ${V2.borderRow}` : 'none' }}
           >
-            <div style={{ width: 8, height: 8, borderRadius: '50%', background: cat.color, flexShrink: 0 }} />
-            <span style={{ fontSize: 11, color: V2.textSecondary, flex: 1 }}>{cat.label}</span>
-            <span style={{ fontSize: 11, fontWeight: 500, color: V2.textMuted }}>{cat.count}</span>
+            <div
+              // allow-presentation-style: per-category legend dot color
+              className="w-2 h-2 rounded-full shrink-0"
+              style={{ background: cat.color }}
+            />
+            <span className="text-2xs text-[rgb(var(--text-secondary))] flex-1">{cat.label}</span>
+            <span className="text-2xs font-medium text-[rgb(var(--text-tertiary))]">{cat.count}</span>
           </div>
         ))}
       </div>
@@ -351,31 +361,43 @@ function DOWPatternCard({
   const isLowest = (rate: number) => rate === minRate && minRate < maxRate
 
   return (
-    <div style={cardStyle}>
+    <div className={CARD}>
       <CardHeader
         icon={<ActivityIcon />}
         iconBg="rgba(239,159,39,0.10)"
         title="Day-of-Week Pattern"
         subtitle="Average attendance rate by weekday"
       />
-      <div style={cardBodyStyle}>
-        <div style={{ display: 'flex', gap: 6 }}>
+      <div className={CARD_BODY}>
+        <div className="flex gap-1.5">
           {days.map((day) => {
             const d = pattern[day]
             const heightPct = maxRate > 0 ? (d.avgRate / 100) * 100 : 0
             const lowest = isLowest(d.avgRate)
             return (
-              <div key={day} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                <div style={{ height: 36, width: '100%', background: 'rgba(255,255,255,0.04)', borderRadius: 4, overflow: 'hidden', display: 'flex', alignItems: 'flex-end' }}>
-                  <div style={{ width: '100%', height: `${heightPct}%`, background: getBarColor(d.avgRate), borderRadius: 3, transition: 'all 0.3s' }} />
+              <div key={day} className="flex-1 flex flex-col items-center gap-1">
+                <div className="w-full h-9 rounded bg-[rgb(var(--background-tertiary))] overflow-hidden flex items-end">
+                  <div
+                    // allow-presentation-style: data-driven bar height + rate color
+                    className="w-full rounded-[3px] transition-all"
+                    style={{ height: `${heightPct}%`, background: getBarColor(d.avgRate) }}
+                  />
                 </div>
-                <div style={{ fontSize: 9, color: lowest ? V2.danger : V2.textGhost }}>{DAY_SHORT[day]}</div>
-                <div style={{ fontSize: 9, fontWeight: 600, color: lowest ? V2.danger : V2.textMuted }}>{d.avgRate.toFixed(0)}%</div>
+                <div
+                  // allow-presentation-style: lowest-day emphasis color
+                  className="text-4xs"
+                  style={{ color: lowest ? V2.danger : V2.textGhost }}
+                >{DAY_SHORT[day]}</div>
+                <div
+                  // allow-presentation-style: lowest-day emphasis color
+                  className="text-4xs font-semibold"
+                  style={{ color: lowest ? V2.danger : V2.textMuted }}
+                >{d.avgRate.toFixed(0)}%</div>
               </div>
             )
           })}
         </div>
-        <div style={{ fontSize: 9, color: V2.textGhost, marginTop: 10, paddingTop: 8, borderTop: `1px solid ${V2.borderSeparator}` }}>
+        <div className="text-4xs text-[rgb(var(--text-disabled))] mt-2.5 pt-2" style={{ borderTop: `1px solid ${V2.borderSeparator}` }}>
           {DAY_SHORT[minDay]} has the lowest avg attendance ({minRate.toFixed(0)}%). {DAY_SHORT[maxDay]} is highest.
         </div>
       </div>
@@ -401,15 +423,15 @@ function TrendChart({
 
   if (sorted.length === 0) {
     return (
-      <div style={cardStyle}>
+      <div className={CARD}>
         <CardHeader
           icon={<TrendLineIcon />}
           iconBg="rgba(29,158,117,0.10)"
           title="30-Day Attendance Rate"
           subtitle="No trend data available"
         />
-        <div style={{ ...cardBodyStyle, height: 80, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <span style={{ fontSize: 11, color: V2.textHint }}>No trend data available for the selected period.</span>
+        <div className={`${CARD_BODY} h-20 flex items-center justify-center`}>
+          <span className="text-2xs text-[rgb(var(--text-disabled))]">No trend data available for the selected period.</span>
         </div>
       </div>
     )
@@ -447,20 +469,20 @@ function TrendChart({
   const lastDate = new Date(sorted[n - 1].date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 
   return (
-    <div style={cardStyle}>
+    <div className={CARD}>
       <CardHeader
         icon={<TrendLineIcon />}
         iconBg="rgba(29,158,117,0.10)"
         title="30-Day Attendance Rate"
         subtitle={`Daily recorded attendance rate trend — ${firstDate} to ${lastDate}`}
         right={
-          <div style={{ display: 'flex', gap: 12, fontSize: 10 }}>
-            <span style={{ color: V2.textHint }}>7-day avg: <strong style={{ color: V2.success }}>{periodAverages.last7Days.toFixed(1)}%</strong></span>
-            <span style={{ color: V2.textHint }}>30-day avg: <strong style={{ color: V2.textMuted }}>{periodAverages.last30Days.toFixed(1)}%</strong></span>
+          <div className="flex gap-3 text-3xs">
+            <span className="text-[rgb(var(--text-disabled))]">7-day avg: <strong className="text-[#1D9E75]">{periodAverages.last7Days.toFixed(1)}%</strong></span>
+            <span className="text-[rgb(var(--text-disabled))]">30-day avg: <strong className="text-[rgb(var(--text-tertiary))]">{periodAverages.last30Days.toFixed(1)}%</strong></span>
           </div>
         }
       />
-      <div style={{ ...cardBodyStyle, paddingTop: 8 }}>
+      <div className={`${CARD_BODY} pt-2`}>
         <svg viewBox={`0 0 ${width} ${height}`} width="100%" height={height} style={{ overflow: 'visible' }}>
           <defs>
             <linearGradient id="attTrendGrad" x1="0" y1="0" x2="0" y2="1">
@@ -488,7 +510,7 @@ function TrendChart({
             </>
           )}
         </svg>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, fontSize: 9, color: V2.textGhost }}>
+        <div className="flex justify-between mt-1.5 text-4xs text-[rgb(var(--text-disabled))]">
           {dateLabels.map((dl, i) => (
             <span key={i}>{dl.label}</span>
           ))}
@@ -516,18 +538,18 @@ function SectionCompletionCard({
   const offset = circumference * (1 - pct / 100)
 
   return (
-    <div style={cardStyle}>
+    <div className={CARD}>
       <CardHeader
         icon={<CheckSquareIcon />}
         iconBg="rgba(127,119,221,0.10)"
         title="Section Completion"
         subtitle="Today's recording status per section"
       />
-      <div style={cardBodyStyle}>
-        <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}>
+      <div className={CARD_BODY}>
+        <div className="flex gap-5 items-start">
           {/* Ring */}
-          <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-            <div style={{ position: 'relative', width: 72, height: 72 }}>
+          <div className="shrink-0 flex flex-col items-center gap-1.5">
+            <div className="relative" style={{ width: 72, height: 72 }}>
               <svg width={72} height={72} viewBox="0 0 72 72">
                 <circle cx="36" cy="36" r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="10" />
                 <circle
@@ -540,26 +562,25 @@ function SectionCompletionCard({
                   transform="rotate(-90 36 36)"
                 />
               </svg>
-              <div style={{
-                position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column',
-              }}>
-                <span style={{ fontSize: 16, fontWeight: 700, color: pct > 0 ? V2.textPrimary : V2.textHint }}>{pct}%</span>
+              <div className="absolute inset-0 flex items-center justify-center flex-col">
+                <span
+                  // allow-presentation-style: ring center value color depends on completion
+                  className="text-base font-bold"
+                  style={{ color: pct > 0 ? V2.textPrimary : V2.textHint }}
+                >{pct}%</span>
               </div>
             </div>
-            <div style={{ fontSize: 9, color: V2.textHint }}>{sectionsWithAttendance} / {totalSections}</div>
+            <div className="text-4xs text-[rgb(var(--text-disabled))]">{sectionsWithAttendance} / {totalSections}</div>
           </div>
 
           {/* Section list */}
-          <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
+          <div className="flex-1 min-w-0 overflow-hidden">
             {/* Header row */}
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6, paddingBottom: 6,
-              borderBottom: `1px solid ${V2.borderSeparator}`,
-            }}>
-              <span style={{ fontSize: 9, fontWeight: 700, color: V2.textGhost, textTransform: 'uppercase', letterSpacing: '0.5px', flex: 1 }}>Section</span>
-              <span style={{ fontSize: 9, fontWeight: 700, color: V2.textGhost, textTransform: 'uppercase', letterSpacing: '0.5px', width: 28, textAlign: 'center' }}>Enr.</span>
-              <span style={{ fontSize: 9, fontWeight: 700, color: V2.textGhost, textTransform: 'uppercase', letterSpacing: '0.5px', width: 36, textAlign: 'center' }}>Rec.</span>
-              <span style={{ fontSize: 9, fontWeight: 700, color: V2.textGhost, textTransform: 'uppercase', letterSpacing: '0.5px', width: 70, textAlign: 'right' }}>Status</span>
+            <div className="flex items-center gap-2.5 mb-1.5 pb-1.5" style={{ borderBottom: `1px solid ${V2.borderSeparator}` }}>
+              <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px] flex-1">Section</span>
+              <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px] text-center" style={{ width: 28 }}>Enr.</span>
+              <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px] text-center" style={{ width: 36 }}>Rec.</span>
+              <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px] text-right" style={{ width: 70 }}>Status</span>
             </div>
             {/* Rows */}
             {sections.map((s, i) => {
@@ -568,26 +589,25 @@ function SectionCompletionCard({
                 ? { background: 'rgba(29,158,117,0.10)', color: V2.success }
                 : s.recordedCount > 0
                   ? { background: 'rgba(239,159,39,0.10)', color: V2.warning }
-                  : { background: 'rgba(255,255,255,0.05)', color: V2.textHint }
+                  : { background: 'rgb(var(--background-tertiary))', color: V2.textHint }
 
               return (
                 <div
                   key={s.sectionId}
-                  style={{
-                    display: 'flex', alignItems: 'center', padding: '7px 0', gap: 10,
-                    borderBottom: i < sections.length - 1 ? `1px solid ${V2.borderRow}` : 'none',
-                  }}
+                  className="flex items-center gap-2.5 py-2"
+                  style={{ borderBottom: i < sections.length - 1 ? `1px solid ${V2.borderRow}` : 'none' }}
                 >
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 11, fontWeight: 500, color: V2.textSecondary }}>{s.courseName}</div>
-                    <span style={{ fontSize: 9, color: V2.textHint, fontFamily: 'var(--font-mono, monospace)' }}>#{s.sectionNumber}</span>
+                  <div className="flex-1">
+                    <div className="text-2xs font-medium text-[rgb(var(--text-secondary))]">{s.courseName}</div>
+                    <span className="text-4xs text-[rgb(var(--text-disabled))]" style={{ fontFamily: 'var(--font-mono, monospace)' }}>#{s.sectionNumber}</span>
                   </div>
-                  <span style={{ fontSize: 10, color: V2.textHint, width: 28, textAlign: 'center' }}>{s.studentCount}</span>
-                  <span style={{ fontSize: 10, color: V2.textHint, width: 36, textAlign: 'center' }}>{s.recordedCount}</span>
-                  <span style={{
-                    fontSize: 9, fontWeight: 500, padding: '2px 7px', borderRadius: 5, whiteSpace: 'nowrap', width: 70, textAlign: 'right',
-                    ...statusStyle,
-                  }}>{statusLabel}</span>
+                  <span className="text-3xs text-[rgb(var(--text-disabled))] text-center" style={{ width: 28 }}>{s.studentCount}</span>
+                  <span className="text-3xs text-[rgb(var(--text-disabled))] text-center" style={{ width: 36 }}>{s.recordedCount}</span>
+                  <span
+                    // allow-presentation-style: per-section status chip tint (complete/partial/not-started)
+                    className="text-4xs font-medium px-2 py-0.5 rounded-[5px] whitespace-nowrap text-right"
+                    style={{ width: 70, ...statusStyle }}
+                  >{statusLabel}</span>
                 </div>
               )
             })}
@@ -616,26 +636,27 @@ function PeriodAveragesCard({
   const trending = periodAverages.last7Days > periodAverages.last30Days ? 'upward' : 'downward'
 
   return (
-    <div style={cardStyle}>
+    <div className={CARD}>
       <CardHeader
         icon={<BarChartSmallIcon />}
         iconBg="rgba(29,158,117,0.10)"
         title="Period Averages"
         subtitle="Attendance rates across different time windows"
       />
-      <div style={cardBodyStyle}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 16 }}>
+      <div className={CARD_BODY}>
+        <div className="grid grid-cols-3 gap-2.5 mb-4">
           {tiles.map((t) => (
-            <div key={t.label} style={{
-              background: 'rgba(255,255,255,0.02)', border: `1px solid ${V2.borderDefault}`,
-              borderRadius: 8, padding: 12, textAlign: 'center',
-            }}>
-              <div style={{ fontSize: 9, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', color: V2.textGhost, marginBottom: 6 }}>{t.label}</div>
-              <div style={{ fontSize: 20, fontWeight: 700, color: t.color }}>{t.value.toFixed(1)}%</div>
+            <div key={t.label} className="rounded-lg p-3 text-center bg-[rgb(var(--background-tertiary)/0.5)] border border-[rgb(var(--border-primary)/0.35)]">
+              <div className="text-4xs font-bold uppercase tracking-[0.5px] text-[rgb(var(--text-disabled))] mb-1.5">{t.label}</div>
+              <div
+                // allow-presentation-style: per-tile accent (success vs neutral)
+                className="text-xl font-bold"
+                style={{ color: t.color }}
+              >{t.value.toFixed(1)}%</div>
             </div>
           ))}
         </div>
-        <div style={{ fontSize: 10, color: V2.textGhost, fontStyle: 'italic', textAlign: 'center', marginTop: 4 }}>
+        <div className="text-3xs text-[rgb(var(--text-disabled))] italic text-center mt-1">
           Attendance is trending {trending} over the last 7 days vs. 30-day baseline.
         </div>
       </div>
@@ -718,7 +739,7 @@ function AlertsTableV2({
   }
 
   return (
-    <div style={cardStyle}>
+    <div className={CARD}>
       <CardHeader
         icon={<WarningTriangleIcon />}
         iconBg="rgba(239,159,39,0.10)"
@@ -726,20 +747,20 @@ function AlertsTableV2({
         subtitle="Students below 90% attendance rate · sorted by severity"
         right={
           alerts.length > 0
-            ? <span style={{ fontSize: 10, color: V2.textHint }}>Showing {alerts.length} of {totalAtRiskCount} at-risk student{totalAtRiskCount !== 1 ? 's' : ''}</span>
+            ? <span className="text-3xs text-[rgb(var(--text-disabled))]">Showing {alerts.length} of {totalAtRiskCount} at-risk student{totalAtRiskCount !== 1 ? 's' : ''}</span>
             : undefined
         }
       />
-      <div style={cardBodyStyle}>
+      <div className={CARD_BODY}>
         {alerts.length === 0 ? (
-          <div style={{ padding: '32px 0', textAlign: 'center' }}>
-            <CheckCircle style={{ width: 40, height: 40, color: V2.success, margin: '0 auto 12px' }} />
-            <p style={{ fontSize: 12, color: V2.textSecondary }}>No students below the attendance threshold</p>
+          <div className="py-8 text-center">
+            <CheckCircle className="text-[#1D9E75] mx-auto mb-3" style={{ width: 40, height: 40 }} />
+            <p className="text-xs text-[rgb(var(--text-secondary))]">No students below the attendance threshold</p>
           </div>
         ) : (
           <>
             {/* Header */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6, paddingBottom: 6, borderBottom: `1px solid ${V2.borderSeparator}` }}>
+            <div className="flex items-center gap-3 mb-1.5 pb-1.5" style={{ borderBottom: `1px solid ${V2.borderSeparator}` }}>
               <span style={headerColStyle('studentName', 'flex', 'left')} onClick={() => toggleSort('studentName')}>
                 Student {sortKey === 'studentName' && (sortDir === 'asc' ? '▲' : '▼')}
               </span>
@@ -762,35 +783,38 @@ function AlertsTableV2({
               return (
                 <div
                   key={alert.studentId}
-                  style={{
-                    display: 'flex', alignItems: 'center', padding: '8px 0', gap: 12,
-                    borderBottom: i < sorted.length - 1 ? `1px solid ${V2.borderRow}` : 'none',
-                  }}
+                  className="flex items-center gap-3 py-2"
+                  style={{ borderBottom: i < sorted.length - 1 ? `1px solid ${V2.borderRow}` : 'none' }}
                 >
-                  <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+                  <div className="flex-1 flex items-center gap-2 min-w-0">
                     <UserAvatar userId={alert.studentId} userName={alert.studentName} size="sm" />
-                    <div style={{ minWidth: 0 }}>
+                    <div className="min-w-0">
                       <button
                         type="button"
                         onClick={() => onStudentClick?.(alert.studentId)}
-                        style={{
-                          background: 'none', border: 'none', padding: 0, cursor: 'pointer', textAlign: 'left',
-                          fontSize: 12, fontWeight: 500, color: V2.textPrimary,
-                        }}
+                        className="bg-transparent border-0 p-0 cursor-pointer text-left text-xs font-medium text-[rgb(var(--text-primary))]"
                       >
                         {alert.studentName}
                       </button>
                       {alert.gradeLevel && (
-                        <span style={{ display: 'block', fontSize: 9, color: V2.textHint }}>{alert.gradeLevel}</span>
+                        <span className="block text-4xs text-[rgb(var(--text-disabled))]">{alert.gradeLevel}</span>
                       )}
                     </div>
                   </div>
-                  <span style={{ fontSize: 12, fontWeight: 700, width: 60, textAlign: 'right', color: getRateColorHex(alert.attendanceRate) }}>
+                  <span
+                    // allow-presentation-style: rate severity color
+                    className="text-xs font-bold text-right"
+                    style={{ width: 60, color: getRateColorHex(alert.attendanceRate) }}
+                  >
                     {alert.attendanceRate.toFixed(1)}%
                   </span>
-                  <span style={{ fontSize: 11, color: V2.textMuted, width: 50, textAlign: 'center' }}>{alert.absentDays}</span>
-                  <span style={{ fontSize: 11, color: V2.textHint, width: 50, textAlign: 'center' }}>{alert.totalDays}</span>
-                  <span style={{ fontSize: 10, color: t.color, width: 60, textAlign: 'right' }}>{t.text}</span>
+                  <span className="text-2xs text-[rgb(var(--text-tertiary))] text-center" style={{ width: 50 }}>{alert.absentDays}</span>
+                  <span className="text-2xs text-[rgb(var(--text-disabled))] text-center" style={{ width: 50 }}>{alert.totalDays}</span>
+                  <span
+                    // allow-presentation-style: trend direction color
+                    className="text-3xs text-right"
+                    style={{ width: 60, color: t.color }}
+                  >{t.text}</span>
                 </div>
               )
             })}
@@ -844,23 +868,19 @@ export function AttendanceDashboard({
   // Error state
   if (error) {
     return (
-      <div style={{ ...cardStyle, padding: 24, textAlign: 'center' }}>
-        <AlertTriangle style={{ width: 20, height: 20, color: V2.danger, margin: '0 auto 8px' }} />
-        <p style={{ fontSize: 13, fontWeight: 500, color: V2.danger, marginBottom: 4 }}>Failed to load attendance overview</p>
-        <p style={{ fontSize: 11, color: V2.textMuted }}>Please try refreshing the page. If the issue persists, contact support.</p>
+      <div className={`${CARD} p-6 text-center`}>
+        <AlertTriangle className="text-[rgb(var(--state-danger-fg))] mx-auto mb-2" style={{ width: 20, height: 20 }} />
+        <p className="text-sm font-medium text-[rgb(var(--state-danger-fg))] mb-1">Failed to load attendance overview</p>
+        <p className="text-2xs text-[rgb(var(--text-tertiary))]">Please try refreshing the page. If the issue persists, contact support.</p>
       </div>
     )
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+    <div className="flex flex-col gap-3">
       {/* SCOPE INDICATOR */}
       {!isSchoolWide && summary && (
-        <div style={{
-          display: 'inline-flex', alignItems: 'center', gap: 6, padding: '4px 10px',
-          fontSize: 10, fontWeight: 500, borderRadius: 20,
-          background: 'rgba(55,138,221,0.08)', color: V2.info,
-        }}>
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 text-3xs font-medium rounded-[20px] bg-[rgb(var(--state-info-bg))] text-[rgb(var(--state-info-fg))]">
           Showing data for your sections ({summary.totalStudents} students)
         </div>
       )}
@@ -876,12 +896,12 @@ export function AttendanceDashboard({
 
       {/* ROW 1: Absence Breakdown + DOW Pattern (CLS-015) */}
       {isLoading ? (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <div className="grid grid-cols-2 gap-3">
           <SkeletonCard />
           <SkeletonCard />
         </div>
       ) : data ? (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <div className="grid grid-cols-2 gap-3">
           {data.absenceBreakdown && (
             <WidgetErrorBoundaryV2>
               <AbsenceBreakdownCard breakdown={data.absenceBreakdown} date={currentDate} />
@@ -906,12 +926,12 @@ export function AttendanceDashboard({
 
       {/* ROW 3: Section Completion + Period Averages (CLS-017, CLS-018) */}
       {isLoading ? (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <div className="grid grid-cols-2 gap-3">
           <SkeletonCard />
           <SkeletonCard />
         </div>
       ) : data ? (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+        <div className="grid grid-cols-2 gap-3">
           {data.sectionCompletion && (
             <WidgetErrorBoundaryV2>
               <SectionCompletionCard sectionCompletion={data.sectionCompletion} />
