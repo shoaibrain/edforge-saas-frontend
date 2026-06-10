@@ -401,12 +401,7 @@ export default function InvoicesPage() {
             <button
               type="button"
               onClick={() => navigate({ to: '/invoices/bulk-generate' })}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80"
-              style={{
-                background: 'rgb(var(--background-tertiary))',
-                borderColor: 'rgb(var(--border-primary) / 0.35)',
-                color: 'rgb(var(--text-secondary))',
-              }}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
             >
               <Users className="w-3.5 h-3.5" />
               Bulk Generate
@@ -414,11 +409,7 @@ export default function InvoicesPage() {
             <button
               type="button"
               onClick={() => setShowGenerateForm(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90"
-              style={{
-                background: '#1D9E75',
-                color: '#fff',
-              }}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
             >
               <Plus className="w-3.5 h-3.5" />
               Generate Invoice

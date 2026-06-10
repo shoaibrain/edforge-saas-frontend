@@ -15,27 +15,27 @@ export interface FinanceInfoBannerProps {
 
 const VARIANT_STYLES = {
   info: {
-    bg: 'rgba(55,138,221,0.06)',
-    border: 'rgba(55,138,221,0.12)',
-    icon: '#378ADD',
+    box: 'bg-[rgb(var(--accent-academics)/0.06)] border-[rgb(var(--accent-academics)/0.12)]',
+    fg: 'text-[rgb(var(--accent-academics))]',
+    btnBg: 'bg-[rgb(var(--accent-academics))]',
     Icon: Info,
   },
   warning: {
-    bg: 'rgba(239,159,39,0.06)',
-    border: 'rgba(239,159,39,0.12)',
-    icon: '#EF9F27',
+    box: 'bg-[rgb(var(--accent-attendance)/0.06)] border-[rgb(var(--accent-attendance)/0.12)]',
+    fg: 'text-[rgb(var(--accent-attendance))]',
+    btnBg: 'bg-[rgb(var(--accent-attendance))]',
     Icon: AlertTriangle,
   },
   danger: {
-    bg: 'rgba(226,75,74,0.06)',
-    border: 'rgba(226,75,74,0.12)',
-    icon: '#E24B4A',
+    box: 'bg-[rgb(var(--accent-finance)/0.06)] border-[rgb(var(--accent-finance)/0.12)]',
+    fg: 'text-[rgb(var(--accent-finance))]',
+    btnBg: 'bg-[rgb(var(--accent-finance))]',
     Icon: AlertCircle,
   },
   success: {
-    bg: 'rgba(29,158,117,0.06)',
-    border: 'rgba(29,158,117,0.12)',
-    icon: '#1D9E75',
+    box: 'bg-[rgb(var(--accent-enrollment)/0.06)] border-[rgb(var(--accent-enrollment)/0.12)]',
+    fg: 'text-[#1D9E75]',
+    btnBg: 'bg-[#1D9E75]',
     Icon: CheckCircle,
   },
 } as const
@@ -54,25 +54,17 @@ export function FinanceInfoBanner({
   const IconComponent = styles.Icon
 
   return (
-    <div
-      className="flex items-center gap-3 rounded-xl"
-      style={{
-        background: styles.bg,
-        border: `1px solid ${styles.border}`,
-        padding: '12px 14px',
-      }}
-    >
+    <div className={`flex items-center gap-3 rounded-xl border px-3.5 py-3 ${styles.box}`}>
       <IconComponent
-        className="w-3.5 h-3.5 flex-shrink-0"
-        style={{ color: styles.icon }}
+        className={`w-3.5 h-3.5 flex-shrink-0 ${styles.fg}`}
         strokeWidth={2}
       />
       <div className="flex-1 min-w-0">
-        <p className="text-xs font-medium" style={{ color: 'rgb(var(--text-primary))' }}>
+        <p className="text-xs font-medium text-[rgb(var(--text-primary))]">
           {message}
         </p>
         {subtitle && (
-          <p className="text-xs mt-0.5" style={{ color: 'rgb(var(--text-tertiary))' }}>
+          <p className="text-xs mt-0.5 text-[rgb(var(--text-tertiary))]">
             {subtitle}
           </p>
         )}
@@ -80,11 +72,7 @@ export function FinanceInfoBanner({
       {action && (
         <button
           onClick={action.onClick}
-          className="flex-shrink-0 text-xs font-medium px-3 py-1 rounded-md transition-opacity hover:opacity-80"
-          style={{
-            background: styles.icon,
-            color: '#fff',
-          }}
+          className={`flex-shrink-0 text-xs font-medium px-3 py-1 rounded-md transition-opacity hover:opacity-80 text-[#fff] ${styles.btnBg}`}
         >
           {action.label}
         </button>
@@ -92,8 +80,7 @@ export function FinanceInfoBanner({
       {dismissible && (
         <button
           onClick={() => setDismissed(true)}
-          className="flex-shrink-0 p-0.5 rounded hover:opacity-70 transition-opacity"
-          style={{ color: 'rgb(var(--text-tertiary))' }}
+          className="flex-shrink-0 p-0.5 rounded hover:opacity-70 transition-opacity text-[rgb(var(--text-tertiary))]"
         >
           <X className="w-3.5 h-3.5" />
         </button>
