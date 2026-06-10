@@ -82,10 +82,7 @@ function StudentsInsightStrip({
 }) {
   if (isLoading) {
     return (
-      <div
-        className="h-5 rounded-lg v2-skeleton-pulse"
-        style={{ background: 'rgb(var(--background-tertiary))', width: '60%' }}
-      />
+      <div className="h-5 w-3/5 rounded-lg v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
     )
   }
 
@@ -100,10 +97,11 @@ function StudentsInsightStrip({
     : undefined
 
   return (
-    <p className="text-xs leading-relaxed" style={{ color: 'rgb(var(--text-tertiary))' }}>
+    <p className="text-xs leading-relaxed text-[rgb(var(--text-tertiary))]">
       {totalEnrolled} student{totalEnrolled !== 1 ? 's' : ''} enrolled across {gradeCount} grade{gradeCount !== 1 ? 's' : ''}
       {' · '}
       {attendanceRate != null ? (
+        // allow-presentation-style: attendance-rate severity color
         <span style={attendanceColor ? { color: attendanceColor } : undefined}>
           {attendanceRate.toFixed(1)}% attendance today
         </span>
@@ -112,7 +110,7 @@ function StudentsInsightStrip({
       )}
       {' · '}
       {atRiskCount > 0 ? (
-        <span style={{ color: 'rgb(var(--state-danger-fg))' }}>
+        <span className="text-[rgb(var(--state-danger-fg))]">
           {atRiskCount} at-risk student{atRiskCount !== 1 ? 's' : ''}
         </span>
       ) : (
@@ -127,66 +125,56 @@ function StudentsInsightStrip({
 // ============================================================================
 
 function TableSkeleton() {
-  // Block colors via semantic tokens (read correctly in light + dark) — the
+  // Block fills via semantic tokens (read correctly in light + dark) — the
   // skeleton mirrors the 8-column roster so there's no load → render jump.
-  const block = 'rgb(var(--text-tertiary)/0.18)'
-  const blockFaint = 'rgb(var(--text-tertiary)/0.10)'
+  const block = 'bg-[rgb(var(--text-tertiary)/0.18)]'
+  const blockFaint = 'bg-[rgb(var(--text-tertiary)/0.10)]'
   return (
-    <div
-      className="rounded-xl border overflow-hidden"
-      style={{
-        background: 'rgb(var(--background-secondary))',
-        borderColor: 'rgb(var(--border-primary) / 0.35)',
-      }}
-    >
+    <div className="rounded-xl border overflow-hidden bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]">
       {/* Header row */}
-      <div
-        className="flex items-center gap-4 px-4 py-2.5 border-b"
-        style={{ borderColor: 'rgb(var(--border-primary) / 0.35)', background: 'rgb(var(--background-tertiary))' }}
-      >
+      <div className="flex items-center gap-4 px-4 py-2.5 border-b border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-tertiary))]">
         {[150, 48, 90, 120, 90, 60, 70, 24].map((w, i) => (
-          <div key={i} className="h-3 rounded v2-skeleton-pulse" style={{ width: w, background: block }} />
+          <div key={i} className={`h-3 rounded v2-skeleton-pulse ${block}`} style={{ width: w }} />
         ))}
       </div>
       {/* 8 skeleton rows */}
       {Array.from({ length: 8 }).map((_, rowIdx) => (
         <div
           key={rowIdx}
-          className="flex items-center gap-4 px-4 py-3 border-b"
-          style={{ borderColor: 'rgb(var(--border-primary) / 0.35)' }}
+          className="flex items-center gap-4 px-4 py-3 border-b border-[rgb(var(--border-primary)/0.35)]"
         >
           {/* Student: avatar + name/id */}
-          <div className="w-9 h-9 rounded-full v2-skeleton-pulse flex-shrink-0" style={{ background: block }} />
+          <div className={`w-9 h-9 rounded-full v2-skeleton-pulse flex-shrink-0 ${block}`} />
           <div className="flex flex-col gap-1.5" style={{ width: 130 }}>
-            <div className="h-3 rounded v2-skeleton-pulse" style={{ width: 100, background: block }} />
-            <div className="h-2.5 rounded v2-skeleton-pulse" style={{ width: 70, background: blockFaint }} />
+            <div className={`h-3 rounded v2-skeleton-pulse ${block}`} style={{ width: 100 }} />
+            <div className={`h-2.5 rounded v2-skeleton-pulse ${blockFaint}`} style={{ width: 70 }} />
           </div>
           {/* Grade chip */}
-          <div className="h-5 rounded-[7px] v2-skeleton-pulse" style={{ width: 30, background: block }} />
+          <div className={`h-5 rounded-[7px] v2-skeleton-pulse ${block}`} style={{ width: 30 }} />
           {/* Attendance: spark + % */}
           <div className="flex items-center gap-2" style={{ width: 100 }}>
-            <div className="h-4 rounded v2-skeleton-pulse flex-1" style={{ background: blockFaint }} />
-            <div className="h-3 rounded v2-skeleton-pulse" style={{ width: 26, background: block }} />
+            <div className={`h-4 rounded v2-skeleton-pulse flex-1 ${blockFaint}`} />
+            <div className={`h-3 rounded v2-skeleton-pulse ${block}`} style={{ width: 26 }} />
           </div>
           {/* Guardian: stacked circles + name */}
           <div className="flex items-center gap-2" style={{ width: 150 }}>
             <div className="flex -space-x-2 flex-shrink-0">
-              <div className="w-6 h-6 rounded-full v2-skeleton-pulse" style={{ background: block }} />
-              <div className="w-6 h-6 rounded-full v2-skeleton-pulse" style={{ background: blockFaint }} />
+              <div className={`w-6 h-6 rounded-full v2-skeleton-pulse ${block}`} />
+              <div className={`w-6 h-6 rounded-full v2-skeleton-pulse ${blockFaint}`} />
             </div>
-            <div className="h-3 rounded v2-skeleton-pulse" style={{ width: 64, background: block }} />
+            <div className={`h-3 rounded v2-skeleton-pulse ${block}`} style={{ width: 64 }} />
           </div>
           {/* Location: two lines */}
           <div className="flex flex-col gap-1.5" style={{ width: 100 }}>
-            <div className="h-3 rounded v2-skeleton-pulse" style={{ width: 80, background: block }} />
-            <div className="h-2.5 rounded v2-skeleton-pulse" style={{ width: 56, background: blockFaint }} />
+            <div className={`h-3 rounded v2-skeleton-pulse ${block}`} style={{ width: 80 }} />
+            <div className={`h-2.5 rounded v2-skeleton-pulse ${blockFaint}`} style={{ width: 56 }} />
           </div>
           {/* Status pill */}
-          <div className="h-5 rounded-full v2-skeleton-pulse" style={{ width: 56, background: block }} />
+          <div className={`h-5 rounded-full v2-skeleton-pulse ${block}`} style={{ width: 56 }} />
           {/* Date */}
-          <div className="h-3 rounded v2-skeleton-pulse" style={{ width: 64, background: block }} />
+          <div className={`h-3 rounded v2-skeleton-pulse ${block}`} style={{ width: 64 }} />
           {/* Action dot */}
-          <div className="w-4 h-4 rounded v2-skeleton-pulse flex-shrink-0" style={{ background: blockFaint }} />
+          <div className={`w-4 h-4 rounded v2-skeleton-pulse flex-shrink-0 ${blockFaint}`} />
         </div>
       ))}
     </div>
@@ -199,37 +187,17 @@ function TableSkeleton() {
 
 function EmptyFilterState({ onClear }: { onClear: () => void }) {
   return (
-    <div
-      className="flex flex-col items-center justify-center py-16 rounded-xl border"
-      style={{
-        background: 'rgb(var(--background-secondary))',
-        borderColor: 'rgb(var(--border-primary) / 0.35)',
-      }}
-    >
-      <Users
-        className="w-12 h-12 mb-3"
-        style={{ color: 'rgb(var(--text-tertiary))', opacity: 0.5 }}
-      />
-      <p
-        className="text-sm font-medium mb-1"
-        style={{ color: 'rgb(var(--text-primary))' }}
-      >
+    <div className="flex flex-col items-center justify-center py-16 rounded-xl border bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]">
+      <Users className="w-12 h-12 mb-3 opacity-50 text-[rgb(var(--text-tertiary))]" />
+      <p className="text-sm font-medium mb-1 text-[rgb(var(--text-primary))]">
         No students found
       </p>
-      <p
-        className="text-xs mb-4"
-        style={{ color: 'rgb(var(--text-tertiary))' }}
-      >
+      <p className="text-xs mb-4 text-[rgb(var(--text-tertiary))]">
         Try adjusting your filters or search term
       </p>
       <button
         onClick={onClear}
-        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80"
-        style={{
-          background: 'rgb(var(--background-tertiary))',
-          borderColor: 'rgb(var(--border-primary) / 0.35)',
-          color: 'rgb(var(--text-secondary))',
-        }}
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
       >
         Clear filters
       </button>
@@ -261,28 +229,18 @@ function ErrorState({ onRetry }: { onRetry: () => void }) {
   return (
     <div className="min-h-96 flex items-center justify-center">
       <div className="text-center max-w-md">
-        <div
-          className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center"
-          style={{ background: 'rgb(var(--state-danger-bg))' }}
-        >
-          <AlertCircle className="w-8 h-8" style={{ color: 'rgb(var(--state-danger-fg))' }} />
+        <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center bg-[rgb(var(--state-danger-bg))]">
+          <AlertCircle className="w-8 h-8 text-[rgb(var(--state-danger-fg))]" />
         </div>
-        <h3
-          className="text-lg font-semibold mb-2"
-          style={{ color: 'rgb(var(--text-primary))' }}
-        >
+        <h3 className="text-lg font-semibold mb-2 text-[rgb(var(--text-primary))]">
           Failed to Load Students
         </h3>
-        <p
-          className="text-sm mb-4"
-          style={{ color: 'rgb(var(--text-secondary))' }}
-        >
+        <p className="text-sm mb-4 text-[rgb(var(--text-secondary))]">
           Something went wrong while loading the student directory.
         </p>
         <button
           onClick={onRetry}
-          className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg transition-colors hover:opacity-90"
-          style={{ background: '#1D9E75', color: '#fff' }}
+          className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg transition-colors hover:opacity-90 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
         >
           <RefreshCw className="w-4 h-4" />
           Retry
@@ -461,20 +419,14 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
         <motion.div variants={fadeInUp} className="space-y-1">
           <div className="flex items-center justify-between" style={{ height: 44 }}>
             <div className="flex items-center gap-2.5">
-              <div
-                className="w-7 h-7 rounded-[7px] flex items-center justify-center"
-                style={{ background: 'rgba(29, 158, 117, 0.12)' }}
-              >
-                <Users className="w-4 h-4" style={{ color: '#1D9E75' }} />
+              <div className="w-7 h-7 rounded-[7px] flex items-center justify-center bg-[rgb(var(--accent-enrollment)/0.12)]">
+                <Users className="w-4 h-4 text-[#1D9E75]" />
               </div>
-              <h1
-                className="text-sm font-semibold"
-                style={{ color: 'rgb(var(--text-primary))' }}
-              >
+              <h1 className="text-sm font-semibold text-[rgb(var(--text-primary))]">
                 Students
               </h1>
-              <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>|</span>
-              <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>
+              <span className="text-xs text-[rgb(var(--text-disabled))]">|</span>
+              <span className="text-xs text-[rgb(var(--text-disabled))]">
                 {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
               </span>
             </div>
@@ -493,12 +445,7 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
                 <button
                   onClick={() => setShowImport(true)}
                   aria-label="Import students"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40"
-                  style={{
-                    background: 'rgb(var(--background-tertiary))',
-                    borderColor: 'rgb(var(--border-primary) / 0.35)',
-                    color: 'rgb(var(--text-secondary))',
-                  }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40 bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
                 >
                   <Upload className="w-3.5 h-3.5" />
                   Import CSV
@@ -515,12 +462,7 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
                 <button
                   onClick={() => navigate({ to: '/students/import/iemis' })}
                   aria-label="Import from IEMIS"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40"
-                  style={{
-                    background: 'rgb(var(--background-tertiary))',
-                    borderColor: 'rgb(var(--border-primary) / 0.35)',
-                    color: 'rgb(var(--text-secondary))',
-                  }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40 bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
                 >
                   <Upload className="w-3.5 h-3.5" />
                   Import IEMIS
@@ -534,12 +476,7 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
                 <button
                   onClick={() => navigate({ to: '/reports/government' })}
                   aria-label="Government reports"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40"
-                  style={{
-                    background: 'rgb(var(--background-tertiary))',
-                    borderColor: 'rgb(var(--border-primary) / 0.35)',
-                    color: 'rgb(var(--text-secondary))',
-                  }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40 bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
                 >
                   <FileSpreadsheet className="w-3.5 h-3.5" />
                   Govt. Reports
@@ -547,11 +484,7 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
                 <button
                   onClick={handleAddStudent}
                   aria-label="Enroll student"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40"
-                  style={{
-                    background: '#1D9E75',
-                    color: '#fff',
-                  }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
                 >
                   <UserPlus className="w-3.5 h-3.5" />
                   Enroll student

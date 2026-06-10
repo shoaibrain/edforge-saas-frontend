@@ -207,7 +207,7 @@ export function GovernmentReportsExport() {
     return (
       <PageShell onBack={() => navigate({ to: '/' })}>
         <div className="rounded-xl border p-8 text-center" style={cardStyle}>
-          <Loader2 className="w-5 h-5 animate-spin mx-auto" style={{ color: 'rgb(var(--text-tertiary))' }} />
+          <Loader2 className="w-5 h-5 animate-spin mx-auto text-[rgb(var(--text-tertiary))]" />
         </div>
       </PageShell>
     )
@@ -218,11 +218,11 @@ export function GovernmentReportsExport() {
     return (
       <PageShell onBack={() => navigate({ to: '/' })}>
         <div className="rounded-xl border p-8" style={cardStyle}>
-          <AlertTriangle className="w-7 h-7 mb-3" style={{ color: 'rgb(var(--state-warning-fg))' }} />
-          <h2 className="text-base font-semibold mb-1" style={{ color: 'rgb(var(--text-primary))' }}>
+          <AlertTriangle className="w-7 h-7 mb-3 text-[rgb(var(--state-warning-fg))]" />
+          <h2 className="text-base font-semibold mb-1 text-[rgb(var(--text-primary))]">
             This school has no IEMIS code yet
           </h2>
-          <p className="text-sm" style={{ color: 'rgb(var(--text-secondary))' }}>
+          <p className="text-sm text-[rgb(var(--text-secondary))]">
             CEHRD Flash I/II exports require the school’s government-issued IEMIS
             code (the <code>school_iemis_code</code> column). Add it under School
             Settings, then return here to generate reports.
@@ -238,18 +238,15 @@ export function GovernmentReportsExport() {
   return (
     <PageShell onBack={() => navigate({ to: '/' })}>
       <header className="mb-6">
-        <h1
-          className="text-xl font-semibold flex items-center gap-2"
-          style={{ color: 'rgb(var(--text-primary))' }}
-        >
-          <FileSpreadsheet className="w-5 h-5" style={{ color: '#1D9E75' }} />
+        <h1 className="text-xl font-semibold flex items-center gap-2 text-[rgb(var(--text-primary))]">
+          <FileSpreadsheet className="w-5 h-5 text-[#1D9E75]" />
           Government Reports
         </h1>
-        <p className="text-sm mt-1" style={{ color: 'rgb(var(--text-secondary))' }}>
+        <p className="text-sm mt-1 text-[rgb(var(--text-secondary))]">
           Generate, download, and track CEHRD IEMIS Flash I / Flash II
           submissions for{' '}
-          <span style={{ color: 'rgb(var(--text-primary))' }}>{school.name}</span>{' '}
-          <span style={{ color: 'rgb(var(--text-tertiary))' }}>· IEMIS {school.emisSchoolCode}</span>.
+          <span className="text-[rgb(var(--text-primary))]">{school.name}</span>{' '}
+          <span className="text-[rgb(var(--text-tertiary))]">· IEMIS {school.emisSchoolCode}</span>.
         </p>
       </header>
 
@@ -257,7 +254,7 @@ export function GovernmentReportsExport() {
       <section className="rounded-xl border p-5 mb-6" style={cardStyle}>
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-medium" style={{ color: 'rgb(var(--text-secondary))' }}>
+            <span className="text-xs font-medium text-[rgb(var(--text-secondary))]">
               Report
             </span>
             <select
@@ -266,8 +263,7 @@ export function GovernmentReportsExport() {
                 setTemplateId(e.target.value as ReportingTemplateId)
                 resetPreflight()
               }}
-              className="px-3 py-2 text-sm rounded-lg border bg-transparent"
-              style={{ borderColor: 'rgb(var(--border-primary) / 0.35)', color: 'rgb(var(--text-primary))' }}
+              className="px-3 py-2 text-sm rounded-lg border bg-transparent border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-primary))]"
             >
               {TEMPLATE_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
@@ -278,7 +274,7 @@ export function GovernmentReportsExport() {
           </label>
 
           <label className="flex flex-col gap-1.5">
-            <span className="text-xs font-medium" style={{ color: 'rgb(var(--text-secondary))' }}>
+            <span className="text-xs font-medium text-[rgb(var(--text-secondary))]">
               Academic year (BS)
             </span>
             {useYearDropdown ? (
@@ -288,8 +284,7 @@ export function GovernmentReportsExport() {
                   setAcademicYearBs(e.target.value)
                   resetPreflight()
                 }}
-                className="px-3 py-2 text-sm rounded-lg border bg-transparent"
-                style={{ borderColor: 'rgb(var(--border-primary) / 0.35)', color: 'rgb(var(--text-primary))' }}
+                className="px-3 py-2 text-sm rounded-lg border bg-transparent border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-primary))]"
               >
                 {yearOptions.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -308,11 +303,10 @@ export function GovernmentReportsExport() {
                   inputMode="numeric"
                   placeholder="2083"
                   aria-label="Academic year in Bikram Sambat"
-                  className="px-3 py-2 text-sm rounded-lg border bg-transparent"
-                  style={{ borderColor: 'rgb(var(--border-primary) / 0.35)', color: 'rgb(var(--text-primary))' }}
+                  className="px-3 py-2 text-sm rounded-lg border bg-transparent border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-primary))]"
                 />
                 {academicYearBs.length > 0 && !yearValid && (
-                  <span className="text-xs" style={{ color: 'rgb(var(--state-danger-fg))' }}>
+                  <span className="text-xs text-[rgb(var(--state-danger-fg))]">
                     Enter a 4-digit BS year, e.g. 2083.
                   </span>
                 )}
@@ -322,11 +316,8 @@ export function GovernmentReportsExport() {
         </div>
 
         {templateId === 'IEMIS_NPL_CEHRD_FLASH_II' && (
-          <div
-            className="mt-4 rounded-lg border p-3 text-xs flex items-start gap-2"
-            style={{ borderColor: 'rgb(var(--border-primary) / 0.35)', color: 'rgb(var(--text-secondary))' }}
-          >
-            <Info className="w-4 h-4 mt-0.5 shrink-0" style={{ color: 'rgb(var(--state-warning-fg))' }} />
+          <div className="mt-4 rounded-lg border p-3 text-xs flex items-start gap-2 border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]">
+            <Info className="w-4 h-4 mt-0.5 shrink-0 text-[rgb(var(--state-warning-fg))]" />
             <span>
               Flash II’s <strong>exam marks</strong> and <strong>GPA</strong> columns are
               entered manually in this version; all other columns (enrollment,
@@ -338,10 +329,7 @@ export function GovernmentReportsExport() {
         {preflight && <PreflightSummary preflight={preflight} />}
 
         {existingReport && (
-          <div
-            className="mt-3 text-xs flex items-start gap-2"
-            style={{ color: 'rgb(var(--text-tertiary))' }}
-          >
+          <div className="mt-3 text-xs flex items-start gap-2 text-[rgb(var(--text-tertiary))]">
             <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" />
             <span>
               A {TEMPLATE_LABELS[templateId]} for BS {academicYearBs} already exists
@@ -354,8 +342,7 @@ export function GovernmentReportsExport() {
           <button
             onClick={handlePreflight}
             disabled={!yearValid || preflightMut.isPending}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors hover:opacity-80 disabled:opacity-50"
-            style={{ borderColor: 'rgb(var(--border-primary) / 0.35)', color: 'rgb(var(--text-secondary))' }}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors hover:opacity-80 disabled:opacity-50 border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
           >
             {preflightMut.isPending ? (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -367,8 +354,7 @@ export function GovernmentReportsExport() {
           <button
             onClick={handleGenerate}
             disabled={!canGenerate}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors hover:opacity-90 disabled:opacity-50"
-            style={{ background: '#1D9E75', color: '#fff' }}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors hover:opacity-90 disabled:opacity-50 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
           >
             {createMut.isPending ? (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -395,11 +381,8 @@ export function GovernmentReportsExport() {
 
       {/* ---- History ---- */}
       <section className="rounded-xl border" style={cardStyle}>
-        <div
-          className="px-5 py-3 border-b flex items-center justify-between gap-3 flex-wrap"
-          style={{ borderColor: 'rgb(var(--border-primary) / 0.35)' }}
-        >
-          <span className="text-sm font-medium" style={{ color: 'rgb(var(--text-primary))' }}>
+        <div className="px-5 py-3 border-b flex items-center justify-between gap-3 flex-wrap border-[rgb(var(--border-primary)/0.35)]">
+          <span className="text-sm font-medium text-[rgb(var(--text-primary))]">
             Report history
           </span>
           <div className="flex items-center gap-1" role="group" aria-label="Filter by report">
@@ -414,12 +397,11 @@ export function GovernmentReportsExport() {
                   key={opt.value}
                   onClick={() => setTemplateFilter(opt.value)}
                   aria-pressed={active}
-                  className="px-2.5 py-1 text-xs font-medium rounded-md border transition-colors"
-                  style={{
-                    background: active ? '#1D9E75' : 'transparent',
-                    borderColor: active ? '#1D9E75' : 'rgb(var(--border-primary) / 0.35)',
-                    color: active ? '#fff' : 'rgb(var(--text-secondary))',
-                  }}
+                  className={`px-2.5 py-1 text-xs font-medium rounded-md border transition-colors ${
+                    active
+                      ? 'bg-[#1D9E75] border-[#1D9E75] text-[#fff]'
+                      : 'bg-transparent border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]'
+                  }`}
                 >
                   {opt.label}
                 </button>
@@ -430,10 +412,10 @@ export function GovernmentReportsExport() {
 
         {snapshotsQuery.isLoading ? (
           <div className="px-5 py-8 text-center">
-            <Loader2 className="w-5 h-5 animate-spin mx-auto" style={{ color: 'rgb(var(--text-tertiary))' }} />
+            <Loader2 className="w-5 h-5 animate-spin mx-auto text-[rgb(var(--text-tertiary))]" />
           </div>
         ) : groupedHistory.length === 0 ? (
-          <div className="px-5 py-8 text-center text-sm" style={{ color: 'rgb(var(--text-tertiary))' }}>
+          <div className="px-5 py-8 text-center text-sm text-[rgb(var(--text-tertiary))]">
             {snapshots.length === 0
               ? 'No reports generated yet for this school.'
               : 'No reports match this filter.'}
@@ -441,28 +423,20 @@ export function GovernmentReportsExport() {
         ) : (
           groupedHistory.map((group) => (
             <div key={group.year}>
-              <div
-                className="px-5 py-1.5 text-xs font-semibold uppercase tracking-wide border-b"
-                style={{
-                  borderColor: 'rgb(var(--border-primary) / 0.35)',
-                  color: 'rgb(var(--text-tertiary))',
-                  background: 'transparent',
-                }}
-              >
+              <div className="px-5 py-1.5 text-xs font-semibold uppercase tracking-wide border-b bg-transparent border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-tertiary))]">
                 BS {group.year}
               </div>
               <ul>
                 {group.items.map((snap) => (
                   <li
                     key={snap.snapshotId}
-                    className="px-5 py-3 border-b last:border-b-0 flex items-center gap-3 flex-wrap"
-                    style={{ borderColor: 'rgb(var(--border-primary) / 0.35)' }}
+                    className="px-5 py-3 border-b last:border-b-0 flex items-center gap-3 flex-wrap border-[rgb(var(--border-primary)/0.35)]"
                   >
                     <div className="min-w-0 flex-1">
-                      <div className="text-sm font-medium truncate" style={{ color: 'rgb(var(--text-primary))' }}>
+                      <div className="text-sm font-medium truncate text-[rgb(var(--text-primary))]">
                         {TEMPLATE_LABELS[snap.templateId]}
                       </div>
-                      <div className="text-xs mt-0.5" style={{ color: 'rgb(var(--text-tertiary))' }}>
+                      <div className="text-xs mt-0.5 text-[rgb(var(--text-tertiary))]">
                         {typeof snap.rowCount === 'number' ? `${snap.rowCount} rows · ` : ''}
                         {snap.generatedAt
                           ? `generated ${new Date(snap.generatedAt).toLocaleString()}`
@@ -470,7 +444,7 @@ export function GovernmentReportsExport() {
                         {snap.dryRun ? ' · dry-run' : ''}
                       </div>
                       {snap.status === 'failed' && snap.errorSummary && (
-                        <div className="text-xs mt-0.5" style={{ color: 'rgb(var(--state-danger-fg))' }}>
+                        <div className="text-xs mt-0.5 text-[rgb(var(--state-danger-fg))]">
                           {snap.errorSummary}
                         </div>
                       )}
@@ -524,10 +498,7 @@ export function GovernmentReportsExport() {
         )}
 
         {/* ---- Operator guidance: the manual portal step ---- */}
-        <div
-          className="px-5 py-3 border-t text-xs flex items-start gap-2"
-          style={{ borderColor: 'rgb(var(--border-primary) / 0.35)', color: 'rgb(var(--text-tertiary))' }}
-        >
+        <div className="px-5 py-3 border-t text-xs flex items-start gap-2 border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-tertiary))]">
           <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" />
           <span>
             After downloading, upload the CSV to the IEMIS portal (
@@ -535,7 +506,7 @@ export function GovernmentReportsExport() {
               href={IEMIS_PORTAL_URL}
               target="_blank"
               rel="noopener noreferrer"
-              style={{ color: '#1D9E75' }}
+              className="text-[#1D9E75]"
             >
               emis.cehrd.gov.np
             </a>
@@ -557,8 +528,7 @@ function PageShell({ children, onBack }: { children: React.ReactNode; onBack: ()
     <div className="max-w-4xl mx-auto px-4 py-8">
       <button
         onClick={onBack}
-        className="inline-flex items-center gap-1.5 text-sm transition-colors hover:opacity-80 mb-3"
-        style={{ color: 'rgb(var(--text-secondary))' }}
+        className="inline-flex items-center gap-1.5 text-sm transition-colors hover:opacity-80 mb-3 text-[rgb(var(--text-secondary))]"
       >
         <ArrowLeft className="w-4 h-4" />
         Back
@@ -571,11 +541,8 @@ function PageShell({ children, onBack }: { children: React.ReactNode; onBack: ()
 function EmptyCard({ children }: { children: React.ReactNode }) {
   return (
     <div className="rounded-xl border p-8 text-center" style={cardStyle}>
-      <FileSpreadsheet
-        className="w-8 h-8 mx-auto mb-3"
-        style={{ color: 'rgb(var(--text-tertiary))' }}
-      />
-      <p style={{ color: 'rgb(var(--text-secondary))' }}>{children}</p>
+      <FileSpreadsheet className="w-8 h-8 mx-auto mb-3 text-[rgb(var(--text-tertiary))]" />
+      <p className="text-[rgb(var(--text-secondary))]">{children}</p>
     </div>
   )
 }
@@ -598,8 +565,7 @@ function RowButton({
       onClick={onClick}
       disabled={disabled}
       aria-label={ariaLabel}
-      className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md border transition-colors hover:opacity-80 disabled:opacity-50"
-      style={{ borderColor: 'rgb(var(--border-primary) / 0.35)', color: 'rgb(var(--text-secondary))' }}
+      className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md border transition-colors hover:opacity-80 disabled:opacity-50 border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
     >
       {icon}
       {label}
@@ -610,33 +576,30 @@ function RowButton({
 function PreflightSummary({ preflight }: { preflight: PreflightReportingSnapshotResponse }) {
   const { errors, warnings, canProceed } = preflight
   return (
-    <div
-      className="mt-4 rounded-lg border p-3 text-sm"
-      style={{ borderColor: 'rgb(var(--border-primary) / 0.35)' }}
-    >
-      <div className="flex items-center gap-2 font-medium" style={{ color: 'rgb(var(--text-primary))' }}>
+    <div className="mt-4 rounded-lg border p-3 text-sm border-[rgb(var(--border-primary)/0.35)]">
+      <div className="flex items-center gap-2 font-medium text-[rgb(var(--text-primary))]">
         {canProceed ? (
-          <CheckCircle2 className="w-4 h-4" style={{ color: 'rgb(var(--state-success-fg))' }} />
+          <CheckCircle2 className="w-4 h-4 text-[rgb(var(--state-success-fg))]" />
         ) : (
-          <AlertTriangle className="w-4 h-4" style={{ color: 'rgb(var(--state-danger-fg))' }} />
+          <AlertTriangle className="w-4 h-4 text-[rgb(var(--state-danger-fg))]" />
         )}
         {canProceed ? 'Validation passed' : 'Validation blocked'}
       </div>
       {errors.length > 0 && (
-        <ul className="mt-2 space-y-1" style={{ color: 'rgb(var(--state-danger-fg))' }}>
+        <ul className="mt-2 space-y-1 text-[rgb(var(--state-danger-fg))]">
           {errors.map((e, i) => (
             <li key={`e-${i}`}>• {e.field}: {e.error}</li>
           ))}
         </ul>
       )}
       {warnings.length > 0 && (
-        <ul className="mt-2 space-y-1" style={{ color: 'rgb(var(--text-tertiary))' }}>
+        <ul className="mt-2 space-y-1 text-[rgb(var(--text-tertiary))]">
           {warnings.map((w, i) => (
             <li key={`w-${i}`}>• {w.field}: {w.message}</li>
           ))}
         </ul>
       )}
-      <div className="mt-2 text-xs" style={{ color: 'rgb(var(--text-tertiary))' }}>
+      <div className="mt-2 text-xs text-[rgb(var(--text-tertiary))]">
         Validation confirms the school and academic year exist. Per-student field
         issues are reported on the report row during generation.
       </div>
@@ -675,30 +638,30 @@ function ActiveGenerationBanner({
       role="status"
       aria-live="polite"
     >
-      {spinning && <Loader2 className="w-5 h-5 animate-spin" style={{ color: '#1D9E75' }} />}
-      {stalledGenerating && <AlertTriangle className="w-5 h-5" style={{ color: 'rgb(var(--state-warning-fg))' }} />}
-      {ready && <CheckCircle2 className="w-5 h-5" style={{ color: 'rgb(var(--state-success-fg))' }} />}
-      {failed && <AlertTriangle className="w-5 h-5" style={{ color: 'rgb(var(--state-danger-fg))' }} />}
+      {spinning && <Loader2 className="w-5 h-5 animate-spin text-[#1D9E75]" />}
+      {stalledGenerating && <AlertTriangle className="w-5 h-5 text-[rgb(var(--state-warning-fg))]" />}
+      {ready && <CheckCircle2 className="w-5 h-5 text-[rgb(var(--state-success-fg))]" />}
+      {failed && <AlertTriangle className="w-5 h-5 text-[rgb(var(--state-danger-fg))]" />}
       <div className="flex-1 min-w-0">
-        <div className="text-sm font-medium" style={{ color: 'rgb(var(--text-primary))' }}>
+        <div className="text-sm font-medium text-[rgb(var(--text-primary))]">
           {spinning && 'Generating report…'}
           {stalledGenerating && 'Taking longer than expected'}
           {ready && 'Report ready'}
           {failed && 'Generation failed'}
         </div>
         {stalledGenerating && (
-          <div className="text-xs mt-0.5" style={{ color: 'rgb(var(--text-tertiary))' }}>
+          <div className="text-xs mt-0.5 text-[rgb(var(--text-tertiary))]">
             This is unusual for a single school — it may have failed. Refresh to
             check the latest status.
           </div>
         )}
         {ready && empty && (
-          <div className="text-xs mt-0.5" style={{ color: 'rgb(var(--state-warning-fg))' }}>
+          <div className="text-xs mt-0.5 text-[rgb(var(--state-warning-fg))]">
             This report has 0 students — double-check the academic year before submitting.
           </div>
         )}
         {failed && snapshot.errorSummary && (
-          <div className="text-xs mt-0.5" style={{ color: 'rgb(var(--state-danger-fg))' }}>
+          <div className="text-xs mt-0.5 text-[rgb(var(--state-danger-fg))]">
             {snapshot.errorSummary}
           </div>
         )}
@@ -707,8 +670,7 @@ function ActiveGenerationBanner({
         <button
           onClick={onRefresh}
           disabled={refreshing}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors hover:opacity-80 disabled:opacity-50"
-          style={{ borderColor: 'rgb(var(--border-primary) / 0.35)', color: 'rgb(var(--text-secondary))' }}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors hover:opacity-80 disabled:opacity-50 border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
         >
           {refreshing ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
           Refresh
@@ -718,8 +680,7 @@ function ActiveGenerationBanner({
         <button
           onClick={onDownload}
           disabled={downloading}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors hover:opacity-90 disabled:opacity-50"
-          style={{ background: '#1D9E75', color: '#fff' }}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors hover:opacity-90 disabled:opacity-50 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
         >
           {downloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
           Download CSV
@@ -727,8 +688,7 @@ function ActiveGenerationBanner({
       )}
       <button
         onClick={onDismiss}
-        className="text-xs transition-colors hover:opacity-80"
-        style={{ color: 'rgb(var(--text-tertiary))' }}
+        className="text-xs transition-colors hover:opacity-80 text-[rgb(var(--text-tertiary))]"
       >
         Dismiss
       </button>
