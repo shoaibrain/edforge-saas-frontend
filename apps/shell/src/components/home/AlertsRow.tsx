@@ -52,32 +52,13 @@ interface AlertsRowProps {
 
 function AlertSkeleton() {
   return (
-    <div
-      className="flex items-center gap-3 rounded-[10px] border"
-      style={{
-        padding: '11px 14px',
-        background: 'rgb(var(--background-secondary))',
-        borderColor: 'rgb(var(--border-primary) / 0.35)',
-      }}
-    >
-      <div
-        className="w-7 h-7 rounded-[7px] flex-shrink-0 v2-skeleton-pulse"
-        style={{ background: 'rgb(var(--background-tertiary))' }}
-      />
+    <div className="flex items-center gap-3 rounded-[10px] border px-3.5 py-3 bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]">
+      <div className="w-7 h-7 rounded-[7px] flex-shrink-0 v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
       <div className="flex-1 space-y-1.5">
-        <div
-          className="h-3.5 w-64 rounded v2-skeleton-pulse"
-          style={{ background: 'rgb(var(--background-tertiary))' }}
-        />
-        <div
-          className="h-3 w-44 rounded v2-skeleton-pulse"
-          style={{ background: 'rgb(var(--background-tertiary))' }}
-        />
+        <div className="h-3.5 w-64 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
+        <div className="h-3 w-44 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
       </div>
-      <div
-        className="h-6 w-20 rounded-md flex-shrink-0 v2-skeleton-pulse"
-        style={{ background: 'rgb(var(--background-tertiary))' }}
-      />
+      <div className="h-6 w-20 rounded-md flex-shrink-0 v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
     </div>
   )
 }
@@ -121,9 +102,9 @@ export function AlertsRow({ alerts, loading }: AlertsRowProps) {
                 }}
               >
                 <div
-                  className="flex items-center gap-3 rounded-[10px] border"
+                  // allow-presentation-style: per-severity alert bg + border (state tokens chosen at runtime)
+                  className="flex items-center gap-3 rounded-[10px] border px-3.5 py-3"
                   style={{
-                    padding: '11px 14px',
                     background: config.bg,
                     borderColor: config.border,
                   }}
@@ -131,29 +112,31 @@ export function AlertsRow({ alerts, loading }: AlertsRowProps) {
                 >
                   {/* Icon */}
                   <div
-                    className="flex items-center justify-center flex-shrink-0"
+                    // allow-presentation-style: per-severity icon tint
+                    className="flex items-center justify-center flex-shrink-0 rounded-[7px]"
                     style={{
                       width: 28,
                       height: 28,
-                      borderRadius: 7,
                       background: config.iconBg,
                     }}
                   >
-                    <ModuleIcon className="w-3.5 h-3.5" style={{ color: config.iconColor }} />
+                    <ModuleIcon
+                      // allow-presentation-style: per-severity icon color
+                      className="w-3.5 h-3.5"
+                      style={{ color: config.iconColor }}
+                    />
                   </div>
 
                   {/* Content */}
                   <div className="flex-1 min-w-0">
                     <p
+                      // allow-presentation-style: per-severity title color
                       className="text-xs font-medium truncate"
                       style={{ color: config.titleColor }}
                     >
                       {alert.title}
                     </p>
-                    <p
-                      className="text-xs mt-0.5 truncate"
-                      style={{ color: 'rgb(var(--text-disabled))' }}
-                    >
+                    <p className="text-xs mt-0.5 truncate text-[rgb(var(--text-disabled))]">
                       {alert.description}
                     </p>
                   </div>
@@ -161,6 +144,7 @@ export function AlertsRow({ alerts, loading }: AlertsRowProps) {
                   {/* CTA button */}
                   <Link
                     to={alert.href as any}
+                    // allow-presentation-style: per-severity CTA bg/border/color
                     className="text-xs font-medium px-2.5 py-1 rounded-md border whitespace-nowrap flex-shrink-0 transition-opacity hover:opacity-80"
                     style={{
                       color: config.ctaColor,

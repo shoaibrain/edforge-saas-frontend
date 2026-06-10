@@ -55,11 +55,8 @@ function TrendSkeleton() {
         {Array.from({ length: 15 }).map((_, i) => (
           <div
             key={i}
-            className="flex-1 rounded-t v2-skeleton-pulse"
-            style={{
-              height: `${30 + Math.random() * 50}%`,
-              background: 'rgb(var(--background-tertiary))',
-            }}
+            className="flex-1 rounded-t v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]"
+            style={{ height: `${30 + Math.random() * 50}%` }}
           />
         ))}
       </div>
@@ -75,24 +72,18 @@ function ChartTooltip({ active, payload }: any) {
   if (!active || !payload?.length) return null
   const point = payload[0].payload
   return (
-    <div
-      className="rounded-md shadow-lg px-3 py-2 border text-xs"
-      style={{
-        background: 'rgb(var(--background-tertiary))',
-        borderColor: 'rgb(var(--border-primary) / 0.35)',
-      }}
-    >
-      <p style={{ color: 'rgb(var(--text-tertiary))' }}>
+    <div className="rounded-md shadow-lg px-3 py-2 border text-xs bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary)/0.35)]">
+      <p className="text-[rgb(var(--text-tertiary))]">
         {new Date(point.date).toLocaleDateString('en-US', {
           weekday: 'short',
           month: 'short',
           day: 'numeric',
         })}
       </p>
-      <p className="font-semibold mt-0.5" style={{ color: 'rgb(var(--text-primary))' }}>
+      <p className="font-semibold mt-0.5 text-[rgb(var(--text-primary))]">
         {point.rate.toFixed(1)}%
       </p>
-      <p className="mt-0.5" style={{ color: 'rgb(var(--text-tertiary))' }}>
+      <p className="mt-0.5 text-[rgb(var(--text-tertiary))]">
         {point.present} of {point.total} present
       </p>
     </div>
@@ -125,34 +116,25 @@ export function AttendanceTrendCard({
 
   return (
     <div
-      className="rounded-xl border flex flex-col"
-      style={{
-        background: 'rgb(var(--background-secondary))',
-        borderColor: 'rgb(var(--border-primary) / 0.35)',
-        padding: 18,
-      }}
+      // allow-presentation-style: card padding (18px) is off the 4px scale
+      className="rounded-xl border flex flex-col bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]"
+      style={{ padding: 18 }}
     >
       {/* Custom HTML legend */}
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3
-            className="text-sm font-medium"
-            style={{ color: 'rgb(var(--text-secondary))' }}
-          >
+          <h3 className="text-sm font-medium text-[rgb(var(--text-secondary))]">
             {t('homeV2.trend.attendanceTrend')}
           </h3>
-          <p className="text-xs mt-0.5" style={{ color: 'rgb(var(--text-disabled))' }}>
+          <p className="text-xs mt-0.5 text-[rgb(var(--text-disabled))]">
             {t('homeV2.trend.rollingAverage')}
           </p>
         </div>
         <div className="flex items-center gap-4">
           {/* Actual swatch */}
           <div className="flex items-center gap-1.5">
-            <div
-              className="rounded-sm"
-              style={{ width: 8, height: 2, background: '#1D9E75' }}
-            />
-            <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>
+            <div className="rounded-sm w-2 h-0.5 bg-[#1D9E75]" />
+            <span className="text-xs text-[rgb(var(--text-disabled))]">
               {t('homeV2.trend.actual')}
             </span>
           </div>
@@ -165,13 +147,13 @@ export function AttendanceTrendCard({
                 borderTop: '1px dashed rgba(239, 159, 39, 0.6)',
               }}
             />
-            <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>
+            <span className="text-xs text-[rgb(var(--text-disabled))]">
               {t('homeV2.trend.target', { threshold: ATTENDANCE_THRESHOLD })}
             </span>
           </div>
           {/* Average */}
           {summary && (
-            <span className="text-xs font-semibold" style={{ color: '#1D9E75' }}>
+            <span className="text-xs font-semibold text-[#1D9E75]">
               {t('homeV2.trend.avg', { avg: summary.avg.toFixed(1) })}
             </span>
           )}
@@ -184,8 +166,9 @@ export function AttendanceTrendCard({
           <TrendSkeleton />
         ) : chartData.length === 0 ? (
           <div
-            className="flex items-center justify-center text-sm"
-            style={{ height: 148, color: 'rgb(var(--text-tertiary))' }}
+            // allow-presentation-style: fixed 148px empty-state height (matches chart)
+            className="flex items-center justify-center text-sm text-[rgb(var(--text-tertiary))]"
+            style={{ height: 148 }}
           >
             {t('homeV2.trend.noData')}
           </div>
@@ -261,15 +244,11 @@ export function AttendanceTrendCard({
       </div>
 
       {/* Footer link */}
-      <div
-        className="pt-3 mt-3"
-        style={{ borderTop: '1px solid rgb(var(--border-primary) / 0.35)' }}
-      >
+      <div className="pt-3 mt-3 border-t border-[rgb(var(--border-primary)/0.35)]">
         <Link
           to="/academics/$"
           params={{ _splat: 'classrooms?tab=attendance' }}
-          className="inline-flex items-center gap-1.5 text-xs font-medium transition-opacity hover:opacity-80"
-          style={{ color: '#1D9E75' }}
+          className="inline-flex items-center gap-1.5 text-xs font-medium transition-opacity hover:opacity-80 text-[#1D9E75]"
         >
           {t('homeV2.trend.viewAttendance')}
           <ArrowRight className="w-3 h-3" />

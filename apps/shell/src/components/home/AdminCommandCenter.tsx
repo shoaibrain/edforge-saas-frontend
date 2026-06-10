@@ -160,13 +160,7 @@ export function AdminCommandCenter({ schoolId }: AdminCommandCenterProps) {
     if (availableSchools.length === 0 && gettingStarted.show) {
       return (
         <motion.div
-          className="flex flex-col"
-          style={{
-            gap: '16px',
-            padding: '20px 28px',
-            background: 'rgb(var(--background-primary))',
-            minHeight: '100%',
-          }}
+          className="flex flex-col gap-4 px-7 py-5 min-h-full bg-[rgb(var(--background-primary))]"
           variants={staggerContainer}
           initial={prefersReducedMotion ? undefined : 'hidden'}
           animate="visible"
@@ -184,7 +178,7 @@ export function AdminCommandCenter({ schoolId }: AdminCommandCenterProps) {
     }
     return (
       <div className="py-16 text-center">
-        <p className="text-sm" style={{ color: 'rgb(var(--text-tertiary))' }}>
+        <p className="text-sm text-[rgb(var(--text-tertiary))]">
           {t('homeV2.selectSchool')}
         </p>
       </div>
@@ -193,13 +187,7 @@ export function AdminCommandCenter({ schoolId }: AdminCommandCenterProps) {
 
   return (
     <motion.div
-      className="flex flex-col"
-      style={{
-        gap: '16px',
-        padding: '20px 28px',
-        background: 'rgb(var(--background-primary))',
-        minHeight: '100%',
-      }}
+      className="flex flex-col gap-4 px-7 py-5 min-h-full bg-[rgb(var(--background-primary))]"
       variants={staggerContainer}
       initial={prefersReducedMotion ? undefined : 'hidden'}
       animate="visible"
@@ -209,14 +197,9 @@ export function AdminCommandCenter({ schoolId }: AdminCommandCenterProps) {
       {/* ================================================================ */}
       {!isOnline && (
         <div
-          className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs"
+          className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs bg-[rgb(var(--state-warning-bg))] border border-[rgb(var(--state-warning-border))] text-[rgb(var(--state-warning-fg))]"
           role="status"
           aria-live="polite"
-          style={{
-            background: 'rgb(var(--state-warning-bg))',
-            border: '1px solid rgb(var(--state-warning-border))',
-            color: 'rgb(var(--state-warning-fg))',
-          }}
         >
           <WifiOff className="w-3.5 h-3.5 flex-shrink-0" />
           <span>{t('homeV2.offline')}</span>
@@ -255,8 +238,7 @@ export function AdminCommandCenter({ schoolId }: AdminCommandCenterProps) {
         <motion.div
           variants={sectionVariants}
           transition={{ duration: 0.2 }}
-          className="grid grid-cols-2 lg:grid-cols-4"
-          style={{ gap: '12px' }}
+          className="grid grid-cols-2 lg:grid-cols-4 gap-3"
         >
           <HomeStatCard
             label={t('homeV2.kpi.studentsEnrolled')}
@@ -347,8 +329,7 @@ export function AdminCommandCenter({ schoolId }: AdminCommandCenterProps) {
         <motion.div
           variants={sectionVariants}
           transition={{ duration: 0.2 }}
-          className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr]"
-          style={{ gap: '12px' }}
+          className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-3"
         >
           <AttendanceTrendCard
             chartData={trend.chartData}
@@ -376,8 +357,7 @@ export function AdminCommandCenter({ schoolId }: AdminCommandCenterProps) {
         <motion.div
           variants={sectionVariants}
           transition={{ duration: 0.2 }}
-          className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr]"
-          style={{ gap: '12px' }}
+          className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-3"
         >
           <AttendanceBySectionCard
             sections={sectionAttendance.sections}

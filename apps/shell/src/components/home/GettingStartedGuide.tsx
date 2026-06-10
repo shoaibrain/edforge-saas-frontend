@@ -77,11 +77,7 @@ export function GettingStartedGuide({
         initial="hidden"
         animate="visible"
         exit="exit"
-        className="rounded-xl border overflow-hidden"
-        style={{
-          background: 'rgb(var(--background-secondary))',
-          borderColor: 'rgb(var(--border-primary) / 0.35)',
-        }}
+        className="rounded-xl border overflow-hidden bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]"
       >
         {/* ── Header ──────────────────────────────────────────────────── */}
         <div
@@ -89,29 +85,16 @@ export function GettingStartedGuide({
         >
           <div className="flex items-center gap-2.5">
             <div
-              className="flex items-center justify-center rounded-lg"
-              style={{
-                width: 28,
-                height: 28,
-                background: 'rgb(var(--accent-enrollment) / 0.12)',
-              }}
+              className="flex items-center justify-center rounded-lg bg-[rgb(var(--accent-enrollment)/0.12)]"
+              style={{ width: 28, height: 28 }}
             >
-              <Sparkles
-                className="w-4 h-4"
-                style={{ color: '#1D9E75' }}
-              />
+              <Sparkles className="w-4 h-4 text-[#1D9E75]" />
             </div>
             <div>
-              <h3
-                className="text-sm font-semibold leading-tight"
-                style={{ color: 'rgb(var(--text-primary))' }}
-              >
+              <h3 className="text-sm font-semibold leading-tight text-[rgb(var(--text-primary))]">
                 Get started with EdForge
               </h3>
-              <p
-                className="text-xs mt-0.5"
-                style={{ color: 'rgb(var(--text-disabled))' }}
-              >
+              <p className="text-xs mt-0.5 text-[rgb(var(--text-disabled))]">
                 {completedCount} of {totalCount} complete
               </p>
             </div>
@@ -122,17 +105,15 @@ export function GettingStartedGuide({
             className="p-1.5 rounded-lg transition-colors hover:bg-[rgb(var(--background-overlay)/0.05)] dark:hover:bg-[rgb(var(--background-primary)/0.05)]"
             aria-label="Dismiss getting started guide"
           >
-            <X className="w-4 h-4" style={{ color: 'rgb(var(--text-disabled))' }} />
+            <X className="w-4 h-4 text-[rgb(var(--text-disabled))]" />
           </button>
         </div>
 
         {/* ── Progress Bar ────────────────────────────────────────────── */}
         <div className="px-5 pb-3">
-          <div
-            className="h-1.5 rounded-full overflow-hidden"
-            style={{ background: 'rgb(var(--background-tertiary) / 0.5)' }}
-          >
+          <div className="h-1.5 rounded-full overflow-hidden bg-[rgb(var(--background-tertiary)/0.5)]">
             <motion.div
+              // allow-presentation-style: decorative brand progress gradient
               className="h-full rounded-full"
               style={{
                 background: 'linear-gradient(90deg, #0a9396, #14b8a6)',
@@ -155,6 +136,7 @@ export function GettingStartedGuide({
               <motion.div key={item.id} variants={itemVariants}>
                 <Link
                   to={item.blocked ? '/home' : (item.href as any)}
+                  // allow-presentation-style: row highlight bg is hover/active-state driven (also set imperatively on mouse events)
                   className="group flex items-center gap-3 px-2.5 py-2.5 rounded-lg no-underline transition-colors"
                   style={{
                     background: isFirstIncomplete
@@ -180,88 +162,42 @@ export function GettingStartedGuide({
                   {/* Status indicator */}
                   <div className="shrink-0">
                     {item.completed ? (
-                      <CheckCircle2
-                        className="w-5 h-5"
-                        style={{ color: '#1D9E75' }}
-                      />
+                      <CheckCircle2 className="w-5 h-5 text-[#1D9E75]" />
                     ) : item.blocked ? (
-                      <Lock
-                        className="w-4 h-4 ml-[1.5px]"
-                        style={{ color: 'rgb(var(--text-disabled))' }}
-                      />
+                      <Lock className="w-4 h-4 ml-[1.5px] text-[rgb(var(--text-disabled))]" />
                     ) : (
-                      <Circle
-                        className="w-5 h-5"
-                        style={{
-                          color: isFirstIncomplete
-                            ? '#1D9E75'
-                            : 'rgb(var(--text-disabled))',
-                        }}
-                      />
+                      <Circle className={`w-5 h-5 ${isFirstIncomplete ? 'text-[#1D9E75]' : 'text-[rgb(var(--text-disabled))]'}`} />
                     )}
                   </div>
 
                   {/* Icon */}
                   <div
-                    className="shrink-0 flex items-center justify-center rounded-md"
-                    style={{
-                      width: 28,
-                      height: 28,
-                      background: item.completed
-                        ? 'rgba(29, 158, 117, 0.08)'
-                        : 'rgb(var(--background-tertiary) / 0.5)',
-                    }}
+                    className={`shrink-0 flex items-center justify-center rounded-md ${item.completed ? 'bg-[rgb(var(--accent-enrollment)/0.08)]' : 'bg-[rgb(var(--background-tertiary)/0.5)]'}`}
+                    style={{ width: 28, height: 28 }}
                   >
-                    <Icon
-                      className="w-3.5 h-3.5"
-                      style={{
-                        color: item.completed
-                          ? '#1D9E75'
-                          : 'rgb(var(--text-secondary))',
-                      }}
-                    />
+                    <Icon className={`w-3.5 h-3.5 ${item.completed ? 'text-[#1D9E75]' : 'text-[rgb(var(--text-secondary))]'}`} />
                   </div>
 
                   {/* Text */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span
-                        className="text-xs font-medium leading-tight"
-                        style={{
-                          color: item.completed
-                            ? 'rgb(var(--text-disabled))'
-                            : 'rgb(var(--text-primary))',
-                          textDecoration: item.completed ? 'line-through' : 'none',
-                        }}
-                      >
+                      <span className={`text-xs font-medium leading-tight ${item.completed ? 'text-[rgb(var(--text-disabled))] line-through' : 'text-[rgb(var(--text-primary))]'}`}>
                         {item.title}
                       </span>
                       {isFirstIncomplete && (
-                        <span
-                          className="text-xs font-semibold px-1.5 py-0.5 rounded-full"
-                          style={{
-                            background: '#1D9E75',
-                            color: '#fff',
-                          }}
-                        >
+                        <span className="text-xs font-semibold px-1.5 py-0.5 rounded-full bg-[#1D9E75] text-[#fff]">
                           Start here
                         </span>
                       )}
                     </div>
-                    <span
-                      className="text-xs leading-tight mt-0.5 block"
-                      style={{ color: 'rgb(var(--text-disabled))' }}
-                    >
+                    <span className="text-xs leading-tight mt-0.5 block text-[rgb(var(--text-disabled))]">
                       {item.blocked ? item.blockedHint : item.description}
                     </span>
                   </div>
 
                   {/* Arrow */}
                   {!item.completed && !item.blocked && (
-                    <ChevronRight
-                      className="w-4 h-4 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                      style={{ color: 'rgb(var(--text-disabled))' }}
-                    />
+                    <ChevronRight className="w-4 h-4 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity text-[rgb(var(--text-disabled))]" />
                   )}
                 </Link>
               </motion.div>
