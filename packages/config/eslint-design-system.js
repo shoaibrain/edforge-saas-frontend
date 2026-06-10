@@ -303,6 +303,45 @@ export default [
       'edforge-design-system/prefer-ui-select': 'warn',
       'edforge-design-system/prefer-ui-form-controls': 'warn',
       'edforge-design-system/no-local-form-style-constants': 'warn',
+      'edforge-design-system/no-presentation-style-objects': 'error',
+    },
+  },
+  {
+    // UI/UX final sprint exit gate — the inline-style → token/className sweep
+    // is complete across operator surfaces, so no-presentation-style-objects is
+    // a hard error on apps/** (above). These paths are intentionally NOT yet
+    // migrated and stay warnings so the gate can flip without churning code we
+    // are deferring on purpose:
+    //   - students/CSVImport.tsx: blocked on the missing IEMIS field (the
+    //     importer is hidden from the UI with a TODO; code kept intact).
+    //   - landing / landing-v2: marketing pages, not part of the operator app.
+    //   - parent-portal / portal-shared / student-portal: portal experiences
+    //     not planned for this release; code kept intact for when they ship.
+    // When any of these is picked up, convert it and delete its entry here.
+    ...pluginConfig,
+    files: [
+      'apps/academics/src/components/students/CSVImport.tsx',
+      'apps/shell/src/components/landing/**/*.{ts,tsx}',
+      'apps/shell/src/components/landing-v2/**/*.{ts,tsx}',
+      'apps/shell/src/pages/parent-portal/**/*.{ts,tsx}',
+      'apps/shell/src/pages/portal-shared/**/*.{ts,tsx}',
+      'apps/shell/src/pages/student-portal/**/*.{ts,tsx}',
+    ],
+    rules: {
+      'edforge-design-system/no-presentation-style-objects': 'warn',
+    },
+  },
+  {
+    // packages/ui is the shared primitive library, not an operator MFE surface.
+    // The inline-style sweep targeted apps/** (the product UI); the shared
+    // data-viz primitives (charts, heatmaps, rings, stat cards) mostly carry
+    // genuinely dynamic style objects and are a separate follow-up. Keep the
+    // presentation-style rule a warning here so the apps/** flip lands without
+    // dragging the primitive library into the same PR. no-hardcoded-colors and
+    // no-arbitrary-tailwind-values remain errors for packages/ui (set above).
+    ...pluginConfig,
+    files: ['packages/ui/**/*.{ts,tsx}'],
+    rules: {
       'edforge-design-system/no-presentation-style-objects': 'warn',
     },
   },

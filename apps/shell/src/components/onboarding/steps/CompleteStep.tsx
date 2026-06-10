@@ -27,6 +27,7 @@ function Confetti() {
         return (
           <div
             key={i}
+            // allow-presentation-style: confetti particle position/size/color are randomized per-render
             className="absolute animate-confetti-fall"
             style={{
               left: `${left}%`,

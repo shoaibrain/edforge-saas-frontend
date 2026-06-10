@@ -406,6 +406,7 @@ function RoomsColumn({ schoolId }: { schoolId: string }) {
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-sm font-bold text-[rgb(var(--text-primary))]">{room.roomNumber || room.name}</span>
                     <span
+                      // allow-presentation-style: room-type chip colors are data-driven (typeColor)
                       className="text-xs font-medium px-1.5 py-0.5 rounded"
                       style={{ background: typeColor.bg, color: typeColor.text }}
                     >

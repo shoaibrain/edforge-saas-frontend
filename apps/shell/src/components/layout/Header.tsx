@@ -85,16 +85,13 @@ function HamburgerButton() {
   return (
     <button
       onClick={toggleSidebar}
-      className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-150"
-      style={{ cursor: 'pointer' }}
-      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'var(--shell-ni-hover)' }}
-      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent' }}
+      className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-150 cursor-pointer hover:bg-[var(--shell-ni-hover)]"
       aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
     >
       <div className="flex flex-col gap-1">
-        <span className="block w-5 h-[1.8px] rounded-sm" style={{ background: 'var(--shell-hbg-line)', transition: 'background 0.3s' }} />
-        <span className="block w-5 h-[1.8px] rounded-sm" style={{ background: 'var(--shell-hbg-line)', transition: 'background 0.3s' }} />
-        <span className="block w-5 h-[1.8px] rounded-sm" style={{ background: 'var(--shell-hbg-line)', transition: 'background 0.3s' }} />
+        <span className="block w-5 h-[1.8px] rounded-sm bg-[var(--shell-hbg-line)]" style={{ transition: 'background 0.3s' }} />
+        <span className="block w-5 h-[1.8px] rounded-sm bg-[var(--shell-hbg-line)]" style={{ transition: 'background 0.3s' }} />
+        <span className="block w-5 h-[1.8px] rounded-sm bg-[var(--shell-hbg-line)]" style={{ transition: 'background 0.3s' }} />
       </div>
     </button>
   )
@@ -109,40 +106,27 @@ function ThemePill() {
 
   return (
     <div
-      className="flex items-center gap-0.5 rounded-2xl flex-shrink-0"
-      style={{
-        padding: '3px',
-        background: 'var(--shell-theme-pill-bg)',
-        border: '0.5px solid var(--shell-border-color)',
-        transition: 'background 0.3s',
-      }}
+      className="flex items-center gap-0.5 rounded-2xl flex-shrink-0 p-0.5 border-[0.5px] bg-[var(--shell-theme-pill-bg)] border-[var(--shell-border-color)]"
+      style={{ transition: 'background 0.3s' }}
     >
       <button
         className={cn(
-          'rounded-xl text-xs font-medium transition-all duration-150 border-none font-[inherit]',
+          'rounded-xl text-xs font-medium transition-all duration-150 border-none font-[inherit] px-2.5 py-0.5 cursor-pointer',
+          resolvedTheme === 'light'
+            ? 'bg-[var(--shell-cp-bg)] text-[color:var(--shell-text-1)] shadow-[0_1px_2px_rgba(0,0,0,0.12)]'
+            : 'bg-transparent text-[color:var(--shell-text-3)] shadow-none',
         )}
-        style={{
-          padding: '3px 10px',
-          background: resolvedTheme === 'light' ? 'var(--shell-cp-bg)' : 'transparent',
-          color: resolvedTheme === 'light' ? 'var(--shell-text-1)' : 'var(--shell-text-3)',
-          boxShadow: resolvedTheme === 'light' ? '0 1px 2px rgba(0,0,0,0.12)' : 'none',
-          cursor: 'pointer',
-        }}
         onClick={() => setTheme('light')}
       >
         Light
       </button>
       <button
         className={cn(
-          'rounded-xl text-xs font-medium transition-all duration-150 border-none font-[inherit]',
+          'rounded-xl text-xs font-medium transition-all duration-150 border-none font-[inherit] px-2.5 py-0.5 cursor-pointer',
+          resolvedTheme === 'dark'
+            ? 'bg-[var(--shell-cp-bg)] text-[color:var(--shell-text-1)] shadow-[0_1px_2px_rgba(0,0,0,0.12)]'
+            : 'bg-transparent text-[color:var(--shell-text-3)] shadow-none',
         )}
-        style={{
-          padding: '3px 10px',
-          background: resolvedTheme === 'dark' ? 'var(--shell-cp-bg)' : 'transparent',
-          color: resolvedTheme === 'dark' ? 'var(--shell-text-1)' : 'var(--shell-text-3)',
-          boxShadow: resolvedTheme === 'dark' ? '0 1px 2px rgba(0,0,0,0.12)' : 'none',
-          cursor: 'pointer',
-        }}
         onClick={() => setTheme('dark')}
       >
         Dark
@@ -189,18 +173,14 @@ function HomeTopbarCenter() {
   return (
     <div className="flex items-center gap-0 min-w-0">
       <span
-        className="text-[13.5px] font-medium"
-        style={{ color: 'var(--shell-text-1)', transition: 'color 0.3s' }}
+        className="text-[13.5px] font-medium text-[color:var(--shell-text-1)]"
+        style={{ transition: 'color 0.3s' }}
       >
         {greeting}
       </span>
       <span
-        className="text-xs ml-[10px] pl-[10px]"
-        style={{
-          color: 'var(--shell-text-4)',
-          borderLeft: '1px solid var(--shell-border-color)',
-          transition: 'color 0.3s, border-color 0.3s',
-        }}
+        className="text-xs ml-[10px] pl-[10px] border-l text-[color:var(--shell-text-4)] border-[var(--shell-border-color)]"
+        style={{ transition: 'color 0.3s, border-color 0.3s' }}
       >
         {dateDisplay}
       </span>
@@ -333,24 +313,14 @@ export function Header() {
 
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-[45] flex items-center"
-      style={{
-        height: 'var(--shell-topbar-h)',
-        background: 'var(--shell-page-bg)',
-        transition: 'background 0.3s',
-      }}
+      className="fixed top-0 left-0 right-0 z-[45] flex items-center h-[var(--shell-topbar-h)] bg-[var(--shell-page-bg)]"
+      style={{ transition: 'background 0.3s' }}
       aria-label="Global header"
     >
       {/* LEFT ZONE: width tracks sidebar for visual alignment */}
       <div
-        className="flex items-center gap-1 flex-shrink-0 overflow-hidden"
-        style={{
-          width: collapsed
-            ? 'var(--shell-sidebar-w-collapsed)'
-            : 'var(--shell-sidebar-w)',
-          transition: 'width var(--shell-transition)',
-          paddingLeft: '16px',
-        }}
+        className={`flex items-center gap-1 flex-shrink-0 overflow-hidden pl-4 ${collapsed ? 'w-[var(--shell-sidebar-w-collapsed)]' : 'w-[var(--shell-sidebar-w)]'}`}
+        style={{ transition: 'width var(--shell-transition)' }}
       >
         <HamburgerButton />
         {!collapsed && <SchoolSwitcher />}

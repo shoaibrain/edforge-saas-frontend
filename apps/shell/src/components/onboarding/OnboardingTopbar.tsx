@@ -12,8 +12,7 @@ export function OnboardingTopbar({ currentStep, totalSteps }: OnboardingTopbarPr
 
   return (
     <div
-      className="fixed top-0.5 left-0 right-0 z-40 h-14 flex items-center justify-between px-6"
-      style={{ backdropFilter: 'blur(8px)', backgroundColor: 'rgba(var(--bg-primary), 0.85)' }}
+      className="fixed top-0.5 left-0 right-0 z-40 h-14 flex items-center justify-between px-6 backdrop-blur bg-[rgba(var(--bg-primary),0.85)]"
     >
       {/* Logo */}
       <div className="flex items-center gap-2">

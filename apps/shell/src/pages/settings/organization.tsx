@@ -236,6 +236,7 @@ function OrgEmptyState({ onSetupSea }: { onSetupSea?: () => void }) {
           ].map(({ Icon, color, angle }, i) => (
             <motion.div
               key={i}
+              // allow-presentation-style: decorative orbiting org-type icon, per-item brand tint
               className="absolute w-8 h-8 rounded-lg flex items-center justify-center"
               style={{ background: `${color}20`, left: '50%', top: '50%' }}
               animate={{
@@ -253,7 +254,11 @@ function OrgEmptyState({ onSetupSea }: { onSetupSea?: () => void }) {
               }}
               transition={{ duration: 10, repeat: Infinity, ease: 'linear', delay: i * 0.5 }}
             >
-              <Icon className="w-4 h-4" style={{ color }} />
+              <Icon
+                // allow-presentation-style: decorative icon uses its per-item brand tint
+                className="w-4 h-4"
+                style={{ color }}
+              />
             </motion.div>
           ))}
         </motion.div>

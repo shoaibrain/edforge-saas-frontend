@@ -79,8 +79,7 @@ export function SchoolSwitcher() {
       return (
         <button
           onClick={handleCreateSchool}
-          className="flex items-center gap-2 h-10 px-2 rounded-[10px] transition-colors"
-          style={{ color: 'var(--shell-text-2)' }}
+          className="flex items-center gap-2 h-10 px-2 rounded-[10px] transition-colors text-[color:var(--shell-text-2)]"
         >
           <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[rgb(var(--action-primary-bg))]/20 to-[rgb(var(--action-primary-bg-hover))]/20 border border-dashed border-[rgb(var(--border-focus)/0.40)] flex items-center justify-center flex-shrink-0">
             <Plus className="w-3.5 h-3.5 text-[rgb(var(--action-secondary-fg))] " />
@@ -94,7 +93,7 @@ export function SchoolSwitcher() {
         <div className="w-7 h-7 rounded-lg bg-amber-500/10 flex items-center justify-center flex-shrink-0">
           <AlertCircle className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
         </div>
-        <span className="text-xs" style={{ color: 'var(--shell-text-3)' }}>No school assigned</span>
+        <span className="text-xs text-[color:var(--shell-text-3)]">No school assigned</span>
       </div>
     )
   }
@@ -109,10 +108,10 @@ export function SchoolSwitcher() {
           className="w-8 h-8 rounded-lg flex-shrink-0"
         />
         <div className="min-w-0">
-          <p className="text-[12.5px] font-semibold truncate max-w-40" style={{ color: 'var(--shell-school-name)' }}>
+          <p className="text-[12.5px] font-semibold truncate max-w-40 text-[color:var(--shell-school-name)]">
             {activeSchool.name}
           </p>
-          <p className="text-[9.5px] font-medium truncate" style={{ color: 'var(--shell-school-code)' }}>
+          <p className="text-[9.5px] font-medium truncate text-[color:var(--shell-school-code)]">
             {activeSchool.code}
           </p>
         </div>
@@ -248,10 +247,7 @@ export function SchoolSwitcher() {
   return (
     <Menu as="div" className="relative">
       <MenuButton
-        className="flex items-center gap-2 h-10 px-2 rounded-[10px] transition-colors flex-shrink-0"
-        style={{ cursor: 'pointer' }}
-        onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'var(--shell-ni-hover)' }}
-        onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent' }}
+        className="flex items-center gap-2 h-10 px-2 rounded-[10px] transition-colors flex-shrink-0 cursor-pointer hover:bg-[var(--shell-ni-hover)]"
       >
         <img
           src={getSchoolAvatar(activeSchool?.name || 'school', { size: 30 })}
@@ -262,14 +258,14 @@ export function SchoolSwitcher() {
           )}
         />
         <div className="min-w-0 text-left" style={{ lineHeight: 1.2 }}>
-          <p className="text-[12.5px] font-semibold truncate max-w-40" style={{ color: 'var(--shell-school-name)', transition: 'color 0.3s' }}>
+          <p className="text-[12.5px] font-semibold truncate max-w-40 text-[color:var(--shell-school-name)]" style={{ transition: 'color 0.3s' }}>
             {activeSchool?.name || 'Select School'}
           </p>
-          <p className="text-[9.5px] font-medium truncate" style={{ color: 'var(--shell-school-code)', transition: 'color 0.3s' }}>
+          <p className="text-[9.5px] font-medium truncate text-[color:var(--shell-school-code)]" style={{ transition: 'color 0.3s' }}>
             {isTransitioning ? 'Switching...' : activeSchool?.code || 'Choose school'}
           </p>
         </div>
-        <svg className="flex-shrink-0" width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ marginLeft: '-2px' }}>
+        <svg className="flex-shrink-0 -ml-0.5" width="12" height="12" viewBox="0 0 12 12" fill="none">
           <path d="M3 4.5l3 3 3-3" stroke="var(--shell-school-code)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </MenuButton>

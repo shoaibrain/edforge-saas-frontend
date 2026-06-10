@@ -195,6 +195,7 @@ function ColorSwatch({ label, hex }: ColorSwatchProps) {
   return (
     <div className="flex items-center gap-3">
       <div
+        // allow-presentation-style: swatch fill is the tenant's configured brand hex
         className="w-10 h-10 rounded-lg border border-[rgb(var(--border-primary))] shadow-sm shrink-0"
         style={{ backgroundColor: hex }}
         role="img"

@@ -31,6 +31,7 @@ export function WelcomeStep({ onNext }: OnboardingStepProps) {
     <div className="flex flex-col items-center text-center py-12 relative">
       {/* Subtle radial gradient backdrop */}
       <div
+        // allow-presentation-style: decorative one-off radial-gradient backdrop (no token equivalent)
         className="absolute inset-0 pointer-events-none"
         style={{
           background: 'radial-gradient(circle at 50% 20%, rgba(10, 147, 150, 0.06) 0%, transparent 60%)',
@@ -84,12 +85,7 @@ export function WelcomeStep({ onNext }: OnboardingStepProps) {
         {FEATURE_PILLS.map((pill) => (
           <span
             key={pill}
-            className="text-xs px-3 py-1 rounded-full border font-medium"
-            style={{
-              color: 'rgb(var(--text-secondary))',
-              borderColor: 'rgb(var(--border-primary))',
-              background: 'rgb(var(--background-tertiary))',
-            }}
+            className="text-xs px-3 py-1 rounded-full border font-medium text-[rgb(var(--text-secondary))] border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary))]"
           >
             {pill}
           </span>

@@ -99,7 +99,7 @@ function makeStudent(overrides: Partial<StudentResponseDto> = {}): StudentRespon
 function ContentPane({ children }: { children: React.ReactNode }) {
   return (
     <div data-testid="content-pane" className="relative overflow-hidden" style={{ position: 'relative', overflow: 'hidden', width: 1024, height: 768 }}>
-      <div data-testid="page-content" style={{ padding: 20 }}>
+      <div data-testid="page-content" className="p-5">
         Page content sibling — used as the layout-shift witness.
       </div>
       {children}

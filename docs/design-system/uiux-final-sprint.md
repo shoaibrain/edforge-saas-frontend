@@ -153,3 +153,30 @@ operator-impact first; landing/marketing last.
   its accent members (`success`/`info`/…) feed chart `stroke`/`fill` and stay
   (those are dynamic-viz inline, marker them).
 - Two-repo hygiene + branch discipline per CLAUDE.md.
+
+## 8. Ratchet closed (2026-06-10)
+
+`no-presentation-style-objects` is now **`error`** for `apps/**` in
+[`packages/config/eslint-design-system.js`](../../packages/config/eslint-design-system.js).
+The operator-facing tail (Tier 1, Tier 2 non-portal, plus the shell chrome —
+`Header`, `Sidebar`, `AppShell`, `SchoolSwitcher`, onboarding, settings tabs,
+calendar/branding/meetings, analytics) is at **0** presentation-style warnings.
+Conversions are token/className where the value is static; genuinely dynamic
+values (data-driven chart/calendar colors, depth-based tree indent, randomized
+confetti, tenant brand swatch) carry an in-tag `// allow-presentation-style:`
+marker with a reason.
+
+**Still `warn` (explicit allowlist in the same config), code kept intact:**
+
+- `apps/academics/src/components/students/CSVImport.tsx` — importer is hidden
+  from the UI pending the missing IEMIS field; not converted.
+- `apps/shell/src/components/landing/**`, `landing-v2/**` — marketing pages,
+  outside the operator app.
+- `apps/shell/src/pages/parent-portal/**`, `portal-shared/**`,
+  `student-portal/**` — portal experiences not planned for this release.
+- `packages/ui/**` — the shared primitive library (charts, heatmaps, rings,
+  stat cards) is mostly dynamic-viz and is a separate follow-up; its
+  `no-hardcoded-colors` / `no-arbitrary-tailwind-values` errors still apply.
+
+When any allowlisted path is picked up, convert it and delete its entry from the
+config block.

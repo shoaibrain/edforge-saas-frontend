@@ -1389,12 +1389,7 @@ function SessionRowWithExamForm({
           </span>
           {hasExamDates && (
             <span
-              className="text-xs font-medium px-1.5 py-0.5 rounded"
-              style={{
-                background: 'rgba(249,115,22,0.08)',
-                color: '#F97316',
-                border: '1px solid rgba(249,115,22,0.2)',
-              }}
+              className="text-xs font-medium px-1.5 py-0.5 rounded border bg-[rgba(249,115,22,0.08)] text-[#F97316] border-[rgba(249,115,22,0.2)]"
               title="Exam window — auto-syncs to the calendar"
             >
               Exam: {formatRange(associatedGp.examStartDate, associatedGp.examEndDate)}
@@ -1653,6 +1648,7 @@ function CalendarMonthGrid({ currentMonth, onMonthChange, dateMap, selectedDate,
               )}
               {colorCfg && (
                 <span
+                  // allow-presentation-style: calendar day-type dot color is data-driven (colorCfg.dot)
                   className="absolute bottom-0.5 w-1 h-1 rounded-full"
                   style={{ background: colorCfg.dot }}
                 />
@@ -1663,8 +1659,7 @@ function CalendarMonthGrid({ currentMonth, onMonthChange, dateMap, selectedDate,
                   shows the full block context pill. */}
               {blockName && !isSelected && (
                 <span
-                  className="absolute top-0.5 right-0.5 w-1 h-1 rounded-full"
-                  style={{ background: 'rgba(127,119,221,0.7)' }}
+                  className="absolute top-0.5 right-0.5 w-1 h-1 rounded-full bg-[rgba(127,119,221,0.7)]"
                   aria-hidden
                 />
               )}
@@ -1805,18 +1800,30 @@ function DateEditPanel({ dateEntry, onClose, onSave, isSaving, calendarSystem }:
       {/* Header with close button */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full" style={{ background: isWeekendWithHoliday ? 'rgb(var(--text-tertiary))' : colorCfg.dot }} />
+          <span
+            // allow-presentation-style: day-type indicator dot is data-driven (colorCfg.dot)
+            className="w-2.5 h-2.5 rounded-full"
+            style={{ background: isWeekendWithHoliday ? 'rgb(var(--text-tertiary))' : colorCfg.dot }}
+          />
           <h4 className="text-xs font-semibold text-[rgb(var(--text-primary))]">{displayTitle}</h4>
         </div>
         <button onClick={onClose} className="text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] text-sm">✕</button>
       </div>
 
       {/* Date Info Card */}
-      <div className="rounded-lg px-3 py-2 mb-2.5" style={{ background: isWeekendWithHoliday || isWeekend ? 'rgba(148,163,184,0.06)' : colorCfg.bg, border: `1px solid ${infoBorderColor}` }}>
+      <div
+        // allow-presentation-style: info-card bg/border are data-driven (colorCfg.bg / infoBorderColor)
+        className="rounded-lg px-3 py-2 mb-2.5 border"
+        style={{ background: isWeekendWithHoliday || isWeekend ? 'rgba(148,163,184,0.06)' : colorCfg.bg, borderColor: infoBorderColor }}
+      >
         {/* Date display */}
         <div className="flex items-center gap-2 mb-1">
           <span className="text-xs font-medium text-[rgb(var(--text-secondary))]">{dateLabel}</span>
-          <span className="text-xs font-medium px-1.5 py-0.5 rounded" style={{ background: colorCfg.bg, color: colorCfg.dot }}>
+          <span
+            // allow-presentation-style: day-type chip colors are data-driven (colorCfg)
+            className="text-xs font-medium px-1.5 py-0.5 rounded"
+            style={{ background: colorCfg.bg, color: colorCfg.dot }}
+          >
             {colorCfg.label}
           </span>
         </div>
@@ -2422,8 +2429,9 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
         {DAY_TYPE_LEGEND_CHIPS.map(dt => (
           <span
             key={dt.label}
-            className="text-xs font-medium px-1.5 py-0.5 rounded"
-            style={{ background: dt.color, color: dt.text, border: `1px solid ${dt.border}` }}
+            // allow-presentation-style: legend chip colors are data-driven (dt.*)
+            className="text-xs font-medium px-1.5 py-0.5 rounded border"
+            style={{ background: dt.color, color: dt.text, borderColor: dt.border }}
           >
             {dt.label}
           </span>
@@ -2773,10 +2781,15 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
                     const colors = periodTypeColors[period.periodType] || periodTypeColors.instructional
                     return (
                       <div key={idx} className="flex items-center gap-2.5 px-3 py-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: colors.text }} />
+                        <span
+                          // allow-presentation-style: period-type dot is data-driven (colors.text)
+                          className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                          style={{ background: colors.text }}
+                        />
                         <span className="text-xs text-[rgb(var(--text-secondary))] min-w-20">{period.classPeriodName || period.name}</span>
                         <span className="text-xs text-[rgb(var(--text-tertiary))] tabular-nums">{period.startTime} – {period.endTime}</span>
                         <span
+                          // allow-presentation-style: period-type chip colors are data-driven (colors)
                           className="text-xs font-medium px-1.5 py-px rounded ml-auto"
                           style={{ background: colors.bg, color: colors.text }}
                         >
