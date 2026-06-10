@@ -83,7 +83,7 @@ export function StudentDashboard({ schoolId }: StudentDashboardProps) {
   if (!schoolId) {
     return (
       <div className="py-16 text-center">
-        <p className="text-sm" style={{ color: 'rgb(var(--text-tertiary))' }}>
+        <p className="text-sm text-[rgb(var(--text-tertiary))]">
           {t('homeV2.selectSchoolTeacher')}
         </p>
       </div>
@@ -92,13 +92,7 @@ export function StudentDashboard({ schoolId }: StudentDashboardProps) {
 
   return (
     <motion.div
-      className="flex flex-col"
-      style={{
-        gap: '16px',
-        padding: '20px 28px',
-        background: 'rgb(var(--background-primary))',
-        minHeight: '100%',
-      }}
+      className="flex flex-col gap-4 px-7 py-5 min-h-full bg-[rgb(var(--background-primary))]"
       variants={staggerContainer}
       initial={prefersReducedMotion ? undefined : 'hidden'}
       animate="visible"
@@ -108,48 +102,46 @@ export function StudentDashboard({ schoolId }: StudentDashboardProps) {
         <motion.div
           variants={sectionVariants}
           transition={{ duration: 0.2 }}
-          className="rounded-xl border"
-          style={{
-            background: 'rgb(var(--background-secondary))',
-            borderColor: 'rgb(var(--border-primary) / 0.35)',
-            padding: 18,
-          }}
+          // allow-presentation-style: card padding (18px) is off the 4px scale
+          className="rounded-xl border bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]"
+          style={{ padding: 18 }}
         >
-          <h2
-            className="text-sm font-medium mb-1"
-            style={{ color: 'rgb(var(--text-secondary))' }}
-          >
+          <h2 className="text-sm font-medium mb-1 text-[rgb(var(--text-secondary))]">
             {t('homeV2.student.welcomeTitle')}
           </h2>
-          <p className="text-xs mb-4" style={{ color: 'rgb(var(--text-tertiary))' }}>
+          <p className="text-xs mb-4 text-[rgb(var(--text-tertiary))]">
             {t('homeV2.student.welcomeDescription')}
           </p>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4" style={{ gap: '12px' }}>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {studentLinks.map((link) => {
               const Icon = link.icon
               return (
                 <Link
                   key={link.label}
                   to={link.href as any}
-                  className="flex flex-col gap-2 p-3 rounded-lg transition-colors"
-                  style={{ background: 'rgb(var(--background-tertiary))' }}
+                  className="flex flex-col gap-2 p-3 rounded-lg transition-colors bg-[rgb(var(--background-tertiary))]"
                 >
                   <div
+                    // allow-presentation-style: per-link accent tint
                     className="w-8 h-8 rounded-lg flex items-center justify-center"
                     style={{ background: `${link.color}15` }}
                   >
-                    <Icon className="w-4 h-4" style={{ color: link.color }} />
+                    <Icon
+                      // allow-presentation-style: per-link accent color
+                      className="w-4 h-4"
+                      style={{ color: link.color }}
+                    />
                   </div>
                   <div>
-                    <p className="text-xs font-medium" style={{ color: 'rgb(var(--text-tertiary))' }}>
+                    <p className="text-xs font-medium text-[rgb(var(--text-tertiary))]">
                       {link.label}
                     </p>
-                    <p className="text-xs mt-0.5" style={{ color: 'rgb(var(--text-tertiary))' }}>
+                    <p className="text-xs mt-0.5 text-[rgb(var(--text-tertiary))]">
                       {link.description}
                     </p>
                   </div>
-                  <ArrowRight className="w-3 h-3 mt-auto" style={{ color: 'rgb(var(--text-disabled))' }} />
+                  <ArrowRight className="w-3 h-3 mt-auto text-[rgb(var(--text-disabled))]" />
                 </Link>
               )
             })}

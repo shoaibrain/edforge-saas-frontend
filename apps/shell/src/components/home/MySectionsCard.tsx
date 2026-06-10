@@ -31,11 +31,7 @@ function SectionsSkeleton() {
   return (
     <div className="space-y-2">
       {Array.from({ length: 3 }).map((_, i) => (
-        <div
-          key={i}
-          className="h-16 rounded-lg v2-skeleton-pulse"
-          style={{ background: 'rgb(var(--background-tertiary))' }}
-        />
+        <div key={i} className="h-16 rounded-lg v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
       ))}
     </div>
   )
@@ -50,24 +46,18 @@ export function MySectionsCard({ sections, isLoading }: MySectionsCardProps) {
 
   return (
     <div
-      className="rounded-xl border"
-      style={{
-        background: 'rgb(var(--background-secondary))',
-        borderColor: 'rgb(var(--border-primary) / 0.35)',
-        padding: 18,
-      }}
+      // allow-presentation-style: card padding (18px) is off the 4px scale
+      className="rounded-xl border bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]"
+      style={{ padding: 18 }}
     >
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <CalendarDays className="w-4 h-4" style={{ color: '#378ADD' }} />
-          <h3
-            className="text-sm font-medium"
-            style={{ color: 'rgb(var(--text-secondary))' }}
-          >
+          <CalendarDays className="w-4 h-4 text-[rgb(var(--accent-academics))]" />
+          <h3 className="text-sm font-medium text-[rgb(var(--text-secondary))]">
             {t('homeV2.teacher.mySections')}
           </h3>
           {!isLoading && (
-            <span className="text-xs" style={{ color: 'rgb(var(--text-tertiary))' }}>
+            <span className="text-xs text-[rgb(var(--text-tertiary))]">
               ({sections.length})
             </span>
           )}
@@ -75,8 +65,7 @@ export function MySectionsCard({ sections, isLoading }: MySectionsCardProps) {
         <Link
           to="/academics/$"
           params={{ _splat: 'classrooms' }}
-          className="flex items-center gap-1 text-xs font-medium transition-opacity hover:opacity-80"
-          style={{ color: '#1D9E75' }}
+          className="flex items-center gap-1 text-xs font-medium transition-opacity hover:opacity-80 text-[#1D9E75]"
         >
           {t('homeV2.teacher.viewAll')}
           <ArrowRight className="w-3 h-3" />
@@ -87,20 +76,17 @@ export function MySectionsCard({ sections, isLoading }: MySectionsCardProps) {
         <SectionsSkeleton />
       ) : sections.length === 0 ? (
         <div className="py-8 text-center">
-          <BookOpen className="w-8 h-8 mx-auto mb-2" style={{ color: 'rgb(var(--text-disabled))' }} />
-          <p className="text-sm" style={{ color: 'rgb(var(--text-tertiary))' }}>
+          <BookOpen className="w-8 h-8 mx-auto mb-2 text-[rgb(var(--text-disabled))]" />
+          <p className="text-sm text-[rgb(var(--text-tertiary))]">
             {t('homeV2.teacher.noSectionsAssigned')}
           </p>
-          <p className="text-xs mt-1" style={{ color: 'rgb(var(--text-tertiary))' }}>
+          <p className="text-xs mt-1 text-[rgb(var(--text-tertiary))]">
             {t('homeV2.teacher.contactAdmin')}
           </p>
         </div>
       ) : (
         <>
-          <div
-            className="flex items-center gap-4 mb-3 text-xs"
-            style={{ color: 'rgb(var(--text-tertiary))' }}
-          >
+          <div className="flex items-center gap-4 mb-3 text-xs text-[rgb(var(--text-tertiary))]">
             <span className="flex items-center gap-1">
               <CalendarDays className="w-3 h-3" />
               {sections.length} section{sections.length !== 1 ? 's' : ''}
@@ -119,24 +105,17 @@ export function MySectionsCard({ sections, isLoading }: MySectionsCardProps) {
             {sections.map((section) => (
               <li
                 key={section.sectionId}
-                className="flex items-center justify-between px-3 py-2.5 rounded-lg transition-colors"
-                style={{ background: 'rgb(var(--background-tertiary))' }}
+                className="flex items-center justify-between px-3 py-2.5 rounded-lg transition-colors bg-[rgb(var(--background-tertiary))]"
                 aria-label={`${section.courseName || section.courseCode || 'Section'} ${section.sectionNumber}, ${section.currentEnrollment} students`}
               >
                 <div className="min-w-0 flex-1">
-                  <p
-                    className="text-xs font-medium truncate"
-                    style={{ color: 'rgb(var(--text-tertiary))' }}
-                  >
+                  <p className="text-xs font-medium truncate text-[rgb(var(--text-tertiary))]">
                     {section.courseName || section.courseCode || 'Section'}{' '}
-                    <span style={{ color: 'rgb(var(--text-tertiary))', fontWeight: 400 }}>
+                    <span className="font-normal text-[rgb(var(--text-tertiary))]">
                       — {section.sectionNumber}
                     </span>
                   </p>
-                  <p
-                    className="text-xs mt-0.5"
-                    style={{ color: 'rgb(var(--text-tertiary))' }}
-                  >
+                  <p className="text-xs mt-0.5 text-[rgb(var(--text-tertiary))]">
                     {section.currentEnrollment}/{section.maxEnrollment} students
                     {section.locationRoomNumber &&
                       ` · Room ${section.locationRoomNumber}`}
@@ -147,8 +126,7 @@ export function MySectionsCard({ sections, isLoading }: MySectionsCardProps) {
                   <Link
                     to="/academics/$"
                     params={{ _splat: `classrooms/${section.sectionId}?tab=attendance` }}
-                    className="p-1.5 rounded-md transition-opacity hover:opacity-70"
-                    style={{ color: 'rgb(var(--state-warning-fg))' }}
+                    className="p-1.5 rounded-md transition-opacity hover:opacity-70 text-[rgb(var(--state-warning-fg))]"
                     title={t('homeV2.teacher.takeAttendance')}
                     aria-label={`Take attendance for ${section.courseName || section.sectionNumber}`}
                   >
@@ -157,8 +135,7 @@ export function MySectionsCard({ sections, isLoading }: MySectionsCardProps) {
                   <Link
                     to="/academics/$"
                     params={{ _splat: `classrooms/${section.sectionId}?tab=gradebook` }}
-                    className="p-1.5 rounded-md transition-opacity hover:opacity-70"
-                    style={{ color: '#7F77DD' }}
+                    className="p-1.5 rounded-md transition-opacity hover:opacity-70 text-[#7F77DD]"
                     title={t('homeV2.teacher.enterGrades')}
                     aria-label={`Enter grades for ${section.courseName || section.sectionNumber}`}
                   >

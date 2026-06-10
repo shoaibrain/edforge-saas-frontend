@@ -53,9 +53,9 @@ function SectionSkeleton() {
             {['Section', 'Students', 'Recorded', 'Rate', 'Status'].map((h) => (
               <th
                 key={h}
-                className="text-left text-xs font-medium pb-2 px-2"
+                className="text-left text-xs font-medium pb-2 px-2 text-[rgb(var(--text-tertiary))]"
                 scope="col"
-                style={{ color: 'rgb(var(--text-tertiary))', borderBottom: '1px solid rgb(var(--border-primary) / 0.35)' }}
+                style={{ borderBottom: '1px solid rgb(var(--border-primary) / 0.35)' }}
               >
                 {h}
               </th>
@@ -66,19 +66,19 @@ function SectionSkeleton() {
           {Array.from({ length: 5 }).map((_, i) => (
             <tr key={i}>
               <td className="py-2.5 px-2" style={{ borderBottom: i < 4 ? '1px solid rgb(var(--border-primary) / 0.35)' : 'none' }}>
-                <div className="h-3 rounded v2-skeleton-pulse" style={{ width: `${100 + Math.random() * 80}px`, background: 'rgb(var(--background-tertiary))' }} />
+                <div className="h-3 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" style={{ width: `${100 + Math.random() * 80}px` }} />
               </td>
               <td className="py-2.5 px-2" style={{ borderBottom: i < 4 ? '1px solid rgb(var(--border-primary) / 0.35)' : 'none' }}>
-                <div className="h-3 w-8 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
+                <div className="h-3 w-8 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
               </td>
               <td className="py-2.5 px-2" style={{ borderBottom: i < 4 ? '1px solid rgb(var(--border-primary) / 0.35)' : 'none' }}>
-                <div className="h-3 w-10 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
+                <div className="h-3 w-10 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
               </td>
               <td className="py-2.5 px-2" style={{ borderBottom: i < 4 ? '1px solid rgb(var(--border-primary) / 0.35)' : 'none' }}>
-                <div className="h-3 w-10 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
+                <div className="h-3 w-10 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
               </td>
               <td className="py-2.5 px-2" style={{ borderBottom: i < 4 ? '1px solid rgb(var(--border-primary) / 0.35)' : 'none' }}>
-                <div className="h-5 w-16 rounded-md v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
+                <div className="h-5 w-16 rounded-md v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
               </td>
             </tr>
           ))}
@@ -123,23 +123,17 @@ export function AttendanceBySectionCard({
 
   return (
     <div
-      className="rounded-xl border"
-      style={{
-        background: 'rgb(var(--background-secondary))',
-        borderColor: 'rgb(var(--border-primary) / 0.35)',
-        padding: 18,
-      }}
+      // allow-presentation-style: card padding (18px) is off the 4px scale
+      className="rounded-xl border bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]"
+      style={{ padding: 18 }}
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-1">
-        <span
-          className="text-sm font-medium"
-          style={{ color: 'rgb(var(--text-secondary))' }}
-        >
+        <span className="text-sm font-medium text-[rgb(var(--text-secondary))]">
           {t('homeV2.attendance.classroomAttendance')}
         </span>
         {todayRate != null && (
-          <span className="text-xs font-medium" style={{ color: 'rgb(var(--state-warning-fg))' }}>
+          <span className="text-xs font-medium text-[rgb(var(--state-warning-fg))]">
             {todayRate.toFixed(1)}% today
           </span>
         )}
@@ -147,19 +141,19 @@ export function AttendanceBySectionCard({
 
       {/* Ticket 2.4: Summary header bar */}
       {!isLoading && sections.length > 0 && (
-        <div
-          className="flex items-center gap-3 mb-3 text-xs"
-          style={{ color: 'rgb(var(--text-tertiary))' }}
-        >
+        <div className="flex items-center gap-3 mb-3 text-xs text-[rgb(var(--text-tertiary))]">
           <span>{sections.length} section{sections.length !== 1 ? 's' : ''} total</span>
-          <span style={{ color: 'rgb(var(--border-primary) / 0.35)' }}>·</span>
-          <span style={{ color: takenCount === sections.length ? '#1D9E75' : undefined }}>
+          <span className="text-[rgb(var(--border-primary)/0.35)]">·</span>
+          <span className={takenCount === sections.length ? 'text-[rgb(var(--accent-enrollment))]' : ''}>
             {recordedCount}/{sections.length} recorded
           </span>
           {todayRate != null && (
             <>
-              <span style={{ color: 'rgb(var(--border-primary) / 0.35)' }}>·</span>
-              <span style={{ color: getRateColor(todayRate) }}>
+              <span className="text-[rgb(var(--border-primary)/0.35)]">·</span>
+              <span
+                // allow-presentation-style: overall attendance-rate severity color
+                style={{ color: getRateColor(todayRate) }}
+              >
                 {todayRate.toFixed(1)}% overall
               </span>
             </>
@@ -170,14 +164,13 @@ export function AttendanceBySectionCard({
       {/* Ticket 2.5: Empty state for no academic year */}
       {!isLoading && !academicYearId ? (
         <div className="flex flex-col items-center gap-2 py-8">
-          <Settings className="w-5 h-5" style={{ color: 'rgb(var(--text-disabled))' }} />
-          <p className="text-sm text-center" style={{ color: 'rgb(var(--text-tertiary))' }}>
+          <Settings className="w-5 h-5 text-[rgb(var(--text-disabled))]" />
+          <p className="text-sm text-center text-[rgb(var(--text-tertiary))]">
             {t('homeV2.attendance.noAcademicYear')}
           </p>
           <a
             href="/settings/organization"
-            className="text-xs font-medium transition-opacity hover:opacity-80"
-            style={{ color: '#1D9E75' }}
+            className="text-xs font-medium transition-opacity hover:opacity-80 text-[#1D9E75]"
           >
             {t('homeV2.attendance.setupAcademicYear')}
           </a>
@@ -185,7 +178,7 @@ export function AttendanceBySectionCard({
       ) : isLoading ? (
         <SectionSkeleton />
       ) : sections.length === 0 ? (
-        <p className="text-sm py-6 text-center" style={{ color: 'rgb(var(--text-tertiary))' }}>
+        <p className="text-sm py-6 text-center text-[rgb(var(--text-tertiary))]">
           {t('homeV2.attendance.noSectionsToday')}
         </p>
       ) : (
@@ -199,37 +192,37 @@ export function AttendanceBySectionCard({
               <tr>
                 <th
                   scope="col"
-                  className="text-left text-xs font-medium pb-2 px-2"
-                  style={{ color: 'rgb(var(--text-tertiary))', borderBottom: '1px solid rgb(var(--border-primary) / 0.35)' }}
+                  className="text-left text-xs font-medium pb-2 px-2 text-[rgb(var(--text-tertiary))]"
+                  style={{ borderBottom: '1px solid rgb(var(--border-primary) / 0.35)' }}
                 >
                   {t('homeV2.attendance.section')}
                 </th>
                 <th
                   scope="col"
-                  className="text-center text-xs font-medium pb-2 px-2"
-                  style={{ color: 'rgb(var(--text-tertiary))', borderBottom: '1px solid rgb(var(--border-primary) / 0.35)', width: 80 }}
+                  className="text-center text-xs font-medium pb-2 px-2 text-[rgb(var(--text-tertiary))]"
+                  style={{ borderBottom: '1px solid rgb(var(--border-primary) / 0.35)', width: 80 }}
                 >
                   {t('homeV2.attendance.students')}
                 </th>
                 <th
                   scope="col"
-                  className="text-center text-xs font-medium pb-2 px-2"
-                  style={{ color: 'rgb(var(--text-tertiary))', borderBottom: '1px solid rgb(var(--border-primary) / 0.35)', width: 80 }}
+                  className="text-center text-xs font-medium pb-2 px-2 text-[rgb(var(--text-tertiary))]"
+                  style={{ borderBottom: '1px solid rgb(var(--border-primary) / 0.35)', width: 80 }}
                 >
                   {t('homeV2.attendance.recordedCol')}
                 </th>
                 {/* Ticket 2.2: Rate column */}
                 <th
                   scope="col"
-                  className="text-center text-xs font-medium pb-2 px-2"
-                  style={{ color: 'rgb(var(--text-tertiary))', borderBottom: '1px solid rgb(var(--border-primary) / 0.35)', width: 70 }}
+                  className="text-center text-xs font-medium pb-2 px-2 text-[rgb(var(--text-tertiary))]"
+                  style={{ borderBottom: '1px solid rgb(var(--border-primary) / 0.35)', width: 70 }}
                 >
                   {t('homeV2.attendance.rate')}
                 </th>
                 <th
                   scope="col"
-                  className="text-right text-xs font-medium pb-2 px-2"
-                  style={{ color: 'rgb(var(--text-tertiary))', borderBottom: '1px solid rgb(var(--border-primary) / 0.35)', width: 90 }}
+                  className="text-right text-xs font-medium pb-2 px-2 text-[rgb(var(--text-tertiary))]"
+                  style={{ borderBottom: '1px solid rgb(var(--border-primary) / 0.35)', width: 90 }}
                 >
                   {t('homeV2.attendance.status')}
                 </th>
@@ -260,7 +253,7 @@ export function AttendanceBySectionCard({
                         borderBottom: i < sections.length - 1 ? '1px solid rgb(var(--border-primary) / 0.35)' : 'none',
                       }}
                     >
-                      <span className="text-xs" style={{ color: 'rgb(var(--text-tertiary))' }}>
+                      <span className="text-xs text-[rgb(var(--text-tertiary))]">
                         {section.name}
                       </span>
                     </td>
@@ -271,12 +264,12 @@ export function AttendanceBySectionCard({
                       }}
                     >
                       {section.studentCount != null ? (
-                        <span className="inline-flex items-center gap-1 text-xs" style={{ color: 'rgb(var(--text-tertiary))' }}>
+                        <span className="inline-flex items-center gap-1 text-xs text-[rgb(var(--text-tertiary))]">
                           <Users className="w-2.5 h-2.5" />
                           {section.studentCount}
                         </span>
                       ) : (
-                        <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>—</span>
+                        <span className="text-xs text-[rgb(var(--text-disabled))]">—</span>
                       )}
                     </td>
                     <td
@@ -286,15 +279,11 @@ export function AttendanceBySectionCard({
                       }}
                     >
                       {section.recordedCount != null && section.studentCount != null ? (
-                        <span className="text-xs" style={{
-                          color: section.recordedCount === section.studentCount
-                            ? '#1D9E75'
-                            : 'rgb(var(--text-tertiary))',
-                        }}>
+                        <span className={`text-xs ${section.recordedCount === section.studentCount ? 'text-[rgb(var(--accent-enrollment))]' : 'text-[rgb(var(--text-tertiary))]'}`}>
                           {section.recordedCount}/{section.studentCount}
                         </span>
                       ) : (
-                        <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>—</span>
+                        <span className="text-xs text-[rgb(var(--text-disabled))]">—</span>
                       )}
                     </td>
                     {/* Ticket 2.2: Rate cell with color coding */}
@@ -306,13 +295,14 @@ export function AttendanceBySectionCard({
                     >
                       {rate != null ? (
                         <span
+                          // allow-presentation-style: per-section attendance-rate severity color
                           className="text-xs font-medium"
                           style={{ color: getRateColor(rate) }}
                         >
                           {rate.toFixed(0)}%
                         </span>
                       ) : (
-                        <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>—</span>
+                        <span className="text-xs text-[rgb(var(--text-disabled))]">—</span>
                       )}
                     </td>
                     <td
@@ -323,11 +313,7 @@ export function AttendanceBySectionCard({
                     >
                       {section.status === 'taken' ? (
                         <span
-                          className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-md"
-                          style={{
-                            background: 'rgb(var(--accent-enrollment) / 0.12)',
-                            color: '#1D9E75',
-                          }}
+                          className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-md bg-[rgb(var(--accent-enrollment)/0.12)] text-[rgb(var(--accent-enrollment))]"
                           aria-label="Attendance taken"
                         >
                           <Check className="w-2 h-2" />
@@ -335,11 +321,7 @@ export function AttendanceBySectionCard({
                         </span>
                       ) : section.status === 'partial' ? (
                         <span
-                          className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-md"
-                          style={{
-                            background: 'rgb(var(--accent-academics) / 0.12)',
-                            color: '#378ADD',
-                          }}
+                          className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-md bg-[rgb(var(--accent-academics)/0.12)] text-[rgb(var(--accent-academics))]"
                           aria-label="Attendance partially taken"
                         >
                           <Clock className="w-2 h-2" />
@@ -347,11 +329,7 @@ export function AttendanceBySectionCard({
                         </span>
                       ) : (
                         <span
-                          className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-md"
-                          style={{
-                            background: 'rgb(var(--accent-attendance) / 0.12)',
-                            color: 'rgb(var(--state-warning-fg))',
-                          }}
+                          className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-md bg-[rgb(var(--accent-attendance)/0.12)] text-[rgb(var(--state-warning-fg))]"
                           aria-label="Attendance pending"
                         >
                           <Clock className="w-2 h-2" />

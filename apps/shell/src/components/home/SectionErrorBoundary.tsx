@@ -67,17 +67,12 @@ export class SectionErrorBoundary extends Component<Props, State> {
       return (
         <div className="flex flex-col items-center justify-center gap-3 py-8 px-4 rounded-xl border border-[rgb(var(--border-primary) / 0.35)] bg-[rgb(var(--background-secondary))]">
           <div className="flex items-center gap-3">
-            <p className="text-sm" style={{ color: 'rgb(var(--text-tertiary))' }}>
+            <p className="text-sm text-[rgb(var(--text-tertiary))]">
               {this.props.fallbackMessage || 'Something went wrong'}
             </p>
             <button
               onClick={this.handleRetry}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors"
-              style={{
-                background: 'rgb(var(--state-warning-bg))',
-                color: 'rgb(var(--state-warning-fg))',
-                border: '1px solid rgb(var(--state-warning-border))',
-              }}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors bg-[rgb(var(--state-warning-bg))] text-[rgb(var(--state-warning-fg))] border border-[rgb(var(--state-warning-border))]"
             >
               <RotateCcw className="w-3 h-3" />
               Retry
@@ -86,20 +81,10 @@ export class SectionErrorBoundary extends Component<Props, State> {
           {/* Ticket 4.3: debug mode — show error stack */}
           {DEBUG && this.state.error && (
             <details className="w-full max-w-lg text-left mt-2">
-              <summary
-                className="text-xs cursor-pointer"
-                style={{ color: 'rgb(var(--text-disabled))' }}
-              >
+              <summary className="text-xs cursor-pointer text-[rgb(var(--text-disabled))]">
                 Error details (debug mode)
               </summary>
-              <pre
-                className="mt-1 p-2 rounded text-xs overflow-x-auto max-h-32"
-                style={{
-                  background: 'rgb(var(--background-tertiary))',
-                  color: 'rgb(var(--state-danger-fg))',
-                  fontFamily: 'monospace',
-                }}
-              >
+              <pre className="mt-1 p-2 rounded text-xs overflow-x-auto max-h-32 font-mono bg-[rgb(var(--background-tertiary))] text-[rgb(var(--state-danger-fg))]">
                 {this.state.error.message}
                 {'\n'}
                 {this.state.error.stack}
