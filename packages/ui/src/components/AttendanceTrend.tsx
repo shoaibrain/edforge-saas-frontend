@@ -100,6 +100,7 @@ export function AttendanceTrend({
   if (effRate == null) {
     return (
       <span
+        // allow-presentation-style: accepts a caller style override (spread)
         className={cn('text-xs', className)}
         style={{ color: 'rgb(var(--text-tertiary))', ...style }}
         title="No attendance recorded yet"
@@ -129,7 +130,11 @@ export function AttendanceTrend({
 
       {showValue && (
         <span className="inline-flex items-center gap-1">
-          <span className="text-xs font-semibold tabular-nums" style={{ color }}>
+          <span
+            // allow-presentation-style: value color is the attendance threshold tier
+            className="text-xs font-semibold tabular-nums"
+            style={{ color }}
+          >
             {formatPct(effRate, locale)}
           </span>
           {caret && (
@@ -200,10 +205,12 @@ function Spark({
 function Bar({ rate, color, width, height }: { rate: number; color: string; width: number; height: number }) {
   return (
     <div
+      // allow-presentation-style: bar width + vertical centering are computed from the size props
       className="relative rounded-full flex-shrink-0 overflow-hidden"
       style={{ width, height: 4, background: 'rgb(var(--border-secondary)/0.5)', marginTop: (height - 4) / 2, marginBottom: (height - 4) / 2 }}
     >
       <div
+        // allow-presentation-style: fill width is the attendance rate; color is the threshold tier
         className="absolute inset-y-0 left-0 rounded-full"
         style={{ width: `${rate}%`, background: color }}
       />

@@ -43,6 +43,7 @@ export function AnimatedProgressBar({
 
   return (
     <div
+      // allow-presentation-style: track height + color are caller-provided (props)
       className="rounded-sm overflow-hidden"
       style={{
         height,
@@ -55,6 +56,7 @@ export function AnimatedProgressBar({
       aria-label={label}
     >
       <div
+        // allow-presentation-style: fill width is the animated percentage; color is a prop
         className="h-full rounded-sm"
         style={{
           width: `${width}%`,

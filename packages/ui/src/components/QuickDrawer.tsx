@@ -143,9 +143,8 @@ function QuickDrawerRoot({
         }}
       >
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 bg-[rgba(0,0,0,0.18)]"
           style={{
-            background: 'rgba(0, 0, 0, 0.18)',
             backdropFilter: 'blur(0.3px)',
             WebkitBackdropFilter: 'blur(0.3px)',
           }}
@@ -159,6 +158,7 @@ function QuickDrawerRoot({
         aria-modal={isOpen}
         aria-labelledby={ariaLabelledBy}
         aria-hidden={!isOpen}
+        // allow-presentation-style: panel surface/borders/shadow are mode-driven and accept a caller style override
         className={cn(
           'absolute flex flex-col',
           mode === 'side' && 'top-0 right-0 bottom-0',
@@ -187,10 +187,7 @@ function QuickDrawerRoot({
         {/* Drag handle for bottom sheet */}
         {mode === 'sheet' && (
           <div className="flex justify-center py-2 flex-shrink-0">
-            <div
-              className="w-8 h-1 rounded-full"
-              style={{ background: 'rgb(var(--text-disabled))' }}
-            />
+            <div className="w-8 h-1 rounded-full bg-[rgb(var(--text-disabled))]" />
           </div>
         )}
 
@@ -234,13 +231,7 @@ function Body({ children, className }: QuickDrawerBodyProps) {
 
 function Footer({ children, className }: QuickDrawerFooterProps) {
   return (
-    <div
-      className={cn('flex-shrink-0', className)}
-      style={{
-        borderTop: '1px solid rgb(var(--border-primary) / 0.35)',
-        background: 'rgb(var(--background-secondary))',
-      }}
-    >
+    <div className={cn('flex-shrink-0 border-t border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-secondary))]', className)}>
       {children}
     </div>
   )

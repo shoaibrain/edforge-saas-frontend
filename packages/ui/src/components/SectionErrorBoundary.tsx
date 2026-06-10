@@ -40,17 +40,12 @@ export class WidgetErrorBoundaryV2 extends Component<Props, State> {
     if (this.state.hasError) {
       return (
         <div className="flex items-center justify-center gap-3 py-8 px-4 rounded-xl border border-[rgb(var(--border-primary) / 0.35)] bg-[rgb(var(--background-secondary))]">
-          <p className="text-sm" style={{ color: 'rgb(var(--text-tertiary))' }}>
+          <p className="text-sm text-[rgb(var(--text-tertiary))]">
             {this.props.fallbackMessage || 'Something went wrong'}
           </p>
           <button
             onClick={this.handleRetry}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors"
-            style={{
-              background: 'rgb(var(--state-warning-bg))',
-              color: 'rgb(var(--state-warning-fg))',
-              border: '1px solid rgb(var(--state-warning-border))',
-            }}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors border bg-[rgb(var(--state-warning-bg))] text-[rgb(var(--state-warning-fg))] border-[rgb(var(--state-warning-border))]"
           >
             <RotateCcw className="w-3 h-3" />
             Retry

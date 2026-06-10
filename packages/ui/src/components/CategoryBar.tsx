@@ -19,24 +19,16 @@ export const CategoryBar = forwardRef<HTMLDivElement, CategoryBarProps>(
     return (
       <div ref={ref} className={cn('space-y-1', className)} {...props}>
         <div className="flex items-center justify-between">
-          <span
-            className="text-xs font-medium"
-            style={{ color: 'rgb(var(--text-secondary))' }}
-          >
+          <span className="text-xs font-medium text-[rgb(var(--text-secondary))]">
             {label}
           </span>
-          <span
-            className="text-xs font-mono tabular-nums"
-            style={{ color: 'rgb(var(--text-tertiary))' }}
-          >
+          <span className="text-xs font-mono tabular-nums text-[rgb(var(--text-tertiary))]">
             {weight}%
           </span>
         </div>
-        <div
-          className="h-1.5 rounded-full overflow-hidden"
-          style={{ background: 'rgb(var(--background-tertiary))' }}
-        >
+        <div className="h-1.5 rounded-full overflow-hidden bg-[rgb(var(--background-tertiary))]">
           <div
+            // allow-presentation-style: fill width is the achievement %, color is caller-provided
             className="h-full rounded-full v2-bar-fill"
             style={{
               width: `${clampedFill}%`,

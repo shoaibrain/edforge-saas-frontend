@@ -119,6 +119,7 @@ export const WeekTimetable = forwardRef<HTMLDivElement, WeekTimetableProps>(
               return (
                 <div
                   key={label}
+                  // allow-presentation-style: today-column highlight tints with the brand accent
                   className="text-center py-2 rounded-lg"
                   style={{
                     background: isToday
@@ -128,23 +129,14 @@ export const WeekTimetable = forwardRef<HTMLDivElement, WeekTimetableProps>(
                 >
                   <div className="flex items-center justify-center gap-1">
                     {isToday && (
-                      <span
-                        className="w-1.5 h-1.5 rounded-full shrink-0"
-                        style={{ background: '#1D9E75' }}
-                      />
+                      <span className="w-1.5 h-1.5 rounded-full shrink-0 bg-[#1D9E75]" />
                     )}
-                    <p
-                      className="text-xs font-medium"
-                      style={{ color: isToday ? '#1D9E75' : 'rgb(var(--text-tertiary))' }}
-                    >
+                    <p className={`text-xs font-medium ${isToday ? 'text-[#1D9E75]' : 'text-[rgb(var(--text-tertiary))]'}`}>
                       {label}
                     </p>
                   </div>
                   {weekStartDate && (
-                    <p
-                      className="text-xs"
-                      style={{ color: isToday ? '#1D9E75' : 'rgb(var(--text-tertiary))' }}
-                    >
+                    <p className={`text-xs ${isToday ? 'text-[#1D9E75]' : 'text-[rgb(var(--text-tertiary))]'}`}>
                       {dayDate(weekStartDate, i)}
                     </p>
                   )}
@@ -161,16 +153,10 @@ export const WeekTimetable = forwardRef<HTMLDivElement, WeekTimetableProps>(
             >
               {/* Time label */}
               <div className="flex flex-col justify-center pr-2 text-right">
-                <span
-                  className="text-xs font-mono tabular-nums leading-tight"
-                  style={{ color: 'rgb(var(--text-tertiary))' }}
-                >
+                <span className="text-xs font-mono tabular-nums leading-tight text-[rgb(var(--text-tertiary))]">
                   {period.startTime}
                 </span>
-                <span
-                  className="text-xs font-mono tabular-nums"
-                  style={{ color: 'rgb(var(--text-disabled))' }}
-                >
+                <span className="text-xs font-mono tabular-nums text-[rgb(var(--text-disabled))]">
                   {period.endTime}
                 </span>
               </div>
@@ -185,6 +171,7 @@ export const WeekTimetable = forwardRef<HTMLDivElement, WeekTimetableProps>(
                   return (
                     <div
                       key={dow}
+                      // allow-presentation-style: cell tint is the deterministic per-course hue
                       className="rounded-lg p-2 min-h-14 border transition-colors"
                       style={{
                         background: `color-mix(in srgb, ${color} 10%, transparent)`,
@@ -192,16 +179,14 @@ export const WeekTimetable = forwardRef<HTMLDivElement, WeekTimetableProps>(
                       }}
                     >
                       <p
+                        // allow-presentation-style: course title color is the per-course hue
                         className="text-xs font-semibold truncate leading-tight"
                         style={{ color }}
                       >
                         {block.courseName}
                       </p>
                       {block.room && (
-                        <p
-                          className="text-xs truncate mt-0.5"
-                          style={{ color: 'rgb(var(--text-tertiary))' }}
-                        >
+                        <p className="text-xs truncate mt-0.5 text-[rgb(var(--text-tertiary))]">
                           {block.room}
                         </p>
                       )}
@@ -214,13 +199,9 @@ export const WeekTimetable = forwardRef<HTMLDivElement, WeekTimetableProps>(
                   return (
                     <div
                       key={dow}
-                      className="rounded-lg p-2 min-h-14 flex items-center justify-center"
-                      style={{ background: 'rgb(var(--background-tertiary) / 0.5)' }}
+                      className="rounded-lg p-2 min-h-14 flex items-center justify-center bg-[rgb(var(--background-tertiary)/0.5)]"
                     >
-                      <span
-                        className="text-xs italic"
-                        style={{ color: 'rgb(var(--text-disabled))' }}
-                      >
+                      <span className="text-xs italic text-[rgb(var(--text-disabled))]">
                         {period.periodName}
                       </span>
                     </div>
@@ -231,8 +212,7 @@ export const WeekTimetable = forwardRef<HTMLDivElement, WeekTimetableProps>(
                 return (
                   <div
                     key={dow}
-                    className="rounded-lg min-h-14 border border-dashed"
-                    style={{ borderColor: 'rgb(var(--border-primary) / 0.35)' }}
+                    className="rounded-lg min-h-14 border border-dashed border-[rgb(var(--border-primary)/0.35)]"
                   />
                 )
               })}

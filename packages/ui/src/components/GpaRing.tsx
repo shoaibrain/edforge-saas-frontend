@@ -49,11 +49,10 @@ export const GpaRing = forwardRef<SVGSVGElement, GpaRingProps>(
     if (loading) {
       return (
         <div
-          className={cn('rounded-full v2-skeleton-pulse', className)}
+          className={cn('rounded-full v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]', className)}
           style={{
             width: pixelSize,
             height: pixelSize,
-            background: 'rgb(var(--background-tertiary))',
           }}
           role="status"
           aria-label="Loading GPA"
