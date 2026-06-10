@@ -26,15 +26,9 @@ export function CourseTypeChip({ type }: CourseTypeChipProps) {
 
   return (
     <span
-      style={{
-        fontSize: 10,
-        fontWeight: 500,
-        padding: '2px 8px',
-        borderRadius: 6,
-        whiteSpace: 'nowrap',
-        background: colors.bg,
-        color: colors.color,
-      }}
+      // allow-presentation-style: per-course-type chip bg/text from the style map
+      className="text-3xs font-medium py-0.5 px-2 rounded-md whitespace-nowrap"
+      style={{ background: colors.bg, color: colors.color }}
     >
       {label}
     </span>

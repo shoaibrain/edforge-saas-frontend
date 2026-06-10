@@ -137,26 +137,18 @@ function ActionMenu({
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="p-1.5 rounded-md transition-colors hover:opacity-80"
-        style={{ color: 'rgb(var(--text-tertiary))' }}
+        className="p-1.5 rounded-md transition-colors hover:opacity-80 text-[rgb(var(--text-tertiary))]"
       >
         <MoreHorizontal className="w-4 h-4" />
       </button>
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div
-            className="absolute right-0 z-20 mt-1 w-44 rounded-lg py-1 overflow-hidden shadow-lg"
-            style={{
-              background: 'rgb(var(--background-tertiary))',
-              border: '1px solid rgb(var(--border-primary) / 0.35)',
-            }}
-          >
+          <div className="absolute right-0 z-20 mt-1 w-44 rounded-lg py-1 overflow-hidden shadow-lg bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary)/0.35)]">
             <button
               type="button"
               onClick={() => { onWithdraw(); setOpen(false) }}
-              className="flex items-center gap-2 w-full px-3 py-2 text-xs transition-colors hover:opacity-80"
-              style={{ color: '#E24B4A' }}
+              className="flex items-center gap-2 w-full px-3 py-2 text-xs transition-colors hover:opacity-80 text-[rgb(var(--accent-finance))]"
             >
               <UserMinus className="w-3.5 h-3.5" />
               Withdraw
@@ -164,8 +156,7 @@ function ActionMenu({
             <button
               type="button"
               onClick={() => { onTransfer(); setOpen(false) }}
-              className="flex items-center gap-2 w-full px-3 py-2 text-xs transition-colors hover:opacity-80"
-              style={{ color: '#378ADD' }}
+              className="flex items-center gap-2 w-full px-3 py-2 text-xs transition-colors hover:opacity-80 text-[rgb(var(--accent-academics))]"
             >
               <ArrowRightLeft className="w-3.5 h-3.5" />
               Transfer
@@ -174,8 +165,7 @@ function ActionMenu({
               <button
                 type="button"
                 onClick={() => { onMarkNoShow(); setOpen(false) }}
-                className="flex items-center gap-2 w-full px-3 py-2 text-xs transition-colors hover:opacity-80"
-                style={{ color: '#EF9F27' }}
+                className="flex items-center gap-2 w-full px-3 py-2 text-xs transition-colors hover:opacity-80 text-[rgb(var(--accent-attendance))]"
               >
                 <UserX className="w-3.5 h-3.5" />
                 Mark No-Show
@@ -227,10 +217,7 @@ export function EnrollmentTable({
         header: 'Student',
         enableSorting: true,
         cell: ({ getValue, row }) => (
-          <span
-            className="font-medium"
-            style={{ fontSize: 12, color: 'rgb(var(--text-primary))' }}
-          >
+          <span className="font-medium text-xs text-[rgb(var(--text-primary))]">
             {getValue<string>() || <UuidBadge value={row.original.studentId} />}
           </span>
         ),
@@ -240,7 +227,7 @@ export function EnrollmentTable({
         header: 'Grade Level',
         enableSorting: true,
         cell: ({ getValue }) => (
-          <span style={{ fontSize: 12, color: 'rgb(var(--text-secondary))' }}>
+          <span className="text-xs text-[rgb(var(--text-secondary))]">
             {getValue<string>()}
           </span>
         ),
@@ -257,7 +244,7 @@ export function EnrollmentTable({
         header: 'Entry Date',
         enableSorting: true,
         cell: ({ getValue }) => (
-          <span style={{ fontSize: 12, color: 'rgb(var(--text-secondary))' }}>
+          <span className="text-xs text-[rgb(var(--text-secondary))]">
             {formatDate(getValue<string | null>())}
           </span>
         ),
@@ -270,12 +257,7 @@ export function EnrollmentTable({
         cell: ({ getValue }) => {
           const val = getValue<string | null>()
           return (
-            <span
-              style={{
-                fontSize: 12,
-                color: val ? 'rgb(var(--text-secondary))' : 'rgb(var(--text-disabled))',
-              }}
-            >
+            <span className={`text-xs ${val ? 'text-[rgb(var(--text-secondary))]' : 'text-[rgb(var(--text-disabled))]'}`}>
               {formatDate(val)}
             </span>
           )
@@ -286,7 +268,7 @@ export function EnrollmentTable({
         header: 'Type',
         enableSorting: true,
         cell: ({ getValue }) => (
-          <span style={{ fontSize: 12, color: 'rgb(var(--text-secondary))' }}>
+          <span className="text-xs text-[rgb(var(--text-secondary))]">
             {formatEnrollmentType(getValue<string>())}
           </span>
         ),
@@ -340,7 +322,7 @@ export function EnrollmentTable({
       }
       searchPlaceholder="Search students..."
       emptyState={{
-        icon: <Users className="w-10 h-10" style={{ color: 'rgb(var(--text-disabled))', opacity: 0.4 }} />,
+        icon: <Users className="w-10 h-10 opacity-40 text-[rgb(var(--text-disabled))]" />,
         title: 'No enrollments found',
         description: 'Try adjusting your filters or search term.',
       }}
@@ -370,12 +352,7 @@ export function EnrollmentTable({
             <button
               type="button"
               onClick={() => { onGradeLevelChange(null); onStatusChange(null) }}
-              className="flex items-center gap-1 px-2.5 py-1.5 text-xs rounded-[8px] transition-colors hover:opacity-80"
-              style={{
-                background: 'rgba(255, 255, 255, 0.04)',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                color: 'rgb(var(--text-tertiary))',
-              }}
+              className="flex items-center gap-1 px-2.5 py-1.5 text-xs rounded-[8px] transition-colors hover:opacity-80 bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-tertiary))]"
             >
               <X className="w-3 h-3" />
               Clear

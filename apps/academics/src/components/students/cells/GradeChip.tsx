@@ -16,8 +16,7 @@ export function GradeChip({ grade }: GradeChipProps) {
   }
   return (
     <span
-      className="inline-grid place-items-center h-6 min-w-8 px-2 rounded-[7px] text-xs font-semibold tabular-nums"
-      style={{ background: 'rgba(55, 138, 221, 0.12)', color: '#378ADD' }}
+      className="inline-grid place-items-center h-6 min-w-8 px-2 rounded-[7px] text-xs font-semibold tabular-nums bg-[rgb(var(--accent-academics)/0.12)] text-[rgb(var(--accent-academics))]"
       title={`Grade ${grade}`}
     >
       {grade}

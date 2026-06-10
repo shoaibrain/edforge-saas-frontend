@@ -57,12 +57,9 @@ export function StudentStatusBadge({ status }: StudentStatusBadgeProps) {
 
   return (
     <span
-      className="inline-flex items-center px-2.5 py-0.5 text-xs font-medium"
-      style={{
-        borderRadius: 10,
-        background: config.bg,
-        color: config.color,
-      }}
+      // allow-presentation-style: per-status badge bg/text from the status config map
+      className="inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-[10px]"
+      style={{ background: config.bg, color: config.color }}
     >
       {config.label}
     </span>

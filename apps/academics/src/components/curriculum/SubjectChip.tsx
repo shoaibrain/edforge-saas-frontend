@@ -17,16 +17,9 @@ export function SubjectChip({ subject }: SubjectChipProps) {
 
   return (
     <span
-      style={{
-        fontSize: 10,
-        fontWeight: 500,
-        padding: '2px 8px',
-        borderRadius: 8,
-        whiteSpace: 'nowrap',
-        display: 'inline-block',
-        background: bg,
-        color: text,
-      }}
+      // allow-presentation-style: per-subject chip bg/text from the subject-area color map
+      className="text-3xs font-medium py-0.5 px-2 rounded-lg whitespace-nowrap inline-block"
+      style={{ background: bg, color: text }}
     >
       {getSubjectAreaLabel(subject)}
     </span>
