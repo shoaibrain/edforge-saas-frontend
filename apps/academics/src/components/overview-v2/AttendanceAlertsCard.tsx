@@ -23,26 +23,12 @@ function AlertsSkeleton() {
       {[1, 2].map((i) => (
         <div
           key={i}
-          className="flex items-center gap-3 rounded-[10px] border"
-          style={{
-            padding: '11px 14px',
-            background: 'rgb(var(--background-secondary))',
-            borderColor: 'rgb(var(--border-primary) / 0.35)',
-          }}
+          className="flex items-center gap-3 rounded-[10px] border px-3.5 py-3 bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]"
         >
-          <div
-            className="w-7 h-7 rounded-[7px] flex-shrink-0 v2-skeleton-pulse"
-            style={{ background: 'rgb(var(--background-tertiary))' }}
-          />
+          <div className="w-7 h-7 rounded-[7px] flex-shrink-0 v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
           <div className="flex-1 space-y-1.5">
-            <div
-              className="h-3.5 w-48 rounded v2-skeleton-pulse"
-              style={{ background: 'rgb(var(--background-tertiary))' }}
-            />
-            <div
-              className="h-3 w-32 rounded v2-skeleton-pulse"
-              style={{ background: 'rgb(var(--background-tertiary))' }}
-            />
+            <div className="h-3.5 w-48 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
+            <div className="h-3 w-32 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
           </div>
         </div>
       ))}

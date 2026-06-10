@@ -55,6 +55,7 @@ function StaffAvatar({ staff }: { staff: any }) {
   if (imgError || !src) {
     return (
       <div
+        // allow-presentation-style: per-staff deterministic avatar color
         className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-semibold text-[rgb(var(--action-primary-fg))]"
         style={{ background: bg }}
       >
@@ -69,6 +70,7 @@ function StaffAvatar({ staff }: { staff: any }) {
       alt={name}
       width={32}
       height={32}
+      // allow-presentation-style: per-staff avatar bg shows behind the loading image
       className="w-8 h-8 rounded-full flex-shrink-0"
       style={{ background: bg, maxWidth: 32, maxHeight: 32 }}
       onError={() => setImgError(true)}
@@ -88,15 +90,12 @@ function StaffSkeleton() {
     <div className="space-y-3">
       {[1, 2, 3].map((i) => (
         <div key={i} className="flex items-center gap-3">
-          <div
-            className="w-8 h-8 rounded-full v2-skeleton-pulse flex-shrink-0"
-            style={{ background: 'rgb(var(--background-tertiary))' }}
-          />
+          <div className="w-8 h-8 rounded-full v2-skeleton-pulse flex-shrink-0 bg-[rgb(var(--background-tertiary))]" />
           <div className="flex-1 space-y-1">
-            <div className="h-3 w-20 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
-            <div className="h-2.5 w-28 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
+            <div className="h-3 w-20 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
+            <div className="h-2.5 w-28 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
           </div>
-          <div className="h-4 w-14 rounded-full v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
+          <div className="h-4 w-14 rounded-full v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
         </div>
       ))}
     </div>
@@ -128,22 +127,16 @@ export function StaffRosterCard({
 
   return (
     <div
-      className="rounded-xl border flex flex-col"
-      style={{
-        background: 'rgb(var(--background-secondary))',
-        borderColor: 'rgb(var(--border-primary) / 0.35)',
-        padding: 18,
-      }}
+      // allow-presentation-style: card padding (18px) is off the 4px scale
+      className="rounded-xl border flex flex-col bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]"
+      style={{ padding: 18 }}
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
-        <h3
-          className="text-sm font-medium"
-          style={{ color: 'rgb(var(--text-secondary))' }}
-        >
+        <h3 className="text-sm font-medium text-[rgb(var(--text-secondary))]">
           Staff roster
         </h3>
-        <span className="text-xs font-medium" style={{ color: 'rgb(var(--text-tertiary))' }}>
+        <span className="text-xs font-medium text-[rgb(var(--text-tertiary))]">
           {activeCount} active
         </span>
       </div>
@@ -153,11 +146,11 @@ export function StaffRosterCard({
         {isLoading ? (
           <StaffSkeleton />
         ) : isError ? (
-          <div className="text-sm py-4 text-center" style={{ color: 'rgb(var(--text-tertiary))' }}>
+          <div className="text-sm py-4 text-center text-[rgb(var(--text-tertiary))]">
             Unable to load staff data
           </div>
         ) : displayStaff.length === 0 ? (
-          <div className="text-sm py-4 text-center" style={{ color: 'rgb(var(--text-tertiary))' }}>
+          <div className="text-sm py-4 text-center text-[rgb(var(--text-tertiary))]">
             No staff members
           </div>
         ) : (
@@ -170,15 +163,16 @@ export function StaffRosterCard({
                   <StaffAvatar staff={s} />
                   {/* Info */}
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium truncate" style={{ color: 'rgb(var(--text-secondary))' }}>
+                    <p className="text-xs font-medium truncate text-[rgb(var(--text-secondary))]">
                       {getDisplayName(s)}
                     </p>
-                    <p className="text-xs truncate" style={{ color: 'rgb(var(--text-disabled))' }}>
+                    <p className="text-xs truncate text-[rgb(var(--text-disabled))]">
                       {getRole(s)} · {getDepartment(s)}
                     </p>
                   </div>
                   {/* Badge */}
                   <span
+                    // allow-presentation-style: employment-type chip tint (full-time/contract)
                     className="text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0"
                     style={{
                       background: isFullTime ? 'rgba(29,158,117,0.10)' : 'rgba(239,159,39,0.10)',
@@ -197,14 +191,14 @@ export function StaffRosterCard({
       {/* Department coverage */}
       {departments.length > 0 && (
         <>
-          <div className="my-3" style={{ height: 1, background: 'rgb(var(--border-primary) / 0.35)' }} />
+          <div className="my-3 h-px bg-[rgb(var(--border-primary)/0.35)]" />
           <div className="space-y-1.5">
             {departments.slice(0, 4).map((dept) => (
               <div key={dept.name} className="flex items-center justify-between">
-                <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>
+                <span className="text-xs text-[rgb(var(--text-disabled))]">
                   {dept.name}
                 </span>
-                <span className="text-xs font-medium" style={{ color: '#1D9E75' }}>
+                <span className="text-xs font-medium text-[#1D9E75]">
                   {dept.count} teacher{dept.count !== 1 ? 's' : ''}
                 </span>
               </div>

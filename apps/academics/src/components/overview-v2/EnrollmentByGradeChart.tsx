@@ -34,20 +34,15 @@ function ChartSkeleton() {
     <div className="space-y-2.5">
       {[1, 2, 3, 4, 5].map((i) => (
         <div key={i} className="flex items-center gap-3">
-          <div
-            className="w-14 h-3 rounded v2-skeleton-pulse"
-            style={{ background: 'rgb(var(--background-tertiary))' }}
-          />
+          <div className="w-14 h-3 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
           <div className="flex-1">
             <div
-              className="h-3.5 rounded-sm v2-skeleton-pulse"
-              style={{ background: 'rgb(var(--background-tertiary))', width: `${30 + Math.random() * 50}%` }}
+              // allow-presentation-style: randomized skeleton bar width
+              className="h-3.5 rounded-sm v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]"
+              style={{ width: `${30 + Math.random() * 50}%` }}
             />
           </div>
-          <div
-            className="w-6 h-3 rounded v2-skeleton-pulse"
-            style={{ background: 'rgb(var(--background-tertiary))' }}
-          />
+          <div className="w-6 h-3 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
         </div>
       ))}
     </div>
@@ -58,16 +53,9 @@ function CustomTooltip({ active, payload }: any) {
   if (!active || !payload?.length) return null
   const d = payload[0].payload as GradeLevelDistribution
   return (
-    <div
-      className="rounded-lg border px-3 py-2 text-xs shadow-lg"
-      style={{
-        background: 'rgb(var(--background-secondary))',
-        borderColor: 'rgb(var(--border-primary) / 0.35)',
-        color: 'rgb(var(--text-secondary))',
-      }}
-    >
+    <div className="rounded-lg border px-3 py-2 text-xs shadow-lg bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]">
       <div className="font-semibold">{d.displayLabel}</div>
-      <div style={{ color: 'rgb(var(--text-disabled))' }}>
+      <div className="text-[rgb(var(--text-disabled))]">
         {d.count} student{d.count !== 1 ? 's' : ''} · {d.percentage}%
       </div>
     </div>
@@ -86,22 +74,16 @@ export function EnrollmentByGradeChart({
 
   return (
     <div
-      className="rounded-xl border flex flex-col"
-      style={{
-        background: 'rgb(var(--background-secondary))',
-        borderColor: 'rgb(var(--border-primary) / 0.35)',
-        padding: 18,
-      }}
+      // allow-presentation-style: card padding (18px) is off the 4px scale
+      className="rounded-xl border flex flex-col bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]"
+      style={{ padding: 18 }}
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <h3
-          className="text-sm font-medium"
-          style={{ color: 'rgb(var(--text-secondary))' }}
-        >
+        <h3 className="text-sm font-medium text-[rgb(var(--text-secondary))]">
           Enrollment by grade level
         </h3>
-        <span className="text-xs font-semibold" style={{ color: 'rgb(var(--state-info-fg))' }}>
+        <span className="text-xs font-semibold text-[rgb(var(--state-info-fg))]">
           {total} total
         </span>
       </div>
@@ -115,8 +97,9 @@ export function EnrollmentByGradeChart({
           <ChartSkeleton />
         ) : data.length === 0 ? (
           <div
-            className="flex items-center justify-center text-sm"
-            style={{ height: 120, color: 'rgb(var(--text-tertiary))' }}
+            // allow-presentation-style: fixed 120px empty-state height
+            className="flex items-center justify-center text-sm text-[rgb(var(--text-tertiary))]"
+            style={{ height: 120 }}
           >
             No enrollment data
           </div>
@@ -170,11 +153,10 @@ export function EnrollmentByGradeChart({
       </div>
 
       {/* Footer */}
-      <div className="pt-3 mt-3" style={{ borderTop: '1px solid rgb(var(--border-primary) / 0.35)' }}>
+      <div className="pt-3 mt-3 border-t border-[rgb(var(--border-primary)/0.35)]">
         <Link
           to="/students"
-          className="inline-flex items-center gap-1.5 text-xs font-medium transition-opacity hover:opacity-80"
-          style={{ color: '#1D9E75' }}
+          className="inline-flex items-center gap-1.5 text-xs font-medium transition-opacity hover:opacity-80 text-[#1D9E75]"
         >
           View Enrollment
           <ArrowRight className="w-3 h-3" />

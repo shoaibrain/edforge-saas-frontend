@@ -36,20 +36,20 @@ function CardSkeleton() {
       {[1, 2, 3].map((i) => (
         <div key={i}>
           <div className="flex justify-between mb-1.5">
-            <div className="h-3 w-16 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
-            <div className="h-3 w-24 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
+            <div className="h-3 w-16 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
+            <div className="h-3 w-24 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
           </div>
-          <div className="h-1 rounded-sm v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
+          <div className="h-1 rounded-sm v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
         </div>
       ))}
       {/* Fee type skeleton rows */}
-      <div style={{ height: 1, background: 'rgb(var(--background-tertiary))' }} />
+      <div className="h-px bg-[rgb(var(--background-tertiary))]" />
       {[1, 2, 3].map((i) => (
         <div key={`ft-${i}`} className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
-          <div className="h-3 w-14 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
-          <div className="flex-1 h-1 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
-          <div className="h-3 w-20 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
+          <div className="w-2 h-2 rounded-full v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
+          <div className="h-3 w-14 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
+          <div className="flex-1 h-1 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
+          <div className="h-3 w-20 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
         </div>
       ))}
     </div>
@@ -82,19 +82,16 @@ export function CollectionPerformanceCard({
 
   return (
     <div
-      className="rounded-xl border flex flex-col"
-      style={{
-        background: 'rgb(var(--background-secondary))',
-        borderColor: 'rgb(var(--border-primary) / 0.35)',
-        padding: 18,
-      }}
+      // allow-presentation-style: card padding (18px) is off the 4px scale
+      className="rounded-xl border flex flex-col bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]"
+      style={{ padding: 18 }}
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium" style={{ color: 'rgb(var(--text-secondary))' }}>
+        <h3 className="text-sm font-medium text-[rgb(var(--text-secondary))]">
           Collection performance
         </h3>
-        <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>
+        <span className="text-xs text-[rgb(var(--text-disabled))]">
           {collectionRate.toFixed(1)}% collected
         </span>
       </div>
@@ -107,8 +104,8 @@ export function CollectionPerformanceCard({
           {/* Collected */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs" style={{ color: 'rgb(var(--text-tertiary))' }}>Collected</span>
-              <span className="text-xs font-medium" style={{ color: '#1D9E75' }}>
+              <span className="text-xs text-[rgb(var(--text-tertiary))]">Collected</span>
+              <span className="text-xs font-medium text-[#1D9E75]">
                 {formatShort(totalCollected)}
               </span>
             </div>
@@ -119,8 +116,8 @@ export function CollectionPerformanceCard({
           {nonOverdueOutstanding >= 1000 && (
             <div>
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs" style={{ color: 'rgb(var(--text-tertiary))' }}>Outstanding</span>
-                <span className="text-xs font-medium" style={{ color: 'rgb(var(--state-warning-fg))' }}>
+                <span className="text-xs text-[rgb(var(--text-tertiary))]">Outstanding</span>
+                <span className="text-xs font-medium text-[rgb(var(--state-warning-fg))]">
                   {formatShort(nonOverdueOutstanding)}
                 </span>
               </div>
@@ -132,8 +129,8 @@ export function CollectionPerformanceCard({
           {overdue > 0 && (
             <div>
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs" style={{ color: 'rgb(var(--text-tertiary))' }}>Overdue</span>
-                <span className="text-xs font-medium" style={{ color: 'rgb(var(--state-danger-fg))' }}>
+                <span className="text-xs text-[rgb(var(--text-tertiary))]">Overdue</span>
+                <span className="text-xs font-medium text-[rgb(var(--state-danger-fg))]">
                   {formatShort(overdue)}
                 </span>
               </div>
@@ -144,14 +141,14 @@ export function CollectionPerformanceCard({
           {/* Divider + Fee type section */}
           {byFeeType.length > 0 && (
             <>
-              <div style={{ height: 1, background: 'rgb(var(--border-primary) / 0.35)', margin: '2px 0' }} />
+              <div className="h-px bg-[rgb(var(--border-primary)/0.35)] my-0.5" />
 
               {/* Section header */}
               <div className="flex items-center justify-between">
-                <span className="text-xs font-medium" style={{ color: 'rgb(var(--text-secondary))' }}>
+                <span className="text-xs font-medium text-[rgb(var(--text-secondary))]">
                   By fee type
                 </span>
-                <span className="text-xs tabular-nums" style={{ color: 'rgb(var(--text-disabled))' }}>
+                <span className="text-xs tabular-nums text-[rgb(var(--text-disabled))]">
                   {byFeeType.length} type{byFeeType.length !== 1 ? 's' : ''}
                 </span>
               </div>
@@ -165,20 +162,28 @@ export function CollectionPerformanceCard({
                     <div key={fee.feeType}>
                       <div className="flex items-center justify-between mb-1">
                         <div className="flex items-center gap-1.5 min-w-0">
-                          <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: color }} />
-                          <span className="text-xs font-medium truncate" style={{ color: 'rgb(var(--text-secondary))', maxWidth: 120 }}>
+                          <div
+                            // allow-presentation-style: per-fee-type legend dot color
+                            className="w-2 h-2 rounded-full flex-shrink-0"
+                            style={{ background: color }}
+                          />
+                          <span className="text-xs font-medium truncate text-[rgb(var(--text-secondary))]" style={{ maxWidth: 120 }}>
                             {formatFeeType(fee.feeType)}
                           </span>
                         </div>
                         <div className="flex items-center gap-2 flex-shrink-0">
-                          <span className="text-xs tabular-nums" style={{ color }}>
+                          <span
+                            // allow-presentation-style: per-fee-type collected amount color
+                            className="text-xs tabular-nums"
+                            style={{ color }}
+                          >
                             {formatShort(fee.collectedAmount)}
                           </span>
-                          <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>/</span>
-                          <span className="text-xs tabular-nums" style={{ color: 'rgb(var(--text-disabled))' }}>
+                          <span className="text-xs text-[rgb(var(--text-disabled))]">/</span>
+                          <span className="text-xs tabular-nums text-[rgb(var(--text-disabled))]">
                             {formatShort(fee.totalAmount)}
                           </span>
-                          <span className="text-xs tabular-nums" style={{ color: 'rgb(var(--text-disabled))' }}>
+                          <span className="text-xs tabular-nums text-[rgb(var(--text-disabled))]">
                             ({fee.invoiceCount})
                           </span>
                         </div>
@@ -193,8 +198,7 @@ export function CollectionPerformanceCard({
               {hasOverflow && (
                 <button
                   onClick={() => setShowAll(!showAll)}
-                  className="inline-flex items-center gap-1 text-xs font-medium transition-colors hover:opacity-80 self-start"
-                  style={{ color: '#1D9E75' }}
+                  className="inline-flex items-center gap-1 text-xs font-medium transition-colors hover:opacity-80 self-start text-[#1D9E75]"
                 >
                   {showAll ? (
                     <>
@@ -214,10 +218,10 @@ export function CollectionPerformanceCard({
 
           {/* Total invoiced */}
           <div className="flex items-baseline justify-between pt-1">
-            <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>
+            <span className="text-xs text-[rgb(var(--text-disabled))]">
               Total invoiced this year
             </span>
-            <span className="text-sm font-semibold" style={{ color: 'rgb(var(--text-primary))' }}>
+            <span className="text-sm font-semibold text-[rgb(var(--text-primary))]">
               {formatShort(totalInvoiced)}
             </span>
           </div>
