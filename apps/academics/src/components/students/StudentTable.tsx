@@ -1,41 +1,57 @@
 /**
- * StudentTable Component — V2
+ * StudentTable Component
  *
- * Displays a paginated table of students with sorting.
- * Row click opens a quick-info drawer (managed by parent).
+ * Paginated, sortable student roster. Row click opens the quick-info drawer.
  *
- * V2 changes:
- * - Gradient initials avatar instead of DiceBear
- * - Attendance column with semantic color + progress bar
- * - Contact column removed
- * - StudentNumber standalone column removed (shown under name)
- * - Three-dot action column
- * - V2 StatusBadge styling
+ * Columns: Student · Grade (chip) · Attendance (trend) · Guardian (stack) ·
+ * Location · Status · Enrolled · Actions. Guardian/Location are ABAC-gated and
+ * responsively hidden on narrow panes (Columns menu to opt back in).
  */
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 import { User, MoreVertical, UserMinus, ExternalLink } from 'lucide-react'
-import { TanstackDataTable, AttendanceDonutRing, type ColumnDef } from '@edforge/ui'
+import {
+  TanstackDataTable,
+  AttendanceTrend,
+  type AttendanceTrendDirection,
+  type ColumnDef,
+  type DataTableColumnMeta,
+} from '@edforge/ui'
+import { gradeSort } from '@edforge/types'
 import type { StudentResponseDto } from '@aibrains/shared-types'
 import { StudentStatusBadge } from './StudentStatusBadge'
 import { UserAvatar } from '../common/UserAvatar'
+import { GradeChip } from './cells/GradeChip'
+import { GuardianCell } from './cells/GuardianCell'
+import { StudentLocationCell } from './cells/StudentLocationCell'
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
+export interface StudentAttendanceSignal {
+  rate: number
+  trend?: AttendanceTrendDirection
+  /** Optional daily series (Sprint 2 batch endpoint) — drives the sparkline. */
+  series?: number[]
+}
+
 interface StudentTableProps {
   students: StudentResponseDto[]
-  alertsMap: Map<string, number>
+  /** studentId → attendance signal (rate + trend [+ series]). At-risk only until Sprint 2. */
+  attendanceByStudent: Map<string, StudentAttendanceSignal>
   isLoading?: boolean
   onAddStudent?: () => void
   onViewStudent?: (student: StudentResponseDto) => void
   onWithdraw?: (student: StudentResponseDto) => void
-  /**
-   * Server-pagination adapter. Set when the caller is driving an infinite
-   * query; keeps the Next button enabled while `hasMore=true`, auto-fetches
-   * additional pages when the user runs off the end of the client buffer.
-   */
+  /** Locale for attendance % formatting (e.g. tenant 'ne-NP'). */
+  locale?: string
+  /** ABAC gates — render Guardian/Location columns only when permitted. */
+  canViewGuardians?: boolean
+  canViewLocation?: boolean
+  /** Toolbar content: filter presets/search/selects (left) and Export (right). */
+  toolbarStart?: ReactNode
+  toolbarExtra?: ReactNode
   hasMore?: boolean
   isFetchingMore?: boolean
   onLoadMore?: () => void
@@ -49,20 +65,22 @@ interface StudentTableProps {
 function formatDate(dateStr: string | undefined): string {
   if (!dateStr) return '-'
   try {
-    return new Date(dateStr).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    })
+    return new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
   } catch {
     return '-'
   }
 }
 
-function getAttendanceRateColor(rate: number): string {
-  if (rate < 80) return '#E24B4A'
-  if (rate < 90) return '#EF9F27'
-  return '#1D9E75'
+const CENTER: DataTableColumnMeta = { align: 'center' }
+
+// Responsive initial visibility, read synchronously at mount so the table
+// doesn't flash the wrong column set (effect-based hooks capture `false` on
+// first paint). Resize-reactivity + persistence are a follow-up (STU-TBL-1.8b).
+function computeInitialVisibility(): Record<string, boolean> {
+  if (typeof window === 'undefined') return {}
+  const xl = window.matchMedia('(min-width: 1280px)').matches
+  const lg = window.matchMedia('(min-width: 1024px)').matches
+  return { enrollmentDate: xl, guardian: lg, location: lg }
 }
 
 // ============================================================================
@@ -79,7 +97,6 @@ function RowActionMenu({
   onWithdraw?: (student: StudentResponseDto) => void
 }) {
   const [open, setOpen] = useState(false)
-
   return (
     <div className="relative" onClick={(e) => e.stopPropagation()}>
       <button
@@ -95,10 +112,7 @@ function RowActionMenu({
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
           <div
             className="absolute right-0 z-20 mt-1 w-40 rounded-lg border overflow-hidden shadow-lg"
-            style={{
-              background: 'rgb(var(--background-tertiary))',
-              borderColor: 'rgb(var(--border-primary))',
-            }}
+            style={{ background: 'rgb(var(--background-tertiary))', borderColor: 'rgb(var(--border-primary))' }}
           >
             {onView && (
               <button
@@ -133,44 +147,38 @@ function RowActionMenu({
 
 export function StudentTable({
   students,
-  alertsMap,
+  attendanceByStudent,
   isLoading = false,
   onAddStudent,
   onViewStudent,
   onWithdraw,
+  locale,
+  canViewGuardians = true,
+  canViewLocation = true,
+  toolbarStart,
+  toolbarExtra,
   hasMore,
   isFetchingMore,
   onLoadMore,
   serverTotalHint,
 }: StudentTableProps) {
-  const columns: ColumnDef<StudentResponseDto, unknown>[] = useMemo(
-    () => [
+  const columns: ColumnDef<StudentResponseDto, unknown>[] = useMemo(() => {
+    const cols: ColumnDef<StudentResponseDto, unknown>[] = [
       {
         accessorKey: 'fullName',
         header: 'Student',
-        size: 260,
+        size: 230,
         cell: ({ row }) => {
           const student = row.original
           return (
             <div className="flex items-center gap-3">
-              <UserAvatar
-                userId={student.studentId}
-                userName={student.fullName}
-                role="student"
-                size="lg"
-              />
+              <UserAvatar userId={student.studentId} userName={student.fullName} role="student" size="lg" />
               <div className="min-w-0">
-                <p
-                  className="text-sm font-medium truncate"
-                  style={{ color: 'rgb(var(--text-primary))' }}
-                >
+                <p className="text-sm font-medium truncate" style={{ color: 'rgb(var(--text-primary))' }}>
                   {student.fullName}
                 </p>
                 {student.studentNumber && (
-                  <p
-                    className="text-xs font-mono truncate"
-                    style={{ color: 'rgb(var(--text-tertiary))' }}
-                  >
+                  <p className="text-xs font-mono truncate" style={{ color: 'rgb(var(--text-tertiary))' }}>
                     #{student.studentNumber}
                   </p>
                 )}
@@ -182,62 +190,66 @@ export function StudentTable({
       {
         accessorKey: 'currentGradeLevel',
         header: 'Grade',
-        size: 100,
-        cell: ({ row }) => (
-          <span
-            className="text-xs font-medium"
-            style={{ color: 'rgb(var(--text-primary))' }}
-          >
-            {row.original.currentGradeLevel}
-          </span>
-        ),
+        size: 64,
+        meta: CENTER,
+        sortingFn: (a, b) => gradeSort(a.original.currentGradeLevel ?? '', b.original.currentGradeLevel ?? ''),
+        cell: ({ row }) => <GradeChip grade={row.original.currentGradeLevel} />,
       },
       {
         id: 'attendance',
         header: 'Attendance',
-        size: 140,
+        size: 132,
         enableSorting: false,
         cell: ({ row }) => {
-          const rate = alertsMap.get(row.original.studentId) ?? null
-          if (rate === null || rate === undefined) {
-            return (
-              <span
-                className="text-xs"
-                style={{ color: 'rgb(var(--text-tertiary))' }}
-                title="No attendance recorded yet"
-              >
-                —
-              </span>
-            )
-          }
-          const color = getAttendanceRateColor(rate)
+          const signal = attendanceByStudent.get(row.original.studentId)
           return (
-            <div className="flex items-center gap-2">
-              <AttendanceDonutRing rate={rate} size={24} strokeWidth={3} />
-              <span className="text-xs font-medium" style={{ color }}>
-                {rate.toFixed(1)}%
-              </span>
-            </div>
+            <AttendanceTrend
+              rate={signal?.rate ?? null}
+              series={signal?.series ?? null}
+              trend={signal?.trend}
+              locale={locale}
+            />
           )
         },
       },
+    ]
+
+    if (canViewGuardians) {
+      cols.push({
+        id: 'guardian',
+        header: 'Guardian',
+        size: 176,
+        enableSorting: false,
+        meta: { enableHiding: true },
+        cell: ({ row }) => <GuardianCell guardians={row.original.guardians} />,
+      })
+    }
+
+    if (canViewLocation) {
+      cols.push({
+        id: 'location',
+        header: 'Location',
+        size: 148,
+        enableSorting: false,
+        meta: { enableHiding: true },
+        cell: ({ row }) => <StudentLocationCell address={row.original.contactInfo?.address} />,
+      })
+    }
+
+    cols.push(
       {
         accessorKey: 'status',
         header: 'Status',
-        size: 110,
-        cell: ({ row }) => (
-          <StudentStatusBadge status={row.original.status} />
-        ),
+        size: 96,
+        cell: ({ row }) => <StudentStatusBadge status={row.original.status} />,
       },
       {
         accessorKey: 'enrollmentDate',
         header: 'Enrolled',
-        size: 130,
+        size: 116,
+        meta: { enableHiding: true },
         cell: ({ row }) => (
-          <span
-            className="text-xs"
-            style={{ color: 'rgb(var(--text-secondary))' }}
-          >
+          <span className="text-xs" style={{ color: 'rgb(var(--text-secondary))' }}>
             {formatDate(row.original.enrollmentDate)}
           </span>
         ),
@@ -245,27 +257,19 @@ export function StudentTable({
       {
         id: 'actions',
         header: '',
-        size: 48,
+        size: 44,
         enableSorting: false,
-        cell: ({ row }) => (
-          <RowActionMenu
-            student={row.original}
-            onView={onViewStudent}
-            onWithdraw={onWithdraw}
-          />
-        ),
+        cell: ({ row }) => <RowActionMenu student={row.original} onView={onViewStudent} onWithdraw={onWithdraw} />,
       },
-    ],
-    [alertsMap, onViewStudent, onWithdraw]
-  )
+    )
+
+    return cols
+  }, [attendanceByStudent, onViewStudent, onWithdraw, locale, canViewGuardians, canViewLocation])
+
+  const initialColumnVisibility = useMemo(computeInitialVisibility, [])
 
   const serverPagination = onLoadMore
-    ? {
-        hasMore: Boolean(hasMore),
-        isFetching: Boolean(isFetchingMore),
-        onLoadMore,
-        serverTotalHint,
-      }
+    ? { hasMore: Boolean(hasMore), isFetching: Boolean(isFetchingMore), onLoadMore, serverTotalHint }
     : undefined
 
   return (
@@ -274,19 +278,18 @@ export function StudentTable({
       data={students}
       isLoading={isLoading}
       enableSorting={true}
+      enableColumnVisibility
+      tableId="academics-students-table"
+      initialColumnVisibility={initialColumnVisibility}
+      toolbarStart={toolbarStart}
+      toolbarExtra={toolbarExtra}
       pagination={{ pageSize: 20 }}
       serverPagination={serverPagination}
       emptyState={{
         icon: <User className="w-12 h-12" />,
         title: 'No students found',
-        description:
-          'Get started by adding your first student to the directory.',
-        action: onAddStudent
-          ? {
-              label: 'Add Student',
-              onClick: onAddStudent,
-            }
-          : undefined,
+        description: 'Get started by adding your first student to the directory.',
+        action: onAddStudent ? { label: 'Add Student', onClick: onAddStudent } : undefined,
       }}
       onRowClick={onViewStudent}
       maxHeight="calc(100vh - 22rem)"

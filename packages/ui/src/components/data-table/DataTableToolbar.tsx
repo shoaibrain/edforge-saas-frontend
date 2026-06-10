@@ -11,6 +11,7 @@ interface DataTableToolbarProps<TData> {
   searchPlaceholder?: string
   facetedFilters?: FacetedFilterConfig[]
   enableColumnVisibility?: boolean
+  toolbarStart?: ReactNode
   toolbarExtra?: ReactNode
 }
 
@@ -19,6 +20,7 @@ export function DataTableToolbar<TData>({
   searchPlaceholder,
   facetedFilters,
   enableColumnVisibility,
+  toolbarStart,
   toolbarExtra,
 }: DataTableToolbarProps<TData>) {
   const isFiltered =
@@ -26,7 +28,12 @@ export function DataTableToolbar<TData>({
     !!(table.getState().globalFilter as string)
 
   return (
-    <div className="flex items-center gap-3 flex-wrap">
+    <div className="flex items-center gap-x-3 gap-y-2 flex-wrap">
+      {/* Leading cluster — filters/search/facets grow and wrap among themselves */}
+      <div className="flex flex-1 min-w-0 items-center gap-x-3 gap-y-2 flex-wrap">
+      {/* Leading slot (e.g. filter chips / search / selects) */}
+      {toolbarStart}
+
       {/* Search */}
       {searchPlaceholder && (
         <div className="relative flex-1 max-w-sm">
@@ -91,15 +98,16 @@ export function DataTableToolbar<TData>({
           <X className="w-3 h-3" />
         </button>
       )}
+      </div>
 
-      {/* Spacer */}
-      <div className="flex-1" />
-
-      {/* Column Visibility */}
-      {enableColumnVisibility && <DataTableViewOptions table={table} />}
-
-      {/* Extra Actions */}
-      {toolbarExtra}
+      {/* Trailing cluster — View + actions stay grouped and right-aligned; on
+          narrow widths they wrap to a second row together (not split apart). */}
+      {(enableColumnVisibility || toolbarExtra) && (
+        <div className="flex items-center gap-2 ml-auto flex-shrink-0">
+          {enableColumnVisibility && <DataTableViewOptions table={table} />}
+          {toolbarExtra}
+        </div>
+      )}
     </div>
   )
 }

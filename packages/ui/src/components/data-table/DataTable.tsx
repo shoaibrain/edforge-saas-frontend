@@ -37,6 +37,7 @@ export function DataTable<TData>({
   onRowClick,
   searchPlaceholder,
   facetedFilters,
+  toolbarStart,
   toolbarExtra,
   bulkActions,
   className,
@@ -98,17 +99,19 @@ export function DataTable<TData>({
     )
   }
 
-  // Empty state
-  if (data.length === 0 && emptyState && !isLoading) {
-    return <DataTableEmpty config={emptyState} className={className} />
-  }
-
   const selectedRowCount = Object.keys(
     table.getState().rowSelection
   ).length
 
-  const hasToolbar = searchPlaceholder || facetedFilters?.length || enableColumnVisibility || toolbarExtra
+  const hasToolbar = searchPlaceholder || facetedFilters?.length || enableColumnVisibility || toolbarExtra || toolbarStart
   const hasBulkActions = bulkActions && selectedRowCount > 0
+  // Empty body is rendered INSIDE the card so a toolbar (filters/search) stays
+  // visible above it — otherwise a search that returns nothing would hide its
+  // own search box. Without a toolbar, render the empty state as a standalone card.
+  const isEmpty = data.length === 0 && !!emptyState && !isLoading
+  if (isEmpty && !hasToolbar) {
+    return <DataTableEmpty config={emptyState} className={className} />
+  }
 
   return (
     <div
@@ -126,6 +129,7 @@ export function DataTable<TData>({
             searchPlaceholder={searchPlaceholder}
             facetedFilters={facetedFilters}
             enableColumnVisibility={enableColumnVisibility}
+            toolbarStart={toolbarStart}
             toolbarExtra={toolbarExtra}
           />
         </div>
@@ -185,6 +189,9 @@ export function DataTable<TData>({
           </div>
         )}
 
+        {isEmpty && emptyState ? (
+          <DataTableEmpty config={emptyState} bare />
+        ) : (
         <table className="w-full" role="grid" style={{ tableLayout: 'fixed' }}>
           <thead className="sticky top-0 z-10">
             {table.getHeaderGroups().map((headerGroup) => (
@@ -247,10 +254,11 @@ export function DataTable<TData>({
             ))}
           </tbody>
         </table>
+        )}
       </div>
 
-      {/* Pagination — always visible at bottom */}
-      {pagination && (
+      {/* Pagination — hidden under the empty state */}
+      {pagination && !isEmpty && (
         <div className="flex-shrink-0">
           <DataTablePagination
             table={table}

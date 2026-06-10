@@ -4,13 +4,18 @@ import { cn, focusRing } from '../../utils'
 interface DataTableEmptyProps {
   config: DataTableEmptyStateConfig
   className?: string
+  /** Render without the card chrome (border/shadow/bg) — for nesting inside an
+   *  existing card so a persistent toolbar stays above the empty body. */
+  bare?: boolean
 }
 
-export function DataTableEmpty({ config, className }: DataTableEmptyProps) {
+export function DataTableEmpty({ config, className, bare = false }: DataTableEmptyProps) {
   return (
     <div
       className={cn(
-        'flex flex-col items-center justify-center py-12 px-4 text-center rounded-xl border border-[rgb(var(--border-primary)/0.5)] shadow-[0_1px_3px_0_rgb(0_0_0/0.08),0_1px_2px_-1px_rgb(0_0_0/0.08)] bg-[rgb(var(--background-primary))]',
+        'flex flex-col items-center justify-center py-12 px-4 text-center',
+        !bare &&
+          'rounded-xl border border-[rgb(var(--border-primary)/0.5)] shadow-[0_1px_3px_0_rgb(0_0_0/0.08),0_1px_2px_-1px_rgb(0_0_0/0.08)] bg-[rgb(var(--background-primary))]',
         className
       )}
     >

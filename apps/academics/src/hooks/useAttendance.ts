@@ -23,6 +23,7 @@ import {
   getCalendarDate,
   getAttendanceTrend,
   getAttendanceAlerts,
+  getAttendanceStudentTrends,
   getAttendanceOverview,
   parseApiError,
   type CreateAttendanceParams,
@@ -35,6 +36,7 @@ import {
   type CalendarDateInfo,
   type AttendanceAlert,
   type AttendanceOverviewResponse,
+  type StudentAttendanceTrend,
 } from '../services/academics.service'
 
 // ============================================================================
@@ -56,6 +58,8 @@ export const attendanceKeys = {
     [...attendanceKeys.all, 'trend', schoolId, startDate, endDate] as const,
   alerts: (schoolId: string) =>
     [...attendanceKeys.all, 'alerts', schoolId] as const,
+  studentTrends: (schoolId: string, studentIds: string, startDate: string, endDate: string) =>
+    [...attendanceKeys.all, 'student-trends', schoolId, studentIds, startDate, endDate] as const,
   records: (schoolId: string, date: string) =>
     [...attendanceKeys.all, 'records', schoolId, date] as const,
   calendarDate: (schoolId: string, date: string) =>
@@ -332,6 +336,33 @@ export function useAttendanceTrend({
     queryFn: () => getAttendanceTrend(schoolId, startDate, endDate),
     enabled: enabled && !!schoolId && !!startDate && !!endDate,
     staleTime: 5 * 60 * 1000,
+  })
+}
+
+/**
+ * Hook to fetch batch per-student attendance trends for the roster sparkline.
+ * `studentIds` is sorted for a stable query key (caller passes the visible page,
+ * ≤50). Returns a studentId → trend map.
+ */
+export function useAttendanceStudentTrends({
+  schoolId,
+  studentIds,
+  startDate,
+  endDate,
+  enabled = true,
+}: {
+  schoolId: string
+  studentIds: string[]
+  startDate: string
+  endDate: string
+  enabled?: boolean
+}) {
+  const sortedIds = [...studentIds].sort()
+  return useQuery<Record<string, StudentAttendanceTrend>, Error>({
+    queryKey: attendanceKeys.studentTrends(schoolId, sortedIds.join(','), startDate, endDate),
+    queryFn: () => getAttendanceStudentTrends(schoolId, sortedIds, startDate, endDate),
+    enabled: enabled && !!schoolId && sortedIds.length > 0 && !!startDate && !!endDate,
+    staleTime: 10 * 60 * 1000,
   })
 }
 

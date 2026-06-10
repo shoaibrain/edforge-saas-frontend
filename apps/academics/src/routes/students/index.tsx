@@ -21,11 +21,13 @@ import {
   GraduationCap,
   School,
   FileSpreadsheet,
+  Download,
+  Loader2,
 } from 'lucide-react'
-import { StatCard, WidgetErrorBoundaryV2, Card } from '@edforge/ui'
+import { StatCard, WidgetErrorBoundaryV2, Card, Button } from '@edforge/ui'
 import { getAttendanceColor } from '@edforge/types'
 import { useResourcePermissions } from '@edforge/abac'
-import { StudentTable, StudentQuickProfile, StudentsFilterRow, CSVImport } from '../../components/students'
+import { StudentTable, StudentQuickProfile, StudentsFilterRow, CSVImport, type StudentAttendanceSignal } from '../../components/students'
 import { ConfirmationDialog } from '../../components/common'
 import {
   useStudents,
@@ -36,6 +38,7 @@ import {
 import { useActiveSchoolId } from '../../stores'
 import { useStudentFilters, useStudentFilterActions } from '../../stores/students.store'
 import { useAcademicsOverviewV2 } from '../../hooks/useAcademicsOverviewV2'
+import { useAttendanceStudentTrends } from '../../hooks/useAttendance'
 import { filterStudentsByMode } from '../../utils/student-filters'
 import type { StudentResponseDto } from '@aibrains/shared-types'
 
@@ -124,6 +127,10 @@ function StudentsInsightStrip({
 // ============================================================================
 
 function TableSkeleton() {
+  // Block colors via semantic tokens (read correctly in light + dark) — the
+  // skeleton mirrors the 8-column roster so there's no load → render jump.
+  const block = 'rgb(var(--text-tertiary)/0.18)'
+  const blockFaint = 'rgb(var(--text-tertiary)/0.10)'
   return (
     <div
       className="rounded-xl border overflow-hidden"
@@ -137,12 +144,8 @@ function TableSkeleton() {
         className="flex items-center gap-4 px-4 py-2.5 border-b"
         style={{ borderColor: 'rgb(var(--border-primary) / 0.35)', background: 'rgb(var(--background-tertiary))' }}
       >
-        {[160, 60, 80, 70, 80, 30].map((w, i) => (
-          <div
-            key={i}
-            className="h-3 rounded v2-skeleton-pulse"
-            style={{ width: w, background: 'rgba(255,255,255,0.06)' }}
-          />
+        {[150, 48, 90, 120, 90, 60, 70, 24].map((w, i) => (
+          <div key={i} className="h-3 rounded v2-skeleton-pulse" style={{ width: w, background: block }} />
         ))}
       </div>
       {/* 8 skeleton rows */}
@@ -152,53 +155,38 @@ function TableSkeleton() {
           className="flex items-center gap-4 px-4 py-3 border-b"
           style={{ borderColor: 'rgb(var(--border-primary) / 0.35)' }}
         >
-          {/* Avatar circle */}
-          <div
-            className="w-9 h-9 rounded-full v2-skeleton-pulse flex-shrink-0"
-            style={{ background: 'rgba(255,255,255,0.06)' }}
-          />
-          {/* Name + ID */}
-          <div className="flex flex-col gap-1.5" style={{ width: 140 }}>
-            <div
-              className="h-3 rounded v2-skeleton-pulse"
-              style={{ width: 100, background: 'rgba(255,255,255,0.06)' }}
-            />
-            <div
-              className="h-2.5 rounded v2-skeleton-pulse"
-              style={{ width: 70, background: 'rgba(255,255,255,0.04)' }}
-            />
+          {/* Student: avatar + name/id */}
+          <div className="w-9 h-9 rounded-full v2-skeleton-pulse flex-shrink-0" style={{ background: block }} />
+          <div className="flex flex-col gap-1.5" style={{ width: 130 }}>
+            <div className="h-3 rounded v2-skeleton-pulse" style={{ width: 100, background: block }} />
+            <div className="h-2.5 rounded v2-skeleton-pulse" style={{ width: 70, background: blockFaint }} />
           </div>
-          {/* Grade */}
-          <div
-            className="h-3 rounded v2-skeleton-pulse"
-            style={{ width: 40, background: 'rgba(255,255,255,0.06)' }}
-          />
-          {/* Attendance bar */}
+          {/* Grade chip */}
+          <div className="h-5 rounded-[7px] v2-skeleton-pulse" style={{ width: 30, background: block }} />
+          {/* Attendance: spark + % */}
           <div className="flex items-center gap-2" style={{ width: 100 }}>
-            <div
-              className="h-3 rounded v2-skeleton-pulse"
-              style={{ width: 35, background: 'rgba(255,255,255,0.06)' }}
-            />
-            <div
-              className="h-1 rounded-full v2-skeleton-pulse flex-1"
-              style={{ background: 'rgba(255,255,255,0.04)' }}
-            />
+            <div className="h-4 rounded v2-skeleton-pulse flex-1" style={{ background: blockFaint }} />
+            <div className="h-3 rounded v2-skeleton-pulse" style={{ width: 26, background: block }} />
+          </div>
+          {/* Guardian: stacked circles + name */}
+          <div className="flex items-center gap-2" style={{ width: 150 }}>
+            <div className="flex -space-x-2 flex-shrink-0">
+              <div className="w-6 h-6 rounded-full v2-skeleton-pulse" style={{ background: block }} />
+              <div className="w-6 h-6 rounded-full v2-skeleton-pulse" style={{ background: blockFaint }} />
+            </div>
+            <div className="h-3 rounded v2-skeleton-pulse" style={{ width: 64, background: block }} />
+          </div>
+          {/* Location: two lines */}
+          <div className="flex flex-col gap-1.5" style={{ width: 100 }}>
+            <div className="h-3 rounded v2-skeleton-pulse" style={{ width: 80, background: block }} />
+            <div className="h-2.5 rounded v2-skeleton-pulse" style={{ width: 56, background: blockFaint }} />
           </div>
           {/* Status pill */}
-          <div
-            className="h-5 rounded-full v2-skeleton-pulse"
-            style={{ width: 60, background: 'rgba(255,255,255,0.06)' }}
-          />
+          <div className="h-5 rounded-full v2-skeleton-pulse" style={{ width: 56, background: block }} />
           {/* Date */}
-          <div
-            className="h-3 rounded v2-skeleton-pulse"
-            style={{ width: 80, background: 'rgba(255,255,255,0.06)' }}
-          />
+          <div className="h-3 rounded v2-skeleton-pulse" style={{ width: 64, background: block }} />
           {/* Action dot */}
-          <div
-            className="w-4 h-4 rounded v2-skeleton-pulse"
-            style={{ background: 'rgba(255,255,255,0.04)' }}
-          />
+          <div className="w-4 h-4 rounded v2-skeleton-pulse flex-shrink-0" style={{ background: blockFaint }} />
         </div>
       ))}
     </div>
@@ -320,6 +308,7 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
 
   // ABAC permissions
   const studentPerms = useResourcePermissions('students')
+  const guardianPerms = useResourcePermissions('guardians')
 
   // Student filters from store
   const filters = useStudentFilters()
@@ -349,7 +338,8 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
   // V2 overview data (KPIs + alerts)
   const overviewData = useAcademicsOverviewV2(schoolId)
 
-  // Attendance alerts map: studentId → attendanceRate
+  // Attendance alerts map: studentId → attendanceRate (rate-only; drives the
+  // at-risk chip filter + the drawer).
   const alertsMap = useMemo(() => {
     const map = new Map<string, number>()
     for (const alert of overviewData.alerts.students) {
@@ -366,6 +356,45 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
     () => filterStudentsByMode(students, filters.filterMode, alertsMap),
     [students, filters.filterMode, alertsMap],
   )
+
+  // ── Attendance trend (Sprint 2) ──────────────────────────────────
+  // Real 30-day daily series for the visible page (≤50) drives the inline
+  // sparkline. Batched in one request keyed to the displayed studentIds.
+  const trendWindow = useMemo(() => {
+    const end = new Date()
+    const start = new Date()
+    start.setDate(start.getDate() - 29)
+    const fmt = (d: Date) => d.toISOString().slice(0, 10)
+    return { startDate: fmt(start), endDate: fmt(end) }
+  }, [])
+
+  const visibleStudentIds = useMemo(
+    () => filteredStudents.slice(0, 50).map((s) => s.studentId),
+    [filteredStudents],
+  )
+
+  const { data: studentTrends } = useAttendanceStudentTrends({
+    schoolId,
+    studentIds: visibleStudentIds,
+    startDate: trendWindow.startDate,
+    endDate: trendWindow.endDate,
+  })
+
+  // Richer per-student signal for the AttendanceTrend cell: at-risk alerts
+  // (rate + trend) as the base, overlaid with the real daily series for the
+  // visible page. Students with neither render "—".
+  const attendanceByStudent = useMemo(() => {
+    const map = new Map<string, StudentAttendanceSignal>()
+    for (const alert of overviewData.alerts.students) {
+      map.set(alert.studentId, { rate: alert.attendanceRate, trend: alert.trend })
+    }
+    if (studentTrends) {
+      for (const [studentId, t] of Object.entries(studentTrends)) {
+        map.set(studentId, { rate: t.rate, trend: t.trend, series: t.series })
+      }
+    }
+    return map
+  }, [overviewData.alerts.students, studentTrends])
 
   // Derive KPI values
   const attendanceRate = overviewData.overview.todayAttendanceRate
@@ -532,16 +561,6 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
           />
         </motion.div>
 
-        {/* ---- Filter Strip ---- */}
-        <motion.div variants={fadeInUp}>
-          <StudentsFilterRow
-            isExporting={overviewData.isExporting}
-            hasAcademicYear={!!overviewData.academicYear.id}
-            onExport={overviewData.handleExportCSV}
-            schoolId={schoolId}
-          />
-        </motion.div>
-
         {/* ---- Error State ---- */}
         {isError ? (
           <ErrorState onRetry={() => refetch()} />
@@ -643,7 +662,26 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
               ) : (
                 <StudentTable
                   students={filteredStudents}
-                  alertsMap={alertsMap}
+                  attendanceByStudent={attendanceByStudent}
+                  canViewGuardians={guardianPerms.view}
+                  canViewLocation={studentPerms.view}
+                  toolbarStart={<StudentsFilterRow schoolId={schoolId} />}
+                  toolbarExtra={
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={overviewData.handleExportCSV}
+                      disabled={overviewData.isExporting || !overviewData.academicYear.id}
+                      aria-label="Export students as CSV"
+                    >
+                      {overviewData.isExporting ? (
+                        <Loader2 className="w-3 h-3 animate-spin mr-1.5" />
+                      ) : (
+                        <Download className="w-3 h-3 mr-1.5" />
+                      )}
+                      Export CSV
+                    </Button>
+                  }
                   isLoading={studentsLoading}
                   onAddStudent={handleAddStudent}
                   onViewStudent={handleViewStudent}

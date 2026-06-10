@@ -14,6 +14,13 @@ interface UserAvatarProps {
   role?: 'student' | 'staff'
   size?: 'sm' | 'md' | 'lg'
   className?: string
+  /**
+   * Explicit avatar seed. Overrides the role-default seed (student → userId,
+   * staff → userName). Use a collision-resistant value for guardians, whose
+   * `guardianId` is optional and whose names repeat within an archetype
+   * (e.g. `${guardianId ?? firstName + '|' + lastName + '|' + relationship}`).
+   */
+  seed?: string
 }
 
 const SIZES = { sm: 24, md: 32, lg: 40 }
@@ -40,12 +47,12 @@ function getInitialsBgColor(name: string): string {
   return colors[Math.abs(hash) % colors.length]
 }
 
-export function UserAvatar({ userId, userName, role = 'student', size = 'md', className = '' }: UserAvatarProps) {
+export function UserAvatar({ userId, userName, role = 'student', size = 'md', className = '', seed }: UserAvatarProps) {
   const [imgError, setImgError] = useState(false)
   const px = SIZES[size]
   const avatarUrl = role === 'staff'
-    ? getStaffAvatar(userName, { size: px })
-    : getStudentAvatar(userId, { size: px })
+    ? getStaffAvatar(seed ?? userName, { size: px })
+    : getStudentAvatar(seed ?? userId, { size: px })
   const initials = getInitials(userName)
   const bgColor = getInitialsBgColor(userName)
 
