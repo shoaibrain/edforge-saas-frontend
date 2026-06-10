@@ -217,18 +217,11 @@ function OverviewTab() {
         <div className="flex-1 min-w-0">
           <SectionFilters schoolId={schoolId} totalResults={total} />
         </div>
-        <div
-          className="flex items-center rounded-lg p-0.5 flex-shrink-0"
-          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
-        >
+        <div className="flex items-center rounded-lg p-0.5 flex-shrink-0 bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary)/0.35)]">
           <button
             type="button"
             onClick={() => setViewMode('grid')}
-            className="p-1.5 rounded-md transition-colors"
-            style={{
-              background: viewMode === 'grid' ? 'rgba(55,138,221,0.12)' : 'transparent',
-              color: viewMode === 'grid' ? '#378ADD' : 'rgb(var(--text-tertiary))',
-            }}
+            className={`p-1.5 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-[rgb(var(--accent-academics)/0.12)] text-[#378ADD]' : 'bg-transparent text-[rgb(var(--text-tertiary))]'}`}
             aria-label="Grid view"
           >
             <LayoutGrid className="w-4 h-4" />
@@ -236,11 +229,7 @@ function OverviewTab() {
           <button
             type="button"
             onClick={() => setViewMode('list')}
-            className="p-1.5 rounded-md transition-colors"
-            style={{
-              background: viewMode === 'list' ? 'rgba(55,138,221,0.12)' : 'transparent',
-              color: viewMode === 'list' ? '#378ADD' : 'rgb(var(--text-tertiary))',
-            }}
+            className={`p-1.5 rounded-md transition-colors ${viewMode === 'list' ? 'bg-[rgb(var(--accent-academics)/0.12)] text-[#378ADD]' : 'bg-transparent text-[rgb(var(--text-tertiary))]'}`}
             aria-label="List view"
           >
             <List className="w-4 h-4" />
@@ -598,13 +587,13 @@ function ContextBanner({
     if (activeTab === 'overview') {
       return (
         <>
-          <em style={{ color: '#378ADD', fontStyle: 'normal' }}>{overviewStats.total} active sections</em>
+          <em className="not-italic text-[rgb(var(--accent-academics))]">{overviewStats.total} active sections</em>
           {' '}across{' '}
-          <em style={{ color: '#378ADD', fontStyle: 'normal' }}>{overviewStats.courses} courses</em>
+          <em className="not-italic text-[rgb(var(--accent-academics))]">{overviewStats.courses} courses</em>
           {' '}&mdash;{' '}
-          <em style={{ color: '#1D9E75', fontStyle: 'normal' }}>{overviewStats.students} students enrolled</em>
+          <em className="not-italic text-[#1D9E75]">{overviewStats.students} students enrolled</em>
           , avg utilization{' '}
-          <em style={{ color: '#EF9F27', fontStyle: 'normal' }}>{overviewStats.utilization}%</em>
+          <em className="not-italic text-[rgb(var(--accent-attendance))]">{overviewStats.utilization}%</em>
           .
         </>
       )
@@ -618,13 +607,13 @@ function ContextBanner({
       const completionPct = gradeData.gradingProgress?.completionRate?.toFixed(0) ?? '—'
       return (
         <>
-          <em style={{ color: '#E24B4A', fontStyle: 'normal' }}>{gradeData.atRiskCount} students</em>
+          <em className="not-italic text-[rgb(var(--accent-finance))]">{gradeData.atRiskCount} students</em>
           {' '}at risk (below 60%){worstCourse && (
-            <> &mdash; concentrated in <em style={{ color: '#E24B4A', fontStyle: 'normal' }}>{worstCourse}</em></>
+            <> &mdash; concentrated in <em className="not-italic text-[rgb(var(--accent-finance))]">{worstCourse}</em></>
           )}.{' '}
-          <em style={{ color: '#1D9E75', fontStyle: 'normal' }}>{passingCourses} at 100% pass rate</em>
+          <em className="not-italic text-[#1D9E75]">{passingCourses} at 100% pass rate</em>
           . Grading{' '}
-          <em style={{ color: '#378ADD', fontStyle: 'normal' }}>{completionPct}% complete</em>
+          <em className="not-italic text-[rgb(var(--accent-academics))]">{completionPct}% complete</em>
           .
         </>
       )
@@ -638,13 +627,13 @@ function ContextBanner({
       const atRiskCount = attendanceData.atRiskStudents?.length ?? 0
       return (
         <>
-          <em style={{ color: '#378ADD', fontStyle: 'normal' }}>{recorded} of {totalStudents} students</em>
+          <em className="not-italic text-[rgb(var(--accent-academics))]">{recorded} of {totalStudents} students</em>
           {' '}recorded today. 7-day average{' '}
-          <em style={{ color: '#1D9E75', fontStyle: 'normal' }}>{avg7}%</em>
+          <em className="not-italic text-[#1D9E75]">{avg7}%</em>
           {' '}vs 30-day{' '}
-          <em style={{ color: '#EF9F27', fontStyle: 'normal' }}>{avg30}%</em>
+          <em className="not-italic text-[rgb(var(--accent-attendance))]">{avg30}%</em>
           .{atRiskCount > 0 && (
-            <>{' '}<em style={{ color: '#E24B4A', fontStyle: 'normal' }}>{atRiskCount} students</em> flagged below 90% attendance.</>
+            <>{' '}<em className="not-italic text-[rgb(var(--accent-finance))]">{atRiskCount} students</em> flagged below 90% attendance.</>
           )}
         </>
       )
@@ -656,10 +645,7 @@ function ContextBanner({
   if (!bannerContent) return null
 
   return (
-    <p
-      className="px-6 pb-3"
-      style={{ fontSize: 11, color: 'rgb(var(--text-tertiary))', lineHeight: 1.5 }}
-    >
+    <p className="px-6 pb-3 text-2xs text-[rgb(var(--text-tertiary))] leading-normal">
       {bannerContent}
     </p>
   )
@@ -691,29 +677,20 @@ export function ClassroomsModule() {
   )
 
   return (
-    <div className="min-h-full" style={{ background: 'rgb(var(--background-primary))' }}>
+    <div className="min-h-full bg-[rgb(var(--background-primary))]">
       {/* Page Header */}
-      <div
-        className="border-b"
-        style={{ borderColor: 'rgb(var(--border-primary) / 0.35)', background: 'rgb(var(--background-secondary))' }}
-      >
+      <div className="border-b border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-secondary))]">
         <div className="px-6 py-4">
           <div className="flex items-center justify-between" style={{ height: 44 }}>
             <div className="flex items-center gap-2.5">
-              <div
-                className="w-7 h-7 rounded-[7px] flex items-center justify-center"
-                style={{ background: 'rgba(55, 138, 221, 0.10)' }}
-              >
-                <LayoutGrid className="w-4 h-4" style={{ color: '#378ADD' }} />
+              <div className="w-7 h-7 rounded-[7px] flex items-center justify-center bg-[rgb(var(--accent-academics)/0.1)]">
+                <LayoutGrid className="w-4 h-4 text-[rgb(var(--accent-academics))]" />
               </div>
-              <h1
-                className="text-sm font-semibold"
-                style={{ color: 'rgb(var(--text-primary))' }}
-              >
+              <h1 className="text-sm font-semibold text-[rgb(var(--text-primary))]">
                 Classrooms
               </h1>
-              <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>|</span>
-              <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>
+              <span className="text-xs text-[rgb(var(--text-disabled))]">|</span>
+              <span className="text-xs text-[rgb(var(--text-disabled))]">
                 {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
               </span>
             </div>
@@ -723,11 +700,7 @@ export function ClassroomsModule() {
                 <button
                   onClick={() => navigate({ to: '/classrooms/create' })}
                   aria-label="New classroom"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40"
-                  style={{
-                    background: '#1D9E75',
-                    color: '#fff',
-                  }}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   New classroom
@@ -743,13 +716,9 @@ export function ClassroomsModule() {
         {/* Tab Navigation */}
         <div className="px-6">
           <nav
-            className="flex overflow-x-auto"
+            className="flex overflow-x-auto gap-0 border-b border-[rgb(var(--border-primary)/0.35)]"
             aria-label="Classrooms tabs"
             role="tablist"
-            style={{
-              gap: 0,
-              borderBottom: '1px solid rgba(255,255,255,0.06)',
-            }}
           >
             {TABS.map((tab) => {
               const isActive = activeTab === tab.id
@@ -761,27 +730,11 @@ export function ClassroomsModule() {
                   aria-selected={isActive}
                   aria-controls={`panel-${tab.id}`}
                   onClick={() => setActiveTab(tab.id)}
-                  className="whitespace-nowrap"
-                  style={{
-                    padding: '8px 16px',
-                    fontSize: 12,
-                    fontWeight: isActive ? 500 : 400,
-                    color: isActive ? '#378ADD' : 'rgb(var(--text-tertiary))',
-                    cursor: 'pointer',
-                    borderBottom: `2px solid ${isActive ? '#378ADD' : 'transparent'}`,
-                    marginBottom: -1,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 6,
-                    background: 'none',
-                    border: 'none',
-                    borderBottomStyle: 'solid',
-                    borderBottomWidth: 2,
-                    borderBottomColor: isActive ? '#378ADD' : 'transparent',
-                    transition: 'color 150ms ease',
-                  }}
-                  onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.color = 'rgb(var(--text-secondary))' }}
-                  onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.color = 'rgb(var(--text-tertiary))' }}
+                  className={`whitespace-nowrap flex items-center gap-1.5 px-4 py-2 text-xs cursor-pointer transition-colors bg-transparent border-b-2 -mb-px ${
+                    isActive
+                      ? 'font-medium text-[#378ADD] border-[#378ADD]'
+                      : 'font-normal text-[rgb(var(--text-tertiary))] border-transparent hover:text-[rgb(var(--text-secondary))]'
+                  }`}
                 >
                   <tab.icon
                     className="w-3 h-3"
@@ -790,14 +743,11 @@ export function ClassroomsModule() {
                   {tab.label}
                   {tab.id === 'overview' && sectionCount !== undefined && (
                     <span
-                      style={{
-                        fontSize: 10,
-                        fontWeight: 600,
-                        padding: '1px 5px',
-                        borderRadius: 8,
-                        background: isActive ? 'rgba(55,138,221,0.12)' : 'rgba(255,255,255,0.06)',
-                        color: isActive ? '#378ADD' : 'rgb(var(--text-tertiary))',
-                      }}
+                      className={`text-3xs font-semibold py-px px-1.5 rounded-lg ${
+                        isActive
+                          ? 'bg-[rgb(var(--accent-academics)/0.12)] text-[#378ADD]'
+                          : 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]'
+                      }`}
                     >
                       {sectionCount}
                     </span>

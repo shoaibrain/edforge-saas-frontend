@@ -116,42 +116,19 @@ function StandardsContent() {
     >
       {/* Icon */}
       <div
-        style={{
-          width: 48,
-          height: 48,
-          borderRadius: 12,
-          background: 'rgba(127,119,221,0.15)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginBottom: 12,
-        }}
+        className="flex items-center justify-center rounded-xl mb-3 bg-[rgb(var(--accent-reports)/0.15)]"
+        style={{ width: 48, height: 48 }}
       >
-        <ShieldCheck style={{ width: 24, height: 24, color: '#7F77DD' }} />
+        <ShieldCheck className="w-6 h-6 text-[#7F77DD]" />
       </div>
 
       {/* Heading */}
-      <h3
-        style={{
-          fontSize: 14,
-          fontWeight: 500,
-          color: 'rgb(var(--text-primary))',
-          marginBottom: 6,
-        }}
-      >
+      <h3 className="text-sm font-medium text-[rgb(var(--text-primary))] mb-1.5">
         Standards alignment
       </h3>
 
       {/* Body */}
-      <p
-        style={{
-          fontSize: 12,
-          color: 'rgb(var(--text-disabled))',
-          maxWidth: 320,
-          lineHeight: 1.5,
-          marginBottom: 16,
-        }}
-      >
+      <p className="text-xs text-[rgb(var(--text-disabled))] max-w-80 leading-normal mb-4">
         Map courses to academic standards to track curriculum coverage and EdFi
         compliance. Standards can be configured per course.
       </p>
@@ -275,19 +252,14 @@ export function CurriculumModule() {
   })
 
   return (
-    <div className="min-h-full" style={{ padding: '18px 20px' }}>
+    <div className="min-h-full px-5 py-4">
       {/* ---- V2 Page Header ---- */}
-      <div className="flex items-center justify-between" style={{ height: 44, marginBottom: 4 }}>
+      <div className="flex items-center justify-between mb-1" style={{ height: 44 }}>
         <div className="flex items-center gap-2.5">
           {/* Icon */}
           <div
-            className="flex items-center justify-center"
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: 8,
-              background: 'rgba(127,119,221,0.10)',
-            }}
+            className="flex items-center justify-center rounded-lg bg-[rgb(var(--accent-reports)/0.1)]"
+            style={{ width: 32, height: 32 }}
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path
@@ -301,19 +273,13 @@ export function CurriculumModule() {
           </div>
 
           {/* Title */}
-          <h1
-            className="text-lg font-semibold"
-            style={{ color: 'rgb(var(--text-primary))', letterSpacing: -0.3 }}
-          >
+          <h1 className="text-lg font-semibold text-[rgb(var(--text-primary))] tracking-[-0.3px]">
             Curriculum
           </h1>
 
           {/* Separator + Date */}
-          <span style={{ color: 'rgba(255,255,255,0.12)', fontSize: 13 }}>|</span>
-          <span
-            className="text-sm"
-            style={{ color: 'rgb(var(--text-disabled))' }}
-          >
+          <span className="text-sm text-[rgb(var(--text-disabled))]">|</span>
+          <span className="text-sm text-[rgb(var(--text-disabled))]">
             {today}
           </span>
         </div>
@@ -324,18 +290,7 @@ export function CurriculumModule() {
             <button
               type="button"
               onClick={openCreateDrawer}
-              className="inline-flex items-center gap-1.5 transition-colors hover:opacity-90"
-              style={{
-                height: 36,
-                padding: '0 14px',
-                fontSize: 12,
-                fontWeight: 500,
-                borderRadius: 8,
-                background: '#1D9E75',
-                color: '#fff',
-                border: 'none',
-                cursor: 'pointer',
-              }}
+              className="inline-flex items-center gap-1.5 transition-colors hover:opacity-90 h-9 px-3.5 text-xs font-medium rounded-lg border-none cursor-pointer bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
             >
               <Plus style={{ width: 12, height: 12 }} />
               Add course
@@ -345,35 +300,23 @@ export function CurriculumModule() {
       </div>
 
       {/* ---- Context Banner ---- */}
-      <p
-        className="text-xs"
-        style={{
-          color: 'rgb(var(--text-disabled))',
-          marginBottom: 14,
-        }}
-      >
-        <span style={{ color: 'var(--color-info, #378ADD)', fontWeight: 500 }}>
+      <p className="text-xs text-[rgb(var(--text-disabled))] mb-3.5">
+        <span className="font-medium text-[rgb(var(--accent-academics))]">
           {stats.total}
         </span>{' '}
         courses across{' '}
-        <span style={{ color: 'var(--color-info, #378ADD)', fontWeight: 500 }}>
+        <span className="font-medium text-[rgb(var(--accent-academics))]">
           {stats.subjects}
         </span>{' '}
         subject areas · {stats.elective} elective ·{' '}
-        <span style={{ color: 'var(--color-info, #378ADD)', fontWeight: 500 }}>
+        <span className="font-medium text-[rgb(var(--accent-academics))]">
           {stats.specializedTypes}
         </span>{' '}
         specialized course types (Honors, AP, Dual Enrollment)
       </p>
 
       {/* ---- KPI Tiles ---- */}
-      <div
-        className="grid gap-2"
-        style={{
-          gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
-          marginBottom: 14,
-        }}
-      >
+      <div className="grid gap-2 grid-cols-4 mb-3.5">
         <StatCard
           label="Total Courses"
           value={String(stats.total)}
@@ -433,48 +376,25 @@ export function CurriculumModule() {
       </div>
 
       {/* ---- Tab Bar ---- */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: 0,
-          marginBottom: 14,
-          borderBottom: '1px solid rgba(255,255,255,0.06)',
-        }}
-      >
+      <div className="flex items-center gap-0 mb-3.5 border-b border-[rgb(var(--border-primary)/0.35)]">
         {/* Courses tab */}
         <button
           type="button"
           onClick={() => setActiveTab('courses')}
-          style={{
-            padding: '8px 14px',
-            fontSize: 12,
-            fontWeight: activeTab === 'courses' ? 500 : 400,
-            color: activeTab === 'courses' ? '#7F77DD' : 'var(--text-hint, #5a6070)',
-            cursor: 'pointer',
-            borderBottom: `2px solid ${activeTab === 'courses' ? '#7F77DD' : 'transparent'}`,
-            marginBottom: -1,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 5,
-            background: 'none',
-            border: 'none',
-            borderBottomStyle: 'solid',
-            borderBottomWidth: 2,
-            borderBottomColor: activeTab === 'courses' ? '#7F77DD' : 'transparent',
-          }}
+          className={`flex items-center gap-1.5 px-3.5 py-2 text-xs cursor-pointer bg-transparent border-b-2 -mb-px ${
+            activeTab === 'courses'
+              ? 'font-medium text-[#7F77DD] border-[#7F77DD]'
+              : 'font-normal text-[rgb(var(--text-tertiary))] border-transparent'
+          }`}
         >
           <CoursesIcon active={activeTab === 'courses'} />
           Courses
           <span
-            style={{
-              fontSize: 10,
-              fontWeight: 600,
-              padding: '1px 5px',
-              borderRadius: 8,
-              background: activeTab === 'courses' ? 'rgba(127,119,221,0.12)' : 'rgba(255,255,255,0.06)',
-              color: activeTab === 'courses' ? '#7F77DD' : 'var(--text-hint, #5a6070)',
-            }}
+            className={`text-3xs font-semibold py-px px-1.5 rounded-lg ${
+              activeTab === 'courses'
+                ? 'bg-[rgb(var(--accent-reports)/0.12)] text-[#7F77DD]'
+                : 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]'
+            }`}
           >
             {stats.total}
           </span>
@@ -484,22 +404,11 @@ export function CurriculumModule() {
         <button
           type="button"
           onClick={() => setActiveTab('grade-levels')}
-          style={{
-            padding: '8px 14px',
-            fontSize: 12,
-            fontWeight: activeTab === 'grade-levels' ? 500 : 400,
-            color: activeTab === 'grade-levels' ? '#7F77DD' : 'var(--text-hint, #5a6070)',
-            cursor: 'pointer',
-            marginBottom: -1,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 5,
-            background: 'none',
-            border: 'none',
-            borderBottomStyle: 'solid',
-            borderBottomWidth: 2,
-            borderBottomColor: activeTab === 'grade-levels' ? '#7F77DD' : 'transparent',
-          }}
+          className={`flex items-center gap-1.5 px-3.5 py-2 text-xs cursor-pointer bg-transparent border-b-2 -mb-px ${
+            activeTab === 'grade-levels'
+              ? 'font-medium text-[#7F77DD] border-[#7F77DD]'
+              : 'font-normal text-[rgb(var(--text-tertiary))] border-transparent'
+          }`}
         >
           <GradeLevelsIcon active={activeTab === 'grade-levels'} />
           Grade levels
@@ -509,22 +418,11 @@ export function CurriculumModule() {
         <button
           type="button"
           onClick={() => setActiveTab('standards')}
-          style={{
-            padding: '8px 14px',
-            fontSize: 12,
-            fontWeight: activeTab === 'standards' ? 500 : 400,
-            color: activeTab === 'standards' ? '#7F77DD' : 'var(--text-hint, #5a6070)',
-            cursor: 'pointer',
-            marginBottom: -1,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 5,
-            background: 'none',
-            border: 'none',
-            borderBottomStyle: 'solid',
-            borderBottomWidth: 2,
-            borderBottomColor: activeTab === 'standards' ? '#7F77DD' : 'transparent',
-          }}
+          className={`flex items-center gap-1.5 px-3.5 py-2 text-xs cursor-pointer bg-transparent border-b-2 -mb-px ${
+            activeTab === 'standards'
+              ? 'font-medium text-[#7F77DD] border-[#7F77DD]'
+              : 'font-normal text-[rgb(var(--text-tertiary))] border-transparent'
+          }`}
         >
           <StandardsIcon active={activeTab === 'standards'} />
           Standards
@@ -546,7 +444,7 @@ export function CurriculumModule() {
               <CourseFilters totalCount={totalCount} />
 
               {/* Course Table */}
-              <div style={{ marginTop: 12 }}>
+              <div className="mt-3">
                 <CourseTable
                 
                   courses={courses}

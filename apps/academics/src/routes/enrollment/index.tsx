@@ -82,16 +82,14 @@ function YearProgressBar({ startDate, endDate }: { startDate: string; endDate: s
 
   return (
     <div className="flex items-center gap-2">
-      <div
-        className="w-20 h-1.5 rounded-full overflow-hidden"
-        style={{ background: 'rgba(255, 255, 255, 0.06)' }}
-      >
+      <div className="w-20 h-1.5 rounded-full overflow-hidden bg-[rgb(var(--background-tertiary))]">
         <div
-          className="h-full rounded-full"
-          style={{ width: `${progress}%`, background: '#1D9E75' }}
+          // allow-presentation-style: data-driven progress bar width
+          className="h-full rounded-full bg-[#1D9E75]"
+          style={{ width: `${progress}%` }}
         />
       </div>
-      <span className="text-xs" style={{ color: 'rgb(var(--text-tertiary))' }}>
+      <span className="text-xs text-[rgb(var(--text-tertiary))]">
         {progress}%
       </span>
     </div>
@@ -222,35 +220,14 @@ export function EnrollmentModule() {
   return (
     <div className="min-h-full">
       {/* V2 Page Header */}
-      <div
-        className="px-6 py-4"
-        style={{
-          borderBottom: '1px solid rgb(var(--border-primary) / 0.35)',
-          background: 'rgb(var(--background-secondary))',
-        }}
-      >
+      <div className="px-6 py-4 border-b border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-secondary))]">
         <div className="flex items-center justify-between">
           {/* Left: Icon + Title */}
           <div className="flex items-center gap-3">
-            <div
-              className="flex items-center justify-center"
-              style={{
-                width: 32,
-                height: 32,
-                background: 'rgba(29, 158, 117, 0.1)',
-                borderRadius: 8,
-              }}
-            >
-              <UserPlus className="w-4 h-4" style={{ color: '#1D9E75' }} />
+            <div className="flex items-center justify-center rounded-lg bg-[rgb(var(--accent-enrollment)/0.1)]" style={{ width: 32, height: 32 }}>
+              <UserPlus className="w-4 h-4 text-[#1D9E75]" />
             </div>
-            <h1
-              className="font-semibold"
-              style={{
-                fontSize: 18,
-                color: 'rgb(var(--text-primary))',
-                letterSpacing: '-0.3px',
-              }}
-            >
+            <h1 className="font-semibold text-lg tracking-[-0.3px] text-[rgb(var(--text-primary))]">
               Enroll student
             </h1>
           </div>
@@ -260,12 +237,7 @@ export function EnrollmentModule() {
             <button
               type="button"
               onClick={handleCancelEnrollment}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[8px] transition-colors hover:opacity-80"
-              style={{
-                background: 'transparent',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                color: '#7a8099',
-              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[8px] transition-colors hover:opacity-80 bg-transparent border border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-tertiary))]"
             >
               <X className="w-3 h-3" />
               Cancel enrollment
@@ -276,12 +248,7 @@ export function EnrollmentModule() {
                 <select
                   value={activeYearId}
                   onChange={(e) => setSelectedYearId(e.target.value)}
-                  className="px-2.5 py-1.5 text-xs rounded-[8px] focus:outline-none"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.04)',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
-                    color: 'rgb(var(--text-secondary))',
-                  }}
+                  className="px-2.5 py-1.5 text-xs rounded-[8px] focus:outline-none bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
                 >
                   {academicYears.map((year: { yearId: string; name: string; status: string }) => (
                     <option key={year.yearId} value={year.yearId}>
@@ -293,12 +260,7 @@ export function EnrollmentModule() {
                   <button
                     type="button"
                     onClick={handleExportCSV}
-                    className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-[8px] transition-colors hover:opacity-80"
-                    style={{
-                      background: 'transparent',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
-                      color: 'rgb(var(--text-tertiary))',
-                    }}
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-[8px] transition-colors hover:opacity-80 bg-transparent border border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-tertiary))]"
                     title="Export enrollments as CSV"
                   >
                     <Download className="w-3 h-3" />
@@ -310,12 +272,7 @@ export function EnrollmentModule() {
                     type="button"
                     onClick={handleCloseYear}
                     disabled={closeYearMutation.isPending}
-                    className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-[8px] transition-colors disabled:opacity-50"
-                    style={{
-                      background: 'rgba(239, 159, 39, 0.08)',
-                      border: '1px solid rgba(239, 159, 39, 0.2)',
-                      color: '#EF9F27',
-                    }}
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-[8px] transition-colors disabled:opacity-50 bg-[rgb(var(--accent-attendance)/0.08)] border border-[rgb(var(--accent-attendance)/0.2)] text-[rgb(var(--accent-attendance))]"
                     title="Close all open enrollments for this year"
                   >
                     <Lock className="w-3 h-3" />
@@ -329,10 +286,7 @@ export function EnrollmentModule() {
 
         {/* Context Banner */}
         {!summaryLoading && (
-          <p
-            className="mt-2"
-            style={{ fontSize: 11, color: 'rgb(var(--text-tertiary))' }}
-          >
+          <p className="mt-2 text-2xs text-[rgb(var(--text-tertiary))]">
             Registering a new student
             {activeYearObj ? ` · Academic year ${activeYearObj.name}` : ''}
             {summary ? ` · ${summary.totalEnrolled ?? 0} students currently enrolled` : ''}
@@ -341,7 +295,7 @@ export function EnrollmentModule() {
       </div>
 
       {/* Tab Navigation */}
-      <div className="px-6" style={{ background: 'rgb(var(--background-secondary))' }}>
+      <div className="px-6 bg-[rgb(var(--background-secondary))]">
         <nav className="flex items-center gap-1" aria-label="Enrollment tabs">
           {tabItems
             .filter((tab) => tab.id !== 'registration' || enrollPerms.create)
@@ -351,20 +305,20 @@ export function EnrollmentModule() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className="relative flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium transition-colors"
-                  style={{
-                    color: isActive ? '#1D9E75' : '#5a6070',
-                    borderBottom: isActive ? '2px solid #1D9E75' : '2px solid transparent',
-                  }}
+                  className={`relative flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium transition-colors border-b-2 ${
+                    isActive
+                      ? 'text-[#1D9E75] border-[#1D9E75]'
+                      : 'text-[rgb(var(--text-tertiary))] border-transparent'
+                  }`}
                 >
                   {tab.label}
                   {tab.count !== undefined && (
                     <span
-                      className="text-xs font-semibold px-1.5 py-0.5 rounded-full"
-                      style={{
-                        background: isActive ? 'rgba(29, 158, 117, 0.12)' : 'rgba(255, 255, 255, 0.06)',
-                        color: isActive ? '#1D9E75' : 'rgb(var(--text-tertiary))',
-                      }}
+                      className={`text-xs font-semibold px-1.5 py-0.5 rounded-full ${
+                        isActive
+                          ? 'bg-[rgb(var(--accent-enrollment)/0.12)] text-[#1D9E75]'
+                          : 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]'
+                      }`}
                     >
                       {tab.count}
                     </span>
@@ -372,8 +326,7 @@ export function EnrollmentModule() {
                   {isActive && (
                     <motion.div
                       layoutId="enrollment-tab-indicator"
-                      className="absolute bottom-0 left-0 right-0 h-0.5 rounded-t-full"
-                      style={{ background: '#1D9E75' }}
+                      className="absolute bottom-0 left-0 right-0 h-0.5 rounded-t-full bg-[#1D9E75]"
                       transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                     />
                   )}
@@ -397,39 +350,24 @@ export function EnrollmentModule() {
               <div className="space-y-4">
                 {/* Academic Year Progress Strip */}
                 {activeYearObj && (
-                  <div
-                    className="flex flex-wrap items-center gap-x-4 gap-y-2"
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.02)',
-                      border: '1px solid rgba(255, 255, 255, 0.05)',
-                      borderRadius: 10,
-                      padding: '12px 14px',
-                    }}
-                  >
-                    <Calendar className="w-3.5 h-3.5" style={{ color: '#1D9E75' }} />
-                    <span
-                      className="text-xs font-medium px-2 py-0.5"
-                      style={{
-                        background: 'rgba(29, 158, 117, 0.1)',
-                        color: '#1D9E75',
-                        borderRadius: 6,
-                      }}
-                    >
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-[10px] px-3.5 py-3 bg-[rgb(var(--background-tertiary)/0.5)] border border-[rgb(var(--border-primary)/0.35)]">
+                    <Calendar className="w-3.5 h-3.5 text-[#1D9E75]" />
+                    <span className="text-xs font-medium px-2 py-0.5 rounded-md bg-[rgb(var(--accent-enrollment)/0.1)] text-[#1D9E75]">
                       {activeYearObj.name}
                     </span>
                     <YearProgressBar
                       startDate={activeYearObj.startDate}
                       endDate={activeYearObj.endDate}
                     />
-                    <div className="ml-auto flex items-center gap-3 text-xs" style={{ color: 'rgb(var(--text-tertiary))' }}>
+                    <div className="ml-auto flex items-center gap-3 text-xs text-[rgb(var(--text-tertiary))]">
                       <span>
-                        <strong style={{ color: 'rgb(var(--text-primary))' }}>{summary?.totalEnrolled ?? '--'}</strong> enrolled
+                        <strong className="text-[rgb(var(--text-primary))]">{summary?.totalEnrolled ?? '--'}</strong> enrolled
                       </span>
                       <span>
-                        <strong style={{ color: 'rgb(var(--text-primary))' }}>{activeCount}</strong> active
+                        <strong className="text-[rgb(var(--text-primary))]">{activeCount}</strong> active
                       </span>
                       <span>
-                        <strong style={{ color: 'rgb(var(--text-primary))' }}>{gradeLevelCount}</strong> grade levels
+                        <strong className="text-[rgb(var(--text-primary))]">{gradeLevelCount}</strong> grade levels
                       </span>
                     </div>
                   </div>

@@ -740,7 +740,7 @@ export function BulkRosteringPage() {
       </div>
 
       {/* Matrix */}
-      <div className="flex-1 overflow-auto relative" style={{ paddingBottom: pendingChanges.size > 0 || isSubmitting ? '72px' : '0' }}>
+      <div className={`flex-1 overflow-auto relative ${pendingChanges.size > 0 || isSubmitting ? 'pb-[72px]' : 'pb-0'}`}>
         {isInitialLoading ? (
           <div className="flex flex-col items-center justify-center py-24">
             <Loader2 className="w-10 h-10 text-[rgb(var(--action-secondary-fg))] animate-spin mb-4" />

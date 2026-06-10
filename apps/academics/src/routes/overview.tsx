@@ -74,10 +74,7 @@ function AcademicsInsightStrip({
 }) {
   if (isLoading) {
     return (
-      <div
-        className="h-5 rounded-lg v2-skeleton-pulse"
-        style={{ background: 'rgb(var(--background-tertiary))', width: '60%' }}
-      />
+      <div className="h-5 w-3/5 rounded-lg v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
     )
   }
 
@@ -100,7 +97,7 @@ function AcademicsInsightStrip({
   }
 
   return (
-    <p className="text-xs leading-relaxed" style={{ color: 'rgb(var(--text-tertiary))' }}>
+    <p className="text-xs leading-relaxed text-[rgb(var(--text-tertiary))]">
       {parts.join(' · ')}
     </p>
   )
@@ -191,32 +188,20 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
         <motion.div variants={fadeInUp} className="space-y-1">
           <div className="flex items-center justify-between" style={{ height: 44 }}>
             <div className="flex items-center gap-2.5">
-              <div
-                className="w-7 h-7 rounded-[7px] flex items-center justify-center"
-                style={{ background: 'rgba(29, 158, 117, 0.12)' }}
-              >
-                <GraduationCap className="w-4 h-4" style={{ color: '#1D9E75' }} />
+              <div className="w-7 h-7 rounded-[7px] flex items-center justify-center bg-[rgb(var(--accent-enrollment)/0.12)]">
+                <GraduationCap className="w-4 h-4 text-[#1D9E75]" />
               </div>
-              <h1
-                className="text-sm font-semibold"
-                style={{ color: 'rgb(var(--text-primary))' }}
-              >
+              <h1 className="text-sm font-semibold text-[rgb(var(--text-primary))]">
                 Academics
               </h1>
-              <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>|</span>
-              <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>
+              <span className="text-xs text-[rgb(var(--text-disabled))]">|</span>
+              <span className="text-xs text-[rgb(var(--text-disabled))]">
                 {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
               </span>
               {data.academicYear.name && (
                 <>
-                  <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>|</span>
-                  <span
-                    className="text-xs px-2.5 py-1 rounded-md"
-                    style={{
-                      background: 'rgb(var(--background-tertiary))',
-                      color: 'rgb(var(--text-tertiary))',
-                    }}
-                  >
+                  <span className="text-xs text-[rgb(var(--text-disabled))]">|</span>
+                  <span className="text-xs px-2.5 py-1 rounded-md bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]">
                     {data.academicYear.name}
                   </span>
                 </>
@@ -227,12 +212,7 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
               <button
                 onClick={() => navigate({ to: '/students/enrollment' })}
                 aria-label="Enroll a student"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40"
-                style={{
-                  background: 'rgb(var(--background-tertiary))',
-                  borderColor: 'rgb(var(--border-primary) / 0.35)',
-                  color: 'rgb(var(--text-secondary))',
-                }}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40 bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
               >
                 <UserPlus className="w-3.5 h-3.5" />
                 Enroll Student
@@ -240,11 +220,7 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
               <button
                 onClick={() => navigate({ to: '/classrooms', search: { tab: 'attendance' } })}
                 aria-label="Take attendance"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40"
-                style={{
-                  background: '#1D9E75',
-                  color: '#fff',
-                }}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
               >
                 <ClipboardCheck className="w-3.5 h-3.5" />
                 Take Attendance
