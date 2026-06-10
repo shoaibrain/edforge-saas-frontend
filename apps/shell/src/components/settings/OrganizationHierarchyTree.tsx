@@ -280,6 +280,7 @@ function TreeNode({ node, depth, expandedIds, onToggle, searchTerm, onNodeAction
         initial={{ opacity: 0, x: -8 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ ...springTransition, delay: depth * 0.02 }}
+        // allow-presentation-style: tree-node indent is computed from hierarchy depth
         className={cn(
           'group flex items-center gap-2 py-2 px-3 rounded-lg cursor-pointer',
           'hover:bg-[rgb(var(--background-tertiary))] transition-colors',

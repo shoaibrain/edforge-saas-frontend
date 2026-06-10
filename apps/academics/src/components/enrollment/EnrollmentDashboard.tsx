@@ -18,25 +18,12 @@ export function EnrollmentDashboard({ isLoading, activeYear }: EnrollmentDashboa
   // No active year — show setup prompt
   if (!isLoading && !activeYear) {
     return (
-      <div
-        className="p-8 text-center"
-        style={{
-          borderRadius: 10,
-          border: '2px dashed rgba(239, 159, 39, 0.3)',
-          background: 'rgb(var(--state-warning-bg))',
-        }}
-      >
-        <AlertTriangle className="w-10 h-10 mx-auto mb-3" style={{ color: '#EF9F27' }} />
-        <h3
-          className="font-semibold mb-2"
-          style={{ fontSize: 14, color: 'rgb(var(--text-primary))' }}
-        >
+      <div className="p-8 text-center rounded-[10px] border-2 border-dashed border-[rgb(var(--accent-attendance)/0.3)] bg-[rgb(var(--state-warning-bg))]">
+        <AlertTriangle className="w-10 h-10 mx-auto mb-3 text-[rgb(var(--accent-attendance))]" />
+        <h3 className="font-semibold mb-2 text-sm text-[rgb(var(--text-primary))]">
           No active academic year for this school
         </h3>
-        <p
-          className="max-w-md mx-auto"
-          style={{ fontSize: 12, color: 'rgb(var(--text-tertiary))' }}
-        >
+        <p className="max-w-md mx-auto text-xs text-[rgb(var(--text-tertiary))]">
           Set up and activate an academic year in School Settings to begin enrolling students and viewing enrollment data.
         </p>
       </div>
@@ -47,10 +34,7 @@ export function EnrollmentDashboard({ isLoading, activeYear }: EnrollmentDashboa
     return (
       <div className="space-y-4">
         {activeYear && (
-          <div
-            className="h-14 rounded-[10px] animate-pulse"
-            style={{ background: 'rgba(255, 255, 255, 0.04)' }}
-          />
+          <div className="h-14 rounded-[10px] animate-pulse bg-[rgb(var(--background-tertiary))]" />
         )}
       </div>
     )

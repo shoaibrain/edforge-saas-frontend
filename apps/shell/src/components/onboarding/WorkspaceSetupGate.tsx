@@ -77,55 +77,16 @@ export function WorkspaceSetupGate({ onComplete }: WorkspaceSetupGateProps) {
   const settings = workspaceSettings
 
   return (
-    <div
-      style={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '2rem',
-      }}
-    >
-      <div
-        style={{
-          maxWidth: 520,
-          width: '100%',
-          background: 'var(--background-primary, #ffffff)',
-          borderRadius: 12,
-          border: '1px solid var(--border-primary, #e4e7f0)',
-          padding: '2rem',
-          boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
-        }}
-      >
-        <h2
-          style={{
-            margin: '0 0 0.25rem',
-            fontSize: '1.5rem',
-            fontWeight: 600,
-            color: 'var(--text-primary, #1e2436)',
-          }}
-        >
+    <div className="w-full h-full flex items-center justify-center p-8">
+      <div className="max-w-lg w-full p-8 rounded-xl border bg-[rgb(var(--background-primary))] border-[rgb(var(--border-primary))] shadow-[0_4px_24px_rgba(0,0,0,0.08)]">
+        <h2 className="m-0 mb-1 text-2xl font-semibold text-[rgb(var(--text-primary))]">
           Welcome{tenantName ? `, ${tenantName}` : ''}
         </h2>
-        <p
-          style={{
-            margin: '0 0 1.5rem',
-            color: 'var(--text-secondary, #7a8099)',
-            fontSize: '0.875rem',
-          }}
-        >
+        <p className="mt-0 mb-6 text-sm text-[rgb(var(--text-secondary))]">
           Before you start, confirm your workspace settings.
         </p>
 
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '0.75rem',
-            marginBottom: '1.5rem',
-          }}
-        >
+        <div className="flex flex-col gap-3 mb-6">
           <SettingRow label="Currency" value={settings?.defaultCurrency ?? '—'} />
           <SettingRow
             label="Calendar System"
@@ -138,48 +99,21 @@ export function WorkspaceSetupGate({ onComplete }: WorkspaceSetupGateProps) {
           />
         </div>
 
-        <p
-          style={{
-            margin: '0 0 1.5rem',
-            color: 'var(--text-secondary, #7a8099)',
-            fontSize: '0.75rem',
-          }}
-        >
+        <p className="mt-0 mb-6 text-xs text-[rgb(var(--text-secondary))]">
           These settings apply to your entire organization.
         </p>
 
         <button
           onClick={handleConfirm}
           disabled={isConfirming}
-          style={{
-            width: '100%',
-            padding: '0.75rem 1rem',
-            fontSize: '0.9375rem',
-            fontWeight: 600,
-            color: '#ffffff',
-            background: 'var(--accent-primary, #1D9E75)',
-            border: 'none',
-            borderRadius: 8,
-            cursor: isConfirming ? 'not-allowed' : 'pointer',
-            opacity: isConfirming ? 0.7 : 1,
-            marginBottom: '0.75rem',
-          }}
+          className="w-full px-4 py-3 mb-3 text-sm font-semibold rounded-lg border-none cursor-pointer bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] disabled:opacity-70 disabled:cursor-not-allowed"
         >
           {isConfirming ? 'Confirming...' : 'Confirm & Start Using EdForge'}
         </button>
 
         <button
           onClick={handleEditSettings}
-          style={{
-            width: '100%',
-            padding: '0.5rem 1rem',
-            fontSize: '0.8125rem',
-            color: 'var(--text-secondary, #7a8099)',
-            background: 'transparent',
-            border: 'none',
-            cursor: 'pointer',
-            textDecoration: 'underline',
-          }}
+          className="w-full px-4 py-2 text-xs underline bg-transparent border-none cursor-pointer text-[rgb(var(--text-secondary))]"
         >
           These look wrong — edit settings
         </button>
@@ -190,20 +124,11 @@ export function WorkspaceSetupGate({ onComplete }: WorkspaceSetupGateProps) {
 
 function SettingRow({ label, value }: { label: string; value: string }) {
   return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '0.5rem 0.75rem',
-        background: 'var(--background-secondary, #f8f9fc)',
-        borderRadius: 6,
-      }}
-    >
-      <span style={{ color: 'var(--text-secondary, #7a8099)', fontSize: '0.8125rem' }}>
+    <div className="flex justify-between items-center px-3 py-2 rounded-md bg-[rgb(var(--background-secondary))]">
+      <span className="text-xs text-[rgb(var(--text-secondary))]">
         {label}
       </span>
-      <span style={{ color: 'var(--text-primary, #1e2436)', fontSize: '0.875rem', fontWeight: 500 }}>
+      <span className="text-sm font-medium text-[rgb(var(--text-primary))]">
         {value}
       </span>
     </div>

@@ -338,6 +338,7 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
               {categories.map((cat, i) => (
                 <div
                   key={cat.categoryId}
+                  // allow-presentation-style: data-driven weight bar width + per-category hue
                   className="h-full transition-all"
                   style={{
                     width: `${cat.weight}%`,

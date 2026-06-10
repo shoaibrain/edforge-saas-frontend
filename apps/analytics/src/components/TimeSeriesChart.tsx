@@ -119,7 +119,11 @@ function ChartTooltip({
       <ul className="mt-1.5 space-y-0.5">
         {payload.map((p) => (
           <li key={p.name} className="flex items-center gap-2">
-            <span className="inline-block w-2 h-2 rounded-full" style={{ background: p.color }} />
+            <span
+              // allow-presentation-style: legend swatch matches the chart series color
+              className="inline-block w-2 h-2 rounded-full"
+              style={{ background: p.color }}
+            />
             <span className="text-[rgb(var(--text-primary))] font-mono">{p.value}</span>
             <span className="text-[rgb(var(--text-tertiary))] truncate">{p.name}</span>
           </li>
@@ -189,7 +193,11 @@ function MetricPicker({
             }`}
             style={isOn ? undefined : { color }}
           >
-            <span className="inline-block w-1.5 h-1.5 rounded-full mr-1.5 align-middle" style={{ background: color }} />
+            <span
+              // allow-presentation-style: metric toggle swatch matches the chart series color
+              className="inline-block w-1.5 h-1.5 rounded-full mr-1.5 align-middle"
+              style={{ background: color }}
+            />
             {m}
           </button>
         )

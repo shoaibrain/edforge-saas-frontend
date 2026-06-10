@@ -78,6 +78,7 @@ function TokenSwatch({
   return (
     <div className="rounded-xl border border-border-subtle bg-background-secondary p-3">
       <div
+        // allow-presentation-style: token-gallery swatch renders the token's own raw rgb value
         className="mb-3 h-12 rounded-lg border border-border-subtle"
         style={{
           background: kind === 'background' ? `rgb(${value})` : 'rgb(var(--background-primary))',
@@ -138,6 +139,7 @@ export default function DesignSystemDevPage() {
               {stateTokens.map(([label, bg, fg, border]) => (
                 <div
                   key={label}
+                  // allow-presentation-style: state-token gallery renders each token's raw rgb triplet
                   className="rounded-xl border p-3"
                   style={{
                     background: `rgb(${bg})`,

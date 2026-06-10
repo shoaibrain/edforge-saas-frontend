@@ -92,6 +92,7 @@ function AnimatedNavIcon({
         'relative flex items-center justify-center flex-shrink-0 transition-colors duration-150',
         collapsed ? 'w-12 h-12 rounded-xl' : 'w-9 h-9 rounded-[10px]',
       )}
+      // allow-presentation-style: active nav-icon container tint is accent-driven
       style={{ background: containerBg }}
     >
       <IconEl
@@ -100,6 +101,7 @@ function AnimatedNavIcon({
           'transition-colors duration-200 relative z-10',
           isActive && isDanger && 'text-rust-500',
         )}
+        // allow-presentation-style: active nav-icon color is accent-driven
         style={iconColor ? { color: iconColor } : undefined}
         strokeWidth={1.75}
       />
@@ -150,6 +152,7 @@ function NavItemLink({
         {isActive && !isDanger && !collapsed && (
           <motion.div
             layoutId="sidebar-nav-pill"
+            // allow-presentation-style: active nav pill bg is the accent-keyed shell var
             className="absolute inset-0 rounded-3xl"
             style={{ background: pillBgVar }}
             transition={{ type: 'spring', stiffness: 400, damping: 30 }}
@@ -157,11 +160,11 @@ function NavItemLink({
         )}
         {/* Danger active bg — expanded only */}
         {isActive && isDanger && !collapsed && (
-          <div className="absolute inset-0 rounded-3xl" style={{ background: 'rgba(226,75,74,0.10)' }} />
+          <div className="absolute inset-0 rounded-3xl bg-[rgb(var(--accent-finance)/0.1)]" />
         )}
         {/* Hover bg — expanded only (collapsed hover handled by icon container) */}
         {!isActive && isHovered && !collapsed && (
-          <div className="absolute inset-0 rounded-3xl transition-colors duration-150" style={{ background: 'var(--shell-ni-hover)' }} />
+          <div className="absolute inset-0 rounded-3xl transition-colors duration-150 bg-[var(--shell-ni-hover)]" />
         )}
 
         {/* Icon with container */}
@@ -188,6 +191,7 @@ function NavItemLink({
                 !isActive && !isDanger && 'font-normal',
                 !isActive && isDanger && 'text-rust-500/80 font-normal',
               )}
+              // allow-presentation-style: active nav label color is the accent-keyed shell var
               style={{
                 color: isActive && !isDanger
                   ? pillTextVar
@@ -270,12 +274,7 @@ function NavGroup({
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="px-5 pt-4 pb-1.5"
-          style={{
-            fontSize: '10.5px',
-            fontWeight: 500,
-            color: 'var(--shell-sec-lbl)',
-          }}
+          className="px-5 pt-4 pb-1.5 text-3xs font-medium text-[var(--shell-sec-lbl)]"
         >
           {tNav(`group.${group.id}`, { defaultValue: group.label })}
         </motion.p>
@@ -350,6 +349,7 @@ function HomeNavButton({
         {isActive && !collapsed && (
           <motion.div
             layoutId="sidebar-nav-pill"
+            // allow-presentation-style: active nav pill bg is the accent-keyed shell var
             className="absolute inset-0 rounded-3xl"
             style={{ background: pillBgVar }}
             transition={{ type: 'spring', stiffness: 400, damping: 30 }}
@@ -357,7 +357,7 @@ function HomeNavButton({
         )}
         {/* Hover bg — expanded only */}
         {!isActive && isHovered && !collapsed && (
-          <div className="absolute inset-0 rounded-3xl transition-colors duration-150" style={{ background: 'var(--shell-ni-hover)' }} />
+          <div className="absolute inset-0 rounded-3xl transition-colors duration-150 bg-[var(--shell-ni-hover)]" />
         )}
 
         {/* Icon with container */}
@@ -377,6 +377,7 @@ function HomeNavButton({
               animate={{ opacity: 1, width: 'auto' }}
               exit={{ opacity: 0, width: 0 }}
               transition={{ duration: 0.15 }}
+              // allow-presentation-style: active nav label color is the accent-keyed shell var
               className="text-sm whitespace-nowrap overflow-hidden relative z-10"
               style={{
                 color: isActive
@@ -434,12 +435,11 @@ export function Sidebar() {
 
   return (
     <aside
-      className="fixed left-0 top-0 bottom-0 z-40 flex flex-col overflow-hidden"
+      className="fixed left-0 top-0 bottom-0 z-40 flex flex-col overflow-hidden bg-[var(--shell-page-bg)]"
       style={{
         width: collapsed
           ? 'var(--shell-sidebar-w-collapsed)'
           : 'var(--shell-sidebar-w)',
-        background: 'var(--shell-page-bg)',
         transition: 'width var(--shell-transition), background 0.3s',
       }}
       aria-label="Main navigation"
@@ -463,7 +463,7 @@ export function Sidebar() {
           {/* Home / Back button */}
           <div className="mb-1">
             <HomeNavButton collapsed={collapsed} isSubModule={isSubModule} accentKey={accentKey} />
-            <div className="mt-1" style={{ borderBottom: '1px solid var(--shell-divider)', margin: '0 12px' }} />
+            <div className="mt-1 mx-3 border-b border-[var(--shell-divider)]" />
           </div>
 
           {/* Module navigation groups */}

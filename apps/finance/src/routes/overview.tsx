@@ -76,10 +76,7 @@ function InsightStrip({
 }) {
   if (isLoading) {
     return (
-      <div
-        className="h-5 rounded-lg v2-skeleton-pulse"
-        style={{ background: 'rgb(var(--background-tertiary))', width: '60%' }}
-      />
+      <div className="h-5 w-3/5 rounded-lg v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
     )
   }
 
@@ -96,7 +93,7 @@ function InsightStrip({
   }
 
   return (
-    <p className="text-xs leading-relaxed" style={{ color: 'rgb(var(--text-tertiary))' }}>
+    <p className="text-xs leading-relaxed text-[rgb(var(--text-tertiary))]">
       {parts.join(' · ')}
     </p>
   )
@@ -109,18 +106,15 @@ function InsightStrip({
 function EmptyRecentSection({ title, message }: { title: string; message: string }) {
   return (
     <div
-      className="rounded-xl border flex flex-col items-center justify-center py-8"
-      style={{
-        background: 'rgb(var(--background-secondary))',
-        borderColor: 'rgb(var(--border-primary) / 0.35)',
-        padding: 18,
-      }}
+      // allow-presentation-style: card padding (18px) is off the 4px scale
+      className="rounded-xl border flex flex-col items-center justify-center py-8 bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]"
+      style={{ padding: 18 }}
     >
-      <Inbox className="w-7 h-7 mb-2" style={{ color: 'rgb(var(--text-tertiary))', opacity: 0.35 }} />
-      <h3 className="text-xs font-medium mb-0.5" style={{ color: 'rgb(var(--text-tertiary))' }}>
+      <Inbox className="w-7 h-7 mb-2 opacity-35 text-[rgb(var(--text-tertiary))]" />
+      <h3 className="text-xs font-medium mb-0.5 text-[rgb(var(--text-tertiary))]">
         {title}
       </h3>
-      <p className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>
+      <p className="text-xs text-[rgb(var(--text-disabled))]">
         {message}
       </p>
     </div>
@@ -139,9 +133,9 @@ export function Overview() {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
-          <DollarSign className="w-12 h-12 mx-auto mb-4 opacity-30" style={{ color: 'rgb(var(--text-tertiary))' }} />
-          <h2 className="text-lg font-semibold" style={{ color: 'rgb(var(--text-primary))' }}>Select a School</h2>
-          <p className="text-sm mt-1" style={{ color: 'rgb(var(--text-tertiary))' }}>
+          <DollarSign className="w-12 h-12 mx-auto mb-4 opacity-30 text-[rgb(var(--text-tertiary))]" />
+          <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">Select a School</h2>
+          <p className="text-sm mt-1 text-[rgb(var(--text-tertiary))]">
             Choose a school from the top navigation to view financial data.
           </p>
         </div>
@@ -189,17 +183,14 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
       <div className="space-y-1">
         <div className="flex items-center justify-between" style={{ height: 44 }}>
           <div className="flex items-center gap-2.5">
-            <div
-              className="w-7 h-7 rounded-[7px] flex items-center justify-center"
-              style={{ background: 'rgba(29, 158, 117, 0.12)' }}
-            >
-              <DollarSign className="w-4 h-4" style={{ color: '#1D9E75' }} />
+            <div className="w-7 h-7 rounded-[7px] flex items-center justify-center bg-[rgb(var(--accent-enrollment)/0.12)]">
+              <DollarSign className="w-4 h-4 text-[#1D9E75]" />
             </div>
-            <h1 className="text-sm font-semibold" style={{ color: 'rgb(var(--text-primary))' }}>
+            <h1 className="text-sm font-semibold text-[rgb(var(--text-primary))]">
               Finance
             </h1>
-            <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>|</span>
-            <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>
+            <span className="text-xs text-[rgb(var(--text-disabled))]">|</span>
+            <span className="text-xs text-[rgb(var(--text-disabled))]">
               {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
             </span>
           </div>
@@ -208,12 +199,7 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
             <button
               onClick={() => navigate({ to: '/invoices/bulk-generate' })}
               aria-label="Bulk invoice generation"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40"
-              style={{
-                background: 'rgb(var(--background-tertiary))',
-                borderColor: 'rgb(var(--border-primary) / 0.35)',
-                color: 'rgb(var(--text-secondary))',
-              }}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40 bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
             >
               <FileStack className="w-3.5 h-3.5" />
               Bulk invoice
@@ -221,11 +207,7 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
             <button
               onClick={() => navigate({ to: '/payments/record' })}
               aria-label="Record a payment"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40"
-              style={{
-                background: '#1D9E75',
-                color: '#fff',
-              }}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
             >
               <CreditCard className="w-3.5 h-3.5" />
               Record payment

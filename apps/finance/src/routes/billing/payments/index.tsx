@@ -777,11 +777,7 @@ export default function PaymentsPage() {
           <button
             type="button"
             onClick={() => navigate({ to: '/payments/record' })}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90"
-            style={{
-              background: '#1D9E75',
-              color: '#fff',
-            }}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
           >
             Record Payment
           </button>

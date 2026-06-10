@@ -292,11 +292,7 @@ export default function FeeStructuresPage() {
           <button
             type="button"
             onClick={() => setShowForm(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90"
-            style={{
-              background: '#1D9E75',
-              color: '#fff',
-            }}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
           >
             <Plus className="w-3.5 h-3.5" />
             Add Fee Structure

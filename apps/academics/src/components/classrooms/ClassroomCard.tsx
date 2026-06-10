@@ -37,13 +37,7 @@ export function ClassroomCard({ section, subjectAreaOverride, onNavigate, onEdit
 
   return (
     <article
-      className="group relative rounded-xl border overflow-hidden hover:-translate-y-px transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#378ADD] focus-visible:ring-offset-2"
-      style={{
-        background: 'rgb(var(--background-secondary))',
-        borderColor: 'rgb(var(--border-primary) / 0.35)',
-      }}
-      onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgb(var(--border-primary) / 0.5)' }}
-      onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgb(var(--border-primary) / 0.35)' }}
+      className="group relative rounded-xl border overflow-hidden hover:-translate-y-px transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#378ADD] focus-visible:ring-offset-2 bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)] hover:border-[rgb(var(--border-primary)/0.5)]"
       aria-label={`${sectionName} — ${courseName || 'No course'}, ${teacherName}, ${section.currentEnrollment} of ${section.maxEnrollment} students`}
       role="link"
       tabIndex={0}
@@ -56,11 +50,8 @@ export function ClassroomCard({ section, subjectAreaOverride, onNavigate, onEdit
         <div className={`absolute inset-0 bg-gradient-to-t from-[rgb(var(--background-overlay)/0.20)] to-transparent`} />
         <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${color.gradient}`} />
         {/* Subject icon overlay */}
-        <div
-          className="absolute top-2 right-2 w-6 h-6 rounded-[6px] flex items-center justify-center"
-          style={{ background: 'rgba(255,255,255,0.12)' }}
-        >
-          <SubjectIcon className="w-3.5 h-3.5" style={{ color: 'rgba(255,255,255,0.65)' }} />
+        <div className="absolute top-2 right-2 w-6 h-6 rounded-[6px] flex items-center justify-center bg-[rgb(255_255_255/0.12)]">
+          <SubjectIcon className="w-3.5 h-3.5 text-[rgb(255_255_255/0.65)]" />
         </div>
       </div>
 
@@ -69,9 +60,9 @@ export function ClassroomCard({ section, subjectAreaOverride, onNavigate, onEdit
         {/* Title + actions row */}
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0 overflow-hidden">
-            <h3 className="text-sm font-medium truncate" style={{ color: 'rgb(var(--text-primary))' }} title={sectionName}>{sectionName}</h3>
+            <h3 className="text-sm font-medium truncate text-[rgb(var(--text-primary))]" title={sectionName}>{sectionName}</h3>
             {courseName && (
-              <p className="text-xs truncate mt-0.5" style={{ color: 'rgb(var(--text-tertiary))' }} title={courseName}>{courseName}</p>
+              <p className="text-xs truncate mt-0.5 text-[rgb(var(--text-tertiary))]" title={courseName}>{courseName}</p>
             )}
           </div>
 
@@ -121,33 +112,27 @@ export function ClassroomCard({ section, subjectAreaOverride, onNavigate, onEdit
         </div>
 
         {/* Teacher */}
-        <p className="text-xs truncate" style={{ color: 'rgb(var(--text-tertiary))' }} title={teacherName}>{teacherName}</p>
+        <p className="text-xs truncate text-[rgb(var(--text-tertiary))]" title={teacherName}>{teacherName}</p>
 
         {/* Enrollment progress bar */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
-            <span className="text-xs" style={{ color: 'rgb(var(--text-tertiary))' }}>
+            <span className="text-xs text-[rgb(var(--text-tertiary))]">
               {section.currentEnrollment}/{section.maxEnrollment} students
             </span>
             {/* Status dot + text */}
             <div className="flex items-center gap-1.5 text-xs">
-              <div
-                className="w-1.5 h-1.5 rounded-full"
-                style={{ background: section.isActive ? '#1D9E75' : 'rgb(var(--text-disabled))' }}
-              />
-              <span style={{ color: section.isActive ? '#1D9E75' : 'rgb(var(--text-tertiary))' }}>
+              <div className={`w-1.5 h-1.5 rounded-full ${section.isActive ? 'bg-[#1D9E75]' : 'bg-[rgb(var(--text-disabled))]'}`} />
+              <span className={section.isActive ? 'text-[#1D9E75]' : 'text-[rgb(var(--text-tertiary))]'}>
                 {section.isActive ? 'Active' : 'Inactive'}
               </span>
             </div>
           </div>
-          <div className="h-1 rounded-sm overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+          <div className="h-1 rounded-sm overflow-hidden bg-[rgb(var(--background-tertiary))]">
             <div
-              className="h-full rounded-sm"
-              style={{
-                width: `${percent}%`,
-                background: capacityColor,
-                transition: 'width 600ms ease-out',
-              }}
+              // allow-presentation-style: data-driven capacity bar width + color
+              className="h-full rounded-sm transition-[width] duration-[600ms] ease-out"
+              style={{ width: `${percent}%`, background: capacityColor }}
             />
           </div>
         </div>

@@ -24,17 +24,12 @@ export function FinanceFilterChips({
             key={option.value}
             type="button"
             onClick={() => onChange(option.value)}
-            className="transition-colors"
+            // allow-presentation-style: active chip tint/border/text derive from the per-filter accentColor prop
+            className="transition-colors text-2xs font-medium px-3 py-1 rounded-md border cursor-pointer"
             style={{
-              fontSize: '11px',
-              fontWeight: 500,
-              padding: '4px 12px',
-              borderRadius: 6,
-              border: '1px solid',
               background: isActive ? `${accentColor}18` : 'transparent',
               borderColor: isActive ? `${accentColor}30` : 'rgb(var(--border-primary) / 0.35)',
               color: isActive ? accentColor : 'rgb(var(--text-secondary))',
-              cursor: 'pointer',
             }}
           >
             {option.label}

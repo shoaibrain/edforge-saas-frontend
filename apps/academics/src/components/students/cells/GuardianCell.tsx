@@ -54,8 +54,16 @@ function GuardianBadges({ guardian }: { guardian: GuardianDto }) {
 
 function Badge({ color, label }: { color: string; label: string }) {
   return (
-    <span className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wide" style={{ color }}>
-      <span className="w-1.5 h-1.5 rounded-full" style={{ background: color }} />
+    <span
+      // allow-presentation-style: badge color is a per-badge prop
+      className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wide"
+      style={{ color }}
+    >
+      <span
+        // allow-presentation-style: badge dot matches the color prop
+        className="w-1.5 h-1.5 rounded-full"
+        style={{ background: color }}
+      />
       {label}
     </span>
   )
@@ -88,6 +96,7 @@ export function GuardianCell({ guardians }: { guardians?: GuardianDto[] }) {
           {visible.map((g, i) => (
             <span
               key={guardianSeed(g)}
+              // allow-presentation-style: primary guardian gets a green avatar ring (dynamic boxShadow)
               className="rounded-full"
               style={{
                 zIndex: visible.length - i,
@@ -99,8 +108,8 @@ export function GuardianCell({ guardians }: { guardians?: GuardianDto[] }) {
           ))}
           {extra > 0 && (
             <span
-              className="inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-semibold flex-shrink-0"
-              style={{ background: 'rgba(0,95,115,0.14)', color: 'rgb(var(--text-secondary))', boxShadow: '0 0 0 2px rgb(var(--background-secondary))', zIndex: 0 }}
+              className="inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-semibold flex-shrink-0 bg-[rgb(var(--state-info-fg)/0.14)] text-[rgb(var(--text-secondary))] shadow-[0_0_0_2px_rgb(var(--background-secondary))]"
+              style={{ zIndex: 0 }}
             >
               +{extra}
             </span>
@@ -127,16 +136,15 @@ export function GuardianCell({ guardians }: { guardians?: GuardianDto[] }) {
           <div
             role="dialog"
             aria-label="Guardians"
-            className="absolute left-0 z-20 mt-1 w-64 rounded-lg border overflow-hidden shadow-lg"
-            style={{ background: 'rgb(var(--background-secondary))', borderColor: 'rgb(var(--border-primary)/0.5)' }}
+            className="absolute left-0 z-20 mt-1 w-64 rounded-lg border overflow-hidden shadow-lg bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.5)]"
             onKeyDown={(e) => { if (e.key === 'Escape') setOpen(false) }}
           >
-            <div className="px-3 py-2 text-xs font-bold uppercase tracking-wider border-b text-[rgb(var(--text-tertiary))]" style={{ borderColor: 'rgb(var(--border-primary)/0.3)' }}>
+            <div className="px-3 py-2 text-xs font-bold uppercase tracking-wider border-b text-[rgb(var(--text-tertiary))] border-[rgb(var(--border-primary)/0.3)]">
               {sorted.length} Guardian{sorted.length === 1 ? '' : 's'}
             </div>
             <ul>
               {sorted.map((g) => (
-                <li key={guardianSeed(g)} className="flex items-center gap-2.5 px-3 py-2 border-b last:border-b-0" style={{ borderColor: 'rgb(var(--border-secondary)/0.4)' }}>
+                <li key={guardianSeed(g)} className="flex items-center gap-2.5 px-3 py-2 border-b last:border-b-0 border-[rgb(var(--border-secondary)/0.4)]">
                   <UserAvatar userId={g.guardianId ?? ''} userName={`${g.firstName} ${g.lastName}`} role="staff" size="sm" seed={guardianSeed(g)} />
                   <div className="min-w-0">
                     <div className="text-xs font-medium truncate text-[rgb(var(--text-primary))]">{g.firstName} {g.lastName}</div>

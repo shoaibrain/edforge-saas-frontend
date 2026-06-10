@@ -453,6 +453,7 @@ function CourseGradeCard({
                   <div
                     key={cat.categoryId || i}
                     title={`${cat.categoryName}: ${catPct.toFixed(0)}% (${cat.weight}% weight)`}
+                    // allow-presentation-style: data-driven category bar width + grade-band color
                     className="h-full transition-all"
                     style={{
                       width: `${pct}%`,

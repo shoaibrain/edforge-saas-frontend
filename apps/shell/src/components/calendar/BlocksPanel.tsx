@@ -279,6 +279,7 @@ export function BlocksPanel({
                         {block.blockName}
                       </h4>
                       <span
+                        // allow-presentation-style: block-type chip colors are data-driven (meta.*)
                         className="flex-shrink-0 text-xs font-medium px-1.5 py-0.5 rounded border"
                         style={{
                           background: meta.bgChip,

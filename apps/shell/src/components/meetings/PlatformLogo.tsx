@@ -28,6 +28,7 @@ export function PlatformLogo({ platformId, size = 24, className = '' }: Platform
 
   return (
     <Icon
+      // allow-presentation-style: icon tint is the third-party platform's brand color
       style={{ color, width: size, height: size }}
       className={className}
     />

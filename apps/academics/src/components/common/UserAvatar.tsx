@@ -59,6 +59,7 @@ export function UserAvatar({ userId, userName, role = 'student', size = 'md', cl
   if (imgError || !avatarUrl) {
     return (
       <div
+        // allow-presentation-style: avatar font-size scales with the px size prop
         className={`inline-flex items-center justify-center rounded-full text-[rgb(var(--action-primary-fg))] font-medium flex-shrink-0 ${bgColor} ${className}`}
         style={{ width: px, height: px, fontSize: px * 0.4 }}
         aria-label={userName}

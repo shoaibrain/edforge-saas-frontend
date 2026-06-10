@@ -46,21 +46,17 @@ export function FeeStructureList({
         cell: ({ row }) => {
           const fee = row.original
           return (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span style={{
-                  width: 6, height: 6, borderRadius: '50%',
-                  background: fee.isActive !== false ? '#1D9E75' : 'rgb(var(--text-disabled))',
-                  flexShrink: 0, display: 'inline-block'
-                }} />
-                <span style={{ fontSize: '12px', fontWeight: 500, color: 'rgb(var(--text-primary))' }}>
+            <div className="flex flex-col gap-0.5">
+              <div className="flex items-center gap-1.5">
+                <span className={`w-1.5 h-1.5 rounded-full shrink-0 inline-block ${fee.isActive !== false ? 'bg-[#1D9E75]' : 'bg-[rgb(var(--text-disabled))]'}`} />
+                <span className="text-xs font-medium text-[rgb(var(--text-primary))]">
                   {fee.name}
                 </span>
               </div>
-              <span style={{ fontSize: '10px', color: 'rgb(var(--text-tertiary))' }}>
+              <span className="text-3xs text-[rgb(var(--text-tertiary))]">
                 {fee.description}
                 {fee.autoApplyOnEnrollment && (
-                  <> · <span style={{ color: '#1D9E75' }}>Auto-apply on enrollment</span></>
+                  <> · <span className="text-[#1D9E75]">Auto-apply on enrollment</span></>
                 )}
               </span>
             </div>
@@ -81,11 +77,11 @@ export function FeeStructureList({
         cell: ({ row }) => {
           const fee = row.original
           return (
-            <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', gap: 3 }}>
-              <span style={{ fontSize: '13px', fontWeight: 600, color: 'rgb(var(--text-primary))' }}>
+            <div className="text-right flex flex-col gap-0.5">
+              <span className="text-sm font-semibold text-[rgb(var(--text-primary))]">
                 {formatCompact(fee.amount)}
               </span>
-              <span style={{ fontSize: '9px', color: 'rgb(var(--text-disabled))' }}>
+              <span className="text-4xs text-[rgb(var(--text-disabled))]">
                 {settings.currency} · {fee.frequency?.replace(/_/g, ' ').toLowerCase() ?? ''}
               </span>
             </div>
@@ -109,27 +105,15 @@ export function FeeStructureList({
           const gradeLevels = row.original.gradeLevels ?? []
           if (gradeLevels.length === 0) {
             return (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                <span style={{
-                  background: 'rgba(29,158,117,0.08)',
-                  color: '#1D9E75',
-                  border: '1px solid rgba(29,158,117,0.15)',
-                  fontSize: '10px', fontWeight: 500,
-                  padding: '1px 6px', borderRadius: 5
-                }}>All Grades</span>
+              <div className="flex flex-wrap gap-1">
+                <span className="text-3xs font-medium py-px px-1.5 rounded-[5px] border bg-[rgb(var(--accent-enrollment)/0.08)] text-[#1D9E75] border-[rgb(var(--accent-enrollment)/0.15)]">All Grades</span>
               </div>
             )
           }
           return (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+            <div className="flex flex-wrap gap-1">
               {[...gradeLevels].sort(gradeSort).map((g) => (
-                <span key={g} style={{
-                  background: 'rgba(55,138,221,0.08)',
-                  color: '#378ADD',
-                  border: '1px solid rgba(55,138,221,0.15)',
-                  fontSize: '10px', fontWeight: 500,
-                  padding: '1px 6px', borderRadius: 5
-                }}>{formatGradeLabel(g)}</span>
+                <span key={g} className="text-3xs font-medium py-px px-1.5 rounded-[5px] border bg-[rgb(var(--accent-academics)/0.08)] text-[rgb(var(--accent-academics))] border-[rgb(var(--accent-academics)/0.15)]">{formatGradeLabel(g)}</span>
               ))}
             </div>
           )

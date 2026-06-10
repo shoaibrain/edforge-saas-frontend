@@ -162,33 +162,17 @@ function GradeLevelChips({ grades }: { grades: string[] }) {
   const remaining = grades.length - 3
 
   return (
-    <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+    <div className="flex gap-0.5 flex-wrap">
       {display.map((g, i) => (
         <span
           key={i}
-          style={{
-            fontSize: 10,
-            fontWeight: 500,
-            color: 'var(--text-secondary, #7a8099)',
-            background: 'rgba(255,255,255,0.05)',
-            padding: '1px 5px',
-            borderRadius: 5,
-          }}
+          className="text-3xs font-medium py-px px-1.5 rounded-[5px] text-[rgb(var(--text-secondary))] bg-[rgb(var(--background-tertiary))]"
         >
           {g}
         </span>
       ))}
       {!showAll && remaining > 0 && (
-        <span
-          style={{
-            fontSize: 10,
-            fontWeight: 500,
-            color: 'var(--text-hint, #5a6070)',
-            background: 'rgba(255,255,255,0.03)',
-            padding: '1px 5px',
-            borderRadius: 5,
-          }}
-        >
+        <span className="text-3xs font-medium py-px px-1.5 rounded-[5px] text-[rgb(var(--text-disabled))] bg-[rgb(var(--background-tertiary)/0.5)]">
           +{remaining} more
         </span>
       )}
@@ -225,20 +209,7 @@ export function CourseTable({
         header: 'Code',
         size: 120,
         cell: ({ row }) => (
-          <span
-            style={{
-              fontFamily: 'var(--font-mono, monospace)',
-              fontSize: 10,
-              fontWeight: 500,
-              background: 'rgba(255,255,255,0.06)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              color: 'var(--text-secondary, #9aa0b8)',
-              padding: '3px 7px',
-              borderRadius: 5,
-              letterSpacing: 0.3,
-              whiteSpace: 'nowrap',
-            }}
-          >
+          <span className="font-mono text-3xs font-medium py-0.5 px-1.5 rounded-[5px] tracking-[0.3px] whitespace-nowrap bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]">
             {row.original.courseCode}
           </span>
         ),
@@ -298,13 +269,13 @@ export function CourseTable({
                 {row.original.credits}
               </span>
               {style === 'ap' && (
-                <sup style={{ color: 'var(--color-danger, #E24B4A)', fontSize: 9, fontWeight: 700, marginLeft: 3 }}>AP</sup>
+                <sup className="text-4xs font-bold ml-[3px] text-[rgb(var(--accent-finance))]">AP</sup>
               )}
               {style === 'dual' && (
-                <sup style={{ color: 'var(--color-info, #378ADD)', fontSize: 9, fontWeight: 700, marginLeft: 3 }}>DE</sup>
+                <sup className="text-4xs font-bold ml-[3px] text-[rgb(var(--accent-academics))]">DE</sup>
               )}
               {style === 'honors' && (
-                <sup style={{ color: 'var(--color-warning, #EF9F27)', fontSize: 9, fontWeight: 700, marginLeft: 3 }}>H</sup>
+                <sup className="text-4xs font-bold ml-[3px] text-[rgb(var(--accent-attendance))]">H</sup>
               )}
             </div>
           )

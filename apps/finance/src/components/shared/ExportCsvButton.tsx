@@ -15,17 +15,8 @@ export function ExportCsvButton({ onClick, isExporting }: ExportCsvButtonProps) 
       type="button"
       onClick={onClick}
       disabled={isExporting}
-      className="inline-flex items-center gap-1.5 transition-colors hover:opacity-80 disabled:opacity-50"
-      style={{
-        fontSize: '11px',
-        fontWeight: 500,
-        padding: '4px 10px',
-        borderRadius: 6,
-        border: '1px solid rgb(var(--border-primary) / 0.35)',
-        color: 'rgb(var(--text-secondary))',
-        background: 'transparent',
-        cursor: isExporting ? 'not-allowed' : 'pointer',
-      }}
+      className="inline-flex items-center gap-1.5 transition-colors hover:opacity-80 disabled:opacity-50 text-2xs font-medium px-2.5 py-1 rounded-md border border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))] bg-transparent"
+      style={{ cursor: isExporting ? 'not-allowed' : 'pointer' }}
     >
       {isExporting ? (
         <Loader2 className="w-3 h-3 animate-spin" />
