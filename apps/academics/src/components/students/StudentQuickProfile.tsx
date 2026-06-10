@@ -126,14 +126,13 @@ export function StudentQuickProfile({
           <div className="flex-1 min-w-0 pt-[1px]">
             <h2
               id="sqp-name"
-              className="text-sm font-semibold truncate"
-              style={{ color: 'rgb(var(--text-primary))', letterSpacing: '-0.2px', lineHeight: 1.25 }}
+              className="text-sm font-semibold truncate text-[rgb(var(--text-primary))] tracking-[-0.2px] leading-[1.25]"
             >
               {student.fullName}
             </h2>
             <div className="flex items-center gap-2 mt-[3px]">
               {student.studentNumber && (
-                <span className="font-mono text-xs" style={{ color: 'rgb(var(--text-tertiary))' }}>
+                <span className="font-mono text-xs text-[rgb(var(--text-tertiary))]">
                   #{student.studentNumber}
                 </span>
               )}
@@ -150,10 +149,10 @@ export function StudentQuickProfile({
           <button
             type="button"
             onClick={onClose}
-            className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md border border-[rgb(var(--border-primary) / 0.35)] bg-[rgb(var(--background-tertiary) / 0.6)] transition-colors hover:opacity-80 ${focusRingInset}`}
+            className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md border border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-tertiary)/0.6)] transition-colors hover:opacity-80 ${focusRingInset}`}
             aria-label="Close"
           >
-            <X className="w-3.5 h-3.5" style={{ color: 'rgb(var(--text-tertiary))' }} />
+            <X className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))]" />
           </button>
         </div>
       </QuickDrawer.Header>
@@ -190,35 +189,26 @@ export function StudentQuickProfile({
               accent="#7F77DD"
               muted
             />
-            <div
-              className="relative overflow-hidden flex flex-col items-center justify-center gap-0.5 py-2"
-              style={{ background: 'rgb(var(--background-tertiary) / 0.5)', border: '1px solid rgb(var(--border-primary) / 0.35)', borderRadius: 9 }}
-            >
+            <div className="relative overflow-hidden flex flex-col items-center justify-center gap-0.5 py-2 bg-[rgb(var(--background-tertiary)/0.5)] border border-[rgb(var(--border-primary)/0.35)] rounded-[9px]">
               {attendanceRate != null ? (
                 <AttendanceDonutRing rate={attendanceRate} size={36} strokeWidth={3} showLabel />
               ) : (
-                <div className="w-5 h-5 rounded-full" style={{ border: '2px solid rgb(var(--text-disabled))' }} />
+                <div className="w-5 h-5 rounded-full border-2 border-[rgb(var(--text-disabled))]" />
               )}
-              <div className="text-xs font-semibold uppercase tracking-[0.5px] mt-[2px]" style={{ color: 'rgb(var(--text-disabled))' }}>
+              <div className="text-xs font-semibold uppercase tracking-[0.5px] mt-[2px] text-[rgb(var(--text-disabled))]">
                 Attendance
               </div>
-              <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{ background: accent, opacity: 0.7 }} />
+              <div
+                // allow-presentation-style: accent underline reflects the attendance-rate severity color
+                className="absolute bottom-0 left-0 right-0 h-0.5 opacity-70"
+                style={{ background: accent }}
+              />
             </div>
           </div>
 
           {/* ── Enrollment card ── */}
-          <div
-            style={{
-              background: 'rgb(var(--background-tertiary) / 0.5)',
-              border: '1px solid rgb(var(--border-primary) / 0.35)',
-              borderRadius: 10,
-              padding: '12px 14px 14px',
-            }}
-          >
-            <div
-              className="text-xs font-bold uppercase tracking-[0.6px] mb-[10px] pb-[6px]"
-              style={{ color: 'rgb(var(--text-disabled))', borderBottom: '1px solid rgb(var(--border-primary) / 0.35)' }}
-            >
+          <div className="bg-[rgb(var(--background-tertiary)/0.5)] border border-[rgb(var(--border-primary)/0.35)] rounded-[10px] pt-3 px-3.5 pb-3.5">
+            <div className="text-xs font-bold uppercase tracking-[0.6px] mb-[10px] pb-[6px] text-[rgb(var(--text-disabled))] border-b border-[rgb(var(--border-primary)/0.35)]">
               Enrollment
             </div>
             <div className="grid grid-cols-2 gap-x-[14px] gap-y-[10px]">
@@ -230,12 +220,9 @@ export function StudentQuickProfile({
           </div>
 
           {/* ── Privacy note ── */}
-          <div
-            className="flex gap-2 px-3 py-2"
-            style={{ background: 'rgba(55,138,221,0.04)', border: '1px solid rgba(55,138,221,0.10)', borderRadius: 7 }}
-          >
-            <Lock className="flex-shrink-0 mt-[1px]" style={{ width: 11, height: 11, color: 'rgb(var(--state-info-fg))' }} />
-            <span className="text-xs leading-snug" style={{ color: 'rgb(var(--text-tertiary))' }}>
+          <div className="flex gap-2 px-3 py-2 bg-[rgb(var(--accent-academics)/0.04)] border border-[rgb(var(--accent-academics)/0.1)] rounded-[7px]">
+            <Lock className="flex-shrink-0 mt-[1px] text-[rgb(var(--state-info-fg))]" style={{ width: 11, height: 11 }} />
+            <span className="text-xs leading-snug text-[rgb(var(--text-tertiary))]">
               Demographics, contact info, and guardian details are on the full profile page.
             </span>
           </div>
@@ -274,21 +261,19 @@ function Tile({
   muted?: boolean
 }) {
   return (
-    <div
-      className="relative overflow-hidden flex flex-col items-center gap-1 py-2.5"
-      style={{ background: 'rgb(var(--background-tertiary) / 0.5)', border: '1px solid rgb(var(--border-primary) / 0.35)', borderRadius: 9 }}
-    >
+    <div className="relative overflow-hidden flex flex-col items-center gap-1 py-2.5 bg-[rgb(var(--background-tertiary)/0.5)] border border-[rgb(var(--border-primary)/0.35)] rounded-[9px]">
       {icon}
-      <div
-        className="text-lg font-semibold leading-none"
-        style={{ color: muted ? 'rgb(var(--text-tertiary))' : 'rgb(var(--text-primary))', letterSpacing: '-0.4px' }}
-      >
+      <div className={`text-lg font-semibold leading-none tracking-[-0.4px] ${muted ? 'text-[rgb(var(--text-tertiary))]' : 'text-[rgb(var(--text-primary))]'}`}>
         {value}
       </div>
-      <div className="text-xs font-semibold uppercase tracking-[0.5px]" style={{ color: 'rgb(var(--text-disabled))' }}>
+      <div className="text-xs font-semibold uppercase tracking-[0.5px] text-[rgb(var(--text-disabled))]">
         {label}
       </div>
-      <div className="absolute bottom-0 left-0 right-0 h-0.5" style={{ background: accent, opacity: muted ? 0.3 : 0.6 }} />
+      <div
+        // allow-presentation-style: per-tile accent underline color (prop)
+        className={`absolute bottom-0 left-0 right-0 h-0.5 ${muted ? 'opacity-30' : 'opacity-60'}`}
+        style={{ background: accent }}
+      />
     </div>
   )
 }
@@ -297,17 +282,14 @@ function Field({ label, value, sub }: { label: string; value: string; sub?: stri
   const empty = !value || value === '—'
   return (
     <div className="flex flex-col gap-0.5">
-      <div className="text-xs font-semibold uppercase tracking-[0.5px]" style={{ color: 'rgb(var(--text-disabled))' }}>
+      <div className="text-xs font-semibold uppercase tracking-[0.5px] text-[rgb(var(--text-disabled))]">
         {label}
       </div>
-      <div
-        className="text-xs font-medium leading-tight"
-        style={{ color: empty ? 'rgb(var(--text-tertiary))' : 'rgb(var(--text-secondary))' }}
-      >
+      <div className={`text-xs font-medium leading-tight ${empty ? 'text-[rgb(var(--text-tertiary))]' : 'text-[rgb(var(--text-secondary))]'}`}>
         {value}
       </div>
       {sub && (
-        <div className="text-xs" style={{ color: 'rgb(var(--text-tertiary))' }}>{sub}</div>
+        <div className="text-xs text-[rgb(var(--text-tertiary))]">{sub}</div>
       )}
     </div>
   )
