@@ -126,19 +126,13 @@ export function EnrollmentStep({
       <div className="space-y-4">
         {/* No active academic year blocking message */}
         {noActiveYear && (
-          <div
-            className="flex items-start gap-3 rounded-lg p-3"
-            style={{
-              background: 'rgb(var(--state-danger-bg))',
-              border: '1px solid rgb(var(--state-danger-border))',
-            }}
-          >
-            <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" style={{ color: 'rgb(var(--state-danger-fg))' }} />
+          <div className="flex items-start gap-3 rounded-lg p-3 bg-[rgb(var(--state-danger-bg))] border border-[rgb(var(--state-danger-border))]">
+            <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-[rgb(var(--state-danger-fg))]" />
             <div>
-              <p style={{ fontSize: 12, fontWeight: 500, color: 'rgb(var(--state-danger-fg))' }}>
+              <p className="text-xs font-medium text-[rgb(var(--state-danger-fg))]">
                 No active academic year available
               </p>
-              <p style={{ fontSize: 11, color: 'rgb(var(--text-secondary))', marginTop: 2 }}>
+              <p className="text-2xs text-[rgb(var(--text-secondary))] mt-0.5">
                 Please configure and activate an academic year in School Settings before enrolling students.
               </p>
             </div>
@@ -176,34 +170,20 @@ export function EnrollmentStep({
             <div>
               {yearsLoading ? (
                 <div className="space-y-1.5">
-                  <label className="block text-sm font-medium" style={{ color: 'rgb(var(--text-secondary))' }}>
+                  <label className="block text-sm font-medium text-[rgb(var(--text-secondary))]">
                     Academic Year *
                   </label>
-                  <div
-                    className="flex items-center gap-2 px-3 py-2.5 rounded-lg"
-                    style={{
-                      border: '1px solid rgb(var(--border-primary) / 0.35)',
-                      background: 'rgba(255, 255, 255, 0.04)',
-                    }}
-                  >
-                    <Loader2 className="w-4 h-4 animate-spin" style={{ color: 'rgb(var(--text-tertiary))' }} />
-                    <span style={{ fontSize: 12, color: 'rgb(var(--text-tertiary))' }}>Loading academic years...</span>
+                  <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg border border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-tertiary))]">
+                    <Loader2 className="w-4 h-4 animate-spin text-[rgb(var(--text-tertiary))]" />
+                    <span className="text-xs text-[rgb(var(--text-tertiary))]">Loading academic years...</span>
                   </div>
                 </div>
               ) : yearsError ? (
                 <div className="space-y-1.5">
-                  <label className="block text-sm font-medium" style={{ color: 'rgb(var(--state-danger-fg))' }}>
+                  <label className="block text-sm font-medium text-[rgb(var(--state-danger-fg))]">
                     Academic Year *
                   </label>
-                  <div
-                    className="px-3 py-2.5 rounded-lg"
-                    style={{
-                      border: '1px solid rgb(var(--state-danger-border))',
-                      background: 'rgb(var(--state-danger-bg))',
-                      fontSize: 12,
-                      color: 'rgb(var(--state-danger-fg))',
-                    }}
-                  >
+                  <div className="px-3 py-2.5 rounded-lg text-xs border border-[rgb(var(--state-danger-border))] bg-[rgb(var(--state-danger-bg))] text-[rgb(var(--state-danger-fg))]">
                     Failed to load academic years. Please refresh.
                   </div>
                 </div>
@@ -245,15 +225,9 @@ export function EnrollmentStep({
                 className="overflow-hidden mt-3"
               >
                 {selectedYear.status === 'active' ? (
-                  <div
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg"
-                    style={{
-                      background: 'rgb(var(--state-success-bg))',
-                      border: '1px solid rgb(var(--state-success-border))',
-                    }}
-                  >
-                    <CheckCircle2 className="w-4 h-4 shrink-0" style={{ color: '#1D9E75' }} />
-                    <span style={{ fontSize: 12, color: '#1D9E75' }}>
+                  <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[rgb(var(--state-success-bg))] border border-[rgb(var(--state-success-border))]">
+                    <CheckCircle2 className="w-4 h-4 shrink-0 text-[#1D9E75]" />
+                    <span className="text-xs text-[#1D9E75]">
                       Active academic year — enrollment will be immediately active
                     </span>
                   </div>
@@ -301,13 +275,7 @@ export function EnrollmentStep({
         >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4">
             <div className="space-y-1">
-              <div
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg"
-                style={{
-                  border: '1px solid rgb(var(--border-primary) / 0.35)',
-                  background: 'rgba(255, 255, 255, 0.04)',
-                }}
-              >
+              <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-tertiary))]">
                 <input
                   type="checkbox"
                   {...form.register('enrollment.primarySchool')}
@@ -316,13 +284,12 @@ export function EnrollmentStep({
                 />
                 <label
                   htmlFor="enrollment.primarySchool"
-                  className="text-sm select-none"
-                  style={{ color: 'rgb(var(--text-primary))' }}
+                  className="text-sm select-none text-[rgb(var(--text-primary))]"
                 >
                   Primary School
                 </label>
               </div>
-              <p style={{ fontSize: 10, color: 'rgb(var(--text-tertiary))', paddingLeft: 4 }}>
+              <p className="text-3xs text-[rgb(var(--text-tertiary))] pl-1">
                 Is this the student's primary school of enrollment?
               </p>
             </div>
@@ -335,13 +302,7 @@ export function EnrollmentStep({
             />
 
             <div className="space-y-1">
-              <div
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg"
-                style={{
-                  border: '1px solid rgb(var(--border-primary) / 0.35)',
-                  background: 'rgba(255, 255, 255, 0.04)',
-                }}
-              >
+              <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-tertiary))]">
                 <input
                   type="checkbox"
                   {...form.register('enrollment.repeatGradeIndicator')}
@@ -350,13 +311,12 @@ export function EnrollmentStep({
                 />
                 <label
                   htmlFor="enrollment.repeatGradeIndicator"
-                  className="text-sm select-none"
-                  style={{ color: 'rgb(var(--text-primary))' }}
+                  className="text-sm select-none text-[rgb(var(--text-primary))]"
                 >
                   Repeat Grade
                 </label>
               </div>
-              <p style={{ fontSize: 10, color: 'rgb(var(--text-tertiary))', paddingLeft: 4 }}>
+              <p className="text-3xs text-[rgb(var(--text-tertiary))] pl-1">
                 Check if the student is repeating the current grade level
               </p>
             </div>
@@ -427,15 +387,9 @@ export function EnrollmentStep({
         </CollapsibleSection>
 
         {/* Auto-populated Info */}
-        <div
-          className="flex items-start gap-3 rounded-lg p-3"
-          style={{
-            background: 'rgba(255, 255, 255, 0.02)',
-            border: '1px solid rgb(var(--border-primary) / 0.35)',
-          }}
-        >
-          <Info className="w-4 h-4 shrink-0 mt-0.5" style={{ color: 'rgb(var(--text-tertiary))' }} />
-          <p style={{ fontSize: 11, color: 'rgb(var(--text-tertiary))' }}>
+        <div className="flex items-start gap-3 rounded-lg p-3 bg-[rgb(var(--background-tertiary)/0.5)] border border-[rgb(var(--border-primary)/0.35)]">
+          <Info className="w-4 h-4 shrink-0 mt-0.5 text-[rgb(var(--text-tertiary))]" />
+          <p className="text-2xs text-[rgb(var(--text-tertiary))]">
             <span className="font-medium">Auto-populated:</span> School, grade level, and entry grade level descriptor are automatically set based on your school context and Step 1 selections.
           </p>
         </div>
