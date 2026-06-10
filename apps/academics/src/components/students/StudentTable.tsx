@@ -283,7 +283,7 @@ export function StudentTable({
       initialColumnVisibility={initialColumnVisibility}
       toolbarStart={toolbarStart}
       toolbarExtra={toolbarExtra}
-      pagination={{ pageSize: 20 }}
+      pagination={{ pageSize: 50 }}
       serverPagination={serverPagination}
       emptyState={{
         icon: <User className="w-12 h-12" />,

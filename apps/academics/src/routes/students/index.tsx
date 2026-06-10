@@ -482,6 +482,14 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
             {/* Action buttons */}
             {studentPerms.create && (
               <div className="flex items-center gap-2">
+                {/*
+                  TODO(students-csv-import): "Import CSV" is hidden from the view
+                  until the CSV importer populates the student IEMIS field that
+                  the PABSON archetype requires (currently missing from the
+                  importer's column mapping). Not a priority to fix — re-enable
+                  this button once the importer maps IEMIS. "Import IEMIS" and
+                  "Govt. Reports" below remain the supported import/export paths.
+
                 <button
                   onClick={() => setShowImport(true)}
                   aria-label="Import students"
@@ -495,6 +503,7 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
                   <Upload className="w-3.5 h-3.5" />
                   Import CSV
                 </button>
+                */}
                 {/*
                   Phase 3.1 — IEMIS button is always visible. The eligibility
                   gate (active school must have emisSchoolCode) is enforced
