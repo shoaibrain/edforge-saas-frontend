@@ -52,12 +52,12 @@ function FeedSkeleton() {
     <div className="space-y-3">
       {[1, 2, 3, 4, 5].map((i) => (
         <div key={i} className="flex items-center gap-3">
-          <div className="w-7 h-7 rounded-md v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
+          <div className="w-7 h-7 rounded-md v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
           <div className="flex-1 space-y-1">
-            <div className="h-3 w-24 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
-            <div className="h-2.5 w-16 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
+            <div className="h-3 w-24 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
+            <div className="h-2.5 w-16 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
           </div>
-          <div className="h-3 w-16 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
+          <div className="h-3 w-16 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
         </div>
       ))}
     </div>
@@ -71,21 +71,18 @@ export function RecentPaymentsCard({ payments, isLoading }: RecentPaymentsCardPr
 
   return (
     <div
-      className="rounded-xl border flex flex-col"
-      style={{
-        background: 'rgb(var(--background-secondary))',
-        borderColor: 'rgb(var(--border-primary) / 0.35)',
-        padding: 18,
-      }}
+      // allow-presentation-style: card padding (18px) is off the 4px scale
+      className="rounded-xl border flex flex-col bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]"
+      style={{ padding: 18 }}
     >
-      <h3 className="text-sm font-medium mb-3" style={{ color: 'rgb(var(--text-secondary))' }}>
+      <h3 className="text-sm font-medium mb-3 text-[rgb(var(--text-secondary))]">
         Recent payments
       </h3>
 
       {isLoading ? (
         <FeedSkeleton />
       ) : top5.length === 0 ? (
-        <p className="text-xs py-4" style={{ color: 'rgb(var(--text-tertiary))' }}>No payments yet.</p>
+        <p className="text-xs py-4 text-[rgb(var(--text-tertiary))]">No payments yet.</p>
       ) : (
         <div className="space-y-1">
           {top5.map((payment) => {
@@ -102,6 +99,7 @@ export function RecentPaymentsCard({ payments, isLoading }: RecentPaymentsCardPr
                   const Icon = GATEWAY_ICONS[payment.gateway]
                   return (
                     <div
+                      // allow-presentation-style: per-gateway icon tint + color
                       className="w-7 h-7 rounded-md flex items-center justify-center flex-shrink-0"
                       style={{ background: `${color}18`, color }}
                     >
@@ -116,19 +114,16 @@ export function RecentPaymentsCard({ payments, isLoading }: RecentPaymentsCardPr
 
                 {/* Details */}
                 <div className="flex-1 min-w-0">
-                  <div className="text-xs font-medium truncate" style={{ color: 'rgb(var(--text-secondary))' }}>
+                  <div className="text-xs font-medium truncate text-[rgb(var(--text-secondary))]">
                     <EntityIdDisplay entity="payment" data={payment} variant="inline" />
                   </div>
-                  <div className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>
+                  <div className="text-xs text-[rgb(var(--text-disabled))]">
                     {formatGatewayLabel(payment.gateway)} · {formatRelativeDate(dateStr)}
                   </div>
                 </div>
 
                 {/* Amount */}
-                <span
-                  className="text-xs font-semibold flex-shrink-0"
-                  style={{ color: '#1D9E75' }}
-                >
+                <span className="text-xs font-semibold flex-shrink-0 text-[#1D9E75]">
                   {format(payment.amount, { decimals: 0 })}
                 </span>
               </div>

@@ -79,10 +79,10 @@ function SectionSkeleton({ rows = 4 }: { rows?: number }) {
       {Array.from({ length: rows }).map((_, i) => (
         <div key={i} className="space-y-1">
           <div className="flex justify-between">
-            <div className="h-3 w-16 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
-            <div className="h-3 w-10 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
+            <div className="h-3 w-16 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
+            <div className="h-3 w-10 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
           </div>
-          <div className="h-1 rounded-sm v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
+          <div className="h-1 rounded-sm v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
         </div>
       ))}
     </div>
@@ -92,10 +92,10 @@ function SectionSkeleton({ rows = 4 }: { rows?: number }) {
 function SpectrumSkeleton() {
   return (
     <div className="space-y-2">
-      <div className="h-6 rounded-lg v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
+      <div className="h-6 rounded-lg v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
       <div className="flex gap-4 justify-between">
         {[1, 2, 3, 4, 5].map((i) => (
-          <div key={i} className="h-3 w-12 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
+          <div key={i} className="h-3 w-12 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
         ))}
       </div>
     </div>
@@ -108,16 +108,9 @@ function DonutTooltip({ active, payload }: any) {
   if (!active || !payload?.length) return null
   const d = payload[0]
   return (
-    <div
-      className="rounded-lg border px-3 py-2 text-xs shadow-lg"
-      style={{
-        background: 'rgb(var(--background-secondary))',
-        borderColor: 'rgb(var(--border-primary) / 0.35)',
-        color: 'rgb(var(--text-secondary))',
-      }}
-    >
+    <div className="rounded-lg border px-3 py-2 text-xs shadow-lg bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]">
       <div className="font-semibold">{d.name}</div>
-      <div style={{ color: 'rgb(var(--text-disabled))' }}>
+      <div className="text-[rgb(var(--text-disabled))]">
         {d.value} invoice{d.value !== 1 ? 's' : ''} · {d.payload.pct}%
       </div>
     </div>
@@ -202,23 +195,17 @@ export function BillingHealthCard({
 
   return (
     <div
-      className="rounded-xl border flex flex-col"
-      style={{
-        background: 'rgb(var(--background-secondary))',
-        borderColor: 'rgb(var(--border-primary) / 0.35)',
-        padding: 18,
-      }}
+      // allow-presentation-style: card padding (18px) is off the 4px scale
+      className="rounded-xl border flex flex-col bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]"
+      style={{ padding: 18 }}
     >
       {/* ── Header ── */}
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium" style={{ color: 'rgb(var(--text-secondary))' }}>
+        <h3 className="text-sm font-medium text-[rgb(var(--text-secondary))]">
           Billing health
         </h3>
         {!isLoading && !hasAnyOverdue && totalInvoiceCount > 0 && (
-          <span
-            className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full"
-            style={{ background: 'rgba(29,158,117,0.12)', color: '#1D9E75' }}
-          >
+          <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-[rgb(var(--state-success-bg))] text-[#1D9E75]">
             <CheckCircle2 className="w-3 h-3" />
             All accounts current
           </span>
@@ -230,11 +217,11 @@ export function BillingHealthCard({
         <SectionSkeleton />
       ) : totalInvoiceCount === 0 ? (
         <div className="flex flex-col items-center py-6">
-          <CheckCircle2 className="w-8 h-8 mb-2" style={{ color: 'rgb(var(--text-tertiary))', opacity: 0.4 }} />
-          <p className="text-xs font-medium" style={{ color: 'rgb(var(--text-tertiary))' }}>
+          <CheckCircle2 className="w-8 h-8 mb-2 opacity-40 text-[rgb(var(--text-tertiary))]" />
+          <p className="text-xs font-medium text-[rgb(var(--text-tertiary))]">
             No invoices yet
           </p>
-          <p className="text-xs mt-0.5" style={{ color: 'rgb(var(--text-disabled))' }}>
+          <p className="text-xs mt-0.5 text-[rgb(var(--text-disabled))]">
             Create your first invoice to see billing health data.
           </p>
         </div>
@@ -265,10 +252,10 @@ export function BillingHealthCard({
                 </PieChart>
               </ResponsiveContainer>
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                <span className="text-sm font-semibold leading-none" style={{ color: 'rgb(var(--text-primary))' }}>
+                <span className="text-sm font-semibold leading-none text-[rgb(var(--text-primary))]">
                   {totalInvoiceCount}
                 </span>
-                <span className="text-xs mt-0.5" style={{ color: 'rgb(var(--text-disabled))' }}>
+                <span className="text-xs mt-0.5 text-[rgb(var(--text-disabled))]">
                   invoices
                 </span>
               </div>
@@ -279,16 +266,20 @@ export function BillingHealthCard({
               {donutData.map((item) => (
                 <div key={item.name} className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
-                    <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: item.color }} />
-                    <span className="text-xs" style={{ color: 'rgb(var(--text-secondary))' }}>
+                    <div
+                      // allow-presentation-style: per-status legend dot color
+                      className="w-2 h-2 rounded-full flex-shrink-0"
+                      style={{ background: item.color }}
+                    />
+                    <span className="text-xs text-[rgb(var(--text-secondary))]">
                       {item.name}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs tabular-nums" style={{ color: 'rgb(var(--text-disabled))' }}>
+                    <span className="text-xs tabular-nums text-[rgb(var(--text-disabled))]">
                       {item.pct}%
                     </span>
-                    <span className="text-xs font-medium tabular-nums" style={{ color: 'rgb(var(--text-secondary))' }}>
+                    <span className="text-xs font-medium tabular-nums text-[rgb(var(--text-secondary))]">
                       {item.value}
                     </span>
                   </div>
@@ -298,16 +289,16 @@ export function BillingHealthCard({
           </div>
 
           {/* ── Divider ── */}
-          <div className="my-4" style={{ height: 1, background: 'rgb(var(--border-primary) / 0.35)' }} />
+          <div className="my-4 h-px bg-[rgb(var(--border-primary)/0.35)]" />
 
           {/* ── Aging Spectrum ── */}
           <div className="mb-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-medium" style={{ color: 'rgb(var(--text-secondary))' }}>
+              <span className="text-xs font-medium text-[rgb(var(--text-secondary))]">
                 Aging overview
               </span>
               {hasAnyOverdue && (
-                <span className="text-xs tabular-nums" style={{ color: 'rgb(var(--text-disabled))' }}>
+                <span className="text-xs tabular-nums text-[rgb(var(--text-disabled))]">
                   {totalCount} overdue
                 </span>
               )}
@@ -315,7 +306,7 @@ export function BillingHealthCard({
 
             {/* Insight text */}
             {agingInsight && (
-              <p className="text-xs mb-3 leading-relaxed" style={{ color: 'rgb(var(--text-tertiary))' }}>
+              <p className="text-xs mb-3 leading-relaxed text-[rgb(var(--text-tertiary))]">
                 {agingInsight}
               </p>
             )}
@@ -323,15 +314,9 @@ export function BillingHealthCard({
             {isLoading ? (
               <SpectrumSkeleton />
             ) : !hasAnyOverdue ? (
-              <div
-                className="rounded-lg px-4 py-3 flex items-center gap-2"
-                style={{
-                  background: 'rgba(29, 158, 117, 0.06)',
-                  border: '1px solid rgba(29, 158, 117, 0.15)',
-                }}
-              >
-                <CheckCircle2 className="w-4 h-4 flex-shrink-0" style={{ color: '#1D9E75' }} />
-                <span className="text-xs" style={{ color: '#1D9E75' }}>
+              <div className="rounded-lg px-4 py-3 flex items-center gap-2 bg-[rgb(var(--state-success-bg))] border border-[rgb(var(--state-success-border))]">
+                <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-[#1D9E75]" />
+                <span className="text-xs text-[#1D9E75]">
                   No overdue invoices — all accounts are current.
                 </span>
               </div>
@@ -350,6 +335,7 @@ export function BillingHealthCard({
                     return (
                       <div
                         key={bucket.label}
+                        // allow-presentation-style: per-bucket aging heat segment (width/color/opacity from data)
                         className="relative flex items-center justify-center transition-all duration-500"
                         style={{
                           width: `${width}%`,
@@ -370,7 +356,7 @@ export function BillingHealthCard({
                 </div>
 
                 {/* Bucket labels */}
-                <div className="flex mt-1.5" style={{ gap: 2 }}>
+                <div className="flex mt-1.5 gap-0.5">
                   {buckets.map((bucket, idx) => {
                     const isActive = bucket.count > 0
                     const minWidth = 6
@@ -385,13 +371,14 @@ export function BillingHealthCard({
                         style={{ width: `${width}%` }}
                       >
                         <div
+                          // allow-presentation-style: active bucket label uses its heat color
                           className="text-xs font-medium truncate"
                           style={{ color: isActive ? color : 'rgb(var(--text-disabled))' }}
                         >
                           {bucket.label}
                         </div>
                         {isActive && (
-                          <div className="text-xs tabular-nums" style={{ color: 'rgb(var(--text-tertiary))' }}>
+                          <div className="text-xs tabular-nums text-[rgb(var(--text-tertiary))]">
                             {formatShort(bucket.amount)}
                           </div>
                         )}
@@ -404,16 +391,16 @@ export function BillingHealthCard({
           </div>
 
           {/* ── Divider ── */}
-          <div className="mb-4" style={{ height: 1, background: 'rgb(var(--border-primary) / 0.35)' }} />
+          <div className="mb-4 h-px bg-[rgb(var(--border-primary)/0.35)]" />
 
           {/* ── Payment Methods ── */}
           <div>
-            <span className="text-xs font-medium" style={{ color: 'rgb(var(--text-secondary))' }}>
+            <span className="text-xs font-medium text-[rgb(var(--text-secondary))]">
               Payment methods
             </span>
 
             {totalPaymentCount === 0 ? (
-              <p className="text-xs py-3" style={{ color: 'rgb(var(--text-tertiary))' }}>No payments recorded yet.</p>
+              <p className="text-xs py-3 text-[rgb(var(--text-tertiary))]">No payments recorded yet.</p>
             ) : (
               <div className="space-y-2 mt-2.5">
                 {sortedGateways.map(([gateway, count]) => {
@@ -423,16 +410,20 @@ export function BillingHealthCard({
                     <div key={gateway} className="space-y-1">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-1.5">
-                          <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: color }} />
-                          <span className="text-xs" style={{ color: 'rgb(var(--text-secondary))' }}>
+                          <div
+                            // allow-presentation-style: per-gateway legend dot color
+                            className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                            style={{ background: color }}
+                          />
+                          <span className="text-xs text-[rgb(var(--text-secondary))]">
                             {formatGatewayLabel(gateway)}
                           </span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-xs tabular-nums" style={{ color: 'rgb(var(--text-disabled))' }}>
+                          <span className="text-xs tabular-nums text-[rgb(var(--text-disabled))]">
                             {pct.toFixed(0)}%
                           </span>
-                          <span className="text-xs font-medium tabular-nums" style={{ color: 'rgb(var(--text-secondary))' }}>
+                          <span className="text-xs font-medium tabular-nums text-[rgb(var(--text-secondary))]">
                             {count}
                           </span>
                         </div>
