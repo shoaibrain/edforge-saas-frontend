@@ -13,6 +13,12 @@
  *  - Full-width: At-Risk Students with avatar chips
  *
  * Data source: single useGradeOverview aggregate endpoint.
+ *
+ * Presentation: static type/spacing/color live in Tailwind classes (semantic
+ * tokens + the text-2xs/3xs/4xs micro-scale). Genuinely per-datum colors and
+ * chart geometry stay inline, marked `allow-presentation-style`. Off-scale
+ * fixed pixel widths/heights stay inline; off-scale padding is snapped to the
+ * 4px scale.
  */
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
@@ -52,11 +58,15 @@ type AtRiskStudent = GradeOverviewResponse['atRiskStudents'][number]
 // V2 DESIGN TOKENS (inline)
 // ============================================================================
 
+// Neutral members route through canonical semantic tokens (theme-aware, and
+// the former rgba(255,255,255,0.0x) separators that washed out to invisible on
+// the light theme are now real border tokens). Vivid brand accents stay as
+// literals for SVG stroke/fill and per-datum chart/legend colors.
 const V2 = {
   bgSurface: 'rgb(var(--background-secondary))',
   borderDefault: 'rgb(var(--border-primary) / 0.35)',
-  borderSeparator: 'rgba(255,255,255,0.05)',
-  borderRow: 'rgba(255,255,255,0.04)',
+  borderSeparator: 'rgb(var(--border-primary) / 0.3)',
+  borderRow: 'rgb(var(--border-primary) / 0.15)',
   textPrimary: 'rgb(var(--text-primary))',
   textSecondary: 'rgb(var(--text-secondary))',
   textMuted: 'rgb(var(--text-tertiary))',
@@ -70,24 +80,13 @@ const V2 = {
   orange: '#D85A30',
 }
 
-const cardStyle: React.CSSProperties = {
-  background: V2.bgSurface,
-  border: `1px solid ${V2.borderDefault}`,
-  borderRadius: 10,
-  overflow: 'hidden',
-}
-
-const cardHeaderStyle: React.CSSProperties = {
-  padding: '12px 16px',
-  borderBottom: `1px solid ${V2.borderSeparator}`,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-}
-
-const cardBodyStyle: React.CSSProperties = {
-  padding: 16,
-}
+// Shared card chrome as class strings (semantic tokens) — de-dupes the former
+// cardStyle/cardHeaderStyle/cardBodyStyle inline objects.
+const CARD =
+  'bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary)/0.35)] rounded-[10px] overflow-hidden'
+const CARD_HEADER =
+  'px-4 py-3 border-b border-[rgb(var(--border-primary)/0.3)] flex items-center justify-between'
+const CARD_BODY = 'p-4'
 
 // ============================================================================
 // V2 GRADE COLOR HELPER (inline hex, not Tailwind)
@@ -124,24 +123,18 @@ function CardHeader({
   icon: React.ReactNode
 }) {
   return (
-    <div style={cardHeaderStyle}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+    <div className={CARD_HEADER}>
+      <div className="flex items-center gap-2">
         <div
-          style={{
-            width: 22,
-            height: 22,
-            borderRadius: 5,
-            background: iconBg,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
+          // allow-presentation-style: per-card icon tint passed as prop + fixed 22px chip
+          className="rounded-[5px] flex items-center justify-center"
+          style={{ width: 22, height: 22, background: iconBg }}
         >
           {icon}
         </div>
         <div>
-          <div style={{ fontSize: 12, fontWeight: 600, color: V2.textPrimary }}>{title}</div>
-          <div style={{ fontSize: 10, color: V2.textGhost, marginTop: 1 }}>{subtitle}</div>
+          <div className="text-xs font-semibold text-[rgb(var(--text-primary))]">{title}</div>
+          <div className="text-3xs text-[rgb(var(--text-disabled))] mt-px">{subtitle}</div>
         </div>
       </div>
       {right}
@@ -232,52 +225,26 @@ function ActionsDropdown({
   }, [open])
 
   return (
-    <div ref={ref} style={{ position: 'relative' }}>
+    <div ref={ref} className="relative">
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        style={{
-          padding: 6,
-          borderRadius: 6,
-          background: 'transparent',
-          border: 'none',
-          color: V2.textHint,
-          cursor: 'pointer',
-        }}
+        className="p-1.5 rounded-md bg-transparent border-none text-[rgb(var(--text-tertiary))] cursor-pointer"
         aria-label="More actions"
       >
         <MoreHorizontal style={{ width: 14, height: 14 }} />
       </button>
       {open && (
         <div
-          style={{
-            position: 'absolute',
-            right: 0,
-            top: '100%',
-            marginTop: 4,
-            width: 200,
-            background: V2.bgSurface,
-            border: `1px solid ${V2.borderDefault}`,
-            borderRadius: 10,
-            zIndex: 20,
-            padding: '4px 0',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-          }}
+          className="absolute right-0 top-full mt-1 z-20 bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary)/0.35)] rounded-[10px] py-1 shadow-popover"
+          style={{ width: 200 }}
         >
           <button
             type="button"
             onClick={() => { onExportGradebook(); setOpen(false) }}
             disabled={gradebookDisabled}
+            className="flex items-center gap-2 w-full py-2 px-3.5 text-2xs text-[rgb(var(--text-tertiary))] bg-transparent border-none"
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              width: '100%',
-              padding: '8px 14px',
-              fontSize: 11,
-              color: V2.textMuted,
-              background: 'transparent',
-              border: 'none',
               cursor: gradebookDisabled ? 'not-allowed' : 'pointer',
               opacity: gradebookDisabled ? 0.4 : 1,
             }}
@@ -289,16 +256,8 @@ function ActionsDropdown({
             type="button"
             onClick={() => { onExportAtRisk(); setOpen(false) }}
             disabled={atRiskDisabled}
+            className="flex items-center gap-2 w-full py-2 px-3.5 text-2xs text-[rgb(var(--text-tertiary))] bg-transparent border-none"
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              width: '100%',
-              padding: '8px 14px',
-              fontSize: 11,
-              color: V2.textMuted,
-              background: 'transparent',
-              border: 'none',
               cursor: atRiskDisabled ? 'not-allowed' : 'pointer',
               opacity: atRiskDisabled ? 0.4 : 1,
             }}
@@ -352,16 +311,16 @@ const DIST_COLORS: Record<string, string> = {
   A: V2.success,
   B: V2.info,
   C: V2.warning,
-  D: 'rgba(255,255,255,0.15)',
+  D: 'rgb(var(--text-disabled))', // neutral grey; the former white@15% washed out on the light theme
   F: V2.danger,
 }
 
 const DIST_LABELS: Record<string, string> = {
-  A: 'A (90\u2013100)',
-  B: 'B (80\u201389)',
-  C: 'C (70\u201379)',
-  D: 'D (60\u201369)',
-  F: 'F (0\u201359)',
+  A: 'A (90–100)',
+  B: 'B (80–89)',
+  C: 'C (70–79)',
+  D: 'D (60–69)',
+  F: 'F (0–59)',
 }
 
 // ============================================================================
@@ -432,17 +391,7 @@ export function GradeOverview({
 
   if (isError) {
     return (
-      <div
-        style={{
-          borderRadius: 10,
-          border: `1px solid rgba(226,75,74,0.2)`,
-          background: 'rgba(226,75,74,0.06)',
-          padding: 24,
-          fontSize: 12,
-          color: V2.danger,
-          textAlign: 'center',
-        }}
-      >
+      <div className="rounded-[10px] border border-[rgb(var(--state-danger-border))] bg-[rgb(var(--state-danger-bg))] p-6 text-xs text-center text-[rgb(var(--state-danger-fg))]">
         Failed to load grade data. Please try refreshing.
       </div>
     )
@@ -451,7 +400,7 @@ export function GradeOverview({
   if (isLoading) {
     return (
       <WidgetErrorBoundaryV2 fallbackMessage="Failed to load grade statistics">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10 }}>
+        <div className="grid grid-cols-4 gap-2.5">
           {Array.from({ length: 4 }).map((_, i) => (
             <StatCard key={i} label="" value="" icon={Users} accentColor="rgba(55,138,221,0.10)" iconColor={V2.info} barColor={V2.info} loading />
           ))}
@@ -462,9 +411,9 @@ export function GradeOverview({
 
   if (!data || data.totalStudentsGraded === 0) {
     return (
-      <div style={{ padding: 48, textAlign: 'center' }}>
-        <GraduationCap style={{ width: 40, height: 40, margin: '0 auto 12px', color: V2.textHint }} />
-        <p style={{ fontSize: 13, color: V2.textMuted }}>No grades recorded yet across sections.</p>
+      <div className="p-12 text-center">
+        <GraduationCap className="text-[rgb(var(--text-tertiary))] mx-auto mb-3" style={{ width: 40, height: 40 }} />
+        <p className="text-sm text-[rgb(var(--text-tertiary))]">No grades recorded yet across sections.</p>
       </div>
     )
   }
@@ -491,18 +440,22 @@ export function GradeOverview({
   return (
     <div>
       {/* ---- GRADE ANALYTICS SUB-HEADER ---- */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 22, height: 22, borderRadius: 5, background: 'rgba(55,138,221,0.10)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <div
+            // allow-presentation-style: section icon chip tint + fixed 22px chip
+            className="rounded-[5px] flex items-center justify-center"
+            style={{ width: 22, height: 22, background: 'rgba(55,138,221,0.10)' }}
+          >
             <BookIcon color={V2.info} />
           </div>
           <div>
-            <div style={{ fontSize: 12, fontWeight: 600, color: V2.textPrimary }}>Grade Analytics</div>
-            <div style={{ fontSize: 10, color: V2.textGhost }}>School-wide academic performance &middot; 2025&ndash;2026</div>
+            <div className="text-xs font-semibold text-[rgb(var(--text-primary))]">Grade Analytics</div>
+            <div className="text-3xs text-[rgb(var(--text-disabled))]">School-wide academic performance &middot; 2025&ndash;2026</div>
           </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 10, color: V2.textHint }}>
+        <div className="flex items-center gap-2">
+          <span className="text-3xs text-[rgb(var(--text-tertiary))]">
             {data.sectionsWithGrades} of {data.totalSections} sections graded
           </span>
           {gradePerms.view && (
@@ -518,7 +471,7 @@ export function GradeOverview({
 
       {/* ---- KPI ROW (CLS-005) ---- */}
       <WidgetErrorBoundaryV2 fallbackMessage="Failed to load grade statistics">
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10, marginBottom: 14 }}>
+        <div className="grid grid-cols-4 gap-2.5 mb-3.5">
           <StatCard
             label="STUDENTS GRADED"
             value={String(data.totalStudentsGraded)}
@@ -559,20 +512,20 @@ export function GradeOverview({
       </WidgetErrorBoundaryV2>
 
       {/* ---- ROW 1: Grading Completion + Assessment Performance (CLS-006, CLS-007) ---- */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+      <div className="grid grid-cols-2 gap-3 mb-3">
 
         {/* Grading Completion */}
-        <div style={cardStyle}>
+        <div className={CARD}>
           <CardHeader
             iconBg="rgba(127,119,221,0.10)"
             title="Grading Completion"
             subtitle="Assignment entries across active sections"
             icon={<CheckboxIcon color={V2.purple} />}
           />
-          <div style={cardBodyStyle}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+          <div className={CARD_BODY}>
+            <div className="flex items-center gap-5">
               {/* SVG Donut */}
-              <div style={{ position: 'relative', flexShrink: 0 }}>
+              <div className="relative shrink-0">
                 <svg width={80} height={80} viewBox="0 0 80 80">
                   <circle cx={40} cy={40} r={donutR} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={10} />
                   <circle
@@ -582,28 +535,28 @@ export function GradeOverview({
                     strokeLinecap="round" transform="rotate(-90 40 40)"
                   />
                 </svg>
-                <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
-                  <span style={{ fontSize: 18, fontWeight: 700, color: V2.textPrimary, lineHeight: 1 }}>{completionRate.toFixed(0)}%</span>
-                  <span style={{ fontSize: 9, color: V2.textHint, marginTop: 2 }}>graded</span>
+                <div className="absolute inset-0 flex items-center justify-center flex-col">
+                  <span className="text-lg font-bold leading-none text-[rgb(var(--text-primary))]">{completionRate.toFixed(0)}%</span>
+                  <span className="text-4xs text-[rgb(var(--text-tertiary))] mt-0.5">graded</span>
                 </div>
               </div>
               {/* Stats */}
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: V2.textMuted }}>
-                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: V2.purple }} />
+              <div className="flex-1 flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <span className="flex items-center gap-1.5 text-2xs text-[rgb(var(--text-tertiary))]">
+                    <span className="w-2 h-2 rounded-full bg-[#7F77DD]" />
                     Graded
                   </span>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: V2.textPrimary }}>{gradedEntries}</span>
+                  <span className="text-xs font-semibold text-[rgb(var(--text-primary))]">{gradedEntries}</span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: V2.textMuted }}>
-                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'rgba(255,255,255,0.12)' }} />
+                <div className="flex items-center justify-between">
+                  <span className="flex items-center gap-1.5 text-2xs text-[rgb(var(--text-tertiary))]">
+                    <span className="w-2 h-2 rounded-full bg-[rgb(var(--text-disabled))]" />
                     Remaining
                   </span>
-                  <span style={{ fontSize: 12, fontWeight: 600, color: V2.textMuted }}>{ungradedStubs}</span>
+                  <span className="text-xs font-semibold text-[rgb(var(--text-tertiary))]">{ungradedStubs}</span>
                 </div>
-                <div style={{ fontSize: 10, color: V2.textGhost, marginTop: 4, paddingTop: 8, borderTop: `1px solid ${V2.borderSeparator}` }}>
+                <div className="text-3xs text-[rgb(var(--text-disabled))] mt-1 pt-2" style={{ borderTop: `1px solid ${V2.borderSeparator}` }}>
                   {totalEntries} total assignment entries
                 </div>
               </div>
@@ -612,66 +565,84 @@ export function GradeOverview({
         </div>
 
         {/* Assessment Performance */}
-        <div style={cardStyle}>
+        <div className={CARD}>
           <CardHeader
             iconBg="rgba(55,138,221,0.10)"
             title="Assessment Performance"
             subtitle="Average scores by assessment type"
             icon={<BookIcon color={V2.info} />}
           />
-          <div style={cardBodyStyle}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div className={CARD_BODY}>
+            <div className="flex items-center gap-4">
               {/* Formative gauge */}
-              <div style={{ flexShrink: 0, textAlign: 'center' }}>
-                <div style={{ position: 'relative' }}>
+              <div className="shrink-0 text-center">
+                <div className="relative">
                   <svg width={68} height={68} viewBox="0 0 68 68">
                     <circle cx={34} cy={34} r={gaugeR} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={8} />
                     <circle cx={34} cy={34} r={gaugeR} fill="none" stroke={V2.success} strokeWidth={8}
                       strokeDasharray={gaugeC} strokeDashoffset={formOffset}
                       strokeLinecap="round" transform="rotate(-90 34 34)" />
                   </svg>
-                  <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <span style={{ fontSize: 16, fontWeight: 700, color: V2.success }}>{formScore.toFixed(0)}%</span>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-base font-bold text-[#1D9E75]">{formScore.toFixed(0)}%</span>
                   </div>
                 </div>
-                <div style={{ fontSize: 11, fontWeight: 600, color: V2.textSecondary, marginTop: 4 }}>Formative</div>
-                <div style={{ fontSize: 9, color: V2.textGhost }}>Quizzes, homework, participation</div>
+                <div className="text-2xs font-semibold text-[rgb(var(--text-secondary))] mt-1">Formative</div>
+                <div className="text-4xs text-[rgb(var(--text-disabled))]">Quizzes, homework, participation</div>
               </div>
 
-              <div style={{ width: 1, height: 50, background: 'rgba(255,255,255,0.06)' }} />
+              <div
+                // allow-presentation-style: fixed 50px vertical divider
+                className="w-px bg-[rgb(var(--border-primary)/0.3)]"
+                style={{ height: 50 }}
+              />
 
               {/* Summative gauge */}
-              <div style={{ flexShrink: 0, textAlign: 'center' }}>
-                <div style={{ position: 'relative' }}>
+              <div className="shrink-0 text-center">
+                <div className="relative">
                   <svg width={68} height={68} viewBox="0 0 68 68">
                     <circle cx={34} cy={34} r={gaugeR} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={8} />
                     <circle cx={34} cy={34} r={gaugeR} fill="none" stroke={V2.info} strokeWidth={8}
                       strokeDasharray={gaugeC} strokeDashoffset={summOffset}
                       strokeLinecap="round" transform="rotate(-90 34 34)" />
                   </svg>
-                  <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <span style={{ fontSize: 16, fontWeight: 700, color: V2.info }}>{summScore.toFixed(0)}%</span>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span
+                      // allow-presentation-style: summative accent (info hex, not a brand-class literal)
+                      className="text-base font-bold"
+                      style={{ color: V2.info }}
+                    >{summScore.toFixed(0)}%</span>
                   </div>
                 </div>
-                <div style={{ fontSize: 11, fontWeight: 600, color: V2.textSecondary, marginTop: 4 }}>Summative</div>
-                <div style={{ fontSize: 9, color: V2.textGhost }}>Tests, exams, projects</div>
+                <div className="text-2xs font-semibold text-[rgb(var(--text-secondary))] mt-1">Summative</div>
+                <div className="text-4xs text-[rgb(var(--text-disabled))]">Tests, exams, projects</div>
               </div>
 
-              <div style={{ width: 1, height: 50, background: 'rgba(255,255,255,0.06)' }} />
+              <div
+                // allow-presentation-style: fixed 50px vertical divider
+                className="w-px bg-[rgb(var(--border-primary)/0.3)]"
+                style={{ height: 50 }}
+              />
 
               {/* Insight */}
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 10, color: V2.textHint, lineHeight: 1.5 }}>
+              <div className="flex-1">
+                <div className="text-3xs text-[rgb(var(--text-tertiary))] leading-normal">
                   {formScore > summScore ? (
-                    <><em style={{ fontStyle: 'normal', color: V2.success }}>Formative {scoreDiff}% higher</em> than summative &mdash; well balanced.</>
+                    <><em className="not-italic text-[#1D9E75]">Formative {scoreDiff}% higher</em> than summative &mdash; well balanced.</>
                   ) : summScore > formScore ? (
-                    <><em style={{ fontStyle: 'normal', color: V2.info }}>Summative {scoreDiff}% higher</em> than formative.</>
+                    <>
+                      <em
+                        // allow-presentation-style: summative accent (info hex, not a brand-class literal)
+                        className="not-italic"
+                        style={{ color: V2.info }}
+                      >Summative {scoreDiff}% higher</em> than formative.
+                    </>
                   ) : (
                     <>Formative and summative scores are equal &mdash; well balanced.</>
                   )}
                 </div>
                 {data.assessmentBreakdown?.unclassified && data.assessmentBreakdown.unclassified.count > 0 && (
-                  <div style={{ fontSize: 9, color: V2.textGhost, marginTop: 8 }}>
+                  <div className="text-4xs text-[rgb(var(--text-disabled))] mt-2">
                     +{data.assessmentBreakdown.unclassified.count} unclassified (avg {data.assessmentBreakdown.unclassified.avgScore.toFixed(1)}%)
                   </div>
                 )}
@@ -682,30 +653,38 @@ export function GradeOverview({
       </div>
 
       {/* ---- ROW 2: Grade Distribution (CLS-008) ---- */}
-      <div style={{ marginBottom: 12 }}>
-        <div style={cardStyle}>
+      <div className="mb-3">
+        <div className={CARD}>
           <CardHeader
             iconBg="rgba(239,159,39,0.10)"
             title="Grade Distribution"
             subtitle="Number of students in each grade range based on overall course averages"
             icon={<BarChartIcon color={V2.warning} />}
           />
-          <div style={cardBodyStyle}>
-            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 8, height: 110, padding: '16px 0 0' }}>
+          <div className={CARD_BODY}>
+            <div className="flex items-end gap-2 pt-4" style={{ height: 110 }}>
               {distBars.map((bar) => {
                 const barColor = DIST_COLORS[bar.letter] || V2.textGhost
                 const labelColor = bar.letter === 'D' ? V2.textGhost : barColor
                 return (
-                  <div key={bar.letter} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, height: '100%', justifyContent: 'flex-end' }}>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: labelColor, marginBottom: 4 }}>{bar.count}</span>
-                    <div style={{ width: '100%', borderRadius: '4px 4px 0 0', background: barColor, height: `${bar.heightPct}%`, minHeight: 2 }} />
+                  <div key={bar.letter} className="flex-1 flex flex-col items-center gap-1 h-full justify-end">
+                    <span
+                      // allow-presentation-style: per-grade-band label color
+                      className="text-2xs font-bold mb-1"
+                      style={{ color: labelColor }}
+                    >{bar.count}</span>
+                    <div
+                      // allow-presentation-style: data-driven bar height + per-band fill color
+                      className="w-full rounded-t"
+                      style={{ background: barColor, height: `${bar.heightPct}%`, minHeight: 2 }}
+                    />
                   </div>
                 )
               })}
             </div>
-            <div style={{ display: 'flex', gap: 8, paddingTop: 8, borderTop: `1px solid ${V2.borderSeparator}`, marginTop: 12 }}>
+            <div className="flex gap-2 pt-2 mt-3" style={{ borderTop: `1px solid ${V2.borderSeparator}` }}>
               {distBars.map((bar) => (
-                <div key={bar.letter} style={{ flex: 1, textAlign: 'center', fontSize: 9, color: V2.textGhost }}>
+                <div key={bar.letter} className="flex-1 text-center text-4xs text-[rgb(var(--text-disabled))]">
                   {DIST_LABELS[bar.letter]}
                 </div>
               ))}
@@ -715,40 +694,52 @@ export function GradeOverview({
       </div>
 
       {/* ---- ROW 3: Category Performance + Course Performance (CLS-009, CLS-010) ---- */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+      <div className="grid grid-cols-2 gap-3 mb-3">
 
         {/* Category Performance */}
         {data.categoryPerformance && data.categoryPerformance.length > 0 && (
-          <div style={cardStyle}>
+          <div className={CARD}>
             <CardHeader
               iconBg="rgba(29,158,117,0.10)"
               title="Category Performance"
               subtitle="Average scores by grading policy category"
               icon={<CircleArrowIcon color={V2.success} />}
             />
-            <div style={cardBodyStyle}>
+            <div className={CARD_BODY}>
               {/* Column headers */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6, paddingBottom: 6, borderBottom: `1px solid ${V2.borderSeparator}` }}>
-                <span style={{ fontSize: 9, fontWeight: 700, color: V2.textGhost, textTransform: 'uppercase', letterSpacing: 0.5, width: 110 }}>Category</span>
-                <span style={{ fontSize: 9, fontWeight: 700, color: V2.textGhost, textTransform: 'uppercase', letterSpacing: 0.5, width: 36, textAlign: 'center' }}>Wt.</span>
-                <span style={{ flex: 1, fontSize: 9, fontWeight: 700, color: V2.textGhost, textTransform: 'uppercase', letterSpacing: 0.5 }}>Score</span>
-                <span style={{ fontSize: 9, fontWeight: 700, color: V2.textGhost, textTransform: 'uppercase', letterSpacing: 0.5, width: 50, textAlign: 'right' }}>#</span>
-                <span style={{ fontSize: 9, fontWeight: 700, color: V2.textGhost, textTransform: 'uppercase', letterSpacing: 0.5, width: 50, textAlign: 'right' }}>Avg</span>
+              <div className="flex items-center gap-3 mb-1.5 pb-1.5" style={{ borderBottom: `1px solid ${V2.borderSeparator}` }}>
+                <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px]" style={{ width: 110 }}>Category</span>
+                <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px] text-center" style={{ width: 36 }}>Wt.</span>
+                <span className="flex-1 text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px]">Score</span>
+                <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px] text-right" style={{ width: 50 }}>#</span>
+                <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px] text-right" style={{ width: 50 }}>Avg</span>
               </div>
               {data.categoryPerformance.map((cat, idx) => {
                 const barColor = CATEGORY_COLORS[idx % CATEGORY_COLORS.length]
                 const matchedWeight = policyWeights?.find((w) => w.categoryId === cat.categoryId)
                 const catName = matchedWeight?.categoryName || cat.categoryName.charAt(0).toUpperCase() + cat.categoryName.slice(1)
-                const weight = matchedWeight ? `${matchedWeight.weight}%` : '\u2014'
+                const weight = matchedWeight ? `${matchedWeight.weight}%` : '—'
                 return (
-                  <div key={cat.categoryId} style={{ display: 'flex', alignItems: 'center', padding: '9px 0', borderBottom: `1px solid ${V2.borderRow}`, gap: 12 }}>
-                    <span style={{ fontSize: 12, fontWeight: 500, color: V2.textPrimary, width: 110, flexShrink: 0 }}>{catName}</span>
-                    <span style={{ fontSize: 10, color: V2.textHint, width: 36, flexShrink: 0, textAlign: 'center' }}>{weight}</span>
-                    <div style={{ flex: 1, height: 4, background: 'rgba(255,255,255,0.06)', borderRadius: 2, overflow: 'hidden' }}>
-                      <div style={{ height: '100%', borderRadius: 2, background: barColor, width: `${cat.avgScore}%` }} />
+                  <div
+                    key={cat.categoryId}
+                    className="flex items-center py-2 gap-3"
+                    style={{ borderBottom: `1px solid ${V2.borderRow}` }}
+                  >
+                    <span className="text-xs font-medium text-[rgb(var(--text-primary))] shrink-0" style={{ width: 110 }}>{catName}</span>
+                    <span className="text-3xs text-[rgb(var(--text-tertiary))] shrink-0 text-center" style={{ width: 36 }}>{weight}</span>
+                    <div className="flex-1 h-1 rounded-[2px] overflow-hidden bg-[rgb(var(--background-tertiary))]">
+                      <div
+                        // allow-presentation-style: data-driven category bar width + color
+                        className="h-full rounded-[2px]"
+                        style={{ background: barColor, width: `${cat.avgScore}%` }}
+                      />
                     </div>
-                    <span style={{ fontSize: 10, color: V2.textHint, width: 50, textAlign: 'right', flexShrink: 0 }}>{cat.assignmentCount}</span>
-                    <span style={{ fontSize: 12, fontWeight: 600, width: 50, textAlign: 'right', flexShrink: 0, color: barColor }}>{cat.avgScore.toFixed(1)}%</span>
+                    <span className="text-3xs text-[rgb(var(--text-tertiary))] text-right shrink-0" style={{ width: 50 }}>{cat.assignmentCount}</span>
+                    <span
+                      // allow-presentation-style: category avg score color matches its bar
+                      className="text-xs font-semibold text-right shrink-0"
+                      style={{ width: 50, color: barColor }}
+                    >{cat.avgScore.toFixed(1)}%</span>
                   </div>
                 )
               })}
@@ -758,28 +749,23 @@ export function GradeOverview({
 
         {/* Course Performance */}
         {data.coursePerformance.length > 0 && (
-          <div style={cardStyle}>
+          <div className={CARD}>
             <CardHeader
               iconBg="rgba(55,138,221,0.10)"
               title="Course Performance"
               subtitle="Aggregated grade metrics per course across sections"
               icon={<BookIcon color={V2.info} />}
             />
-            <div style={cardBodyStyle}>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <div className={CARD_BODY}>
+              <table className="w-full border-collapse">
                 <thead>
                   <tr>
-                    {['Course', 'Sec.', 'Std.', 'Avg Grade \u2193', 'GPA', 'Pass %'].map((h, i) => (
+                    {['Course', 'Sec.', 'Std.', 'Avg Grade ↓', 'GPA', 'Pass %'].map((h, i) => (
                       <th
                         key={h}
+                        className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px] pb-2"
                         style={{
                           textAlign: i === 0 ? 'left' : 'right',
-                          fontSize: 9,
-                          fontWeight: 700,
-                          color: V2.textGhost,
-                          textTransform: 'uppercase',
-                          letterSpacing: 0.5,
-                          padding: '0 0 8px',
                           cursor: ['courseName', '', '', 'avgGrade', '', 'passRate'][i] ? 'pointer' : 'default',
                         }}
                         onClick={() => {
@@ -797,14 +783,22 @@ export function GradeOverview({
                 <tbody>
                   {sortedCourses.map((course) => (
                     <tr key={course.courseId}>
-                      <td style={{ padding: '10px 0', borderBottom: `1px solid ${V2.borderRow}`, fontSize: 12, fontWeight: 500, color: V2.textPrimary }}>{course.courseName}</td>
-                      <td style={{ padding: '10px 0', borderBottom: `1px solid ${V2.borderRow}`, textAlign: 'right', color: V2.textHint, fontSize: 11 }}>{course.sectionCount}</td>
-                      <td style={{ padding: '10px 0', borderBottom: `1px solid ${V2.borderRow}`, textAlign: 'right', color: V2.textHint, fontSize: 11 }}>{course.studentCount}</td>
-                      <td style={{ padding: '10px 0', borderBottom: `1px solid ${V2.borderRow}`, textAlign: 'right', fontSize: 12, fontWeight: 600, color: getGradeColorHex(course.avgGrade) }}>
+                      <td className="py-2.5 text-xs font-medium text-[rgb(var(--text-primary))]" style={{ borderBottom: `1px solid ${V2.borderRow}` }}>{course.courseName}</td>
+                      <td className="py-2.5 text-right text-2xs text-[rgb(var(--text-tertiary))]" style={{ borderBottom: `1px solid ${V2.borderRow}` }}>{course.sectionCount}</td>
+                      <td className="py-2.5 text-right text-2xs text-[rgb(var(--text-tertiary))]" style={{ borderBottom: `1px solid ${V2.borderRow}` }}>{course.studentCount}</td>
+                      <td
+                        // allow-presentation-style: grade-band severity color
+                        className="py-2.5 text-right text-xs font-semibold"
+                        style={{ borderBottom: `1px solid ${V2.borderRow}`, color: getGradeColorHex(course.avgGrade) }}
+                      >
                         {course.avgGrade.toFixed(1)}%
                       </td>
-                      <td style={{ padding: '10px 0', borderBottom: `1px solid ${V2.borderRow}`, textAlign: 'right', fontSize: 11, color: V2.textMuted }}>{course.avgGpa.toFixed(2)}</td>
-                      <td style={{ padding: '10px 0', borderBottom: `1px solid ${V2.borderRow}`, textAlign: 'right', fontSize: 12, fontWeight: 600, color: getPassColorHex(course.passRate) }}>
+                      <td className="py-2.5 text-right text-2xs text-[rgb(var(--text-tertiary))]" style={{ borderBottom: `1px solid ${V2.borderRow}` }}>{course.avgGpa.toFixed(2)}</td>
+                      <td
+                        // allow-presentation-style: pass-rate severity color
+                        className="py-2.5 text-right text-xs font-semibold"
+                        style={{ borderBottom: `1px solid ${V2.borderRow}`, color: getPassColorHex(course.passRate) }}
+                      >
                         {course.passRate.toFixed(1)}%
                       </td>
                     </tr>
@@ -817,33 +811,33 @@ export function GradeOverview({
       </div>
 
       {/* ---- ROW 4: At-Risk Students (CLS-011) ---- */}
-      <div style={{ marginBottom: 12 }}>
-        <div style={cardStyle}>
+      <div className="mb-3">
+        <div className={CARD}>
           <CardHeader
             iconBg="rgba(226,75,74,0.10)"
             title="At-Risk Students"
             subtitle="Students scoring below 60% in any course"
             right={
               data.atRiskStudents.length > 0 ? (
-                <span style={{ fontSize: 10, color: V2.textHint }}>{data.atRiskStudents.length} students</span>
+                <span className="text-3xs text-[rgb(var(--text-tertiary))]">{data.atRiskStudents.length} students</span>
               ) : undefined
             }
             icon={<WarningIcon color={V2.danger} />}
           />
-          <div style={cardBodyStyle}>
+          <div className={CARD_BODY}>
             {data.atRiskStudents.length === 0 ? (
-              <div style={{ padding: 32, textAlign: 'center' }}>
-                <CheckCircle style={{ width: 40, height: 40, margin: '0 auto 12px', color: V2.success }} />
-                <p style={{ fontSize: 12, color: V2.textMuted }}>No students below the grade threshold</p>
+              <div className="p-8 text-center">
+                <CheckCircle className="text-[#1D9E75] mx-auto mb-3" style={{ width: 40, height: 40 }} />
+                <p className="text-xs text-[rgb(var(--text-tertiary))]">No students below the grade threshold</p>
               </div>
             ) : (
               <>
                 {/* Column headers */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6, paddingBottom: 6, borderBottom: `1px solid ${V2.borderSeparator}` }}>
-                  <span style={{ fontSize: 9, fontWeight: 700, color: V2.textGhost, textTransform: 'uppercase', letterSpacing: 0.5, flex: 1 }}>Student</span>
-                  <span style={{ fontSize: 9, fontWeight: 700, color: V2.textGhost, textTransform: 'uppercase', letterSpacing: 0.5, flex: 1 }}>Course</span>
-                  <span style={{ fontSize: 9, fontWeight: 700, color: V2.textGhost, textTransform: 'uppercase', letterSpacing: 0.5, width: 80, textAlign: 'right' }}>Grade</span>
-                  <span style={{ fontSize: 9, fontWeight: 700, color: V2.textGhost, textTransform: 'uppercase', letterSpacing: 0.5, width: 50, textAlign: 'right' }}>Letter</span>
+                <div className="flex items-center gap-3 mb-1.5 pb-1.5" style={{ borderBottom: `1px solid ${V2.borderSeparator}` }}>
+                  <span className="flex-1 text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px]">Student</span>
+                  <span className="flex-1 text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px]">Course</span>
+                  <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px] text-right" style={{ width: 80 }}>Grade</span>
+                  <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px] text-right" style={{ width: 50 }}>Letter</span>
                 </div>
                 {data.atRiskStudents.map((student, i) => {
                   const gradeColor = student.numericGrade < 60 ? V2.danger : V2.warning
@@ -852,46 +846,39 @@ export function GradeOverview({
                   return (
                     <div
                       key={`${student.studentId}-${student.courseId}-${i}`}
-                      style={{ display: 'flex', alignItems: 'center', padding: '9px 0', borderBottom: `1px solid ${V2.borderRow}`, gap: 12 }}
+                      className="flex items-center py-2 gap-3"
+                      style={{ borderBottom: `1px solid ${V2.borderRow}` }}
                     >
                       {/* Avatar chip */}
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1 }}>
+                      <div className="flex items-center gap-2.5 flex-1">
                         <div
+                          // allow-presentation-style: per-student avatar gradient + white text on it
+                          className="rounded-full flex items-center justify-center shrink-0 text-3xs font-bold"
                           style={{
                             width: 28,
                             height: 28,
-                            borderRadius: '50%',
                             background: getStudentGradient(student.studentName),
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            fontSize: 10,
-                            fontWeight: 700,
                             color: 'white',
-                            flexShrink: 0,
                           }}
                         >
                           {getInitials(student.studentName)}
                         </div>
                         <div>
-                          <div style={{ fontSize: 12, fontWeight: 500, color: V2.textPrimary }}>{student.studentName}</div>
+                          <div className="text-xs font-medium text-[rgb(var(--text-primary))]">{student.studentName}</div>
                         </div>
                       </div>
-                      <div style={{ flex: 1, fontSize: 10, color: V2.textHint }}>{student.courseName}</div>
-                      <span style={{ fontSize: 12, fontWeight: 700, color: gradeColor, width: 80, textAlign: 'right' }}>
+                      <div className="flex-1 text-3xs text-[rgb(var(--text-tertiary))]">{student.courseName}</div>
+                      <span
+                        // allow-presentation-style: at-risk grade severity color
+                        className="text-xs font-bold text-right"
+                        style={{ width: 80, color: gradeColor }}
+                      >
                         {student.numericGrade.toFixed(1)}%
                       </span>
                       <span
-                        style={{
-                          fontSize: 9,
-                          fontWeight: 600,
-                          background: letterBg,
-                          color: letterColor,
-                          padding: '1px 6px',
-                          borderRadius: 4,
-                          width: 50,
-                          textAlign: 'center',
-                        }}
+                        // allow-presentation-style: letter-grade chip tint (danger/warning)
+                        className="text-4xs font-semibold py-px px-1.5 rounded text-center"
+                        style={{ width: 50, background: letterBg, color: letterColor }}
                       >
                         {student.letterGrade}
                       </span>
