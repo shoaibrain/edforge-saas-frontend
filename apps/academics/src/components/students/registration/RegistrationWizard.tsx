@@ -149,19 +149,26 @@ function RegistrationStepper() {
   return (
     <nav
       aria-label="Registration progress"
-      className="w-full"
-      style={{
-        background: '#161b27',
-        border: '1px solid rgba(255, 255, 255, 0.06)',
-        borderRadius: 10,
-        padding: '14px 20px',
-      }}
+      className="w-full rounded-[10px] px-5 py-3.5 bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary)/0.35)]"
     >
       <div className="flex items-center">
         {steps.map((step, index) => {
           const status = getStepStatus(index)
           const isClickable = canGoToStep(index)
           const isLast = index === steps.length - 1
+
+          const dotCls =
+            status === 'completed'
+              ? 'bg-[#1D9E75] text-[#fff]'
+              : status === 'current'
+                ? 'bg-[rgb(var(--accent-enrollment)/0.2)] border-2 border-[#1D9E75] text-[#1D9E75]'
+                : 'bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-disabled))]'
+          const labelCls =
+            status === 'completed'
+              ? 'text-[#1D9E75]'
+              : status === 'current'
+                ? 'text-[rgb(var(--text-secondary))]'
+                : 'text-[rgb(var(--text-disabled))]'
 
           return (
             <div key={step.id} className="flex items-center flex-1 last:flex-none">
@@ -172,29 +179,7 @@ function RegistrationStepper() {
                 className={`flex flex-col items-center gap-1 group relative ${isClickable ? 'cursor-pointer' : 'cursor-default'}`}
               >
                 {/* Step dot */}
-                <div
-                  className="flex items-center justify-center shrink-0"
-                  style={{
-                    width: 24,
-                    height: 24,
-                    borderRadius: '50%',
-                    fontSize: 10,
-                    fontWeight: 600,
-                    ...(status === 'completed'
-                      ? { background: '#1D9E75', color: '#fff' }
-                      : status === 'current'
-                        ? {
-                            background: 'rgba(29, 158, 117, 0.2)',
-                            border: '2px solid #1D9E75',
-                            color: '#1D9E75',
-                          }
-                        : {
-                            background: 'rgba(255, 255, 255, 0.06)',
-                            border: '1px solid rgba(255, 255, 255, 0.1)',
-                            color: '#3a4055',
-                          }),
-                  }}
-                >
+                <div className={`flex items-center justify-center shrink-0 w-6 h-6 rounded-full text-3xs font-semibold ${dotCls}`}>
                   {status === 'completed' ? (
                     <Check className="w-3 h-3" />
                   ) : (
@@ -203,36 +188,14 @@ function RegistrationStepper() {
                 </div>
 
                 {/* Label */}
-                <span
-                  className="hidden sm:block text-center leading-tight whitespace-nowrap"
-                  style={{
-                    fontSize: 9,
-                    fontWeight: 500,
-                    marginTop: 4,
-                    color:
-                      status === 'completed'
-                        ? '#1D9E75'
-                        : status === 'current'
-                          ? '#c8ccd8'
-                          : '#3a4055',
-                  }}
-                >
+                <span className={`hidden sm:block text-center leading-tight whitespace-nowrap text-4xs font-medium mt-1 ${labelCls}`}>
                   {step.title}
                 </span>
               </button>
 
               {/* Connecting line */}
               {!isLast && (
-                <div
-                  className="flex-1 mx-2"
-                  style={{
-                    height: 1,
-                    background:
-                      status === 'completed'
-                        ? '#1D9E75'
-                        : 'rgba(255, 255, 255, 0.06)',
-                  }}
-                />
+                <div className={`flex-1 mx-2 h-px ${status === 'completed' ? 'bg-[#1D9E75]' : 'bg-[rgb(var(--border-primary)/0.35)]'}`} />
               )}
             </div>
           )
@@ -317,30 +280,14 @@ function RegistrationFooter() {
   const isOptional = currentStepData?.isOptional
 
   return (
-    <div
-      className="sticky bottom-0 z-10 backdrop-blur-sm"
-      style={{
-        background: 'rgb(var(--background-secondary))',
-        borderTop: '1px solid rgba(255, 255, 255, 0.05)',
-        marginTop: 20,
-        paddingTop: 16,
-      }}
-    >
+    <div className="sticky bottom-0 z-10 backdrop-blur-sm bg-[rgb(var(--background-secondary))] border-t border-[rgb(var(--border-primary)/0.35)] mt-5 pt-4">
       <div className="flex items-center justify-between">
         <div>
           {!isFirst && (
             <button
               type="button"
               onClick={goToBack}
-              className="flex items-center gap-2 transition-colors hover:opacity-80"
-              style={{
-                background: 'transparent',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: 8,
-                padding: '8px 16px',
-                fontSize: 12,
-                color: '#7a8099',
-              }}
+              className="flex items-center gap-2 transition-colors hover:opacity-80 bg-transparent border border-[rgb(var(--border-primary)/0.35)] rounded-lg px-4 py-2 text-xs text-[rgb(var(--text-tertiary))]"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               Back
@@ -353,8 +300,7 @@ function RegistrationFooter() {
             <button
               type="button"
               onClick={() => goToNext()}
-              className="px-4 py-2 text-xs font-medium transition-colors hover:opacity-80"
-              style={{ color: 'rgb(var(--text-tertiary))' }}
+              className="px-4 py-2 text-xs font-medium transition-colors hover:opacity-80 text-[rgb(var(--text-tertiary))]"
             >
               Skip
             </button>
@@ -365,8 +311,7 @@ function RegistrationFooter() {
               type="button"
               onClick={() => submit()}
               disabled={isSubmitting}
-              className="flex items-center gap-2 px-5 py-2 text-xs font-semibold text-[rgb(var(--action-primary-fg))] rounded-[8px] transition-all hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
-              style={{ background: '#1D9E75' }}
+              className="flex items-center gap-2 px-5 py-2 text-xs font-semibold text-[rgb(var(--action-primary-fg))] rounded-[8px] transition-all hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed bg-[rgb(var(--action-primary-bg))]"
             >
               {isSubmitting ? (
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -379,8 +324,7 @@ function RegistrationFooter() {
             <button
               type="button"
               onClick={() => goToNext()}
-              className="flex items-center gap-2 px-5 py-2 text-xs font-semibold text-[rgb(var(--action-primary-fg))] rounded-[8px] transition-all hover:opacity-90"
-              style={{ background: '#1D9E75' }}
+              className="flex items-center gap-2 px-5 py-2 text-xs font-semibold text-[rgb(var(--action-primary-fg))] rounded-[8px] transition-all hover:opacity-90 bg-[rgb(var(--action-primary-bg))]"
             >
               Continue
               <ArrowRight className="w-3.5 h-3.5" />
@@ -396,12 +340,9 @@ function RegistrationFooter() {
 // V2 CONTEXT SIDEBAR
 // ============================================================================
 
-const sidebarCardStyle = {
-  background: '#161b27',
-  border: '1px solid rgba(255, 255, 255, 0.06)',
-  borderRadius: 10,
-  padding: 14,
-}
+// Theme-aware sidebar card chrome (was a dark-only #161b27 island).
+const SIDEBAR_CARD =
+  'rounded-[10px] p-3.5 bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary)/0.35)]'
 
 function ContextSidebar() {
   const { steps, getStepStatus, formData, currentStep } = useWizard()
@@ -428,31 +369,31 @@ function ContextSidebar() {
   }, [formData])
 
   return (
-    <div className="hidden lg:flex flex-col gap-3" style={{ width: 260, flexShrink: 0 }}>
+    <div className="hidden lg:flex flex-col gap-3 shrink-0" style={{ width: 260 }}>
       {/* Card 1: Enrollment Context */}
-      <div style={sidebarCardStyle}>
+      <div className={SIDEBAR_CARD}>
         <div className="flex items-center gap-2 mb-3">
-          <BookOpen className="w-3.5 h-3.5" style={{ color: '#1D9E75' }} />
-          <span style={{ fontSize: 11, fontWeight: 500, color: 'rgb(var(--text-secondary))' }}>
+          <BookOpen className="w-3.5 h-3.5 text-[#1D9E75]" />
+          <span className="text-2xs font-medium text-[rgb(var(--text-secondary))]">
             Enrollment Context
           </span>
         </div>
         <div className="space-y-2">
           <div className="flex justify-between">
-            <span style={{ fontSize: 10, color: '#4a5068' }}>Academic Year</span>
-            <span style={{ fontSize: 11, fontWeight: 500, color: '#c8ccd8' }}>
+            <span className="text-3xs text-[rgb(var(--text-tertiary))]">Academic Year</span>
+            <span className="text-2xs font-medium text-[rgb(var(--text-secondary))]">
               {currentYear?.name ?? '--'}
             </span>
           </div>
           <div className="flex justify-between">
-            <span style={{ fontSize: 10, color: '#4a5068' }}>Enrolled</span>
-            <span style={{ fontSize: 11, fontWeight: 500, color: '#c8ccd8' }}>
+            <span className="text-3xs text-[rgb(var(--text-tertiary))]">Enrolled</span>
+            <span className="text-2xs font-medium text-[rgb(var(--text-secondary))]">
               {summary?.totalEnrolled ?? '--'}
             </span>
           </div>
           <div className="flex justify-between">
-            <span style={{ fontSize: 10, color: '#4a5068' }}>Grade Levels</span>
-            <span style={{ fontSize: 11, fontWeight: 500, color: '#c8ccd8' }}>
+            <span className="text-3xs text-[rgb(var(--text-tertiary))]">Grade Levels</span>
+            <span className="text-2xs font-medium text-[rgb(var(--text-secondary))]">
               {gradeLevelCount || '--'}
             </span>
           </div>
@@ -460,10 +401,10 @@ function ContextSidebar() {
       </div>
 
       {/* Card 2: Required for EdFi */}
-      <div style={sidebarCardStyle}>
+      <div className={SIDEBAR_CARD}>
         <div className="flex items-center gap-2 mb-3">
-          <Shield className="w-3.5 h-3.5" style={{ color: '#1D9E75' }} />
-          <span style={{ fontSize: 11, fontWeight: 500, color: 'rgb(var(--text-secondary))' }}>
+          <Shield className="w-3.5 h-3.5 text-[#1D9E75]" />
+          <span className="text-2xs font-medium text-[rgb(var(--text-secondary))]">
             Required for EdFi
           </span>
         </div>
@@ -471,19 +412,16 @@ function ContextSidebar() {
           {edfiStatus.map((f, i) => (
             <div
               key={f.key}
-              className="flex items-center justify-between"
-              style={{
-                padding: '5px 0',
-                borderBottom: i < edfiStatus.length - 1 ? '1px solid rgba(255, 255, 255, 0.04)' : 'none',
-              }}
+              className="flex items-center justify-between py-1"
+              style={{ borderBottom: i < edfiStatus.length - 1 ? '1px solid rgb(var(--border-primary) / 0.2)' : 'none' }}
             >
-              <span style={{ fontSize: 10, color: '#4a5068' }}>{f.label}</span>
+              <span className="text-3xs text-[rgb(var(--text-tertiary))]">{f.label}</span>
               {f.filled ? (
-                <span style={{ fontSize: 11, fontWeight: 500, color: '#1D9E75' }}>Filled</span>
+                <span className="text-2xs font-medium text-[#1D9E75]">Filled</span>
               ) : f.step === currentStep + 1 ? (
-                <span style={{ fontSize: 11, fontWeight: 500, color: '#EF9F27' }}>Required</span>
+                <span className="text-2xs font-medium text-[rgb(var(--state-warning-fg))]">Required</span>
               ) : (
-                <span style={{ fontSize: 11, fontWeight: 500, color: '#EF9F27' }}>Step {f.step}</span>
+                <span className="text-2xs font-medium text-[rgb(var(--state-warning-fg))]">Step {f.step}</span>
               )}
             </div>
           ))}
@@ -491,70 +429,37 @@ function ContextSidebar() {
       </div>
 
       {/* Card 3: Progress */}
-      <div style={sidebarCardStyle}>
+      <div className={SIDEBAR_CARD}>
         <div className="flex items-center gap-2 mb-3">
-          <ListChecks className="w-3.5 h-3.5" style={{ color: '#1D9E75' }} />
-          <span style={{ fontSize: 11, fontWeight: 500, color: 'rgb(var(--text-secondary))' }}>
+          <ListChecks className="w-3.5 h-3.5 text-[#1D9E75]" />
+          <span className="text-2xs font-medium text-[rgb(var(--text-secondary))]">
             Progress
           </span>
         </div>
         <div className="space-y-1.5">
           {steps.map((step, i) => {
             const status = getStepStatus(i)
+            const progressLabelCls =
+              status === 'completed'
+                ? 'text-[#1D9E75]'
+                : status === 'current'
+                  ? 'text-[rgb(var(--text-secondary))]'
+                  : 'text-[rgb(var(--text-disabled))]'
             return (
               <div key={step.id} className="flex items-center gap-2">
                 {status === 'completed' ? (
-                  <div
-                    className="flex items-center justify-center"
-                    style={{ width: 14, height: 14, borderRadius: '50%', background: '#1D9E75' }}
-                  >
+                  <div className="flex items-center justify-center w-3.5 h-3.5 rounded-full bg-[#1D9E75]">
                     <Check className="w-2.5 h-2.5 text-[rgb(var(--action-primary-fg))]" />
                   </div>
                 ) : status === 'current' ? (
-                  <div
-                    style={{
-                      width: 14,
-                      height: 14,
-                      borderRadius: '50%',
-                      border: '2px solid #1D9E75',
-                      background: 'transparent',
-                    }}
-                  />
+                  <div className="w-3.5 h-3.5 rounded-full border-2 border-[#1D9E75] bg-transparent" />
                 ) : (
-                  <div
-                    style={{
-                      width: 14,
-                      height: 14,
-                      borderRadius: '50%',
-                      background: 'rgba(255, 255, 255, 0.06)',
-                    }}
-                  />
+                  <div className="w-3.5 h-3.5 rounded-full bg-[rgb(var(--background-tertiary))]" />
                 )}
-                <span
-                  style={{
-                    fontSize: 10,
-                    color:
-                      status === 'completed'
-                        ? '#1D9E75'
-                        : status === 'current'
-                          ? '#c8ccd8'
-                          : '#3a4055',
-                  }}
-                >
+                <span className={`text-3xs ${progressLabelCls}`}>
                   {step.title}
                 </span>
-                <span
-                  className="ml-auto"
-                  style={{
-                    fontSize: 9,
-                    color:
-                      status === 'completed'
-                        ? '#1D9E75'
-                        : status === 'current'
-                          ? 'rgb(var(--text-tertiary))'
-                          : '#3a4055',
-                  }}
-                >
+                <span className={`ml-auto text-4xs ${status === 'completed' ? 'text-[#1D9E75]' : status === 'current' ? 'text-[rgb(var(--text-tertiary))]' : 'text-[rgb(var(--text-disabled))]'}`}>
                   {status === 'completed' ? 'Done' : status === 'current' ? 'Current' : ''}
                 </span>
               </div>
@@ -630,14 +535,7 @@ function WizardLayout({
       <div className="flex gap-5 px-6 pb-6 pt-2 min-h-0">
         {/* Form Card */}
         <div className="flex-1 min-w-0">
-          <div
-            style={{
-              background: 'rgb(var(--background-secondary))',
-              border: '1px solid rgb(var(--border-primary) / 0.35)',
-              borderRadius: 12,
-              padding: 24,
-            }}
-          >
+          <div className="bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary)/0.35)] rounded-xl p-6">
             {/* Section title */}
             <motion.div
               key={`title-${currentStep}`}
@@ -645,21 +543,11 @@ function WizardLayout({
               animate={{ opacity: 1, y: 0 }}
               className="mb-5"
             >
-              <h2
-                className="font-semibold"
-                style={{
-                  fontSize: 13,
-                  color: 'rgb(var(--text-primary))',
-                  letterSpacing: '-0.2px',
-                }}
-              >
+              <h2 className="font-semibold text-sm tracking-[-0.2px] text-[rgb(var(--text-primary))]">
                 {currentStepData.title}
               </h2>
               {currentStepData.description && (
-                <p
-                  className="mt-1"
-                  style={{ fontSize: 11, color: 'rgb(var(--text-tertiary))' }}
-                >
+                <p className="mt-1 text-2xs text-[rgb(var(--text-tertiary))]">
                   {currentStepData.description}
                 </p>
               )}

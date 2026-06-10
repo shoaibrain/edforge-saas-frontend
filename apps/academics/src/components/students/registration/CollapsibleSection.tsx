@@ -119,12 +119,7 @@ export function CollapsibleSection({
 
   return (
     <div
-      style={{
-        borderRadius: 12,
-        border: '1px solid rgb(var(--border-primary) / 0.35)',
-        background: isExpanded ? 'transparent' : 'rgba(255, 255, 255, 0.01)',
-        overflow: 'hidden',
-      }}
+      className={`rounded-xl border border-[rgb(var(--border-primary)/0.35)] overflow-hidden ${isExpanded ? 'bg-transparent' : 'bg-[rgb(var(--background-tertiary)/0.4)]'}`}
     >
       {/* Header — clickable toggle */}
       <button
@@ -132,46 +127,23 @@ export function CollapsibleSection({
         onClick={toggle}
         aria-expanded={isExpanded}
         aria-controls={contentId}
-        className="w-full flex items-center gap-3 text-left transition-colors hover:bg-[rgba(255,255,255,0.02)]"
-        style={{ padding: '14px 16px' }}
+        className="w-full flex items-center gap-3 text-left transition-colors px-4 py-3.5 hover:bg-[rgb(var(--background-tertiary)/0.5)]"
       >
         {/* Icon pill */}
         <div
-          className="flex items-center justify-center shrink-0"
-          style={{
-            width: 28,
-            height: 28,
-            borderRadius: 8,
-            background: hasErrors
-              ? 'rgb(var(--state-danger-bg))'
-              : 'rgba(29, 158, 117, 0.08)',
-          }}
+          className={`flex items-center justify-center shrink-0 rounded-lg ${hasErrors ? 'bg-[rgb(var(--state-danger-bg))]' : 'bg-[rgb(var(--accent-enrollment)/0.08)]'}`}
+          style={{ width: 28, height: 28 }}
         >
-          <Icon
-            className="w-3.5 h-3.5"
-            style={{
-              color: hasErrors ? 'rgb(var(--state-danger-fg))' : '#1D9E75',
-            }}
-          />
+          <Icon className={`w-3.5 h-3.5 ${hasErrors ? 'text-[rgb(var(--state-danger-fg))]' : 'text-[#1D9E75]'}`} />
         </div>
 
         {/* Title + description */}
         <div className="flex-1 min-w-0">
-          <span
-            className="block font-semibold"
-            style={{
-              fontSize: 13,
-              color: 'rgb(var(--text-primary))',
-              letterSpacing: '-0.2px',
-            }}
-          >
+          <span className="block font-semibold text-sm tracking-[-0.2px] text-[rgb(var(--text-primary))]">
             {title}
           </span>
           {description && (
-            <span
-              className="block"
-              style={{ fontSize: 11, color: 'rgb(var(--text-tertiary))', marginTop: 1 }}
-            >
+            <span className="block text-2xs text-[rgb(var(--text-tertiary))] mt-px">
               {description}
             </span>
           )}
@@ -180,32 +152,22 @@ export function CollapsibleSection({
         {/* Completion badge (shown when collapsed or has status) */}
         <div className="flex items-center gap-2 shrink-0">
           {hasErrors ? (
-            <span
-              className="flex items-center gap-1"
-              style={{ fontSize: 10, fontWeight: 500, color: 'rgb(var(--state-danger-fg))' }}
-            >
+            <span className="flex items-center gap-1 text-3xs font-medium text-[rgb(var(--state-danger-fg))]">
               <AlertCircle className="w-3 h-3" />
               {errorCount} {errorCount === 1 ? 'error' : 'errors'}
             </span>
           ) : !isExpanded ? (
             isComplete ? (
-              <span
-                className="flex items-center gap-1"
-                style={{ fontSize: 10, fontWeight: 500, color: '#1D9E75' }}
-              >
+              <span className="flex items-center gap-1 text-3xs font-medium text-[#1D9E75]">
                 <Check className="w-3 h-3" />
                 Complete
               </span>
             ) : filled > 0 ? (
-              <span
-                style={{ fontSize: 10, fontWeight: 500, color: 'rgb(var(--text-tertiary))' }}
-              >
+              <span className="text-3xs font-medium text-[rgb(var(--text-tertiary))]">
                 {filled} of {total} filled
               </span>
             ) : (
-              <span
-                style={{ fontSize: 10, color: 'rgb(var(--text-disabled))' }}
-              >
+              <span className="text-3xs text-[rgb(var(--text-disabled))]">
                 {total} fields
               </span>
             )
@@ -216,10 +178,7 @@ export function CollapsibleSection({
             animate={{ rotate: isExpanded ? 180 : 0 }}
             transition={{ duration: 0.2 }}
           >
-            <ChevronDown
-              className="w-4 h-4"
-              style={{ color: 'rgb(var(--text-tertiary))' }}
-            />
+            <ChevronDown className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
           </motion.div>
         </div>
       </button>
@@ -235,13 +194,7 @@ export function CollapsibleSection({
             transition={{ duration: 0.25, ease: 'easeInOut' }}
             style={{ overflow: 'hidden' }}
           >
-            <div
-              style={{
-                padding: '0 16px 16px',
-                borderTop: '1px solid rgb(var(--border-primary) / 0.35)',
-                paddingTop: 16,
-              }}
-            >
+            <div className="px-4 pt-4 pb-4 border-t border-[rgb(var(--border-primary)/0.35)]">
               {children}
             </div>
           </motion.div>

@@ -87,15 +87,9 @@ export function MedicalStep({
     <FormProvider {...form}>
       <div className="space-y-4">
         {/* Info Banner */}
-        <div
-          className="flex items-start gap-3 rounded-lg p-3"
-          style={{
-            background: 'rgb(var(--state-info-bg))',
-            border: '1px solid rgb(var(--state-info-border))',
-          }}
-        >
-          <Info className="w-4 h-4 shrink-0 mt-0.5" style={{ color: 'rgb(var(--state-info-fg))' }} />
-          <p style={{ fontSize: 12, color: 'rgb(var(--text-secondary))' }}>
+        <div className="flex items-start gap-3 rounded-lg p-3 bg-[rgb(var(--state-info-bg))] border border-[rgb(var(--state-info-border))]">
+          <Info className="w-4 h-4 shrink-0 mt-0.5 text-[rgb(var(--state-info-fg))]" />
+          <p className="text-xs text-[rgb(var(--text-secondary))]">
             All fields on this page are optional. You can skip this step and add information later.
           </p>
         </div>
