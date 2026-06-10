@@ -24,15 +24,12 @@ function ListSkeleton() {
     <div className="space-y-3">
       {[1, 2, 3, 4, 5].map((i) => (
         <div key={i} className="flex items-center gap-3">
-          <div
-            className="w-8 h-8 rounded-full v2-skeleton-pulse flex-shrink-0"
-            style={{ background: 'rgb(var(--background-tertiary))' }}
-          />
+          <div className="w-8 h-8 rounded-full v2-skeleton-pulse flex-shrink-0 bg-[rgb(var(--background-tertiary))]" />
           <div className="flex-1 space-y-1">
-            <div className="h-3 w-24 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
-            <div className="h-2.5 w-16 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
+            <div className="h-3 w-24 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
+            <div className="h-2.5 w-16 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
           </div>
-          <div className="h-3 w-8 rounded v2-skeleton-pulse" style={{ background: 'rgb(var(--background-tertiary))' }} />
+          <div className="h-3 w-8 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
         </div>
       ))}
     </div>
@@ -66,6 +63,7 @@ function StudentAvatar({ name, studentId }: { name: string; studentId: string })
   if (imgError || !src) {
     return (
       <div
+        // allow-presentation-style: per-student deterministic avatar color
         className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-semibold text-[rgb(var(--action-primary-fg))]"
         style={{ background: bg }}
       >
@@ -80,6 +78,7 @@ function StudentAvatar({ name, studentId }: { name: string; studentId: string })
       alt={name}
       width={30}
       height={30}
+      // allow-presentation-style: per-student avatar bg shows behind the loading image
       className="w-8 h-8 rounded-full flex-shrink-0"
       style={{ background: bg, maxWidth: 30, maxHeight: 30 }}
       onError={() => setImgError(true)}
@@ -96,22 +95,16 @@ export function AtRiskStudentsCard({
 
   return (
     <div
-      className="rounded-xl border flex flex-col"
-      style={{
-        background: 'rgb(var(--background-secondary))',
-        borderColor: 'rgb(var(--border-primary) / 0.35)',
-        padding: 18,
-      }}
+      // allow-presentation-style: card padding (18px) is off the 4px scale
+      className="rounded-xl border flex flex-col bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]"
+      style={{ padding: 18 }}
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
-        <h3
-          className="text-sm font-medium"
-          style={{ color: 'rgb(var(--text-secondary))' }}
-        >
+        <h3 className="text-sm font-medium text-[rgb(var(--text-secondary))]">
           At-risk student detail
         </h3>
-        <span className="text-xs font-semibold" style={{ color: '#E24B4A' }}>
+        <span className="text-xs font-semibold text-[rgb(var(--state-danger-fg))]">
           {totalAtRisk} at risk
         </span>
       </div>
@@ -121,10 +114,7 @@ export function AtRiskStudentsCard({
         {isLoading ? (
           <ListSkeleton />
         ) : totalAtRisk === 0 ? (
-          <div
-            className="flex items-center justify-center text-sm py-6"
-            style={{ color: 'rgb(var(--text-tertiary))' }}
-          >
+          <div className="flex items-center justify-center text-sm py-6 text-[rgb(var(--text-tertiary))]">
             No at-risk students
           </div>
         ) : (
@@ -135,15 +125,19 @@ export function AtRiskStudentsCard({
                 <div key={student.studentId} className="flex items-center gap-3">
                   <StudentAvatar name={student.studentName} studentId={student.studentId} />
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium truncate" style={{ color: 'rgb(var(--text-secondary))' }}>
+                    <p className="text-xs font-medium truncate text-[rgb(var(--text-secondary))]">
                       {student.studentName}
                     </p>
-                    <p className="text-xs mt-0.5" style={{ color: 'rgb(var(--text-disabled))' }}>
+                    <p className="text-xs mt-0.5 text-[rgb(var(--text-disabled))]">
                       {student.gradeLevel ? `Grade ${student.gradeLevel}` : ''}{student.gradeLevel ? ' · ' : ''}{student.absentDays} absent
                     </p>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
-                    <span className="text-xs font-semibold tabular-nums" style={{ color }}>
+                    <span
+                      // allow-presentation-style: attendance-rate severity color (danger/warning)
+                      className="text-xs font-semibold tabular-nums"
+                      style={{ color }}
+                    >
                       {student.attendanceRate.toFixed(1)}%
                     </span>
                     <div className="w-12">
@@ -162,11 +156,10 @@ export function AtRiskStudentsCard({
       </div>
 
       {/* Footer */}
-      <div className="pt-3 mt-3" style={{ borderTop: '1px solid rgb(var(--border-primary) / 0.35)' }}>
+      <div className="pt-3 mt-3 border-t border-[rgb(var(--border-primary)/0.35)]">
         <Link
           to="/students"
-          className="inline-flex items-center gap-1.5 text-xs font-medium transition-opacity hover:opacity-80"
-          style={{ color: '#1D9E75' }}
+          className="inline-flex items-center gap-1.5 text-xs font-medium transition-opacity hover:opacity-80 text-[#1D9E75]"
         >
           View all {totalAtRisk} at-risk students
           <ArrowRight className="w-3 h-3" />

@@ -86,11 +86,13 @@ export function AcademicsFilterRow({
   onClear,
   onExport,
 }: AcademicsFilterRowProps) {
+  // Date/grade inputs read off the unified light theme. The former
+  // rgba(255,255,255,0.0x) bg/border washed out to invisible, and
+  // colorScheme:'dark' forced a dark native date-picker over the light app.
   const inputStyle = {
-    background: 'rgba(255, 255, 255, 0.04)',
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    background: 'rgb(var(--background-secondary))',
+    borderColor: 'rgb(var(--border-primary) / 0.35)',
     color: 'rgb(var(--text-secondary))',
-    colorScheme: 'dark' as const,
   }
 
   // Detect which quick-select pill is active
@@ -124,19 +126,18 @@ export function AcademicsFilterRow({
             <button
               key={opt.key}
               onClick={() => handleQuickSelect(opt.key)}
-              className="px-2.5 py-1 text-xs font-medium rounded-full border transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/30"
-              style={{
-                background: isActive ? '#1D9E75' : 'transparent',
-                borderColor: isActive ? '#1D9E75' : 'rgba(255, 255, 255, 0.1)',
-                color: isActive ? '#fff' : 'rgb(var(--text-tertiary))',
-              }}
+              className={`px-2.5 py-1 text-xs font-medium rounded-full border transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/30 ${
+                isActive
+                  ? 'bg-[#1D9E75] border-[#1D9E75] text-[#fff]'
+                  : 'bg-transparent border-[rgb(var(--border-primary)/0.4)] text-[rgb(var(--text-tertiary))]'
+              }`}
             >
               {opt.label}
             </button>
           )
         })}
 
-        <span className="text-xs mx-1" style={{ color: 'rgb(var(--text-disabled))' }}>or</span>
+        <span className="text-xs mx-1 text-[rgb(var(--text-disabled))]">or</span>
 
         {/* Date inputs */}
         <input
@@ -147,7 +148,7 @@ export function AcademicsFilterRow({
           className="px-2 py-1 text-xs border rounded-[7px] focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/30"
           style={inputStyle}
         />
-        <span className="text-xs" style={{ color: 'rgb(var(--text-disabled))' }}>→</span>
+        <span className="text-xs text-[rgb(var(--text-disabled))]">→</span>
         <input
           type="date"
           value={toDate}
@@ -176,8 +177,7 @@ export function AcademicsFilterRow({
         {hasActiveFilters && (
           <button
             onClick={onClear}
-            className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full transition-colors hover:opacity-80"
-            style={{ color: '#1D9E75' }}
+            className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full transition-colors hover:opacity-80 text-[#1D9E75]"
           >
             <X className="w-3 h-3" />
             Clear
@@ -190,12 +190,7 @@ export function AcademicsFilterRow({
             onClick={onExport}
             disabled={isExporting || !hasAcademicYear}
             aria-label="Export enrollments as CSV"
-            className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40"
-            style={{
-              background: 'rgb(var(--background-tertiary))',
-              borderColor: 'rgb(var(--border-primary) / 0.35)',
-              color: 'rgb(var(--text-secondary))',
-            }}
+            className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40 bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
           >
             {isExporting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />}
             Export CSV
