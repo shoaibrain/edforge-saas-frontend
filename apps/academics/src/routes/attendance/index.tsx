@@ -118,7 +118,7 @@ function TabBar({
   onTabChange: (tab: TabId) => void
 }) {
   return (
-    <nav style={{ display: 'flex', gap: 4 }} aria-label="Attendance tabs">
+    <nav className="flex gap-1" aria-label="Attendance tabs">
       {TABS.map((tab) => {
         const isActive = activeTab === tab.id
         return (
@@ -126,20 +126,11 @@ function TabBar({
             key={tab.id}
             type="button"
             onClick={() => onTabChange(tab.id)}
-            style={{
-              padding: '5px 12px',
-              borderRadius: 6,
-              fontSize: 11,
-              fontWeight: 500,
-              color: isActive ? '#378ADD' : 'rgb(var(--text-disabled))',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 5,
-              border: isActive ? '1px solid rgba(55,138,221,0.20)' : '1px solid transparent',
-              background: isActive ? 'rgba(55,138,221,0.10)' : 'transparent',
-              transition: 'all 0.12s',
-            }}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-2xs font-medium cursor-pointer transition-all border ${
+              isActive
+                ? 'text-[#378ADD] border-[rgb(var(--accent-academics)/0.2)] bg-[rgb(var(--accent-academics)/0.1)]'
+                : 'text-[rgb(var(--text-disabled))] border-transparent bg-transparent'
+            }`}
           >
             <tab.icon style={{ width: 11, height: 11 }} />
             {tab.label}
@@ -243,7 +234,7 @@ export function AttendanceModule() {
 
   if (yearLoading) {
     return (
-      <div className="space-y-3" style={{ padding: '0 24px' }}>
+      <div className="space-y-3 px-6">
         {Array.from({ length: 4 }).map((_, i) => (
           <div key={i} className="h-24 bg-surface-secondary rounded-xl animate-pulse" />
         ))}
@@ -253,7 +244,7 @@ export function AttendanceModule() {
 
   if (!currentYear?.yearId) {
     return (
-      <div style={{ padding: '24px' }}>
+      <div className="p-6">
         <NoCurrentAcademicYearEmptyState
           secondaryMessage="Set up an academic year in school settings before recording attendance."
         />
@@ -425,22 +416,22 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
   return (
     <div style={{ minHeight: '100%' }}>
       {/* V2 Attendance Sub-Header + Sub-Tabs */}
-      <div style={{ padding: '0 24px' }}>
+      <div className="px-6">
         {/* Sub-Header Row */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <div style={{ width: 32, height: 32, background: 'rgba(239,159,39,0.10)', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <ClipboardCheck style={{ width: 16, height: 16, color: '#EF9F27' }} />
+        <div className="flex items-center justify-between mb-3.5">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center rounded-lg bg-[rgb(var(--accent-attendance)/0.1)]" style={{ width: 32, height: 32 }}>
+              <ClipboardCheck className="w-4 h-4 text-[rgb(var(--accent-attendance))]" />
             </div>
             <div>
-              <div style={{ fontSize: 15, fontWeight: 600, letterSpacing: '-0.2px', color: 'rgb(var(--text-primary))' }}>Attendance</div>
-              <div style={{ fontSize: 10, color: 'rgb(var(--text-disabled))' }}>
+              <div className="text-base font-semibold tracking-[-0.2px] text-[rgb(var(--text-primary))]">Attendance</div>
+              <div className="text-3xs text-[rgb(var(--text-disabled))]">
                 Record and review attendance by class section · {currentYearName || 'Academic Year'}
               </div>
             </div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ fontSize: 10, color: 'rgb(var(--text-disabled))' }}>
+          <div className="flex items-center gap-2">
+            <span className="text-3xs text-[rgb(var(--text-disabled))]">
               Last updated: {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </span>
           </div>
@@ -451,7 +442,7 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
 
         {/* Controls Row (only for daily entry) */}
         {activeTab === 'daily-entry' && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 24, flexWrap: 'wrap', marginTop: 12, marginBottom: 4 }}>
+          <div className="flex items-center gap-6 flex-wrap mt-3 mb-1">
             <SectionSelector
               sections={sections}
               selectedId={selectedSectionId}
@@ -475,7 +466,7 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
       </div>
 
       {/* Tab Content */}
-      <div style={{ padding: '16px 24px 24px' }}>
+      <div className="pt-4 px-6 pb-6">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
