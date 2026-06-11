@@ -183,12 +183,16 @@ tiers, animated widths, caller-provided accent props) carry markers;
 
 The marketing landing was swept and the `landing/**` + `landing-v2/**`
 warn-overrides were removed — they now inherit the `error` gate. This covered
-the three sub-areas: the live homepage (`landing-v2/sections/**` +
-`components/**` — hero, pillars + visuals, district/teacher/student demo
-dashboards, security strip, FAQ, CTA, footer), the legal-page chrome
-(`landing/Navbar.tsx`, `landing/Footer.tsx`), and the internal
-`/_landing-preview` galleries (`TokenGallery`, `PrimitiveGallery`,
-`StringsCatalog`). 26 files, **0** presentation-style warnings.
+the live homepage (`landing-v2/sections/**` + `components/**` — hero, pillars +
+visuals, district/teacher/student demo dashboards, security strip, FAQ, CTA,
+footer) and the legal-page chrome (`landing/Navbar.tsx`, `landing/Footer.tsx`).
+**0** presentation-style warnings.
+
+The `/_landing-preview` prototyping route and its galleries (`TokenGallery`,
+`PrimitiveGallery`, `StringsCatalog`, `LandingPreviewPage`) were build-out
+scaffolding — never linked from product UI — and were **deleted** rather than
+converted (route + barrel export + test removed; they only consumed real
+landing components/data, so nothing shared was affected).
 
 Landing has its own `--lp-*` token system (`packages/theme/src/landing-tokens.css`
 + `landing/landing.css`); static styles became `*-[var(--lp-*)]` classes. Because
