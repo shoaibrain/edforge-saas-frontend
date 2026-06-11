@@ -26,7 +26,8 @@ import {
   AlertTriangle,
   CheckCircle,
 } from 'lucide-react'
-import { WidgetErrorBoundaryV2 } from '@edforge/ui'
+import { WidgetErrorBoundaryV2, DataTable, createColumnHelper } from '@edforge/ui'
+import type { ColumnDef } from '@tanstack/react-table'
 import { useAttendanceOverview } from '../../hooks/useAttendance'
 import { StudentAttendanceModal } from '../../components/attendance/StudentAttendanceModal'
 import { UserAvatar } from '../../components/common/UserAvatar'
@@ -45,8 +46,6 @@ interface AttendanceDashboardProps {
   academicYearId: string
   currentDate: string
 }
-
-type SortDir = 'asc' | 'desc'
 
 // ============================================================================
 // V2 DESIGN TOKENS
@@ -668,15 +667,107 @@ function PeriodAveragesCard({
 // ATTENDANCE ALERTS TABLE (CLS-019)
 // ============================================================================
 
-type AlertSortKey = 'studentName' | 'attendanceRate' | 'absentDays' | 'totalDays' | 'trend'
-
 function getRateColorHex(rate: number): string {
   if (rate < 60) return V2.danger
   if (rate < 80) return V2.warning
   return V2.textMuted
 }
 
-function AlertsTableV2({
+const TREND_META: Record<AttendanceAlert['trend'], { text: string; color: string }> = {
+  improving: { text: '↑ Improving', color: V2.success },
+  declining: { text: '↓ Declining', color: V2.danger },
+  stable: { text: '— Stable', color: V2.textHint },
+}
+
+const alertColumnHelper = createColumnHelper<AttendanceAlert>()
+
+const alertColumns = [
+  alertColumnHelper.accessor('studentName', {
+    header: 'Student',
+    enableSorting: true,
+    cell: ({ row }) => {
+      const a = row.original
+      return (
+        <div className="flex items-center gap-2 min-w-0">
+          <UserAvatar userId={a.studentId} userName={a.studentName} size="sm" />
+          <div className="min-w-0">
+            <span className="block truncate text-xs font-medium text-[rgb(var(--text-primary))]">{a.studentName}</span>
+            {a.gradeLevel && (
+              <span className="block text-4xs text-[rgb(var(--text-disabled))]">{a.gradeLevel}</span>
+            )}
+          </div>
+        </div>
+      )
+    },
+    meta: { align: 'left' },
+  }),
+  alertColumnHelper.accessor('attendanceRate', {
+    header: 'Rate',
+    enableSorting: true,
+    cell: ({ getValue }) => {
+      const rate = getValue()
+      return (
+        <span
+          // allow-presentation-style: rate severity color
+          className="text-xs font-bold tabular-nums"
+          style={{ color: getRateColorHex(rate) }}
+        >
+          {rate.toFixed(1)}%
+        </span>
+      )
+    },
+    meta: { align: 'right' },
+  }),
+  alertColumnHelper.accessor('absentDays', {
+    header: 'Absent',
+    enableSorting: true,
+    cell: ({ getValue }) => (
+      <span className="text-2xs tabular-nums text-[rgb(var(--text-tertiary))]">{getValue()}</span>
+    ),
+    meta: { align: 'center' },
+  }),
+  alertColumnHelper.accessor('totalDays', {
+    header: 'Total',
+    enableSorting: true,
+    cell: ({ getValue }) => (
+      <span className="text-2xs tabular-nums text-[rgb(var(--text-disabled))]">{getValue()}</span>
+    ),
+    meta: { align: 'center' },
+  }),
+  alertColumnHelper.accessor('trend', {
+    header: 'Trend',
+    enableSorting: true,
+    // faceted filter supplies a string[] of selected trends
+    filterFn: (row, columnId, filterValue) => {
+      if (!Array.isArray(filterValue) || filterValue.length === 0) return true
+      return (filterValue as string[]).includes(row.getValue(columnId))
+    },
+    cell: ({ getValue }) => {
+      const t = TREND_META[getValue()]
+      return (
+        <span
+          // allow-presentation-style: trend direction color
+          className="text-3xs font-medium"
+          style={{ color: t.color }}
+        >
+          {t.text}
+        </span>
+      )
+    },
+    meta: { align: 'right' },
+  }),
+] as ColumnDef<AttendanceAlert, unknown>[]
+
+/**
+ * Attendance Alerts — the actionable at-risk list.
+ *
+ * Uses the shared @edforge/ui DataTable: bounded height + pagination + sort +
+ * a Trend faceted filter + student search, so the page no longer grows
+ * unbounded as the at-risk cohort grows. Client-paginated over the aggregate's
+ * `atRiskStudents` today; when the backend exposes a server-paginated at-risk
+ * endpoint (plan T4), swap to DataTable's `serverPagination` adapter.
+ */
+function AttendanceAlertsTable({
   alerts,
   totalAtRiskCount,
   onStudentClick,
@@ -685,142 +776,56 @@ function AlertsTableV2({
   totalAtRiskCount: number
   onStudentClick?: (studentId: string) => void
 }) {
-  const [sortKey, setSortKey] = useState<AlertSortKey>('attendanceRate')
-  const [sortDir, setSortDir] = useState<SortDir>('asc')
-
-  const toggleSort = (key: AlertSortKey) => {
-    if (sortKey === key) {
-      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))
-    } else {
-      setSortKey(key)
-      setSortDir('asc')
-    }
-  }
-
-  const sorted = useMemo(() => {
-    const list = [...alerts]
-    list.sort((a, b) => {
-      let cmp = 0
-      switch (sortKey) {
-        case 'studentName': cmp = a.studentName.localeCompare(b.studentName); break
-        case 'attendanceRate': cmp = a.attendanceRate - b.attendanceRate; break
-        case 'absentDays': cmp = a.absentDays - b.absentDays; break
-        case 'totalDays': cmp = a.totalDays - b.totalDays; break
-        case 'trend': {
-          const order = { declining: 0, stable: 1, improving: 2 }
-          cmp = (order[a.trend] ?? 1) - (order[b.trend] ?? 1)
-          break
-        }
-      }
-      return sortDir === 'desc' ? -cmp : cmp
-    })
-    return list
-  }, [alerts, sortKey, sortDir])
-
-  const headerColStyle = (_field: AlertSortKey, width: number | string, align: 'left' | 'right' | 'center' = 'right'): React.CSSProperties => ({
-    fontSize: 9,
-    fontWeight: 700,
-    color: V2.textGhost,
-    textTransform: 'uppercase',
-    letterSpacing: '0.5px',
-    width: typeof width === 'number' ? width : undefined,
-    flex: width === 'flex' ? 1 : undefined,
-    textAlign: align,
-    cursor: 'pointer',
-    userSelect: 'none',
-  })
-
-  const trendText = (trend: string) => {
-    switch (trend) {
-      case 'improving': return { text: '↑ Improving', color: V2.success }
-      case 'declining': return { text: '↓ Declining', color: V2.danger }
-      default: return { text: '— Stable', color: V2.textHint }
-    }
-  }
-
   return (
-    <div className={CARD}>
-      <CardHeader
-        icon={<WarningTriangleIcon />}
-        iconBg="rgba(239,159,39,0.10)"
-        title="Attendance Alerts"
-        subtitle="Students below 90% attendance rate · sorted by severity"
-        right={
-          alerts.length > 0
-            ? <span className="text-3xs text-[rgb(var(--text-disabled))]">Showing {alerts.length} of {totalAtRiskCount} at-risk student{totalAtRiskCount !== 1 ? 's' : ''}</span>
-            : undefined
-        }
-      />
-      <div className={CARD_BODY}>
-        {alerts.length === 0 ? (
-          <div className="py-8 text-center">
-            <CheckCircle className="text-[#1D9E75] mx-auto mb-3" style={{ width: 40, height: 40 }} />
-            <p className="text-xs text-[rgb(var(--text-secondary))]">No students below the attendance threshold</p>
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2 min-w-0">
+          <div
+            className="flex items-center justify-center rounded-md shrink-0 bg-[rgb(var(--accent-attendance)/0.1)]"
+            style={{ width: 22, height: 22 }}
+          >
+            <WarningTriangleIcon />
           </div>
-        ) : (
-          <>
-            {/* Header */}
-            <div className="flex items-center gap-3 mb-1.5 pb-1.5" style={{ borderBottom: `1px solid ${V2.borderSeparator}` }}>
-              <span style={headerColStyle('studentName', 'flex', 'left')} onClick={() => toggleSort('studentName')}>
-                Student {sortKey === 'studentName' && (sortDir === 'asc' ? '▲' : '▼')}
-              </span>
-              <span style={headerColStyle('attendanceRate', 70)} onClick={() => toggleSort('attendanceRate')}>
-                Rate {sortKey === 'attendanceRate' && (sortDir === 'asc' ? '▲' : '▼')}
-              </span>
-              <span style={headerColStyle('absentDays', 60, 'center')} onClick={() => toggleSort('absentDays')}>
-                Absent {sortKey === 'absentDays' && (sortDir === 'asc' ? '▲' : '▼')}
-              </span>
-              <span style={headerColStyle('totalDays', 50, 'center')} onClick={() => toggleSort('totalDays')}>
-                Total {sortKey === 'totalDays' && (sortDir === 'asc' ? '▲' : '▼')}
-              </span>
-              <span style={headerColStyle('trend', 60)} onClick={() => toggleSort('trend')}>
-                Trend {sortKey === 'trend' && (sortDir === 'asc' ? '▲' : '▼')}
-              </span>
-            </div>
-            {/* Rows */}
-            {sorted.map((alert, i) => {
-              const t = trendText(alert.trend)
-              return (
-                <div
-                  key={alert.studentId}
-                  className="flex items-center gap-3 py-2"
-                  style={{ borderBottom: i < sorted.length - 1 ? `1px solid ${V2.borderRow}` : 'none' }}
-                >
-                  <div className="flex-1 flex items-center gap-2 min-w-0">
-                    <UserAvatar userId={alert.studentId} userName={alert.studentName} size="sm" />
-                    <div className="min-w-0">
-                      <button
-                        type="button"
-                        onClick={() => onStudentClick?.(alert.studentId)}
-                        className="bg-transparent border-0 p-0 cursor-pointer text-left text-xs font-medium text-[rgb(var(--text-primary))]"
-                      >
-                        {alert.studentName}
-                      </button>
-                      {alert.gradeLevel && (
-                        <span className="block text-4xs text-[rgb(var(--text-disabled))]">{alert.gradeLevel}</span>
-                      )}
-                    </div>
-                  </div>
-                  <span
-                    // allow-presentation-style: rate severity color
-                    className="text-xs font-bold text-right"
-                    style={{ width: 60, color: getRateColorHex(alert.attendanceRate) }}
-                  >
-                    {alert.attendanceRate.toFixed(1)}%
-                  </span>
-                  <span className="text-2xs text-[rgb(var(--text-tertiary))] text-center" style={{ width: 50 }}>{alert.absentDays}</span>
-                  <span className="text-2xs text-[rgb(var(--text-disabled))] text-center" style={{ width: 50 }}>{alert.totalDays}</span>
-                  <span
-                    // allow-presentation-style: trend direction color
-                    className="text-3xs text-right"
-                    style={{ width: 60, color: t.color }}
-                  >{t.text}</span>
-                </div>
-              )
-            })}
-          </>
+          <div className="min-w-0">
+            <div className="text-sm font-semibold text-[rgb(var(--text-primary))]">Attendance Alerts</div>
+            <div className="text-3xs text-[rgb(var(--text-disabled))]">Students below 90% attendance rate</div>
+          </div>
+        </div>
+        {totalAtRiskCount > 0 && (
+          <span className="text-3xs text-[rgb(var(--text-disabled))] shrink-0">
+            {alerts.length < totalAtRiskCount
+              ? `Showing ${alerts.length} of ${totalAtRiskCount} at-risk students`
+              : `${totalAtRiskCount} at-risk student${totalAtRiskCount !== 1 ? 's' : ''}`}
+          </span>
         )}
       </div>
+
+      <DataTable<AttendanceAlert>
+        columns={alertColumns}
+        data={alerts}
+        getRowId={(a) => a.studentId}
+        enableSorting
+        searchPlaceholder="Search students"
+        facetedFilters={[
+          {
+            columnId: 'trend',
+            title: 'Trend',
+            options: [
+              { label: 'Declining', value: 'declining' },
+              { label: 'Stable', value: 'stable' },
+              { label: 'Improving', value: 'improving' },
+            ],
+          },
+        ]}
+        pagination={{ pageSize: 8, pageSizeOptions: [8, 16, 24] }}
+        maxHeight="520px"
+        onRowClick={(a) => onStudentClick?.(a.studentId)}
+        emptyState={{
+          icon: <CheckCircle className="text-[#1D9E75]" style={{ width: 40, height: 40 }} />,
+          title: 'No students below the attendance threshold',
+          description: 'Every student is at or above 90% attendance.',
+        }}
+      />
     </div>
   )
 }
@@ -950,7 +955,7 @@ export function AttendanceDashboard({
         <SkeletonCard />
       ) : (
         <WidgetErrorBoundaryV2>
-          <AlertsTableV2
+          <AttendanceAlertsTable
             alerts={data?.atRiskStudents ?? []}
             totalAtRiskCount={data?.totalAtRiskCount ?? 0}
             onStudentClick={(studentId) => {

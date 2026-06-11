@@ -11,11 +11,10 @@
 import { useState, useMemo, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { usePermission } from '@edforge/abac'
-import { Select } from '@edforge/ui'
+import { Select, SegmentedControl } from '@edforge/ui'
 import {
   ClipboardCheck,
   Loader2,
-  BarChart3,
   AlertTriangle,
   Wifi,
   WifiOff,
@@ -48,11 +47,6 @@ import { NoCurrentAcademicYearEmptyState } from '../../components/common'
 import type { AttendanceStatus } from '../../services/academics.service'
 
 type TabId = 'overview' | 'daily-entry'
-
-const TABS: { id: TabId; label: string; icon: typeof BarChart3 }[] = [
-  { id: 'overview', label: 'Overview', icon: BarChart3 },
-  { id: 'daily-entry', label: 'Daily Entry', icon: ClipboardCheck },
-]
 
 // ============================================================================
 // SAVE STATUS INDICATOR
@@ -103,41 +97,6 @@ function SaveStatusIndicator({
       <Icon className={`w-3.5 h-3.5 ${status === 'saving' ? 'animate-spin' : ''}`} />
       <span>{text}</span>
     </div>
-  )
-}
-
-// ============================================================================
-// TAB BAR (framer-motion animated underline — consistent with other modules)
-// ============================================================================
-
-function TabBar({
-  activeTab,
-  onTabChange,
-}: {
-  activeTab: TabId
-  onTabChange: (tab: TabId) => void
-}) {
-  return (
-    <nav className="flex gap-1" aria-label="Attendance tabs">
-      {TABS.map((tab) => {
-        const isActive = activeTab === tab.id
-        return (
-          <button
-            key={tab.id}
-            type="button"
-            onClick={() => onTabChange(tab.id)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-2xs font-medium cursor-pointer transition-all border ${
-              isActive
-                ? 'text-[#378ADD] border-[rgb(var(--accent-academics)/0.2)] bg-[rgb(var(--accent-academics)/0.1)]'
-                : 'text-[rgb(var(--text-disabled))] border-transparent bg-transparent'
-            }`}
-          >
-            <tab.icon style={{ width: 11, height: 11 }} />
-            {tab.label}
-          </button>
-        )
-      })}
-    </nav>
   )
 }
 
@@ -415,30 +374,31 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
 
   return (
     <div style={{ minHeight: '100%' }}>
-      {/* V2 Attendance Sub-Header + Sub-Tabs */}
+      {/* V2 Attendance Header — title left, Overview / Daily Entry toggle right */}
       <div className="px-6">
-        {/* Sub-Header Row */}
-        <div className="flex items-center justify-between mb-3.5">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center rounded-lg bg-[rgb(var(--accent-attendance)/0.1)]" style={{ width: 32, height: 32 }}>
+        {/* Header Row */}
+        <div className="flex items-center justify-between gap-3 mb-3.5">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="flex items-center justify-center rounded-lg bg-[rgb(var(--accent-attendance)/0.1)] shrink-0" style={{ width: 32, height: 32 }}>
               <ClipboardCheck className="w-4 h-4 text-[rgb(var(--accent-attendance))]" />
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="text-base font-semibold tracking-[-0.2px] text-[rgb(var(--text-primary))]">Attendance</div>
-              <div className="text-3xs text-[rgb(var(--text-disabled))]">
+              <div className="text-3xs text-[rgb(var(--text-disabled))] truncate">
                 Record and review attendance by class section · {currentYearName || 'Academic Year'}
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-3xs text-[rgb(var(--text-disabled))]">
-              Last updated: {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-            </span>
-          </div>
+          <SegmentedControl
+            aria-label="Attendance view"
+            tabs={[
+              { id: 'overview', label: 'Overview' },
+              { id: 'daily-entry', label: 'Daily Entry' },
+            ]}
+            value={activeTab}
+            onChange={(v) => setActiveTab(v as TabId)}
+          />
         </div>
-
-        {/* Sub-Tabs */}
-        <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
 
         {/* Controls Row (only for daily entry) */}
         {activeTab === 'daily-entry' && (
