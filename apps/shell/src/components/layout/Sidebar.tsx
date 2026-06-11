@@ -225,7 +225,7 @@ function NavItemLink({
 
   if (collapsed) {
     return (
-      <Tooltip content={translatedLabel} side="right" sideOffset={12}>
+      <Tooltip content={translatedLabel} side="right" sideOffset={12} className="block">
         <motion.div
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
@@ -398,7 +398,7 @@ function HomeNavButton({
 
   if (collapsed) {
     return (
-      <Tooltip content={label} side="right" sideOffset={12}>
+      <Tooltip content={label} side="right" sideOffset={12} className="block">
         {linkContent}
       </Tooltip>
     )

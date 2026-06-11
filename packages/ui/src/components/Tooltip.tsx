@@ -9,6 +9,13 @@ interface TooltipProps {
   sideOffset?: number
   disabled?: boolean
   delayDuration?: number
+  /**
+   * Display/utility classes for the trigger wrapper. Defaults to `inline-block`.
+   * Pass `block` (or `block w-full`) when the trigger must remain a block-level
+   * element so it stacks vertically — e.g. collapsed sidebar nav items, which
+   * would otherwise flow horizontally while the panel width is mid-animation.
+   */
+  className?: string
 }
 
 export function Tooltip({
@@ -18,6 +25,7 @@ export function Tooltip({
   sideOffset = 8,
   disabled = false,
   delayDuration = 200,
+  className = 'inline-block',
 }: TooltipProps) {
   const [isVisible, setIsVisible] = useState(false)
   const [position, setPosition] = useState({ x: 0, y: 0 })
@@ -100,7 +108,7 @@ export function Tooltip({
         onMouseLeave={handleMouseLeave}
         onFocus={handleMouseEnter}
         onBlur={handleMouseLeave}
-        className="inline-block"
+        className={className}
       >
         {children}
       </div>
