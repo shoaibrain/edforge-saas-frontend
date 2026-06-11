@@ -2,7 +2,7 @@
 
 **Status:** proposed · **Owner:** frontend / design-system · **Type:** UX + correctness
 **Scope:** the first-run boot experience (loaders) and the active-school resolution flow.
-**Visual prototype:** [`prototypes/organic-loader.html`](prototypes/organic-loader.html) — open in a browser.
+**Visual prototype:** [`prototypes/organic-loader-v2.html`](prototypes/organic-loader-v2.html) — open in a browser (v2, refined; `organic-loader.html` is the superseded v1).
 
 This plan covers two tightly-coupled presentation-layer problems that together create
 the "slow and buggy" first impression:
@@ -38,27 +38,34 @@ brand-color note in §A.5.
 
 ### A.2 Design concept
 
-A single organic system, *"The Forge"* — a nod to **Ed·Forge** (forging education):
+> **v1 → v2 (design correction).** v1 stamped a **white mark on a teal blob** and animated it
+> with a `stroke-dashoffset` **draw** that redrew the mark every loop — which read as generic
+> and *flashed* (two objects on two rhythms). v2 fixes the root error: **the mark and the
+> organic form are ONE object.** Nothing is stamped; nothing redraws.
 
-- **The crucible** — a soft **squircle blob** that *breathes* (gentle scale) and *morphs its
-  corner radii* on a slow loop. Not a circle, not a hard rectangle — organic and alive.
-- **The mark forges itself** — inside the crucible, the **actual EdForge "E" mark**
-  (the exact path from `logo.svg`) draws on via `stroke-dashoffset`, then holds.
-- **The ember sheen** — once forged, a bright highlight *sweeps across the stroke* like
-  light on hot metal, then the cycle breathes and repeats.
-- **No spinners. No bouncing dots.** The breathing + draw *is* the progress feeling — calm,
-  premium, and unmistakably EdForge.
+The system, *"The Forge"* (a nod to **Ed·Forge** — forging education):
+
+- **One molten form** — a soft blob that *breathes* (gentle scale) and *morphs its corner
+  radii* slowly, its gradient **flowing like hot metal** (animated gradient position). Organic
+  and alive, but a single continuous motion — no spinner, no dots, no draw.
+- **The mark is negative space** — the **actual EdForge "E"** (exact `logo.svg` path) is the
+  **surface breathing through** the form (a real alpha-mask cutout), *not* a logo placed on
+  top. It never animates on its own, so it can never flash. (Concept A — recommended.)
+- **Alternates** (in the prototype): **B "Molten flow mark"** — no container, light flows
+  *through* the letterform continuously; **C "Embossed crucible"** — a matte blob with the
+  mark *carved in* (inset shadow, same hue). All three are continuous and coherent.
 
 **Why this is the right call (design rationale):**
-- *On-brand & memorable* — it animates the real logo, so every wait reinforces the brand
-  instead of a generic letter.
-- *Organic, per the brief* — squircle morphing + breathing reads "soft/blobby" without being
-  juvenile; it suits a serious EMIS.
-- *One vocabulary, many states* — boot, module-load, school-switch, and inline all share the
-  same primitive, so the app feels coherent (a stated design-system principle: "MFE drift is
-  a defect").
-- *Quiet motion* — uses the existing motion tokens and fully honors `prefers-reduced-motion`
-  (calm opacity breathe on a fully-formed mark).
+- *Coherent by construction* — there is only one object to animate, so the motion is one calm
+  breath; the "flashing" failure mode is structurally impossible.
+- *On-brand & distinctive, not generic* — the real mark as negative space in a molten form is
+  ownable; it drops the white-logo-on-color cliché.
+- *Warmer, editorial palette* — three options sampled from the real brand world: **Forge**
+  (green→gold, operator app), **Ink** (navy→steel, landing), **Coral** (terracotta→ember).
+- *One vocabulary, many states* — boot, module-load, school-switch, and inline share the same
+  primitive ("MFE drift is a defect").
+- *Quiet motion* — uses motion tokens and honors `prefers-reduced-motion` (a still,
+  fully-formed mark with a gentle opacity breath).
 
 ### A.3 States (one component, `<BrandLoader>`)
 
@@ -79,14 +86,19 @@ A single organic system, *"The Forge"* — a nod to **Ed·Forge** (forging educa
                 accent={tokenName}      // module tint, optional
                 label={string} />        // optional caption
    ```
-   - Inlines the `logo.svg` path as an SVG; the crucible is a `<div>` with the morph/breathe
-     animations; the sheen is a second `<path>` with a short dash that sweeps.
-   - **Colors bind to tokens, not hex.** Crucible gradient = brand tokens; module variant =
-     `--accent-*`. Add CSS custom props so the prototype's literals become token-driven.
+   - The form is a `<div>` blob (border-radius morph + breathe + flowing gradient via animated
+     `background-position`). The **mark is a real alpha mask** cutout of the `logo.svg` path
+     (`mask-image`/`-webkit-mask-image`), so the negative space works on **any** surface
+     (boot/page/overlay) — not the prototype's surface-color shortcut. No separate mark
+     animation exists, so nothing can flash.
+   - **Colors bind to tokens, not hex.** The molten gradient = brand tokens (chosen palette);
+     module variant tints to `--accent-*`. Add CSS custom props so the prototype's literals
+     become token-driven.
 2. **Keyframes** → add to `packages/theme/src/utilities.css` (next to the existing
-   `shimmer`/`fade-in` keyframes): `blob-morph`, `breathe`, `aura-pulse`, `draw`, `sheen`.
-   All wrapped in a `@media (prefers-reduced-motion: reduce)` override that disables morph/
-   draw/sheen and leaves a gentle opacity breathe.
+   `shimmer`/`fade-in` keyframes): `blob-morph`, `breathe`, `molten` (gradient-position flow).
+   **No `draw`/`sheen`** (those caused the v1 flash). Wrap in a
+   `@media (prefers-reduced-motion: reduce)` override that disables morph/molten and leaves a
+   gentle opacity breath on the still, fully-formed mark.
 3. **Swap call-sites** (no behavior change, pure presentation):
    - `LoadingScreen.tsx` → render `<BrandLoader variant="boot" .../>` (keep the component name/
      API so `router.tsx` Suspense fallbacks are untouched; pass module name where known).
@@ -101,21 +113,20 @@ A single organic system, *"The Forge"* — a nod to **Ed·Forge** (forging educa
    JS boots. Drop a static, CSS-only crucible into `index.html` so the brand appears
    *instantly* and the React `<BrandLoader>` cross-fades in — removes the "white flash".
 
-### A.5 Brand-color reconciliation (decision needed)
+### A.5 Palette & the brand-color split (decision needed)
 
-There is a **real brand split** in the codebase:
-- The **mark** (`logo.svg`, `favicon.svg`) is **teal→cyan** `#005f73 → #0a9396`.
-- The **app** is **green-forward**: `--action-primary-bg #0F6E56`, brand-green focus `#1D9E75`.
+The loader deliberately **moves away from the teal/cyan logo gradient** (it read as generic).
+v2 offers three warmer, more editorial palettes — pick one:
 
-The prototype shows **both** color stories:
-- **A — Brand gradient** (teal→cyan): literal logo fidelity.
-- **B — Forge ember** (molten green→amber `#0F6E56 → #EF9F27`): matches the operator app's
-  warm/green identity and the "forge" metaphor best.
+- **Forge** — green→gold `#0F6E56 → #2FA37A → #EFB54A` (matches the operator app; recommended).
+- **Ink** — navy→steel `#1D3557 → #457B9D` (editorial, sampled from the landing page).
+- **Coral** — terracotta→ember `#C44536 → #E07A5F → #EFB54A` (warmest, most ownable).
 
-**Recommendation:** ship **B (Forge ember)** for the in-app loader so the boot moment matches
-the app's actual palette, **and** open a separate tiny task to align the logo/favicon to the
-green system (or consciously keep teal as the "mark only" color). This is a brand call for the
-owner — flagging it, not deciding it unilaterally.
+This also surfaces a **real brand split** to resolve separately: the **mark** (`logo.svg`,
+`favicon.svg`) is **teal→cyan** `#005f73 → #0a9396`, while the **app** is **green-forward**
+(`--action-primary-bg #0F6E56`, focus `#1D9E75`). Recommendation: ship the loader in **Forge**,
+and open a small follow-up to align the logo/favicon to the green system (or consciously keep
+teal as mark-only). A brand call for the owner — flagged, not decided unilaterally.
 
 ---
 

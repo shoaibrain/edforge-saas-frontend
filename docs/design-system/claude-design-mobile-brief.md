@@ -128,7 +128,7 @@ Source: `packages/ui/src/index.ts`.
 - **Locale:** `DateDisplay`, `BsDatePicker`/`DateInput`, `SchoolDate`, `LanguageSwitcher`.
 - **Loader (incoming):** an organic **"The Forge"** `BrandLoader` is being introduced — see
   [`boot-loader-and-school-resolution-plan.md`](boot-loader-and-school-resolution-plan.md) and
-  [`prototypes/organic-loader.html`](prototypes/organic-loader.html). Mobile splash/inline
+  [`prototypes/organic-loader-v2.html`](prototypes/organic-loader-v2.html). Mobile splash/inline
   loaders should use this language.
 
 ---
@@ -274,7 +274,7 @@ KPI rows — **unusable one-handed on a phone.** Priorities, highest impact firs
 | Archetype (Nepal) | `packages/archetype`, `packages/date-utils`, `@edforge/forms AddressFields` |
 | Permissions | `packages/abac` (`usePermission`, `useCanAccess`) |
 | Design-system rules | `docs/design-system/README.md` |
-| Loader language | `docs/design-system/boot-loader-and-school-resolution-plan.md` + `prototypes/organic-loader.html` |
+| Loader language | `docs/design-system/boot-loader-and-school-resolution-plan.md` + `prototypes/organic-loader-v2.html` |
 
 ---
 

@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EdForge — Organic loader v2 (refined)</title>
+<!--
+  v2 — responds to feedback on v1:
+    ✗ v1: white logo stamped on a teal blob (generic), + a "draw" animation that
+          redrew the mark each loop = FLASHING, incoherent with the blob.
+    ✓ v2 principle: the mark and the organic form are ONE object. Nothing is stamped,
+          nothing redraws. Motion is continuous (molten flow / breathing), never a
+          draw-on. No white. Warmer, more editorial palette from the real brand world.
+  Mark path is still the real logo.svg. Hardcoded values OK (static design artifact).
+-->
+<style>
+  :root{
+    --bg: 250 247 242;        /* --background-primary light (warm cream) */
+    --surface: 255 255 255;
+    --ink: 26 31 46;
+    --ink-2: 88 95 111;
+    --border: 150 143 126;
+    --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  [data-theme="dark"]{ --bg: 15 17 23; --surface: 22 27 39; --ink: 232 234 240; --ink-2: 150 156 178; --border: 255 255 255; }
+  *{ box-sizing:border-box; }
+  body{ margin:0; font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+        background:rgb(var(--bg)); color:rgb(var(--ink)); -webkit-font-smoothing:antialiased;
+        transition:background .4s var(--ease), color .4s var(--ease); }
+  header{ display:flex; align-items:center; justify-content:space-between; gap:16px;
+          padding:20px 28px; border-bottom:1px solid rgb(var(--border)/.25);
+          position:sticky; top:0; background:rgb(var(--bg)/.85); backdrop-filter:blur(8px); z-index:5; }
+  header h1{ font-size:16px; font-weight:700; margin:0; letter-spacing:-.01em; }
+  header p{ margin:3px 0 0; font-size:12px; color:rgb(var(--ink-2)); max-width:680px; line-height:1.5; }
+  header button{ font:inherit; font-size:12px; font-weight:600; cursor:pointer; padding:8px 12px;
+                 border-radius:10px; border:1px solid rgb(var(--border)/.35); background:rgb(var(--surface)); color:rgb(var(--ink)); }
+  main{ padding:34px 28px 90px; max-width:1180px; margin:0 auto; }
+  .lead{ font-size:14px; line-height:1.6; color:rgb(var(--ink-2)); max-width:760px; margin:0 0 26px; }
+  .lead b{ color:rgb(var(--ink)); font-weight:600; }
+  .row-label{ font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+              color:rgb(var(--ink-2)); margin:30px 0 12px; }
+  .grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:18px; }
+  .stage{ border:1px solid rgb(var(--border)/.25); border-radius:18px; overflow:hidden;
+          background:rgb(var(--surface)); box-shadow:0 1px 2px rgb(0 18 25/.06),0 1px 3px rgb(0 18 25/.05); }
+  .canvas{ height:230px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; background:rgb(var(--bg)); }
+  .meta{ padding:12px 16px; border-top:1px solid rgb(var(--border)/.2); }
+  .meta .t{ font-size:13px; font-weight:600; }
+  .meta .d{ font-size:12px; color:rgb(var(--ink-2)); margin-top:2px; line-height:1.45; }
+  .cap{ font-size:13px; font-weight:500; color:rgb(var(--ink-2)); }
+  .cap .em{ color:rgb(var(--ink)); font-weight:600; }
+  .badge{ display:inline-block; font-size:10px; font-weight:700; letter-spacing:.04em; padding:2px 7px;
+          border-radius:999px; background:rgb(var(--border)/.14); color:rgb(var(--ink-2)); margin-left:6px; }
+  code{ font-family:'JetBrains Mono',ui-monospace,monospace; font-size:.9em; background:rgb(var(--border)/.12); padding:1px 5px; border-radius:5px; }
+  footer{ text-align:center; font-size:12px; color:rgb(var(--ink-2)); padding:28px; }
+
+  /* ============================================================
+     CONCEPT A — "Living negative space"  (the recommended one)
+     ONE object: a warm, slowly-morphing blob whose gradient flows
+     like molten metal. The mark is the SURFACE breathing THROUGH
+     the blob (negative space), not a logo on top. Nothing redraws,
+     nothing flashes — the mark is simply where the blob isn't.
+     (Prototype paints the cutout in the surface color; the shipped
+      component uses a real alpha mask so it works on any surface.)
+     ============================================================ */
+  .lns{ --size:104px; position:relative; width:var(--size); height:var(--size); }
+  .lns .blob{
+    position:absolute; inset:0;
+    border-radius:46% 54% 56% 44% / 48% 46% 54% 52%;
+    background:linear-gradient(135deg, var(--c1), var(--c2), var(--c3));
+    background-size:220% 220%;
+    box-shadow:0 14px 34px -10px color-mix(in srgb, var(--c2) 55%, transparent);
+    animation: a-morph 9s ease-in-out infinite, a-molten 6s ease-in-out infinite, a-breathe 4.6s var(--ease) infinite;
+  }
+  /* the negative-space mark: surface-colored, STATIC. it reads as a clean hole. */
+  .lns .cut{ position:absolute; inset:0; }
+  .lns .cut path{ fill:none; stroke:rgb(var(--bg)); stroke-width:17; stroke-linecap:round; stroke-linejoin:round;
+                  /* a whisper of inner depth so the hole feels carved, not pasted */
+                  filter:drop-shadow(0 1px 0 rgb(0 0 0 / .06)); }
+  @keyframes a-morph{
+    0%,100%{ border-radius:46% 54% 56% 44% / 48% 46% 54% 52%; }
+    33%    { border-radius:58% 42% 45% 55% / 55% 50% 50% 45%; }
+    66%    { border-radius:44% 56% 60% 40% / 42% 56% 44% 58%; }
+  }
+  @keyframes a-molten{ 0%,100%{ background-position:0% 50%; } 50%{ background-position:100% 50%; } }
+  @keyframes a-breathe{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.04); } }
+
+  /* palettes (form is identical; only the gradient changes) */
+  .forge{ --c1:#0F6E56; --c2:#2FA37A; --c3:#EFB54A; }   /* warm green -> gold (operator app, "molten") */
+  .ink{   --c1:#1D3557; --c2:#3E6491; --c3:#457B9D; }   /* navy -> steel (editorial, from the landing) */
+  .coral{ --c1:#C44536; --c2:#E07A5F; --c3:#EFB54A; }   /* terracotta -> ember (warm, distinctive) */
+
+  /* ============================================================
+     CONCEPT B — "Molten flow mark"
+     No container at all. Just the mark, its stroke filled with a
+     gradient that FLOWS continuously through the letterform (SMIL,
+     seamless repeat — no draw, no flash). A soft morphing glow
+     breathes behind it. Minimal, editorial, premium.
+     ============================================================ */
+  .mfm{ --size:104px; position:relative; width:var(--size); height:var(--size); display:grid; place-items:center; }
+  .mfm .glow{ position:absolute; inset:6%; border-radius:48% 52% 55% 45% / 50% 48% 52% 50%;
+              background:radial-gradient(circle at 50% 45%, color-mix(in srgb,#2FA37A 38%,transparent), transparent 70%);
+              filter:blur(6px); animation:b-glow 5s ease-in-out infinite; }
+  .mfm svg{ position:relative; width:78%; height:78%; overflow:visible; animation:b-breathe 4.6s var(--ease) infinite; }
+  @keyframes b-glow{ 0%,100%{ transform:scale(.95); opacity:.55; } 50%{ transform:scale(1.1); opacity:.9; } }
+  @keyframes b-breathe{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.045); } }
+
+  /* ============================================================
+     CONCEPT C — "Embossed crucible"
+     A soft MATTE blob (low-saturation, no candy gloss). The mark is
+     carved IN — same hue, inset shadow — so it has depth, not a
+     white stamp. The whole thing warms/cools (gradient shift). One
+     surface, one motion.
+     ============================================================ */
+  .emb{ --size:104px; position:relative; width:var(--size); height:var(--size); }
+  .emb .blob{ position:absolute; inset:0; border-radius:47% 53% 55% 45% / 49% 47% 53% 51%;
+              background:linear-gradient(140deg, var(--c1), var(--c2)); background-size:200% 200%;
+              box-shadow:inset 0 2px 6px rgb(255 255 255/.15), 0 12px 30px -12px color-mix(in srgb,var(--c1) 50%,transparent);
+              animation:a-morph 9s ease-in-out infinite, a-molten 7s ease-in-out infinite, a-breathe 4.6s var(--ease) infinite; }
+  .emb .cut path{ fill:none; stroke:color-mix(in srgb, var(--c1) 78%, #000 22%); stroke-width:15;
+                  stroke-linecap:round; stroke-linejoin:round;
+                  filter:drop-shadow(0 1.5px 1px rgb(0 0 0/.28)) drop-shadow(0 -1px 0 rgb(255 255 255/.18)); }
+  .emb .cut{ position:absolute; inset:0; }
+  .matte{ --c1:#2E7D63; --c2:#4F9E7E; }
+
+  /* ============================================================
+     REDUCED MOTION — fully-formed, still. A breath of opacity only.
+     ============================================================ */
+  @media (prefers-reduced-motion: reduce){
+    .lns .blob, .emb .blob{ animation:none; }
+    .mfm .glow{ animation:none; opacity:.5; }
+    .mfm svg{ animation:rm 3s ease-in-out infinite; }
+    @keyframes rm{ 0%,100%{opacity:1;} 50%{opacity:.55;} }
+  }
+  .rm-demo .blob{ animation:rm-op 3s ease-in-out infinite !important; }
+  @keyframes rm-op{ 0%,100%{opacity:1;} 50%{opacity:.62;} }
+  .rm-note{ font-size:11px; color:rgb(var(--ink-2)); max-width:230px; text-align:center; margin-top:4px; }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>EdForge — Organic loader <span class="badge">v2 · refined</span></h1>
+    <p>Fixing v1: no white stamped logo, no flashing redraw. The mark and the organic form are now <b>one object</b>; motion is <b>continuous</b> (molten flow / breathing). Warmer, editorial palette. Toggle dark; try OS "reduce motion".</p>
+  </div>
+  <button onclick="document.body.dataset.theme = document.body.dataset.theme==='dark'?'':'dark'">Toggle dark</button>
+</header>
+
+<main>
+  <p class="lead">
+    Three directions, all <b>continuous and coherent</b> — nothing redraws, nothing flashes. Pick a <b>form</b>
+    (A / B / C) and, for A, a <b>palette</b> (Forge / Ink / Coral). My recommendation: <b>A "Living negative space"</b>
+    in <b>Forge</b> — the mark is the warm surface breathing through a single molten form, which is the most
+    distinctive and the most on-brand for an EMIS that should feel calm and crafted.
+  </p>
+
+  <!-- CONCEPT A — three palettes -->
+  <div class="row-label">Concept A — "Living negative space" · the mark is a hole in one molten form (recommended)</div>
+  <div class="grid">
+    <div class="stage">
+      <div class="canvas">
+        <div class="lns forge"><div class="blob"></div>
+          <svg class="cut" viewBox="0 0 200 200"><path d="M 32 158 L 85 52 Q 94 34 112 34 L 168 34 M 100 96 L 168 96 M 100 158 L 168 158"/></svg></div>
+        <div class="cap">Forge · <span class="em">green → gold</span></div>
+      </div>
+      <div class="meta"><div class="t">Palette: FORGE (operator app)</div><div class="d">Molten green→gold that flows like hot metal. No white; the mark is the cream surface showing through. Boot state.</div></div>
+    </div>
+    <div class="stage">
+      <div class="canvas">
+        <div class="lns ink"><div class="blob"></div>
+          <svg class="cut" viewBox="0 0 200 200"><path d="M 32 158 L 85 52 Q 94 34 112 34 L 168 34 M 100 96 L 168 96 M 100 158 L 168 158"/></svg></div>
+        <div class="cap">Ink · <span class="em">navy → steel</span></div>
+      </div>
+      <div class="meta"><div class="t">Palette: INK (editorial)</div><div class="d">Pulled from the landing page's navy/steel. Calm, serious, premium — reads as "records you can trust".</div></div>
+    </div>
+    <div class="stage">
+      <div class="canvas">
+        <div class="lns coral"><div class="blob"></div>
+          <svg class="cut" viewBox="0 0 200 200"><path d="M 32 158 L 85 52 Q 94 34 112 34 L 168 34 M 100 96 L 168 96 M 100 158 L 168 158"/></svg></div>
+        <div class="cap">Coral · <span class="em">terracotta → ember</span></div>
+      </div>
+      <div class="meta"><div class="t">Palette: CORAL (warm/distinctive)</div><div class="d">Terracotta→ember — warmest and most ownable, echoes the landing's coral accent. The "forge" metaphor at its most literal.</div></div>
+    </div>
+  </div>
+
+  <!-- CONCEPT B + C + reduced motion -->
+  <div class="row-label">Concepts B &amp; C — alternates · and the reduced-motion fallback</div>
+  <div class="grid">
+    <div class="stage">
+      <div class="canvas">
+        <div class="mfm"><div class="glow"></div>
+          <svg viewBox="0 0 200 200">
+            <defs>
+              <linearGradient id="flowB" x1="0" y1="0" x2="0.45" y2="0" gradientUnits="objectBoundingBox" spreadMethod="repeat">
+                <stop offset="0" stop-color="#0F6E56"/><stop offset="0.5" stop-color="#3FA982"/><stop offset="1" stop-color="#EFB54A"/>
+                <animateTransform attributeName="gradientTransform" type="translate" from="0 0" to="0.45 0" dur="2.6s" repeatCount="indefinite"/>
+              </linearGradient>
+            </defs>
+            <path d="M 32 158 L 85 52 Q 94 34 112 34 L 168 34 M 100 96 L 168 96 M 100 158 L 168 158"
+                  fill="none" stroke="url(#flowB)" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg></div>
+        <div class="cap">Concept B · molten flow</div>
+      </div>
+      <div class="meta"><div class="t">B — "Molten flow mark"</div><div class="d">No container. Light flows <b>through</b> the letterform continuously (seamless gradient, never a draw). Most minimal/editorial. The mark <b>is</b> the loader.</div></div>
+    </div>
+
+    <div class="stage">
+      <div class="canvas">
+        <div class="emb matte"><div class="blob"></div>
+          <svg class="cut" viewBox="0 0 200 200"><path d="M 32 158 L 85 52 Q 94 34 112 34 L 168 34 M 100 96 L 168 96 M 100 158 L 168 158"/></svg></div>
+        <div class="cap">Concept C · embossed</div>
+      </div>
+      <div class="meta"><div class="t">C — "Embossed crucible"</div><div class="d">Soft <b>matte</b> blob (no gloss). The mark is <b>carved in</b> — same hue + inset shadow — so it has tactile depth, not a stamp. One surface, one motion.</div></div>
+    </div>
+
+    <div class="stage">
+      <div class="canvas">
+        <div class="lns forge rm-demo"><div class="blob"></div>
+          <svg class="cut" viewBox="0 0 200 200"><path d="M 32 158 L 85 52 Q 94 34 112 34 L 168 34 M 100 96 L 168 96 M 100 158 L 168 158"/></svg></div>
+        <div class="rm-note">Reduced motion: the form holds still and only breathes opacity. No morph, no flow.</div>
+      </div>
+      <div class="meta"><div class="t">Accessibility</div><div class="d">All concepts degrade to a still, fully-formed mark with a gentle opacity breath. Honors <code>prefers-reduced-motion</code>.</div></div>
+    </div>
+  </div>
+
+  <p class="lead" style="margin-top:30px;">
+    <b>How this answers the feedback:</b> (1) <b>no teal + white</b> — the mark is negative space (A/C) or a flowing
+    gradient (B), in a warmer palette you choose; (2) <b>no flashing</b> — there is no separate logo animation to
+    redraw; the single form morphs and its color flows, so the motion is one continuous, coherent breath.
+  </p>
+</main>
+
+<footer>EdForge design artifact · v2 · open in a browser · shipped component binds to theme tokens &amp; uses a real alpha mask for the negative space</footer>
+</body>
+</html>
