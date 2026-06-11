@@ -38,7 +38,7 @@ import PrivacyPage from './components/landing/pages/PrivacyPage'
 import TermsPage from './components/landing/pages/TermsPage'
 import SecurityLandingPage from './components/landing/pages/SecurityPage'
 import AccessibilityPage from './components/landing/pages/AccessibilityPage'
-import { LandingPreviewPage, LandingPageV2 } from './components/landing-v2'
+import { LandingPageV2 } from './components/landing-v2'
 
 import HomePage from './pages/HomePage'
 import SettingsPage from './pages/SettingsPage'
@@ -383,17 +383,6 @@ const authCallbackRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/auth/callback',
   component: OAuthCallbackHandler,
-})
-
-// ============================================================================
-// LANDING V2 PREVIEW ROUTE — always-on developer preview, unauthenticated.
-// Build-out scratch surface; not linked from product UI.
-// ============================================================================
-
-const landingV2PreviewRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/_landing-preview',
-  component: LandingPreviewPage,
 })
 
 // ============================================================================
@@ -869,7 +858,6 @@ const routeTree = rootRoute.addChildren([
   loginRoute,
   forgotPasswordRoute,
   authCallbackRoute,
-  landingV2PreviewRoute,
   onboardingRoute,
   publicRoute.addChildren([
     aboutRoute,
