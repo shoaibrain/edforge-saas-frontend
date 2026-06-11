@@ -126,18 +126,18 @@ export function UseCasePanel({
             tabIndex={isActive ? 0 : -1}
             onClick={() => selectFeature(i)}
             onKeyDown={(e) => onKeyDown(e, i)}
+            className="pt-[20px] pb-[20px] pl-[24px] bg-transparent"
             style={{
               display: 'block',
               textAlign: 'left',
               width: '100%',
-              padding: '20px 0 20px 24px',
               borderLeft: `3px solid ${isActive ? accent : 'transparent'}`,
-              background: 'transparent',
               transition: 'border-color 0.2s',
               cursor: 'pointer',
             }}
           >
             <div
+              // allow-presentation-style: editorial 19px title + active-state color toggle
               style={{
                 fontSize: 19,
                 fontWeight: 700,
@@ -152,6 +152,7 @@ export function UseCasePanel({
             {isActive ? (
               <>
                 <div
+                  // allow-presentation-style: editorial 14.5px description copy
                   style={{
                     fontSize: 14.5,
                     lineHeight: 1.6,
@@ -164,6 +165,7 @@ export function UseCasePanel({
                 </div>
                 <a
                   href="#"
+                  // allow-presentation-style: editorial 13.5px link + dynamic accent color
                   style={{
                     fontSize: 13.5,
                     fontWeight: 600,
@@ -217,12 +219,14 @@ export function UseCasePanel({
       id={sectionId}
       aria-labelledby={`${sectionId}-heading`}
       className="lp-section"
+      // allow-presentation-style: section background is a caller-provided prop
       style={{ background, position: 'relative' }}
     >
       <Container>
-        <div className="lp-usecase-header" style={{ textAlign: 'center', marginBottom: 56 }}>
+        <div className="lp-usecase-header mb-14" style={{ textAlign: 'center' }}>
           {eyebrow ? (
             <div
+              // allow-presentation-style: editorial 11px uppercase eyebrow
               style={{
                 fontSize: 11,
                 fontWeight: 700,
@@ -237,12 +241,12 @@ export function UseCasePanel({
           ) : null}
           <h2
             id={`${sectionId}-heading`}
-            className="lp-h-section"
-            style={{ maxWidth: 880, margin: '0 auto 18px' }}
+            className="lp-h-section mx-auto mb-[18px]"
+            style={{ maxWidth: 880 }}
           >
             {renderHeading(heading)}
           </h2>
-          <p className="lp-lede" style={{ margin: '0 auto', textAlign: 'center' }}>
+          <p className="lp-lede mx-auto" style={{ textAlign: 'center' }}>
             {lede}
           </p>
         </div>
@@ -281,6 +285,7 @@ function renderHeading(h: UseCasePanelHeading) {
       ))}{' '}
       <span
         className="lp-serif"
+        // allow-presentation-style: dynamic serif accent color + editorial 1.05em
         style={{ color: h.serifColor ?? 'var(--lp-primary)', fontSize: '1.05em' }}
       >
         {h.serif}

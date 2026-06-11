@@ -49,6 +49,7 @@ export function PillarCard({
       onMouseLeave={() => setHover(false)}
       onFocus={() => setHover(true)}
       onBlur={() => setHover(false)}
+      // allow-presentation-style: per-card palette background + hover-driven elevation shadow
       style={{
         gridColumn: `span ${colSpan}`,
         position: 'relative',
@@ -68,6 +69,7 @@ export function PillarCard({
       }}
     >
       <div
+        // allow-presentation-style: fluid clamp() title size + per-card palette ink
         style={{
           fontSize: 'clamp(22px, 2.2vw, 30px)',
           fontWeight: 700,
@@ -82,6 +84,7 @@ export function PillarCard({
         {title}
       </div>
       <div
+        // allow-presentation-style: per-card palette ink description
         style={{
           fontSize: 14,
           lineHeight: 1.5,
@@ -115,6 +118,7 @@ export function PillarCard({
       {/* Expand affordance */}
       <div
         aria-hidden
+        // allow-presentation-style: per-card palette accent button + decorative shadow
         style={{
           position: 'absolute',
           bottom: 22,

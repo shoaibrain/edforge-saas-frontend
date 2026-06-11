@@ -6,6 +6,7 @@ type VisualProps = { accent: string; ink: string }
 export function ApiVisual(_props: VisualProps) {
   return (
     <div
+      // allow-presentation-style: decorative dark terminal chrome + editorial 11px mono
       style={{
         background: '#1A1A1A',
         borderRadius: 12,
@@ -16,16 +17,16 @@ export function ApiVisual(_props: VisualProps) {
         lineHeight: 1.5,
       }}
     >
-      <div style={{ color: '#7BE0B7' }}>POST</div>
-      <div style={{ color: '#fff', opacity: 0.8 }}>/v1/students</div>
-      <div style={{ color: '#F47E3E', marginTop: 6 }}>{'{'}</div>
-      <div style={{ color: '#fff', opacity: 0.7, paddingLeft: 10 }}>
-        "grade": <span style={{ color: '#FFD78A' }}>"3"</span>,
+      <div className="text-[#7BE0B7]">POST</div>
+      <div className="text-[#fff]" style={{ opacity: 0.8 }}>/v1/students</div>
+      <div className="text-[#F47E3E] mt-1.5">{'{'}</div>
+      <div className="text-[#fff] pl-2.5" style={{ opacity: 0.7 }}>
+        "grade": <span className="text-[#FFD78A]">"3"</span>,
       </div>
-      <div style={{ color: '#fff', opacity: 0.7, paddingLeft: 10 }}>
-        "active": <span style={{ color: '#9AE6B4' }}>true</span>
+      <div className="text-[#fff] pl-2.5" style={{ opacity: 0.7 }}>
+        "active": <span className="text-[#9AE6B4]">true</span>
       </div>
-      <div style={{ color: '#F47E3E' }}>{'}'}</div>
+      <div className="text-[#F47E3E]">{'}'}</div>
     </div>
   )
 }

@@ -7,6 +7,7 @@ export function AnalyticsVisual({ accent, ink }: VisualProps) {
   const gradientId = `lp-pillar-analytics-${accent.replace(/[^a-zA-Z0-9]/g, '')}`
   return (
     <div
+      // allow-presentation-style: decorative card chrome, white + soft drop shadow
       style={{
         background: '#fff',
         borderRadius: 12,
@@ -15,6 +16,7 @@ export function AnalyticsVisual({ accent, ink }: VisualProps) {
       }}
     >
       <div
+        // allow-presentation-style: editorial 10px label + per-card palette ink
         style={{
           fontSize: 10,
           fontWeight: 700,
@@ -54,6 +56,7 @@ export function AnalyticsVisual({ accent, ink }: VisualProps) {
         ))}
       </svg>
       <div
+        // allow-presentation-style: per-card palette ink headline
         style={{
           fontSize: 18,
           fontWeight: 700,

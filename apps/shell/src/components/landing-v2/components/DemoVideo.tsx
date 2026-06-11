@@ -122,11 +122,10 @@ export const DemoVideo = forwardRef<DemoVideoHandle, DemoVideoProps>(
     if (showMode === 'dashboard') {
       return (
         <div
+          className="bg-[var(--lp-bg-elevated)] shadow-[var(--lp-shadow-lg)]"
           style={{
-            background: 'var(--lp-bg-elevated)',
             border: '1px solid var(--lp-border)',
             borderRadius: 18,
-            boxShadow: 'var(--lp-shadow-lg)',
             overflow: 'hidden',
           }}
         >
@@ -165,13 +164,12 @@ export const DemoVideo = forwardRef<DemoVideoHandle, DemoVideoProps>(
 
     return (
       <div
+        className="bg-[#0F1A2E] shadow-[var(--lp-shadow-lg)]"
         style={{
           position: 'relative',
           borderRadius: 18,
           overflow: 'hidden',
           aspectRatio: '16 / 10',
-          background: '#0F1A2E',
-          boxShadow: 'var(--lp-shadow-lg)',
           border: '1px solid var(--lp-border)',
         }}
       >
@@ -197,6 +195,7 @@ export const DemoVideo = forwardRef<DemoVideoHandle, DemoVideoProps>(
 
         {caption ? (
           <div
+            // allow-presentation-style: glass caption badge, rgba tint + editorial 12.5px
             style={{
               position: 'absolute',
               left: 14,
@@ -216,6 +215,7 @@ export const DemoVideo = forwardRef<DemoVideoHandle, DemoVideoProps>(
           >
             <span
               aria-hidden
+              // allow-presentation-style: dynamic accent-driven dot fill + halo
               style={{
                 width: 7,
                 height: 7,
@@ -230,6 +230,7 @@ export const DemoVideo = forwardRef<DemoVideoHandle, DemoVideoProps>(
 
         {/* Controls */}
         <div
+          // allow-presentation-style: decorative gradient scrim, no token
           style={{
             position: 'absolute',
             left: 0,
@@ -247,6 +248,7 @@ export const DemoVideo = forwardRef<DemoVideoHandle, DemoVideoProps>(
             onClick={toggle}
             aria-label={playing ? 'Pause demonstration' : 'Play demonstration'}
             type="button"
+            // allow-presentation-style: glass control button, rgba tint over dark video
             style={{
               width: 34,
               height: 34,
@@ -280,6 +282,7 @@ export const DemoVideo = forwardRef<DemoVideoHandle, DemoVideoProps>(
             aria-valuemin={0}
             aria-valuemax={100}
             aria-valuenow={Math.round(progress * 100)}
+            // allow-presentation-style: decorative rgba track over dark video
             style={{
               flex: 1,
               height: 6,
@@ -294,6 +297,7 @@ export const DemoVideo = forwardRef<DemoVideoHandle, DemoVideoProps>(
                   <span
                     key={i}
                     aria-hidden
+                    // allow-presentation-style: dynamic chapter position + active-state fill
                     style={{
                       position: 'absolute',
                       left: `${(ch.start / duration) * 100}%`,
@@ -309,6 +313,7 @@ export const DemoVideo = forwardRef<DemoVideoHandle, DemoVideoProps>(
               : null}
             <span
               aria-hidden
+              // allow-presentation-style: dynamic progress width + accent fill
               style={{
                 position: 'absolute',
                 left: 0,
@@ -324,6 +329,7 @@ export const DemoVideo = forwardRef<DemoVideoHandle, DemoVideoProps>(
 
           <div
             className="lp-mono"
+            // allow-presentation-style: editorial 11px mono label, rgba over dark video
             style={{
               fontSize: 11,
               color: 'rgba(255,255,255,0.9)',

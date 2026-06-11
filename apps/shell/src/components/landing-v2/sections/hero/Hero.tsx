@@ -11,12 +11,9 @@ export function Hero() {
     <section
       id="top"
       aria-labelledby="hero-heading"
-      className="lp-hero"
+      className="lp-hero bg-[var(--lp-bg)] pt-14 pb-0"
       style={{
         position: 'relative',
-        background: 'var(--lp-bg)',
-        paddingTop: 56,
-        paddingBottom: 0,
         overflow: 'hidden',
       }}
     >

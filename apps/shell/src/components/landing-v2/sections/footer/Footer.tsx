@@ -11,10 +11,9 @@ export function Footer() {
   return (
     <footer
       role="contentinfo"
+      className="bg-[var(--lp-bg)] pt-[56px] pb-[32px]"
       style={{
-        background: 'var(--lp-bg)',
         borderTop: '1px solid var(--lp-border)',
-        padding: '56px 0 32px',
       }}
     >
       <Container>
@@ -22,14 +21,13 @@ export function Footer() {
           style={{
             display: 'grid',
             gridTemplateColumns: '1.2fr 1fr 1fr 1fr 1fr',
-            gap: 32,
-            marginBottom: 40,
           }}
-          className="lp-footer-grid"
+          className="lp-footer-grid gap-8 mb-10"
         >
           <div>
             <EdforgeLogo />
             <div
+              // allow-presentation-style: editorial 13px tagline copy
               style={{
                 fontSize: 13,
                 color: 'var(--lp-ink-muted)',
@@ -40,28 +38,27 @@ export function Footer() {
             >
               {FOOTER.tagline}
             </div>
-            <div style={{ fontSize: 12, color: 'var(--lp-ink-hint)', marginTop: 10 }}>
+            <div className="text-xs text-[var(--lp-ink-hint)] mt-2.5">
               {FOOTER.legalEntity}
             </div>
           </div>
           {FOOTER.columns.map((col) => (
             <nav key={col.heading} aria-label={col.heading}>
               <div
+                className="text-xs text-[var(--lp-ink-muted)] mb-3.5"
                 style={{
-                  fontSize: 12,
                   fontWeight: 700,
                   letterSpacing: '0.1em',
                   textTransform: 'uppercase',
-                  color: 'var(--lp-ink-muted)',
-                  marginBottom: 14,
                 }}
               >
                 {col.heading}
               </div>
-              <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+              <ul className="m-0 p-0" style={{ listStyle: 'none' }}>
                 {col.items.map((item) => (
                   <li
                     key={item.label}
+                    // allow-presentation-style: editorial 13.5px link copy
                     style={{
                       fontSize: 13.5,
                       color: 'var(--lp-ink-3)',
@@ -70,8 +67,8 @@ export function Footer() {
                   >
                     <a
                       href={item.href}
+                      className="text-inherit"
                       style={{
-                        color: 'inherit',
                         textDecoration: 'none',
                         display: 'inline-block',
                       }}
@@ -85,6 +82,7 @@ export function Footer() {
           ))}
         </div>
         <div
+          // allow-presentation-style: editorial 12.5px legal row
           style={{
             display: 'flex',
             justifyContent: 'space-between',
@@ -98,12 +96,13 @@ export function Footer() {
           }}
         >
           <div>{FOOTER.copyright}</div>
-          <nav aria-label="Legal" style={{ display: 'flex', gap: 20 }}>
+          <nav aria-label="Legal" className="gap-5" style={{ display: 'flex' }}>
             {FOOTER.legalLinks.map((link) => (
               <a
                 key={link.label}
                 href={link.href}
-                style={{ color: 'inherit', textDecoration: 'none' }}
+                className="text-inherit"
+                style={{ textDecoration: 'none' }}
               >
                 {link.label}
               </a>

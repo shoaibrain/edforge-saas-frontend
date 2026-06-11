@@ -7,19 +7,25 @@ import { Tag } from '@edforge/ui'
  */
 export function TeacherDashboard() {
   return (
-    <div style={{ padding: 22, background: 'var(--lp-bg-elevated)' }}>
+    <div className="pt-[22px] pb-[22px] pl-[22px] pr-[22px] bg-[var(--lp-bg-elevated)]">
       <div
+        className="mb-4"
         style={{
           display: 'flex',
           justifyContent: 'space-between',
-          marginBottom: 16,
         }}
       >
         <div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--lp-ink)' }}>
+          <div
+            // allow-presentation-style: editorial 13px heading
+            style={{ fontSize: 13, fontWeight: 700, color: 'var(--lp-ink)' }}
+          >
             Parent Engagement Dashboard
           </div>
-          <div style={{ fontSize: 11.5, color: 'var(--lp-ink-muted)' }}>
+          <div
+            // allow-presentation-style: editorial 11.5px subtitle
+            style={{ fontSize: 11.5, color: 'var(--lp-ink-muted)' }}
+          >
             Ms. Chen · Room 214
           </div>
         </div>
@@ -29,11 +35,10 @@ export function TeacherDashboard() {
       </div>
 
       <div
+        className="gap-2.5 mb-3"
         style={{
           display: 'grid',
           gridTemplateColumns: '1fr 1fr',
-          gap: 10,
-          marginBottom: 12,
         }}
       >
         <EngagementStat
@@ -57,13 +62,13 @@ export function TeacherDashboard() {
       </div>
 
       <div
+        className="p-3"
         style={{
-          padding: 12,
           border: '1px solid var(--lp-border)',
           borderRadius: 12,
         }}
       >
-        <div style={{ fontSize: 12, fontWeight: 600, marginBottom: 10 }}>
+        <div className="text-xs mb-2.5" style={{ fontWeight: 600 }}>
           Recent parent contact
         </div>
         {CONTACTS.map((contact, i) => (
@@ -97,15 +102,15 @@ function EngagementStat({
 }: StatProps) {
   return (
     <div
+      className="p-3 bg-[var(--lp-bg-warm)]"
       style={{
-        padding: 12,
         border: '1px solid var(--lp-border)',
         borderRadius: 12,
-        background: 'var(--lp-bg-warm)',
       }}
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+      <div className="gap-2 mb-1.5" style={{ display: 'flex', alignItems: 'center' }}>
         <div
+          // allow-presentation-style: per-stat data-driven icon bg + accent color
           style={{
             width: 24,
             height: 24,
@@ -118,9 +123,13 @@ function EngagementStat({
         >
           <Icon name={icon} size={14} />
         </div>
-        <div style={{ fontSize: 11.5, fontWeight: 600 }}>{label}</div>
+        <div
+          // allow-presentation-style: editorial 11.5px label
+          style={{ fontSize: 11.5, fontWeight: 600 }}
+        >{label}</div>
       </div>
       <div
+        // allow-presentation-style: editorial 24px value + data-driven accent color
         style={{
           fontSize: 24,
           fontWeight: 700,
@@ -130,13 +139,19 @@ function EngagementStat({
       >
         {value}
         {valueSuffix ? (
-          <span style={{ fontSize: 13, color: 'var(--lp-ink-muted)' }}>
+          <span
+            // allow-presentation-style: editorial 13px suffix
+            style={{ fontSize: 13, color: 'var(--lp-ink-muted)' }}
+          >
             {' '}
             {valueSuffix}
           </span>
         ) : null}
       </div>
-      <div style={{ fontSize: 10.5, color: 'var(--lp-ink-muted)' }}>{caption}</div>
+      <div
+        // allow-presentation-style: editorial 10.5px caption
+        style={{ fontSize: 10.5, color: 'var(--lp-ink-muted)' }}
+      >{caption}</div>
     </div>
   )
 }
@@ -183,16 +198,16 @@ function ContactRow({
 }: Contact & { divide: boolean }) {
   return (
     <div
+      className="gap-2.5 pt-2 pb-2"
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: 10,
-        padding: '8px 0',
         borderTop: divide ? '1px solid var(--lp-border)' : 'none',
       }}
     >
       <div
         aria-hidden
+        // allow-presentation-style: editorial 10px monogram avatar
         style={{
           width: 28,
           height: 28,
@@ -208,14 +223,21 @@ function ContactRow({
         {name[0]}
       </div>
       <div style={{ flex: 1 }}>
-        <div style={{ fontSize: 12, fontWeight: 600 }}>{name}</div>
-        <div style={{ fontSize: 10.5, color: 'var(--lp-ink-muted)' }}>{subject}</div>
+        <div className="text-xs" style={{ fontWeight: 600 }}>{name}</div>
+        <div
+          // allow-presentation-style: editorial 10.5px subject
+          style={{ fontSize: 10.5, color: 'var(--lp-ink-muted)' }}
+        >{subject}</div>
       </div>
-      <span style={{ fontSize: 10, fontWeight: 600, color: statusColor }}>
+      <span
+        // allow-presentation-style: editorial 10px status + data-driven status color
+        style={{ fontSize: 10, fontWeight: 600, color: statusColor }}
+      >
         {status}
       </span>
       <span
         className="lp-mono"
+        // allow-presentation-style: editorial 10px mono elapsed time
         style={{ fontSize: 10, color: 'var(--lp-ink-hint)' }}
       >
         {elapsed}

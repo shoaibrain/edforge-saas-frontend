@@ -10,10 +10,11 @@ export function ChatVisual({ accent, ink }: VisualProps) {
     { who: 'Sra. Ruiz', text: 'Las conferencias de otoño...', tag: 'ES' },
   ]
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+    <div className="gap-1.5" style={{ display: 'flex', flexDirection: 'column' }}>
       {messages.map((m, i) => (
         <div
           key={i}
+          // allow-presentation-style: decorative bubble chrome, white + soft drop shadow
           style={{
             background: '#fff',
             borderRadius: 12,
@@ -23,17 +24,20 @@ export function ChatVisual({ accent, ink }: VisualProps) {
           }}
         >
           <div
+            className="gap-2 mb-1"
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: 8,
-              marginBottom: 4,
             }}
           >
-            <div style={{ fontSize: 10, fontWeight: 700, color: ink }}>
+            <div
+              // allow-presentation-style: editorial 10px name + per-card palette ink
+              style={{ fontSize: 10, fontWeight: 700, color: ink }}
+            >
               {m.who}
             </div>
             <div
+              // allow-presentation-style: editorial 8px tag + per-card accent tint/color
               style={{
                 fontSize: 8,
                 fontWeight: 700,
@@ -47,7 +51,10 @@ export function ChatVisual({ accent, ink }: VisualProps) {
               {m.tag}
             </div>
           </div>
-          <div style={{ fontSize: 11, color: ink, opacity: 0.75 }}>
+          <div
+            // allow-presentation-style: editorial 11px text + per-card palette ink
+            style={{ fontSize: 11, color: ink, opacity: 0.75 }}
+          >
             {m.text}
           </div>
         </div>

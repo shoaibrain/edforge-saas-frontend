@@ -15,6 +15,7 @@ export function FinalCTA() {
       id="demo"
       aria-labelledby="final-cta-heading"
       className="lp-section"
+      // allow-presentation-style: decorative crimson gradient backdrop + on-gradient white text
       style={{
         background:
           'linear-gradient(135deg, var(--lp-primary) 0%, var(--lp-primary-hover) 100%)',
@@ -42,6 +43,7 @@ export function FinalCTA() {
         <div style={{ position: 'relative', textAlign: 'center' }}>
           <h2
             id="final-cta-heading"
+            // allow-presentation-style: fluid clamp() display size + on-gradient white text
             style={{
               fontSize: 'clamp(36px, 4.5vw, 62px)',
               fontWeight: 700,
@@ -55,6 +57,7 @@ export function FinalCTA() {
             {FINAL_CTA.headingLead}{' '}
             <span
               className="lp-serif"
+              // allow-presentation-style: editorial 1.05em serif accent, on-gradient peach
               style={{ color: '#FFE7D3', fontSize: '1.05em' }}
             >
               {FINAL_CTA.headingSerif}
@@ -62,21 +65,19 @@ export function FinalCTA() {
             {renderWithBreaks(FINAL_CTA.headingTail)}
           </h2>
           <p
+            className="text-lg text-[rgba(255,255,255,0.9)] mx-auto mb-8"
             style={{
-              fontSize: 18,
-              color: 'rgba(255,255,255,0.9)',
               maxWidth: 640,
-              margin: '0 auto 32px',
               lineHeight: 1.5,
             }}
           >
             {FINAL_CTA.lede}
           </p>
           <div
+            className="gap-3"
             style={{
               display: 'flex',
               justifyContent: 'center',
-              gap: 12,
               flexWrap: 'wrap',
             }}
           >
@@ -92,6 +93,7 @@ export function FinalCTA() {
           </div>
           {'ctaMicro' in FINAL_CTA && (
             <p
+              // allow-presentation-style: editorial 13px micro-copy, on-gradient white
               style={{
                 fontSize: 13,
                 color: 'rgba(255,255,255,0.7)',

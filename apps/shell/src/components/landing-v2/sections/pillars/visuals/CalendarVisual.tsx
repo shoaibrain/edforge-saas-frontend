@@ -10,6 +10,7 @@ const TODAY = 10
 export function CalendarVisual({ accent, ink }: VisualProps) {
   return (
     <div
+      // allow-presentation-style: decorative card chrome, white + soft drop shadow
       style={{
         background: '#fff',
         borderRadius: 12,
@@ -17,10 +18,14 @@ export function CalendarVisual({ accent, ink }: VisualProps) {
         boxShadow: '0 8px 24px -8px rgba(29,53,87,0.15)',
       }}
     >
-      <div style={{ fontSize: 10, fontWeight: 700, color: ink, marginBottom: 10 }}>
+      <div
+        // allow-presentation-style: editorial 10px label + per-card palette ink
+        style={{ fontSize: 10, fontWeight: 700, color: ink, marginBottom: 10 }}
+      >
         MARCH 2026
       </div>
       <div
+        // allow-presentation-style: off-scale 3px grid gap
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(7, 1fr)',
@@ -33,6 +38,7 @@ export function CalendarVisual({ accent, ink }: VisualProps) {
           return (
             <div
               key={i}
+              // allow-presentation-style: per-day event/today state colors + editorial 9px
               style={{
                 aspectRatio: '1',
                 borderRadius: 4,

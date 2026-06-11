@@ -7,7 +7,8 @@ export function Hairline() {
     <div
       role="separator"
       aria-orientation="horizontal"
-      style={{ height: 1, background: 'var(--lp-border)' }}
+      className="bg-[var(--lp-border)]"
+      style={{ height: 1 }}
     />
   )
 }

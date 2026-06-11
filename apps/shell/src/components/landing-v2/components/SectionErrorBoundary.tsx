@@ -43,6 +43,7 @@ export class SectionErrorBoundary extends Component<Props, State> {
       return (
         <div
           role="alert"
+          // allow-presentation-style: decorative dev-only error card, rgba tints + editorial 13px
           style={{
             margin: '24px auto',
             maxWidth: 720,
@@ -55,11 +56,12 @@ export class SectionErrorBoundary extends Component<Props, State> {
             lineHeight: 1.55,
           }}
         >
-          <div style={{ fontWeight: 700, marginBottom: 6 }}>
+          <div className="mb-1.5" style={{ fontWeight: 700 }}>
             Landing section failed: {this.props.sectionName}
           </div>
           <pre
             className="lp-mono"
+            // allow-presentation-style: editorial 11px dev stack trace size
             style={{
               whiteSpace: 'pre-wrap',
               fontSize: 11,

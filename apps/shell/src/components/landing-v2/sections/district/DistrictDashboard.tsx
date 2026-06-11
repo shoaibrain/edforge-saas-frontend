@@ -8,24 +8,30 @@ import { Tag } from '@edforge/ui'
  */
 export function DistrictDashboard() {
   return (
-    <div style={{ padding: 24, background: 'var(--lp-bg-elevated)' }}>
+    <div className="p-6 bg-[var(--lp-bg-elevated)]">
       <div
+        className="mb-[18px]"
         style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'flex-start',
-          marginBottom: 18,
         }}
       >
         <div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--lp-ink)' }}>
+          <div
+            // allow-presentation-style: editorial 13px heading
+            style={{ fontSize: 13, fontWeight: 700, color: 'var(--lp-ink)' }}
+          >
             District Overview
           </div>
-          <div style={{ fontSize: 11.5, color: 'var(--lp-ink-muted)', marginTop: 2 }}>
+          <div
+            // allow-presentation-style: editorial 11.5px subtitle
+            style={{ fontSize: 11.5, color: 'var(--lp-ink-muted)', marginTop: 2 }}
+          >
             Real-time performance metrics
           </div>
         </div>
-        <div style={{ display: 'flex', gap: 6 }}>
+        <div className="gap-1.5" style={{ display: 'flex' }}>
           <Tag variant="ink">12 schools</Tag>
           <Tag variant="green" dot>
             Live
@@ -35,11 +41,10 @@ export function DistrictDashboard() {
 
       {/* Stat cards */}
       <div
+        className="gap-2.5 mb-3.5"
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: 10,
-          marginBottom: 14,
         }}
       >
         {STAT_CARDS.map((stat) => (
@@ -48,7 +53,7 @@ export function DistrictDashboard() {
       </div>
 
       {/* Chart + action items */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 10 }}>
+      <div className="gap-2.5" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr' }}>
         <FinancialChart />
         <ActionItems />
       </div>
@@ -91,21 +96,21 @@ const STAT_CARDS: StatCardProps[] = [
 function StatCard({ label, value, delta, accent, icon }: StatCardProps) {
   return (
     <div
+      className="p-3 bg-[var(--lp-bg-warm)]"
       style={{
-        padding: 12,
         border: '1px solid var(--lp-border)',
         borderRadius: 12,
-        background: 'var(--lp-bg-warm)',
       }}
     >
       <div
+        className="mb-1.5"
         style={{
           display: 'flex',
           justifyContent: 'space-between',
-          marginBottom: 6,
         }}
       >
         <div
+          // allow-presentation-style: per-stat data-driven icon accent color
           style={{
             width: 26,
             height: 26,
@@ -118,21 +123,26 @@ function StatCard({ label, value, delta, accent, icon }: StatCardProps) {
         >
           <Icon name={icon} size={14} />
         </div>
-        <span style={{ fontSize: 10.5, color: 'var(--lp-green-ink)', fontWeight: 600 }}>
+        <span
+          // allow-presentation-style: editorial 10.5px delta chip
+          style={{ fontSize: 10.5, color: 'var(--lp-green-ink)', fontWeight: 600 }}
+        >
           ▲ {delta}
         </span>
       </div>
       <div
+        className="text-xl text-[var(--lp-ink)]"
         style={{
-          fontSize: 20,
           fontWeight: 700,
-          color: 'var(--lp-ink)',
           letterSpacing: '-0.02em',
         }}
       >
         {value}
       </div>
-      <div style={{ fontSize: 10.5, color: 'var(--lp-ink-muted)', marginTop: 1 }}>
+      <div
+        // allow-presentation-style: editorial 10.5px label
+        style={{ fontSize: 10.5, color: 'var(--lp-ink-muted)', marginTop: 1 }}
+      >
         {label}
       </div>
     </div>
@@ -152,21 +162,25 @@ function FinancialChart() {
   ]
   return (
     <div
+      className="pt-[14px] pb-[14px] pl-[14px] pr-[14px]"
       style={{
-        padding: 14,
         border: '1px solid var(--lp-border)',
         borderRadius: 12,
       }}
     >
       <div
+        className="mb-3"
         style={{
           display: 'flex',
           justifyContent: 'space-between',
-          marginBottom: 12,
         }}
       >
-        <div style={{ fontSize: 12.5, fontWeight: 600 }}>Financial performance</div>
         <div
+          // allow-presentation-style: editorial 12.5px chart title
+          style={{ fontSize: 12.5, fontWeight: 600 }}
+        >Financial performance</div>
+        <div
+          // allow-presentation-style: editorial 11px filter chip
           style={{
             fontSize: 11,
             color: 'var(--lp-ink-muted)',
@@ -242,27 +256,30 @@ function ActionItems() {
   ]
   return (
     <div
+      className="pt-[14px] pb-[14px] pl-[14px] pr-[14px]"
       style={{
-        padding: 14,
         border: '1px solid var(--lp-border)',
         borderRadius: 12,
       }}
     >
-      <div style={{ fontSize: 12.5, fontWeight: 600, marginBottom: 10 }}>
+      <div
+        // allow-presentation-style: editorial 12.5px panel title
+        style={{ fontSize: 12.5, fontWeight: 600, marginBottom: 10 }}
+      >
         Action items
       </div>
       {items.map((it, i) => (
         <div
           key={it.title}
+          className="gap-2 pt-[7px] pb-[7px]"
           style={{
             display: 'flex',
-            gap: 8,
-            padding: '7px 0',
             borderTop: i ? '1px solid var(--lp-border)' : 'none',
           }}
         >
           <span
             aria-hidden
+            // allow-presentation-style: per-item data-driven dot color
             style={{
               width: 6,
               height: 6,
@@ -273,10 +290,16 @@ function ActionItems() {
             }}
           />
           <div>
-            <div style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--lp-ink)' }}>
+            <div
+              // allow-presentation-style: editorial 11.5px item title
+              style={{ fontSize: 11.5, fontWeight: 600, color: 'var(--lp-ink)' }}
+            >
               {it.title}
             </div>
-            <div style={{ fontSize: 10.5, color: 'var(--lp-ink-muted)' }}>
+            <div
+              // allow-presentation-style: editorial 10.5px item description
+              style={{ fontSize: 10.5, color: 'var(--lp-ink-muted)' }}
+            >
               {it.description}
             </div>
           </div>
