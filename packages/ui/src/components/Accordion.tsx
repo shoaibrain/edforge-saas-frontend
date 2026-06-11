@@ -139,7 +139,7 @@ export function Accordion({
               borderBottom: '1px solid var(--lp-border, #E8E1D4)',
             }}
           >
-            <h3 style={{ margin: 0 }}>
+            <h3 className="m-0">
               <button
                 ref={(el) => {
                   buttonsRef.current[i] = el
@@ -150,49 +150,30 @@ export function Accordion({
                 aria-controls={panelId}
                 onClick={() => toggle(item.id)}
                 onKeyDown={(e) => onKeyDown(e, i)}
-                className={focusRing}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 20,
-                  width: '100%',
-                  padding: '22px 0',
-                  background: 'transparent',
-                  border: 'none',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  font: 'inherit',
-                  color: 'inherit',
-                }}
+                className={`${focusRing} flex items-center gap-5 w-full pt-[22px] pb-[22px] px-0 text-left font-[inherit] bg-transparent border-none cursor-pointer text-inherit`}
               >
                 <div
+                  // allow-presentation-style: 17px editorial trigger size has no scale token; landing ink color
+                  className="flex-1 font-medium tracking-[-0.01em] leading-snug"
                   style={{
-                    flex: 1,
                     fontSize: 17,
-                    fontWeight: 500,
                     color: 'var(--lp-ink, #0F1A2E)',
-                    letterSpacing: '-0.01em',
-                    lineHeight: 1.4,
                   }}
                 >
                   {item.trigger}
                 </div>
                 <div
                   aria-hidden
+                  // allow-presentation-style: toggle chip background switches on open state (props)
+                  className="w-9 h-9 rounded-full grid place-items-center flex-shrink-0"
                   style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: 18,
                     background: open ? iconColorOpen : iconColor,
                     color: '#fff',
                     fontSize: 20,
                     lineHeight: 1,
-                    display: 'grid',
-                    placeItems: 'center',
                     transform: open ? 'rotate(45deg)' : 'rotate(0deg)',
                     transition:
                       'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s',
-                    flexShrink: 0,
                   }}
                 >
                   +
@@ -211,10 +192,10 @@ export function Accordion({
               }}
             >
               <div
+                // allow-presentation-style: 15px editorial panel size has no scale token; landing ink color
+                className="pt-0 pb-[22px] pl-0 pr-[60px] leading-relaxed"
                 style={{
-                  padding: '0 60px 22px 0',
                   fontSize: 15,
-                  lineHeight: 1.65,
                   color: 'var(--lp-ink-3, #3B4862)',
                 }}
               >

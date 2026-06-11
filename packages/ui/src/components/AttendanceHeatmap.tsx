@@ -107,24 +107,19 @@ export const AttendanceHeatmap = forwardRef<HTMLDivElement, AttendanceHeatmapPro
         <div className="flex items-center justify-between mb-3">
           <button
             onClick={() => onMonthChange(prevMonth(yearMonth))}
-            className={cn('p-1.5 rounded-lg transition-colors', focusRingInset)}
-            style={{ color: 'rgb(var(--text-tertiary))' }}
+            className={cn('p-1.5 rounded-lg transition-colors text-[rgb(var(--text-tertiary))]', focusRingInset)}
             aria-label="Previous month"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
             </svg>
           </button>
-          <span
-            className="text-sm font-medium"
-            style={{ color: 'rgb(var(--text-primary))' }}
-          >
+          <span className="text-sm font-medium text-[rgb(var(--text-primary))]">
             {monthLabel}
           </span>
           <button
             onClick={() => onMonthChange(nextMonth(yearMonth))}
-            className={cn('p-1.5 rounded-lg transition-colors', focusRingInset)}
-            style={{ color: 'rgb(var(--text-tertiary))' }}
+            className={cn('p-1.5 rounded-lg transition-colors text-[rgb(var(--text-tertiary))]', focusRingInset)}
             aria-label="Next month"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -136,11 +131,7 @@ export const AttendanceHeatmap = forwardRef<HTMLDivElement, AttendanceHeatmapPro
         {/* Day headers */}
         <div className="grid grid-cols-7 gap-1 mb-1">
           {dayHeaders.map((h) => (
-            <div
-              key={h}
-              className="text-center text-xs font-medium py-1"
-              style={{ color: 'rgb(var(--text-tertiary))' }}
-            >
+            <div key={h} className="text-center text-xs font-medium py-1 text-[rgb(var(--text-tertiary))]">
               {h}
             </div>
           ))}
@@ -158,6 +149,7 @@ export const AttendanceHeatmap = forwardRef<HTMLDivElement, AttendanceHeatmapPro
             return (
               <div
                 key={cell.date}
+                // allow-presentation-style: heatmap cell colors are attendance-status-driven
                 className={cn(
                   'aspect-square rounded-lg flex items-center justify-center text-xs font-medium tabular-nums',
                   focusRingInset
@@ -184,16 +176,14 @@ export const AttendanceHeatmap = forwardRef<HTMLDivElement, AttendanceHeatmapPro
           {(['present', 'absent', 'late', 'excused', 'holiday'] as HeatmapStatus[]).map((status) => (
             <div key={status} className="flex items-center gap-1">
               <div
+                // allow-presentation-style: legend swatch colors are attendance-status-driven
                 className="w-3 h-3 rounded"
                 style={{
                   background: STATUS_COLORS[status].bg,
                   border: STATUS_COLORS[status].border ?? '1px solid rgb(var(--border-primary) / 0.35)',
                 }}
               />
-              <span
-                className="text-xs capitalize"
-                style={{ color: 'rgb(var(--text-tertiary))' }}
-              >
+              <span className="text-xs capitalize text-[rgb(var(--text-tertiary))]">
                 {status}
               </span>
             </div>

@@ -332,20 +332,6 @@ export default [
     },
   },
   {
-    // packages/ui is the shared primitive library, not an operator MFE surface.
-    // The inline-style sweep targeted apps/** (the product UI); the shared
-    // data-viz primitives (charts, heatmaps, rings, stat cards) mostly carry
-    // genuinely dynamic style objects and are a separate follow-up. Keep the
-    // presentation-style rule a warning here so the apps/** flip lands without
-    // dragging the primitive library into the same PR. no-hardcoded-colors and
-    // no-arbitrary-tailwind-values remain errors for packages/ui (set above).
-    ...pluginConfig,
-    files: ['packages/ui/**/*.{ts,tsx}'],
-    rules: {
-      'edforge-design-system/no-presentation-style-objects': 'warn',
-    },
-  },
-  {
     // Epic T exit gate. Settings + onboarding are fully migrated off native
     // <select> and local form-style constants, so these two rules are hard
     // errors on that path — a regression now fails CI instead of adding a

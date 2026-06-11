@@ -156,7 +156,8 @@ operator-impact first; landing/marketing last.
 
 ## 8. Ratchet closed (2026-06-10)
 
-`no-presentation-style-objects` is now **`error`** for `apps/**` in
+`no-presentation-style-objects` is now **`error`** for both `apps/**` and
+`packages/ui/**` in
 [`packages/config/eslint-design-system.js`](../../packages/config/eslint-design-system.js).
 The operator-facing tail (Tier 1, Tier 2 non-portal, plus the shell chrome —
 `Header`, `Sidebar`, `AppShell`, `SchoolSwitcher`, onboarding, settings tabs,
@@ -166,6 +167,18 @@ values (data-driven chart/calendar colors, depth-based tree indent, randomized
 confetti, tenant brand swatch) carry an in-tag `// allow-presentation-style:`
 marker with a reason.
 
+### packages/ui closed (follow-up, 2026-06-10)
+
+The shared primitive library was swept in a follow-up pass and the
+`packages/ui/**` warn-override was removed — it now inherits the `error` gate.
+`StatCard`, `StatStrip`, `CourseCard`, `V2AlertItem`, `Accordion`,
+`QuickDrawer`, `StatusPill`, `SectionErrorBoundary`, plus the data-viz set
+(`WeekTimetable`, `AttendanceHeatmap`, `AttendanceTrend`, `CategoryBar`,
+`AnimatedProgressBar`, `AttendanceDonutRing`, `GpaRing`) are at **0**
+presentation-style warnings. Data-driven fills/colors (per-course hue, status
+tiers, animated widths, caller-provided accent props) carry markers;
+`StatusPill`'s variant→token map became className fragments.
+
 **Still `warn` (explicit allowlist in the same config), code kept intact:**
 
 - `apps/academics/src/components/students/CSVImport.tsx` — importer is hidden
@@ -174,9 +187,6 @@ marker with a reason.
   outside the operator app.
 - `apps/shell/src/pages/parent-portal/**`, `portal-shared/**`,
   `student-portal/**` — portal experiences not planned for this release.
-- `packages/ui/**` — the shared primitive library (charts, heatmaps, rings,
-  stat cards) is mostly dynamic-viz and is a separate follow-up; its
-  `no-hardcoded-colors` / `no-arbitrary-tailwind-values` errors still apply.
 
 When any allowlisted path is picked up, convert it and delete its entry from the
 config block.

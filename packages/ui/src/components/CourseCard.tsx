@@ -74,39 +74,35 @@ export const CourseCard = forwardRef<HTMLDivElement, CourseCardProps>(
         ref={ref}
         className={cn(
           'rounded-2xl border overflow-hidden transition-all duration-200 motion-safe:hover:-translate-y-0.5 hover:shadow-md',
+          'bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]',
           className
         )}
-        style={{
-          background: 'rgb(var(--background-secondary))',
-          borderColor: 'rgb(var(--border-primary) / 0.35)',
-        }}
         {...props}
       >
         {/* Color stripe */}
-        <div className="h-1.5" style={{ background: color }} />
+        <div
+          // allow-presentation-style: stripe color is the deterministic per-course hue
+          className="h-1.5"
+          style={{ background: color }}
+        />
 
         <div className="p-4">
           {/* Header: course name + grade badge */}
           <div className="flex items-start justify-between gap-3 mb-3">
             <div className="min-w-0">
               {courseCode && (
-                <p
-                  className="text-xs font-mono uppercase tracking-[0.06em] mb-0.5"
-                  style={{ color: 'rgb(var(--text-tertiary))' }}
-                >
+                <p className="text-xs font-mono uppercase tracking-[0.06em] mb-0.5 text-[rgb(var(--text-tertiary))]">
                   {courseCode}
                 </p>
               )}
-              <h3
-                className="font-display text-base font-medium italic truncate"
-                style={{ color: 'rgb(var(--text-primary))' }}
-              >
+              <h3 className="font-display text-base font-medium italic truncate text-[rgb(var(--text-primary))]">
                 {courseName}
               </h3>
             </div>
 
             {/* Grade badge */}
             <div
+              // allow-presentation-style: grade badge bg/border are derived from the grade tier
               className="shrink-0 w-11 h-11 rounded-xl flex items-center justify-center"
               style={{
                 background: hasGrade
@@ -116,6 +112,7 @@ export const CourseCard = forwardRef<HTMLDivElement, CourseCardProps>(
               }}
             >
               <span
+                // allow-presentation-style: grade letter color is derived from the grade tier
                 className="text-base font-bold"
                 style={{ color: hasGrade ? gradeTokenColor(letterGrade) : 'rgb(var(--text-tertiary))' }}
               >
@@ -127,19 +124,20 @@ export const CourseCard = forwardRef<HTMLDivElement, CourseCardProps>(
           {/* Score row */}
           {hasGrade && (
             <div className="flex items-center gap-4 text-xs mb-3">
-              <span style={{ color: 'rgb(var(--text-tertiary))' }}>
-                <span className="font-mono tabular-nums" style={{ color: 'rgb(var(--text-secondary))' }}>
+              <span className="text-[rgb(var(--text-tertiary))]">
+                <span className="font-mono tabular-nums text-[rgb(var(--text-secondary))]">
                   {numericGrade != null ? numericGrade.toFixed(1) : '—'}
                 </span>
                 /100
               </span>
-              <span style={{ color: 'rgb(var(--text-tertiary))' }}>
-                <span className="font-mono tabular-nums" style={{ color: 'rgb(var(--text-secondary))' }}>
+              <span className="text-[rgb(var(--text-tertiary))]">
+                <span className="font-mono tabular-nums text-[rgb(var(--text-secondary))]">
                   {gpaPoints != null ? gpaPoints.toFixed(2) : '—'}
                 </span>
                 {' GPA'}
               </span>
               <span
+                // allow-presentation-style: status pill colors switch on final vs in-progress state
                 className="text-xs px-1.5 py-0.5 rounded-full"
                 style={{
                   background: isFinal ? 'rgb(var(--state-success-bg))' : 'rgb(var(--state-info-bg))',
@@ -153,10 +151,7 @@ export const CourseCard = forwardRef<HTMLDivElement, CourseCardProps>(
 
           {/* Not graded state */}
           {!hasGrade && (
-            <p
-              className="text-xs mb-3"
-              style={{ color: 'rgb(var(--text-tertiary))' }}
-            >
+            <p className="text-xs mb-3 text-[rgb(var(--text-tertiary))]">
               Not graded yet
             </p>
           )}
@@ -183,10 +178,7 @@ export const CourseCard = forwardRef<HTMLDivElement, CourseCardProps>(
           {teacherName && (
             <>
               <DashedDivider className="my-3" />
-              <p
-                className="text-xs"
-                style={{ color: 'rgb(var(--text-tertiary))' }}
-              >
+              <p className="text-xs text-[rgb(var(--text-tertiary))]">
                 {teacherName}
               </p>
             </>

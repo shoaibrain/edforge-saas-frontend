@@ -100,6 +100,7 @@ export function AttendanceDonutRing({
 
       {showLabel && (
         <span
+          // allow-presentation-style: label size scales with the ring diameter; color is the rate tier
           className="absolute inset-0 flex items-center justify-center font-semibold"
           style={{ fontSize: computedLabelSize, color }}
         >

@@ -64,6 +64,7 @@ export function V2AlertItem({
 
   return (
     <div
+      // allow-presentation-style: alert bg/border are severity-driven (config)
       className="flex items-center gap-3 rounded-[10px] border"
       style={{
         padding: '11px 14px',
@@ -75,6 +76,7 @@ export function V2AlertItem({
       {/* Icon */}
       {icon && (
         <div
+          // allow-presentation-style: icon chip background is severity-driven (config)
           className="flex items-center justify-center flex-shrink-0"
           style={{
             width: 28,
@@ -83,7 +85,11 @@ export function V2AlertItem({
             background: config.iconBg,
           }}
         >
-          <div style={{ color: config.iconColor }} className="w-3.5 h-3.5 flex items-center justify-center">
+          <div
+            // allow-presentation-style: icon fill is severity-driven (config)
+            style={{ color: config.iconColor }}
+            className="w-3.5 h-3.5 flex items-center justify-center"
+          >
             {icon}
           </div>
         </div>
@@ -92,15 +98,13 @@ export function V2AlertItem({
       {/* Content */}
       <div className="flex-1 min-w-0">
         <p
+          // allow-presentation-style: title color is severity-driven (config)
           className="text-xs font-medium truncate"
           style={{ color: config.titleColor }}
         >
           {title}
         </p>
-        <p
-          className="text-xs mt-0.5 truncate"
-          style={{ color: 'rgb(var(--text-disabled))' }}
-        >
+        <p className="text-xs mt-0.5 truncate text-[rgb(var(--text-disabled))]">
           {subtitle}
         </p>
       </div>
@@ -108,6 +112,7 @@ export function V2AlertItem({
       {/* Count */}
       {count != null && (
         <span
+          // allow-presentation-style: count color is severity-driven (config)
           className="text-sm font-semibold flex-shrink-0"
           style={{ color: config.countColor }}
         >
@@ -119,6 +124,7 @@ export function V2AlertItem({
       {cta && (
         <button
           onClick={cta.onClick}
+          // allow-presentation-style: CTA colors are severity-driven (config)
           className="text-xs font-medium px-2.5 py-1 rounded-md border whitespace-nowrap flex-shrink-0 transition-opacity hover:opacity-80"
           style={{
             color: config.ctaColor,
