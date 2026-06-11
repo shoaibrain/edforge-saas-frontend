@@ -13,7 +13,7 @@ type EdforgeLogoProps = {
 
 export function EdforgeLogo({ size = 34, label = 'Edforge' }: EdforgeLogoProps) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+    <div className="gap-2.5" style={{ display: 'flex', alignItems: 'center' }}>
       <svg
         width={size}
         height={size}
@@ -39,16 +39,16 @@ export function EdforgeLogo({ size = 34, label = 'Edforge' }: EdforgeLogoProps) 
       </svg>
       <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
         <span
+          className="text-lg text-[var(--lp-ink)]"
           style={{
             fontWeight: 700,
-            fontSize: 18,
             letterSpacing: '-0.02em',
-            color: 'var(--lp-ink)',
           }}
         >
           Edforge
         </span>
         <span
+          // allow-presentation-style: editorial 9.5px sub-wordmark size, no scale class
           style={{
             fontSize: 9.5,
             fontWeight: 600,

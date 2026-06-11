@@ -13,6 +13,7 @@ export function Eyebrow({
 }) {
   return (
     <span
+      // allow-presentation-style: dynamic color prop + editorial 11px eyebrow size
       style={{
         fontSize: 11,
         fontWeight: 700,

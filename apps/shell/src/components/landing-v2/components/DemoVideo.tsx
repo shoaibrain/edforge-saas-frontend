@@ -122,11 +122,10 @@ export const DemoVideo = forwardRef<DemoVideoHandle, DemoVideoProps>(
     if (showMode === 'dashboard') {
       return (
         <div
+          className="bg-[var(--lp-bg-elevated)] shadow-[var(--lp-shadow-lg)]"
           style={{
-            background: 'var(--lp-bg-elevated)',
             border: '1px solid var(--lp-border)',
             borderRadius: 18,
-            boxShadow: 'var(--lp-shadow-lg)',
             overflow: 'hidden',
           }}
         >
@@ -165,13 +164,12 @@ export const DemoVideo = forwardRef<DemoVideoHandle, DemoVideoProps>(
 
     return (
       <div
+        className="bg-[#0F1A2E] shadow-[var(--lp-shadow-lg)]"
         style={{
           position: 'relative',
           borderRadius: 18,
           overflow: 'hidden',
           aspectRatio: '16 / 10',
-          background: '#0F1A2E',
-          boxShadow: 'var(--lp-shadow-lg)',
           border: '1px solid var(--lp-border)',
         }}
       >
@@ -197,6 +195,7 @@ export const DemoVideo = forwardRef<DemoVideoHandle, DemoVideoProps>(
 
         {caption ? (
           <div
+            // allow-presentation-style: glass caption badge, rgba tint + editorial 12.5px
             style={{
               position: 'absolute',
               left: 14,

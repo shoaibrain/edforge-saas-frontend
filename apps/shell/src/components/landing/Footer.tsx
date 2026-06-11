@@ -45,9 +45,8 @@ const socialLinks = [
 export function Footer() {
   return (
     <footer
-      className="w-full"
+      className="w-full bg-[rgb(var(--background-primary))]"
       style={{
-        backgroundColor: 'rgb(var(--background-primary))',
         borderTop: '1px solid rgb(var(--border-primary))',
       }}
     >
@@ -59,18 +58,16 @@ export function Footer() {
             <div className="flex items-center gap-2.5">
               <img src="/logo.svg" alt="EdForge Logo" className="w-7 h-7 object-contain" />
               <span
-                className="text-lg font-bold tracking-tight"
+                className="text-lg font-bold tracking-tight text-[rgb(var(--text-primary))]"
                 style={{
                   fontFamily: 'var(--lp-font-heading)',
-                  color: 'rgb(var(--text-primary))',
                 }}
               >
                 EdForge Technologies
               </span>
             </div>
             <p
-              className="mt-1.5 text-sm"
-              style={{ color: 'rgb(var(--text-tertiary))' }}
+              className="mt-1.5 text-sm text-[rgb(var(--text-tertiary))]"
             >
               Everything your schools run on — in one place.
             </p>
@@ -95,10 +92,10 @@ export function Footer() {
         {/* Bottom: Copyright + Compliance + Social */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-6">
-            <p className="text-xs" style={{ color: 'rgb(var(--text-tertiary))' }}>
+            <p className="text-xs text-[rgb(var(--text-tertiary))]">
               &copy; {new Date().getFullYear()} EdForge Technologies LLC
             </p>
-            <p className="text-xs" style={{ color: 'rgb(var(--text-tertiary))' }}>
+            <p className="text-xs text-[rgb(var(--text-tertiary))]">
               FERPA Compliant&ensp;&middot;&ensp;COPPA Ready&ensp;&middot;&ensp;Ed-Fi Aligned
             </p>
           </div>
@@ -111,11 +108,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={social.label}
-                className="flex h-8 w-8 items-center justify-center rounded-full transition-colors"
-                style={{
-                  color: 'rgb(var(--text-tertiary))',
-                  backgroundColor: 'transparent',
-                }}
+                className="flex h-8 w-8 items-center justify-center rounded-full transition-colors text-[rgb(var(--text-tertiary))] bg-transparent"
                 onMouseEnter={(e) => {
                   e.currentTarget.style.color = 'rgb(var(--text-primary))'
                   e.currentTarget.style.backgroundColor = 'rgb(var(--border-secondary))'
