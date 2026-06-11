@@ -19,13 +19,13 @@ export function FAQ() {
     <section
       id="faqs"
       aria-labelledby="faq-heading"
-      className="lp-section"
-      style={{ background: 'var(--lp-bg)' }}
+      className="lp-section bg-[var(--lp-bg)]"
     >
       <Container>
-        <div style={{ maxWidth: 900, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 48 }}>
+        <div className="mx-auto" style={{ maxWidth: 900 }}>
+          <div className="mb-12" style={{ textAlign: 'center' }}>
             <span
+              // allow-presentation-style: editorial 11px uppercase eyebrow
               style={{
                 fontSize: 11,
                 fontWeight: 700,
@@ -39,11 +39,13 @@ export function FAQ() {
             <h2
               id="faq-heading"
               className="lp-h-section"
+              // allow-presentation-style: fluid clamp() section heading size
               style={{ marginTop: 12, fontSize: 'clamp(34px, 4vw, 52px)' }}
             >
               {FAQ_STRINGS.headingLead}{' '}
               <span
                 className="lp-serif"
+                // allow-presentation-style: editorial 1.05em serif accent
                 style={{ color: 'var(--lp-primary)', fontSize: '1.05em' }}
               >
                 {FAQ_STRINGS.headingSerif}

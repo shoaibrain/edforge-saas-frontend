@@ -217,8 +217,7 @@ export function Navbar() {
             <img src="/logo.svg" alt="EdForge Logo" className="w-full h-full object-contain" />
           </div>
           <span
-            className="text-xl font-bold tracking-tight"
-            style={{ color: 'rgb(var(--text-primary))' }}
+            className="text-xl font-bold tracking-tight text-[rgb(var(--text-primary))]"
           >
             EdForge
           </span>
@@ -229,6 +228,7 @@ export function Navbar() {
           <div className="relative flex items-center gap-1">
             {/* Sliding Hover Indicator */}
             <div
+              // allow-presentation-style: dynamic indicator position/size with decorative rgba fill
               className="absolute top-1 bottom-1 rounded-full transition-all duration-300 ease-out"
               style={{
                 left: indicatorStyle.left,
@@ -250,6 +250,7 @@ export function Navbar() {
                 }}
               >
                 <button
+                  // allow-presentation-style: color toggles on active/hover state
                   aria-haspopup={item.type === 'mega_menu' ? 'true' : undefined}
                   aria-expanded={item.type === 'mega_menu' ? activeDropdown === item.label : undefined}
                   aria-controls={item.type === 'mega_menu' ? `dropdown-${item.label}` : undefined}
@@ -289,15 +290,12 @@ export function Navbar() {
             onMouseLeave={() => { setActiveDropdown(null); setHoveredItem(null) }}
           >
             <div
-              className={`relative backdrop-blur-xl border overflow-hidden transition-all duration-300 ease-out origin-top ${showDropdown ? 'opacity-100 translate-y-0 scale-100 visible' : 'opacity-0 -translate-y-4 scale-95 invisible'
+              className={`relative backdrop-blur-xl border overflow-hidden transition-all duration-300 ease-out origin-top bg-[rgba(255,255,255,0.95)] border-[rgba(226,232,240,0.8)] shadow-[var(--lp-shadow-elevated)] ${showDropdown ? 'opacity-100 translate-y-0 scale-100 visible' : 'opacity-0 -translate-y-4 scale-95 invisible'
                 }`}
               style={{
                 width: 'min(900px, calc(100vw - 3rem))',
                 height: '420px',
-                backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                borderColor: 'rgba(226, 232, 240, 0.8)',
                 borderRadius: 'var(--lp-radius-lg)',
-                boxShadow: 'var(--lp-shadow-elevated)',
               }}
             >
               {/* Carousel Wrapper */}
@@ -314,49 +312,48 @@ export function Navbar() {
                             <NavLink
                               key={idx}
                               href={subItem.href}
-                              className="group flex flex-col p-5 transition-all duration-200 hover:shadow-md"
+                              className="group flex flex-col p-5 transition-all duration-200 hover:shadow-md bg-[rgb(var(--background-primary))]"
                               style={{
                                 borderRadius: 'var(--lp-radius-md)',
-                                backgroundColor: 'rgb(var(--background-primary))',
                                 border: '1px solid rgba(226, 232, 240, 0.8)',
                               }}
                             >
                               <div className="flex items-center gap-3 mb-3">
                                 <div
+                                  // allow-presentation-style: per-item data-driven icon background
                                   className="p-2.5 transition-all group-hover:scale-110"
                                   style={{
                                     borderRadius: 'var(--lp-radius-sm)',
                                     backgroundColor: subItem.iconBg,
                                   }}
                                 >
-                                  <subItem.icon className="w-5 h-5" style={{ color: subItem.iconColor }} />
+                                  <subItem.icon
+                                    // allow-presentation-style: per-item data-driven icon color
+                                    className="w-5 h-5"
+                                    style={{ color: subItem.iconColor }}
+                                  />
                                 </div>
-                                <span className="font-semibold" style={{ color: 'rgb(var(--text-primary))' }}>{subItem.title}</span>
+                                <span className="font-semibold text-[rgb(var(--text-primary))]">{subItem.title}</span>
                               </div>
-                              <p className="text-sm leading-snug" style={{ color: 'rgb(var(--text-secondary))' }}>{subItem.description}</p>
+                              <p className="text-sm leading-snug text-[rgb(var(--text-secondary))]">{subItem.description}</p>
                             </NavLink>
                           ))}
                         </div>
                         {item.dropdown.footerItems && (
                           <div
-                            className="p-4 grid grid-cols-3 gap-4"
+                            className="p-4 grid grid-cols-3 gap-4 bg-[rgb(var(--background-primary))]"
                             style={{
-                              backgroundColor: 'rgb(var(--background-primary))',
                               borderTop: '1px solid rgba(226, 232, 240, 0.8)',
                             }}
                           >
                             {item.dropdown.footerItems.map((footerItem, idx) => (
                               <NavLink key={idx} href={footerItem.href} className="flex items-center gap-3 p-2 rounded-xl hover:bg-[rgb(var(--background-secondary))] transition-colors group">
                                 <div
-                                  className="p-1.5 rounded-lg transition-colors"
-                                  style={{
-                                    backgroundColor: 'rgba(249, 115, 22, 0.06)',
-                                    color: 'rgb(var(--text-secondary))',
-                                  }}
+                                  className="p-1.5 rounded-lg transition-colors bg-[rgba(249,115,22,0.06)] text-[rgb(var(--text-secondary))]"
                                 >
                                   <footerItem.icon className="w-4 h-4" />
                                 </div>
-                                <span className="text-sm font-medium" style={{ color: 'rgb(var(--text-secondary))' }}>{footerItem.title}</span>
+                                <span className="text-sm font-medium text-[rgb(var(--text-secondary))]">{footerItem.title}</span>
                               </NavLink>
                             ))}
                           </div>
@@ -365,9 +362,9 @@ export function Navbar() {
                     ) : (
                       <div className="flex flex-col h-full">
                         {item.dropdown?.header && (
-                          <div className="p-8 border-b" style={{ borderColor: 'rgba(226, 232, 240, 0.8)' }}>
-                            <h3 className="text-xl font-bold" style={{ color: 'rgb(var(--text-primary))' }}>{item.dropdown.header.title}</h3>
-                            <p className="text-base mt-2" style={{ color: 'rgb(var(--text-secondary))' }}>{item.dropdown.header.description}</p>
+                          <div className="p-8 border-b border-[rgba(226,232,240,0.8)]">
+                            <h3 className="text-xl font-bold text-[rgb(var(--text-primary))]">{item.dropdown.header.title}</h3>
+                            <p className="text-base mt-2 text-[rgb(var(--text-secondary))]">{item.dropdown.header.description}</p>
                           </div>
                         )}
                         <div className="grid grid-cols-2 gap-4 p-6 flex-1">
@@ -375,28 +372,32 @@ export function Navbar() {
                             <NavLink
                               key={idx}
                               href={subItem.href}
-                              className="group flex items-start gap-4 p-4 transition-all duration-200 hover:shadow-md"
+                              className="group flex items-start gap-4 p-4 transition-all duration-200 hover:shadow-md bg-[rgb(var(--background-primary))]"
                               style={{
                                 borderRadius: 'var(--lp-radius-md)',
-                                backgroundColor: 'rgb(var(--background-primary))',
                                 border: '1px solid rgba(226, 232, 240, 0.8)',
                               }}
                             >
                               <div
+                                // allow-presentation-style: per-item data-driven icon background
                                 className="flex-shrink-0 w-12 h-12 flex items-center justify-center transition-all duration-300 group-hover:scale-110"
                                 style={{
                                   borderRadius: 'var(--lp-radius-sm)',
                                   backgroundColor: subItem.iconBg,
                                 }}
                               >
-                                <subItem.icon className="w-6 h-6 transition-transform duration-300" style={{ color: subItem.iconColor }} />
+                                <subItem.icon
+                                  // allow-presentation-style: per-item data-driven icon color
+                                  className="w-6 h-6 transition-transform duration-300"
+                                  style={{ color: subItem.iconColor }}
+                                />
                               </div>
                               <div>
-                                <div className="font-semibold flex items-center gap-2 text-base" style={{ color: 'rgb(var(--text-primary))' }}>
+                                <div className="font-semibold flex items-center gap-2 text-base text-[rgb(var(--text-primary))]">
                                   {subItem.title}
-                                  <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" style={{ color: 'rgb(var(--text-tertiary))' }} />
+                                  <ArrowRight className="w-4 h-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-[rgb(var(--text-tertiary))]" />
                                 </div>
-                                <p className="text-sm mt-1 leading-relaxed" style={{ color: 'rgb(var(--text-secondary))' }}>{subItem.description}</p>
+                                <p className="text-sm mt-1 leading-relaxed text-[rgb(var(--text-secondary))]">{subItem.description}</p>
                               </div>
                             </NavLink>
                           ))}
@@ -414,20 +415,18 @@ export function Navbar() {
         <div className="flex items-center gap-4">
           <Link
             to="/login"
-            className="hidden md:inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold transition-all hover:shadow-md hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#F97316]"
+            className="hidden md:inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold transition-all hover:shadow-md hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#F97316] bg-[#F97316] text-[#FFFFFF]"
             style={{
               borderRadius: 'var(--lp-radius-pill)',
-              backgroundColor: '#F97316',
-              color: '#FFFFFF',
             }}
           >
             Sign In
           </Link>
           {/* Mobile Toggle — 44x44px min touch target */}
           <button
-            className="md:hidden min-w-11 min-h-11 flex items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#F97316]"
+            // allow-presentation-style: background toggles on mobileMenuOpen state
+            className="md:hidden min-w-11 min-h-11 flex items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#F97316] text-[rgb(var(--text-primary))]"
             style={{
-              color: 'rgb(var(--text-primary))',
               backgroundColor: mobileMenuOpen ? 'rgba(249, 115, 22, 0.08)' : 'transparent',
             }}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -444,7 +443,7 @@ export function Navbar() {
         When the nav has backdrop-blur (scrolled state), backdrop-filter makes the nav
         the containing block for position:fixed children, breaking the menu dimensions. */}
     <div
-      className={`md:hidden transition-opacity duration-300 ${mobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'
+      className={`md:hidden transition-opacity duration-300 bg-[#FAF9F6] ${mobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'
         }`}
       style={{
         position: 'fixed',
@@ -453,7 +452,6 @@ export function Navbar() {
         right: 0,
         bottom: 0,
         zIndex: 40,
-        backgroundColor: '#FAF9F6',
       }}
     >
       <div className="flex flex-col" style={{ height: '100%' }}>
@@ -463,8 +461,7 @@ export function Navbar() {
             {NAV_ITEMS.filter((item) => item.type === 'mega_menu').map((item) => (
               <div key={item.label}>
                 <div
-                  className="mb-2 text-xs font-semibold uppercase tracking-wider"
-                  style={{ color: 'rgb(var(--text-tertiary))' }}
+                  className="mb-2 text-xs font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))]"
                 >
                   {item.label}
                 </div>
@@ -476,8 +473,12 @@ export function Navbar() {
                       className="flex items-center gap-3 rounded-xl px-2 py-2.5 min-h-11 transition-colors touch-manipulation hover:bg-[rgb(var(--background-secondary))]"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      <subItem.icon className="w-4 h-4 shrink-0" style={{ color: subItem.iconColor }} />
-                      <span className="text-sm font-medium" style={{ color: 'rgb(var(--text-primary))' }}>{subItem.title}</span>
+                      <subItem.icon
+                        // allow-presentation-style: per-item data-driven icon color
+                        className="w-4 h-4 shrink-0"
+                        style={{ color: subItem.iconColor }}
+                      />
+                      <span className="text-sm font-medium text-[rgb(var(--text-primary))]">{subItem.title}</span>
                     </NavLink>
                   ))}
                 </div>
@@ -490,11 +491,9 @@ export function Navbar() {
         <div className="p-4" style={{ borderTop: '1px solid rgba(226, 232, 240, 0.8)' }}>
           <Link
             to="/login"
-            className="lp-nav-signin flex items-center justify-center w-full min-h-12 py-3 font-semibold transition-all hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#F97316]"
+            className="lp-nav-signin flex items-center justify-center w-full min-h-12 py-3 font-semibold transition-all hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#F97316] bg-[#F97316] text-[#FFFFFF]"
             style={{
               borderRadius: 'var(--lp-radius-pill)',
-              backgroundColor: '#F97316',
-              color: '#FFFFFF',
             }}
             onClick={() => setMobileMenuOpen(false)}
           >

@@ -15,20 +15,18 @@ export function PlatformPillars() {
     <section
       id="platform"
       aria-labelledby="platform-heading"
-      className="lp-section"
-      style={{ background: 'var(--lp-bg)' }}
+      className="lp-section bg-[var(--lp-bg)]"
     >
       <Container>
         <div
+          className="mb-[52px] mx-auto"
           style={{
             textAlign: 'center',
-            marginBottom: 52,
             maxWidth: 860,
-            marginLeft: 'auto',
-            marginRight: 'auto',
           }}
         >
           <span
+            // allow-presentation-style: editorial 11px uppercase eyebrow
             style={{
               fontSize: 11,
               fontWeight: 700,
@@ -42,6 +40,7 @@ export function PlatformPillars() {
           <h2
             id="platform-heading"
             className="lp-h-section"
+            // allow-presentation-style: fluid clamp() section heading size
             style={{
               marginTop: 12,
               fontSize: 'clamp(36px, 4.2vw, 56px)',
@@ -50,17 +49,19 @@ export function PlatformPillars() {
             }}
           >
             {PLATFORM_PILLARS.headingLead}{' '}
-            <span className="lp-serif" style={{ color: 'var(--lp-primary)', fontSize: '1.05em' }}>
+            <span
+              className="lp-serif"
+              // allow-presentation-style: editorial 1.05em serif accent
+              style={{ color: 'var(--lp-primary)', fontSize: '1.05em' }}
+            >
               {PLATFORM_PILLARS.headingSerif}
             </span>
             {PLATFORM_PILLARS.headingTail}
           </h2>
           <p
-            className="lp-lede"
+            className="lp-lede mt-4 mx-auto text-lg"
             style={{
-              margin: '16px auto 0',
               maxWidth: 640,
-              fontSize: 18,
             }}
           >
             {PLATFORM_PILLARS.lede}

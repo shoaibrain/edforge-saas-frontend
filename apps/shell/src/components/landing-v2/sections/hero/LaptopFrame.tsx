@@ -15,6 +15,7 @@ export function LaptopFrame({ staticFallback }: LaptopFrameProps) {
 
   return (
     <div
+      // allow-presentation-style: decorative laptop chrome, dark hex + multi-stop shadow
       style={{
         position: 'relative',
         background: '#151515',
@@ -30,6 +31,7 @@ export function LaptopFrame({ staticFallback }: LaptopFrameProps) {
       {/* Camera notch */}
       <div
         aria-hidden
+        // allow-presentation-style: decorative camera-notch dot, dark hex + inset shadow
         style={{
           position: 'absolute',
           top: 8,
@@ -44,8 +46,8 @@ export function LaptopFrame({ staticFallback }: LaptopFrameProps) {
       />
       {/* Screen */}
       <div
+        className="bg-[#fff]"
         style={{
-          background: '#fff',
           borderRadius: 6,
           overflow: 'hidden',
           aspectRatio: '16 / 10',
@@ -83,6 +85,7 @@ function StaticHeroPoster() {
     <div
       role="img"
       aria-label="Edforge platform overview"
+      // allow-presentation-style: decorative multi-stop gradient poster backdrop
       style={{
         width: '100%',
         height: '100%',
@@ -95,6 +98,7 @@ function StaticHeroPoster() {
     >
       <div
         className="lp-serif"
+        // allow-presentation-style: fluid clamp() poster wordmark size
         style={{
           fontSize: 'clamp(28px, 3vw, 44px)',
           color: 'var(--lp-primary)',

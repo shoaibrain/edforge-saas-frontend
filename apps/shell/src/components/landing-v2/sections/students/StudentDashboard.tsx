@@ -8,19 +8,25 @@ import { Tag } from '@edforge/ui'
  */
 export function StudentDashboard() {
   return (
-    <div style={{ padding: 22, background: 'var(--lp-bg-elevated)' }}>
+    <div className="pt-[22px] pb-[22px] pl-[22px] pr-[22px] bg-[var(--lp-bg-elevated)]">
       <div
+        className="mb-4"
         style={{
           display: 'flex',
           justifyContent: 'space-between',
-          marginBottom: 16,
         }}
       >
         <div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--lp-ink)' }}>
+          <div
+            // allow-presentation-style: editorial 13px heading
+            style={{ fontSize: 13, fontWeight: 700, color: 'var(--lp-ink)' }}
+          >
             Recommended For You
           </div>
-          <div style={{ fontSize: 11.5, color: 'var(--lp-ink-muted)' }}>
+          <div
+            // allow-presentation-style: editorial 11.5px subtitle
+            style={{ fontSize: 11.5, color: 'var(--lp-ink-muted)' }}
+          >
             Jordan · Grade 10
           </div>
         </div>
@@ -31,7 +37,7 @@ export function StudentDashboard() {
 
       <FocusChart />
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+      <div className="gap-2" style={{ display: 'flex', flexDirection: 'column' }}>
         {TASKS.map((task, i) => (
           <TaskRow key={task.title} task={task} active={i === 0} />
         ))}
@@ -52,38 +58,39 @@ function FocusChart() {
   ]
   return (
     <div
+      className="pt-[14px] pb-[14px] pl-[14px] pr-[14px] mb-3"
       style={{
-        padding: 14,
         border: '1px solid var(--lp-border)',
         borderRadius: 12,
-        marginBottom: 12,
       }}
     >
       <div
+        className="mb-2.5"
         style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          marginBottom: 10,
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div className="gap-2" style={{ display: 'flex', alignItems: 'center' }}>
           <div
+            className="bg-[var(--lp-primary-soft)] text-[var(--lp-primary-ink)]"
             style={{
               width: 22,
               height: 22,
               borderRadius: 6,
-              background: 'var(--lp-primary-soft)',
               display: 'grid',
               placeItems: 'center',
-              color: 'var(--lp-primary-ink)',
             }}
           >
             <Icon name="sparkle" size={12} />
           </div>
-          <div style={{ fontSize: 12, fontWeight: 600 }}>Today's focus areas</div>
+          <div className="text-xs" style={{ fontWeight: 600 }}>Today's focus areas</div>
         </div>
-        <div style={{ fontSize: 11, color: 'var(--lp-ink-muted)' }}>Week of Apr 15</div>
+        <div
+          // allow-presentation-style: editorial 11px caption
+          style={{ fontSize: 11, color: 'var(--lp-ink-muted)' }}
+        >Week of Apr 15</div>
       </div>
       <svg
         viewBox="0 0 300 80"
@@ -165,6 +172,7 @@ const TASKS: Task[] = [
 function TaskRow({ task, active }: { task: Task; active: boolean }) {
   return (
     <div
+      // allow-presentation-style: active-state background toggle
       style={{
         display: 'flex',
         gap: 10,
@@ -176,6 +184,7 @@ function TaskRow({ task, active }: { task: Task; active: boolean }) {
     >
       <span
         aria-hidden
+        // allow-presentation-style: per-task data-driven dot color
         style={{
           width: 6,
           height: 6,
@@ -186,14 +195,21 @@ function TaskRow({ task, active }: { task: Task; active: boolean }) {
         }}
       />
       <div style={{ flex: 1 }}>
-        <div style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--lp-ink)' }}>
+        <div
+          // allow-presentation-style: editorial 12.5px title
+          style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--lp-ink)' }}
+        >
           {task.title}
         </div>
-        <div style={{ fontSize: 11, color: 'var(--lp-ink-muted)' }}>
+        <div
+          // allow-presentation-style: editorial 11px description
+          style={{ fontSize: 11, color: 'var(--lp-ink-muted)' }}
+        >
           {task.description}
         </div>
       </div>
       <div
+        // allow-presentation-style: editorial 10.5px badge chip
         style={{
           fontSize: 10.5,
           fontWeight: 600,

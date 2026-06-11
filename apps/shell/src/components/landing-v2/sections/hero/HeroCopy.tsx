@@ -10,9 +10,10 @@ export function HeroCopy() {
   const midParts = HERO.headingMid.split('\n')
   return (
     <Container>
-      <div style={{ textAlign: 'center', position: 'relative', zIndex: 3, paddingBottom: 20 }}>
+      <div className="pb-5" style={{ textAlign: 'center', position: 'relative', zIndex: 3 }}>
         <h1
           id="hero-heading"
+          // allow-presentation-style: fluid clamp() display size
           style={{
             margin: '10px auto 16px',
             maxWidth: 980,
@@ -26,6 +27,7 @@ export function HeroCopy() {
         >
           <span
             className="lp-serif"
+            // allow-presentation-style: editorial 1.02em serif accent
             style={{ color: 'var(--lp-primary)', fontSize: '1.02em' }}
           >
             {HERO.headingSerif1}
@@ -38,6 +40,7 @@ export function HeroCopy() {
           ))}
           <span
             className="lp-serif"
+            // allow-presentation-style: editorial 1.02em serif accent
             style={{ color: 'var(--lp-primary)', fontSize: '1.02em' }}
           >
             {HERO.headingSerif2}
@@ -45,11 +48,9 @@ export function HeroCopy() {
           {HERO.headingTail}
         </h1>
         <p
+          className="mx-auto mb-[22px] text-lg text-[var(--lp-ink-3)]"
           style={{
-            margin: '0 auto 22px',
-            fontSize: 18,
             lineHeight: 1.55,
-            color: 'var(--lp-ink-3)',
             maxWidth: 600,
             textWrap: 'pretty',
           }}
@@ -59,6 +60,7 @@ export function HeroCopy() {
         <a
           href="#stage"
           onClick={() => landingEvents.heroCtaClick('scroll_hint')}
+          // allow-presentation-style: editorial 13px scroll-hint chip
           style={{
             marginTop: 6,
             display: 'inline-flex',
@@ -70,7 +72,7 @@ export function HeroCopy() {
             textDecoration: 'none',
           }}
         >
-          <span aria-hidden style={{ fontSize: 16 }}>
+          <span aria-hidden className="text-base">
             ↓
           </span>{' '}
           {HERO.scrollHint}

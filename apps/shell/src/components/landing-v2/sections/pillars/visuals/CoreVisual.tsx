@@ -12,6 +12,7 @@ export function CoreVisual({ accent, ink }: VisualProps) {
   ]
   return (
     <div
+      // allow-presentation-style: decorative tilted card chrome, white + soft drop shadow
       style={{
         background: '#fff',
         borderRadius: 12,
@@ -21,14 +22,14 @@ export function CoreVisual({ accent, ink }: VisualProps) {
       }}
     >
       <div
+        className="gap-2 mb-2.5"
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: 8,
-          marginBottom: 10,
         }}
       >
         <div
+          // allow-presentation-style: per-card accent swatch fill
           style={{
             width: 24,
             height: 24,
@@ -36,22 +37,25 @@ export function CoreVisual({ accent, ink }: VisualProps) {
             background: accent,
           }}
         />
-        <div style={{ fontSize: 11, fontWeight: 700, color: ink }}>
+        <div
+          // allow-presentation-style: editorial 11px label + per-card palette ink
+          style={{ fontSize: 11, fontWeight: 700, color: ink }}
+        >
           Attendance · 3rd Grade
         </div>
       </div>
       {students.map((s, i) => (
         <div
           key={s.name}
+          className="gap-2 pt-[6px] pb-[6px]"
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: 8,
-            padding: '6px 0',
             borderTop: i ? '1px solid rgba(29,53,87,0.06)' : 'none',
           }}
         >
           <div
+            // allow-presentation-style: per-student tint avatar fill
             style={{
               width: 20,
               height: 20,
@@ -59,10 +63,16 @@ export function CoreVisual({ accent, ink }: VisualProps) {
               background: `${s.tint}33`,
             }}
           />
-          <div style={{ fontSize: 11, flex: 1, color: ink, opacity: 0.85 }}>
+          <div
+            // allow-presentation-style: editorial 11px name + per-card palette ink
+            style={{ fontSize: 11, flex: 1, color: ink, opacity: 0.85 }}
+          >
             {s.name}
           </div>
-          <div style={{ fontSize: 10, color: accent, fontWeight: 700 }}>●</div>
+          <div
+            // allow-presentation-style: editorial 10px status dot + per-card accent
+            style={{ fontSize: 10, color: accent, fontWeight: 700 }}
+          >●</div>
         </div>
       ))}
     </div>

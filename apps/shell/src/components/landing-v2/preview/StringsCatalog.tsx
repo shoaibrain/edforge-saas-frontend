@@ -9,9 +9,10 @@ import { Container } from '../components/layout/Container'
 export function StringsCatalog() {
   const entries = Object.entries(STR)
   return (
-    <div style={{ padding: '48px 32px 96px', background: 'var(--lp-bg-warm)' }}>
+    <div className="pt-[48px] pl-[32px] pr-[32px] pb-[96px] bg-[var(--lp-bg-warm)]">
       <Container>
         <h1
+          // allow-presentation-style: editorial 40px display heading
           style={{
             fontSize: 40,
             letterSpacing: '-0.03em',
@@ -19,9 +20,9 @@ export function StringsCatalog() {
             margin: '0 0 8px',
           }}
         >
-          Copy <span className="lp-serif" style={{ color: 'var(--lp-primary)' }}>catalog</span>
+          Copy <span className="lp-serif text-[var(--lp-primary)]">catalog</span>
         </h1>
-        <p style={{ color: 'var(--lp-ink-3)', marginBottom: 32 }}>
+        <p className="text-[var(--lp-ink-3)] mb-8">
           Every string sourced from{' '}
           <code className="lp-mono">apps/shell/src/components/landing-v2/landing.strings.ts</code>.
         </p>
@@ -29,15 +30,14 @@ export function StringsCatalog() {
         {entries.map(([key, value]) => (
           <section
             key={key}
+            className="p-5 bg-[var(--lp-bg-elevated)] mb-4"
             style={{
-              padding: 20,
-              background: 'var(--lp-bg-elevated)',
               border: '1px solid var(--lp-border)',
               borderRadius: 'var(--lp-radius)',
-              marginBottom: 16,
             }}
           >
             <div
+              // allow-presentation-style: editorial 11px uppercase key label
               style={{
                 fontSize: 11,
                 fontWeight: 700,
@@ -50,12 +50,9 @@ export function StringsCatalog() {
               {key}
             </div>
             <pre
-              className="lp-mono"
+              className="lp-mono text-xs text-[var(--lp-ink-2)] m-0"
               style={{
                 whiteSpace: 'pre-wrap',
-                fontSize: 12,
-                color: 'var(--lp-ink-2)',
-                margin: 0,
                 lineHeight: 1.55,
               }}
             >

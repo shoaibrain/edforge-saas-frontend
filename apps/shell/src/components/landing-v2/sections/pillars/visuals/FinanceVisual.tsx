@@ -6,6 +6,7 @@ type VisualProps = { accent: string; ink: string }
 export function FinanceVisual({ accent, ink }: VisualProps) {
   return (
     <div
+      // allow-presentation-style: decorative card chrome, white + soft drop shadow
       style={{
         background: '#fff',
         borderRadius: 12,
@@ -13,10 +14,14 @@ export function FinanceVisual({ accent, ink }: VisualProps) {
         boxShadow: '0 8px 24px -8px rgba(29,53,87,0.15)',
       }}
     >
-      <div style={{ fontSize: 10, fontWeight: 700, color: ink, marginBottom: 10 }}>
+      <div
+        // allow-presentation-style: editorial 10px label + per-card palette ink
+        style={{ fontSize: 10, fontWeight: 700, color: ink, marginBottom: 10 }}
+      >
         BUDGET · FY'26
       </div>
       <div
+        // allow-presentation-style: editorial 22px headline + per-card palette ink
         style={{
           fontSize: 22,
           fontWeight: 700,
@@ -26,7 +31,10 @@ export function FinanceVisual({ accent, ink }: VisualProps) {
       >
         $4.2M
       </div>
-      <div style={{ fontSize: 10, color: ink, opacity: 0.6, marginBottom: 10 }}>
+      <div
+        // allow-presentation-style: editorial 10px caption + per-card palette ink
+        style={{ fontSize: 10, color: ink, opacity: 0.6, marginBottom: 10 }}
+      >
         of $6.8M allocated
       </div>
       <div
@@ -35,6 +43,7 @@ export function FinanceVisual({ accent, ink }: VisualProps) {
         aria-valuemax={100}
         aria-valuenow={62}
         aria-label="Budget allocation"
+        // allow-presentation-style: per-card accent-tinted track
         style={{
           height: 8,
           borderRadius: 4,
@@ -44,6 +53,7 @@ export function FinanceVisual({ accent, ink }: VisualProps) {
       >
         <div
           aria-hidden
+          // allow-presentation-style: per-card accent fill
           style={{
             height: '100%',
             width: '62%',

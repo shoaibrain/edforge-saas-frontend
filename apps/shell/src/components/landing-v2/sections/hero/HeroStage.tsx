@@ -25,18 +25,18 @@ export function HeroStage() {
     <div
       id="stage"
       ref={stageRef}
-      className="lp-hero-stage"
+      className="lp-hero-stage mt-2"
       style={{
         position: 'relative',
         width: '100%',
         height: 700,
-        marginTop: 8,
       }}
     >
       {/* Solid accent band — hidden on mobile via .lp-hero-band */}
       <div
         aria-hidden
         className="lp-hero-band"
+        // allow-presentation-style: scroll-driven gutter/radius + decorative accent glow shadow
         style={{
           position: 'absolute',
           left: gutter,

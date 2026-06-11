@@ -179,12 +179,30 @@ presentation-style warnings. Data-driven fills/colors (per-course hue, status
 tiers, animated widths, caller-provided accent props) carry markers;
 `StatusPill`'s variant→token map became className fragments.
 
+### landing / marketing closed (follow-up, 2026-06-11)
+
+The marketing landing was swept and the `landing/**` + `landing-v2/**`
+warn-overrides were removed — they now inherit the `error` gate. This covered
+the three sub-areas: the live homepage (`landing-v2/sections/**` +
+`components/**` — hero, pillars + visuals, district/teacher/student demo
+dashboards, security strip, FAQ, CTA, footer), the legal-page chrome
+(`landing/Navbar.tsx`, `landing/Footer.tsx`), and the internal
+`/_landing-preview` galleries (`TokenGallery`, `PrimitiveGallery`,
+`StringsCatalog`). 26 files, **0** presentation-style warnings.
+
+Landing has its own `--lp-*` token system (`packages/theme/src/landing-tokens.css`
++ `landing/landing.css`); static styles became `*-[var(--lp-*)]` classes. Because
+the marketing/preview code is hand-tuned editorial pixel typography, a larger
+share than the operator/ui sweeps is carried as `// allow-presentation-style`
+markers — off-scale font sizes (13/11.5/10.5px, `clamp()`, `em`), decorative
+gradients/multi-stop shadows, per-datum demo-data colors, and the preview
+galleries' raw token swatches. Exact-px font sizes (12→`text-xs`, 14→`text-sm`,
+18→`text-lg`, 20→`text-xl`) were snapped to scale classes (pixel-equivalent).
+
 **Still `warn` (explicit allowlist in the same config), code kept intact:**
 
 - `apps/academics/src/components/students/CSVImport.tsx` — importer is hidden
   from the UI pending the missing IEMIS field; not converted.
-- `apps/shell/src/components/landing/**`, `landing-v2/**` — marketing pages,
-  outside the operator app.
 - `apps/shell/src/pages/parent-portal/**`, `portal-shared/**`,
   `student-portal/**` — portal experiences not planned for this release.
 

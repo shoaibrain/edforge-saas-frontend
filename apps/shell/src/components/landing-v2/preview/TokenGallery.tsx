@@ -50,8 +50,9 @@ const SHADOWS = [
 
 export function TokenGallery() {
   return (
-    <div style={{ padding: '48px 32px', fontFamily: 'Inter, sans-serif' }}>
+    <div className="pt-[48px] pb-[48px] pl-[32px] pr-[32px]" style={{ fontFamily: 'Inter, sans-serif' }}>
       <h1
+        // allow-presentation-style: editorial 48px display heading
         style={{
           fontSize: 48,
           letterSpacing: '-0.035em',
@@ -59,44 +60,51 @@ export function TokenGallery() {
           color: 'var(--lp-ink)',
         }}
       >
-        Landing V2 <span className="lp-serif" style={{ color: 'var(--lp-primary)' }}>token gallery</span>
+        Landing V2 <span className="lp-serif text-[var(--lp-primary)]">token gallery</span>
       </h1>
-      <p style={{ color: 'var(--lp-ink-3)', marginBottom: 40 }}>
+      <p className="text-[var(--lp-ink-3)] mb-10">
         Every design token from <code className="lp-mono">packages/theme/src/landing-tokens.css</code>, rendered against the live surface.
       </p>
 
       {/* Palette */}
       {GROUPS.map((group) => (
-        <section key={group} style={{ marginBottom: 32 }}>
-          <h2 style={{ fontSize: 18, marginBottom: 12, color: 'var(--lp-ink)' }}>{group}</h2>
+        <section key={group} className="mb-8">
+          <h2 className="text-lg mb-3 text-[var(--lp-ink)]">{group}</h2>
           <div
+            className="gap-3"
             style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
-              gap: 12,
             }}
           >
             {PALETTE.filter((p) => p.group === group).map((p) => (
               <div
                 key={p.cssVar}
+                className="bg-[var(--lp-bg-elevated)]"
                 style={{
                   border: '1px solid var(--lp-border)',
                   borderRadius: 'var(--lp-radius)',
                   overflow: 'hidden',
-                  background: 'var(--lp-bg-elevated)',
                 }}
               >
                 <div
+                  // allow-presentation-style: dynamic token-value swatch fill
                   style={{
                     height: 72,
                     background: `var(${p.cssVar})`,
                     borderBottom: '1px solid var(--lp-border)',
                   }}
                 />
-                <div style={{ padding: 10 }}>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--lp-ink)' }}>{p.name}</div>
+                <div className="p-2.5">
+                  <div
+                    // allow-presentation-style: editorial 13px token label
+                    style={{ fontSize: 13, fontWeight: 600, color: 'var(--lp-ink)' }}
+                  >
+                    {p.name}
+                  </div>
                   <code
                     className="lp-mono"
+                    // allow-presentation-style: editorial 11px mono token name
                     style={{ fontSize: 11, color: 'var(--lp-ink-muted)' }}
                   >
                     {p.cssVar}
@@ -109,35 +117,62 @@ export function TokenGallery() {
       ))}
 
       {/* Typography */}
-      <section style={{ marginBottom: 32 }}>
-        <h2 style={{ fontSize: 18, marginBottom: 12, color: 'var(--lp-ink)' }}>Typography</h2>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <section className="mb-8">
+        <h2 className="text-lg mb-3 text-[var(--lp-ink)]">Typography</h2>
+        <div className="gap-4" style={{ display: 'flex', flexDirection: 'column' }}>
           <div>
-            <span style={{ fontSize: 11, color: 'var(--lp-ink-muted)' }}>Display · Inter 700 + Instrument Serif italic</span>
-            <div style={{ fontSize: 64, lineHeight: 1.02, letterSpacing: '-0.035em', color: 'var(--lp-ink)' }}>
-              One platform to power <span className="lp-serif" style={{ color: 'var(--lp-primary)' }}>every school</span>.
+            <span
+              // allow-presentation-style: editorial 11px caption label
+              style={{ fontSize: 11, color: 'var(--lp-ink-muted)' }}
+            >
+              Display · Inter 700 + Instrument Serif italic
+            </span>
+            <div
+              // allow-presentation-style: editorial 64px display specimen
+              style={{ fontSize: 64, lineHeight: 1.02, letterSpacing: '-0.035em', color: 'var(--lp-ink)' }}
+            >
+              One platform to power <span className="lp-serif text-[var(--lp-primary)]">every school</span>.
             </div>
           </div>
           <div>
-            <span style={{ fontSize: 11, color: 'var(--lp-ink-muted)' }}>Section · Inter 700</span>
-            <div style={{ fontSize: 48, lineHeight: 1.05, letterSpacing: '-0.03em', color: 'var(--lp-ink)' }}>
+            <span
+              // allow-presentation-style: editorial 11px caption label
+              style={{ fontSize: 11, color: 'var(--lp-ink-muted)' }}
+            >
+              Section · Inter 700
+            </span>
+            <div
+              // allow-presentation-style: editorial 48px section specimen
+              style={{ fontSize: 48, lineHeight: 1.05, letterSpacing: '-0.03em', color: 'var(--lp-ink)' }}
+            >
               Section heading
             </div>
           </div>
           <div>
-            <span style={{ fontSize: 11, color: 'var(--lp-ink-muted)' }}>Lede · Inter 400</span>
-            <div style={{ fontSize: 18, lineHeight: 1.55, color: 'var(--lp-ink-3)', maxWidth: 640 }}>
+            <span
+              // allow-presentation-style: editorial 11px caption label
+              style={{ fontSize: 11, color: 'var(--lp-ink-muted)' }}
+            >
+              Lede · Inter 400
+            </span>
+            <div className="text-lg text-[var(--lp-ink-3)]" style={{ lineHeight: 1.55, maxWidth: 640 }}>
               The quick brown fox jumps over the lazy dog. Unify student data, school operations, and district analytics.
             </div>
           </div>
           <div>
-            <span style={{ fontSize: 11, color: 'var(--lp-ink-muted)' }}>Mono · JetBrains Mono</span>
-            <div className="lp-mono" style={{ fontSize: 14, color: 'var(--lp-ink-2)' }}>
+            <span
+              // allow-presentation-style: editorial 11px caption label
+              style={{ fontSize: 11, color: 'var(--lp-ink-muted)' }}
+            >
+              Mono · JetBrains Mono
+            </span>
+            <div className="lp-mono text-sm text-[var(--lp-ink-2)]">
               app.edforge.com/district
             </div>
           </div>
           <div>
             <span
+              // allow-presentation-style: editorial 11px uppercase eyebrow
               style={{
                 fontSize: 11,
                 fontWeight: 700,
@@ -153,23 +188,21 @@ export function TokenGallery() {
       </section>
 
       {/* Radii */}
-      <section style={{ marginBottom: 32 }}>
-        <h2 style={{ fontSize: 18, marginBottom: 12, color: 'var(--lp-ink)' }}>Radii</h2>
-        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+      <section className="mb-8">
+        <h2 className="text-lg mb-3 text-[var(--lp-ink)]">Radii</h2>
+        <div className="gap-3" style={{ display: 'flex', flexWrap: 'wrap' }}>
           {RADII.map((r) => (
             <div
               key={r.name}
+              className="bg-[var(--lp-primary-soft)] text-xs text-[var(--lp-primary-ink)]"
               style={{
                 width: 96,
                 height: 96,
-                background: 'var(--lp-primary-soft)',
                 border: '1px solid var(--lp-border)',
                 borderRadius: `var(${r.cssVar})`,
                 display: 'grid',
                 placeItems: 'center',
-                fontSize: 12,
                 fontWeight: 600,
-                color: 'var(--lp-primary-ink)',
               }}
             >
               {r.name}
@@ -179,16 +212,17 @@ export function TokenGallery() {
       </section>
 
       {/* Shadows */}
-      <section style={{ marginBottom: 32 }}>
-        <h2 style={{ fontSize: 18, marginBottom: 12, color: 'var(--lp-ink)' }}>Shadows</h2>
-        <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
+      <section className="mb-8">
+        <h2 className="text-lg mb-3 text-[var(--lp-ink)]">Shadows</h2>
+        <div className="gap-6" style={{ display: 'flex', flexWrap: 'wrap' }}>
           {SHADOWS.map((s) => (
             <div
               key={s.name}
+              className="bg-[var(--lp-bg-elevated)]"
+              // allow-presentation-style: dynamic token-value box-shadow swatch + editorial 13px label
               style={{
                 width: 160,
                 height: 96,
-                background: 'var(--lp-bg-elevated)',
                 border: '1px solid var(--lp-border)',
                 borderRadius: 'var(--lp-radius-lg)',
                 boxShadow: `var(${s.cssVar})`,
