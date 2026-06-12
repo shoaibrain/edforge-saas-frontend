@@ -216,6 +216,11 @@ export {
   type AttendanceTrendDirection,
 } from './components/AttendanceTrend'
 export {
+  TrendAreaChart,
+  type TrendAreaChartProps,
+  type TrendChartPoint,
+} from './components/TrendAreaChart'
+export {
   QuickDrawer,
   useQuickDrawer,
   type QuickDrawerRootProps,

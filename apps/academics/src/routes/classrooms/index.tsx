@@ -56,7 +56,7 @@ import { ClassroomCardGrid } from '../../components/classrooms/ClassroomCardGrid
 // --- Grades imports ---
 import { useGradesStore } from '../../stores/grades.store'
 import { useCurrentAcademicYear, useGradingPeriods } from '../../hooks'
-import { useSectionGrades, useGradingPolicies, useGradeOverview } from '../../hooks/useGrades'
+import { useSectionGrades, useGradingPolicies } from '../../hooks/useGrades'
 import { GradebookGrid } from '../../components/grades/GradebookGrid'
 import { GradingPolicyList } from '../../components/grades/GradingPolicyList'
 import { BulkGradeModal } from '../../components/grades/BulkGradeModal'
@@ -68,7 +68,6 @@ import { GradeOverview } from '../grades/overview'
 import { TabErrorBoundary } from '../../components/common/TabErrorBoundary'
 import { NoCurrentAcademicYearEmptyState } from '../../components/common'
 import { StatCard, WidgetErrorBoundaryV2, Button, Select } from '@edforge/ui'
-import { useAttendanceOverview } from '../../hooks/useAttendance'
 
 // ============================================================================
 // TYPES
@@ -543,114 +542,6 @@ import { AttendanceModule } from '../attendance/index'
 // CONTEXT BANNER (CLS-003)
 // ============================================================================
 
-function ContextBanner({
-  activeTab,
-  schoolId,
-}: {
-  activeTab: ClassroomTabId
-  schoolId: string
-}) {
-  // Overview data — from sections
-  const { data: sectionsPages } = useSections({
-    schoolId,
-    filters: { isActive: true },
-    enabled: !!schoolId && activeTab === 'overview',
-  })
-  const overviewSections = useMemo(() => flattenSectionPages(sectionsPages), [sectionsPages])
-  const overviewStats = useMemo(() => {
-    const total = overviewSections.length
-    const students = overviewSections.reduce((s, sec) => s + sec.currentEnrollment, 0)
-    const capacity = overviewSections.reduce((s, sec) => s + sec.maxEnrollment, 0)
-    const utilization = capacity > 0 ? Math.round((students / capacity) * 100) : 0
-    const courses = new Set(overviewSections.map((s) => s.courseId)).size
-    return { total, students, utilization, courses }
-  }, [overviewSections])
-
-  // Gradebook data
-  const { data: currentYear } = useCurrentAcademicYear(schoolId)
-  const { data: gradeData } = useGradeOverview(
-    schoolId,
-    currentYear?.yearId || '',
-    !!schoolId && !!currentYear?.yearId && activeTab === 'gradebook'
-  )
-
-  // Attendance data
-  const today = new Date().toISOString().split('T')[0]
-  const { data: attendanceData } = useAttendanceOverview({
-    schoolId,
-    academicYearId: currentYear?.yearId || '',
-    date: today,
-    enabled: !!schoolId && !!currentYear?.yearId && activeTab === 'attendance',
-  })
-
-  const bannerContent = useMemo(() => {
-    if (activeTab === 'overview') {
-      return (
-        <>
-          <em className="not-italic text-[rgb(var(--accent-academics))]">{overviewStats.total} active sections</em>
-          {' '}across{' '}
-          <em className="not-italic text-[rgb(var(--accent-academics))]">{overviewStats.courses} courses</em>
-          {' '}&mdash;{' '}
-          <em className="not-italic text-[#1D9E75]">{overviewStats.students} students enrolled</em>
-          , avg utilization{' '}
-          <em className="not-italic text-[rgb(var(--accent-attendance))]">{overviewStats.utilization}%</em>
-          .
-        </>
-      )
-    }
-
-    if (activeTab === 'gradebook' && gradeData) {
-      const worstCourse = gradeData.coursePerformance.length > 0
-        ? [...gradeData.coursePerformance].sort((a, b) => a.avgGrade - b.avgGrade)[0]?.courseName
-        : null
-      const passingCourses = gradeData.coursePerformance.filter((c) => c.passRate === 100).length
-      const completionPct = gradeData.gradingProgress?.completionRate?.toFixed(0) ?? '—'
-      return (
-        <>
-          <em className="not-italic text-[rgb(var(--accent-finance))]">{gradeData.atRiskCount} students</em>
-          {' '}at risk (below 60%){worstCourse && (
-            <> &mdash; concentrated in <em className="not-italic text-[rgb(var(--accent-finance))]">{worstCourse}</em></>
-          )}.{' '}
-          <em className="not-italic text-[#1D9E75]">{passingCourses} at 100% pass rate</em>
-          . Grading{' '}
-          <em className="not-italic text-[rgb(var(--accent-academics))]">{completionPct}% complete</em>
-          .
-        </>
-      )
-    }
-
-    if (activeTab === 'attendance' && attendanceData) {
-      const recorded = attendanceData.todaySummary?.totalRecorded ?? 0
-      const totalStudents = attendanceData.todaySummary?.totalStudents ?? 0
-      const avg7 = attendanceData.periodAverages?.last7Days?.toFixed(1) ?? '—'
-      const avg30 = attendanceData.periodAverages?.last30Days?.toFixed(1) ?? '—'
-      const atRiskCount = attendanceData.atRiskStudents?.length ?? 0
-      return (
-        <>
-          <em className="not-italic text-[rgb(var(--accent-academics))]">{recorded} of {totalStudents} students</em>
-          {' '}recorded today. 7-day average{' '}
-          <em className="not-italic text-[#1D9E75]">{avg7}%</em>
-          {' '}vs 30-day{' '}
-          <em className="not-italic text-[rgb(var(--accent-attendance))]">{avg30}%</em>
-          .{atRiskCount > 0 && (
-            <>{' '}<em className="not-italic text-[rgb(var(--accent-finance))]">{atRiskCount} students</em> flagged below 90% attendance.</>
-          )}
-        </>
-      )
-    }
-
-    return null
-  }, [activeTab, overviewStats, gradeData, attendanceData])
-
-  if (!bannerContent) return null
-
-  return (
-    <p className="px-6 pb-3 text-2xs text-[rgb(var(--text-tertiary))] leading-normal">
-      {bannerContent}
-    </p>
-  )
-}
-
 // ============================================================================
 // CLASSROOMS MODULE (main export)
 // ============================================================================
@@ -678,45 +569,11 @@ export function ClassroomsModule() {
 
   return (
     <div className="min-h-full bg-[rgb(var(--background-primary))]">
-      {/* Page Header */}
-      <div className="border-b border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-secondary))]">
-        <div className="px-6 py-4">
-          <div className="flex items-center justify-between" style={{ height: 44 }}>
-            <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-[7px] flex items-center justify-center bg-[rgb(var(--accent-academics)/0.1)]">
-                <LayoutGrid className="w-4 h-4 text-[rgb(var(--accent-academics))]" />
-              </div>
-              <h1 className="text-sm font-semibold text-[rgb(var(--text-primary))]">
-                Classrooms
-              </h1>
-              <span className="text-xs text-[rgb(var(--text-disabled))]">|</span>
-              <span className="text-xs text-[rgb(var(--text-disabled))]">
-                {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-              </span>
-            </div>
-
-            {schedPerms.create && (
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => navigate({ to: '/classrooms/create' })}
-                  aria-label="New classroom"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  New classroom
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Context Banner (CLS-003) */}
-        <ContextBanner activeTab={activeTab} schoolId={schoolId} />
-
-        {/* Tab Navigation */}
-        <div className="px-6">
+      {/* Slim header — the shell breadcrumb is the page title; just tabs + the primary action */}
+      <div className="border-b border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-secondary))] px-6">
+        <div className="flex items-center justify-between gap-4">
           <nav
-            className="flex overflow-x-auto gap-0 border-b border-[rgb(var(--border-primary)/0.35)]"
+            className="flex overflow-x-auto -mb-px"
             aria-label="Classrooms tabs"
             role="tablist"
           >
@@ -730,7 +587,7 @@ export function ClassroomsModule() {
                   aria-selected={isActive}
                   aria-controls={`panel-${tab.id}`}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`whitespace-nowrap flex items-center gap-1.5 px-4 py-2 text-xs cursor-pointer transition-colors bg-transparent border-b-2 -mb-px ${
+                  className={`whitespace-nowrap flex items-center gap-1.5 px-4 py-3 text-xs cursor-pointer transition-colors bg-transparent border-b-2 -mb-px ${
                     isActive
                       ? 'font-medium text-[#378ADD] border-[#378ADD]'
                       : 'font-normal text-[rgb(var(--text-tertiary))] border-transparent hover:text-[rgb(var(--text-secondary))]'
@@ -756,6 +613,17 @@ export function ClassroomsModule() {
               )
             })}
           </nav>
+
+          {schedPerms.create && (
+            <button
+              onClick={() => navigate({ to: '/classrooms/create' })}
+              aria-label="New classroom"
+              className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              New classroom
+            </button>
+          )}
         </div>
       </div>
 

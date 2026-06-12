@@ -20,6 +20,7 @@ import {
   WifiOff,
   Check,
   CloudOff,
+  CalendarDays,
 } from 'lucide-react'
 import { useActiveSchoolId } from '../../stores/app.store'
 import {
@@ -374,21 +375,14 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
 
   return (
     <div style={{ minHeight: '100%' }}>
-      {/* V2 Attendance Header — title left, Overview / Daily Entry toggle right */}
+      {/* Attendance toolbar — breadcrumb + the active "Attendance" tab already name
+          the page, so no title echo: just the academic-year chip + the view toggle */}
       <div className="px-6">
-        {/* Header Row */}
-        <div className="flex items-center justify-between gap-3 mb-3.5">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="flex items-center justify-center rounded-lg bg-[rgb(var(--accent-attendance)/0.1)] shrink-0" style={{ width: 32, height: 32 }}>
-              <ClipboardCheck className="w-4 h-4 text-[rgb(var(--accent-attendance))]" />
-            </div>
-            <div className="min-w-0">
-              <div className="text-base font-semibold tracking-[-0.2px] text-[rgb(var(--text-primary))]">Attendance</div>
-              <div className="text-3xs text-[rgb(var(--text-disabled))] truncate">
-                Record and review attendance by class section · {currentYearName || 'Academic Year'}
-              </div>
-            </div>
-          </div>
+        <div className="flex items-center justify-end gap-2 mb-3.5">
+          <span className="inline-flex items-center gap-1.5 text-3xs font-medium text-[rgb(var(--text-tertiary))] bg-[rgb(var(--background-tertiary))] rounded-full px-2.5 py-1">
+            <CalendarDays className="w-3 h-3" />
+            {currentYearName || 'Academic year'}
+          </span>
           <SegmentedControl
             aria-label="Attendance view"
             tabs={[

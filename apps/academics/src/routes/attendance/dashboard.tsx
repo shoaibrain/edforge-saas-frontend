@@ -1,32 +1,36 @@
 /**
- * AttendanceDashboard — V2 Redesign
+ * AttendanceDashboard — consolidated Overview
  *
- * Rich analytics dashboard powered by the single `useAttendanceOverview`
- * aggregate endpoint. All cards use V2 card chrome, inline SVG charts,
- * and proper color system matching edforge_classrooms_v2_redesign.html.
+ * Distills the attendance Overview into THREE cohesive sections (was seven
+ * stacked widgets):
+ *   1. Attendance Pulse        — headline rate + 30-day trend (reusable
+ *      @edforge/ui TrendAreaChart) + today's recording progress & composition
+ *      + day-of-week patterns.
+ *   2. Classrooms & Recording  — period averages (chips) + completion ring +
+ *      per-classroom recording status.
+ *   3. Attendance Alerts       — the bounded @edforge/ui DataTable of at-risk
+ *      students.
  *
- * Layout (top to bottom):
- *  - Today Summary strip (CLS-014)
- *  - Two-col: Absence Breakdown + DOW Pattern bars (CLS-015)
- *  - Full-width: 30-Day Trend SVG chart (CLS-016)
- *  - Two-col: Section Completion ring + Period Averages (CLS-017, CLS-018)
- *  - Full-width: Attendance Alerts table (CLS-019)
+ * Terminology: "Classroom" is the user-facing frontend term; "section" is the
+ * server / Ed-Fi term. The data fields stay `section*`; user-facing copy says
+ * "classroom".
  *
- * Data source: single useAttendanceOverview aggregate endpoint.
+ * Data source: the single useAttendanceOverview aggregate endpoint.
  *
- * Presentation: static type/spacing/color live in Tailwind classes (semantic
- * tokens + the text-2xs/3xs/4xs micro-scale). Genuinely per-datum colors and
- * chart geometry stay inline, marked `allow-presentation-style`. Off-scale
- * fixed pixel widths/heights stay inline (width/height aren't presentation
- * keys); off-scale padding is snapped to the 4px scale.
+ * Presentation: SVG geometry + per-datum colors are inherent to a data
+ * visualization and stay inline (marked `allow-presentation-style`). Static
+ * type/spacing use semantic tokens + the text-2xs/3xs/4xs micro scale.
  */
 
 import { useState, useMemo } from 'react'
+import { AlertTriangle, CheckCircle, ClipboardCheck } from 'lucide-react'
 import {
-  AlertTriangle,
-  CheckCircle,
-} from 'lucide-react'
-import { WidgetErrorBoundaryV2, DataTable, createColumnHelper } from '@edforge/ui'
+  WidgetErrorBoundaryV2,
+  DataTable,
+  createColumnHelper,
+  TrendAreaChart,
+  type TrendChartPoint,
+} from '@edforge/ui'
 import type { ColumnDef } from '@tanstack/react-table'
 import { useAttendanceOverview } from '../../hooks/useAttendance'
 import { StudentAttendanceModal } from '../../components/attendance/StudentAttendanceModal'
@@ -48,81 +52,30 @@ interface AttendanceDashboardProps {
 }
 
 // ============================================================================
-// V2 DESIGN TOKENS
+// V2 DESIGN TOKENS — vivid brand accents kept as literals for SVG stroke/fill
+// and per-datum chart/legend colors (inline + marked, never moved to className).
 // ============================================================================
 
-// Vivid brand accents kept as literals for SVG stroke/fill and per-datum
-// chart/legend colors (these stay inline + marked, never moved to className).
-// The neutral text/surface/border members feed inline non-presentation styles
-// (borderLeft/borderBottom ternaries) and dynamic per-datum color choices.
 const V2 = {
-  bgSurface: 'rgb(var(--background-secondary))',
-  borderDefault: 'rgb(var(--border-primary) / 0.35)',
-  borderSeparator: 'rgb(var(--border-primary) / 0.3)',
-  borderRow: 'rgb(var(--border-primary) / 0.15)',
-  textPrimary: 'rgb(var(--text-primary))',
-  textSecondary: 'rgb(var(--text-secondary))',
-  textMuted: 'rgb(var(--text-tertiary))',
-  textHint: 'rgb(var(--text-disabled))',
-  textGhost: 'rgb(var(--text-disabled))',
   success: '#1D9E75',
   info: '#378ADD',
   warning: '#EF9F27',
   danger: '#E24B4A',
   purple: '#7F77DD',
-  orange: '#D85A30',
+  textMuted: 'rgb(var(--text-tertiary))',
+  textHint: 'rgb(var(--text-disabled))',
+  borderRow: 'rgb(var(--border-primary) / 0.15)',
 }
 
-// Shared card chrome as class strings (semantic tokens) — de-dupes the former
-// cardStyle/cardHeaderStyle/cardBodyStyle inline objects.
 const CARD =
   'bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary)/0.35)] rounded-[10px] overflow-hidden'
 const CARD_HEADER =
   'px-4 py-3 border-b border-[rgb(var(--border-primary)/0.3)] flex items-center justify-between'
 const CARD_BODY = 'p-4'
 
-// ============================================================================
-// SVG ICON COMPONENTS
-// ============================================================================
-
-function AlertCircleIcon() {
-  return (
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={V2.danger} strokeWidth="2">
-      <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
-    </svg>
-  )
-}
-
-function ActivityIcon() {
-  return (
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={V2.warning} strokeWidth="2">
-      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-    </svg>
-  )
-}
-
-function TrendLineIcon() {
-  return (
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={V2.success} strokeWidth="2">
-      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-    </svg>
-  )
-}
-
-function CheckSquareIcon() {
-  return (
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={V2.purple} strokeWidth="2">
-      <polyline points="9 11 12 14 22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
-    </svg>
-  )
-}
-
-function BarChartSmallIcon() {
-  return (
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={V2.success} strokeWidth="2">
-      <line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" />
-    </svg>
-  )
+const DAYS_ORDER = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+const DAY_SHORT: Record<string, string> = {
+  Sunday: 'Sun', Monday: 'Mon', Tuesday: 'Tue', Wednesday: 'Wed', Thursday: 'Thu', Friday: 'Fri', Saturday: 'Sat',
 }
 
 function WarningTriangleIcon() {
@@ -133,10 +86,6 @@ function WarningTriangleIcon() {
     </svg>
   )
 }
-
-// ============================================================================
-// CARD HEADER COMPONENT
-// ============================================================================
 
 function CardHeader({
   icon,
@@ -153,37 +102,20 @@ function CardHeader({
 }) {
   return (
     <div className={CARD_HEADER}>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 min-w-0">
         <div
           // allow-presentation-style: per-card icon tint passed as prop + fixed 22px chip
-          className="rounded-[5px] flex items-center justify-center"
+          className="rounded-[5px] flex items-center justify-center shrink-0"
           style={{ width: 22, height: 22, background: iconBg }}
         >
           {icon}
         </div>
-        <div>
+        <div className="min-w-0">
           <div className="text-xs font-semibold text-[rgb(var(--text-primary))]">{title}</div>
-          <div className="text-3xs text-[rgb(var(--text-disabled))] mt-px">{subtitle}</div>
+          <div className="text-3xs text-[rgb(var(--text-disabled))] mt-px truncate">{subtitle}</div>
         </div>
       </div>
       {right}
-    </div>
-  )
-}
-
-// ============================================================================
-// SKELETON LOADERS
-// ============================================================================
-
-function SkeletonStrip() {
-  return (
-    <div className={`${CARD} px-4 py-3.5 flex gap-0`}>
-      {Array.from({ length: 5 }).map((_, i) => (
-        <div key={i} className="flex-1 flex flex-col items-center gap-1">
-          <div className="w-8 h-5 rounded bg-[rgb(var(--background-tertiary))]" />
-          <div className="w-12 h-2 rounded-[3px] bg-[rgb(var(--background-tertiary))]" />
-        </div>
-      ))}
     </div>
   )
 }
@@ -198,465 +130,263 @@ function SkeletonCard() {
 }
 
 // ============================================================================
-// TODAY SUMMARY STRIP (CLS-014)
+// SECTION 1 — ATTENDANCE PULSE
+// headline rate + 30-day trend + today's recording + day-of-week patterns
 // ============================================================================
 
-function TodaySummaryStrip({
+function AttendancePulse({
   summary,
   periodAverages,
+  absenceBreakdown,
+  dayOfWeekPattern,
+  trend,
 }: {
   summary: AttendanceOverviewResponse['todaySummary']
   periodAverages: AttendanceOverviewResponse['periodAverages']
-}) {
-  const pct = (count: number) =>
-    summary.totalStudents > 0 ? `${((count / summary.totalStudents) * 100).toFixed(1)}% of ${summary.totalStudents}` : '—'
-
-  const stats = [
-    { label: 'Present', value: summary.present, color: V2.success, sub: `${summary.totalRecorded ?? summary.present} of ${summary.totalStudents} recorded` },
-    { label: 'Absent', value: summary.absent, color: V2.danger, sub: pct(summary.absent) },
-    { label: 'Late / Tardy', value: summary.late, color: V2.warning, sub: pct(summary.late) },
-    { label: 'Excused', value: summary.excused, color: V2.info, sub: pct(summary.excused) },
-  ]
-
-  const sevenDayUp = periodAverages.last7Days > periodAverages.last30Days
-
-  return (
-    <div className={`${CARD} px-4 py-3.5 mb-3 flex items-center gap-0`}>
-      {stats.map((s, i) => (
-        <div
-          key={s.label}
-          className="flex flex-col items-center flex-1 gap-0.5"
-          style={{ borderLeft: i > 0 ? `1px solid ${V2.borderDefault}` : 'none' }}
-        >
-          <span
-            // allow-presentation-style: per-stat accent color
-            className="text-xl font-bold leading-none"
-            style={{ color: s.color }}
-          >{s.value}</span>
-          <span className="text-4xs font-bold uppercase tracking-[0.5px] text-[rgb(var(--text-disabled))]">{s.label}</span>
-          <span className="text-4xs text-[rgb(var(--text-disabled))]">{s.sub}</span>
-        </div>
-      ))}
-
-      {/* Divider */}
-      <div className="w-px h-12 bg-[rgb(var(--border-primary)/0.35)] shrink-0 mx-4" />
-
-      {/* School Average */}
-      <div className="flex flex-col items-center gap-0.5" style={{ flex: 1.5 }}>
-        <span className="text-xl font-bold leading-none text-[#1D9E75]">
-          {periodAverages.academicYear.toFixed(1)}%
-        </span>
-        <span className="text-4xs font-bold uppercase tracking-[0.5px] text-[rgb(var(--text-disabled))]">
-          School Average
-        </span>
-        <div className="flex items-center gap-1.5 mt-0.5">
-          <span
-            // allow-presentation-style: up/down trend accent (success/danger)
-            className="text-4xs font-medium px-1.5 py-px rounded"
-            style={{
-              background: sevenDayUp ? 'rgba(29,158,117,0.10)' : 'rgba(226,75,74,0.10)',
-              color: sevenDayUp ? V2.success : V2.danger,
-            }}
-          >
-            7-day: {periodAverages.last7Days.toFixed(1)}%
-          </span>
-          <span
-            // allow-presentation-style: up/down trend accent (success/danger)
-            className="text-4xs font-medium px-1.5 py-px rounded"
-            style={{
-              background: !sevenDayUp ? 'rgba(29,158,117,0.10)' : 'rgba(226,75,74,0.10)',
-              color: !sevenDayUp ? V2.success : V2.danger,
-            }}
-          >
-            30-day: {periodAverages.last30Days.toFixed(1)}%
-          </span>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// ============================================================================
-// ABSENCE BREAKDOWN (CLS-014 companion — V2 styled rows)
-// ============================================================================
-
-function AbsenceBreakdownCard({
-  breakdown,
-  date,
-}: {
-  breakdown: AttendanceOverviewResponse['absenceBreakdown']
-  date: string
-}) {
-  const categories = [
-    { label: 'Unexcused', count: breakdown.unexcused, color: V2.danger },
-    { label: 'Excused', count: breakdown.excused, color: V2.info },
-    { label: 'Late / Tardy', count: breakdown.late, color: V2.warning },
-    { label: 'Half Day', count: breakdown.halfDay, color: V2.purple },
-    { label: 'Remote', count: breakdown.remote, color: V2.success },
-  ]
-
-  const total = categories.reduce((sum, c) => sum + c.count, 0)
-  const dateLabel = new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-
-  return (
-    <div className={CARD}>
-      <CardHeader
-        icon={<AlertCircleIcon />}
-        iconBg="rgba(226,75,74,0.08)"
-        title="Today's Absence Breakdown"
-        subtitle={`${dateLabel} — ${total === 0 ? 'no absences recorded yet' : `${total} absences`}`}
-      />
-      <div className={CARD_BODY}>
-        {categories.map((cat, i) => (
-          <div
-            key={cat.label}
-            className="flex items-center gap-2 py-2"
-            style={{ borderBottom: i < categories.length - 1 ? `1px solid ${V2.borderRow}` : 'none' }}
-          >
-            <div
-              // allow-presentation-style: per-category legend dot color
-              className="w-2 h-2 rounded-full shrink-0"
-              style={{ background: cat.color }}
-            />
-            <span className="text-2xs text-[rgb(var(--text-secondary))] flex-1">{cat.label}</span>
-            <span className="text-2xs font-medium text-[rgb(var(--text-tertiary))]">{cat.count}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-// ============================================================================
-// DAY OF WEEK PATTERN — BAR CHART (CLS-015)
-// ============================================================================
-
-const DAYS_ORDER = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
-const DAY_SHORT: Record<string, string> = {
-  Sunday: 'Sun', Monday: 'Mon', Tuesday: 'Tue', Wednesday: 'Wed', Thursday: 'Thu', Friday: 'Fri', Saturday: 'Sat',
-}
-
-function DOWPatternCard({
-  pattern,
-}: {
-  pattern: Record<string, { avgRate: number; avgAbsent: number }>
-}) {
-  const days = DAYS_ORDER.filter((d) => pattern[d] != null)
-  if (days.length === 0) return null
-
-  const rates = days.map((d) => pattern[d].avgRate)
-  const maxRate = Math.max(...rates)
-  const minRate = Math.min(...rates)
-  const minDay = days[rates.indexOf(minRate)]
-  const maxDay = days[rates.indexOf(maxRate)]
-
-  // Color helper: lowest = red, highest = green, mid = blue
-  const getBarColor = (rate: number) => {
-    if (rate === minRate && minRate < maxRate) return `rgba(226,75,74,0.7)`
-    if (rate === maxRate) return `rgba(29,158,117,0.6)`
-    return `rgba(55,138,221,0.5)`
-  }
-
-  const isLowest = (rate: number) => rate === minRate && minRate < maxRate
-
-  return (
-    <div className={CARD}>
-      <CardHeader
-        icon={<ActivityIcon />}
-        iconBg="rgba(239,159,39,0.10)"
-        title="Day-of-Week Pattern"
-        subtitle="Average attendance rate by weekday"
-      />
-      <div className={CARD_BODY}>
-        <div className="flex gap-1.5">
-          {days.map((day) => {
-            const d = pattern[day]
-            const heightPct = maxRate > 0 ? (d.avgRate / 100) * 100 : 0
-            const lowest = isLowest(d.avgRate)
-            return (
-              <div key={day} className="flex-1 flex flex-col items-center gap-1">
-                <div className="w-full h-9 rounded bg-[rgb(var(--background-tertiary))] overflow-hidden flex items-end">
-                  <div
-                    // allow-presentation-style: data-driven bar height + rate color
-                    className="w-full rounded-[3px] transition-all"
-                    style={{ height: `${heightPct}%`, background: getBarColor(d.avgRate) }}
-                  />
-                </div>
-                <div
-                  // allow-presentation-style: lowest-day emphasis color
-                  className="text-4xs"
-                  style={{ color: lowest ? V2.danger : V2.textGhost }}
-                >{DAY_SHORT[day]}</div>
-                <div
-                  // allow-presentation-style: lowest-day emphasis color
-                  className="text-4xs font-semibold"
-                  style={{ color: lowest ? V2.danger : V2.textMuted }}
-                >{d.avgRate.toFixed(0)}%</div>
-              </div>
-            )
-          })}
-        </div>
-        <div className="text-4xs text-[rgb(var(--text-disabled))] mt-2.5 pt-2" style={{ borderTop: `1px solid ${V2.borderSeparator}` }}>
-          {DAY_SHORT[minDay]} has the lowest avg attendance ({minRate.toFixed(0)}%). {DAY_SHORT[maxDay]} is highest.
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// ============================================================================
-// 30-DAY TREND SVG CHART (CLS-016)
-// ============================================================================
-
-function TrendChart({
-  trend,
-  periodAverages,
-}: {
+  absenceBreakdown: AttendanceOverviewResponse['absenceBreakdown']
+  dayOfWeekPattern: AttendanceOverviewResponse['dayOfWeekPattern']
   trend: AttendanceOverviewResponse['trend']
-  periodAverages: AttendanceOverviewResponse['periodAverages']
 }) {
-  const sorted = useMemo(() =>
-    [...trend].sort((a, b) => a.date.localeCompare(b.date)),
+  const recorded = summary.totalRecorded ?? summary.present
+  const total = summary.totalStudents
+  const recordedPct = total > 0 ? (recorded / total) * 100 : 0
+  const inProgress = recorded < total
+  const sevenUp = periodAverages.last7Days >= periodAverages.last30Days
+
+  const trendData = useMemo<TrendChartPoint[]>(
+    () =>
+      [...trend]
+        .sort((a, b) => a.date.localeCompare(b.date))
+        .map((d) => ({ date: d.date, value: d.attendanceRate })),
     [trend]
   )
 
-  if (sorted.length === 0) {
-    return (
-      <div className={CARD}>
-        <CardHeader
-          icon={<TrendLineIcon />}
-          iconBg="rgba(29,158,117,0.10)"
-          title="30-Day Attendance Rate"
-          subtitle="No trend data available"
-        />
-        <div className={`${CARD_BODY} h-20 flex items-center justify-center`}>
-          <span className="text-2xs text-[rgb(var(--text-disabled))]">No trend data available for the selected period.</span>
-        </div>
-      </div>
-    )
-  }
+  const dow = DAYS_ORDER.filter((d) => dayOfWeekPattern[d] != null)
+  const dowRates = dow.map((d) => dayOfWeekPattern[d].avgRate)
+  const dowMax = dowRates.length ? Math.max(...dowRates) : 0
+  const dowMin = dowRates.length ? Math.min(...dowRates) : 0
+  const minDay = dow[dowRates.indexOf(dowMin)]
+  const maxDay = dow[dowRates.indexOf(dowMax)]
 
-  const width = 760
-  const height = 100
-  const n = sorted.length
-  const step = n > 1 ? width / (n - 1) : width
-
-  // Build SVG path — y-axis: 0=100%, 100=0%
-  const points = sorted.map((d, i) => {
-    const x = i * step
-    const y = height - (d.attendanceRate / 100) * height
-    return { x, y }
-  })
-
-  const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')
-  const areaPath = `${linePath} L${width},${height} L0,${height} Z`
-
-  // Date labels (5 evenly spaced)
-  const dateLabels: { label: string; x: number }[] = []
-  const labelCount = Math.min(5, n)
-  for (let i = 0; i < labelCount; i++) {
-    const idx = Math.round((i / (labelCount - 1)) * (n - 1))
-    const d = new Date(sorted[idx].date)
-    dateLabels.push({
-      label: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-      x: idx * step,
-    })
-  }
-
-  // First and last dates for subtitle
-  const firstDate = new Date(sorted[0].date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-  const lastDate = new Date(sorted[n - 1].date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  const composition = [
+    { label: 'Present', value: summary.present, color: V2.success },
+    { label: 'Late / Tardy', value: summary.late, color: V2.warning },
+    { label: 'Excused', value: summary.excused, color: V2.info },
+    { label: 'Absent', value: summary.absent, color: V2.danger },
+  ]
 
   return (
-    <div className={CARD}>
-      <CardHeader
-        icon={<TrendLineIcon />}
-        iconBg="rgba(29,158,117,0.10)"
-        title="30-Day Attendance Rate"
-        subtitle={`Daily recorded attendance rate trend — ${firstDate} to ${lastDate}`}
-        right={
-          <div className="flex gap-3 text-3xs">
-            <span className="text-[rgb(var(--text-disabled))]">7-day avg: <strong className="text-[#1D9E75]">{periodAverages.last7Days.toFixed(1)}%</strong></span>
-            <span className="text-[rgb(var(--text-disabled))]">30-day avg: <strong className="text-[rgb(var(--text-tertiary))]">{periodAverages.last30Days.toFixed(1)}%</strong></span>
+    <div className={`${CARD} ${CARD_BODY}`}>
+      {/* Headline + 30-day trend */}
+      <div className="flex items-start justify-between gap-6">
+        <div className="shrink-0">
+          <div className="flex items-baseline gap-0.5">
+            <span className="text-4xl font-extrabold leading-none tracking-tight text-[rgb(var(--text-primary))]">
+              {periodAverages.academicYear.toFixed(1)}
+            </span>
+            <span className="text-lg font-bold text-[rgb(var(--text-tertiary))]">%</span>
           </div>
-        }
-      />
-      <div className={`${CARD_BODY} pt-2`}>
-        <svg viewBox={`0 0 ${width} ${height}`} width="100%" height={height} style={{ overflow: 'visible' }}>
-          <defs>
-            <linearGradient id="attTrendGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={V2.success} stopOpacity={0.25} />
-              <stop offset="100%" stopColor={V2.success} stopOpacity={0} />
-            </linearGradient>
-          </defs>
-          {/* Gridlines */}
-          {[0, 25, 50, 75, 100].map((y) => (
-            <line key={y} x1="0" y1={y} x2={width} y2={y} stroke="rgba(255,255,255,0.04)" strokeWidth="1" />
-          ))}
-          {/* % labels */}
-          <text x={width + 2} y={3} fontSize={8} fill="rgba(255,255,255,0.2)">100%</text>
-          <text x={width + 2} y={53} fontSize={8} fill="rgba(255,255,255,0.2)">50%</text>
-          <text x={width + 2} y={103} fontSize={8} fill="rgba(255,255,255,0.2)">0%</text>
-          {/* Area fill */}
-          <path d={areaPath} fill="url(#attTrendGrad)" />
-          {/* Line */}
-          <path d={linePath} fill="none" stroke={V2.success} strokeWidth="1.5" strokeLinejoin="round" />
-          {/* Dots at last two points */}
-          {points.length >= 2 && (
-            <>
-              <circle cx={points[points.length - 2].x} cy={points[points.length - 2].y} r={3} fill={V2.success} />
-              <circle cx={points[points.length - 1].x} cy={points[points.length - 1].y} r={3} fill={V2.success} />
-            </>
-          )}
-        </svg>
-        <div className="flex justify-between mt-1.5 text-4xs text-[rgb(var(--text-disabled))]">
-          {dateLabels.map((dl, i) => (
-            <span key={i}>{dl.label}</span>
-          ))}
+          <div className="text-4xs font-bold uppercase tracking-[0.5px] text-[rgb(var(--text-disabled))] mt-1.5">
+            School average
+          </div>
+          <div className="flex gap-1.5 mt-2.5">
+            <span
+              // allow-presentation-style: 7-day up/down trend tint (success/danger)
+              className="text-4xs font-medium px-1.5 py-0.5 rounded"
+              style={{
+                background: sevenUp ? 'rgba(29,158,117,0.10)' : 'rgba(226,75,74,0.10)',
+                color: sevenUp ? V2.success : V2.danger,
+              }}
+            >
+              {sevenUp ? '▲' : '▼'} 7-day {periodAverages.last7Days.toFixed(1)}%
+            </span>
+            <span className="text-4xs font-medium px-1.5 py-0.5 rounded bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]">
+              30-day {periodAverages.last30Days.toFixed(1)}%
+            </span>
+          </div>
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="text-3xs font-medium text-[rgb(var(--text-tertiary))] mb-1">30-day attendance trend</div>
+          <TrendAreaChart
+            data={trendData}
+            height={84}
+            color="rgb(var(--state-success-fg))"
+            valueSuffix="%"
+            clampDomain={[0, 100]}
+            aria-label="30-day attendance rate trend"
+          />
         </div>
       </div>
-    </div>
-  )
-}
 
-// ============================================================================
-// SECTION COMPLETION RING + TABLE (CLS-017)
-// ============================================================================
+      {/* Today — recording progress + composition */}
+      <div className="mt-4 pt-4 border-t border-[rgb(var(--border-primary)/0.18)]">
+        <div className="flex items-center justify-between gap-3 mb-2">
+          <span className="text-2xs font-medium text-[rgb(var(--text-secondary))]">
+            Today · <span className="font-semibold text-[rgb(var(--text-primary))]">{recorded} of {total}</span> students recorded
+            <span className="text-[rgb(var(--text-disabled))]">{inProgress ? ' — recording in progress' : ' — complete'}</span>
+          </span>
+          <span className="text-2xs font-bold text-[rgb(var(--text-tertiary))]">{recordedPct.toFixed(1)}%</span>
+        </div>
+        <div className="h-2 rounded-full bg-[rgb(var(--background-tertiary))] overflow-hidden">
+          <div
+            // allow-presentation-style: data-driven recording progress width + brand gradient
+            className="h-full rounded-full"
+            style={{ width: `${Math.min(100, recordedPct)}%`, background: 'linear-gradient(90deg, #1D9E75, #2FA37A)' }}
+          />
+        </div>
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 mt-3">
+          {composition.map((c) => (
+            <span key={c.label} className="flex items-center gap-1.5 text-2xs text-[rgb(var(--text-secondary))]">
+              <span
+                // allow-presentation-style: per-status legend dot color
+                className="w-2 h-2 rounded-full"
+                style={{ background: c.color }}
+              />
+              {c.label} <b className="font-bold text-[rgb(var(--text-primary))]">{c.value}</b>
+            </span>
+          ))}
+          <span className="text-2xs text-[rgb(var(--text-disabled))] ml-auto">
+            {absenceBreakdown.unexcused} unexcused · {absenceBreakdown.halfDay} half-day · {absenceBreakdown.remote} remote
+          </span>
+        </div>
+      </div>
 
-function SectionCompletionCard({
-  sectionCompletion,
-}: {
-  sectionCompletion: AttendanceOverviewResponse['sectionCompletion']
-}) {
-  const { totalSections, sectionsWithAttendance, sections } = sectionCompletion
-  const pct = totalSections > 0 ? Math.round((sectionsWithAttendance / totalSections) * 100) : 0
-
-  // SVG donut ring
-  const r = 28
-  const circumference = 2 * Math.PI * r
-  const offset = circumference * (1 - pct / 100)
-
-  return (
-    <div className={CARD}>
-      <CardHeader
-        icon={<CheckSquareIcon />}
-        iconBg="rgba(127,119,221,0.10)"
-        title="Section Completion"
-        subtitle="Today's recording status per section"
-      />
-      <div className={CARD_BODY}>
-        <div className="flex gap-5 items-start">
-          {/* Ring */}
-          <div className="shrink-0 flex flex-col items-center gap-1.5">
-            <div className="relative" style={{ width: 72, height: 72 }}>
-              <svg width={72} height={72} viewBox="0 0 72 72">
-                <circle cx="36" cy="36" r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="10" />
-                <circle
-                  cx="36" cy="36" r={r} fill="none"
-                  stroke={pct > 0 ? V2.purple : 'rgba(255,255,255,0.10)'}
-                  strokeWidth="10"
-                  strokeDasharray={circumference.toFixed(1)}
-                  strokeDashoffset={offset.toFixed(1)}
-                  strokeLinecap="round"
-                  transform="rotate(-90 36 36)"
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center flex-col">
-                <span
-                  // allow-presentation-style: ring center value color depends on completion
-                  className="text-base font-bold"
-                  style={{ color: pct > 0 ? V2.textPrimary : V2.textHint }}
-                >{pct}%</span>
-              </div>
-            </div>
-            <div className="text-4xs text-[rgb(var(--text-disabled))]">{sectionsWithAttendance} / {totalSections}</div>
-          </div>
-
-          {/* Section list */}
-          <div className="flex-1 min-w-0 overflow-hidden">
-            {/* Header row */}
-            <div className="flex items-center gap-2.5 mb-1.5 pb-1.5" style={{ borderBottom: `1px solid ${V2.borderSeparator}` }}>
-              <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px] flex-1">Section</span>
-              <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px] text-center" style={{ width: 28 }}>Enr.</span>
-              <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px] text-center" style={{ width: 36 }}>Rec.</span>
-              <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px] text-right" style={{ width: 70 }}>Status</span>
-            </div>
-            {/* Rows */}
-            {sections.map((s, i) => {
-              const statusLabel = s.isComplete ? 'Complete' : s.recordedCount > 0 ? 'Partial' : 'Not Started'
-              const statusStyle: React.CSSProperties = s.isComplete
-                ? { background: 'rgba(29,158,117,0.10)', color: V2.success }
-                : s.recordedCount > 0
-                  ? { background: 'rgba(239,159,39,0.10)', color: V2.warning }
-                  : { background: 'rgb(var(--background-tertiary))', color: V2.textHint }
-
+      {/* Patterns — day-of-week (auto-scaled bars) */}
+      {dow.length > 0 && (
+        <div className="mt-4 pt-3.5 border-t border-[rgb(var(--border-primary)/0.18)] flex items-center justify-between gap-5">
+          <span className="text-2xs text-[rgb(var(--text-tertiary))]">
+            Patterns · <b className="font-semibold text-[rgb(var(--text-secondary))]">{DAY_SHORT[minDay]}</b> lowest ({dowMin.toFixed(0)}%) · <b className="font-semibold text-[rgb(var(--text-secondary))]">{DAY_SHORT[maxDay]}</b> highest ({dowMax.toFixed(0)}%)
+          </span>
+          <div className="flex items-end gap-2.5 shrink-0">
+            {dow.map((day) => {
+              const rate = dayOfWeekPattern[day].avgRate
+              const h = dowMax > dowMin ? 8 + ((rate - dowMin) / (dowMax - dowMin)) * 20 : 18
+              const isLow = rate === dowMin && dowMin < dowMax
+              const isHigh = rate === dowMax
+              const barColor = isLow ? V2.danger : isHigh ? V2.success : V2.info
               return (
-                <div
-                  key={s.sectionId}
-                  className="flex items-center gap-2.5 py-2"
-                  style={{ borderBottom: i < sections.length - 1 ? `1px solid ${V2.borderRow}` : 'none' }}
-                >
-                  <div className="flex-1">
-                    <div className="text-2xs font-medium text-[rgb(var(--text-secondary))]">{s.courseName}</div>
-                    <span className="text-4xs text-[rgb(var(--text-disabled))]" style={{ fontFamily: 'var(--font-mono, monospace)' }}>#{s.sectionNumber}</span>
-                  </div>
-                  <span className="text-3xs text-[rgb(var(--text-disabled))] text-center" style={{ width: 28 }}>{s.studentCount}</span>
-                  <span className="text-3xs text-[rgb(var(--text-disabled))] text-center" style={{ width: 36 }}>{s.recordedCount}</span>
-                  <span
-                    // allow-presentation-style: per-section status chip tint (complete/partial/not-started)
-                    className="text-4xs font-medium px-2 py-0.5 rounded-[5px] whitespace-nowrap text-right"
-                    style={{ width: 70, ...statusStyle }}
-                  >{statusLabel}</span>
+                <div key={day} className="flex flex-col items-center gap-1" style={{ width: 26 }}>
+                  <div
+                    // allow-presentation-style: data-driven bar height + lowest/highest tint
+                    className="rounded-[4px]"
+                    style={{ width: 18, height: h, background: barColor }}
+                  />
+                  <span className="text-4xs text-[rgb(var(--text-disabled))] font-medium">{DAY_SHORT[day]}</span>
+                  <span className="text-4xs text-[rgb(var(--text-tertiary))]">{rate.toFixed(0)}%</span>
                 </div>
               )
             })}
           </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }
 
 // ============================================================================
-// PERIOD AVERAGES (CLS-018)
+// SECTION 2 — CLASSROOMS & RECORDING
+// period averages (chips) + completion ring + per-classroom recording status
+// ("classroom" = user-facing; the data field is `section`)
 // ============================================================================
 
-function PeriodAveragesCard({
+function PeriodChip({ label, value }: { label: string; value: number }) {
+  return (
+    <span className="text-4xs font-medium px-1.5 py-0.5 rounded bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))] whitespace-nowrap">
+      {label} {value.toFixed(1)}%
+    </span>
+  )
+}
+
+function ClassroomsRecording({
+  sectionCompletion,
   periodAverages,
 }: {
+  sectionCompletion: AttendanceOverviewResponse['sectionCompletion']
   periodAverages: AttendanceOverviewResponse['periodAverages']
 }) {
-  const tiles = [
-    { label: '7-Day', value: periodAverages.last7Days, color: V2.success },
-    { label: '30-Day', value: periodAverages.last30Days, color: V2.textMuted },
-    { label: 'Yearly', value: periodAverages.academicYear, color: V2.textMuted },
-  ]
-
-  const trending = periodAverages.last7Days > periodAverages.last30Days ? 'upward' : 'downward'
+  const { totalSections, sectionsWithAttendance, sections } = sectionCompletion
+  const pct = totalSections > 0 ? Math.round((sectionsWithAttendance / totalSections) * 100) : 0
+  const r = 30
+  const circ = 2 * Math.PI * r
+  const offset = circ * (1 - pct / 100)
 
   return (
     <div className={CARD}>
       <CardHeader
-        icon={<BarChartSmallIcon />}
-        iconBg="rgba(29,158,117,0.10)"
-        title="Period Averages"
-        subtitle="Attendance rates across different time windows"
+        icon={<ClipboardCheck className="w-3 h-3 text-[rgb(var(--accent-reports))]" />}
+        iconBg="rgba(127,119,221,0.10)"
+        title="Classrooms & Recording"
+        subtitle="Today's recording status by classroom"
+        right={
+          <div className="flex gap-1.5">
+            <PeriodChip label="7-day" value={periodAverages.last7Days} />
+            <PeriodChip label="30-day" value={periodAverages.last30Days} />
+            <PeriodChip label="Yearly" value={periodAverages.academicYear} />
+          </div>
+        }
       />
       <div className={CARD_BODY}>
-        <div className="grid grid-cols-3 gap-2.5 mb-4">
-          {tiles.map((t) => (
-            <div key={t.label} className="rounded-lg p-3 text-center bg-[rgb(var(--background-tertiary)/0.5)] border border-[rgb(var(--border-primary)/0.35)]">
-              <div className="text-4xs font-bold uppercase tracking-[0.5px] text-[rgb(var(--text-disabled))] mb-1.5">{t.label}</div>
-              <div
-                // allow-presentation-style: per-tile accent (success vs neutral)
-                className="text-xl font-bold"
-                style={{ color: t.color }}
-              >{t.value.toFixed(1)}%</div>
+        <div className="flex gap-5 items-center">
+          {/* Completion ring */}
+          <div className="shrink-0 flex flex-col items-center gap-1.5">
+            <div className="relative" style={{ width: 76, height: 76 }}>
+              <svg width={76} height={76} viewBox="0 0 76 76">
+                <circle cx="38" cy="38" r={r} fill="none" stroke="rgb(var(--background-tertiary))" strokeWidth="9" />
+                <circle
+                  cx="38" cy="38" r={r} fill="none"
+                  stroke={pct > 0 ? V2.purple : 'rgb(var(--border-primary) / 0.3)'}
+                  strokeWidth="9"
+                  strokeDasharray={circ.toFixed(1)}
+                  strokeDashoffset={offset.toFixed(1)}
+                  strokeLinecap="round"
+                  transform="rotate(-90 38 38)"
+                />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-base font-bold text-[rgb(var(--text-primary))]">{pct}%</span>
+                <span className="text-4xs text-[rgb(var(--text-disabled))]">{sectionsWithAttendance} of {totalSections}</span>
+              </div>
             </div>
-          ))}
-        </div>
-        <div className="text-3xs text-[rgb(var(--text-disabled))] italic text-center mt-1">
-          Attendance is trending {trending} over the last 7 days vs. 30-day baseline.
+            <span className="text-4xs text-[rgb(var(--text-disabled))]">classrooms recorded</span>
+          </div>
+
+          {/* Per-classroom list — bounded */}
+          <div className="flex-1 min-w-0 overflow-y-auto" style={{ maxHeight: 188 }}>
+            {sections.length === 0 ? (
+              <div className="py-8 text-center text-2xs text-[rgb(var(--text-disabled))]">No classrooms to record today.</div>
+            ) : (
+              sections.map((s, i) => {
+                const statusLabel = s.isComplete ? 'Complete' : s.recordedCount > 0 ? 'Partial' : 'Not started'
+                const statusStyle: React.CSSProperties = s.isComplete
+                  ? { background: 'rgba(29,158,117,0.10)', color: V2.success }
+                  : s.recordedCount > 0
+                    ? { background: 'rgba(239,159,39,0.10)', color: V2.warning }
+                    : { background: 'rgb(var(--background-tertiary))', color: V2.textHint }
+                return (
+                  <div
+                    key={s.sectionId}
+                    className="flex items-center gap-3 py-2"
+                    style={{ borderBottom: i < sections.length - 1 ? `1px solid ${V2.borderRow}` : 'none' }}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="text-2xs font-medium text-[rgb(var(--text-primary))] truncate">{s.courseName}</div>
+                      <div className="text-4xs text-[rgb(var(--text-disabled))]">#{s.sectionNumber}</div>
+                    </div>
+                    <span className="text-3xs tabular-nums text-[rgb(var(--text-tertiary))] text-right" style={{ width: 56 }}>
+                      {s.recordedCount}/{s.studentCount}
+                    </span>
+                    <span
+                      // allow-presentation-style: per-classroom status tint (complete/partial/not-started)
+                      className="text-4xs font-medium px-2 py-0.5 rounded-[5px] text-center whitespace-nowrap"
+                      style={{ width: 84, ...statusStyle }}
+                    >
+                      {statusLabel}
+                    </span>
+                  </div>
+                )
+              })
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -664,7 +394,7 @@ function PeriodAveragesCard({
 }
 
 // ============================================================================
-// ATTENDANCE ALERTS TABLE (CLS-019)
+// SECTION 3 — ATTENDANCE ALERTS (bounded @edforge/ui DataTable)
 // ============================================================================
 
 function getRateColorHex(rate: number): string {
@@ -758,15 +488,6 @@ const alertColumns = [
   }),
 ] as ColumnDef<AttendanceAlert, unknown>[]
 
-/**
- * Attendance Alerts — the actionable at-risk list.
- *
- * Uses the shared @edforge/ui DataTable: bounded height + pagination + sort +
- * a Trend faceted filter + student search, so the page no longer grows
- * unbounded as the at-risk cohort grows. Client-paginated over the aggregate's
- * `atRiskStudents` today; when the backend exposes a server-paginated at-risk
- * endpoint (plan T4), swap to DataTable's `serverPagination` adapter.
- */
 function AttendanceAlertsTable({
   alerts,
   totalAtRiskCount,
@@ -839,22 +560,13 @@ export function AttendanceDashboard({
   academicYearId,
   currentDate,
 }: AttendanceDashboardProps) {
-  // Student drill-down modal state
   const [selectedStudent, setSelectedStudent] = useState<{
     studentId: string
     studentName: string
   } | null>(null)
 
-  // Scope indicator
   const isSchoolWide = usePermission('manage', 'attendance')
 
-  // Single aggregate data source. Sprint 1 / Ticket 1.3b: the parent
-  // `AttendanceModule` gates on the current AY, so `academicYearId` is
-  // guaranteed non-empty here. Previously `isLoading = queryLoading || !queryEnabled`
-  // permanently rendered skeletons whenever the AY was missing — the
-  // original "skeleton forever" bug. If `academicYearId` somehow arrives
-  // empty (programmer error from a future caller), the query is disabled
-  // and the dashboard renders no-data states instead of spinning forever.
   const queryEnabled = !!schoolId && !!academicYearId
   const {
     data,
@@ -867,10 +579,8 @@ export function AttendanceDashboard({
     enabled: queryEnabled,
   })
   const isLoading = queryLoading
-
   const summary = data?.todaySummary
 
-  // Error state
   if (error) {
     return (
       <div className={`${CARD} p-6 text-center`}>
@@ -883,74 +593,38 @@ export function AttendanceDashboard({
 
   return (
     <div className="flex flex-col gap-3">
-      {/* SCOPE INDICATOR */}
+      {/* Scope indicator */}
       {!isSchoolWide && summary && (
         <div className="inline-flex items-center gap-1.5 px-2.5 py-1 text-3xs font-medium rounded-[20px] bg-[rgb(var(--state-info-bg))] text-[rgb(var(--state-info-fg))]">
-          Showing data for your sections ({summary.totalStudents} students)
+          Showing data for your classrooms ({summary.totalStudents} students)
         </div>
       )}
 
-      {/* TODAY SUMMARY STRIP (CLS-014) */}
-      <WidgetErrorBoundaryV2>
-        {isLoading ? (
-          <SkeletonStrip />
-        ) : summary && data?.periodAverages ? (
-          <TodaySummaryStrip summary={summary} periodAverages={data.periodAverages} />
-        ) : null}
-      </WidgetErrorBoundaryV2>
-
-      {/* ROW 1: Absence Breakdown + DOW Pattern (CLS-015) */}
-      {isLoading ? (
-        <div className="grid grid-cols-2 gap-3">
-          <SkeletonCard />
-          <SkeletonCard />
-        </div>
-      ) : data ? (
-        <div className="grid grid-cols-2 gap-3">
-          {data.absenceBreakdown && (
-            <WidgetErrorBoundaryV2>
-              <AbsenceBreakdownCard breakdown={data.absenceBreakdown} date={currentDate} />
-            </WidgetErrorBoundaryV2>
-          )}
-          {data.dayOfWeekPattern && Object.keys(data.dayOfWeekPattern).length > 0 && (
-            <WidgetErrorBoundaryV2>
-              <DOWPatternCard pattern={data.dayOfWeekPattern} />
-            </WidgetErrorBoundaryV2>
-          )}
-        </div>
-      ) : null}
-
-      {/* ROW 2: 30-Day Trend Chart (CLS-016) — full width */}
+      {/* SECTION 1 — Attendance Pulse */}
       {isLoading ? (
         <SkeletonCard />
-      ) : data?.trend ? (
+      ) : summary && data?.periodAverages && data?.absenceBreakdown && data?.dayOfWeekPattern && data?.trend ? (
         <WidgetErrorBoundaryV2>
-          <TrendChart trend={data.trend} periodAverages={data.periodAverages} />
+          <AttendancePulse
+            summary={summary}
+            periodAverages={data.periodAverages}
+            absenceBreakdown={data.absenceBreakdown}
+            dayOfWeekPattern={data.dayOfWeekPattern}
+            trend={data.trend}
+          />
         </WidgetErrorBoundaryV2>
       ) : null}
 
-      {/* ROW 3: Section Completion + Period Averages (CLS-017, CLS-018) */}
+      {/* SECTION 2 — Classrooms & Recording */}
       {isLoading ? (
-        <div className="grid grid-cols-2 gap-3">
-          <SkeletonCard />
-          <SkeletonCard />
-        </div>
-      ) : data ? (
-        <div className="grid grid-cols-2 gap-3">
-          {data.sectionCompletion && (
-            <WidgetErrorBoundaryV2>
-              <SectionCompletionCard sectionCompletion={data.sectionCompletion} />
-            </WidgetErrorBoundaryV2>
-          )}
-          {data.periodAverages && (
-            <WidgetErrorBoundaryV2>
-              <PeriodAveragesCard periodAverages={data.periodAverages} />
-            </WidgetErrorBoundaryV2>
-          )}
-        </div>
+        <SkeletonCard />
+      ) : data?.sectionCompletion && data?.periodAverages ? (
+        <WidgetErrorBoundaryV2>
+          <ClassroomsRecording sectionCompletion={data.sectionCompletion} periodAverages={data.periodAverages} />
+        </WidgetErrorBoundaryV2>
       ) : null}
 
-      {/* ROW 4: Attendance Alerts (CLS-019) — full width */}
+      {/* SECTION 3 — Attendance Alerts */}
       {isLoading ? (
         <SkeletonCard />
       ) : (
@@ -981,5 +655,3 @@ export function AttendanceDashboard({
     </div>
   )
 }
-
-export default AttendanceDashboard
