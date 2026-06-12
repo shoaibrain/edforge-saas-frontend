@@ -67,7 +67,7 @@ import { GradeOverview } from '../grades/overview'
 // --- Shared ---
 import { TabErrorBoundary } from '../../components/common/TabErrorBoundary'
 import { NoCurrentAcademicYearEmptyState } from '../../components/common'
-import { StatCard, WidgetErrorBoundaryV2, Button, Select } from '@edforge/ui'
+import { StatCard, WidgetErrorBoundaryV2, Button, Select, Container } from '@edforge/ui'
 
 // ============================================================================
 // TYPES
@@ -569,11 +569,15 @@ export function ClassroomsModule() {
 
   return (
     <div className="min-h-full bg-[rgb(var(--background-primary))]">
-      {/* Slim header — the shell breadcrumb is the page title; just tabs + the primary action */}
+      {/* Slim header — the shell breadcrumb is the page title; just tabs + the primary action.
+          Container keeps tabs/action aligned with the content edges on wide panes.
+          NOTE: no overflow-x-auto on the nav — a non-visible overflow-x forces
+          overflow-y to compute to auto, and the active tab's -mb-px border overlay
+          then spawns a 1px vertical scrollbar (the ▲▼ artifact on Windows). */}
       <div className="border-b border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-secondary))] px-6">
-        <div className="flex items-center justify-between gap-4">
+        <Container padding="none" className="flex items-center justify-between gap-4">
           <nav
-            className="flex overflow-x-auto -mb-px"
+            className="flex -mb-px"
             aria-label="Classrooms tabs"
             role="tablist"
           >
@@ -587,7 +591,7 @@ export function ClassroomsModule() {
                   aria-selected={isActive}
                   aria-controls={`panel-${tab.id}`}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`whitespace-nowrap flex items-center gap-1.5 px-4 py-3 text-xs cursor-pointer transition-colors bg-transparent border-b-2 -mb-px ${
+                  className={`whitespace-nowrap flex items-center gap-1.5 px-4 py-3 text-sm cursor-pointer transition-colors bg-transparent border-b-2 -mb-px ${
                     isActive
                       ? 'font-medium text-[#378ADD] border-[#378ADD]'
                       : 'font-normal text-[rgb(var(--text-tertiary))] border-transparent hover:text-[rgb(var(--text-secondary))]'
@@ -618,17 +622,19 @@ export function ClassroomsModule() {
             <button
               onClick={() => navigate({ to: '/classrooms/create' })}
               aria-label="New classroom"
-              className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
+              className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-[7px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
             >
               <Plus className="w-3.5 h-3.5" />
               New classroom
             </button>
           )}
-        </div>
+        </Container>
       </div>
 
-      {/* Tab Content — error-bounded */}
+      {/* Tab Content — error-bounded. Container bounds content width so wide
+          panes don't stretch cards edge-to-edge (matches the header Container). */}
       <div className="p-6 min-h-128" role="tabpanel" id={`panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
+        <Container padding="none">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -662,6 +668,7 @@ export function ClassroomsModule() {
             )}
           </motion.div>
         </AnimatePresence>
+        </Container>
       </div>
     </div>
   )

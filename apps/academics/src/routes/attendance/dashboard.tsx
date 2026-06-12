@@ -111,8 +111,8 @@ function CardHeader({
           {icon}
         </div>
         <div className="min-w-0">
-          <div className="text-xs font-semibold text-[rgb(var(--text-primary))]">{title}</div>
-          <div className="text-3xs text-[rgb(var(--text-disabled))] mt-px truncate">{subtitle}</div>
+          <div className="text-sm font-semibold text-[rgb(var(--text-primary))]">{title}</div>
+          <div className="text-xs text-[rgb(var(--text-disabled))] mt-px truncate">{subtitle}</div>
         </div>
       </div>
       {right}
@@ -186,13 +186,13 @@ function AttendancePulse({
             </span>
             <span className="text-lg font-bold text-[rgb(var(--text-tertiary))]">%</span>
           </div>
-          <div className="text-4xs font-bold uppercase tracking-[0.5px] text-[rgb(var(--text-disabled))] mt-1.5">
+          <div className="text-2xs font-bold uppercase tracking-[0.5px] text-[rgb(var(--text-disabled))] mt-1.5">
             School average
           </div>
           <div className="flex gap-1.5 mt-2.5">
             <span
               // allow-presentation-style: 7-day up/down trend tint (success/danger)
-              className="text-4xs font-medium px-1.5 py-0.5 rounded"
+              className="text-2xs font-medium px-1.5 py-0.5 rounded"
               style={{
                 background: sevenUp ? 'rgba(29,158,117,0.10)' : 'rgba(226,75,74,0.10)',
                 color: sevenUp ? V2.success : V2.danger,
@@ -200,13 +200,13 @@ function AttendancePulse({
             >
               {sevenUp ? '▲' : '▼'} 7-day {periodAverages.last7Days.toFixed(1)}%
             </span>
-            <span className="text-4xs font-medium px-1.5 py-0.5 rounded bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]">
+            <span className="text-2xs font-medium px-1.5 py-0.5 rounded bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]">
               30-day {periodAverages.last30Days.toFixed(1)}%
             </span>
           </div>
         </div>
         <div className="flex-1 min-w-0">
-          <div className="text-3xs font-medium text-[rgb(var(--text-tertiary))] mb-1">30-day attendance trend</div>
+          <div className="text-xs font-medium text-[rgb(var(--text-tertiary))] mb-1">30-day attendance trend</div>
           <TrendAreaChart
             data={trendData}
             height={84}
@@ -221,11 +221,11 @@ function AttendancePulse({
       {/* Today — recording progress + composition */}
       <div className="mt-4 pt-4 border-t border-[rgb(var(--border-primary)/0.18)]">
         <div className="flex items-center justify-between gap-3 mb-2">
-          <span className="text-2xs font-medium text-[rgb(var(--text-secondary))]">
+          <span className="text-sm font-medium text-[rgb(var(--text-secondary))]">
             Today · <span className="font-semibold text-[rgb(var(--text-primary))]">{recorded} of {total}</span> students recorded
             <span className="text-[rgb(var(--text-disabled))]">{inProgress ? ' — recording in progress' : ' — complete'}</span>
           </span>
-          <span className="text-2xs font-bold text-[rgb(var(--text-tertiary))]">{recordedPct.toFixed(1)}%</span>
+          <span className="text-sm font-bold text-[rgb(var(--text-tertiary))]">{recordedPct.toFixed(1)}%</span>
         </div>
         <div className="h-2 rounded-full bg-[rgb(var(--background-tertiary))] overflow-hidden">
           <div
@@ -236,7 +236,7 @@ function AttendancePulse({
         </div>
         <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 mt-3">
           {composition.map((c) => (
-            <span key={c.label} className="flex items-center gap-1.5 text-2xs text-[rgb(var(--text-secondary))]">
+            <span key={c.label} className="flex items-center gap-1.5 text-xs text-[rgb(var(--text-secondary))]">
               <span
                 // allow-presentation-style: per-status legend dot color
                 className="w-2 h-2 rounded-full"
@@ -245,7 +245,7 @@ function AttendancePulse({
               {c.label} <b className="font-bold text-[rgb(var(--text-primary))]">{c.value}</b>
             </span>
           ))}
-          <span className="text-2xs text-[rgb(var(--text-disabled))] ml-auto">
+          <span className="text-xs text-[rgb(var(--text-disabled))] ml-auto">
             {absenceBreakdown.unexcused} unexcused · {absenceBreakdown.halfDay} half-day · {absenceBreakdown.remote} remote
           </span>
         </div>
@@ -254,7 +254,7 @@ function AttendancePulse({
       {/* Patterns — day-of-week (auto-scaled bars) */}
       {dow.length > 0 && (
         <div className="mt-4 pt-3.5 border-t border-[rgb(var(--border-primary)/0.18)] flex items-center justify-between gap-5">
-          <span className="text-2xs text-[rgb(var(--text-tertiary))]">
+          <span className="text-xs text-[rgb(var(--text-tertiary))]">
             Patterns · <b className="font-semibold text-[rgb(var(--text-secondary))]">{DAY_SHORT[minDay]}</b> lowest ({dowMin.toFixed(0)}%) · <b className="font-semibold text-[rgb(var(--text-secondary))]">{DAY_SHORT[maxDay]}</b> highest ({dowMax.toFixed(0)}%)
           </span>
           <div className="flex items-end gap-2.5 shrink-0">
@@ -271,8 +271,8 @@ function AttendancePulse({
                     className="rounded-[4px]"
                     style={{ width: 18, height: h, background: barColor }}
                   />
-                  <span className="text-4xs text-[rgb(var(--text-disabled))] font-medium">{DAY_SHORT[day]}</span>
-                  <span className="text-4xs text-[rgb(var(--text-tertiary))]">{rate.toFixed(0)}%</span>
+                  <span className="text-3xs text-[rgb(var(--text-disabled))] font-medium">{DAY_SHORT[day]}</span>
+                  <span className="text-3xs text-[rgb(var(--text-tertiary))]">{rate.toFixed(0)}%</span>
                 </div>
               )
             })}
@@ -291,7 +291,7 @@ function AttendancePulse({
 
 function PeriodChip({ label, value }: { label: string; value: number }) {
   return (
-    <span className="text-4xs font-medium px-1.5 py-0.5 rounded bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))] whitespace-nowrap">
+    <span className="text-2xs font-medium px-2 py-0.5 rounded bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))] whitespace-nowrap">
       {label} {value.toFixed(1)}%
     </span>
   )
@@ -347,13 +347,13 @@ function ClassroomsRecording({
                 <span className="text-4xs text-[rgb(var(--text-disabled))]">{sectionsWithAttendance} of {totalSections}</span>
               </div>
             </div>
-            <span className="text-4xs text-[rgb(var(--text-disabled))]">classrooms recorded</span>
+            <span className="text-2xs text-[rgb(var(--text-disabled))]">classrooms recorded</span>
           </div>
 
           {/* Per-classroom list — bounded */}
           <div className="flex-1 min-w-0 overflow-y-auto" style={{ maxHeight: 188 }}>
             {sections.length === 0 ? (
-              <div className="py-8 text-center text-2xs text-[rgb(var(--text-disabled))]">No classrooms to record today.</div>
+              <div className="py-8 text-center text-xs text-[rgb(var(--text-disabled))]">No classrooms to record today.</div>
             ) : (
               sections.map((s, i) => {
                 const statusLabel = s.isComplete ? 'Complete' : s.recordedCount > 0 ? 'Partial' : 'Not started'
@@ -369,16 +369,16 @@ function ClassroomsRecording({
                     style={{ borderBottom: i < sections.length - 1 ? `1px solid ${V2.borderRow}` : 'none' }}
                   >
                     <div className="flex-1 min-w-0">
-                      <div className="text-2xs font-medium text-[rgb(var(--text-primary))] truncate">{s.courseName}</div>
-                      <div className="text-4xs text-[rgb(var(--text-disabled))]">#{s.sectionNumber}</div>
+                      <div className="text-sm font-medium text-[rgb(var(--text-primary))] truncate">{s.courseName}</div>
+                      <div className="text-2xs text-[rgb(var(--text-disabled))]">#{s.sectionNumber}</div>
                     </div>
-                    <span className="text-3xs tabular-nums text-[rgb(var(--text-tertiary))] text-right" style={{ width: 56 }}>
+                    <span className="text-xs tabular-nums text-[rgb(var(--text-tertiary))] text-right" style={{ width: 56 }}>
                       {s.recordedCount}/{s.studentCount}
                     </span>
                     <span
                       // allow-presentation-style: per-classroom status tint (complete/partial/not-started)
-                      className="text-4xs font-medium px-2 py-0.5 rounded-[5px] text-center whitespace-nowrap"
-                      style={{ width: 84, ...statusStyle }}
+                      className="text-2xs font-medium px-2 py-0.5 rounded-[5px] text-center whitespace-nowrap"
+                      style={{ width: 92, ...statusStyle }}
                     >
                       {statusLabel}
                     </span>
@@ -421,9 +421,9 @@ const alertColumns = [
         <div className="flex items-center gap-2 min-w-0">
           <UserAvatar userId={a.studentId} userName={a.studentName} size="sm" />
           <div className="min-w-0">
-            <span className="block truncate text-xs font-medium text-[rgb(var(--text-primary))]">{a.studentName}</span>
+            <span className="block truncate text-sm font-medium text-[rgb(var(--text-primary))]">{a.studentName}</span>
             {a.gradeLevel && (
-              <span className="block text-4xs text-[rgb(var(--text-disabled))]">{a.gradeLevel}</span>
+              <span className="block text-2xs text-[rgb(var(--text-disabled))]">{a.gradeLevel}</span>
             )}
           </div>
         </div>
@@ -439,7 +439,7 @@ const alertColumns = [
       return (
         <span
           // allow-presentation-style: rate severity color
-          className="text-xs font-bold tabular-nums"
+          className="text-sm font-bold tabular-nums"
           style={{ color: getRateColorHex(rate) }}
         >
           {rate.toFixed(1)}%
@@ -452,7 +452,7 @@ const alertColumns = [
     header: 'Absent',
     enableSorting: true,
     cell: ({ getValue }) => (
-      <span className="text-2xs tabular-nums text-[rgb(var(--text-tertiary))]">{getValue()}</span>
+      <span className="text-xs tabular-nums text-[rgb(var(--text-tertiary))]">{getValue()}</span>
     ),
     meta: { align: 'center' },
   }),
@@ -460,7 +460,7 @@ const alertColumns = [
     header: 'Total',
     enableSorting: true,
     cell: ({ getValue }) => (
-      <span className="text-2xs tabular-nums text-[rgb(var(--text-disabled))]">{getValue()}</span>
+      <span className="text-xs tabular-nums text-[rgb(var(--text-disabled))]">{getValue()}</span>
     ),
     meta: { align: 'center' },
   }),
@@ -477,7 +477,7 @@ const alertColumns = [
       return (
         <span
           // allow-presentation-style: trend direction color
-          className="text-3xs font-medium"
+          className="text-xs font-medium"
           style={{ color: t.color }}
         >
           {t.text}
@@ -509,11 +509,11 @@ function AttendanceAlertsTable({
           </div>
           <div className="min-w-0">
             <div className="text-sm font-semibold text-[rgb(var(--text-primary))]">Attendance Alerts</div>
-            <div className="text-3xs text-[rgb(var(--text-disabled))]">Students below 90% attendance rate</div>
+            <div className="text-xs text-[rgb(var(--text-disabled))]">Students below 90% attendance rate</div>
           </div>
         </div>
         {totalAtRiskCount > 0 && (
-          <span className="text-3xs text-[rgb(var(--text-disabled))] shrink-0">
+          <span className="text-xs text-[rgb(var(--text-disabled))] shrink-0">
             {alerts.length < totalAtRiskCount
               ? `Showing ${alerts.length} of ${totalAtRiskCount} at-risk students`
               : `${totalAtRiskCount} at-risk student${totalAtRiskCount !== 1 ? 's' : ''}`}
@@ -586,7 +586,7 @@ export function AttendanceDashboard({
       <div className={`${CARD} p-6 text-center`}>
         <AlertTriangle className="text-[rgb(var(--state-danger-fg))] mx-auto mb-2" style={{ width: 20, height: 20 }} />
         <p className="text-sm font-medium text-[rgb(var(--state-danger-fg))] mb-1">Failed to load attendance overview</p>
-        <p className="text-2xs text-[rgb(var(--text-tertiary))]">Please try refreshing the page. If the issue persists, contact support.</p>
+        <p className="text-xs text-[rgb(var(--text-tertiary))]">Please try refreshing the page. If the issue persists, contact support.</p>
       </div>
     )
   }
@@ -595,7 +595,7 @@ export function AttendanceDashboard({
     <div className="flex flex-col gap-3">
       {/* Scope indicator */}
       {!isSchoolWide && summary && (
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 text-3xs font-medium rounded-[20px] bg-[rgb(var(--state-info-bg))] text-[rgb(var(--state-info-fg))]">
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-[20px] bg-[rgb(var(--state-info-bg))] text-[rgb(var(--state-info-fg))]">
           Showing data for your classrooms ({summary.totalStudents} students)
         </div>
       )}

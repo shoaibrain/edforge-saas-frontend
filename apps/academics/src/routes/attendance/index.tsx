@@ -376,12 +376,14 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
   return (
     <div style={{ minHeight: '100%' }}>
       {/* Attendance toolbar — breadcrumb + the active "Attendance" tab already name
-          the page, so no title echo: just the academic-year chip + the view toggle */}
-      <div className="px-6">
+          the page, so no title echo: just the academic-year chip + the view toggle.
+          (No px-6 here: the classrooms tabpanel already supplies padding + Container.) */}
+      <div>
         <div className="flex items-center justify-end gap-2 mb-3.5">
-          <span className="inline-flex items-center gap-1.5 text-3xs font-medium text-[rgb(var(--text-tertiary))] bg-[rgb(var(--background-tertiary))] rounded-full px-2.5 py-1">
-            <CalendarDays className="w-3 h-3" />
-            {currentYearName || 'Academic year'}
+          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] bg-[rgb(var(--background-tertiary))] rounded-full px-2.5 py-1">
+            <CalendarDays className="w-3.5 h-3.5" />
+            {/* humanize slug-style names like "2083-academic-year" */}
+            {(currentYearName || 'Academic year').replace(/-/g, ' ')}
           </span>
           <SegmentedControl
             aria-label="Attendance view"
@@ -419,8 +421,8 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
         )}
       </div>
 
-      {/* Tab Content */}
-      <div className="pt-4 px-6 pb-6">
+      {/* Tab Content (horizontal/bottom padding comes from the classrooms tabpanel) */}
+      <div className="pt-1">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
