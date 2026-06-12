@@ -23,7 +23,6 @@ import { getAttendanceColor } from '@edforge/types'
 import { useActiveSchoolId } from '../stores/app.store'
 import { useAcademicsOverviewV2 } from '../hooks/useAcademicsOverviewV2'
 import { overviewKeys } from '../hooks/useAcademicsOverview'
-import { useSchoolProfile } from '../hooks/useSchool'
 import { Card } from '@edforge/ui'
 
 // V2 components
@@ -153,8 +152,6 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const data = useAcademicsOverviewV2(schoolId)
-  const schoolProfile = useSchoolProfile(schoolId)
-  const schoolName = schoolProfile.data?.name
   const { staggerContainer, fadeInUp } = useMotionVariants()
 
   const handleRefresh = useCallback(() => {
@@ -191,16 +188,10 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
           <ContextBar
             meta={
               <>
-                {schoolName ? (
-                  <span className="font-semibold text-[rgb(var(--text-primary))]">
-                    {schoolName}
-                  </span>
-                ) : null}
-                {schoolName && data.academicYear.name ? <ContextBarSep /> : null}
                 {data.academicYear.name ? (
                   <ContextBarYear>{data.academicYear.name}</ContextBarYear>
                 ) : null}
-                {schoolName || data.academicYear.name ? <ContextBarSep /> : null}
+                {data.academicYear.name ? <ContextBarSep /> : null}
                 <span>
                   {new Date().toLocaleDateString('en-US', {
                     weekday: 'long',
@@ -258,17 +249,7 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
           onExport={data.handleExportCSV}
         />
 
-        {/* ---- Attendance Alerts (compact inline strip) ---- */}
-        <motion.div variants={fadeInUp}>
-          <AttendanceAlertsCard
-            alerts={data.alerts.items}
-            totalCount={data.alerts.totalCount}
-            unrecordedCount={unrecordedCount}
-            isLoading={data.alerts.isLoading}
-          />
-        </motion.div>
-
-        {/* ---- KPI Grid (4 tiles) ---- */}
+        {/* ---- KPI Grid (4 tiles) — lead with the confident numbers ---- */}
         <motion.div
           variants={fadeInUp}
           className="grid gap-3 grid-cols-2 lg:grid-cols-4"
@@ -340,6 +321,21 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
             loading={data.alerts.isLoading}
           />
         </motion.div>
+
+        {/* ---- Needs Attention (attendance alerts, reframed below the KPIs) ---- */}
+        {(data.alerts.isLoading || data.alerts.items.length > 0 || (unrecordedCount ?? 0) > 0) && (
+          <motion.div variants={fadeInUp} className="space-y-2">
+            <h2 className="text-sm font-semibold text-[rgb(var(--text-primary))]">
+              Needs Attention
+            </h2>
+            <AttendanceAlertsCard
+              alerts={data.alerts.items}
+              totalCount={data.alerts.totalCount}
+              unrecordedCount={unrecordedCount}
+              isLoading={data.alerts.isLoading}
+            />
+          </motion.div>
+        )}
 
         {/* ---- Attendance Trend (full width) ---- */}
         <motion.div variants={fadeInUp}>
