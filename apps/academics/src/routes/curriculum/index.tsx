@@ -12,12 +12,11 @@
 import { useState, useMemo } from 'react'
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useResourcePermissions } from '@edforge/abac'
-import { StatCard } from '@edforge/ui'
+import { StatCard, Container } from '@edforge/ui'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   BookOpen,
   Layers,
-  Plus,
   ShieldCheck,
 } from 'lucide-react'
 import { useActiveSchoolId } from '../../stores/app.store'
@@ -266,75 +265,12 @@ export function CurriculumModule() {
     setSelectedCourse(null)
   }
 
-  const today = new Date().toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  })
-
   return (
     <div className="min-h-full px-5 py-4">
-      {/* ---- V2 Page Header ---- */}
-      <div className="flex items-center justify-between mb-1" style={{ height: 44 }}>
-        <div className="flex items-center gap-2.5">
-          {/* Icon */}
-          <div
-            className="flex items-center justify-center rounded-lg bg-[rgb(var(--accent-reports)/0.1)]"
-            style={{ width: 32, height: 32 }}
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path
-                d="M2 2h12v12H2z"
-                stroke="#7F77DD"
-                strokeWidth="1.5"
-                fill="none"
-              />
-              <path d="M5 6h6M5 9h4" stroke="#7F77DD" strokeWidth="1.5" />
-            </svg>
-          </div>
-
-          {/* Title */}
-          <h1 className="text-lg font-semibold text-[rgb(var(--text-primary))] tracking-[-0.3px]">
-            Curriculum
-          </h1>
-
-          {/* Separator + Date */}
-          <span className="text-sm text-[rgb(var(--text-disabled))]">|</span>
-          <span className="text-sm text-[rgb(var(--text-disabled))]">
-            {today}
-          </span>
-        </div>
-
-        {/* Right-side action buttons */}
-        <div className="flex items-center gap-2">
-          {coursePerms.create && (
-            <button
-              type="button"
-              onClick={openCreateDrawer}
-              className="inline-flex items-center gap-1.5 transition-colors hover:opacity-90 h-9 px-3.5 text-xs font-medium rounded-lg border-none cursor-pointer bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
-            >
-              <Plus style={{ width: 12, height: 12 }} />
-              Add course
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* ---- Context Banner ---- */}
-      <p className="text-xs text-[rgb(var(--text-disabled))] mb-3.5">
-        <span className="font-medium text-[rgb(var(--accent-academics))]">
-          {stats.total}
-        </span>{' '}
-        courses across{' '}
-        <span className="font-medium text-[rgb(var(--accent-academics))]">
-          {stats.subjects}
-        </span>{' '}
-        subject areas · {stats.elective} elective ·{' '}
-        <span className="font-medium text-[rgb(var(--accent-academics))]">
-          {stats.specializedTypes}
-        </span>{' '}
-        specialized course types (Honors, AP, Dual Enrollment)
-      </p>
+      <Container padding="none">
+      {/* Header pattern: breadcrumb names the page (shell topbar). No H1/date/
+          summary echo. "Add course" lives inside the Courses tab toolbar (empty
+          state CTA); page-level duplicate removed. */}
 
       {/* ---- KPI Tiles ---- */}
       <div className="grid gap-2 grid-cols-4 mb-3.5">
@@ -520,6 +456,7 @@ export function CurriculumModule() {
         course={selectedCourse}
         onModeChange={setDrawerMode}
       />
+      </Container>
     </div>
   )
 }
