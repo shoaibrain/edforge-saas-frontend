@@ -9,8 +9,9 @@
  * Tabs:
  * - Overview: Section card grid / table with filters, stats, and CRUD
  * - Gradebook: Grade analytics dashboard + cross-section grade recording
- * - Grading Policies: Policy CRUD management
  * - Attendance Board: Daily attendance entry + analytics
+ * (Grading Policies moved to Curriculum — academic configuration, not a
+ *  daily classroom operation. /classrooms?tab=policies redirects there.)
  *
  * No backend changes — presentation layer only.
  */
@@ -23,7 +24,6 @@ import {
   School,
   BarChart3,
   BookCheck,
-  Settings,
   ClipboardCheck,
   Plus,
   GraduationCap,
@@ -58,7 +58,6 @@ import { useGradesStore } from '../../stores/grades.store'
 import { useCurrentAcademicYear, useGradingPeriods } from '../../hooks'
 import { useSectionGrades, useGradingPolicies } from '../../hooks/useGrades'
 import { GradebookGrid } from '../../components/grades/GradebookGrid'
-import { GradingPolicyList } from '../../components/grades/GradingPolicyList'
 import { BulkGradeModal } from '../../components/grades/BulkGradeModal'
 import { FinalizationWizard } from '../../components/grades/FinalizationWizard'
 import { AssignmentEditor } from '../../components/grades/AssignmentEditor'
@@ -73,12 +72,11 @@ import { StatCard, WidgetErrorBoundaryV2, Button, Select, Container } from '@edf
 // TYPES
 // ============================================================================
 
-type ClassroomTabId = 'overview' | 'gradebook' | 'policies' | 'attendance'
+type ClassroomTabId = 'overview' | 'gradebook' | 'attendance'
 
 const TABS: { id: ClassroomTabId; label: string; icon: typeof School }[] = [
   { id: 'overview', label: 'Overview', icon: School },
   { id: 'gradebook', label: 'Gradebook', icon: BookCheck },
-  { id: 'policies', label: 'Grading Policies', icon: Settings },
   { id: 'attendance', label: 'Attendance', icon: ClipboardCheck },
 ]
 
@@ -560,6 +558,14 @@ export function ClassroomsModule() {
   const rawTab = search?.tab || 'overview'
   const activeTab: ClassroomTabId = VALID_TABS.has(rawTab) ? (rawTab as ClassroomTabId) : 'overview'
 
+  // Backward compat: Grading Policies moved to Curriculum (it is academic
+  // configuration, not a daily classroom operation). Old bookmarks redirect.
+  useEffect(() => {
+    if (rawTab === 'policies') {
+      navigate({ to: '/curriculum', search: { tab: 'policies' } as any, replace: true })
+    }
+  }, [rawTab, navigate])
+
   const setActiveTab = useCallback(
     (tab: ClassroomTabId) => {
       navigate({ search: { tab } as any, replace: true })
@@ -652,12 +658,6 @@ export function ClassroomsModule() {
             {activeTab === 'gradebook' && (
               <TabErrorBoundary tabName="Gradebook">
                 <GradebookTab />
-              </TabErrorBoundary>
-            )}
-
-            {activeTab === 'policies' && (
-              <TabErrorBoundary tabName="Grading Policies">
-                <GradingPolicyList />
               </TabErrorBoundary>
             )}
 

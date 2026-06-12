@@ -10,7 +10,7 @@
  */
 
 import { useState, useMemo } from 'react'
-import { useNavigate } from '@tanstack/react-router'
+import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useResourcePermissions } from '@edforge/abac'
 import { StatCard } from '@edforge/ui'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -34,13 +34,16 @@ import { CourseTable } from '../../components/curriculum/CourseTable'
 import { CourseFilters } from '../../components/curriculum/CourseFilters'
 import { CourseDrawer, type DrawerMode } from '../../components/curriculum/CourseDrawer'
 import { GradeLevelsTab } from '../../components/curriculum/GradeLevelsTab'
+import { GradingPolicyList } from '../../components/grades/GradingPolicyList'
 import type { CourseResponseDto } from '@aibrains/shared-types'
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-type CurriculumTab = 'courses' | 'grade-levels' | 'standards'
+type CurriculumTab = 'courses' | 'grade-levels' | 'standards' | 'policies'
+
+const CURRICULUM_TABS = new Set<string>(['courses', 'grade-levels', 'standards', 'policies'])
 
 // ============================================================================
 // TAB SVG ICONS (inline to match prototype exactly)
@@ -98,6 +101,20 @@ function StandardsIcon({ active }: { active: boolean }) {
   )
 }
 
+function PoliciesIcon({ active }: { active: boolean }) {
+  return (
+    <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+      <path
+        d="M3 4.5h10M3 8h7M3 11.5h10"
+        stroke={active ? '#7F77DD' : 'currentColor'}
+        strokeWidth="1.4"
+        strokeLinecap="round"
+      />
+      <circle cx="11.5" cy="8" r="1.6" stroke={active ? '#7F77DD' : 'currentColor'} strokeWidth="1.4" fill="none" />
+    </svg>
+  )
+}
+
 // ============================================================================
 // STANDARDS EMPTY STATE (V2)
 // ============================================================================
@@ -141,7 +158,11 @@ function StandardsContent() {
 // ============================================================================
 
 export function CurriculumModule() {
-  const [activeTab, setActiveTab] = useState<CurriculumTab>('courses')
+  // Deep-linkable initial tab (?tab=policies etc) — switching stays local state
+  const search = useSearch({ strict: false }) as { tab?: string }
+  const [activeTab, setActiveTab] = useState<CurriculumTab>(
+    search?.tab && CURRICULUM_TABS.has(search.tab) ? (search.tab as CurriculumTab) : 'courses'
+  )
   const navigate = useNavigate()
   const schoolId = useActiveSchoolId()
 
@@ -427,6 +448,20 @@ export function CurriculumModule() {
           <StandardsIcon active={activeTab === 'standards'} />
           Standards
         </button>
+
+        {/* Grading Policies tab — academic configuration (moved from Classrooms) */}
+        <button
+          type="button"
+          onClick={() => setActiveTab('policies')}
+          className={`flex items-center gap-1.5 px-3.5 py-2 text-xs cursor-pointer bg-transparent border-b-2 -mb-px ${
+            activeTab === 'policies'
+              ? 'font-medium text-[#7F77DD] border-[#7F77DD]'
+              : 'font-normal text-[rgb(var(--text-tertiary))] border-transparent'
+          }`}
+        >
+          <PoliciesIcon active={activeTab === 'policies'} />
+          Grading Policies
+        </button>
       </div>
 
       {/* ---- Tab Content ---- */}
@@ -472,6 +507,8 @@ export function CurriculumModule() {
           )}
 
           {activeTab === 'standards' && <StandardsContent />}
+
+          {activeTab === 'policies' && <GradingPolicyList />}
         </motion.div>
       </AnimatePresence>
 

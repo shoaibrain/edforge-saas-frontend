@@ -149,6 +149,8 @@ const classroomsIndexRoute = createRoute({
         if (tab === 'my-classes') tab = 'overview'
 
         return {
+            // 'policies' stays parseable so old bookmarks survive the parse —
+            // ClassroomsModule then redirects it to /curriculum?tab=policies
             tab: z
                 .enum(['overview', 'gradebook', 'policies', 'attendance'])
                 .optional()
@@ -336,11 +338,24 @@ const rosteringRoute = createRoute({
     component: BulkRosteringPage,
 })
 
-// Curriculum - Consolidated view of courses, grade levels, and standards
+// Curriculum - Consolidated view of courses, grade levels, standards, and
+// grading policies (policies moved here from Classrooms — they are academic
+// configuration, not a daily classroom operation)
 const curriculumRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/curriculum',
     component: CurriculumModule,
+    // Explicit optional return type so existing search-less Links/navigates
+    // to /curriculum stay valid (a required `tab` key would break them).
+    validateSearch: (
+        search: Record<string, unknown>
+    ): { tab?: 'courses' | 'grade-levels' | 'standards' | 'policies' } => ({
+        tab: z
+            .enum(['courses', 'grade-levels', 'standards', 'policies'])
+            .optional()
+            .catch(undefined)
+            .parse(search.tab),
+    }),
 })
 
 // Course detail - individual course view

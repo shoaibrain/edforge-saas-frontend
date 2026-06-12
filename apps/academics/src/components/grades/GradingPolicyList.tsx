@@ -88,13 +88,17 @@ function PolicyCard({
         <div className="space-y-1.5">
           {policy.categoryWeights.map((cat) => (
             <div key={cat.categoryId} className="flex items-center gap-2">
-              <div className="flex-1 h-2 bg-surface-hover rounded-full overflow-hidden">
+              {/* The fill class was previously malformed ("…)]0" — the ]0
+                  class-suffix bug family) and the track used an undefined
+                  bg-surface-hover, so the entire bar rendered invisible. */}
+              <div className="flex-1 h-2 bg-[rgb(var(--background-tertiary))] rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-[rgb(var(--state-info-bg)/0.18)]0 rounded-full"
-                  style={{ width: `${cat.weight}%` }}
+                  // allow-presentation-style: data-driven weight width
+                  className="h-full bg-[rgb(var(--accent-reports)/0.7)] rounded-full"
+                  style={{ width: `${Math.min(100, cat.weight)}%` }}
                 />
               </div>
-              <span className="text-xs text-text-secondary w-24 text-right">
+              <span className="text-xs text-text-secondary w-36 text-right whitespace-nowrap">
                 {cat.categoryName} ({cat.weight}%)
               </span>
             </div>
