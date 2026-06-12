@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EdForge — page chrome + consolidated Attendance Overview</title>
+<!--
+  DESIGN ARTIFACT — not shipped code. Open in a browser.
+  Shows TWO things together:
+   (1) the new platform header pattern — breadcrumb IS the title; no page H1, no
+       date line, no summary sentence, no "Attendance" sub-header echo. Just a slim
+       tabs+action row and a minimal toggle.
+   (2) the consolidated Overview body (7 widgets -> 3 sections).
+  Real tokens; data mirrors the preview. Hardcoded values OK here.
+-->
+<style>
+  :root{
+    --bg:250 247 242; --surface:255 255 255; --surface-2:244 239 230;
+    --ink:26 31 46; --ink-2:55 65 81; --ink-3:88 95 111; --ink-4:176 182 200;
+    --border:150 143 126; --topbar:240 240 244;
+    --green:#1D9E75; --green-bg:#E8F6F2; --amber:#EF9F27; --amber-bg:#FFECC9;
+    --red:#E24B4A; --red-bg:#F9CAC6; --blue:#378ADD; --slate:#5A6070; --violet:#7F77DD;
+    --action:#0F6E56; --ease:cubic-bezier(0.4,0,0.2,1);
+  }
+  [data-theme="dark"]{ --bg:15 17 23; --surface:22 27 39; --surface-2:30 36 54;
+    --ink:232 234 240; --ink-2:200 204 216; --ink-3:150 156 178; --ink-4:74 80 104; --border:255 255 255; --topbar:12 14 20; }
+  *{ box-sizing:border-box; }
+  body{ margin:0; font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+        background:rgb(var(--bg)); color:rgb(var(--ink)); -webkit-font-smoothing:antialiased; transition:background .3s var(--ease); }
+  .controls{ position:fixed; top:12px; right:14px; z-index:20; }
+  .controls button{ font:inherit; font-size:12px; font-weight:600; cursor:pointer; padding:7px 11px;
+                    border-radius:9px; border:1px solid rgb(var(--border)/.35); background:rgb(var(--surface)); color:rgb(var(--ink)); }
+
+  /* ===== simulated shell topbar — breadcrumb IS the page title ===== */
+  .topbar{ display:flex; align-items:center; gap:14px; height:54px; padding:0 18px;
+           background:rgb(var(--topbar)); border-bottom:1px solid rgb(var(--border)/.18); }
+  .topbar .ham{ width:18px; height:14px; display:flex; flex-direction:column; justify-content:space-between; opacity:.55; }
+  .topbar .ham i{ height:2px; background:rgb(var(--ink)); border-radius:2px; }
+  .school{ display:flex; align-items:center; gap:8px; padding:5px 9px; border-radius:9px; }
+  .school .av{ width:24px; height:24px; border-radius:7px; background:linear-gradient(135deg,#7F77DD,#378ADD); }
+  .school .nm{ font-size:12px; font-weight:600; line-height:1.1; }
+  .school .nm small{ display:block; font-size:9px; color:rgb(var(--ink-4)); font-weight:600; letter-spacing:.04em; }
+  .crumbs{ display:flex; align-items:center; gap:7px; font-size:13px; margin-left:6px; }
+  .crumbs a{ color:rgb(var(--ink-3)); text-decoration:none; }
+  .crumbs .sep{ color:rgb(var(--ink-4)); }
+  .crumbs .cur{ color:rgb(var(--ink)); font-weight:600; }
+  .crumbs .hint{ font-size:10px; color:var(--violet); border:1px dashed var(--violet); border-radius:6px; padding:1px 6px; margin-left:8px; opacity:.85; }
+  .topbar .right{ margin-left:auto; display:flex; align-items:center; gap:10px; }
+  .seg-sm{ display:inline-flex; background:rgb(var(--surface-2)); border:1px solid rgb(var(--border)/.3); border-radius:9px; padding:2px; }
+  .seg-sm span{ font-size:11px; font-weight:600; padding:3px 9px; border-radius:7px; color:rgb(var(--ink-3)); }
+  .seg-sm span.on{ background:rgb(var(--surface)); color:rgb(var(--ink)); box-shadow:0 1px 2px rgb(0 0 0/.08); }
+  .topbar .avatar{ width:26px; height:26px; border-radius:99px; background:linear-gradient(135deg,#EF9F27,#E24B4A); }
+
+  /* ===== the page area ===== */
+  .page{ padding:0 26px 80px; }
+  .page-inner{ max-width:1120px; margin:0 auto; }
+
+  /* slim tabs + action row (replaces the big H1 + date + summary) */
+  .tabrow{ display:flex; align-items:center; gap:4px; border-bottom:1px solid rgb(var(--border)/.2); padding-top:14px; }
+  .tab{ display:flex; align-items:center; gap:7px; font-size:13.5px; font-weight:600; padding:10px 12px 12px;
+        color:rgb(var(--ink-3)); border-bottom:2px solid transparent; cursor:pointer; }
+  .tab .ic{ width:15px; height:15px; opacity:.7; }
+  .tab.on{ color:rgb(var(--ink)); border-bottom-color:var(--blue); }
+  .tab .badge{ font-size:10px; font-weight:700; background:rgb(var(--surface-2)); color:rgb(var(--ink-3)); border-radius:99px; padding:0 6px; }
+  .tabrow .action{ margin-left:auto; display:inline-flex; align-items:center; gap:7px; font-size:13px; font-weight:600;
+                   color:#fff; background:var(--action); border-radius:9px; padding:8px 13px; }
+
+  /* the Attendance tab's own minimal toolbar — no title echo */
+  .tab-toolbar{ display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:14px 0 16px; }
+  .yearchip{ font-size:11px; font-weight:600; color:rgb(var(--ink-3)); background:rgb(var(--surface-2)); border-radius:99px; padding:4px 10px; }
+  .seg{ display:inline-flex; background:rgb(var(--surface-2)); border:1px solid rgb(var(--border)/.3); border-radius:11px; padding:3px; }
+  .seg span{ font-size:13px; font-weight:600; padding:6px 14px; border-radius:8px; color:rgb(var(--ink-3)); cursor:pointer; }
+  .seg span.on{ background:rgb(var(--surface)); color:rgb(var(--ink)); box-shadow:0 1px 2px rgb(0 0 0/.08); }
+
+  .annot{ font-size:11px; color:var(--red); margin:6px 0 0; }
+  .annot.ok{ color:var(--green); }
+
+  /* ===== cards / body (consolidated Overview) ===== */
+  .card{ background:rgb(var(--surface)); border:1px solid rgb(var(--border)/.28); border-radius:16px;
+         box-shadow:0 1px 2px rgb(0 18 25/.05),0 1px 3px rgb(0 18 25/.04); margin-bottom:16px; }
+  .card-pad{ padding:18px 20px; }
+  .tag{ display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:600; padding:3px 9px; border-radius:999px; }
+  .muted{ color:rgb(var(--ink-3)); }
+  .pulse-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:24px; }
+  .headline .big{ font-size:38px; font-weight:800; line-height:1; letter-spacing:-.02em; }
+  .headline .lbl{ font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:rgb(var(--ink-4)); margin-top:5px; }
+  .chips{ display:flex; gap:6px; margin-top:9px; }
+  .spark{ flex:1; min-width:0; }
+  .spark-head{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:2px; }
+  .spark-head .t{ font-size:11px; font-weight:600; color:rgb(var(--ink-3)); }
+  .spark-head .r{ font-size:10px; color:rgb(var(--ink-4)); }
+  .today{ margin-top:18px; padding-top:16px; border-top:1px solid rgb(var(--border)/.18); }
+  .today-row{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:9px; }
+  .today-row .l{ font-size:12px; font-weight:600; } .today-row .l b{ color:rgb(var(--ink)); }
+  .today-row .pct{ font-size:12px; font-weight:700; color:rgb(var(--ink-3)); }
+  .progress{ height:8px; border-radius:99px; background:rgb(var(--surface-2)); overflow:hidden; }
+  .progress > i{ display:block; height:100%; border-radius:99px; background:linear-gradient(90deg,var(--green),#2FA37A); }
+  .composition{ display:flex; gap:18px; margin-top:11px; flex-wrap:wrap; }
+  .composition .c{ display:flex; align-items:center; gap:6px; font-size:12px; color:rgb(var(--ink-2)); }
+  .composition .dot{ width:8px; height:8px; border-radius:99px; }
+  .composition .c b{ font-weight:700; color:rgb(var(--ink)); }
+  .patterns{ margin-top:16px; padding-top:14px; border-top:1px solid rgb(var(--border)/.18); display:flex; align-items:center; justify-content:space-between; gap:20px; }
+  .patterns .insight{ font-size:12px; color:rgb(var(--ink-3)); } .patterns .insight b{ color:rgb(var(--ink-2)); font-weight:600; }
+  .dow{ display:flex; gap:10px; align-items:flex-end; }
+  .dow .d{ display:flex; flex-direction:column; align-items:center; gap:4px; width:30px; }
+  .dow .bar{ width:22px; border-radius:5px 5px 2px 2px; position:relative; }
+  .dow .lab{ font-size:9px; color:rgb(var(--ink-4)); font-weight:600; } .dow .val{ font-size:9px; color:rgb(var(--ink-3)); }
+  .sr-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; }
+  .sec-title{ font-size:13px; font-weight:700; } .sec-sub{ font-size:11px; color:rgb(var(--ink-4)); }
+  .sr-body{ display:flex; gap:22px; align-items:center; }
+  .ring-wrap{ display:flex; flex-direction:column; align-items:center; gap:6px; flex-shrink:0; }
+  .ring-wrap .cap{ font-size:11px; font-weight:600; color:rgb(var(--ink-3)); }
+  .sec-list{ flex:1; min-width:0; max-height:172px; overflow:auto; }
+  .sec-row{ display:flex; align-items:center; gap:10px; padding:7px 0; border-bottom:1px solid rgb(var(--border)/.13); }
+  .sec-row:last-child{ border-bottom:none; }
+  .sec-row .nm{ flex:1; min-width:0; font-size:12.5px; font-weight:500; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .sec-row .nm small{ display:block; font-size:10px; color:rgb(var(--ink-4)); font-weight:400; }
+  .sec-row .ratio{ font-size:11px; color:rgb(var(--ink-3)); font-variant-numeric:tabular-nums; width:50px; text-align:right; }
+  .status{ font-size:10px; font-weight:700; padding:2px 8px; border-radius:99px; width:82px; text-align:center; }
+  .alerts-ph{ border:1px dashed rgb(var(--border)/.4); border-radius:16px; padding:20px; text-align:center; color:rgb(var(--ink-3)); font-size:13px; }
+  .alerts-ph b{ color:rgb(var(--ink-2)); }
+</style>
+</head>
+<body>
+<div class="controls"><button onclick="document.body.dataset.theme = document.body.dataset.theme==='dark'?'':'dark'">Toggle dark</button></div>
+
+<!-- ===== SHELL TOPBAR (breadcrumb = the page title) ===== -->
+<div class="topbar">
+  <div class="ham"><i></i><i></i><i></i></div>
+  <div class="school"><div class="av"></div><div class="nm">Scoggins Middle<small>DPPSW</small></div></div>
+  <nav class="crumbs">
+    <a href="#">Home</a><span class="sep">›</span>
+    <a href="#">Academics</a><span class="sep">›</span>
+    <span class="cur">Classrooms</span>
+    <span class="hint">← this is the page title now</span>
+  </nav>
+  <div class="right">
+    <div class="seg-sm"><span class="on">Light</span><span>Dark</span></div>
+    <div class="avatar"></div>
+  </div>
+</div>
+
+<div class="page"><div class="page-inner">
+
+  <!-- ===== slim tabs + action row (replaces big H1 + date + summary) ===== -->
+  <div class="tabrow">
+    <div class="tab"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Overview <span class="badge">8</span></div>
+    <div class="tab"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Gradebook</div>
+    <div class="tab"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Grading Policies</div>
+    <div class="tab on"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Attendance</div>
+    <div class="action">+ New classroom</div>
+  </div>
+  <p class="annot">Removed: the big “Classrooms | Jun 12, 2026” H1, the “2 of 250 recorded…” summary sentence, and the duplicate “Attendance · Record and review” sub-header (~110px reclaimed).</p>
+
+  <!-- the Attendance tab's minimal toolbar — toggle + year chip, no title echo -->
+  <div class="tab-toolbar">
+    <span class="yearchip">📅 2083 BS · academic year</span>
+    <div class="seg"><span class="on">Overview</span><span>Daily Entry</span></div>
+  </div>
+
+  <!-- ===== SECTION 1: PULSE ===== -->
+  <div class="card"><div class="card-pad">
+    <div class="pulse-top">
+      <div class="headline">
+        <div class="big">9.7<span style="font-size:22px">%</span></div>
+        <div class="lbl">School average</div>
+        <div class="chips">
+          <span class="tag" style="background:var(--green-bg);color:var(--green)">▲ 7-day 10.8%</span>
+          <span class="tag" style="background:rgb(var(--surface-2));color:rgb(var(--ink-3))">30-day 10.5%</span>
+        </div>
+      </div>
+      <div class="spark">
+        <div class="spark-head"><span class="t">30-day attendance trend</span><span class="r">May 12 — Jun 11</span></div>
+        <svg viewBox="0 0 520 90" width="100%" height="90" preserveAspectRatio="none">
+          <defs><linearGradient id="ar" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1D9E75" stop-opacity="0.22"/><stop offset="100%" stop-color="#1D9E75" stop-opacity="0"/></linearGradient></defs>
+          <path d="M0,66 L40,62 L80,68 L120,56 L160,60 L200,51 L240,57 L280,48 L320,54 L360,46 L400,53 L440,45 L480,58 L520,68 L520,90 L0,90 Z" fill="url(#ar)"/>
+          <path d="M0,66 L40,62 L80,68 L120,56 L160,60 L200,51 L240,57 L280,48 L320,54 L360,46 L400,53 L440,45 L480,58 L520,68" fill="none" stroke="#1D9E75" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="520" cy="68" r="3.5" fill="#1D9E75"/>
+        </svg>
+      </div>
+    </div>
+    <div class="today">
+      <div class="today-row"><div class="l">Today · <b>2 of 250</b> students recorded <span class="muted">— recording in progress</span></div><div class="pct">0.8%</div></div>
+      <div class="progress"><i style="width:0.8%"></i></div>
+      <div class="composition">
+        <span class="c"><span class="dot" style="background:var(--green)"></span>Present <b>0</b></span>
+        <span class="c"><span class="dot" style="background:var(--amber)"></span>Late / Tardy <b>0</b></span>
+        <span class="c"><span class="dot" style="background:var(--blue)"></span>Excused <b>0</b></span>
+        <span class="c"><span class="dot" style="background:var(--red)"></span>Absent <b>2</b></span>
+        <span class="c muted" style="margin-left:auto">2 unexcused · 0 half-day · 0 remote</span>
+      </div>
+    </div>
+    <div class="patterns">
+      <div class="insight">Patterns · <b>Thu</b> lowest (8%) · <b>Sun</b> highest (16%)</div>
+      <div class="dow">
+        <div class="d"><div class="bar" style="height:34px;background:var(--green)"></div><span class="lab">Sun</span><span class="val">16%</span></div>
+        <div class="d"><div class="bar" style="height:24px;background:var(--blue)"></div><span class="lab">Mon</span><span class="val">11%</span></div>
+        <div class="d"><div class="bar" style="height:26px;background:var(--blue)"></div><span class="lab">Tue</span><span class="val">12%</span></div>
+        <div class="d"><div class="bar" style="height:24px;background:var(--blue)"></div><span class="lab">Wed</span><span class="val">11%</span></div>
+        <div class="d"><div class="bar" style="height:18px;background:var(--red)"></div><span class="lab">Thu</span><span class="val">8%</span></div>
+        <div class="d"><div class="bar" style="height:18px;background:var(--amber)"></div><span class="lab">Fri</span><span class="val">8%</span></div>
+      </div>
+    </div>
+  </div></div>
+
+  <!-- ===== SECTION 2: SECTIONS & RECORDING ===== -->
+  <div class="card"><div class="card-pad">
+    <div class="sr-head">
+      <div><div class="sec-title">Sections &amp; Recording</div><div class="sec-sub">Today's recording status per section</div></div>
+      <div class="chips">
+        <span class="tag" style="background:rgb(var(--surface-2));color:rgb(var(--ink-3))">7-day 10.8%</span>
+        <span class="tag" style="background:rgb(var(--surface-2));color:rgb(var(--ink-3))">30-day 10.5%</span>
+        <span class="tag" style="background:rgb(var(--surface-2));color:rgb(var(--ink-3))">Yearly 9.7%</span>
+      </div>
+    </div>
+    <div class="sr-body">
+      <div class="ring-wrap">
+        <svg width="88" height="88" viewBox="0 0 92 92">
+          <circle cx="46" cy="46" r="38" fill="none" stroke="rgb(var(--surface-2))" stroke-width="9"/>
+          <circle cx="46" cy="46" r="38" fill="none" stroke="#7F77DD" stroke-width="9" stroke-linecap="round" stroke-dasharray="238.8" stroke-dashoffset="119.4" transform="rotate(-90 46 46)"/>
+          <text x="46" y="44" text-anchor="middle" font-size="21" font-weight="800" fill="rgb(var(--ink))">50%</text>
+          <text x="46" y="58" text-anchor="middle" font-size="9" fill="rgb(var(--ink-4))">4 of 8</text>
+        </svg>
+        <span class="cap">sections recorded</span>
+      </div>
+      <div class="sec-list">
+        <div class="sec-row"><div class="nm">ECD program<small>ECD · Section A</small></div><span class="ratio">17/17</span><span class="status" style="background:var(--green-bg);color:var(--green)">Complete</span></div>
+        <div class="sec-row"><div class="nm">Math Introductory<small>Grade 5 · Section B</small></div><span class="ratio">30/30</span><span class="status" style="background:var(--green-bg);color:var(--green)">Complete</span></div>
+        <div class="sec-row"><div class="nm">Health, Physical &amp; Creative Arts<small>Grade 10 · Section A</small></div><span class="ratio">3/3</span><span class="status" style="background:var(--green-bg);color:var(--green)">Complete</span></div>
+        <div class="sec-row"><div class="nm">Middle School Social Studies<small>Grade 5 · Section B</small></div><span class="ratio">13/15</span><span class="status" style="background:var(--amber-bg);color:#7F4300">Partial</span></div>
+        <div class="sec-row"><div class="nm">Opt. Mathematics<small>—</small></div><span class="ratio">19/26</span><span class="status" style="background:var(--amber-bg);color:#7F4300">Partial</span></div>
+        <div class="sec-row"><div class="nm">Social Studies<small>SOC · Section B</small></div><span class="ratio">0/1</span><span class="status" style="background:rgb(var(--surface-2));color:rgb(var(--ink-3))">Not started</span></div>
+      </div>
+    </div>
+  </div></div>
+
+  <!-- ===== SECTION 3: ALERTS ===== -->
+  <div class="alerts-ph"><b>Section 3 · Attendance Alerts</b> — the bounded, paginated DataTable (already shipped). Unchanged.</div>
+
+  <p class="annot ok" style="margin-top:16px">Result: breadcrumb names the page · one tabs+action row · one minimal toggle · 3 content sections. No repeated titles, far less vertical chrome.</p>
+
+</div></div>
+</body>
+</html>
