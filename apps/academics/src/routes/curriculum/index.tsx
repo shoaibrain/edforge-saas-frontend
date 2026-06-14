@@ -12,7 +12,7 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useResourcePermissions } from '@edforge/abac'
-import { StatCard } from '@edforge/ui'
+import { StatCard, ContextBar, ContextBarSep, ContextBarYear } from '@edforge/ui'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   BookOpen,
@@ -48,16 +48,16 @@ type CurriculumTab = 'courses' | 'grade-levels' | 'standards'
 
 function CoursesIcon({ active }: { active: boolean }) {
   return (
-    <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
       <path
         d="M2 2h12v12H2z"
-        stroke={active ? '#7F77DD' : 'currentColor'}
+        stroke={active ? 'rgb(var(--accent-reports))' : 'currentColor'}
         strokeWidth="1.4"
         fill="none"
       />
       <path
         d="M5 6h6M5 9h4"
-        stroke={active ? '#7F77DD' : 'currentColor'}
+        stroke={active ? 'rgb(var(--accent-reports))' : 'currentColor'}
         strokeWidth="1.4"
       />
     </svg>
@@ -66,10 +66,10 @@ function CoursesIcon({ active }: { active: boolean }) {
 
 function GradeLevelsIcon({ active }: { active: boolean }) {
   return (
-    <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
       <path
         d="M2 4h4v4H2zM10 4h4v4h-4zM6 8h4v4H6zM2 12h4M10 12h4"
-        stroke={active ? '#7F77DD' : 'currentColor'}
+        stroke={active ? 'rgb(var(--accent-reports))' : 'currentColor'}
         strokeWidth="1.3"
         fill="none"
       />
@@ -79,18 +79,18 @@ function GradeLevelsIcon({ active }: { active: boolean }) {
 
 function StandardsIcon({ active }: { active: boolean }) {
   return (
-    <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
       <circle
         cx="8"
         cy="8"
         r="6.5"
-        stroke={active ? '#7F77DD' : 'currentColor'}
+        stroke={active ? 'rgb(var(--accent-reports))' : 'currentColor'}
         strokeWidth="1.4"
         fill="none"
       />
       <path
         d="M5 8l2 2 4-3"
-        stroke={active ? '#7F77DD' : 'currentColor'}
+        stroke={active ? 'rgb(var(--accent-reports))' : 'currentColor'}
         strokeWidth="1.4"
         fill="none"
       />
@@ -119,7 +119,7 @@ function StandardsContent() {
         className="flex items-center justify-center rounded-xl mb-3 bg-[rgb(var(--accent-reports)/0.15)]"
         style={{ width: 48, height: 48 }}
       >
-        <ShieldCheck className="w-6 h-6 text-[#7F77DD]" />
+        <ShieldCheck className="w-6 h-6 text-[rgb(var(--accent-reports))]" />
       </div>
 
       {/* Heading */}
@@ -246,88 +246,68 @@ export function CurriculumModule() {
   }
 
   const today = new Date().toLocaleDateString('en-US', {
+    weekday: 'long',
     month: 'short',
     day: 'numeric',
-    year: 'numeric',
   })
 
   return (
     <div className="min-h-full px-5 py-4">
-      {/* ---- V2 Page Header ---- */}
-      <div className="flex items-center justify-between mb-1" style={{ height: 44 }}>
-        <div className="flex items-center gap-2.5">
-          {/* Icon */}
-          <div
-            className="flex items-center justify-center rounded-lg bg-[rgb(var(--accent-reports)/0.1)]"
-            style={{ width: 32, height: 32 }}
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path
-                d="M2 2h12v12H2z"
-                stroke="#7F77DD"
-                strokeWidth="1.5"
-                fill="none"
-              />
-              <path d="M5 6h6M5 9h4" stroke="#7F77DD" strokeWidth="1.5" />
-            </svg>
-          </div>
-
-          {/* Title */}
-          <h1 className="text-lg font-semibold text-[rgb(var(--text-primary))] tracking-[-0.3px]">
-            Curriculum
-          </h1>
-
-          {/* Separator + Date */}
-          <span className="text-sm text-[rgb(var(--text-disabled))]">|</span>
-          <span className="text-sm text-[rgb(var(--text-disabled))]">
-            {today}
-          </span>
-        </div>
-
-        {/* Right-side action buttons */}
-        <div className="flex items-center gap-2">
-          {coursePerms.create && (
+      {/* ---- Context Bar (operating context, not a page title) ---- */}
+      <ContextBar
+        className="mb-4"
+        meta={
+          <>
+            {currentYear?.name ? (
+              <ContextBarYear>{currentYear.name}</ContextBarYear>
+            ) : null}
+            {currentYear?.name ? <ContextBarSep /> : null}
+            <span>{today}</span>
+          </>
+        }
+        description={
+          <p className="text-xs text-[rgb(var(--text-tertiary))] leading-relaxed">
+            <span className="font-medium text-[rgb(var(--accent-academics))]">
+              {stats.total}
+            </span>{' '}
+            courses across{' '}
+            <span className="font-medium text-[rgb(var(--accent-academics))]">
+              {stats.subjects}
+            </span>{' '}
+            subject areas · {stats.elective} elective ·{' '}
+            <span className="font-medium text-[rgb(var(--accent-academics))]">
+              {stats.specializedTypes}
+            </span>{' '}
+            specialized course types (Honors, AP, Dual Enrollment)
+          </p>
+        }
+        actions={
+          coursePerms.create ? (
             <button
               type="button"
               onClick={openCreateDrawer}
-              className="inline-flex items-center gap-1.5 transition-colors hover:opacity-90 h-9 px-3.5 text-xs font-medium rounded-lg border-none cursor-pointer bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
+              className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-[9px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-enrollment)/0.4)] cursor-pointer bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
             >
-              <Plus style={{ width: 12, height: 12 }} />
+              <Plus className="w-3.5 h-3.5" />
               Add course
             </button>
-          )}
-        </div>
-      </div>
-
-      {/* ---- Context Banner ---- */}
-      <p className="text-xs text-[rgb(var(--text-disabled))] mb-3.5">
-        <span className="font-medium text-[rgb(var(--accent-academics))]">
-          {stats.total}
-        </span>{' '}
-        courses across{' '}
-        <span className="font-medium text-[rgb(var(--accent-academics))]">
-          {stats.subjects}
-        </span>{' '}
-        subject areas · {stats.elective} elective ·{' '}
-        <span className="font-medium text-[rgb(var(--accent-academics))]">
-          {stats.specializedTypes}
-        </span>{' '}
-        specialized course types (Honors, AP, Dual Enrollment)
-      </p>
+          ) : undefined
+        }
+      />
 
       {/* ---- KPI Tiles ---- */}
-      <div className="grid gap-2 grid-cols-4 mb-3.5">
+      <div className="grid gap-3 grid-cols-2 lg:grid-cols-4 mb-3.5">
         <StatCard
           label="Total Courses"
           value={String(stats.total)}
           icon={BookOpen}
-          accentColor="rgba(127,119,221,0.10)"
-          iconColor="#7F77DD"
-          barColor="#7F77DD"
+          accentColor="rgb(var(--accent-reports)/0.1)"
+          iconColor="rgb(var(--accent-reports))"
+          barColor="rgb(var(--accent-reports))"
           tag={{
             text: `${stats.active} active`,
-            color: '#1D9E75',
-            bg: 'rgba(29,158,117,0.1)',
+            color: 'rgb(var(--accent-enrollment))',
+            bg: 'rgb(var(--accent-enrollment)/0.1)',
           }}
           loading={isLoading}
         />
@@ -335,9 +315,9 @@ export function CurriculumModule() {
           label="Subject Areas"
           value={String(stats.subjects)}
           icon={Layers}
-          accentColor="rgba(55,138,221,0.10)"
-          iconColor="#378ADD"
-          barColor="#378ADD"
+          accentColor="rgb(var(--accent-academics)/0.1)"
+          iconColor="rgb(var(--accent-academics))"
+          barColor="rgb(var(--accent-academics))"
           hint="Math · Science · ELA · SS · Arts · Voc."
           loading={isLoading}
         />
@@ -345,15 +325,15 @@ export function CurriculumModule() {
           label="Electives"
           value={String(stats.elective)}
           icon={BookOpen}
-          accentColor="rgba(216,90,48,0.10)"
-          iconColor="#D85A30"
-          barColor="#D85A30"
+          accentColor="rgb(var(--accent-coral)/0.1)"
+          iconColor="rgb(var(--accent-coral))"
+          barColor="rgb(var(--accent-coral))"
           tag={
             stats.electiveName
               ? {
                   text: stats.electiveName,
-                  color: '#7F77DD',
-                  bg: 'rgba(127,119,221,0.1)',
+                  color: 'rgb(var(--accent-reports))',
+                  bg: 'rgb(var(--accent-reports)/0.1)',
                 }
               : undefined
           }
@@ -363,13 +343,13 @@ export function CurriculumModule() {
           label="Specialized Types"
           value={String(stats.specializedTypes)}
           icon={BookOpen}
-          accentColor="rgba(239,159,39,0.10)"
-          iconColor="#EF9F27"
-          barColor="#EF9F27"
+          accentColor="rgb(var(--accent-attendance)/0.1)"
+          iconColor="rgb(var(--accent-attendance))"
+          barColor="rgb(var(--accent-attendance))"
           tag={{
             text: 'Honors · AP · Dual Enroll.',
-            color: '#EF9F27',
-            bg: 'rgba(239,159,39,0.1)',
+            color: 'rgb(var(--accent-attendance))',
+            bg: 'rgb(var(--accent-attendance)/0.1)',
           }}
           loading={isLoading}
         />
@@ -381,18 +361,18 @@ export function CurriculumModule() {
         <button
           type="button"
           onClick={() => setActiveTab('courses')}
-          className={`flex items-center gap-1.5 px-3.5 py-2 text-xs cursor-pointer bg-transparent border-b-2 -mb-px ${
+          className={`flex items-center gap-1.5 px-3.5 py-2.5 text-sm cursor-pointer bg-transparent border-b-2 -mb-px ${
             activeTab === 'courses'
-              ? 'font-medium text-[#7F77DD] border-[#7F77DD]'
-              : 'font-normal text-[rgb(var(--text-tertiary))] border-transparent'
+              ? 'font-semibold text-[rgb(var(--accent-reports))] border-[rgb(var(--accent-reports))]'
+              : 'font-medium text-[rgb(var(--text-tertiary))] border-transparent hover:text-[rgb(var(--text-secondary))]'
           }`}
         >
           <CoursesIcon active={activeTab === 'courses'} />
           Courses
           <span
-            className={`text-3xs font-semibold py-px px-1.5 rounded-lg ${
+            className={`text-2xs font-semibold py-0.5 px-1.5 rounded-md ${
               activeTab === 'courses'
-                ? 'bg-[rgb(var(--accent-reports)/0.12)] text-[#7F77DD]'
+                ? 'bg-[rgb(var(--accent-reports)/0.12)] text-[rgb(var(--accent-reports))]'
                 : 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]'
             }`}
           >
@@ -404,10 +384,10 @@ export function CurriculumModule() {
         <button
           type="button"
           onClick={() => setActiveTab('grade-levels')}
-          className={`flex items-center gap-1.5 px-3.5 py-2 text-xs cursor-pointer bg-transparent border-b-2 -mb-px ${
+          className={`flex items-center gap-1.5 px-3.5 py-2.5 text-sm cursor-pointer bg-transparent border-b-2 -mb-px ${
             activeTab === 'grade-levels'
-              ? 'font-medium text-[#7F77DD] border-[#7F77DD]'
-              : 'font-normal text-[rgb(var(--text-tertiary))] border-transparent'
+              ? 'font-semibold text-[rgb(var(--accent-reports))] border-[rgb(var(--accent-reports))]'
+              : 'font-medium text-[rgb(var(--text-tertiary))] border-transparent hover:text-[rgb(var(--text-secondary))]'
           }`}
         >
           <GradeLevelsIcon active={activeTab === 'grade-levels'} />
@@ -418,10 +398,10 @@ export function CurriculumModule() {
         <button
           type="button"
           onClick={() => setActiveTab('standards')}
-          className={`flex items-center gap-1.5 px-3.5 py-2 text-xs cursor-pointer bg-transparent border-b-2 -mb-px ${
+          className={`flex items-center gap-1.5 px-3.5 py-2.5 text-sm cursor-pointer bg-transparent border-b-2 -mb-px ${
             activeTab === 'standards'
-              ? 'font-medium text-[#7F77DD] border-[#7F77DD]'
-              : 'font-normal text-[rgb(var(--text-tertiary))] border-transparent'
+              ? 'font-semibold text-[rgb(var(--accent-reports))] border-[rgb(var(--accent-reports))]'
+              : 'font-medium text-[rgb(var(--text-tertiary))] border-transparent hover:text-[rgb(var(--text-secondary))]'
           }`}
         >
           <StandardsIcon active={activeTab === 'standards'} />
