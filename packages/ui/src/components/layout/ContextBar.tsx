@@ -12,6 +12,12 @@ export interface ContextBarProps extends HTMLAttributes<HTMLDivElement> {
   description?: ReactNode
   /** Right-aligned page actions (1–2 buttons; primary last). */
   actions?: ReactNode
+  /**
+   * Render the bottom hairline divider. Default true. Set false when the bar
+   * sits directly above another separated element (e.g. a tab bar) that already
+   * provides the visual break.
+   */
+  divider?: boolean
 }
 
 /**
@@ -22,11 +28,12 @@ export interface ContextBarProps extends HTMLAttributes<HTMLDivElement> {
  * year · date) and its actions instead of repeating its own name.
  */
 export const ContextBar = forwardRef<HTMLDivElement, ContextBarProps>(
-  ({ className, meta, description, actions, ...props }, ref) => (
+  ({ className, meta, description, actions, divider = true, ...props }, ref) => (
     <div
       ref={ref}
       className={cn(
-        'flex flex-col gap-3 border-b border-[rgb(var(--border-primary)/0.2)] pb-4 sm:flex-row sm:items-center sm:justify-between',
+        'flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between',
+        divider && 'border-b border-[rgb(var(--border-primary)/0.2)] pb-4',
         className,
       )}
       {...props}

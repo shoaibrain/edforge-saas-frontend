@@ -67,7 +67,7 @@ import { GradeOverview } from '../grades/overview'
 // --- Shared ---
 import { TabErrorBoundary } from '../../components/common/TabErrorBoundary'
 import { NoCurrentAcademicYearEmptyState } from '../../components/common'
-import { StatCard, WidgetErrorBoundaryV2, Button, Select } from '@edforge/ui'
+import { StatCard, WidgetErrorBoundaryV2, Button, Select, ContextBar } from '@edforge/ui'
 import { useAttendanceOverview } from '../../hooks/useAttendance'
 
 // ============================================================================
@@ -90,9 +90,15 @@ const VALID_TABS = new Set<string>(TABS.map((t) => t.id))
 // ============================================================================
 
 function getUtilizationAccent(utilization: number) {
-  if (utilization < 15) return '#E24B4A'
-  if (utilization <= 33) return '#EF9F27'
-  return '#1D9E75'
+  if (utilization < 15) return 'rgb(var(--accent-finance))'
+  if (utilization <= 33) return 'rgb(var(--accent-attendance))'
+  return 'rgb(var(--accent-enrollment))'
+}
+
+function getUtilizationAccentTint(utilization: number) {
+  if (utilization < 15) return 'rgb(var(--accent-finance)/0.1)'
+  if (utilization <= 33) return 'rgb(var(--accent-attendance)/0.1)'
+  return 'rgb(var(--accent-enrollment)/0.1)'
 }
 
 // ============================================================================
@@ -170,42 +176,42 @@ function OverviewTab() {
       <WidgetErrorBoundaryV2 fallbackMessage="Failed to load statistics">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <StatCard
-            label="TOTAL SECTIONS"
+            label="Total Sections"
             value={String(total ?? stats.totalSections)}
             icon={LayoutGrid}
-            accentColor="rgba(55, 138, 221, 0.10)"
-            iconColor="#378ADD"
-            barColor="#378ADD"
+            accentColor="rgb(var(--accent-academics)/0.1)"
+            iconColor="rgb(var(--accent-academics))"
+            barColor="rgb(var(--accent-academics))"
             hint="active classrooms"
             loading={isLoading}
           />
           <StatCard
-            label="TOTAL STUDENTS"
+            label="Total Students"
             value={String(stats.totalEnrolled)}
             icon={Users}
-            accentColor="rgba(29, 158, 117, 0.10)"
-            iconColor="#1D9E75"
-            barColor="#1D9E75"
+            accentColor="rgb(var(--accent-enrollment)/0.1)"
+            iconColor="rgb(var(--accent-enrollment))"
+            barColor="rgb(var(--accent-enrollment))"
             hint="across all sections"
             loading={isLoading}
           />
           <StatCard
-            label="AVG UTILIZATION"
+            label="Avg Utilization"
             value={stats.utilization + '%'}
             icon={Gauge}
-            accentColor={`rgba(${stats.utilization < 15 ? '226,75,74' : stats.utilization <= 33 ? '239,159,39' : '29,158,117'}, 0.10)`}
+            accentColor={getUtilizationAccentTint(stats.utilization)}
             iconColor={getUtilizationAccent(stats.utilization)}
             barColor={getUtilizationAccent(stats.utilization)}
             hint="of seat capacity"
             loading={isLoading}
           />
           <StatCard
-            label="ACTIVE TEACHERS"
+            label="Active Teachers"
             value={String(stats.uniqueTeachers)}
             icon={UsersRound}
-            accentColor="rgba(127, 119, 221, 0.10)"
-            iconColor="#7F77DD"
-            barColor="#7F77DD"
+            accentColor="rgb(var(--accent-reports)/0.1)"
+            iconColor="rgb(var(--accent-reports))"
+            barColor="rgb(var(--accent-reports))"
             hint="assigned sections"
             loading={isLoading}
           />
@@ -221,7 +227,7 @@ function OverviewTab() {
           <button
             type="button"
             onClick={() => setViewMode('grid')}
-            className={`p-1.5 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-[rgb(var(--accent-academics)/0.12)] text-[#378ADD]' : 'bg-transparent text-[rgb(var(--text-tertiary))]'}`}
+            className={`p-1.5 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-[rgb(var(--accent-academics)/0.12)] text-[rgb(var(--accent-academics))]' : 'bg-transparent text-[rgb(var(--text-tertiary))]'}`}
             aria-label="Grid view"
           >
             <LayoutGrid className="w-4 h-4" />
@@ -229,7 +235,7 @@ function OverviewTab() {
           <button
             type="button"
             onClick={() => setViewMode('list')}
-            className={`p-1.5 rounded-md transition-colors ${viewMode === 'list' ? 'bg-[rgb(var(--accent-academics)/0.12)] text-[#378ADD]' : 'bg-transparent text-[rgb(var(--text-tertiary))]'}`}
+            className={`p-1.5 rounded-md transition-colors ${viewMode === 'list' ? 'bg-[rgb(var(--accent-academics)/0.12)] text-[rgb(var(--accent-academics))]' : 'bg-transparent text-[rgb(var(--text-tertiary))]'}`}
             aria-label="List view"
           >
             <List className="w-4 h-4" />
@@ -681,33 +687,30 @@ export function ClassroomsModule() {
       {/* Page Header */}
       <div className="border-b border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-secondary))]">
         <div className="px-6 py-4">
-          <div className="flex items-center justify-between" style={{ height: 44 }}>
-            <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-[7px] flex items-center justify-center bg-[rgb(var(--accent-academics)/0.1)]">
-                <LayoutGrid className="w-4 h-4 text-[rgb(var(--accent-academics))]" />
-              </div>
-              <h1 className="text-sm font-semibold text-[rgb(var(--text-primary))]">
-                Classrooms
-              </h1>
-              <span className="text-xs text-[rgb(var(--text-disabled))]">|</span>
-              <span className="text-xs text-[rgb(var(--text-disabled))]">
-                {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+          <ContextBar
+            divider={false}
+            meta={
+              <span>
+                {new Date().toLocaleDateString('en-US', {
+                  weekday: 'long',
+                  month: 'short',
+                  day: 'numeric',
+                })}
               </span>
-            </div>
-
-            {schedPerms.create && (
-              <div className="flex items-center gap-2">
+            }
+            actions={
+              schedPerms.create ? (
                 <button
                   onClick={() => navigate({ to: '/classrooms/create' })}
                   aria-label="New classroom"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
+                  className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-[9px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-enrollment)/0.4)] bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   New classroom
                 </button>
-              </div>
-            )}
-          </div>
+              ) : undefined
+            }
+          />
         </div>
 
         {/* Context Banner (CLS-003) */}
@@ -730,22 +733,19 @@ export function ClassroomsModule() {
                   aria-selected={isActive}
                   aria-controls={`panel-${tab.id}`}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`whitespace-nowrap flex items-center gap-1.5 px-4 py-2 text-xs cursor-pointer transition-colors bg-transparent border-b-2 -mb-px ${
+                  className={`whitespace-nowrap flex items-center gap-1.5 px-4 py-2.5 text-sm cursor-pointer transition-colors bg-transparent border-b-2 -mb-px ${
                     isActive
-                      ? 'font-medium text-[#378ADD] border-[#378ADD]'
-                      : 'font-normal text-[rgb(var(--text-tertiary))] border-transparent hover:text-[rgb(var(--text-secondary))]'
+                      ? 'font-semibold text-[rgb(var(--accent-academics))] border-[rgb(var(--accent-academics))]'
+                      : 'font-medium text-[rgb(var(--text-tertiary))] border-transparent hover:text-[rgb(var(--text-secondary))]'
                   }`}
                 >
-                  <tab.icon
-                    className="w-3 h-3"
-                    style={{ stroke: 'currentColor', opacity: isActive ? 1 : 0.7 }}
-                  />
+                  <tab.icon className={`w-4 h-4 ${isActive ? 'opacity-100' : 'opacity-70'}`} />
                   {tab.label}
                   {tab.id === 'overview' && sectionCount !== undefined && (
                     <span
-                      className={`text-3xs font-semibold py-px px-1.5 rounded-lg ${
+                      className={`text-2xs font-semibold py-0.5 px-1.5 rounded-md ${
                         isActive
-                          ? 'bg-[rgb(var(--accent-academics)/0.12)] text-[#378ADD]'
+                          ? 'bg-[rgb(var(--accent-academics)/0.12)] text-[rgb(var(--accent-academics))]'
                           : 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]'
                       }`}
                     >

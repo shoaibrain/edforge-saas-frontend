@@ -69,11 +69,11 @@ export const defaultSectionFormData: Partial<SectionFormData> = {
  * Get capacity color class based on enrollment ratio
  */
 export function getCapacityColor(current: number, max: number): string {
-  if (max === 0) return 'bg-[rgb(var(--border-primary))]'
+  if (max === 0) return 'bg-[rgb(var(--border-primary)/0.4)]'
   const ratio = current / max
-  if (ratio >= 0.9) return 'bg-[rgb(var(--state-danger-bg)/0.18)]0'
-  if (ratio >= 0.75) return 'bg-amber-500'
-  return 'bg-[rgb(var(--state-success-bg)/0.18)]0'
+  if (ratio >= 0.9) return 'bg-[rgb(var(--accent-finance))]'
+  if (ratio >= 0.75) return 'bg-[rgb(var(--accent-attendance))]'
+  return 'bg-[rgb(var(--accent-enrollment))]'
 }
 
 /**
