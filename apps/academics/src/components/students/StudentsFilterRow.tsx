@@ -97,7 +97,7 @@ export function StudentsFilterRow({ schoolId }: StudentsFilterRowProps) {
             onClick={() => setFilterMode(chip.key)}
             className={`px-2.5 py-1 text-xs font-medium rounded-full border transition-all focus:outline-none ${
               isActive
-                ? 'bg-[#1D9E75] text-[rgb(var(--action-primary-fg))] border-[#1D9E75]'
+                ? 'bg-[rgb(var(--accent-enrollment))] text-[rgb(var(--action-primary-fg))] border-[rgb(var(--accent-enrollment))]'
                 : 'bg-transparent text-[rgb(var(--text-tertiary))] border-[rgb(var(--border-primary))] hover:text-[rgb(var(--text-secondary))]'
             }`}
           >
@@ -157,7 +157,7 @@ export function StudentsFilterRow({ schoolId }: StudentsFilterRowProps) {
       {isActiveFilters && (
         <button
           onClick={handleClearFilters}
-          className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full text-[#1D9E75] hover:opacity-80 transition-opacity"
+          className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full text-[rgb(var(--accent-enrollment))] hover:opacity-80 transition-opacity"
         >
           <X className="w-3 h-3" />
           Clear
