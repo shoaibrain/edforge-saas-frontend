@@ -322,7 +322,7 @@ function OverviewTab({ course }: { course: CourseResponseDto }) {
           <ul className="space-y-1.5">
             {course.objectives.map((obj, i) => (
               <li key={i} className="flex items-start gap-2 text-sm text-text-secondary">
-                <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[rgb(var(--state-info-bg)/0.18)]0 flex-shrink-0" />
+                <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[rgb(var(--state-info-fg))] flex-shrink-0" />
                 {obj}
               </li>
             ))}
@@ -512,7 +512,7 @@ function SectionsTab({
                 <div className="flex items-center gap-1.5">
                   <div
                     className={`w-2 h-2 rounded-full ${
-                      section.isActive ? 'bg-[rgb(var(--state-success-bg)/0.18)]0' : 'bg-[rgb(var(--text-tertiary))]'
+                      section.isActive ? 'bg-[rgb(var(--state-success-fg))]' : 'bg-[rgb(var(--text-tertiary))]'
                     }`}
                   />
                   <span className="text-xs text-text-secondary">
@@ -690,12 +690,12 @@ export function CourseDetailPage() {
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${
                   course.isActive
                     ? 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] dark:bg-[rgb(var(--state-success-bg)/0.18)] '
-                    : 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))] dark:bg-[rgb(var(--background-tertiary))]0/10 '
+                    : 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))] dark:bg-[rgb(var(--background-tertiary)/0.1)] '
                 }`}
               >
                 <div
                   className={`w-1.5 h-1.5 rounded-full ${
-                    course.isActive ? 'bg-[rgb(var(--state-success-bg)/0.18)]0' : 'bg-[rgb(var(--text-tertiary))]'
+                    course.isActive ? 'bg-[rgb(var(--state-success-fg))]' : 'bg-[rgb(var(--text-tertiary))]'
                   }`}
                 />
                 {course.isActive ? 'Active' : 'Inactive'}
@@ -731,7 +731,7 @@ export function CourseDetailPage() {
                   {isActive && (
                     <motion.div
                       layoutId="courseDetailTab"
-                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-[rgb(var(--state-info-bg)/0.18)]0 rounded-t-full"
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-[rgb(var(--state-info-fg))] rounded-t-full"
                       initial={false}
                       transition={{
                         type: 'spring',

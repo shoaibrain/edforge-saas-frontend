@@ -43,9 +43,9 @@ const statusConfig: Record<
   },
   active: {
     label: 'Active',
-    bg: 'bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-bg)/0.18)]0/20',
+    bg: 'bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-fg)/0.2)]',
     text: 'text-[rgb(var(--state-success-fg))] ',
-    dot: 'bg-[rgb(var(--state-success-bg)/0.18)]0',
+    dot: 'bg-[rgb(var(--state-success-fg))]',
   },
   completed: {
     label: 'Completed',
@@ -55,9 +55,9 @@ const statusConfig: Record<
   },
   archived: {
     label: 'Archived',
-    bg: 'bg-[rgb(var(--background-tertiary))] dark:bg-[rgb(var(--background-tertiary))]0/20',
+    bg: 'bg-[rgb(var(--background-tertiary))] dark:bg-[rgb(var(--background-tertiary)/0.2)]',
     text: 'text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]',
-    dot: 'bg-[rgb(var(--background-tertiary))]0',
+    dot: 'bg-[rgb(var(--background-tertiary))]',
   },
 }
 
@@ -160,7 +160,7 @@ function AcademicYearCard({
         <div className="flex items-center gap-2 ml-3 flex-shrink-0">
           <AcademicYearStatusBadge status={year.status} />
           {year.isCurrent && (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-bg)/0.18)]0/20 text-[rgb(var(--state-success-fg))] ">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-fg)/0.2)] text-[rgb(var(--state-success-fg))] ">
               <CheckCircle2 className="w-3 h-3" />
               Current
             </span>
@@ -270,7 +270,7 @@ function ErrorState({ onRetry }: { onRetry: () => void }) {
   return (
     <div className="min-h-96 flex items-center justify-center">
       <div className="text-center max-w-md">
-        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/20 flex items-center justify-center">
+        <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-fg)/0.2)] flex items-center justify-center">
           <AlertCircle className="w-8 h-8 text-[rgb(var(--state-danger-fg))]" />
         </div>
         <h3 className="text-lg font-semibold text-text-primary mb-2">

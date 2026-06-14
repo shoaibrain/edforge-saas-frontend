@@ -97,27 +97,27 @@ function getGradeColor(numericGrade: number): string {
 }
 
 function getGradeBg(numericGrade: number): string {
-  if (numericGrade >= 90) return 'bg-[rgb(var(--state-success-bg)/0.18)]0'
+  if (numericGrade >= 90) return 'bg-[rgb(var(--state-success-fg))]'
   if (numericGrade >= 80) return 'bg-[rgb(var(--state-info-fg))]'
   if (numericGrade >= 70) return 'bg-[rgb(var(--state-warning-fg))]'
   if (numericGrade >= 60) return 'bg-[rgb(var(--state-warning-fg))]'
-  return 'bg-[rgb(var(--state-danger-bg)/0.18)]0'
+  return 'bg-[rgb(var(--state-danger-fg))]'
 }
 
 function getLetterBadgeClasses(letter: string): string {
   switch (letter) {
-    case 'A': return 'bg-[rgb(var(--state-success-bg)/0.18)]0/15 text-[rgb(var(--state-success-fg))]'
+    case 'A': return 'bg-[rgb(var(--state-success-fg)/0.15)] text-[rgb(var(--state-success-fg))]'
     case 'B': return 'bg-[rgb(var(--state-info-fg))]/15 text-[rgb(var(--state-info-fg))]'
     case 'C': return 'bg-[rgb(var(--state-warning-fg))]/15 text-[rgb(var(--state-warning-fg))]'
     case 'D': return 'bg-[rgb(var(--state-warning-fg))]/15 text-[rgb(var(--state-warning-fg))]'
-    default: return 'bg-[rgb(var(--state-danger-bg)/0.18)]0/15 text-[rgb(var(--state-danger-fg))]'
+    default: return 'bg-[rgb(var(--state-danger-fg)/0.15)] text-[rgb(var(--state-danger-fg))]'
   }
 }
 
 function getAttendanceDotColor(status: string): string {
   switch (status) {
-    case 'present': return 'bg-[rgb(var(--state-success-bg)/0.18)]0'
-    case 'absent': return 'bg-[rgb(var(--state-danger-bg)/0.18)]0'
+    case 'present': return 'bg-[rgb(var(--state-success-fg))]'
+    case 'absent': return 'bg-[rgb(var(--state-danger-fg))]'
     case 'late': case 'tardy': return 'bg-[rgb(var(--state-warning-fg))]'
     case 'excused': return 'bg-[rgb(var(--state-info-fg))]'
     case 'remote': return 'bg-[rgb(var(--state-info-fg))]'
@@ -126,7 +126,7 @@ function getAttendanceDotColor(status: string): string {
 }
 
 function getSubjectColor(subject?: string): { bg: string; text: string } {
-  if (!subject) return { bg: 'bg-[rgb(var(--background-tertiary))]0/10', text: 'text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]' }
+  if (!subject) return { bg: 'bg-[rgb(var(--background-tertiary)/0.1)]', text: 'text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]' }
   const s = subject.toLowerCase()
   if (s.includes('math') || s.includes('algebra') || s.includes('calculus'))
     return { bg: 'bg-[rgb(var(--state-info-bg)/0.18)]', text: 'text-[rgb(var(--state-info-fg))]' }
@@ -142,7 +142,7 @@ function getSubjectColor(subject?: string): { bg: string; text: string } {
     return { bg: 'bg-[rgb(var(--state-warning-fg))]/10', text: 'text-[rgb(var(--state-warning-fg))]' }
   if (s.includes('computer') || s.includes('tech') || s.includes('programming'))
     return { bg: 'bg-[rgb(var(--state-info-fg))]/10', text: 'text-[rgb(var(--state-info-fg))] ' }
-  return { bg: 'bg-[rgb(var(--background-tertiary))]0/10', text: 'text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]' }
+  return { bg: 'bg-[rgb(var(--background-tertiary)/0.1)]', text: 'text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]' }
 }
 
 // ============================================================================
@@ -424,7 +424,7 @@ function CourseGradeCard({
               {letterGrade}
             </span>
             {grade.isFinal && (
-              <span className="px-1.5 py-0.5 rounded text-xs font-medium bg-[rgb(var(--state-info-bg)/0.18)]0/15 text-[rgb(var(--action-secondary-fg))]">
+              <span className="px-1.5 py-0.5 rounded text-xs font-medium bg-[rgb(var(--state-info-fg)/0.15)] text-[rgb(var(--action-secondary-fg))]">
                 Final
               </span>
             )}
@@ -775,7 +775,7 @@ export function OverviewTab({ student }: OverviewTabProps) {
           <Link
             to="/classrooms"
             search={{ tab: 'attendance' }}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--text-primary))] bg-[rgb(var(--state-info-bg)/0.18)] hover:bg-[rgb(var(--state-info-bg)/0.26)] dark:bg-[rgb(var(--state-info-bg)/0.18)] dark:hover:bg-[rgb(var(--state-info-bg)/0.18)]0/20  rounded-lg transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--text-primary))] bg-[rgb(var(--state-info-bg)/0.18)] hover:bg-[rgb(var(--state-info-bg)/0.26)] dark:bg-[rgb(var(--state-info-bg)/0.18)] dark:hover:bg-[rgb(var(--state-info-fg)/0.2)]  rounded-lg transition-colors"
           >
             <Calendar className="w-3.5 h-3.5" />
             {tAcad('sections.history')}

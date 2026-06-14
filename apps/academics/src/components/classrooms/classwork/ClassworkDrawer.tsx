@@ -461,7 +461,7 @@ export function ClassworkDrawer({
                             }
                           `}
                         >
-                          <div className={`w-1.5 h-1.5 rounded-full ${form.status === s ? (s === 'published' ? 'bg-[rgb(var(--state-success-bg)/0.18)]0' : 'bg-[rgb(var(--state-warning-fg))]') : 'bg-text-tertiary'}`} />
+                          <div className={`w-1.5 h-1.5 rounded-full ${form.status === s ? (s === 'published' ? 'bg-[rgb(var(--state-success-fg))]' : 'bg-[rgb(var(--state-warning-fg))]') : 'bg-text-tertiary'}`} />
                           {s === 'draft' ? 'Draft' : 'Published'}
                         </button>
                       ))}

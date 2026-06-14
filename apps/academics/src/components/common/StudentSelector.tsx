@@ -174,7 +174,7 @@ export function StudentSelector({
                     <div
                       className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
                         isSelected
-                          ? 'bg-[rgb(var(--state-info-bg)/0.18)]0 border-[rgb(var(--border-focus))]'
+                          ? 'bg-[rgb(var(--state-info-fg)/0.1)] border-[rgb(var(--border-focus))]'
                           : 'border-border-primary'
                       }`}
                     >

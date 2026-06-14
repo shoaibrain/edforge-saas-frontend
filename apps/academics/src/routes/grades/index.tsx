@@ -224,7 +224,7 @@ export function GradesModule() {
                 {activeTab === tab.id && (
                   <motion.div
                     layoutId="grades-tab-indicator"
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-[rgb(var(--state-info-bg)/0.18)]0 rounded-t-full"
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-[rgb(var(--state-info-fg))] rounded-t-full"
                     transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                   />
                 )}
@@ -300,7 +300,7 @@ export function GradesModule() {
                           type="button"
                           onClick={() => setShowBulkModal(true)}
                           disabled={!effectiveTermId || !currentYear?.yearId}
-                          className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-bg)/0.18)]0 hover:bg-[rgb(var(--action-primary-bg-hover))] rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                          className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg-hover))] rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                         >
                           <Plus className="w-3.5 h-3.5" />
                           Record

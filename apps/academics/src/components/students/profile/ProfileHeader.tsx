@@ -33,10 +33,10 @@ const statusStyles: Record<string, { bg: string; text: string; dot: string }> = 
   active: {
     bg: 'bg-[rgb(var(--state-success-bg)/0.18)]',
     text: 'text-[rgb(var(--state-success-fg))]',
-    dot: 'bg-[rgb(var(--state-success-bg)/0.18)]0',
+    dot: 'bg-[rgb(var(--state-success-fg))]',
   },
   inactive: {
-    bg: 'bg-[rgb(var(--background-tertiary))]0/10',
+    bg: 'bg-[rgb(var(--background-tertiary)/0.1)]',
     text: 'text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]',
     dot: 'bg-[rgb(var(--text-tertiary))]',
   },
@@ -53,7 +53,7 @@ const statusStyles: Record<string, { bg: string; text: string; dot: string }> = 
   withdrawn: {
     bg: 'bg-[rgb(var(--state-danger-bg)/0.18)]',
     text: 'text-[rgb(var(--state-danger-fg))]',
-    dot: 'bg-[rgb(var(--state-danger-bg)/0.18)]0',
+    dot: 'bg-[rgb(var(--state-danger-fg))]',
   },
   suspended: {
     bg: 'bg-[rgb(var(--state-warning-fg))]/10',

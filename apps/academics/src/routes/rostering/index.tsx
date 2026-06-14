@@ -190,13 +190,13 @@ function MatrixCell({
         className={`
           w-7 h-7 rounded border-2 flex items-center justify-center mx-auto transition-all
           ${hasConflict
-            ? 'border-[rgb(var(--state-danger-border))] bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)] hover:bg-[rgb(var(--state-danger-bg)/0.26)] dark:hover:bg-[rgb(var(--state-danger-bg)/0.18)]0/20'
+            ? 'border-[rgb(var(--state-danger-border))] bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)] hover:bg-[rgb(var(--state-danger-bg)/0.26)] dark:hover:bg-[rgb(var(--state-danger-fg)/0.2)]'
             : checked
               ? isPending && pendingAction === 'add'
                 ? 'border-[rgb(var(--state-success-border))] bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-bg)/0.18)] hover:bg-[rgb(var(--state-success-bg)/0.26)]'
-                : 'border-[rgb(var(--border-focus))] bg-[rgb(var(--state-info-bg)/0.18)]0 hover:bg-[rgb(var(--action-primary-bg-hover))] hover:border-[rgb(var(--state-info-border))]'
+                : 'border-[rgb(var(--border-focus))] bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg-hover))] hover:border-[rgb(var(--state-info-border))]'
               : isPending && pendingAction === 'remove'
-                ? 'border-[rgb(var(--state-danger-border))] bg-[rgb(var(--state-danger-bg)/0.18)]/50 dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/5 hover:bg-[rgb(var(--state-danger-bg)/0.26)]'
+                ? 'border-[rgb(var(--state-danger-border))] bg-[rgb(var(--state-danger-bg)/0.18)]/50 dark:bg-[rgb(var(--state-danger-fg)/0.05)] hover:bg-[rgb(var(--state-danger-bg)/0.26)]'
                 : 'border-border-secondary hover:border-[rgb(var(--border-focus))] hover:bg-surface-hover'
           }
         `}
@@ -226,7 +226,7 @@ function MatrixCell({
       {/* Pending change indicator dot */}
       {isPending && (
         <div className={`absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full ${
-          pendingAction === 'add' ? 'bg-[rgb(var(--state-success-bg)/0.18)]0' : 'bg-[rgb(var(--state-danger-bg)/0.18)]0'
+          pendingAction === 'add' ? 'bg-[rgb(var(--state-success-fg))]' : 'bg-[rgb(var(--state-danger-fg))]'
         }`} />
       )}
     </td>
@@ -328,7 +328,7 @@ function SummaryBar({
       {isSubmitting && total > 0 && (
         <div className="h-1 bg-surface-secondary">
           <div
-            className="h-full bg-[rgb(var(--state-info-bg)/0.18)]0 transition-all duration-300 ease-out"
+            className="h-full bg-[rgb(var(--state-info-fg))] transition-all duration-300 ease-out"
             style={{ width: `${Math.round((progress / total) * 100)}%` }}
           />
         </div>

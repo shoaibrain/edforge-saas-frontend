@@ -42,7 +42,7 @@ const statusStyles: Record<string, { bg: string; text: string }> = {
   withdrawn: { bg: 'bg-[rgb(var(--state-danger-bg)/0.18)]', text: 'text-[rgb(var(--state-danger-fg))]' },
   transferred: { bg: 'bg-[rgb(var(--state-warning-fg))]/10', text: 'text-[rgb(var(--state-warning-fg))]' },
   graduated: { bg: 'bg-[rgb(var(--state-info-bg)/0.18)]', text: 'text-[rgb(var(--state-info-fg))]' },
-  completed: { bg: 'bg-[rgb(var(--background-tertiary))]0/10', text: 'text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]' },
+  completed: { bg: 'bg-[rgb(var(--background-tertiary)/0.1)]', text: 'text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]' },
 }
 
 function getStatusStyle(status: string) {
@@ -63,7 +63,7 @@ function CurrentEnrollmentSection({ enrollment }: { enrollment: CurrentEnrollmen
         <CheckCircle2 className="w-4 h-4 text-[rgb(var(--state-success-fg))]" />
         {t('sections.currentEnrollment')}
       </h3>
-      <div className="p-5 rounded-xl bg-[rgb(var(--state-success-bg)/0.18)]0/5 border border-[rgb(var(--state-success-border))]/15">
+      <div className="p-5 rounded-xl bg-[rgb(var(--state-success-fg)/0.05)] border border-[rgb(var(--state-success-border))]/15">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           <div>
             <p className="text-xs font-medium text-text-tertiary uppercase tracking-wide mb-1">{t('fields.gradeLevel')}</p>
@@ -211,7 +211,7 @@ export function EnrollmentTab({ student, onEnroll, onAddToSection }: EnrollmentT
           <CurrentEnrollmentSection enrollment={currentEnrollment} />
           {/* Success-state CTA: next step is adding to sections */}
           {onAddToSection && (
-            <div className="mb-6 p-4 rounded-lg bg-[rgb(var(--state-info-bg)/0.18)]0/5 border border-[rgb(var(--border-focus))]/15 flex items-center justify-between">
+            <div className="mb-6 p-4 rounded-lg bg-[rgb(var(--state-info-fg)/0.05)] border border-[rgb(var(--border-focus))]/15 flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-[rgb(var(--action-secondary-fg))]">
                   {t('enrollment.studentIsEnrolled')}

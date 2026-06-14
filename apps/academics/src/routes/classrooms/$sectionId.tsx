@@ -247,7 +247,7 @@ function SectionGradesTab({ sectionId, section }: { sectionId: string; section: 
             type="button"
             onClick={() => setShowBulkModal(true)}
             disabled={!effectiveTermId}
-            className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-bg)/0.18)]0 hover:bg-[rgb(var(--action-primary-bg-hover))] rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg-hover))] rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <Plus className="w-3.5 h-3.5" />
             Record
@@ -379,11 +379,11 @@ function ProgressOverview({
   }, [roster, todayRecords])
 
   const distColors: Record<string, string> = {
-    A: 'bg-[rgb(var(--state-success-bg)/0.18)]0',
+    A: 'bg-[rgb(var(--state-success-fg))]',
     B: 'bg-[rgb(var(--state-info-fg))]',
     C: 'bg-[rgb(var(--state-warning-fg))]',
     D: 'bg-[rgb(var(--state-warning-fg))]',
-    F: 'bg-[rgb(var(--state-danger-bg)/0.18)]0',
+    F: 'bg-[rgb(var(--state-danger-fg))]',
   }
 
   return (
@@ -469,7 +469,7 @@ function ProgressOverview({
 
             <div className="flex gap-0.5 h-2.5 rounded-full overflow-hidden bg-surface-secondary">
               {attendanceStats.present > 0 && (
-                <div className="bg-[rgb(var(--state-success-bg)/0.18)]0 transition-all" style={{ width: `${(attendanceStats.present / attendanceStats.total) * 100}%` }} title={`Present: ${attendanceStats.present}`} />
+                <div className="bg-[rgb(var(--state-success-fg))] transition-all" style={{ width: `${(attendanceStats.present / attendanceStats.total) * 100}%` }} title={`Present: ${attendanceStats.present}`} />
               )}
               {attendanceStats.late > 0 && (
                 <div className="bg-[rgb(var(--state-warning-fg))] transition-all" style={{ width: `${(attendanceStats.late / attendanceStats.total) * 100}%` }} title={`Late: ${attendanceStats.late}`} />
@@ -478,16 +478,16 @@ function ProgressOverview({
                 <div className="bg-[rgb(var(--state-info-fg))] transition-all" style={{ width: `${(attendanceStats.remote / attendanceStats.total) * 100}%` }} title={`Remote: ${attendanceStats.remote}`} />
               )}
               {attendanceStats.absent > 0 && (
-                <div className="bg-[rgb(var(--state-danger-bg)/0.18)]0 transition-all" style={{ width: `${(attendanceStats.absent / attendanceStats.total) * 100}%` }} title={`Absent: ${attendanceStats.absent}`} />
+                <div className="bg-[rgb(var(--state-danger-fg))] transition-all" style={{ width: `${(attendanceStats.absent / attendanceStats.total) * 100}%` }} title={`Absent: ${attendanceStats.absent}`} />
               )}
             </div>
 
             <div className="flex flex-wrap gap-4 text-xs">
               {[
-                { label: 'Present', value: attendanceStats.present, dot: 'bg-[rgb(var(--state-success-bg)/0.18)]0' },
+                { label: 'Present', value: attendanceStats.present, dot: 'bg-[rgb(var(--state-success-fg))]' },
                 { label: 'Late', value: attendanceStats.late, dot: 'bg-[rgb(var(--state-warning-fg))]' },
                 { label: 'Remote', value: attendanceStats.remote, dot: 'bg-[rgb(var(--state-info-fg))]' },
-                { label: 'Absent', value: attendanceStats.absent, dot: 'bg-[rgb(var(--state-danger-bg)/0.18)]0' },
+                { label: 'Absent', value: attendanceStats.absent, dot: 'bg-[rgb(var(--state-danger-fg))]' },
               ].filter(s => s.value > 0).map((s) => (
                 <div key={s.label} className="flex items-center gap-1.5">
                   <span className={`w-2 h-2 rounded-full ${s.dot}`} />
@@ -775,7 +775,7 @@ export function ClassroomDetailPage() {
                   {isActive && (
                     <motion.div
                       layoutId="classroomDetailTab"
-                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-[rgb(var(--state-info-bg)/0.18)]0 rounded-t-full"
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-[rgb(var(--state-info-fg))] rounded-t-full"
                       initial={false}
                       transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                     />

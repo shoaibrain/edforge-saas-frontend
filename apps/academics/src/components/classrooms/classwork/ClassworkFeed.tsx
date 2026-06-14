@@ -105,7 +105,7 @@ export function ClassworkFeed({ sectionId }: ClassworkFeedProps) {
             type="button"
             onClick={() => refetch()}
             aria-label="Retry loading classwork"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[rgb(var(--state-danger-fg))]  bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/20 rounded-lg hover:bg-[rgb(var(--state-danger-bg)/0.28)] dark:hover:bg-[rgb(var(--state-danger-bg)/0.18)]0/30 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[rgb(var(--state-danger-fg))]  bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-fg)/0.2)] rounded-lg hover:bg-[rgb(var(--state-danger-bg)/0.28)] dark:hover:bg-[rgb(var(--state-danger-fg)/0.3)] transition-colors"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             Retry
