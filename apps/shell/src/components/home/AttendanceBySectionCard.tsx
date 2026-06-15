@@ -144,7 +144,7 @@ export function AttendanceBySectionCard({
         <div className="flex items-center gap-3 mb-3 text-xs text-[rgb(var(--text-tertiary))]">
           <span>{sections.length} section{sections.length !== 1 ? 's' : ''} total</span>
           <span className="text-[rgb(var(--border-primary)/0.35)]">·</span>
-          <span className={takenCount === sections.length ? 'text-[rgb(var(--accent-enrollment))]' : ''}>
+          <span className={takenCount === sections.length ? 'text-[rgb(var(--accent-enrollment-text))]' : ''}>
             {recordedCount}/{sections.length} recorded
           </span>
           {todayRate != null && (
@@ -279,7 +279,7 @@ export function AttendanceBySectionCard({
                       }}
                     >
                       {section.recordedCount != null && section.studentCount != null ? (
-                        <span className={`text-xs ${section.recordedCount === section.studentCount ? 'text-[rgb(var(--accent-enrollment))]' : 'text-[rgb(var(--text-tertiary))]'}`}>
+                        <span className={`text-xs ${section.recordedCount === section.studentCount ? 'text-[rgb(var(--accent-enrollment-text))]' : 'text-[rgb(var(--text-tertiary))]'}`}>
                           {section.recordedCount}/{section.studentCount}
                         </span>
                       ) : (
@@ -313,7 +313,7 @@ export function AttendanceBySectionCard({
                     >
                       {section.status === 'taken' ? (
                         <span
-                          className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-md bg-[rgb(var(--accent-enrollment)/0.12)] text-[rgb(var(--accent-enrollment))]"
+                          className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-md bg-[rgb(var(--accent-enrollment)/0.12)] text-[rgb(var(--accent-enrollment-text))]"
                           aria-label="Attendance taken"
                         >
                           <Check className="w-2 h-2" />
@@ -321,7 +321,7 @@ export function AttendanceBySectionCard({
                         </span>
                       ) : section.status === 'partial' ? (
                         <span
-                          className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-md bg-[rgb(var(--accent-academics)/0.12)] text-[rgb(var(--accent-academics))]"
+                          className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-md bg-[rgb(var(--accent-academics)/0.12)] text-[rgb(var(--accent-academics-text))]"
                           aria-label="Attendance partially taken"
                         >
                           <Clock className="w-2 h-2" />

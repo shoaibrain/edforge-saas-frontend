@@ -1,52 +1,39 @@
 /**
- * FinancePageHeader — V2 page header with icon square, title, and subtitle.
+ * FinancePageHeader — finance page header built on the shared ContextBar.
  *
- * Matches the V2 design pattern from the Finance Overview page header.
+ * The page title is rendered only as a visually-hidden <h1> (for assistive tech /
+ * heading navigation); visually the title is dropped because the shell breadcrumb
+ * carries it (e.g. "Home › Finance › Invoices"), matching the academics rollout
+ * pattern. `meta` shows the operating date, the subtitle becomes the ContextBar
+ * description, and per-page actions are preserved.
  */
 
-import type { LucideIcon } from 'lucide-react'
+import { ContextBar } from '@edforge/ui'
 
 export interface FinancePageHeaderProps {
-  icon: LucideIcon
   title: string
   subtitle: string
-  accentColor: string
-  iconColor: string
   actions?: React.ReactNode
 }
 
-export function FinancePageHeader({
-  icon: Icon,
-  title,
-  subtitle,
-  accentColor,
-  iconColor,
-  actions,
-}: FinancePageHeaderProps) {
+export function FinancePageHeader({ title, subtitle, actions }: FinancePageHeaderProps) {
   return (
-    <div className="flex items-center justify-between" style={{ minHeight: 44 }}>
-      <div className="space-y-1">
-        <div className="flex items-center gap-2.5">
-          <div
-            // allow-presentation-style: per-page accent tint passed as prop
-            className="w-7 h-7 rounded-[7px] flex items-center justify-center"
-            style={{ background: accentColor }}
-          >
-            <Icon
-              // allow-presentation-style: per-page icon color passed as prop
-              className="w-4 h-4"
-              style={{ color: iconColor }}
-            />
-          </div>
-          <h1 className="text-sm font-semibold text-[rgb(var(--text-primary))]">
-            {title}
-          </h1>
-        </div>
-        <p className="text-xs text-[rgb(var(--text-tertiary))]">
-          {subtitle}
-        </p>
-      </div>
-      {actions && <div className="flex items-center gap-2">{actions}</div>}
-    </div>
+    <>
+      <h1 className="sr-only">{title}</h1>
+      <ContextBar
+        meta={
+          <span>
+            {new Date().toLocaleDateString('en-US', {
+              weekday: 'long',
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric',
+            })}
+          </span>
+        }
+        description={<span>{subtitle}</span>}
+        actions={actions}
+      />
+    </>
   )
 }

@@ -24,7 +24,7 @@ import {
   type GradeLevel,
 } from '@aibrains/shared-types'
 import { Button, StatCard, WidgetErrorBoundaryV2 } from '@edforge/ui'
-import { Plus, AlertTriangle, DollarSign, Layers, Settings2, TrendingUp } from 'lucide-react'
+import { Plus, AlertTriangle, DollarSign, Layers, TrendingUp } from 'lucide-react'
 import { useAppStore } from '../../stores/app.store'
 import {
   useFeeStructures,
@@ -283,11 +283,8 @@ export default function FeeStructuresPage() {
     <div className="p-6 space-y-5">
       {/* Header */}
       <FinancePageHeader
-        icon={Settings2}
         title="Fee Structures"
         subtitle="Configure the fee types and amounts for your school."
-        accentColor="rgba(127, 119, 221, 0.12)"
-        iconColor="#7F77DD"
         actions={
           <button
             type="button"
@@ -447,13 +444,18 @@ function DeleteConfirmDialog({
       className="fixed inset-0 z-50 flex items-center justify-center bg-[rgb(var(--background-overlay)/0.50)]"
       onClick={handleBackdropClick}
     >
-      <div className="w-full max-w-sm mx-4 p-6 bg-[rgb(var(--background-primary))] rounded-2xl shadow-xl">
+      <div
+        className="w-full max-w-sm mx-4 p-6 bg-[rgb(var(--background-primary))] rounded-2xl shadow-xl"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="delete-fee-title"
+      >
         {/* Warning icon */}
         <div className="flex items-center justify-center w-12 h-12 mx-auto mb-4 rounded-full bg-[rgb(var(--state-danger-bg)/0.18)]">
           <AlertTriangle className="w-6 h-6 text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]" />
         </div>
 
-        <h3 className="text-lg font-semibold text-[rgb(var(--text-primary))] text-center">
+        <h3 id="delete-fee-title" className="text-lg font-semibold text-[rgb(var(--text-primary))] text-center">
           Delete Fee Structure
         </h3>
 

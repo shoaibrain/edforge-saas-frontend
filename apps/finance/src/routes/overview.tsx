@@ -16,7 +16,7 @@ import {
   CreditCard,
   Inbox,
 } from 'lucide-react'
-import { StatCard, WidgetErrorBoundaryV2 } from '@edforge/ui'
+import { StatCard, WidgetErrorBoundaryV2, ContextBar } from '@edforge/ui'
 import { useCurrency } from '@edforge/types/use-currency'
 import { useFinanceSettings } from '../layouts/FinanceLayout'
 
@@ -179,27 +179,35 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
 
   return (
     <div className="p-6 space-y-5" style={{ minHeight: '100vh' }}>
-      {/* Compact Header + Insight Strip */}
-      <div className="space-y-1">
-        <div className="flex items-center justify-between" style={{ height: 44 }}>
-          <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-[7px] flex items-center justify-center bg-[rgb(var(--accent-enrollment)/0.12)]">
-              <DollarSign className="w-4 h-4 text-[#1D9E75]" />
-            </div>
-            <h1 className="text-sm font-semibold text-[rgb(var(--text-primary))]">
-              Finance
-            </h1>
-            <span className="text-xs text-[rgb(var(--text-disabled))]">|</span>
-            <span className="text-xs text-[rgb(var(--text-disabled))]">
-              {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2">
+      {/* Context Bar (operating context, not a page title — the shell breadcrumb
+          carries "Finance") + Insight Strip */}
+      <h1 className="sr-only">Finance</h1>
+      <ContextBar
+        meta={
+          <span>
+            {new Date().toLocaleDateString('en-US', {
+              weekday: 'long',
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric',
+            })}
+          </span>
+        }
+        description={
+          <InsightStrip
+            totalInvoiced={kpi.totalInvoiced}
+            collectionRate={kpi.collectionRate}
+            overdueCount={overdueCount}
+            isLoading={isLoading}
+            formatShort={formatShort}
+          />
+        }
+        actions={
+          <>
             <button
               onClick={() => navigate({ to: '/invoices/bulk-generate' })}
               aria-label="Bulk invoice generation"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40 bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))]/40 bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
             >
               <FileStack className="w-3.5 h-3.5" />
               Bulk invoice
@@ -207,23 +215,14 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
             <button
               onClick={() => navigate({ to: '/payments/record' })}
               aria-label="Record a payment"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))]/40 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
             >
               <CreditCard className="w-3.5 h-3.5" />
               Record payment
             </button>
-          </div>
-        </div>
-
-        {/* E-01: Contextual insight strip */}
-        <InsightStrip
-          totalInvoiced={kpi.totalInvoiced}
-          collectionRate={kpi.collectionRate}
-          overdueCount={overdueCount}
-          isLoading={isLoading}
-          formatShort={formatShort}
-        />
-      </div>
+          </>
+        }
+      />
 
       {/* Filters & Export (with E-04 quick-select pills) */}
       <FilterRow

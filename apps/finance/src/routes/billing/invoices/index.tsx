@@ -391,11 +391,8 @@ export default function InvoicesPage() {
     <div className="p-6 space-y-5">
       {/* V2 Page Header */}
       <FinancePageHeader
-        icon={FileText}
         title="Invoices"
         subtitle="Generate, issue, and manage student invoices."
-        accentColor="rgba(239, 159, 39, 0.12)"
-        iconColor="#EF9F27"
         actions={
           <div className="flex items-center gap-2">
             <button
@@ -598,13 +595,16 @@ function CancelInvoiceDialog({
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
         className="bg-[rgb(var(--background-primary))] rounded-xl shadow-xl w-full max-w-sm p-6"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="cancel-invoice-title"
       >
         <div className="flex items-start gap-3 mb-4">
           <div className="p-2 rounded-full bg-[rgb(var(--state-danger-bg)/0.18)] ">
             <AlertTriangle className="w-5 h-5 text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]" />
           </div>
           <div>
-            <h3 className="text-base font-semibold text-[rgb(var(--text-primary))]">
+            <h3 id="cancel-invoice-title" className="text-base font-semibold text-[rgb(var(--text-primary))]">
               Cancel Invoice {invoiceNumber}?
             </h3>
             <p className="text-sm text-[rgb(var(--text-secondary))] mt-1">
@@ -665,6 +665,14 @@ function BulkIssueConfirmModal({
   onConfirm: () => void
   onCancel: () => void
 }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !isPending) onCancel()
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [isPending, onCancel])
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgb(var(--background-overlay)/0.40)]">
       <motion.div
@@ -672,13 +680,16 @@ function BulkIssueConfirmModal({
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
         className="bg-[rgb(var(--background-primary))] rounded-xl shadow-xl w-full max-w-sm p-6"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="bulk-issue-title"
       >
         <div className="flex items-start gap-3 mb-4">
           <div className="p-2 rounded-full bg-[rgb(var(--state-info-bg)/0.18)] ">
             <Send className="w-5 h-5 text-[rgb(var(--state-info-fg))] dark:text-[rgb(var(--state-info-fg))]" />
           </div>
           <div>
-            <h3 className="text-base font-semibold text-[rgb(var(--text-primary))]">
+            <h3 id="bulk-issue-title" className="text-base font-semibold text-[rgb(var(--text-primary))]">
               Issue {count} invoices?
             </h3>
             <p className="text-sm text-[rgb(var(--text-secondary))] mt-1">
@@ -720,6 +731,15 @@ function GenerateInvoiceModal({
   const finSettings = useFinanceSettings()
   const { format: formatCurr } = useCurrency(finSettings)
   const generateMutation = useGenerateInvoice(schoolId)
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !generateMutation.isPending) onClose()
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [onClose, generateMutation.isPending])
+
   const { data: feeStructureData } = useFeeStructures(schoolId)
   const { data: academicYearsData } = useAcademicYears(schoolId)
   const feeStructures = Array.isArray(feeStructureData) ? feeStructureData : []
@@ -788,8 +808,11 @@ function GenerateInvoiceModal({
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="bg-[rgb(var(--background-primary))] rounded-xl shadow-xl w-full max-w-lg max-h-[80vh] overflow-y-auto p-6"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="generate-invoice-title"
       >
-        <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))] mb-4">
+        <h2 id="generate-invoice-title" className="text-lg font-semibold text-[rgb(var(--text-primary))] mb-4">
           Generate Invoice
         </h2>
 

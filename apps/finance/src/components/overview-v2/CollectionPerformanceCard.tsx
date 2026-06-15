@@ -105,7 +105,7 @@ export function CollectionPerformanceCard({
           <div>
             <div className="flex items-center justify-between mb-1">
               <span className="text-xs text-[rgb(var(--text-tertiary))]">Collected</span>
-              <span className="text-xs font-medium text-[#1D9E75]">
+              <span className="text-xs font-medium text-[rgb(var(--accent-enrollment-text))]">
                 {formatShort(totalCollected)}
               </span>
             </div>
@@ -198,7 +198,7 @@ export function CollectionPerformanceCard({
               {hasOverflow && (
                 <button
                   onClick={() => setShowAll(!showAll)}
-                  className="inline-flex items-center gap-1 text-xs font-medium transition-colors hover:opacity-80 self-start text-[#1D9E75]"
+                  className="inline-flex items-center gap-1 text-xs font-medium transition-colors hover:opacity-80 self-start text-[rgb(var(--accent-enrollment-text))]"
                 >
                   {showAll ? (
                     <>

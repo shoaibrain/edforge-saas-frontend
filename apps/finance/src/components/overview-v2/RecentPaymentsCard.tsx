@@ -123,7 +123,7 @@ export function RecentPaymentsCard({ payments, isLoading }: RecentPaymentsCardPr
                 </div>
 
                 {/* Amount */}
-                <span className="text-xs font-semibold flex-shrink-0 text-[#1D9E75]">
+                <span className="text-xs font-semibold flex-shrink-0 text-[rgb(var(--accent-enrollment-text))]">
                   {format(payment.amount, { decimals: 0 })}
                 </span>
               </div>

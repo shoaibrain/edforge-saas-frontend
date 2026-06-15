@@ -23,7 +23,7 @@ import { useCallback } from 'react'
 import type { Receipt } from '@edforge/types'
 import { useCurrency } from '@edforge/types/use-currency'
 import { useTranslation } from '@edforge/i18n'
-import { DateDisplay } from '@edforge/ui'
+import { Button, DateDisplay } from '@edforge/ui'
 import { useDownloadReceiptPdf } from '@edforge/finance-services'
 // Sprint M1.5-FU.7.4 — removed `Printer` from imports; HTML `window.print()`
 // button retired in favour of the canonical Download → OS print dialog flow.
@@ -78,27 +78,25 @@ export function PaymentReceipt({ receipt, onBack }: PaymentReceiptProps) {
           </button>
         )}
         <div className="flex gap-2 ml-auto">
-          <button
-            type="button"
+          <Button
+            variant="outline"
+            size="sm"
             onClick={handleDownloadPdf}
             disabled={downloading || !activeSchoolId}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium
-              border border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))]
-              hover:bg-[rgb(var(--bg-tertiary))] transition-colors
-              disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-label={t('receipt.downloadPdf')}
           >
             {downloading ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin" />
             ) : (
               <Download className="w-3.5 h-3.5" />
             )}
-            {downloading ? t('receipt.generating') : t('receipt.download')}
-          </button>
+            {t('receipt.downloadPdf')}
+          </Button>
         </div>
       </div>
 
       {/* Receipt card */}
-      <div className="p-6 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--bg-primary))] print:border-2 print:border-[rgb(var(--text-primary))]">
+      <div className="p-6 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))] print:border-2 print:border-[rgb(var(--text-primary))]">
         {/* Success header */}
         <div className="text-center mb-6 pb-6 border-b border-[rgb(var(--border-primary))] border-dashed">
           <div className="inline-flex p-3 rounded-full bg-[rgb(var(--state-success-bg)/0.18)] mb-3 print:hidden">

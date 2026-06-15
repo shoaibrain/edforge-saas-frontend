@@ -48,7 +48,7 @@ export function FeeStructureList({
           return (
             <div className="flex flex-col gap-0.5">
               <div className="flex items-center gap-1.5">
-                <span className={`w-1.5 h-1.5 rounded-full shrink-0 inline-block ${fee.isActive !== false ? 'bg-[#1D9E75]' : 'bg-[rgb(var(--text-disabled))]'}`} />
+                <span className={`w-1.5 h-1.5 rounded-full shrink-0 inline-block ${fee.isActive !== false ? 'bg-[rgb(var(--accent-enrollment))]' : 'bg-[rgb(var(--text-disabled))]'}`} />
                 <span className="text-xs font-medium text-[rgb(var(--text-primary))]">
                   {fee.name}
                 </span>
@@ -56,7 +56,7 @@ export function FeeStructureList({
               <span className="text-3xs text-[rgb(var(--text-tertiary))]">
                 {fee.description}
                 {fee.autoApplyOnEnrollment && (
-                  <> · <span className="text-[#1D9E75]">Auto-apply on enrollment</span></>
+                  <> · <span className="text-[rgb(var(--accent-enrollment-text))]">Auto-apply on enrollment</span></>
                 )}
               </span>
             </div>
@@ -106,14 +106,14 @@ export function FeeStructureList({
           if (gradeLevels.length === 0) {
             return (
               <div className="flex flex-wrap gap-1">
-                <span className="text-3xs font-medium py-px px-1.5 rounded-[5px] border bg-[rgb(var(--accent-enrollment)/0.08)] text-[#1D9E75] border-[rgb(var(--accent-enrollment)/0.15)]">All Grades</span>
+                <span className="text-3xs font-medium py-px px-1.5 rounded-[5px] border bg-[rgb(var(--accent-enrollment)/0.08)] text-[rgb(var(--accent-enrollment-text))] border-[rgb(var(--accent-enrollment)/0.15)]">All Grades</span>
               </div>
             )
           }
           return (
             <div className="flex flex-wrap gap-1">
               {[...gradeLevels].sort(gradeSort).map((g) => (
-                <span key={g} className="text-3xs font-medium py-px px-1.5 rounded-[5px] border bg-[rgb(var(--accent-academics)/0.08)] text-[rgb(var(--accent-academics))] border-[rgb(var(--accent-academics)/0.15)]">{formatGradeLabel(g)}</span>
+                <span key={g} className="text-3xs font-medium py-px px-1.5 rounded-[5px] border bg-[rgb(var(--accent-academics)/0.08)] text-[rgb(var(--accent-academics-text))] border-[rgb(var(--accent-academics)/0.15)]">{formatGradeLabel(g)}</span>
               ))}
             </div>
           )

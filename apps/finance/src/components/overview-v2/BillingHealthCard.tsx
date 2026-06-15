@@ -205,7 +205,7 @@ export function BillingHealthCard({
           Billing health
         </h3>
         {!isLoading && !hasAnyOverdue && totalInvoiceCount > 0 && (
-          <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-[rgb(var(--state-success-bg))] text-[#1D9E75]">
+          <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-[rgb(var(--state-success-bg))] text-[rgb(var(--accent-enrollment-text))]">
             <CheckCircle2 className="w-3 h-3" />
             All accounts current
           </span>
@@ -315,8 +315,8 @@ export function BillingHealthCard({
               <SpectrumSkeleton />
             ) : !hasAnyOverdue ? (
               <div className="rounded-lg px-4 py-3 flex items-center gap-2 bg-[rgb(var(--state-success-bg))] border border-[rgb(var(--state-success-border))]">
-                <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-[#1D9E75]" />
-                <span className="text-xs text-[#1D9E75]">
+                <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-[rgb(var(--accent-enrollment-text))]" />
+                <span className="text-xs text-[rgb(var(--accent-enrollment-text))]">
                   No overdue invoices — all accounts are current.
                 </span>
               </div>
