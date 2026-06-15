@@ -105,7 +105,7 @@ function BooleanRow({ label, value }: { label: string; value: boolean | undefine
     <div className="flex items-center justify-between gap-4 py-2.5 border-b border-[rgb(var(--border-primary))] last:border-0">
       <span className="text-sm text-[rgb(var(--text-tertiary))] min-w-40">{label}</span>
       {value === true && (
-        <span className="text-sm font-medium text-[#1D9E75]">Yes</span>
+        <span className="text-sm font-medium text-[rgb(var(--accent-enrollment))]">Yes</span>
       )}
       {value === false && (
         <span className="text-sm text-[rgb(var(--text-primary))]">No</span>

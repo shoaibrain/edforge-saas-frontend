@@ -134,7 +134,7 @@ export function CollapsibleSection({
           className={`flex items-center justify-center shrink-0 rounded-lg ${hasErrors ? 'bg-[rgb(var(--state-danger-bg))]' : 'bg-[rgb(var(--accent-enrollment)/0.08)]'}`}
           style={{ width: 28, height: 28 }}
         >
-          <Icon className={`w-3.5 h-3.5 ${hasErrors ? 'text-[rgb(var(--state-danger-fg))]' : 'text-[#1D9E75]'}`} />
+          <Icon className={`w-3.5 h-3.5 ${hasErrors ? 'text-[rgb(var(--state-danger-fg))]' : 'text-[rgb(var(--accent-enrollment))]'}`} />
         </div>
 
         {/* Title + description */}
@@ -158,7 +158,7 @@ export function CollapsibleSection({
             </span>
           ) : !isExpanded ? (
             isComplete ? (
-              <span className="flex items-center gap-1 text-3xs font-medium text-[#1D9E75]">
+              <span className="flex items-center gap-1 text-3xs font-medium text-[rgb(var(--accent-enrollment))]">
                 <Check className="w-3 h-3" />
                 Complete
               </span>
