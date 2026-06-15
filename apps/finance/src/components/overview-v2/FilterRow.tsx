@@ -166,7 +166,7 @@ export function FilterRow({
             onClick={onExport}
             disabled={isExporting}
             aria-label="Export invoices as CSV"
-            className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))]/40 bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
+            className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.30)] bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
           >
             {isExporting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />}
             Export CSV
