@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
 import { Button } from '@edforge/ui'
 import { UuidBadge } from '@edforge/archetype'
-import { ArrowLeft, Check, X, Loader2, Printer, Download, AlertTriangle } from 'lucide-react'
+import { ArrowLeft, Check, X, Loader2, Download, AlertTriangle } from 'lucide-react'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import { useTranslation } from '@edforge/i18n'
 import { useAppStore } from '../../../stores/app.store'
@@ -132,10 +132,6 @@ export default function InvoiceDetailPage() {
               <Download className="w-4 h-4 mr-1.5" />
             )}
             {t('actions.downloadPdf')}
-          </Button>
-          <Button variant="outline" onClick={() => window.print()}>
-            <Printer className="w-4 h-4 mr-1.5" />
-            Print
           </Button>
           {invoice.status === 'draft' && (
             <>
