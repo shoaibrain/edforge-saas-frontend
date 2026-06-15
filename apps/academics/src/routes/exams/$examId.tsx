@@ -170,7 +170,7 @@ function ResultGenerationBadge({
 function transitionToneClass(tone: ExamTransitionAction['tone']): string {
   const base = 'px-3 py-1.5 text-sm font-medium rounded-lg transition-colors disabled:opacity-50'
   if (tone === 'primary') return `${base} text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-fg))] hover:brightness-95`
-  if (tone === 'warning') return `${base} text-[rgb(var(--action-primary-fg))] bg-amber-600 hover:bg-amber-700`
+  if (tone === 'warning') return `${base} text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-warning-fg))] hover:brightness-110`
   return `${base} text-text-secondary border border-border-secondary hover:bg-surface-secondary`
 }
 

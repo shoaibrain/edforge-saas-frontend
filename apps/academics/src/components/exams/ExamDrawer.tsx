@@ -9,7 +9,7 @@
 
 import { useCallback, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { X, Loader2, ClipboardList } from 'lucide-react'
+import { X, Loader2, ClipboardList, AlertTriangle } from 'lucide-react'
 import {
   FormProvider,
   useForm,
@@ -395,6 +395,11 @@ function GradeLevelsField({
       render={({ field, fieldState }) => {
         const value: string[] = field.value ?? []
         const selectedSet = new Set(value)
+        // Soft, presentation-only nudge: a single exam spanning every enabled
+        // grade can't hold grade-specific subjects/marks and produces one mixed
+        // roster + result-card batch. Surfaced only when ALL grades are picked
+        // at a school with a meaningful number of them — never blocks.
+        const allGradesSelected = options.length >= 5 && value.length === options.length
 
         const toggle = (code: string) => {
           if (disabled) return
@@ -449,6 +454,15 @@ function GradeLevelsField({
                 })
               )}
             </div>
+            {allGradesSelected && !disabled && (
+              <div className="mt-2 flex items-start gap-2 px-3 py-2 rounded-lg bg-[rgb(var(--accent-attendance)/0.1)] border border-[rgb(var(--accent-attendance)/0.3)]">
+                <AlertTriangle className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-[rgb(var(--state-warning-fg))]" />
+                <p className="text-xs text-[rgb(var(--state-warning-fg))] leading-relaxed">
+                  All {options.length} grades selected. Subjects, marks, and result cards
+                  differ by grade — most schools run a separate exam per grade.
+                </p>
+              </div>
+            )}
             {fieldState.error?.message ? (
               <p className="text-xs text-[rgb(var(--state-danger-fg))] mt-2">
                 {fieldState.error.message}
