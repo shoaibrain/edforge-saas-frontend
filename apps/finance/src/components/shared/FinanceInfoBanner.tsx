@@ -34,8 +34,8 @@ const VARIANT_STYLES = {
   },
   success: {
     box: 'bg-[rgb(var(--accent-enrollment)/0.06)] border-[rgb(var(--accent-enrollment)/0.12)]',
-    fg: 'text-[#1D9E75]',
-    btnBg: 'bg-[#1D9E75]',
+    fg: 'text-[rgb(var(--accent-enrollment-text))]',
+    btnBg: 'bg-[rgb(var(--action-primary-bg))]',
     Icon: CheckCircle,
   },
 } as const
@@ -72,7 +72,7 @@ export function FinanceInfoBanner({
       {action && (
         <button
           onClick={action.onClick}
-          className={`flex-shrink-0 text-xs font-medium px-3 py-1 rounded-md transition-opacity hover:opacity-80 text-[#fff] ${styles.btnBg}`}
+          className={`flex-shrink-0 text-xs font-medium px-3 py-1 rounded-md transition-opacity hover:opacity-80 text-[rgb(var(--text-on-accent))] ${styles.btnBg}`}
         >
           {action.label}
         </button>

@@ -184,7 +184,7 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
         <div className="flex items-center justify-between" style={{ height: 44 }}>
           <div className="flex items-center gap-2.5">
             <div className="w-7 h-7 rounded-[7px] flex items-center justify-center bg-[rgb(var(--accent-enrollment)/0.12)]">
-              <DollarSign className="w-4 h-4 text-[#1D9E75]" />
+              <DollarSign className="w-4 h-4 text-[rgb(var(--accent-enrollment-text))]" />
             </div>
             <h1 className="text-sm font-semibold text-[rgb(var(--text-primary))]">
               Finance
@@ -199,7 +199,7 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
             <button
               onClick={() => navigate({ to: '/invoices/bulk-generate' })}
               aria-label="Bulk invoice generation"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40 bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))]/40 bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
             >
               <FileStack className="w-3.5 h-3.5" />
               Bulk invoice
@@ -207,7 +207,7 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
             <button
               onClick={() => navigate({ to: '/payments/record' })}
               aria-label="Record a payment"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))]/40 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
             >
               <CreditCard className="w-3.5 h-3.5" />
               Record payment
