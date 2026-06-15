@@ -370,7 +370,7 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
   const deleteStudentMutation = useDeleteStudent()
 
   const handleAddStudent = () => {
-    navigate({ to: '/students/enrollment' })
+    navigate({ to: '/students/enrollment', search: { tab: 'registration' } })
   }
 
   const handleViewStudent = useCallback((student: StudentResponseDto) => {

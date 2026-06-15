@@ -11,8 +11,8 @@
  * Sprint 2 - Ticket 2.9: Assemble Student Profile Page
  */
 
-import { useState } from 'react'
-import { useParams } from '@tanstack/react-router'
+import { useCallback } from 'react'
+import { useParams, useSearch, useNavigate } from '@tanstack/react-router'
 import { useResourcePermissions } from '@edforge/abac'
 import { useTranslation } from '@edforge/i18n'
 import { z } from 'zod'
@@ -133,7 +133,17 @@ export function StudentProfilePage() {
   const params = useParams({ from: '/students/$studentId' })
   const studentId = params.studentId
   const schoolId = useActiveSchoolId()
-  const [activeTab, setActiveTab] = useState<TabId>('overview')
+  const navigate = useNavigate()
+  // URL-synced active tab (deep-linkable / shareable). The route's
+  // validateSearch defaults invalid/absent values to undefined → 'overview'.
+  const { tab } = useSearch({ from: '/students/$studentId' })
+  const activeTab: TabId = tab ?? 'overview'
+  const setActiveTab = useCallback(
+    (next: TabId) => {
+      navigate({ to: '/students/$studentId', params: { studentId }, search: { tab: next }, replace: true })
+    },
+    [navigate, studentId],
+  )
   const { t } = useTranslation('academics')
 
   // ABAC: check student permissions

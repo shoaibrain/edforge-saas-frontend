@@ -7,8 +7,8 @@
  * - Standards: placeholder for future sprint
  */
 
-import { useState, useMemo } from 'react'
-import { useParams, useNavigate } from '@tanstack/react-router'
+import { useState, useMemo, useCallback } from 'react'
+import { useParams, useNavigate, useSearch } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   ArrowLeft,
@@ -571,8 +571,16 @@ function StandardsTab() {
 export function CourseDetailPage() {
   const { courseId } = useParams({ from: '/curriculum/$courseId' })
   const navigate = useNavigate()
+  // URL-synced active tab (deep-linkable / shareable).
+  const { tab } = useSearch({ from: '/curriculum/$courseId' })
   const schoolId = useActiveSchoolId() || ''
-  const [activeTab, setActiveTab] = useState<CourseTab>('overview')
+  const activeTab: CourseTab = tab ?? 'overview'
+  const setActiveTab = useCallback(
+    (next: CourseTab) => {
+      navigate({ to: '/curriculum/$courseId', params: { courseId }, search: { tab: next }, replace: true })
+    },
+    [navigate, courseId],
+  )
 
   // Course drawer for editing
   const [courseDrawerOpen, setCourseDrawerOpen] = useState(false)

@@ -14,7 +14,7 @@
  */
 
 import { useState, useMemo, useCallback } from 'react'
-import { useNavigate } from '@tanstack/react-router'
+import { useNavigate, useSearch } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useResourcePermissions } from '@edforge/abac'
 import { Tabs } from '@edforge/ui'
@@ -55,18 +55,6 @@ import type { EnrollmentResponseDto } from '../../services/academics.service'
 
 type EnrollmentTab = 'registration' | 'dashboard'
 
-function getInitialTab(): EnrollmentTab {
-  try {
-    const params = new URLSearchParams(window.location.search)
-    const tab = params.get('tab')
-    if (tab === 'records') return 'dashboard'
-    if (tab === 'new') return 'registration'
-  } catch {
-    // SSR or error — fall through
-  }
-  return 'registration'
-}
-
 // ============================================================================
 // YEAR PROGRESS BAR (inline)
 // ============================================================================
@@ -103,7 +91,15 @@ function YearProgressBar({ startDate, endDate }: { startDate: string; endDate: s
 
 export function EnrollmentModule() {
   const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState<EnrollmentTab>(getInitialTab)
+  // URL-synced active tab (deep-linkable; legacy ?tab=new|records mapped in route)
+  const { tab } = useSearch({ from: '/students/enrollment' })
+  const activeTab: EnrollmentTab = tab ?? 'registration'
+  const setActiveTab = useCallback(
+    (next: EnrollmentTab) => {
+      navigate({ to: '/students/enrollment', search: { tab: next }, replace: true })
+    },
+    [navigate],
+  )
   const schoolId = useActiveSchoolId() || ''
 
   // ABAC: check enrollment permissions

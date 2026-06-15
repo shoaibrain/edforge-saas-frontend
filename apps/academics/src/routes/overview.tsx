@@ -213,7 +213,7 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
             actions={
               <>
                 <button
-                  onClick={() => navigate({ to: '/students/enrollment' })}
+                  onClick={() => navigate({ to: '/students/enrollment', search: { tab: 'registration' } })}
                   aria-label="Enroll a student"
                   className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-[9px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-enrollment)/0.4)] bg-transparent border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
                 >
