@@ -731,17 +731,18 @@ function GenerateInvoiceModal({
   schoolId: string
   onClose: () => void
 }) {
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
-    document.addEventListener('keydown', onKey)
-    return () => document.removeEventListener('keydown', onKey)
-  }, [onClose])
-
   const finSettings = useFinanceSettings()
   const { format: formatCurr } = useCurrency(finSettings)
   const generateMutation = useGenerateInvoice(schoolId)
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !generateMutation.isPending) onClose()
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [onClose, generateMutation.isPending])
+
   const { data: feeStructureData } = useFeeStructures(schoolId)
   const { data: academicYearsData } = useAcademicYears(schoolId)
   const feeStructures = Array.isArray(feeStructureData) ? feeStructureData : []
