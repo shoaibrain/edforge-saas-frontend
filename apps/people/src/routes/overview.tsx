@@ -18,11 +18,11 @@ import {
   BarChart3,
 } from 'lucide-react'
 import {
+  ContextBar,
   Container,
   focusRing,
   focusRingInset,
   Inline,
-  PageHeader,
   StatCard,
   Text,
   WidgetErrorBoundaryV2,
@@ -121,15 +121,20 @@ export function Overview() {
 
   return (
     <Container size="full" padding="lg" className="overflow-auto py-6">
-      {/* PAGE HEADER */}
-      <PageHeader
+      {/* Context Bar (operating context, not a page title — the shell breadcrumb
+          carries "People & HR") */}
+      <ContextBar
         className="mb-2"
-        title="People"
-        description={new Date().toLocaleDateString('en-US', {
-          month: 'short',
-          day: 'numeric',
-          year: 'numeric',
-        })}
+        meta={
+          <span>
+            {new Date().toLocaleDateString('en-US', {
+              weekday: 'long',
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric',
+            })}
+          </span>
+        }
         actions={(
           <Inline gap="sm">
           <button

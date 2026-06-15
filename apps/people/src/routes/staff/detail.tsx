@@ -13,6 +13,7 @@ import { useParams, Link } from '@tanstack/react-router'
 import { useQuery, useQueries } from '@tanstack/react-query'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
+import { Tabs } from '@edforge/ui'
 import {
     User,
     Mail,
@@ -1595,43 +1596,24 @@ export default function StaffDetailPage() {
                         <StaffActionsDropdown onAssignToSchool={() => setIsAssignModalOpen(true)} />
                     </div>
 
-                    {/* Tabs — left-aligned */}
-                    <div className="flex items-center space-x-1 overflow-x-auto no-scrollbar border-b border-[rgb(var(--border-primary))]">
-                        {TABS.map((tab) => {
-                            const isActive = activeTab === tab.id
+                    {/* Tabs — left-aligned (shared Tabs primitive) */}
+                    <Tabs
+                        tabs={TABS.filter((tab) => !(tab.id === 'security' && !staff.userId)).map((tab) => {
                             const Icon = tab.icon
-                            // Hide security tab if staff has no linked user
-                            if (tab.id === 'security' && !staff.userId) return null
-                            return (
-                                <button
-                                    key={tab.id}
-                                    onClick={() => setActiveTab(tab.id)}
-                                    className={`
-                                        relative px-4 py-3 text-sm font-medium transition-colors whitespace-nowrap outline-none
-                                        ${isActive
-                                            ? 'text-[rgb(var(--text-primary))]'
-                                            : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))]'
-                                        }
-                                    `}
-                                >
-                                    <span className="relative z-10 flex items-center gap-2">
-                                        <Icon className={`w-4 h-4 ${isActive ? 'text-[rgb(var(--action-secondary-fg))]' : 'opacity-70'}`} />
+                            return {
+                                id: tab.id,
+                                label: (
+                                    <span className="flex items-center gap-2">
+                                        <Icon className="w-4 h-4" />
                                         {tab.label}
                                     </span>
-
-                                    {/* Active Indicator Line */}
-                                    {isActive && (
-                                        <motion.div
-                                            layoutId="staffTabIndicator"
-                                            className="absolute bottom-0 left-0 right-0 h-0.5 bg-[rgb(var(--action-primary-bg))] rounded-t-full"
-                                            initial={false}
-                                            transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                                        />
-                                    )}
-                                </button>
-                            )
+                                ),
+                            }
                         })}
-                    </div>
+                        value={activeTab}
+                        onChange={(v) => setActiveTab(v as StaffTab)}
+                        aria-label="Staff detail sections"
+                    />
                 </div>
 
                 {/* Content Area */}
