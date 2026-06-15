@@ -17,6 +17,7 @@ import {
   ChevronLeft,
 } from 'lucide-react'
 import { useSectionGrades, useBulkFinalizeGrades } from '../../hooks/useGrades'
+import { useEscapeToClose } from '../../hooks/useEscapeToClose'
 
 // ============================================================================
 // TYPES
@@ -49,6 +50,7 @@ export function FinalizationWizard({
   const [finalizedCount, setFinalizedCount] = useState(0)
   const [errorCount, setErrorCount] = useState(0)
   const bulkFinalizeMutation = useBulkFinalizeGrades()
+  useEscapeToClose(onClose, open)
 
   const { data: gradebook, isLoading } = useSectionGrades(
     sectionId,
@@ -110,13 +112,18 @@ export function FinalizationWizard({
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgb(var(--background-overlay)/0.50)]">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[rgb(var(--background-overlay)/0.50)]"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="finalize-grades-title"
+    >
       <div className="bg-surface-primary rounded-xl border border-border-secondary shadow-xl w-full max-w-lg">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-secondary">
           <div className="flex items-center gap-2">
             <Lock className="w-5 h-5 text-[rgb(var(--action-secondary-fg))]" />
-            <h3 className="text-lg font-semibold text-text-primary">
+            <h3 id="finalize-grades-title" className="text-lg font-semibold text-text-primary">
               Finalize Grades{termName ? ` — ${termName}` : ''}
             </h3>
           </div>
