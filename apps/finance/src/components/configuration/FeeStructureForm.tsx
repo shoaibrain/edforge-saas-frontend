@@ -211,10 +211,15 @@ export function FeeStructureForm({
       className="fixed inset-0 z-50 flex items-center justify-center bg-[rgb(var(--background-overlay)/0.50)]"
       onClick={handleBackdropClick}
     >
-      <div className="w-full max-w-lg mx-4 bg-[rgb(var(--background-primary))] rounded-2xl shadow-xl flex flex-col max-h-[85vh]">
+      <div
+        className="w-full max-w-lg mx-4 bg-[rgb(var(--background-primary))] rounded-2xl shadow-xl flex flex-col max-h-[85vh]"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="fee-structure-form-title"
+      >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[rgb(var(--border-primary))] flex-shrink-0">
-          <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
+          <h2 id="fee-structure-form-title" className="text-lg font-semibold text-[rgb(var(--text-primary))]">
             {feeStructure ? 'Edit Fee Structure' : 'Add Fee Structure'}
           </h2>
           <button

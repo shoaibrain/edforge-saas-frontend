@@ -386,13 +386,16 @@ function CancelInvoiceDialog({
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
         className="bg-[rgb(var(--background-primary))] rounded-xl shadow-xl w-full max-w-sm p-6"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="cancel-invoice-title"
       >
         <div className="flex items-start gap-3 mb-4">
           <div className="p-2 rounded-full bg-[rgb(var(--state-danger-bg)/0.18)] ">
             <AlertTriangle className="w-5 h-5 text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]" />
           </div>
           <div>
-            <h3 className="text-base font-semibold text-[rgb(var(--text-primary))]">
+            <h3 id="cancel-invoice-title" className="text-base font-semibold text-[rgb(var(--text-primary))]">
               Cancel Invoice {invoiceNumber}?
             </h3>
             <p className="text-sm text-[rgb(var(--text-secondary))] mt-1">

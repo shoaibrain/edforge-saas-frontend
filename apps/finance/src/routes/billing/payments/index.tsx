@@ -105,6 +105,9 @@ function VoidPaymentDialog({
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
         className="bg-[rgb(var(--background-primary))] rounded-xl shadow-xl w-full max-w-sm mx-4 p-6"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="void-payment-title"
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
@@ -112,7 +115,7 @@ function VoidPaymentDialog({
             <div className="p-2 rounded-lg bg-[rgb(var(--state-danger-bg)/0.18)] ">
               <AlertTriangle className="w-5 h-5 text-[rgb(var(--state-danger-fg))]" />
             </div>
-            <h3 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
+            <h3 id="void-payment-title" className="text-lg font-semibold text-[rgb(var(--text-primary))]">
               Void Payment
             </h3>
           </div>
@@ -290,10 +293,13 @@ function RefundPaymentDialog({
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.95 }}
         className="bg-[rgb(var(--background-primary))] rounded-xl shadow-xl w-full max-w-sm mx-4 p-6"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="refund-payment-title"
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
+          <h3 id="refund-payment-title" className="text-lg font-semibold text-[rgb(var(--text-primary))]">
             Refund Payment
           </h3>
           <button
