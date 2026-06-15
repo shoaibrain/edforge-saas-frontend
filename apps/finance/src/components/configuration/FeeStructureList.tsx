@@ -113,7 +113,7 @@ export function FeeStructureList({
           return (
             <div className="flex flex-wrap gap-1">
               {[...gradeLevels].sort(gradeSort).map((g) => (
-                <span key={g} className="text-3xs font-medium py-px px-1.5 rounded-[5px] border bg-[rgb(var(--accent-academics)/0.08)] text-[rgb(var(--accent-academics))] border-[rgb(var(--accent-academics)/0.15)]">{formatGradeLabel(g)}</span>
+                <span key={g} className="text-3xs font-medium py-px px-1.5 rounded-[5px] border bg-[rgb(var(--accent-academics)/0.08)] text-[rgb(var(--accent-academics-text))] border-[rgb(var(--accent-academics)/0.15)]">{formatGradeLabel(g)}</span>
               ))}
             </div>
           )
