@@ -161,11 +161,11 @@ function RegistrationStepper() {
             status === 'completed'
               ? 'bg-[rgb(var(--accent-enrollment))] text-[rgb(var(--action-primary-fg))]'
               : status === 'current'
-                ? 'bg-[rgb(var(--accent-enrollment)/0.2)] border-2 border-[rgb(var(--accent-enrollment))] text-[rgb(var(--accent-enrollment))]'
+                ? 'bg-[rgb(var(--accent-enrollment)/0.2)] border-2 border-[rgb(var(--accent-enrollment))] text-[rgb(var(--accent-enrollment-text))]'
                 : 'bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-disabled))]'
           const labelCls =
             status === 'completed'
-              ? 'text-[rgb(var(--accent-enrollment))]'
+              ? 'text-[rgb(var(--accent-enrollment-text))]'
               : status === 'current'
                 ? 'text-[rgb(var(--text-secondary))]'
                 : 'text-[rgb(var(--text-disabled))]'
@@ -373,7 +373,7 @@ function ContextSidebar() {
       {/* Card 1: Enrollment Context */}
       <div className={SIDEBAR_CARD}>
         <div className="flex items-center gap-2 mb-3">
-          <BookOpen className="w-3.5 h-3.5 text-[rgb(var(--accent-enrollment))]" />
+          <BookOpen className="w-3.5 h-3.5 text-[rgb(var(--accent-enrollment-text))]" />
           <span className="text-2xs font-medium text-[rgb(var(--text-secondary))]">
             Enrollment Context
           </span>
@@ -403,7 +403,7 @@ function ContextSidebar() {
       {/* Card 2: Required for EdFi */}
       <div className={SIDEBAR_CARD}>
         <div className="flex items-center gap-2 mb-3">
-          <Shield className="w-3.5 h-3.5 text-[rgb(var(--accent-enrollment))]" />
+          <Shield className="w-3.5 h-3.5 text-[rgb(var(--accent-enrollment-text))]" />
           <span className="text-2xs font-medium text-[rgb(var(--text-secondary))]">
             Required for EdFi
           </span>
@@ -417,7 +417,7 @@ function ContextSidebar() {
             >
               <span className="text-3xs text-[rgb(var(--text-tertiary))]">{f.label}</span>
               {f.filled ? (
-                <span className="text-2xs font-medium text-[rgb(var(--accent-enrollment))]">Filled</span>
+                <span className="text-2xs font-medium text-[rgb(var(--accent-enrollment-text))]">Filled</span>
               ) : f.step === currentStep + 1 ? (
                 <span className="text-2xs font-medium text-[rgb(var(--state-warning-fg))]">Required</span>
               ) : (
@@ -431,7 +431,7 @@ function ContextSidebar() {
       {/* Card 3: Progress */}
       <div className={SIDEBAR_CARD}>
         <div className="flex items-center gap-2 mb-3">
-          <ListChecks className="w-3.5 h-3.5 text-[rgb(var(--accent-enrollment))]" />
+          <ListChecks className="w-3.5 h-3.5 text-[rgb(var(--accent-enrollment-text))]" />
           <span className="text-2xs font-medium text-[rgb(var(--text-secondary))]">
             Progress
           </span>
@@ -441,7 +441,7 @@ function ContextSidebar() {
             const status = getStepStatus(i)
             const progressLabelCls =
               status === 'completed'
-                ? 'text-[rgb(var(--accent-enrollment))]'
+                ? 'text-[rgb(var(--accent-enrollment-text))]'
                 : status === 'current'
                   ? 'text-[rgb(var(--text-secondary))]'
                   : 'text-[rgb(var(--text-disabled))]'
@@ -459,7 +459,7 @@ function ContextSidebar() {
                 <span className={`text-3xs ${progressLabelCls}`}>
                   {step.title}
                 </span>
-                <span className={`ml-auto text-4xs ${status === 'completed' ? 'text-[rgb(var(--accent-enrollment))]' : status === 'current' ? 'text-[rgb(var(--text-tertiary))]' : 'text-[rgb(var(--text-disabled))]'}`}>
+                <span className={`ml-auto text-4xs ${status === 'completed' ? 'text-[rgb(var(--accent-enrollment-text))]' : status === 'current' ? 'text-[rgb(var(--text-tertiary))]' : 'text-[rgb(var(--text-disabled))]'}`}>
                   {status === 'completed' ? 'Done' : status === 'current' ? 'Current' : ''}
                 </span>
               </div>

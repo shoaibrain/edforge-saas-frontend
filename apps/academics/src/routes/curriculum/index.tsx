@@ -119,7 +119,7 @@ function StandardsContent() {
         className="flex items-center justify-center rounded-xl mb-3 bg-[rgb(var(--accent-reports)/0.15)]"
         style={{ width: 48, height: 48 }}
       >
-        <ShieldCheck className="w-6 h-6 text-[rgb(var(--accent-reports))]" />
+        <ShieldCheck className="w-6 h-6 text-[rgb(var(--accent-reports-text))]" />
       </div>
 
       {/* Heading */}
@@ -267,15 +267,15 @@ export function CurriculumModule() {
         }
         description={
           <p className="text-xs text-[rgb(var(--text-tertiary))] leading-relaxed">
-            <span className="font-medium text-[rgb(var(--accent-academics))]">
+            <span className="font-medium text-[rgb(var(--accent-academics-text))]">
               {stats.total}
             </span>{' '}
             courses across{' '}
-            <span className="font-medium text-[rgb(var(--accent-academics))]">
+            <span className="font-medium text-[rgb(var(--accent-academics-text))]">
               {stats.subjects}
             </span>{' '}
             subject areas · {stats.elective} elective ·{' '}
-            <span className="font-medium text-[rgb(var(--accent-academics))]">
+            <span className="font-medium text-[rgb(var(--accent-academics-text))]">
               {stats.specializedTypes}
             </span>{' '}
             specialized course types (Honors, AP, Dual Enrollment)
@@ -363,7 +363,7 @@ export function CurriculumModule() {
           onClick={() => setActiveTab('courses')}
           className={`flex items-center gap-1.5 px-3.5 py-2.5 text-sm cursor-pointer bg-transparent border-b-2 -mb-px ${
             activeTab === 'courses'
-              ? 'font-semibold text-[rgb(var(--accent-reports))] border-[rgb(var(--accent-reports))]'
+              ? 'font-semibold text-[rgb(var(--accent-reports-text))] border-[rgb(var(--accent-reports))]'
               : 'font-medium text-[rgb(var(--text-tertiary))] border-transparent hover:text-[rgb(var(--text-secondary))]'
           }`}
         >
@@ -372,7 +372,7 @@ export function CurriculumModule() {
           <span
             className={`text-2xs font-semibold py-0.5 px-1.5 rounded-md ${
               activeTab === 'courses'
-                ? 'bg-[rgb(var(--accent-reports)/0.12)] text-[rgb(var(--accent-reports))]'
+                ? 'bg-[rgb(var(--accent-reports)/0.12)] text-[rgb(var(--accent-reports-text))]'
                 : 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]'
             }`}
           >
@@ -386,7 +386,7 @@ export function CurriculumModule() {
           onClick={() => setActiveTab('grade-levels')}
           className={`flex items-center gap-1.5 px-3.5 py-2.5 text-sm cursor-pointer bg-transparent border-b-2 -mb-px ${
             activeTab === 'grade-levels'
-              ? 'font-semibold text-[rgb(var(--accent-reports))] border-[rgb(var(--accent-reports))]'
+              ? 'font-semibold text-[rgb(var(--accent-reports-text))] border-[rgb(var(--accent-reports))]'
               : 'font-medium text-[rgb(var(--text-tertiary))] border-transparent hover:text-[rgb(var(--text-secondary))]'
           }`}
         >
@@ -400,7 +400,7 @@ export function CurriculumModule() {
           onClick={() => setActiveTab('standards')}
           className={`flex items-center gap-1.5 px-3.5 py-2.5 text-sm cursor-pointer bg-transparent border-b-2 -mb-px ${
             activeTab === 'standards'
-              ? 'font-semibold text-[rgb(var(--accent-reports))] border-[rgb(var(--accent-reports))]'
+              ? 'font-semibold text-[rgb(var(--accent-reports-text))] border-[rgb(var(--accent-reports))]'
               : 'font-medium text-[rgb(var(--text-tertiary))] border-transparent hover:text-[rgb(var(--text-secondary))]'
           }`}
         >

@@ -19,7 +19,7 @@ export function EnrollmentDashboard({ isLoading, activeYear }: EnrollmentDashboa
   if (!isLoading && !activeYear) {
     return (
       <div className="p-8 text-center rounded-[10px] border-2 border-dashed border-[rgb(var(--accent-attendance)/0.3)] bg-[rgb(var(--state-warning-bg))]">
-        <AlertTriangle className="w-10 h-10 mx-auto mb-3 text-[rgb(var(--accent-attendance))]" />
+        <AlertTriangle className="w-10 h-10 mx-auto mb-3 text-[rgb(var(--accent-attendance-text))]" />
         <h3 className="font-semibold mb-2 text-sm text-[rgb(var(--text-primary))]">
           No active academic year for this school
         </h3>

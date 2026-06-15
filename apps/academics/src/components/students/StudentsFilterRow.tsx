@@ -157,7 +157,7 @@ export function StudentsFilterRow({ schoolId }: StudentsFilterRowProps) {
       {isActiveFilters && (
         <button
           onClick={handleClearFilters}
-          className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full text-[rgb(var(--accent-enrollment))] hover:opacity-80 transition-opacity"
+          className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full text-[rgb(var(--accent-enrollment-text))] hover:opacity-80 transition-opacity"
         >
           <X className="w-3 h-3" />
           Clear

@@ -177,7 +177,7 @@ export function AcademicsFilterRow({
         {hasActiveFilters && (
           <button
             onClick={onClear}
-            className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full transition-colors hover:opacity-80 text-[rgb(var(--accent-enrollment))]"
+            className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full transition-colors hover:opacity-80 text-[rgb(var(--accent-enrollment-text))]"
           >
             <X className="w-3 h-3" />
             Clear

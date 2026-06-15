@@ -227,7 +227,7 @@ function OverviewTab() {
           <button
             type="button"
             onClick={() => setViewMode('grid')}
-            className={`p-1.5 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-[rgb(var(--accent-academics)/0.12)] text-[rgb(var(--accent-academics))]' : 'bg-transparent text-[rgb(var(--text-tertiary))]'}`}
+            className={`p-1.5 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-[rgb(var(--accent-academics)/0.12)] text-[rgb(var(--accent-academics-text))]' : 'bg-transparent text-[rgb(var(--text-tertiary))]'}`}
             aria-label="Grid view"
           >
             <LayoutGrid className="w-4 h-4" />
@@ -235,7 +235,7 @@ function OverviewTab() {
           <button
             type="button"
             onClick={() => setViewMode('list')}
-            className={`p-1.5 rounded-md transition-colors ${viewMode === 'list' ? 'bg-[rgb(var(--accent-academics)/0.12)] text-[rgb(var(--accent-academics))]' : 'bg-transparent text-[rgb(var(--text-tertiary))]'}`}
+            className={`p-1.5 rounded-md transition-colors ${viewMode === 'list' ? 'bg-[rgb(var(--accent-academics)/0.12)] text-[rgb(var(--accent-academics-text))]' : 'bg-transparent text-[rgb(var(--text-tertiary))]'}`}
             aria-label="List view"
           >
             <List className="w-4 h-4" />
@@ -593,13 +593,13 @@ function ContextBanner({
     if (activeTab === 'overview') {
       return (
         <>
-          <em className="not-italic text-[rgb(var(--accent-academics))]">{overviewStats.total} active sections</em>
+          <em className="not-italic text-[rgb(var(--accent-academics-text))]">{overviewStats.total} active sections</em>
           {' '}across{' '}
-          <em className="not-italic text-[rgb(var(--accent-academics))]">{overviewStats.courses} courses</em>
+          <em className="not-italic text-[rgb(var(--accent-academics-text))]">{overviewStats.courses} courses</em>
           {' '}&mdash;{' '}
-          <em className="not-italic text-[rgb(var(--accent-enrollment))]">{overviewStats.students} students enrolled</em>
+          <em className="not-italic text-[rgb(var(--accent-enrollment-text))]">{overviewStats.students} students enrolled</em>
           , avg utilization{' '}
-          <em className="not-italic text-[rgb(var(--accent-attendance))]">{overviewStats.utilization}%</em>
+          <em className="not-italic text-[rgb(var(--accent-attendance-text))]">{overviewStats.utilization}%</em>
           .
         </>
       )
@@ -613,13 +613,13 @@ function ContextBanner({
       const completionPct = gradeData.gradingProgress?.completionRate?.toFixed(0) ?? '—'
       return (
         <>
-          <em className="not-italic text-[rgb(var(--accent-finance))]">{gradeData.atRiskCount} students</em>
+          <em className="not-italic text-[rgb(var(--accent-finance-text))]">{gradeData.atRiskCount} students</em>
           {' '}at risk (below 60%){worstCourse && (
-            <> &mdash; concentrated in <em className="not-italic text-[rgb(var(--accent-finance))]">{worstCourse}</em></>
+            <> &mdash; concentrated in <em className="not-italic text-[rgb(var(--accent-finance-text))]">{worstCourse}</em></>
           )}.{' '}
-          <em className="not-italic text-[rgb(var(--accent-enrollment))]">{passingCourses} at 100% pass rate</em>
+          <em className="not-italic text-[rgb(var(--accent-enrollment-text))]">{passingCourses} at 100% pass rate</em>
           . Grading{' '}
-          <em className="not-italic text-[rgb(var(--accent-academics))]">{completionPct}% complete</em>
+          <em className="not-italic text-[rgb(var(--accent-academics-text))]">{completionPct}% complete</em>
           .
         </>
       )
@@ -633,13 +633,13 @@ function ContextBanner({
       const atRiskCount = attendanceData.atRiskStudents?.length ?? 0
       return (
         <>
-          <em className="not-italic text-[rgb(var(--accent-academics))]">{recorded} of {totalStudents} students</em>
+          <em className="not-italic text-[rgb(var(--accent-academics-text))]">{recorded} of {totalStudents} students</em>
           {' '}recorded today. 7-day average{' '}
-          <em className="not-italic text-[rgb(var(--accent-enrollment))]">{avg7}%</em>
+          <em className="not-italic text-[rgb(var(--accent-enrollment-text))]">{avg7}%</em>
           {' '}vs 30-day{' '}
-          <em className="not-italic text-[rgb(var(--accent-attendance))]">{avg30}%</em>
+          <em className="not-italic text-[rgb(var(--accent-attendance-text))]">{avg30}%</em>
           .{atRiskCount > 0 && (
-            <>{' '}<em className="not-italic text-[rgb(var(--accent-finance))]">{atRiskCount} students</em> flagged below 90% attendance.</>
+            <>{' '}<em className="not-italic text-[rgb(var(--accent-finance-text))]">{atRiskCount} students</em> flagged below 90% attendance.</>
           )}
         </>
       )
@@ -735,7 +735,7 @@ export function ClassroomsModule() {
                   onClick={() => setActiveTab(tab.id)}
                   className={`whitespace-nowrap flex items-center gap-1.5 px-4 py-2.5 text-sm cursor-pointer transition-colors bg-transparent border-b-2 -mb-px ${
                     isActive
-                      ? 'font-semibold text-[rgb(var(--accent-academics))] border-[rgb(var(--accent-academics))]'
+                      ? 'font-semibold text-[rgb(var(--accent-academics-text))] border-[rgb(var(--accent-academics))]'
                       : 'font-medium text-[rgb(var(--text-tertiary))] border-transparent hover:text-[rgb(var(--text-secondary))]'
                   }`}
                 >
@@ -745,7 +745,7 @@ export function ClassroomsModule() {
                     <span
                       className={`text-2xs font-semibold py-0.5 px-1.5 rounded-md ${
                         isActive
-                          ? 'bg-[rgb(var(--accent-academics)/0.12)] text-[rgb(var(--accent-academics))]'
+                          ? 'bg-[rgb(var(--accent-academics)/0.12)] text-[rgb(var(--accent-academics-text))]'
                           : 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]'
                       }`}
                     >

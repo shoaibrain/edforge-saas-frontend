@@ -222,7 +222,7 @@ export function EnrollmentModule() {
           {/* Left: Icon + Title */}
           <div className="flex items-center gap-3">
             <div className="flex items-center justify-center rounded-lg bg-[rgb(var(--accent-enrollment)/0.1)]" style={{ width: 32, height: 32 }}>
-              <UserPlus className="w-4 h-4 text-[rgb(var(--accent-enrollment))]" />
+              <UserPlus className="w-4 h-4 text-[rgb(var(--accent-enrollment-text))]" />
             </div>
             <h1 className="font-semibold text-lg tracking-[-0.3px] text-[rgb(var(--text-primary))]">
               Enroll student
@@ -269,7 +269,7 @@ export function EnrollmentModule() {
                     type="button"
                     onClick={handleCloseYear}
                     disabled={closeYearMutation.isPending}
-                    className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-[8px] transition-colors disabled:opacity-50 bg-[rgb(var(--accent-attendance)/0.08)] border border-[rgb(var(--accent-attendance)/0.2)] text-[rgb(var(--accent-attendance))]"
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-[8px] transition-colors disabled:opacity-50 bg-[rgb(var(--accent-attendance)/0.08)] border border-[rgb(var(--accent-attendance)/0.2)] text-[rgb(var(--accent-attendance-text))]"
                     title="Close all open enrollments for this year"
                   >
                     <Lock className="w-3 h-3" />
@@ -316,8 +316,8 @@ export function EnrollmentModule() {
                 {/* Academic Year Progress Strip */}
                 {activeYearObj && (
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-[10px] px-3.5 py-3 bg-[rgb(var(--background-tertiary)/0.5)] border border-[rgb(var(--border-primary)/0.35)]">
-                    <Calendar className="w-3.5 h-3.5 text-[rgb(var(--accent-enrollment))]" />
-                    <span className="text-xs font-medium px-2 py-0.5 rounded-md bg-[rgb(var(--accent-enrollment)/0.1)] text-[rgb(var(--accent-enrollment))]">
+                    <Calendar className="w-3.5 h-3.5 text-[rgb(var(--accent-enrollment-text))]" />
+                    <span className="text-xs font-medium px-2 py-0.5 rounded-md bg-[rgb(var(--accent-enrollment)/0.1)] text-[rgb(var(--accent-enrollment-text))]">
                       {activeYearObj.name}
                     </span>
                     <YearProgressBar
