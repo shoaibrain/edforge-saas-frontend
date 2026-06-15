@@ -122,8 +122,8 @@ export function ClassroomCard({ section, subjectAreaOverride, onNavigate, onEdit
             </span>
             {/* Status dot + text */}
             <div className="flex items-center gap-1.5 text-xs">
-              <div className={`w-1.5 h-1.5 rounded-full ${section.isActive ? 'bg-[#1D9E75]' : 'bg-[rgb(var(--text-disabled))]'}`} />
-              <span className={section.isActive ? 'text-[#1D9E75]' : 'text-[rgb(var(--text-tertiary))]'}>
+              <div className={`w-1.5 h-1.5 rounded-full ${section.isActive ? 'bg-[rgb(var(--accent-enrollment))]' : 'bg-[rgb(var(--text-disabled))]'}`} />
+              <span className={section.isActive ? 'text-[rgb(var(--accent-enrollment))]' : 'text-[rgb(var(--text-tertiary))]'}>
                 {section.isActive ? 'Active' : 'Inactive'}
               </span>
             </div>

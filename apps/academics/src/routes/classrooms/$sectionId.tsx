@@ -31,6 +31,7 @@ import {
 } from 'lucide-react'
 import { z } from 'zod'
 import { useResourcePermissions } from '@edforge/abac'
+import { Tabs, type TabItem } from '@edforge/ui'
 import { useSection, useUpdateSection, useSectionRoster } from '../../hooks/useSections'
 import { useCourse } from '../../hooks/useCourses'
 import { useActiveSchoolId } from '../../stores/app.store'
@@ -750,45 +751,29 @@ export function ClassroomDetailPage() {
         </div>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="border-b border-border-secondary bg-surface-secondary/50">
+      {/* Tabs — shared @edforge/ui primitive (house standard, accessible) */}
+      <div className="bg-surface-secondary/50">
         <div className="px-4 sm:px-8">
-          <nav className="flex gap-1 overflow-x-auto" aria-label="Classroom tabs" role="tablist">
-            {TABS.map((tab) => {
-              const isActive = activeTab === tab.id
-              return (
-                <button
-                  key={tab.id}
-                  role="tab"
-                  id={`tab-${tab.id}`}
-                  aria-selected={isActive}
-                  aria-controls={`panel-${tab.id}`}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`relative flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors whitespace-nowrap ${
-                    isActive
-                      ? 'text-text-primary'
-                      : 'text-text-tertiary hover:text-text-secondary'
-                  }`}
-                >
-                  <tab.icon className={`w-4 h-4 ${isActive ? 'text-[rgb(var(--action-secondary-fg))]' : 'opacity-70'}`} />
+          <Tabs
+            aria-label="Classroom tabs"
+            value={activeTab}
+            onChange={(value) => setActiveTab(value as ClassroomDetailTab)}
+            className="overflow-x-auto"
+            tabs={TABS.map((tab): TabItem => ({
+              id: tab.id,
+              label: (
+                <span className="flex items-center gap-2">
+                  <tab.icon className="w-4 h-4" />
                   {tab.label}
-                  {isActive && (
-                    <motion.div
-                      layoutId="classroomDetailTab"
-                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-[rgb(var(--state-info-fg))] rounded-t-full"
-                      initial={false}
-                      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                    />
-                  )}
-                </button>
-              )
-            })}
-          </nav>
+                </span>
+              ),
+            }))}
+          />
         </div>
       </div>
 
       {/* Tab Content */}
-      <div className="px-4 sm:px-8 py-6 min-h-128" role="tabpanel" id={`panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
+      <div className="px-4 sm:px-8 py-6 min-h-128" role="tabpanel">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}

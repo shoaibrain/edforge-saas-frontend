@@ -597,7 +597,7 @@ function ContextBanner({
           {' '}across{' '}
           <em className="not-italic text-[rgb(var(--accent-academics))]">{overviewStats.courses} courses</em>
           {' '}&mdash;{' '}
-          <em className="not-italic text-[#1D9E75]">{overviewStats.students} students enrolled</em>
+          <em className="not-italic text-[rgb(var(--accent-enrollment))]">{overviewStats.students} students enrolled</em>
           , avg utilization{' '}
           <em className="not-italic text-[rgb(var(--accent-attendance))]">{overviewStats.utilization}%</em>
           .
@@ -617,7 +617,7 @@ function ContextBanner({
           {' '}at risk (below 60%){worstCourse && (
             <> &mdash; concentrated in <em className="not-italic text-[rgb(var(--accent-finance))]">{worstCourse}</em></>
           )}.{' '}
-          <em className="not-italic text-[#1D9E75]">{passingCourses} at 100% pass rate</em>
+          <em className="not-italic text-[rgb(var(--accent-enrollment))]">{passingCourses} at 100% pass rate</em>
           . Grading{' '}
           <em className="not-italic text-[rgb(var(--accent-academics))]">{completionPct}% complete</em>
           .
@@ -635,7 +635,7 @@ function ContextBanner({
         <>
           <em className="not-italic text-[rgb(var(--accent-academics))]">{recorded} of {totalStudents} students</em>
           {' '}recorded today. 7-day average{' '}
-          <em className="not-italic text-[#1D9E75]">{avg7}%</em>
+          <em className="not-italic text-[rgb(var(--accent-enrollment))]">{avg7}%</em>
           {' '}vs 30-day{' '}
           <em className="not-italic text-[rgb(var(--accent-attendance))]">{avg30}%</em>
           .{atRiskCount > 0 && (
