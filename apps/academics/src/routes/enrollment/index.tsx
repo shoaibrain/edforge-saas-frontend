@@ -17,6 +17,7 @@ import { useState, useMemo, useCallback } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useResourcePermissions } from '@edforge/abac'
+import { Tabs } from '@edforge/ui'
 import {
   UserPlus,
   Download,
@@ -85,7 +86,7 @@ function YearProgressBar({ startDate, endDate }: { startDate: string; endDate: s
       <div className="w-20 h-1.5 rounded-full overflow-hidden bg-[rgb(var(--background-tertiary))]">
         <div
           // allow-presentation-style: data-driven progress bar width
-          className="h-full rounded-full bg-[#1D9E75]"
+          className="h-full rounded-full bg-[rgb(var(--accent-enrollment))]"
           style={{ width: `${progress}%` }}
         />
       </div>
@@ -225,7 +226,7 @@ export function EnrollmentModule() {
           {/* Left: Icon + Title */}
           <div className="flex items-center gap-3">
             <div className="flex items-center justify-center rounded-lg bg-[rgb(var(--accent-enrollment)/0.1)]" style={{ width: 32, height: 32 }}>
-              <UserPlus className="w-4 h-4 text-[#1D9E75]" />
+              <UserPlus className="w-4 h-4 text-[rgb(var(--accent-enrollment))]" />
             </div>
             <h1 className="font-semibold text-lg tracking-[-0.3px] text-[rgb(var(--text-primary))]">
               Enroll student
@@ -294,46 +295,14 @@ export function EnrollmentModule() {
         )}
       </div>
 
-      {/* Tab Navigation */}
+      {/* Tabs — shared @edforge/ui primitive (house standard, accessible) */}
       <div className="px-6 bg-[rgb(var(--background-secondary))]">
-        <nav className="flex items-center gap-1" aria-label="Enrollment tabs">
-          {tabItems
-            .filter((tab) => tab.id !== 'registration' || enrollPerms.create)
-            .map((tab) => {
-              const isActive = activeTab === tab.id
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`relative flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium transition-colors border-b-2 ${
-                    isActive
-                      ? 'text-[#1D9E75] border-[#1D9E75]'
-                      : 'text-[rgb(var(--text-tertiary))] border-transparent'
-                  }`}
-                >
-                  {tab.label}
-                  {tab.count !== undefined && (
-                    <span
-                      className={`text-xs font-semibold px-1.5 py-0.5 rounded-full ${
-                        isActive
-                          ? 'bg-[rgb(var(--accent-enrollment)/0.12)] text-[#1D9E75]'
-                          : 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]'
-                      }`}
-                    >
-                      {tab.count}
-                    </span>
-                  )}
-                  {isActive && (
-                    <motion.div
-                      layoutId="enrollment-tab-indicator"
-                      className="absolute bottom-0 left-0 right-0 h-0.5 rounded-t-full bg-[#1D9E75]"
-                      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                    />
-                  )}
-                </button>
-              )
-            })}
-        </nav>
+        <Tabs
+          aria-label="Enrollment tabs"
+          value={activeTab}
+          onChange={(value) => setActiveTab(value as EnrollmentTab)}
+          tabs={tabItems.filter((tab) => tab.id !== 'registration' || enrollPerms.create)}
+        />
       </div>
 
       {/* Tab Content */}
@@ -351,8 +320,8 @@ export function EnrollmentModule() {
                 {/* Academic Year Progress Strip */}
                 {activeYearObj && (
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-[10px] px-3.5 py-3 bg-[rgb(var(--background-tertiary)/0.5)] border border-[rgb(var(--border-primary)/0.35)]">
-                    <Calendar className="w-3.5 h-3.5 text-[#1D9E75]" />
-                    <span className="text-xs font-medium px-2 py-0.5 rounded-md bg-[rgb(var(--accent-enrollment)/0.1)] text-[#1D9E75]">
+                    <Calendar className="w-3.5 h-3.5 text-[rgb(var(--accent-enrollment))]" />
+                    <span className="text-xs font-medium px-2 py-0.5 rounded-md bg-[rgb(var(--accent-enrollment)/0.1)] text-[rgb(var(--accent-enrollment))]">
                       {activeYearObj.name}
                     </span>
                     <YearProgressBar
