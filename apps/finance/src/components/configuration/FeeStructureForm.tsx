@@ -191,9 +191,9 @@ export function FeeStructureForm({
   /* --- Escape key handler --- */
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
+      if (e.key === 'Escape' && !isSubmitting) onClose()
     },
-    [onClose],
+    [onClose, isSubmitting],
   )
 
   useEffect(() => {
@@ -203,7 +203,7 @@ export function FeeStructureForm({
 
   /* --- Backdrop click --- */
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget) onClose()
+    if (e.target === e.currentTarget && !isSubmitting) onClose()
   }
 
   return (
