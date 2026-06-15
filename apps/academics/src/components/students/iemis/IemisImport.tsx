@@ -548,7 +548,7 @@ function FileChooserCard({
         <p className="mt-1 text-sm text-text-tertiary">
           or click below to browse. Up to {MAX_IEMIS_ROW_COUNT} rows per file.
         </p>
-        <label className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[rgb(var(--state-info-bg)/0.18)]0 hover:bg-[rgb(var(--action-primary-bg-hover))] text-[rgb(var(--action-primary-fg))] text-sm font-medium cursor-pointer">
+        <label className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg-hover))] text-[rgb(var(--action-primary-fg))] text-sm font-medium cursor-pointer">
           <Upload className="w-4 h-4" />
           Browse files
           <input
@@ -790,7 +790,7 @@ function PreviewView({
           <button
             onClick={onConfirm}
             disabled={willImport <= 0}
-            className="px-4 py-1.5 text-sm rounded-lg bg-[rgb(var(--state-info-bg)/0.18)]0 hover:bg-[rgb(var(--action-primary-bg-hover))] disabled:bg-text-tertiary disabled:cursor-not-allowed text-[rgb(var(--action-primary-fg))] font-medium"
+            className="px-4 py-1.5 text-sm rounded-lg bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg-hover))] disabled:bg-text-tertiary disabled:cursor-not-allowed text-[rgb(var(--action-primary-fg))] font-medium"
           >
             {willImport > 0
               ? `Import ${willImport} student${willImport === 1 ? '' : 's'}`
@@ -884,7 +884,7 @@ function ConfirmModal({
           <button
             onClick={onConfirm}
             disabled={!ack || willImport <= 0}
-            className="px-4 py-1.5 text-sm rounded-lg bg-[rgb(var(--state-info-bg)/0.18)]0 hover:bg-[rgb(var(--action-primary-bg-hover))] disabled:bg-text-tertiary disabled:cursor-not-allowed text-[rgb(var(--action-primary-fg))] font-medium"
+            className="px-4 py-1.5 text-sm rounded-lg bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg-hover))] disabled:bg-text-tertiary disabled:cursor-not-allowed text-[rgb(var(--action-primary-fg))] font-medium"
           >
             Import {willImport} now
           </button>
@@ -938,7 +938,7 @@ function ProgressView({
 
       {/* Indeterminate stripe — until the worker reports per-batch progress */}
       <div className="mt-4 h-1.5 rounded-full bg-[rgb(var(--state-info-bg)/0.26)]  overflow-hidden">
-        <div className="h-full w-1/3 bg-[rgb(var(--state-info-bg)/0.18)]0 animate-[indeterminate_1.4s_ease-in-out_infinite] [animation-name:indeterminate]"
+        <div className="h-full w-1/3 bg-[rgb(var(--state-info-fg))] animate-[indeterminate_1.4s_ease-in-out_infinite] [animation-name:indeterminate]"
           style={{
             animation: 'indeterminate 1.4s ease-in-out infinite',
           }}
@@ -1053,7 +1053,7 @@ function ResultsView({
           </button>
           <button
             onClick={onViewStudents}
-            className="px-4 py-1.5 text-sm rounded-lg bg-[rgb(var(--state-info-bg)/0.18)]0 hover:bg-[rgb(var(--action-primary-bg-hover))] text-[rgb(var(--action-primary-fg))] font-medium"
+            className="px-4 py-1.5 text-sm rounded-lg bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg-hover))] text-[rgb(var(--action-primary-fg))] font-medium"
           >
             View students
           </button>

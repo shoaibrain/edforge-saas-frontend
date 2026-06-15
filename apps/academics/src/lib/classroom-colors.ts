@@ -9,14 +9,14 @@
 import type { CourseSubjectArea } from '@aibrains/shared-types'
 
 export const CLASSROOM_COLORS = [
-  { gradient: 'from-[rgb(var(--state-info-fg))] to-[rgb(var(--action-primary-bg-hover))]', accent: 'bg-[rgb(var(--state-info-bg)/0.18)]0', text: 'text-[rgb(var(--action-primary-fg))]', bg: 'bg-[rgb(var(--state-info-bg)/0.18)]0/10' },
-  { gradient: 'from-[rgb(var(--state-success-fg))] to-[rgb(var(--state-success-fg))]', accent: 'bg-[rgb(var(--state-success-bg)/0.18)]0', text: 'text-[rgb(var(--action-primary-fg))]', bg: 'bg-[rgb(var(--state-success-bg)/0.18)]0/10' },
-  { gradient: 'from-[rgb(var(--state-info-fg))] to-[rgb(var(--state-info-fg))]', accent: 'bg-[rgb(var(--state-info-bg)/0.18)]0', text: 'text-[rgb(var(--action-primary-fg))]', bg: 'bg-[rgb(var(--state-info-bg)/0.18)]0/10' },
+  { gradient: 'from-[rgb(var(--state-info-fg))] to-[rgb(var(--action-primary-bg-hover))]', accent: 'bg-[rgb(var(--action-primary-bg))]', text: 'text-[rgb(var(--action-primary-fg))]', bg: 'bg-[rgb(var(--state-info-fg)/0.1)]' },
+  { gradient: 'from-[rgb(var(--state-success-fg))] to-[rgb(var(--state-success-fg))]', accent: 'bg-[rgb(var(--state-success-fg))]', text: 'text-[rgb(var(--action-primary-fg))]', bg: 'bg-[rgb(var(--state-success-fg)/0.1)]' },
+  { gradient: 'from-[rgb(var(--state-info-fg))] to-[rgb(var(--state-info-fg))]', accent: 'bg-[rgb(var(--state-info-fg))]', text: 'text-[rgb(var(--action-primary-fg))]', bg: 'bg-[rgb(var(--state-info-fg)/0.1)]' },
   { gradient: 'from-amber-500 to-amber-600', accent: 'bg-amber-500', text: 'text-[rgb(var(--action-primary-fg))]', bg: 'bg-amber-500/10' },
-  { gradient: 'from-[rgb(var(--state-danger-fg))] to-[rgb(var(--state-danger-fg))]', accent: 'bg-[rgb(var(--state-danger-bg)/0.18)]0', text: 'text-[rgb(var(--action-primary-fg))]', bg: 'bg-[rgb(var(--state-danger-bg)/0.18)]0/10' },
-  { gradient: 'from-[rgb(var(--state-info-fg))] to-[rgb(var(--state-info-fg))]', accent: 'bg-[rgb(var(--state-info-bg)/0.18)]0', text: 'text-[rgb(var(--action-primary-fg))]', bg: 'bg-[rgb(var(--state-info-bg)/0.18)]0/10' },
-  { gradient: 'from-[rgb(var(--state-info-fg))] to-[rgb(var(--state-info-fg))]', accent: 'bg-[rgb(var(--state-info-bg)/0.18)]0', text: 'text-[rgb(var(--action-primary-fg))]', bg: 'bg-[rgb(var(--state-info-bg)/0.18)]0/10' },
-  { gradient: 'from-[rgb(var(--action-primary-bg))] to-[rgb(var(--action-primary-bg-hover))]', accent: 'bg-[rgb(var(--state-info-bg)/0.18)]0', text: 'text-[rgb(var(--action-primary-fg))]', bg: 'bg-[rgb(var(--state-info-bg)/0.18)]0/10' },
+  { gradient: 'from-[rgb(var(--state-danger-fg))] to-[rgb(var(--state-danger-fg))]', accent: 'bg-[rgb(var(--state-danger-fg))]', text: 'text-[rgb(var(--action-primary-fg))]', bg: 'bg-[rgb(var(--state-danger-fg)/0.1)]' },
+  { gradient: 'from-[rgb(var(--state-info-fg))] to-[rgb(var(--state-info-fg))]', accent: 'bg-[rgb(var(--state-info-fg))]', text: 'text-[rgb(var(--action-primary-fg))]', bg: 'bg-[rgb(var(--state-info-fg)/0.1)]' },
+  { gradient: 'from-[rgb(var(--state-info-fg))] to-[rgb(var(--state-info-fg))]', accent: 'bg-[rgb(var(--state-info-fg))]', text: 'text-[rgb(var(--action-primary-fg))]', bg: 'bg-[rgb(var(--state-info-fg)/0.1)]' },
+  { gradient: 'from-[rgb(var(--action-primary-bg))] to-[rgb(var(--action-primary-bg-hover))]', accent: 'bg-[rgb(var(--action-primary-bg))]', text: 'text-[rgb(var(--action-primary-fg))]', bg: 'bg-[rgb(var(--state-info-fg)/0.1)]' },
 ] as const
 
 export type ClassroomColor = (typeof CLASSROOM_COLORS)[number]

@@ -24,7 +24,7 @@ import {
   Download,
   Loader2,
 } from 'lucide-react'
-import { StatCard, WidgetErrorBoundaryV2, Card, Button } from '@edforge/ui'
+import { StatCard, WidgetErrorBoundaryV2, Card, Button, ContextBar, ContextBarSep, ContextBarYear } from '@edforge/ui'
 import { getAttendanceColor } from '@edforge/types'
 import { useResourcePermissions } from '@edforge/abac'
 import { StudentTable, StudentQuickProfile, StudentsFilterRow, CSVImport, type StudentAttendanceSignal } from '../../components/students'
@@ -370,7 +370,7 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
   const deleteStudentMutation = useDeleteStudent()
 
   const handleAddStudent = () => {
-    navigate({ to: '/students/enrollment' })
+    navigate({ to: '/students/enrollment', search: { tab: 'registration' } })
   }
 
   const handleViewStudent = useCallback((student: StudentResponseDto) => {
@@ -415,91 +415,94 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
         animate="visible"
         className="space-y-5"
       >
-        {/* ---- Compact Header + Insight Strip ---- */}
-        <motion.div variants={fadeInUp} className="space-y-1">
-          <div className="flex items-center justify-between" style={{ height: 44 }}>
-            <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-[7px] flex items-center justify-center bg-[rgb(var(--accent-enrollment)/0.12)]">
-                <Users className="w-4 h-4 text-[#1D9E75]" />
-              </div>
-              <h1 className="text-sm font-semibold text-[rgb(var(--text-primary))]">
-                Students
-              </h1>
-              <span className="text-xs text-[rgb(var(--text-disabled))]">|</span>
-              <span className="text-xs text-[rgb(var(--text-disabled))]">
-                {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-              </span>
-            </div>
+        {/* ---- Context Bar (operating context, not a page title) + Insight Strip ---- */}
+        <motion.div variants={fadeInUp}>
+          <ContextBar
+            meta={
+              <>
+                {overviewData.academicYear.name ? (
+                  <ContextBarYear>{overviewData.academicYear.name}</ContextBarYear>
+                ) : null}
+                {overviewData.academicYear.name ? <ContextBarSep /> : null}
+                <span>
+                  {new Date().toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    month: 'short',
+                    day: 'numeric',
+                  })}
+                </span>
+              </>
+            }
+            description={
+              <StudentsInsightStrip
+                totalEnrolled={overviewData.overview.totalEnrolled ?? 0}
+                gradeCount={overviewData.enrollment.data.length}
+                attendanceRate={attendanceRate}
+                atRiskCount={overviewData.alerts.totalCount}
+                isLoading={overviewData.overview.isLoading}
+              />
+            }
+            actions={
+              studentPerms.create ? (
+                <>
+                  {/*
+                    TODO(students-csv-import): "Import CSV" is hidden from the view
+                    until the CSV importer populates the student IEMIS field that
+                    the PABSON archetype requires (currently missing from the
+                    importer's column mapping). Not a priority to fix — re-enable
+                    this button once the importer maps IEMIS. "Import IEMIS" and
+                    "Govt. Reports" below remain the supported import/export paths.
 
-            {/* Action buttons */}
-            {studentPerms.create && (
-              <div className="flex items-center gap-2">
-                {/*
-                  TODO(students-csv-import): "Import CSV" is hidden from the view
-                  until the CSV importer populates the student IEMIS field that
-                  the PABSON archetype requires (currently missing from the
-                  importer's column mapping). Not a priority to fix — re-enable
-                  this button once the importer maps IEMIS. "Import IEMIS" and
-                  "Govt. Reports" below remain the supported import/export paths.
-
-                <button
-                  onClick={() => setShowImport(true)}
-                  aria-label="Import students"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40 bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
-                >
-                  <Upload className="w-3.5 h-3.5" />
-                  Import CSV
-                </button>
-                */}
-                {/*
-                  Phase 3.1 — IEMIS button is always visible. The eligibility
-                  gate (active school must have emisSchoolCode) is enforced
-                  on the target page itself, not here, because hiding the
-                  button creates a "where'd it go?" mystery for PABSON
-                  admins who swap between an IEMIS-ready school and a
-                  non-IEMIS school mid-session.
-                */}
-                <button
-                  onClick={() => navigate({ to: '/students/import/iemis' })}
-                  aria-label="Import from IEMIS"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40 bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
-                >
-                  <Upload className="w-3.5 h-3.5" />
-                  Import IEMIS
-                </button>
-                {/*
-                  IEMIS export counterpart to "Import IEMIS". Routes to the
-                  Government Reports surface (Flash I/II generation + download).
-                  Eligibility (school + emisSchoolCode) is gated on the target
-                  page, mirroring the import button's always-visible rationale.
-                */}
-                <button
-                  onClick={() => navigate({ to: '/reports/government' })}
-                  aria-label="Government reports"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40 bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
-                >
-                  <FileSpreadsheet className="w-3.5 h-3.5" />
-                  Govt. Reports
-                </button>
-                <button
-                  onClick={handleAddStudent}
-                  aria-label="Enroll student"
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
-                >
-                  <UserPlus className="w-3.5 h-3.5" />
-                  Enroll student
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Contextual insight strip */}
-          <StudentsInsightStrip
-            totalEnrolled={overviewData.overview.totalEnrolled ?? 0}
-            gradeCount={overviewData.enrollment.data.length}
-            attendanceRate={attendanceRate}
-            atRiskCount={overviewData.alerts.totalCount}
-            isLoading={overviewData.overview.isLoading}
+                  <button
+                    onClick={() => setShowImport(true)}
+                    aria-label="Import students"
+                    className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-[9px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-enrollment)/0.4)] bg-transparent border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
+                  >
+                    <Upload className="w-3.5 h-3.5" />
+                    Import CSV
+                  </button>
+                  */}
+                  {/*
+                    Phase 3.1 — IEMIS button is always visible. The eligibility
+                    gate (active school must have emisSchoolCode) is enforced
+                    on the target page itself, not here, because hiding the
+                    button creates a "where'd it go?" mystery for PABSON
+                    admins who swap between an IEMIS-ready school and a
+                    non-IEMIS school mid-session.
+                  */}
+                  <button
+                    onClick={() => navigate({ to: '/students/import/iemis' })}
+                    aria-label="Import from IEMIS"
+                    className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-[9px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-enrollment)/0.4)] bg-transparent border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
+                  >
+                    <Upload className="w-3.5 h-3.5" />
+                    Import IEMIS
+                  </button>
+                  {/*
+                    IEMIS export counterpart to "Import IEMIS". Routes to the
+                    Government Reports surface (Flash I/II generation + download).
+                    Eligibility (school + emisSchoolCode) is gated on the target
+                    page, mirroring the import button's always-visible rationale.
+                  */}
+                  <button
+                    onClick={() => navigate({ to: '/reports/government' })}
+                    aria-label="Government reports"
+                    className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-[9px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-enrollment)/0.4)] bg-transparent border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
+                  >
+                    <FileSpreadsheet className="w-3.5 h-3.5" />
+                    Govt. Reports
+                  </button>
+                  <button
+                    onClick={handleAddStudent}
+                    aria-label="Enroll student"
+                    className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-[9px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-enrollment)/0.4)] bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
+                  >
+                    <UserPlus className="w-3.5 h-3.5" />
+                    Enroll student
+                  </button>
+                </>
+              ) : undefined
+            }
           />
         </motion.div>
 
@@ -518,12 +521,12 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
                   label="Total Enrolled"
                   value={overviewData.overview.totalEnrolled != null ? overviewData.overview.totalEnrolled.toLocaleString() : '—'}
                   icon={Users}
-                  accentColor="rgba(29, 158, 117, 0.12)"
-                  iconColor="#1D9E75"
-                  barColor="#1D9E75"
+                  accentColor="rgb(var(--accent-enrollment)/0.12)"
+                  iconColor="rgb(var(--accent-enrollment))"
+                  barColor="rgb(var(--accent-enrollment))"
                   tag={
                     overviewData.overview.recentEnrollments && overviewData.overview.recentEnrollments > 0
-                      ? { text: `+${overviewData.overview.recentEnrollments} recent`, color: '#1D9E75', bg: 'rgba(29, 158, 117, 0.10)' }
+                      ? { text: `+${overviewData.overview.recentEnrollments} recent`, color: 'rgb(var(--accent-enrollment))', bg: 'rgb(var(--accent-enrollment)/0.1)' }
                       : undefined
                   }
                   hint={overviewData.enrollment.data.length > 0 ? `across ${overviewData.enrollment.data.length} grades` : 'this academic year'}
@@ -538,12 +541,12 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
                   label="At-Risk Students"
                   value={overviewData.alerts.totalCount.toString()}
                   icon={AlertTriangle}
-                  accentColor="rgba(226, 75, 74, 0.12)"
-                  iconColor="#E24B4A"
-                  barColor="#E24B4A"
+                  accentColor="rgb(var(--accent-finance)/0.12)"
+                  iconColor="rgb(var(--accent-finance))"
+                  barColor="rgb(var(--accent-finance))"
                   tag={
                     overviewData.alerts.criticalCount > 0
-                      ? { text: `${overviewData.alerts.criticalCount} critical`, color: '#E24B4A', bg: 'rgba(226, 75, 74, 0.10)' }
+                      ? { text: `${overviewData.alerts.criticalCount} critical`, color: 'rgb(var(--accent-finance))', bg: 'rgb(var(--accent-finance)/0.1)' }
                       : undefined
                   }
                   hint={
@@ -560,14 +563,14 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
                   label="Today's Attendance"
                   value={attendanceRate != null ? `${attendanceRate.toFixed(1)}%` : '—'}
                   icon={ClipboardCheck}
-                  accentColor="rgba(239, 159, 39, 0.12)"
-                  iconColor="#EF9F27"
-                  barColor={attendanceColor || '#EF9F27'}
+                  accentColor="rgb(var(--accent-attendance)/0.12)"
+                  iconColor="rgb(var(--accent-attendance))"
+                  barColor={attendanceColor || 'rgb(var(--accent-attendance))'}
                   valueColor={attendanceColor}
                   tag={
                     overviewData.overview.todayAttendanceSummary &&
                     (overviewData.overview.todayAttendanceSummary.totalStudents - (overviewData.overview.todayAttendanceSummary.totalRecorded ?? 0)) > 0
-                      ? { text: 'Partial data', color: '#EF9F27', bg: 'rgba(239, 159, 39, 0.10)' }
+                      ? { text: 'Partial data', color: 'rgb(var(--accent-attendance))', bg: 'rgb(var(--accent-attendance)/0.1)' }
                       : undefined
                   }
                   hint={
@@ -586,9 +589,9 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
                   label="Grade Levels"
                   value={overviewData.enrollment.data.length.toString()}
                   icon={GraduationCap}
-                  accentColor="rgba(55, 138, 221, 0.12)"
-                  iconColor="#378ADD"
-                  barColor="#378ADD"
+                  accentColor="rgb(var(--accent-academics)/0.12)"
+                  iconColor="rgb(var(--accent-academics))"
+                  barColor="rgb(var(--accent-academics))"
                   hint="covered this year"
                   loading={overviewData.overview.isLoading}
                 />

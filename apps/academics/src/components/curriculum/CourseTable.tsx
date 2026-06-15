@@ -269,13 +269,13 @@ export function CourseTable({
                 {row.original.credits}
               </span>
               {style === 'ap' && (
-                <sup className="text-4xs font-bold ml-[3px] text-[rgb(var(--accent-finance))]">AP</sup>
+                <sup className="text-4xs font-bold ml-[3px] text-[rgb(var(--accent-finance-text))]">AP</sup>
               )}
               {style === 'dual' && (
-                <sup className="text-4xs font-bold ml-[3px] text-[rgb(var(--accent-academics))]">DE</sup>
+                <sup className="text-4xs font-bold ml-[3px] text-[rgb(var(--accent-academics-text))]">DE</sup>
               )}
               {style === 'honors' && (
-                <sup className="text-4xs font-bold ml-[3px] text-[rgb(var(--accent-attendance))]">H</sup>
+                <sup className="text-4xs font-bold ml-[3px] text-[rgb(var(--accent-attendance-text))]">H</sup>
               )}
             </div>
           )

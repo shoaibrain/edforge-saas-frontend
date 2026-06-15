@@ -31,6 +31,7 @@ import {
 } from 'lucide-react'
 import { z } from 'zod'
 import { useResourcePermissions } from '@edforge/abac'
+import { Tabs, type TabItem } from '@edforge/ui'
 import { useSection, useUpdateSection, useSectionRoster } from '../../hooks/useSections'
 import { useCourse } from '../../hooks/useCourses'
 import { useActiveSchoolId } from '../../stores/app.store'
@@ -247,7 +248,7 @@ function SectionGradesTab({ sectionId, section }: { sectionId: string; section: 
             type="button"
             onClick={() => setShowBulkModal(true)}
             disabled={!effectiveTermId}
-            className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-bg)/0.18)]0 hover:bg-[rgb(var(--action-primary-bg-hover))] rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg-hover))] rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <Plus className="w-3.5 h-3.5" />
             Record
@@ -379,11 +380,11 @@ function ProgressOverview({
   }, [roster, todayRecords])
 
   const distColors: Record<string, string> = {
-    A: 'bg-[rgb(var(--state-success-bg)/0.18)]0',
+    A: 'bg-[rgb(var(--state-success-fg))]',
     B: 'bg-[rgb(var(--state-info-fg))]',
     C: 'bg-[rgb(var(--state-warning-fg))]',
     D: 'bg-[rgb(var(--state-warning-fg))]',
-    F: 'bg-[rgb(var(--state-danger-bg)/0.18)]0',
+    F: 'bg-[rgb(var(--state-danger-fg))]',
   }
 
   return (
@@ -469,7 +470,7 @@ function ProgressOverview({
 
             <div className="flex gap-0.5 h-2.5 rounded-full overflow-hidden bg-surface-secondary">
               {attendanceStats.present > 0 && (
-                <div className="bg-[rgb(var(--state-success-bg)/0.18)]0 transition-all" style={{ width: `${(attendanceStats.present / attendanceStats.total) * 100}%` }} title={`Present: ${attendanceStats.present}`} />
+                <div className="bg-[rgb(var(--state-success-fg))] transition-all" style={{ width: `${(attendanceStats.present / attendanceStats.total) * 100}%` }} title={`Present: ${attendanceStats.present}`} />
               )}
               {attendanceStats.late > 0 && (
                 <div className="bg-[rgb(var(--state-warning-fg))] transition-all" style={{ width: `${(attendanceStats.late / attendanceStats.total) * 100}%` }} title={`Late: ${attendanceStats.late}`} />
@@ -478,16 +479,16 @@ function ProgressOverview({
                 <div className="bg-[rgb(var(--state-info-fg))] transition-all" style={{ width: `${(attendanceStats.remote / attendanceStats.total) * 100}%` }} title={`Remote: ${attendanceStats.remote}`} />
               )}
               {attendanceStats.absent > 0 && (
-                <div className="bg-[rgb(var(--state-danger-bg)/0.18)]0 transition-all" style={{ width: `${(attendanceStats.absent / attendanceStats.total) * 100}%` }} title={`Absent: ${attendanceStats.absent}`} />
+                <div className="bg-[rgb(var(--state-danger-fg))] transition-all" style={{ width: `${(attendanceStats.absent / attendanceStats.total) * 100}%` }} title={`Absent: ${attendanceStats.absent}`} />
               )}
             </div>
 
             <div className="flex flex-wrap gap-4 text-xs">
               {[
-                { label: 'Present', value: attendanceStats.present, dot: 'bg-[rgb(var(--state-success-bg)/0.18)]0' },
+                { label: 'Present', value: attendanceStats.present, dot: 'bg-[rgb(var(--state-success-fg))]' },
                 { label: 'Late', value: attendanceStats.late, dot: 'bg-[rgb(var(--state-warning-fg))]' },
                 { label: 'Remote', value: attendanceStats.remote, dot: 'bg-[rgb(var(--state-info-fg))]' },
-                { label: 'Absent', value: attendanceStats.absent, dot: 'bg-[rgb(var(--state-danger-bg)/0.18)]0' },
+                { label: 'Absent', value: attendanceStats.absent, dot: 'bg-[rgb(var(--state-danger-fg))]' },
               ].filter(s => s.value > 0).map((s) => (
                 <div key={s.label} className="flex items-center gap-1.5">
                   <span className={`w-2 h-2 rounded-full ${s.dot}`} />
@@ -750,45 +751,29 @@ export function ClassroomDetailPage() {
         </div>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="border-b border-border-secondary bg-surface-secondary/50">
+      {/* Tabs — shared @edforge/ui primitive (house standard, accessible) */}
+      <div className="bg-surface-secondary/50">
         <div className="px-4 sm:px-8">
-          <nav className="flex gap-1 overflow-x-auto" aria-label="Classroom tabs" role="tablist">
-            {TABS.map((tab) => {
-              const isActive = activeTab === tab.id
-              return (
-                <button
-                  key={tab.id}
-                  role="tab"
-                  id={`tab-${tab.id}`}
-                  aria-selected={isActive}
-                  aria-controls={`panel-${tab.id}`}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`relative flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors whitespace-nowrap ${
-                    isActive
-                      ? 'text-text-primary'
-                      : 'text-text-tertiary hover:text-text-secondary'
-                  }`}
-                >
-                  <tab.icon className={`w-4 h-4 ${isActive ? 'text-[rgb(var(--action-secondary-fg))]' : 'opacity-70'}`} />
+          <Tabs
+            aria-label="Classroom tabs"
+            value={activeTab}
+            onChange={(value) => setActiveTab(value as ClassroomDetailTab)}
+            className="overflow-x-auto"
+            tabs={TABS.map((tab): TabItem => ({
+              id: tab.id,
+              label: (
+                <span className="flex items-center gap-2">
+                  <tab.icon className="w-4 h-4" />
                   {tab.label}
-                  {isActive && (
-                    <motion.div
-                      layoutId="classroomDetailTab"
-                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-[rgb(var(--state-info-bg)/0.18)]0 rounded-t-full"
-                      initial={false}
-                      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                    />
-                  )}
-                </button>
-              )
-            })}
-          </nav>
+                </span>
+              ),
+            }))}
+          />
         </div>
       </div>
 
       {/* Tab Content */}
-      <div className="px-4 sm:px-8 py-6 min-h-128" role="tabpanel" id={`panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
+      <div className="px-4 sm:px-8 py-6 min-h-128" role="tabpanel">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}

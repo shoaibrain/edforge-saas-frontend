@@ -188,6 +188,7 @@ export function EnrollmentDistributionChart({
       <div className="pt-3 mt-auto border-t border-border-secondary">
         <Link
           to="/students/enrollment"
+          search={{ tab: 'dashboard' }}
           className="inline-flex items-center gap-1.5 text-xs font-medium text-[rgb(var(--action-secondary-fg))]  hover:text-[rgb(var(--text-primary))] dark:hover:text-[rgb(var(--text-primary))] transition-colors"
         >
           View Enrollment

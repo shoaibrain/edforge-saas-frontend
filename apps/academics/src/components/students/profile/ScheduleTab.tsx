@@ -93,7 +93,7 @@ function AttendanceSection({ summary }: { summary: AttendanceSummary }) {
         </div>
       )}
       {summary.attendanceRate >= 98 && (
-        <div className="mt-4 p-3 rounded-lg bg-[rgb(var(--state-success-bg)/0.18)]0/5 border border-[rgb(var(--state-success-border))]/15">
+        <div className="mt-4 p-3 rounded-lg bg-[rgb(var(--state-success-fg)/0.05)] border border-[rgb(var(--state-success-border))]/15">
           <p className="text-sm text-[rgb(var(--state-success-fg))] flex items-center gap-2">
             <TrendingUp className="w-4 h-4 flex-shrink-0" />
             Outstanding attendance record!
@@ -126,7 +126,7 @@ function StatCard({
 // ============================================================================
 
 function getSubjectColor(subject?: string): { bg: string; text: string } {
-  if (!subject) return { bg: 'bg-[rgb(var(--background-tertiary))]0/10', text: 'text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]' }
+  if (!subject) return { bg: 'bg-[rgb(var(--background-tertiary)/0.1)]', text: 'text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]' }
   const s = subject.toLowerCase()
   if (s.includes('math') || s.includes('algebra') || s.includes('calculus'))
     return { bg: 'bg-[rgb(var(--state-info-bg)/0.18)]', text: 'text-[rgb(var(--state-info-fg))]' }
@@ -142,7 +142,7 @@ function getSubjectColor(subject?: string): { bg: string; text: string } {
     return { bg: 'bg-[rgb(var(--state-warning-fg))]/10', text: 'text-[rgb(var(--state-warning-fg))]' }
   if (s.includes('computer') || s.includes('tech') || s.includes('programming'))
     return { bg: 'bg-[rgb(var(--state-info-fg))]/10', text: 'text-[rgb(var(--state-info-fg))] ' }
-  return { bg: 'bg-[rgb(var(--background-tertiary))]0/10', text: 'text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]' }
+  return { bg: 'bg-[rgb(var(--background-tertiary)/0.1)]', text: 'text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]' }
 }
 
 // ============================================================================
@@ -341,7 +341,7 @@ export function ScheduleTab({ student, onAddToSection }: ScheduleTabProps) {
           <Link
             to="/classrooms"
             search={{ tab: 'attendance' }}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--text-primary))] bg-[rgb(var(--state-info-bg)/0.18)] hover:bg-[rgb(var(--state-info-bg)/0.26)] dark:bg-[rgb(var(--state-info-bg)/0.18)] dark:hover:bg-[rgb(var(--state-info-bg)/0.18)]0/20  rounded-lg transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--text-primary))] bg-[rgb(var(--state-info-bg)/0.18)] hover:bg-[rgb(var(--state-info-bg)/0.26)] dark:bg-[rgb(var(--state-info-bg)/0.18)] dark:hover:bg-[rgb(var(--state-info-fg)/0.2)]  rounded-lg transition-colors"
           >
             <Calendar className="w-3.5 h-3.5" />
             Attendance History

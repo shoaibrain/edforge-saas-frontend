@@ -13,6 +13,7 @@ import {
   Briefcase,
 } from 'lucide-react'
 import { useActiveSchoolId } from '../../stores/app.store'
+import { ContextBar } from '@edforge/ui'
 import { useSchoolStaff, flattenStaffData } from '../../hooks/useStaff'
 import { TeacherTable } from '../../components/teachers/TeacherTable'
 import { TeacherDetailDrawer } from '../../components/teachers/TeacherDetailDrawer'
@@ -69,20 +70,26 @@ export function TeachersModule() {
 
   return (
     <div className="min-h-full">
-      {/* Page Header */}
+      {/* Header — operating context, not a page title (breadcrumb says Teachers) */}
       <div className="border-b border-border-secondary bg-surface-secondary/50">
-        <div className="px-6 py-6">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-[rgb(var(--state-info-bg)/0.20)] to-[rgb(var(--state-info-bg)/0.14)]">
-              <Users className="w-6 h-6 text-[rgb(var(--state-info-fg))]" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-text-primary">Faculty Directory</h1>
-              <p className="text-text-secondary mt-0.5">
+        <div className="px-6 py-5">
+          <ContextBar
+            divider={false}
+            meta={
+              <span>
+                {new Date().toLocaleDateString('en-US', {
+                  weekday: 'long',
+                  month: 'short',
+                  day: 'numeric',
+                })}
+              </span>
+            }
+            description={
+              <p className="text-sm text-text-secondary">
                 School staff members and their teaching assignments
               </p>
-            </div>
-          </div>
+            }
+          />
         </div>
       </div>
 

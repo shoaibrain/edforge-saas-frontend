@@ -16,6 +16,7 @@
 import { useState, useMemo, useCallback, useRef } from 'react'
 import { Grid3x3, Loader2, AlertTriangle, Check, Plus, Minus, Save } from 'lucide-react'
 import { toast } from 'sonner'
+import { ContextBar, ContextBarYear, ContextBarSep } from '@edforge/ui'
 import { useActiveSchoolId } from '../../stores/app.store'
 import { useSchoolEnabledGradeOptions } from '../../hooks/useGradeOptions'
 import { useCurrentAcademicYear } from '../../hooks'
@@ -190,13 +191,13 @@ function MatrixCell({
         className={`
           w-7 h-7 rounded border-2 flex items-center justify-center mx-auto transition-all
           ${hasConflict
-            ? 'border-[rgb(var(--state-danger-border))] bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)] hover:bg-[rgb(var(--state-danger-bg)/0.26)] dark:hover:bg-[rgb(var(--state-danger-bg)/0.18)]0/20'
+            ? 'border-[rgb(var(--state-danger-border))] bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)] hover:bg-[rgb(var(--state-danger-bg)/0.26)] dark:hover:bg-[rgb(var(--state-danger-fg)/0.2)]'
             : checked
               ? isPending && pendingAction === 'add'
                 ? 'border-[rgb(var(--state-success-border))] bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-bg)/0.18)] hover:bg-[rgb(var(--state-success-bg)/0.26)]'
-                : 'border-[rgb(var(--border-focus))] bg-[rgb(var(--state-info-bg)/0.18)]0 hover:bg-[rgb(var(--action-primary-bg-hover))] hover:border-[rgb(var(--state-info-border))]'
+                : 'border-[rgb(var(--border-focus))] bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg-hover))] hover:border-[rgb(var(--state-info-border))]'
               : isPending && pendingAction === 'remove'
-                ? 'border-[rgb(var(--state-danger-border))] bg-[rgb(var(--state-danger-bg)/0.18)]/50 dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/5 hover:bg-[rgb(var(--state-danger-bg)/0.26)]'
+                ? 'border-[rgb(var(--state-danger-border))] bg-[rgb(var(--state-danger-bg)/0.18)]/50 dark:bg-[rgb(var(--state-danger-fg)/0.05)] hover:bg-[rgb(var(--state-danger-bg)/0.26)]'
                 : 'border-border-secondary hover:border-[rgb(var(--border-focus))] hover:bg-surface-hover'
           }
         `}
@@ -226,7 +227,7 @@ function MatrixCell({
       {/* Pending change indicator dot */}
       {isPending && (
         <div className={`absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full ${
-          pendingAction === 'add' ? 'bg-[rgb(var(--state-success-bg)/0.18)]0' : 'bg-[rgb(var(--state-danger-bg)/0.18)]0'
+          pendingAction === 'add' ? 'bg-[rgb(var(--state-success-fg))]' : 'bg-[rgb(var(--state-danger-fg))]'
         }`} />
       )}
     </td>
@@ -328,7 +329,7 @@ function SummaryBar({
       {isSubmitting && total > 0 && (
         <div className="h-1 bg-surface-secondary">
           <div
-            className="h-full bg-[rgb(var(--state-info-bg)/0.18)]0 transition-all duration-300 ease-out"
+            className="h-full bg-[rgb(var(--state-info-fg))] transition-all duration-300 ease-out"
             style={{ width: `${Math.round((progress / total) * 100)}%` }}
           />
         </div>
@@ -669,25 +670,30 @@ export function BulkRosteringPage() {
   // ---------------------------------------------------------------------------
   return (
     <div className="min-h-full flex flex-col">
-      {/* Header */}
+      {/* Header — operating context, not a page title (breadcrumb says Rostering) */}
       <div className="border-b border-border-secondary bg-surface-secondary/50">
-        <div className="px-6 py-6">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-[rgb(var(--state-info-bg)/0.20)] to-[rgb(var(--state-info-bg)/0.14)]">
-              <Grid3x3 className="w-6 h-6 text-[rgb(var(--action-secondary-fg))]" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-text-primary">Bulk Rostering</h1>
-              <p className="text-text-secondary mt-0.5">
+        <div className="px-6 py-5">
+          <ContextBar
+            divider={false}
+            meta={
+              <>
+                {currentYear?.name ? <ContextBarYear>{currentYear.name}</ContextBarYear> : null}
+                {currentYear?.name ? <ContextBarSep /> : null}
+                <span>
+                  {new Date().toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    month: 'short',
+                    day: 'numeric',
+                  })}
+                </span>
+              </>
+            }
+            description={
+              <p className="text-sm text-text-secondary">
                 Manage student-to-section assignments across all active sections
-                {currentYear && (
-                  <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--action-secondary-fg))]">
-                    {currentYear.name}
-                  </span>
-                )}
               </p>
-            </div>
-          </div>
+            }
+          />
         </div>
       </div>
 

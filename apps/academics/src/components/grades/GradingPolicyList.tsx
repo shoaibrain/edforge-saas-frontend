@@ -90,7 +90,7 @@ function PolicyCard({
             <div key={cat.categoryId} className="flex items-center gap-2">
               <div className="flex-1 h-2 bg-surface-hover rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-[rgb(var(--state-info-bg)/0.18)]0 rounded-full"
+                  className="h-full bg-[rgb(var(--state-info-fg))] rounded-full"
                   style={{ width: `${cat.weight}%` }}
                 />
               </div>
@@ -154,7 +154,7 @@ export function GradingPolicyList() {
           <button
             type="button"
             onClick={() => setShowCreate(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--text-primary))] bg-[rgb(var(--state-info-bg)/0.18)] hover:bg-[rgb(var(--state-info-bg)/0.26)] dark:bg-[rgb(var(--state-info-bg)/0.18)] dark:hover:bg-[rgb(var(--state-info-bg)/0.18)]0/20  rounded-lg transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--text-primary))] bg-[rgb(var(--state-info-bg)/0.18)] hover:bg-[rgb(var(--state-info-bg)/0.26)] dark:bg-[rgb(var(--state-info-bg)/0.18)] dark:hover:bg-[rgb(var(--state-info-fg)/0.2)]  rounded-lg transition-colors"
           >
             <Plus className="w-3.5 h-3.5" />
             New Policy

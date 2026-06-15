@@ -16,6 +16,7 @@ import {
   GraduationCap,
 } from 'lucide-react'
 import { useSections, flattenSectionPages } from '../../hooks'
+import { useEscapeToClose } from '../../hooks/useEscapeToClose'
 import { useActiveSchoolId } from '../../stores/app.store'
 
 // ============================================================================
@@ -48,6 +49,7 @@ interface TeacherDetailDrawerProps {
 export function TeacherDetailDrawer({ member, onClose }: TeacherDetailDrawerProps) {
   const schoolId = useActiveSchoolId() || ''
   const teacherId = member?.staffId || member?.userId || ''
+  useEscapeToClose(onClose, !!member)
 
   // Fetch teacher's sections
   const { data: sectionsData, isLoading: sectionsLoading } = useSections({
@@ -82,10 +84,13 @@ export function TeacherDetailDrawer({ member, onClose }: TeacherDetailDrawerProp
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
             className="fixed right-0 top-0 bottom-0 z-50 w-full max-w-md bg-surface-primary border-l border-border-secondary shadow-xl overflow-y-auto"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="staff-profile-title"
           >
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-border-secondary">
-              <h3 className="text-lg font-semibold text-text-primary">Staff Profile</h3>
+              <h3 id="staff-profile-title" className="text-lg font-semibold text-text-primary">Staff Profile</h3>
               <button
                 type="button"
                 onClick={onClose}

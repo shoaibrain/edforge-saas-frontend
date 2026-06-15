@@ -11,8 +11,8 @@
  * Sprint 2 - Ticket 2.9: Assemble Student Profile Page
  */
 
-import { useState } from 'react'
-import { useParams } from '@tanstack/react-router'
+import { useCallback } from 'react'
+import { useParams, useSearch, useNavigate } from '@tanstack/react-router'
 import { useResourcePermissions } from '@edforge/abac'
 import { useTranslation } from '@edforge/i18n'
 import { z } from 'zod'
@@ -25,7 +25,7 @@ import {
   BarChart3,
   IdCard,
 } from 'lucide-react'
-import { Button } from '@edforge/ui'
+import { Button, Tabs, type TabItem } from '@edforge/ui'
 import { useStudentProfile, useStudentProfileActions, useGrantPortalAccess } from '../../hooks'
 import { useActiveSchoolId } from '../../stores/app.store'
 import { NotFound, PermissionDenied } from '../../components/common'
@@ -133,7 +133,17 @@ export function StudentProfilePage() {
   const params = useParams({ from: '/students/$studentId' })
   const studentId = params.studentId
   const schoolId = useActiveSchoolId()
-  const [activeTab, setActiveTab] = useState<TabId>('overview')
+  const navigate = useNavigate()
+  // URL-synced active tab (deep-linkable / shareable). The route's
+  // validateSearch defaults invalid/absent values to undefined → 'overview'.
+  const { tab } = useSearch({ from: '/students/$studentId' })
+  const activeTab: TabId = tab ?? 'overview'
+  const setActiveTab = useCallback(
+    (next: TabId) => {
+      navigate({ to: '/students/$studentId', params: { studentId }, search: { tab: next }, replace: true })
+    },
+    [navigate, studentId],
+  )
   const { t } = useTranslation('academics')
 
   // ABAC: check student permissions
@@ -211,41 +221,25 @@ export function StudentProfilePage() {
           />
         </div>
 
-        {/* Tab Navigation — aligned with Staff Detail pattern */}
-        <div className="flex items-center space-x-1 overflow-x-auto no-scrollbar border-b border-[rgb(var(--border-primary))]">
-          {TAB_IDS.map((tab) => {
-            const isActive = activeTab === tab.id
+        {/* Tabs — shared @edforge/ui primitive (house standard, accessible) */}
+        <Tabs
+          aria-label="Student profile sections"
+          value={activeTab}
+          onChange={(value) => setActiveTab(value as TabId)}
+          className="overflow-x-auto no-scrollbar"
+          tabs={TAB_IDS.map((tab): TabItem => {
             const Icon = tab.icon
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`
-                  relative px-4 py-3 pb-3.5 text-sm transition-colors whitespace-nowrap outline-none
-                  ${isActive
-                    ? 'text-[rgb(var(--action-secondary-fg))] font-medium'
-                    : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] hover:border-[rgb(var(--border-primary))]'
-                  }
-                `}
-              >
-                <span className="relative z-10 flex items-center gap-2">
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-[rgb(var(--action-secondary-fg))]' : 'opacity-70'}`} />
+            return {
+              id: tab.id,
+              label: (
+                <span className="flex items-center gap-2">
+                  <Icon className="w-4 h-4" />
                   {t(`tabs.${tab.id}`)}
                 </span>
-
-                {/* Animated underline indicator */}
-                {isActive && (
-                  <motion.div
-                    layoutId="studentProfileTab"
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-[rgb(var(--state-info-bg)/0.18)]0 rounded-t-full"
-                    initial={false}
-                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                  />
-                )}
-              </button>
-            )
+              ),
+            }
           })}
-        </div>
+        />
 
         {/* Tab Content with AnimatePresence */}
         <div className="min-h-128 pt-6">

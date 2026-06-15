@@ -14,9 +14,10 @@
  */
 
 import { useState, useMemo, useCallback } from 'react'
-import { useNavigate } from '@tanstack/react-router'
+import { useNavigate, useSearch } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useResourcePermissions } from '@edforge/abac'
+import { Tabs } from '@edforge/ui'
 import {
   UserPlus,
   Download,
@@ -54,18 +55,6 @@ import type { EnrollmentResponseDto } from '../../services/academics.service'
 
 type EnrollmentTab = 'registration' | 'dashboard'
 
-function getInitialTab(): EnrollmentTab {
-  try {
-    const params = new URLSearchParams(window.location.search)
-    const tab = params.get('tab')
-    if (tab === 'records') return 'dashboard'
-    if (tab === 'new') return 'registration'
-  } catch {
-    // SSR or error — fall through
-  }
-  return 'registration'
-}
-
 // ============================================================================
 // YEAR PROGRESS BAR (inline)
 // ============================================================================
@@ -85,7 +74,7 @@ function YearProgressBar({ startDate, endDate }: { startDate: string; endDate: s
       <div className="w-20 h-1.5 rounded-full overflow-hidden bg-[rgb(var(--background-tertiary))]">
         <div
           // allow-presentation-style: data-driven progress bar width
-          className="h-full rounded-full bg-[#1D9E75]"
+          className="h-full rounded-full bg-[rgb(var(--accent-enrollment))]"
           style={{ width: `${progress}%` }}
         />
       </div>
@@ -102,7 +91,15 @@ function YearProgressBar({ startDate, endDate }: { startDate: string; endDate: s
 
 export function EnrollmentModule() {
   const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState<EnrollmentTab>(getInitialTab)
+  // URL-synced active tab (deep-linkable; legacy ?tab=new|records mapped in route)
+  const { tab } = useSearch({ from: '/students/enrollment' })
+  const activeTab: EnrollmentTab = tab ?? 'registration'
+  const setActiveTab = useCallback(
+    (next: EnrollmentTab) => {
+      navigate({ to: '/students/enrollment', search: { tab: next }, replace: true })
+    },
+    [navigate],
+  )
   const schoolId = useActiveSchoolId() || ''
 
   // ABAC: check enrollment permissions
@@ -225,7 +222,7 @@ export function EnrollmentModule() {
           {/* Left: Icon + Title */}
           <div className="flex items-center gap-3">
             <div className="flex items-center justify-center rounded-lg bg-[rgb(var(--accent-enrollment)/0.1)]" style={{ width: 32, height: 32 }}>
-              <UserPlus className="w-4 h-4 text-[#1D9E75]" />
+              <UserPlus className="w-4 h-4 text-[rgb(var(--accent-enrollment-text))]" />
             </div>
             <h1 className="font-semibold text-lg tracking-[-0.3px] text-[rgb(var(--text-primary))]">
               Enroll student
@@ -272,7 +269,7 @@ export function EnrollmentModule() {
                     type="button"
                     onClick={handleCloseYear}
                     disabled={closeYearMutation.isPending}
-                    className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-[8px] transition-colors disabled:opacity-50 bg-[rgb(var(--accent-attendance)/0.08)] border border-[rgb(var(--accent-attendance)/0.2)] text-[rgb(var(--accent-attendance))]"
+                    className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-[8px] transition-colors disabled:opacity-50 bg-[rgb(var(--accent-attendance)/0.08)] border border-[rgb(var(--accent-attendance)/0.2)] text-[rgb(var(--accent-attendance-text))]"
                     title="Close all open enrollments for this year"
                   >
                     <Lock className="w-3 h-3" />
@@ -294,46 +291,14 @@ export function EnrollmentModule() {
         )}
       </div>
 
-      {/* Tab Navigation */}
+      {/* Tabs — shared @edforge/ui primitive (house standard, accessible) */}
       <div className="px-6 bg-[rgb(var(--background-secondary))]">
-        <nav className="flex items-center gap-1" aria-label="Enrollment tabs">
-          {tabItems
-            .filter((tab) => tab.id !== 'registration' || enrollPerms.create)
-            .map((tab) => {
-              const isActive = activeTab === tab.id
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`relative flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium transition-colors border-b-2 ${
-                    isActive
-                      ? 'text-[#1D9E75] border-[#1D9E75]'
-                      : 'text-[rgb(var(--text-tertiary))] border-transparent'
-                  }`}
-                >
-                  {tab.label}
-                  {tab.count !== undefined && (
-                    <span
-                      className={`text-xs font-semibold px-1.5 py-0.5 rounded-full ${
-                        isActive
-                          ? 'bg-[rgb(var(--accent-enrollment)/0.12)] text-[#1D9E75]'
-                          : 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]'
-                      }`}
-                    >
-                      {tab.count}
-                    </span>
-                  )}
-                  {isActive && (
-                    <motion.div
-                      layoutId="enrollment-tab-indicator"
-                      className="absolute bottom-0 left-0 right-0 h-0.5 rounded-t-full bg-[#1D9E75]"
-                      transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                    />
-                  )}
-                </button>
-              )
-            })}
-        </nav>
+        <Tabs
+          aria-label="Enrollment tabs"
+          value={activeTab}
+          onChange={(value) => setActiveTab(value as EnrollmentTab)}
+          tabs={tabItems.filter((tab) => tab.id !== 'registration' || enrollPerms.create)}
+        />
       </div>
 
       {/* Tab Content */}
@@ -351,8 +316,8 @@ export function EnrollmentModule() {
                 {/* Academic Year Progress Strip */}
                 {activeYearObj && (
                   <div className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-[10px] px-3.5 py-3 bg-[rgb(var(--background-tertiary)/0.5)] border border-[rgb(var(--border-primary)/0.35)]">
-                    <Calendar className="w-3.5 h-3.5 text-[#1D9E75]" />
-                    <span className="text-xs font-medium px-2 py-0.5 rounded-md bg-[rgb(var(--accent-enrollment)/0.1)] text-[#1D9E75]">
+                    <Calendar className="w-3.5 h-3.5 text-[rgb(var(--accent-enrollment-text))]" />
+                    <span className="text-xs font-medium px-2 py-0.5 rounded-md bg-[rgb(var(--accent-enrollment)/0.1)] text-[rgb(var(--accent-enrollment-text))]">
                       {activeYearObj.name}
                     </span>
                     <YearProgressBar

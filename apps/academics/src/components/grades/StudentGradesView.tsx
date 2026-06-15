@@ -39,10 +39,10 @@ function getLetterGradeColor(grade: string): string {
 }
 
 function getGpaBadge(gpa: number): { bg: string; text: string } {
-  if (gpa >= 3.5) return { bg: 'bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-bg)/0.18)]0/20', text: 'text-[rgb(var(--state-success-fg))] ' }
+  if (gpa >= 3.5) return { bg: 'bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-fg)/0.2)]', text: 'text-[rgb(var(--state-success-fg))] ' }
   if (gpa >= 3.0) return { bg: 'bg-[rgb(var(--state-info-bg)/0.18)] dark:bg-[rgb(var(--state-info-fg))]/20', text: 'text-[rgb(var(--state-info-fg))]' }
   if (gpa >= 2.0) return { bg: 'bg-[rgb(var(--state-warning-bg)/0.18)] dark:bg-[rgb(var(--state-warning-fg))]/20', text: 'text-[rgb(var(--state-warning-fg))]' }
-  return { bg: 'bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/20', text: 'text-[rgb(var(--state-danger-fg))] ' }
+  return { bg: 'bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-fg)/0.2)]', text: 'text-[rgb(var(--state-danger-fg))] ' }
 }
 
 // ============================================================================
@@ -160,7 +160,7 @@ export function StudentGradesView({
                 </td>
                 <td className="px-4 py-3 text-center">
                   {grade.isFinal ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium text-[rgb(var(--state-success-fg))] bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-bg)/0.18)]0/20  rounded-full">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium text-[rgb(var(--state-success-fg))] bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-fg)/0.2)]  rounded-full">
                       <Lock className="w-3 h-3" />
                       Final
                     </span>

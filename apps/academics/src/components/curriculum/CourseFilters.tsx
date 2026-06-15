@@ -107,7 +107,7 @@ export function CourseFilters({ totalCount: _totalCount }: CourseFiltersProps) {
               onClick={() => actions.setIsActive(chip.value)}
               className={`px-2.5 py-1.5 rounded-md text-xs font-medium border transition-colors ${
                 isActive
-                  ? 'border-[#7F77DD]/40 bg-[#7F77DD]/10 text-[#7F77DD]'
+                  ? 'border-[rgb(var(--accent-reports))]/40 bg-[rgb(var(--accent-reports))]/10 text-[rgb(var(--accent-reports-text))]'
                   : 'border-[rgb(var(--border-primary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))]'
               }`}
             >
@@ -125,7 +125,7 @@ export function CourseFilters({ totalCount: _totalCount }: CourseFiltersProps) {
             actions.resetFilters()
             if (searchInputRef.current) searchInputRef.current.value = ''
           }}
-          className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-[#1D9E75] hover:opacity-80 transition-opacity"
+          className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-[rgb(var(--accent-enrollment-text))] hover:opacity-80 transition-opacity"
         >
           <X className="w-3 h-3" />
           Clear ({filterCount})

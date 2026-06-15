@@ -198,7 +198,7 @@ export function StaffRosterCard({
                 <span className="text-xs text-[rgb(var(--text-disabled))]">
                   {dept.name}
                 </span>
-                <span className="text-xs font-medium text-[#1D9E75]">
+                <span className="text-xs font-medium text-[rgb(var(--accent-enrollment-text))]">
                   {dept.count} teacher{dept.count !== 1 ? 's' : ''}
                 </span>
               </div>

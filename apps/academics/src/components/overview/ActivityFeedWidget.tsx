@@ -30,7 +30,7 @@ const SEVERITY_STYLES = {
   critical: {
     bg: 'bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)]',
     text: 'text-[rgb(var(--state-danger-fg))]',
-    badge: 'bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))] dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/20 ',
+    badge: 'bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))] dark:bg-[rgb(var(--state-danger-fg)/0.2)] ',
     border: 'border-l-4 border-[rgb(var(--state-danger-border))]',
     label: 'Critical',
   },
@@ -44,7 +44,7 @@ const SEVERITY_STYLES = {
   info: {
     bg: 'bg-[rgb(var(--state-info-bg)/0.18)] dark:bg-[rgb(var(--state-info-bg)/0.18)]',
     text: 'text-[rgb(var(--action-secondary-fg))]',
-    badge: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--text-secondary))] dark:bg-[rgb(var(--state-info-bg)/0.18)]0/20 ',
+    badge: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--text-secondary))] dark:bg-[rgb(var(--state-info-fg)/0.2)] ',
     border: 'border-l-4 border-[rgb(var(--border-focus))]',
     label: 'Info',
   },

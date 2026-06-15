@@ -152,8 +152,9 @@ function CapacityBar({ current, max }: { current: number; max: number }) {
 
   return (
     <div className="flex items-center gap-2 min-w-32">
-      <div className="flex-1 h-2 bg-surface-secondary rounded-full overflow-hidden">
+      <div className="flex-1 h-2 bg-[rgb(var(--background-tertiary))] rounded-full overflow-hidden">
         <div
+          // allow-presentation-style: capacity fill width is data-driven
           className={`h-full rounded-full transition-all ${barColor}`}
           style={{ width: `${percent}%` }}
         />

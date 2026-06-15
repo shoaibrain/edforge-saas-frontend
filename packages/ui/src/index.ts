@@ -64,6 +64,12 @@ export { Container, containerVariants, type ContainerProps } from './components/
 export { Inline, inlineVariants, type InlineProps } from './components/layout/Inline'
 export { PageShell, pageShellVariants, type PageShellProps } from './components/layout/PageShell'
 export { PageHeader, type PageHeaderProps } from './components/layout/PageHeader'
+export {
+  ContextBar,
+  ContextBarSep,
+  ContextBarYear,
+  type ContextBarProps,
+} from './components/layout/ContextBar'
 export { SectionCard, type SectionCardProps } from './components/layout/SectionCard'
 export { Stack, stackVariants, type StackProps } from './components/layout/Stack'
 export { Heading, headingVariants, type HeadingProps } from './components/typography/Heading'

@@ -100,7 +100,7 @@ export function AttendanceTrendChart({
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1.5">
-            <div className="rounded-sm w-2 h-0.5 bg-[#1D9E75]" />
+            <div className="rounded-sm w-2 h-0.5 bg-[rgb(var(--accent-enrollment))]" />
             <span className="text-xs text-[rgb(var(--text-disabled))]">Actual</span>
           </div>
           <div className="flex items-center gap-1.5">
@@ -108,7 +108,7 @@ export function AttendanceTrendChart({
             <span className="text-xs text-[rgb(var(--text-disabled))]">{THRESHOLD}% target</span>
           </div>
           {summary && (
-            <span className="text-xs font-semibold text-[#1D9E75]">
+            <span className="text-xs font-semibold text-[rgb(var(--accent-enrollment-text))]">
               Avg {summary.avg.toFixed(1)}%
             </span>
           )}
@@ -186,7 +186,7 @@ export function AttendanceTrendChart({
         <Link
           to="/classrooms"
           search={{ tab: 'attendance' }}
-          className="inline-flex items-center gap-1.5 text-xs font-medium transition-opacity hover:opacity-80 text-[#1D9E75]"
+          className="inline-flex items-center gap-1.5 text-xs font-medium transition-opacity hover:opacity-80 text-[rgb(var(--accent-enrollment-text))]"
         >
           View Attendance
           <ArrowRight className="w-3 h-3" />

@@ -81,7 +81,7 @@ function QuickActions({ onNavigateTab }: { onNavigateTab: (tab: string) => void 
 function SectionInfoCard({ section }: { section: ClassroomOverviewProps['section'] }) {
   const percent = getCapacityPercent(section.currentEnrollment, section.maxEnrollment)
   const capacityColor =
-    percent < 15 ? 'bg-[rgb(var(--state-danger-bg)/0.18)]0' : percent < 33 ? 'bg-[rgb(var(--state-warning-fg))]' : 'bg-[rgb(var(--state-info-bg)/0.18)]0'
+    percent < 15 ? 'bg-[rgb(var(--state-danger-fg))]' : percent < 33 ? 'bg-[rgb(var(--state-warning-fg))]' : 'bg-[rgb(var(--state-info-fg))]'
 
   const details = [
     { icon: BookOpen, label: 'Course', value: `${section.courseName || 'N/A'}${section.courseCode ? ` (${section.courseCode})` : ''}` },
@@ -126,11 +126,11 @@ function SectionInfoCard({ section }: { section: ClassroomOverviewProps['section
 // ── Grade Summary Widget ───────────────────────────────────────────────────
 
 const distColors: Record<string, string> = {
-  A: 'bg-[rgb(var(--state-success-bg)/0.18)]0',
+  A: 'bg-[rgb(var(--state-success-fg))]',
   B: 'bg-[rgb(var(--state-info-fg))]',
   C: 'bg-[rgb(var(--state-warning-fg))]',
   D: 'bg-[rgb(var(--state-warning-fg))]',
-  F: 'bg-[rgb(var(--state-danger-bg)/0.18)]0',
+  F: 'bg-[rgb(var(--state-danger-fg))]',
 }
 
 function GradeSummaryWidget({
@@ -277,7 +277,7 @@ function AttendanceSummaryWidget({
           </div>
           <div className="flex gap-0.5 h-2.5 rounded-full overflow-hidden bg-surface-secondary">
             {stats.present > 0 && (
-              <div className="bg-[rgb(var(--state-success-bg)/0.18)]0 transition-all" style={{ width: `${(stats.present / stats.total) * 100}%` }} title={`Present: ${stats.present}`} />
+              <div className="bg-[rgb(var(--state-success-fg))] transition-all" style={{ width: `${(stats.present / stats.total) * 100}%` }} title={`Present: ${stats.present}`} />
             )}
             {stats.late > 0 && (
               <div className="bg-[rgb(var(--state-warning-fg))] transition-all" style={{ width: `${(stats.late / stats.total) * 100}%` }} title={`Late: ${stats.late}`} />
@@ -286,15 +286,15 @@ function AttendanceSummaryWidget({
               <div className="bg-[rgb(var(--state-info-fg))] transition-all" style={{ width: `${(stats.remote / stats.total) * 100}%` }} title={`Remote: ${stats.remote}`} />
             )}
             {stats.absent > 0 && (
-              <div className="bg-[rgb(var(--state-danger-bg)/0.18)]0 transition-all" style={{ width: `${(stats.absent / stats.total) * 100}%` }} title={`Absent: ${stats.absent}`} />
+              <div className="bg-[rgb(var(--state-danger-fg))] transition-all" style={{ width: `${(stats.absent / stats.total) * 100}%` }} title={`Absent: ${stats.absent}`} />
             )}
           </div>
           <div className="flex flex-wrap gap-4 text-xs">
             {[
-              { label: 'Present', value: stats.present, dot: 'bg-[rgb(var(--state-success-bg)/0.18)]0' },
+              { label: 'Present', value: stats.present, dot: 'bg-[rgb(var(--state-success-fg))]' },
               { label: 'Late', value: stats.late, dot: 'bg-[rgb(var(--state-warning-fg))]' },
               { label: 'Remote', value: stats.remote, dot: 'bg-[rgb(var(--state-info-fg))]' },
-              { label: 'Absent', value: stats.absent, dot: 'bg-[rgb(var(--state-danger-bg)/0.18)]0' },
+              { label: 'Absent', value: stats.absent, dot: 'bg-[rgb(var(--state-danger-fg))]' },
             ]
               .filter((s) => s.value > 0)
               .map((s) => (

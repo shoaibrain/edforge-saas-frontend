@@ -17,38 +17,38 @@ const statusConfig: Record<
 > = {
   active: {
     label: 'Active',
-    bg: 'rgba(29, 158, 117, 0.12)',
-    color: '#1D9E75',
+    bg: 'rgb(var(--accent-enrollment)/0.12)',
+    color: 'rgb(var(--accent-enrollment))',
   },
   inactive: {
     label: 'Inactive',
-    bg: 'rgba(154, 160, 184, 0.12)',
-    color: '#9aa0b8',
+    bg: 'rgb(var(--text-tertiary)/0.12)',
+    color: 'rgb(var(--text-tertiary))',
   },
   pending: {
     label: 'Pending',
-    bg: 'rgba(239, 159, 39, 0.12)',
-    color: '#EF9F27',
+    bg: 'rgb(var(--accent-attendance)/0.12)',
+    color: 'rgb(var(--accent-attendance))',
   },
   graduated: {
     label: 'Graduated',
-    bg: 'rgba(55, 138, 221, 0.12)',
-    color: '#378ADD',
+    bg: 'rgb(var(--accent-academics)/0.12)',
+    color: 'rgb(var(--accent-academics))',
   },
   transferred: {
     label: 'Transferred',
-    bg: 'rgba(239, 159, 39, 0.12)',
-    color: '#EF9F27',
+    bg: 'rgb(var(--accent-attendance)/0.12)',
+    color: 'rgb(var(--accent-attendance))',
   },
   withdrawn: {
     label: 'Withdrawn',
-    bg: 'rgba(226, 75, 74, 0.12)',
-    color: '#E24B4A',
+    bg: 'rgb(var(--accent-finance)/0.12)',
+    color: 'rgb(var(--accent-finance))',
   },
   suspended: {
     label: 'Suspended',
-    bg: 'rgba(239, 159, 39, 0.12)',
-    color: '#EF9F27',
+    bg: 'rgb(var(--accent-attendance)/0.12)',
+    color: 'rgb(var(--accent-attendance))',
   },
 }
 

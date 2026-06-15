@@ -27,7 +27,7 @@ const confidenceStyles = {
     label: 'Medium',
   },
   low: {
-    badge: 'bg-[rgb(var(--background-tertiary))]0/10 text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))] border-[rgb(var(--border-secondary))]',
+    badge: 'bg-[rgb(var(--background-tertiary)/0.1)] text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))] border-[rgb(var(--border-secondary))]',
     label: 'Low',
   },
 }
@@ -83,7 +83,7 @@ export function DuplicateWarning({
         <div
           className={`rounded-xl border ${
             highConfidence.length > 0
-              ? 'bg-[rgb(var(--state-danger-bg)/0.18)]0/5 border-[rgb(var(--state-danger-border))]/15'
+              ? 'bg-[rgb(var(--state-danger-fg)/0.05)] border-[rgb(var(--state-danger-border))]/15'
               : 'bg-[rgb(var(--state-warning-fg))]/5 border-amber-500/15'
           }`}
         >

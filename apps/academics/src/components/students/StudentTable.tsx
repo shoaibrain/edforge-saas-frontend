@@ -122,7 +122,7 @@ function RowActionMenu({
             {onWithdraw && (
               <button
                 onClick={() => { onWithdraw(student); setOpen(false) }}
-                className="flex items-center gap-2 w-full px-3 py-2 text-xs transition-colors hover:opacity-80 text-[rgb(var(--accent-finance))]"
+                className="flex items-center gap-2 w-full px-3 py-2 text-xs transition-colors hover:opacity-80 text-[rgb(var(--accent-finance-text))]"
               >
                 <UserMinus className="w-3 h-3" />
                 Withdraw

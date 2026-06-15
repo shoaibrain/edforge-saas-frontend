@@ -226,8 +226,8 @@ export function EnrollmentStep({
               >
                 {selectedYear.status === 'active' ? (
                   <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[rgb(var(--state-success-bg))] border border-[rgb(var(--state-success-border))]">
-                    <CheckCircle2 className="w-4 h-4 shrink-0 text-[#1D9E75]" />
-                    <span className="text-xs text-[#1D9E75]">
+                    <CheckCircle2 className="w-4 h-4 shrink-0 text-[rgb(var(--accent-enrollment-text))]" />
+                    <span className="text-xs text-[rgb(var(--accent-enrollment-text))]">
                       Active academic year — enrollment will be immediately active
                     </span>
                   </div>

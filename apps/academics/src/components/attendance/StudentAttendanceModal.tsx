@@ -36,10 +36,10 @@ interface StudentAttendanceModalProps {
 function RateBadge({ rate }: { rate: number }) {
   const style =
     rate >= 95
-      ? 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] dark:bg-[rgb(var(--state-success-bg)/0.18)]0/20 '
+      ? 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] dark:bg-[rgb(var(--state-success-fg)/0.2)] '
       : rate >= 90
         ? 'bg-[rgb(var(--state-warning-bg)/0.18)] text-amber-700 dark:bg-[rgb(var(--state-warning-fg))]/20 dark:text-amber-400'
-        : 'bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))] dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/20 '
+        : 'bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))] dark:bg-[rgb(var(--state-danger-fg)/0.2)] '
   return (
     <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${style}`}>
       {rate.toFixed(1)}%
@@ -52,8 +52,8 @@ function RateBadge({ rate }: { rate: number }) {
 // ============================================================================
 
 const statusColorMap: Record<string, string> = {
-  present: 'bg-[rgb(var(--state-success-fg))] dark:bg-[rgb(var(--state-success-bg)/0.18)]0',
-  absent: 'bg-[rgb(var(--state-danger-fg))] dark:bg-[rgb(var(--state-danger-bg)/0.18)]0',
+  present: 'bg-[rgb(var(--state-success-fg))] dark:bg-[rgb(var(--state-success-fg))]',
+  absent: 'bg-[rgb(var(--state-danger-fg))] dark:bg-[rgb(var(--state-danger-fg))]',
   late: 'bg-amber-400 dark:bg-[rgb(var(--state-warning-fg))]',
   tardy: 'bg-amber-400 dark:bg-[rgb(var(--state-warning-fg))]',
   excused: 'bg-[rgb(var(--state-info-fg))] dark:bg-[rgb(var(--state-info-fg))]',

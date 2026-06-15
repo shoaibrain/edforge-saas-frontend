@@ -45,8 +45,8 @@ function sortPrimaryFirst(guardians: GuardianDto[]): GuardianDto[] {
 function GuardianBadges({ guardian }: { guardian: GuardianDto }) {
   return (
     <span className="inline-flex items-center gap-2">
-      {guardian.isPrimary && <Badge color="#1D9E75" label="Primary" />}
-      {guardian.hasPortalAccess && <Badge color="#378ADD" label="Portal" />}
+      {guardian.isPrimary && <Badge color="rgb(var(--accent-enrollment))" label="Primary" />}
+      {guardian.hasPortalAccess && <Badge color="rgb(var(--accent-academics))" label="Portal" />}
       {guardian.canPickup && <Badge color="rgb(var(--text-tertiary))" label="Pickup" />}
     </span>
   )
@@ -100,7 +100,7 @@ export function GuardianCell({ guardians }: { guardians?: GuardianDto[] }) {
               className="rounded-full"
               style={{
                 zIndex: visible.length - i,
-                boxShadow: `0 0 0 2px rgb(var(--background-secondary))${g.isPrimary ? ', 0 0 0 3px #1D9E75' : ''}`,
+                boxShadow: `0 0 0 2px rgb(var(--background-secondary))${g.isPrimary ? ', 0 0 0 3px rgb(var(--accent-enrollment))' : ''}`,
               }}
             >
               <UserAvatar userId={g.guardianId ?? ''} userName={`${g.firstName} ${g.lastName}`} role="staff" size="sm" seed={guardianSeed(g)} />
@@ -125,7 +125,7 @@ export function GuardianCell({ guardians }: { guardians?: GuardianDto[] }) {
             <span className="text-xs uppercase tracking-wide text-[rgb(var(--text-tertiary))]">
               {relationshipLabel(primary.relationship)}
             </span>
-            {primary.hasPortalAccess && <Badge color="#378ADD" label="Portal" />}
+            {primary.hasPortalAccess && <Badge color="rgb(var(--accent-academics))" label="Portal" />}
           </span>
         </span>
       </button>

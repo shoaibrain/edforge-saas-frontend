@@ -37,7 +37,7 @@ export function ClassworkCreateMenu({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-bg)/0.18)]0 rounded-full hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors shadow-sm"
+        className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--action-primary-bg))] rounded-full hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors shadow-sm"
         aria-expanded={isOpen}
         aria-haspopup="menu"
         aria-label="Create classwork"

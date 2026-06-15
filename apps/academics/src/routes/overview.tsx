@@ -10,7 +10,6 @@ import { useNavigate } from '@tanstack/react-router'
 import { motion, useReducedMotion } from 'framer-motion'
 import { useQueryClient } from '@tanstack/react-query'
 import {
-  GraduationCap,
   Users,
   UserPlus,
   LayoutGrid,
@@ -19,7 +18,7 @@ import {
   CalendarClock,
   School,
 } from 'lucide-react'
-import { StatCard, WidgetErrorBoundaryV2 } from '@edforge/ui'
+import { StatCard, WidgetErrorBoundaryV2, ContextBar, ContextBarSep, ContextBarYear } from '@edforge/ui'
 import { getAttendanceColor } from '@edforge/types'
 import { useActiveSchoolId } from '../stores/app.store'
 import { useAcademicsOverviewV2 } from '../hooks/useAcademicsOverviewV2'
@@ -184,57 +183,53 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
         animate="visible"
         className="space-y-5"
       >
-        {/* ---- Compact Header + Insight Strip ---- */}
-        <motion.div variants={fadeInUp} className="space-y-1">
-          <div className="flex items-center justify-between" style={{ height: 44 }}>
-            <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-[7px] flex items-center justify-center bg-[rgb(var(--accent-enrollment)/0.12)]">
-                <GraduationCap className="w-4 h-4 text-[#1D9E75]" />
-              </div>
-              <h1 className="text-sm font-semibold text-[rgb(var(--text-primary))]">
-                Academics
-              </h1>
-              <span className="text-xs text-[rgb(var(--text-disabled))]">|</span>
-              <span className="text-xs text-[rgb(var(--text-disabled))]">
-                {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-              </span>
-              {data.academicYear.name && (
-                <>
-                  <span className="text-xs text-[rgb(var(--text-disabled))]">|</span>
-                  <span className="text-xs px-2.5 py-1 rounded-md bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]">
-                    {data.academicYear.name}
-                  </span>
-                </>
-              )}
-            </div>
-
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => navigate({ to: '/students/enrollment' })}
-                aria-label="Enroll a student"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40 bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
-              >
-                <UserPlus className="w-3.5 h-3.5" />
-                Enroll Student
-              </button>
-              <button
-                onClick={() => navigate({ to: '/classrooms', search: { tab: 'attendance' } })}
-                aria-label="Take attendance"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
-              >
-                <ClipboardCheck className="w-3.5 h-3.5" />
-                Take Attendance
-              </button>
-            </div>
-          </div>
-
-          {/* Contextual insight strip */}
-          <AcademicsInsightStrip
-            totalEnrolled={data.overview.totalEnrolled ?? 0}
-            gradeCount={data.enrollment.data.length}
-            attendanceRate={data.overview.todayAttendanceRate}
-            atRiskCount={data.alerts.totalCount}
-            isLoading={data.overview.isLoading}
+        {/* ---- Context Bar (operating context, not a page title) + Insight Strip ---- */}
+        <motion.div variants={fadeInUp}>
+          <ContextBar
+            meta={
+              <>
+                {data.academicYear.name ? (
+                  <ContextBarYear>{data.academicYear.name}</ContextBarYear>
+                ) : null}
+                {data.academicYear.name ? <ContextBarSep /> : null}
+                <span>
+                  {new Date().toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    month: 'short',
+                    day: 'numeric',
+                  })}
+                </span>
+              </>
+            }
+            description={
+              <AcademicsInsightStrip
+                totalEnrolled={data.overview.totalEnrolled ?? 0}
+                gradeCount={data.enrollment.data.length}
+                attendanceRate={data.overview.todayAttendanceRate}
+                atRiskCount={data.alerts.totalCount}
+                isLoading={data.overview.isLoading}
+              />
+            }
+            actions={
+              <>
+                <button
+                  onClick={() => navigate({ to: '/students/enrollment', search: { tab: 'registration' } })}
+                  aria-label="Enroll a student"
+                  className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-[9px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-enrollment)/0.4)] bg-transparent border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
+                >
+                  <UserPlus className="w-3.5 h-3.5" />
+                  Enroll Student
+                </button>
+                <button
+                  onClick={() => navigate({ to: '/classrooms', search: { tab: 'attendance' } })}
+                  aria-label="Take attendance"
+                  className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-[9px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-enrollment)/0.4)] bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
+                >
+                  <ClipboardCheck className="w-3.5 h-3.5" />
+                  Take Attendance
+                </button>
+              </>
+            }
           />
         </motion.div>
 
@@ -254,17 +249,7 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
           onExport={data.handleExportCSV}
         />
 
-        {/* ---- Attendance Alerts (compact inline strip) ---- */}
-        <motion.div variants={fadeInUp}>
-          <AttendanceAlertsCard
-            alerts={data.alerts.items}
-            totalCount={data.alerts.totalCount}
-            unrecordedCount={unrecordedCount}
-            isLoading={data.alerts.isLoading}
-          />
-        </motion.div>
-
-        {/* ---- KPI Grid (4 tiles) ---- */}
+        {/* ---- KPI Grid (4 tiles) — lead with the confident numbers ---- */}
         <motion.div
           variants={fadeInUp}
           className="grid gap-3 grid-cols-2 lg:grid-cols-4"
@@ -275,10 +260,10 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
               label="Total Enrolled"
               value={data.overview.totalEnrolled != null ? data.overview.totalEnrolled.toLocaleString() : '—'}
               icon={Users}
-              accentColor="rgba(29, 158, 117, 0.12)"
-              iconColor="#1D9E75"
-              barColor="#1D9E75"
-              tag={data.overview.recentEnrollments && data.overview.recentEnrollments > 0 ? { text: `+${data.overview.recentEnrollments} recent`, color: '#1D9E75', bg: 'rgba(29, 158, 117, 0.10)' } : data.enrollment.total > 0 ? { text: `${data.enrollment.data.length} grades`, color: '#1D9E75', bg: 'rgba(29, 158, 117, 0.10)' } : undefined}
+              accentColor="rgb(var(--accent-enrollment)/0.12)"
+              iconColor="rgb(var(--accent-enrollment))"
+              barColor="rgb(var(--accent-enrollment))"
+              tag={data.overview.recentEnrollments && data.overview.recentEnrollments > 0 ? { text: `+${data.overview.recentEnrollments} recent`, color: 'rgb(var(--accent-enrollment))', bg: 'rgb(var(--accent-enrollment)/0.1)' } : data.enrollment.total > 0 ? { text: `${data.enrollment.data.length} grades`, color: 'rgb(var(--accent-enrollment))', bg: 'rgb(var(--accent-enrollment)/0.1)' } : undefined}
               hint={data.enrollment.data.length > 0 ? `across ${data.enrollment.data.length} grades` : 'this academic year'}
               loading={data.overview.isLoading}
               error={data.overview.errors.length > 0}
@@ -291,10 +276,10 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
             label="Active Sections"
             value={data.overview.activeSections != null ? data.overview.activeSections.toString() : '—'}
             icon={LayoutGrid}
-            accentColor="rgba(55, 138, 221, 0.12)"
-            iconColor="#378ADD"
-            barColor="#378ADD"
-            tag={data.teachers.teacherCount != null ? { text: `${data.teachers.teacherCount} teachers`, color: '#378ADD', bg: 'rgba(55, 138, 221, 0.10)' } : undefined}
+            accentColor="rgb(var(--accent-academics)/0.12)"
+            iconColor="rgb(var(--accent-academics))"
+            barColor="rgb(var(--accent-academics))"
+            tag={data.teachers.teacherCount != null ? { text: `${data.teachers.teacherCount} teachers`, color: 'rgb(var(--accent-academics))', bg: 'rgb(var(--accent-academics)/0.1)' } : undefined}
             hint={data.overview.activeSections != null && data.overview.totalEnrolled != null && data.overview.activeSections > 0
               ? `${Math.round(data.overview.totalEnrolled / data.overview.activeSections)}:1 student-section ratio`
               : 'active classes'}
@@ -308,11 +293,11 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
             label="Today's Attendance"
             value={attendanceRate != null ? `${attendanceRate.toFixed(1)}%` : '—'}
             icon={ClipboardCheck}
-            accentColor="rgba(239, 159, 39, 0.12)"
-            iconColor="#EF9F27"
-            barColor={attendanceColor || '#EF9F27'}
+            accentColor="rgb(var(--accent-attendance)/0.12)"
+            iconColor="rgb(var(--accent-attendance))"
+            barColor={attendanceColor || 'rgb(var(--accent-attendance))'}
             valueColor={attendanceColor}
-            tag={unrecordedCount ? { text: 'Partial data', color: '#EF9F27', bg: 'rgba(239, 159, 39, 0.10)' } : undefined}
+            tag={unrecordedCount ? { text: 'Partial data', color: 'rgb(var(--accent-attendance))', bg: 'rgb(var(--accent-attendance)/0.1)' } : undefined}
             hint={data.overview.todayAttendanceSummary
               ? `${data.overview.todayAttendanceSummary.present} present · ${data.overview.todayAttendanceSummary.absent} absent · ${data.overview.todayAttendanceSummary.late} late`
               : 'today'}
@@ -326,16 +311,31 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
             label="At-Risk Students"
             value={data.alerts.totalCount.toString()}
             icon={AlertTriangle}
-            accentColor="rgba(226, 75, 74, 0.12)"
-            iconColor="#E24B4A"
-            barColor="#E24B4A"
-            tag={data.alerts.criticalCount > 0 ? { text: `${data.alerts.criticalCount} below 80%`, color: '#E24B4A', bg: 'rgba(226, 75, 74, 0.10)' } : undefined}
+            accentColor="rgb(var(--accent-finance)/0.12)"
+            iconColor="rgb(var(--accent-finance))"
+            barColor="rgb(var(--accent-finance))"
+            tag={data.alerts.criticalCount > 0 ? { text: `${data.alerts.criticalCount} below 80%`, color: 'rgb(var(--accent-finance))', bg: 'rgb(var(--accent-finance)/0.1)' } : undefined}
             hint={data.alerts.criticalCount > 0 || data.alerts.warningCount > 0
               ? `${data.alerts.criticalCount} critical · ${data.alerts.warningCount} warning`
               : 'below 90% threshold'}
             loading={data.alerts.isLoading}
           />
         </motion.div>
+
+        {/* ---- Needs Attention (attendance alerts, reframed below the KPIs) ---- */}
+        {(data.alerts.isLoading || data.alerts.items.length > 0 || (unrecordedCount ?? 0) > 0) && (
+          <motion.div variants={fadeInUp} className="space-y-2">
+            <h2 className="text-sm font-semibold text-[rgb(var(--text-primary))]">
+              Needs Attention
+            </h2>
+            <AttendanceAlertsCard
+              alerts={data.alerts.items}
+              totalCount={data.alerts.totalCount}
+              unrecordedCount={unrecordedCount}
+              isLoading={data.alerts.isLoading}
+            />
+          </motion.div>
+        )}
 
         {/* ---- Attendance Trend (full width) ---- */}
         <motion.div variants={fadeInUp}>

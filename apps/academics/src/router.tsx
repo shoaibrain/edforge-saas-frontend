@@ -82,12 +82,28 @@ const studentEnrollmentRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/students/enrollment',
     component: EnrollmentModule,
+    validateSearch: (search: Record<string, unknown>) => {
+        // Backward compat: legacy deep links use ?tab=new | ?tab=records
+        let tab = search.tab
+        if (tab === 'new') tab = 'registration'
+        if (tab === 'records') tab = 'dashboard'
+        return {
+            tab: z.enum(['registration', 'dashboard']).optional().catch(undefined).parse(tab),
+        }
+    },
 })
 
 const studentProfileRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/students/$studentId',
     component: StudentProfilePage,
+    validateSearch: (search: Record<string, unknown>) => ({
+        tab: z
+            .enum(['overview', 'profile', 'enrollment', 'family', 'demographics'])
+            .optional()
+            .catch(undefined)
+            .parse(search.tab),
+    }),
 })
 
 const studentProfilesRoute = createRoute({
@@ -348,6 +364,13 @@ const courseDetailRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/curriculum/$courseId',
     component: CourseDetailPage,
+    validateSearch: (search: Record<string, unknown>) => ({
+        tab: z
+            .enum(['overview', 'sections', 'standards'])
+            .optional()
+            .catch(undefined)
+            .parse(search.tab),
+    }),
 })
 
 // ============================================================================

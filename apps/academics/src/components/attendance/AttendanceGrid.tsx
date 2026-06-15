@@ -123,8 +123,8 @@ function ProgressBar({ marked, total }: { marked: number; total: number }) {
       <div
         className={`h-full rounded-full transition-all duration-300 ${
           isComplete
-            ? 'bg-[rgb(var(--state-success-bg)/0.18)]0 animate-pulse'
-            : 'bg-[rgb(var(--state-info-bg)/0.18)]0'
+            ? 'bg-[rgb(var(--state-success-fg))] animate-pulse'
+            : 'bg-[rgb(var(--state-info-fg))]'
         }`}
         style={{ width: `${pct}%` }}
       />
@@ -432,7 +432,7 @@ export function AttendanceGrid({
                 type="button"
                 onClick={markAllPresent}
                 disabled={disabled}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[rgb(var(--state-success-fg))] bg-[rgb(var(--state-success-bg)/0.18)] hover:bg-[rgb(var(--state-success-bg)/0.26)] dark:bg-[rgb(var(--state-success-bg)/0.18)] dark:hover:bg-[rgb(var(--state-success-bg)/0.18)]0/20  rounded-lg transition-colors disabled:opacity-50"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[rgb(var(--state-success-fg))] bg-[rgb(var(--state-success-bg)/0.18)] hover:bg-[rgb(var(--state-success-bg)/0.26)] dark:bg-[rgb(var(--state-success-bg)/0.18)] dark:hover:bg-[rgb(var(--state-success-fg)/0.2)]  rounded-lg transition-colors disabled:opacity-50"
               >
                 <CheckCircle className="w-3.5 h-3.5" />
                 All Present
@@ -441,7 +441,7 @@ export function AttendanceGrid({
                 type="button"
                 onClick={markAllAbsent}
                 disabled={disabled}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[rgb(var(--state-danger-fg))] bg-[rgb(var(--state-danger-bg)/0.18)] hover:bg-[rgb(var(--state-danger-bg)/0.26)] dark:bg-[rgb(var(--state-danger-bg)/0.18)] dark:hover:bg-[rgb(var(--state-danger-bg)/0.18)]0/20  rounded-lg transition-colors disabled:opacity-50"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[rgb(var(--state-danger-fg))] bg-[rgb(var(--state-danger-bg)/0.18)] hover:bg-[rgb(var(--state-danger-bg)/0.26)] dark:bg-[rgb(var(--state-danger-bg)/0.18)] dark:hover:bg-[rgb(var(--state-danger-fg)/0.2)]  rounded-lg transition-colors disabled:opacity-50"
               >
                 <XCircle className="w-3.5 h-3.5" />
                 All Absent
@@ -473,7 +473,7 @@ export function AttendanceGrid({
               type="button"
               onClick={handleSave}
               disabled={isSaving || markedCount === 0 || !hasChanges || disabled}
-              className="flex items-center justify-center gap-1.5 w-full sm:w-auto px-4 py-2.5 sm:py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-bg)/0.18)]0 hover:bg-[rgb(var(--action-primary-bg-hover))] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center justify-center gap-1.5 w-full sm:w-auto px-4 py-2.5 sm:py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg-hover))] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSaving ? (
                 <Loader2 className="w-4 h-4 animate-spin" />

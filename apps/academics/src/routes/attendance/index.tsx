@@ -421,7 +421,7 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
         <div className="flex items-center justify-between mb-3.5">
           <div className="flex items-center gap-3">
             <div className="flex items-center justify-center rounded-lg bg-[rgb(var(--accent-attendance)/0.1)]" style={{ width: 32, height: 32 }}>
-              <ClipboardCheck className="w-4 h-4 text-[rgb(var(--accent-attendance))]" />
+              <ClipboardCheck className="w-4 h-4 text-[rgb(var(--accent-attendance-text))]" />
             </div>
             <div>
               <div className="text-base font-semibold tracking-[-0.2px] text-[rgb(var(--text-primary))]">Attendance</div>

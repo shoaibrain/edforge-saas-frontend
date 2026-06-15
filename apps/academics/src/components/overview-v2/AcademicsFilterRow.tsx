@@ -126,9 +126,9 @@ export function AcademicsFilterRow({
             <button
               key={opt.key}
               onClick={() => handleQuickSelect(opt.key)}
-              className={`px-2.5 py-1 text-xs font-medium rounded-full border transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/30 ${
+              className={`px-2.5 py-1 text-xs font-medium rounded-full border transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-enrollment))]/30 ${
                 isActive
-                  ? 'bg-[#1D9E75] border-[#1D9E75] text-[#fff]'
+                  ? 'bg-[rgb(var(--accent-enrollment))] border-[rgb(var(--accent-enrollment))] text-[rgb(var(--action-primary-fg))]'
                   : 'bg-transparent border-[rgb(var(--border-primary)/0.4)] text-[rgb(var(--text-tertiary))]'
               }`}
             >
@@ -145,7 +145,7 @@ export function AcademicsFilterRow({
           value={fromDate}
           onChange={(e) => onFromChange(e.target.value)}
           aria-label="From date"
-          className="px-2 py-1 text-xs border rounded-[7px] focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/30"
+          className="px-2 py-1 text-xs border rounded-[7px] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-enrollment))]/30"
           style={inputStyle}
         />
         <span className="text-xs text-[rgb(var(--text-disabled))]">→</span>
@@ -154,7 +154,7 @@ export function AcademicsFilterRow({
           value={toDate}
           onChange={(e) => onToChange(e.target.value)}
           aria-label="To date"
-          className="px-2 py-1 text-xs border rounded-[7px] focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/30"
+          className="px-2 py-1 text-xs border rounded-[7px] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-enrollment))]/30"
           style={inputStyle}
         />
 
@@ -163,7 +163,7 @@ export function AcademicsFilterRow({
           <select
             value={gradeLevelFilter}
             onChange={(e) => onGradeLevelChange(e.target.value)}
-            className="px-2 py-1 text-xs border rounded-[7px] focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/30"
+            className="px-2 py-1 text-xs border rounded-[7px] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-enrollment))]/30"
             style={inputStyle}
           >
             <option value="">All Grades</option>
@@ -177,7 +177,7 @@ export function AcademicsFilterRow({
         {hasActiveFilters && (
           <button
             onClick={onClear}
-            className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full transition-colors hover:opacity-80 text-[#1D9E75]"
+            className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full transition-colors hover:opacity-80 text-[rgb(var(--accent-enrollment-text))]"
           >
             <X className="w-3 h-3" />
             Clear
@@ -190,7 +190,7 @@ export function AcademicsFilterRow({
             onClick={onExport}
             disabled={isExporting || !hasAcademicYear}
             aria-label="Export enrollments as CSV"
-            className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[#1D9E75]/40 bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
+            className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-enrollment))]/40 bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
           >
             {isExporting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />}
             Export CSV

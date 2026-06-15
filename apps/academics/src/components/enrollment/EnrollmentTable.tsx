@@ -148,7 +148,7 @@ function ActionMenu({
             <button
               type="button"
               onClick={() => { onWithdraw(); setOpen(false) }}
-              className="flex items-center gap-2 w-full px-3 py-2 text-xs transition-colors hover:opacity-80 text-[rgb(var(--accent-finance))]"
+              className="flex items-center gap-2 w-full px-3 py-2 text-xs transition-colors hover:opacity-80 text-[rgb(var(--accent-finance-text))]"
             >
               <UserMinus className="w-3.5 h-3.5" />
               Withdraw
@@ -156,7 +156,7 @@ function ActionMenu({
             <button
               type="button"
               onClick={() => { onTransfer(); setOpen(false) }}
-              className="flex items-center gap-2 w-full px-3 py-2 text-xs transition-colors hover:opacity-80 text-[rgb(var(--accent-academics))]"
+              className="flex items-center gap-2 w-full px-3 py-2 text-xs transition-colors hover:opacity-80 text-[rgb(var(--accent-academics-text))]"
             >
               <ArrowRightLeft className="w-3.5 h-3.5" />
               Transfer
@@ -165,7 +165,7 @@ function ActionMenu({
               <button
                 type="button"
                 onClick={() => { onMarkNoShow(); setOpen(false) }}
-                className="flex items-center gap-2 w-full px-3 py-2 text-xs transition-colors hover:opacity-80 text-[rgb(var(--accent-attendance))]"
+                className="flex items-center gap-2 w-full px-3 py-2 text-xs transition-colors hover:opacity-80 text-[rgb(var(--accent-attendance-text))]"
               >
                 <UserX className="w-3.5 h-3.5" />
                 Mark No-Show

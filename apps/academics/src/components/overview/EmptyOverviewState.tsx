@@ -23,7 +23,7 @@ const SETUP_STEPS = [
     title: 'Add your first students',
     description: 'Import or create student records to get started',
     href: '/academics/students',
-    iconBg: 'bg-[rgb(var(--state-info-bg)/0.18)]0/15',
+    iconBg: 'bg-[rgb(var(--state-info-fg)/0.15)]',
     iconColor: 'text-[rgb(var(--action-secondary-fg))] ',
   },
   {

@@ -239,7 +239,7 @@ export function GovernmentReportsExport() {
     <PageShell onBack={() => navigate({ to: '/' })}>
       <header className="mb-6">
         <h1 className="text-xl font-semibold flex items-center gap-2 text-[rgb(var(--text-primary))]">
-          <FileSpreadsheet className="w-5 h-5 text-[#1D9E75]" />
+          <FileSpreadsheet className="w-5 h-5 text-[rgb(var(--accent-enrollment-text))]" />
           Government Reports
         </h1>
         <p className="text-sm mt-1 text-[rgb(var(--text-secondary))]">
@@ -399,7 +399,7 @@ export function GovernmentReportsExport() {
                   aria-pressed={active}
                   className={`px-2.5 py-1 text-xs font-medium rounded-md border transition-colors ${
                     active
-                      ? 'bg-[#1D9E75] border-[#1D9E75] text-[#fff]'
+                      ? 'bg-[rgb(var(--accent-enrollment))] border-[rgb(var(--accent-enrollment))] text-[rgb(var(--action-primary-fg))]'
                       : 'bg-transparent border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]'
                   }`}
                 >
@@ -506,7 +506,7 @@ export function GovernmentReportsExport() {
               href={IEMIS_PORTAL_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#1D9E75]"
+              className="text-[rgb(var(--accent-enrollment-text))]"
             >
               emis.cehrd.gov.np
             </a>
@@ -638,7 +638,7 @@ function ActiveGenerationBanner({
       role="status"
       aria-live="polite"
     >
-      {spinning && <Loader2 className="w-5 h-5 animate-spin text-[#1D9E75]" />}
+      {spinning && <Loader2 className="w-5 h-5 animate-spin text-[rgb(var(--accent-enrollment-text))]" />}
       {stalledGenerating && <AlertTriangle className="w-5 h-5 text-[rgb(var(--state-warning-fg))]" />}
       {ready && <CheckCircle2 className="w-5 h-5 text-[rgb(var(--state-success-fg))]" />}
       {failed && <AlertTriangle className="w-5 h-5 text-[rgb(var(--state-danger-fg))]" />}
