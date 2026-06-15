@@ -181,6 +181,7 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
     <div className="p-6 space-y-5" style={{ minHeight: '100vh' }}>
       {/* Context Bar (operating context, not a page title — the shell breadcrumb
           carries "Finance") + Insight Strip */}
+      <h1 className="sr-only">Finance</h1>
       <ContextBar
         meta={
           <span>

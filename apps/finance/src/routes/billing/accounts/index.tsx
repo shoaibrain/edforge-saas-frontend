@@ -455,11 +455,8 @@ export default function StudentAccountsPage() {
     <div className="p-6 space-y-5">
       {/* Header */}
       <FinancePageHeader
-        icon={Users}
         title="Student Accounts"
         subtitle="View student billing accounts, invoices, payments, and ledger history."
-        accentColor="rgba(29, 158, 117, 0.12)"
-        iconColor="#1D9E75"
       />
 
       {/* KPI Tiles */}

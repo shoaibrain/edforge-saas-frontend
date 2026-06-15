@@ -24,7 +24,7 @@ import {
   type GradeLevel,
 } from '@aibrains/shared-types'
 import { Button, StatCard, WidgetErrorBoundaryV2 } from '@edforge/ui'
-import { Plus, AlertTriangle, DollarSign, Layers, Settings2, TrendingUp } from 'lucide-react'
+import { Plus, AlertTriangle, DollarSign, Layers, TrendingUp } from 'lucide-react'
 import { useAppStore } from '../../stores/app.store'
 import {
   useFeeStructures,
@@ -283,11 +283,8 @@ export default function FeeStructuresPage() {
     <div className="p-6 space-y-5">
       {/* Header */}
       <FinancePageHeader
-        icon={Settings2}
         title="Fee Structures"
         subtitle="Configure the fee types and amounts for your school."
-        accentColor="rgba(127, 119, 221, 0.12)"
-        iconColor="#7F77DD"
         actions={
           <button
             type="button"

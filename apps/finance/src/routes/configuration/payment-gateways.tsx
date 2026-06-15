@@ -61,6 +61,7 @@ export default function PaymentGatewaysPage() {
   return (
     <div className="max-w-3xl mx-auto px-6 py-8">
       <div className="space-y-6">
+        <h1 className="sr-only">Payment Gateways</h1>
         <ContextBar
           meta={
             <span>

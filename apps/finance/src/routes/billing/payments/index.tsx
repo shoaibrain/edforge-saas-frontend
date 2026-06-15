@@ -774,11 +774,8 @@ export default function PaymentsPage() {
     <div className="p-6 space-y-5">
       {/* Header */}
       <FinancePageHeader
-        icon={CreditCard}
         title="Payments"
         subtitle="View and manage all payment transactions."
-        accentColor="rgba(29, 158, 117, 0.12)"
-        iconColor="#1D9E75"
         actions={
           <button
             type="button"

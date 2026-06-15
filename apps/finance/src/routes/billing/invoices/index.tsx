@@ -391,11 +391,8 @@ export default function InvoicesPage() {
     <div className="p-6 space-y-5">
       {/* V2 Page Header */}
       <FinancePageHeader
-        icon={FileText}
         title="Invoices"
         subtitle="Generate, issue, and manage student invoices."
-        accentColor="rgba(239, 159, 39, 0.12)"
-        iconColor="#EF9F27"
         actions={
           <div className="flex items-center gap-2">
             <button
