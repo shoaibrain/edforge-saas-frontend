@@ -16,19 +16,19 @@ export interface FinanceInfoBannerProps {
 const VARIANT_STYLES = {
   info: {
     box: 'bg-[rgb(var(--accent-academics)/0.06)] border-[rgb(var(--accent-academics)/0.12)]',
-    fg: 'text-[rgb(var(--accent-academics))]',
+    fg: 'text-[rgb(var(--accent-academics-text))]',
     btnBg: 'bg-[rgb(var(--accent-academics))]',
     Icon: Info,
   },
   warning: {
     box: 'bg-[rgb(var(--accent-attendance)/0.06)] border-[rgb(var(--accent-attendance)/0.12)]',
-    fg: 'text-[rgb(var(--accent-attendance))]',
+    fg: 'text-[rgb(var(--accent-attendance-text))]',
     btnBg: 'bg-[rgb(var(--accent-attendance))]',
     Icon: AlertTriangle,
   },
   danger: {
     box: 'bg-[rgb(var(--accent-finance)/0.06)] border-[rgb(var(--accent-finance)/0.12)]',
-    fg: 'text-[rgb(var(--accent-finance))]',
+    fg: 'text-[rgb(var(--accent-finance-text))]',
     btnBg: 'bg-[rgb(var(--accent-finance))]',
     Icon: AlertCircle,
   },

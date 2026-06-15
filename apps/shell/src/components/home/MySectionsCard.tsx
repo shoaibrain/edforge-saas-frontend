@@ -52,7 +52,7 @@ export function MySectionsCard({ sections, isLoading }: MySectionsCardProps) {
     >
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <CalendarDays className="w-4 h-4 text-[rgb(var(--accent-academics))]" />
+          <CalendarDays className="w-4 h-4 text-[rgb(var(--accent-academics-text))]" />
           <h3 className="text-sm font-medium text-[rgb(var(--text-secondary))]">
             {t('homeV2.teacher.mySections')}
           </h3>

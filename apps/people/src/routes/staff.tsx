@@ -328,7 +328,7 @@ export default function StaffPage() {
 
       {/* CONTEXT BANNER */}
       <Text variant="caption" className="mb-5">
-        <em className="font-medium not-italic text-[rgb(var(--accent-coral))]">
+        <em className="font-medium not-italic text-[rgb(var(--accent-coral-text))]">
           {totalLoaded} active staff member{totalLoaded !== 1 ? 's' : ''}
         </em>
         {' · '}
