@@ -11,6 +11,7 @@
 import { toast } from 'sonner'
 import type { PaymentGateway } from '@edforge/types'
 import { Loader2, AlertTriangle } from 'lucide-react'
+import { ContextBar } from '@edforge/ui'
 import { useAppStore } from '../../stores/app.store'
 import { useGatewayConfigs, useSaveGatewayConfig } from '@edforge/finance-services'
 import { GatewayConfigCard } from '../../components/configuration/GatewayConfigCard'
@@ -60,14 +61,21 @@ export default function PaymentGatewaysPage() {
   return (
     <div className="max-w-3xl mx-auto px-6 py-8">
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">
-            Payment Gateways
-          </h1>
-          <p className="text-sm text-[rgb(var(--text-tertiary))] mt-1">
-            Configure which payment gateways are available for your school.
-          </p>
-        </div>
+        <ContextBar
+          meta={
+            <span>
+              {new Date().toLocaleDateString('en-US', {
+                weekday: 'long',
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+              })}
+            </span>
+          }
+          description={
+            <span>Configure which payment gateways are available for your school.</span>
+          }
+        />
 
         {isLoading ? (
           <div className="flex items-center justify-center py-12">

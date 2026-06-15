@@ -23,12 +23,12 @@ import {
 import { useTranslation } from '@edforge/i18n'
 import {
   Container,
+  ContextBar,
   ErrorState,
   focusRing,
   focusRingInset,
   Inline,
   Input,
-  PageHeader,
   Select,
   StatCard,
   Text,
@@ -318,11 +318,20 @@ export default function StaffPage() {
 
   return (
     <Container size="full" padding="lg" className="overflow-auto py-6">
-      {/* PAGE HEADER */}
-      <PageHeader
+      {/* Context Bar (operating context, not a page title — the shell breadcrumb
+          carries "People & HR › Staff") */}
+      <ContextBar
         className="mb-2"
-        title="Staff Directory"
-        description={new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+        meta={
+          <span>
+            {new Date().toLocaleDateString('en-US', {
+              weekday: 'long',
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric',
+            })}
+          </span>
+        }
         actions={pageActions}
       />
 
