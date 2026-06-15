@@ -16,6 +16,7 @@
 import { useState, useMemo, useCallback, useRef } from 'react'
 import { Grid3x3, Loader2, AlertTriangle, Check, Plus, Minus, Save } from 'lucide-react'
 import { toast } from 'sonner'
+import { ContextBar, ContextBarYear, ContextBarSep } from '@edforge/ui'
 import { useActiveSchoolId } from '../../stores/app.store'
 import { useSchoolEnabledGradeOptions } from '../../hooks/useGradeOptions'
 import { useCurrentAcademicYear } from '../../hooks'
@@ -669,25 +670,30 @@ export function BulkRosteringPage() {
   // ---------------------------------------------------------------------------
   return (
     <div className="min-h-full flex flex-col">
-      {/* Header */}
+      {/* Header — operating context, not a page title (breadcrumb says Rostering) */}
       <div className="border-b border-border-secondary bg-surface-secondary/50">
-        <div className="px-6 py-6">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-[rgb(var(--state-info-bg)/0.20)] to-[rgb(var(--state-info-bg)/0.14)]">
-              <Grid3x3 className="w-6 h-6 text-[rgb(var(--action-secondary-fg))]" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-text-primary">Bulk Rostering</h1>
-              <p className="text-text-secondary mt-0.5">
+        <div className="px-6 py-5">
+          <ContextBar
+            divider={false}
+            meta={
+              <>
+                {currentYear?.name ? <ContextBarYear>{currentYear.name}</ContextBarYear> : null}
+                {currentYear?.name ? <ContextBarSep /> : null}
+                <span>
+                  {new Date().toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    month: 'short',
+                    day: 'numeric',
+                  })}
+                </span>
+              </>
+            }
+            description={
+              <p className="text-sm text-text-secondary">
                 Manage student-to-section assignments across all active sections
-                {currentYear && (
-                  <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--action-secondary-fg))]">
-                    {currentYear.name}
-                  </span>
-                )}
               </p>
-            </div>
-          </div>
+            }
+          />
         </div>
       </div>
 

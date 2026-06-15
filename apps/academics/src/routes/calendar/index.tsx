@@ -16,7 +16,7 @@ import {
   AlertCircle,
   RefreshCw,
 } from 'lucide-react'
-import { Button } from '@edforge/ui'
+import { Button, ContextBar, ContextBarYear, ContextBarSep } from '@edforge/ui'
 import { ConfirmationDialog } from '../../components/common'
 import {
   useAcademicYears,
@@ -394,22 +394,30 @@ export function CalendarModule() {
 
   return (
     <div className="min-h-full">
-      {/* Page Header */}
+      {/* Header — operating context, not a page title (breadcrumb says Calendar) */}
       <div className="border-b border-border-secondary bg-surface-secondary/50">
-        <div className="px-6 py-8">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-[rgb(var(--state-success-bg)/0.20)] to-[rgb(var(--state-info-bg)/0.14)]">
-              <Calendar className="w-6 h-6 text-[rgb(var(--state-success-fg))]" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-text-primary">
-                Academic Calendar
-              </h1>
-              <p className="text-text-secondary mt-1">
+        <div className="px-6 py-5">
+          <ContextBar
+            divider={false}
+            meta={
+              <>
+                {currentYear?.name ? <ContextBarYear>{currentYear.name}</ContextBarYear> : null}
+                {currentYear?.name ? <ContextBarSep /> : null}
+                <span>
+                  {new Date().toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    month: 'short',
+                    day: 'numeric',
+                  })}
+                </span>
+              </>
+            }
+            description={
+              <p className="text-sm text-text-secondary">
                 Manage academic years, terms, and grading periods
               </p>
-            </div>
-          </div>
+            }
+          />
         </div>
       </div>
 
