@@ -1,10 +1,12 @@
 import {
   forwardRef,
+  useId,
   useRef,
   type HTMLAttributes,
   type KeyboardEvent,
   type ReactNode,
 } from 'react'
+import { motion } from 'framer-motion'
 import { cn, focusRing, focusRingInset } from '../utils'
 
 export interface TabItem {
@@ -28,7 +30,7 @@ const ARROW_KEYS = ['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'Home', '
 
 function tabItemClasses(variant: 'line' | 'segmented', selected: boolean) {
   return cn(
-    'inline-flex items-center justify-center gap-2 text-sm font-medium transition-colors duration-fast ease-standard',
+    'relative inline-flex items-center justify-center gap-2 text-sm font-medium transition-colors duration-fast ease-standard',
     'disabled:pointer-events-none disabled:opacity-50',
     variant === 'segmented'
       ? cn(
@@ -39,10 +41,10 @@ function tabItemClasses(variant: 'line' | 'segmented', selected: boolean) {
           focusRingInset
         )
       : cn(
-          '-mb-px border-b-2 px-4 py-3',
+          'px-4 py-3',
           selected
-            ? 'border-[rgb(var(--border-focus))] text-[rgb(var(--text-primary))]'
-            : 'border-transparent text-[rgb(var(--text-secondary))] hover:border-[rgb(var(--border-secondary))] hover:text-[rgb(var(--text-primary))]',
+            ? 'text-[rgb(var(--text-primary))]'
+            : 'text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))]',
           focusRing
         )
   )
@@ -55,6 +57,9 @@ const TabsImpl = forwardRef<HTMLDivElement, TabsProps & { mode: TabsMode }>(
   ) => {
     const buttonRefs = useRef<(HTMLButtonElement | null)[]>([])
     const isTablist = mode === 'tabs'
+    // Unique per Tabs instance so the framer shared-layout slide animation
+    // never bleeds between two tab bars rendered on the same page.
+    const underlineId = useId()
 
     // WAI-ARIA tabs: roving tabindex + arrow/Home/End move selection between
     // enabled tabs. Segmented controls are a group of independent toggle
@@ -134,6 +139,16 @@ const TabsImpl = forwardRef<HTMLDivElement, TabsProps & { mode: TabsMode }>(
                 >
                   {tab.count}
                 </span>
+              ) : null}
+              {/* Sliding active-underline (line variant only). framer-motion
+                  shared-layout animates the bar between tabs on selection. */}
+              {variant === 'line' && selected ? (
+                <motion.span
+                  layoutId={underlineId}
+                  aria-hidden="true"
+                  className="absolute inset-x-0 -bottom-px h-0.5 rounded-t-full bg-[rgb(var(--border-focus))]"
+                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                />
               ) : null}
             </button>
           )
