@@ -36,7 +36,6 @@ export default defineConfig({
           exposes: {
             './StudentsModule': './src/routes/students/index.tsx',
             './AttendanceModule': './src/routes/attendance/index.tsx',
-            './GradebookModule': './src/routes/gradebook/index.tsx',
             './EnrollmentModule': './src/routes/enrollment/index.tsx',
             './AcademicsModule': './src/bootstrap.tsx',
           },
