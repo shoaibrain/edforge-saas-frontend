@@ -32,6 +32,7 @@ import {
 } from 'lucide-react'
 import { z } from 'zod'
 import { useResourcePermissions } from '@edforge/abac'
+import { Tabs, type TabItem } from '@edforge/ui'
 import { useCourse, useUpdateCourse } from '../../hooks/useCourses'
 import {
   useSections,
@@ -711,39 +712,22 @@ export function CourseDetailPage() {
           </div>
         </div>
 
-        {/* Tab Navigation */}
+        {/* Tabs — shared @edforge/ui primitive (house standard, accessible) */}
         <div className="px-6">
-          <nav className="flex gap-1" aria-label="Course tabs">
-            {TABS.map((tab) => {
-              const isActive = activeTab === tab.id
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`relative flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'text-text-primary'
-                      : 'text-text-tertiary hover:text-text-secondary'
-                  }`}
-                >
+          <Tabs
+            aria-label="Course tabs"
+            value={activeTab}
+            onChange={(value) => setActiveTab(value as CourseTab)}
+            tabs={TABS.map((tab): TabItem => ({
+              id: tab.id,
+              label: (
+                <span className="flex items-center gap-2">
                   <tab.icon className="w-4 h-4" />
                   {tab.label}
-                  {isActive && (
-                    <motion.div
-                      layoutId="courseDetailTab"
-                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-[rgb(var(--state-info-fg))] rounded-t-full"
-                      initial={false}
-                      transition={{
-                        type: 'spring',
-                        stiffness: 500,
-                        damping: 30,
-                      }}
-                    />
-                  )}
-                </button>
-              )
-            })}
-          </nav>
+                </span>
+              ),
+            }))}
+          />
         </div>
       </div>
 

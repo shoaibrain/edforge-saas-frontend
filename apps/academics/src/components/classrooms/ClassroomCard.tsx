@@ -37,7 +37,7 @@ export function ClassroomCard({ section, subjectAreaOverride, onNavigate, onEdit
 
   return (
     <article
-      className="group relative rounded-xl border overflow-hidden hover:-translate-y-px transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#378ADD] focus-visible:ring-offset-2 bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)] hover:border-[rgb(var(--border-primary)/0.5)]"
+      className="group relative rounded-xl border overflow-hidden hover:-translate-y-px transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-academics))] focus-visible:ring-offset-2 bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)] hover:border-[rgb(var(--border-primary)/0.5)]"
       aria-label={`${sectionName} — ${courseName || 'No course'}, ${teacherName}, ${section.currentEnrollment} of ${section.maxEnrollment} students`}
       role="link"
       tabIndex={0}

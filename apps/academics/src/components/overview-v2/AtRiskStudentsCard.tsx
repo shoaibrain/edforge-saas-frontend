@@ -159,7 +159,7 @@ export function AtRiskStudentsCard({
       <div className="pt-3 mt-3 border-t border-[rgb(var(--border-primary)/0.35)]">
         <Link
           to="/students"
-          className="inline-flex items-center gap-1.5 text-xs font-medium transition-opacity hover:opacity-80 text-[#1D9E75]"
+          className="inline-flex items-center gap-1.5 text-xs font-medium transition-opacity hover:opacity-80 text-[rgb(var(--accent-enrollment))]"
         >
           View all {totalAtRisk} at-risk students
           <ArrowRight className="w-3 h-3" />
