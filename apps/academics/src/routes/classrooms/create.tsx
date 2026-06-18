@@ -39,6 +39,10 @@ export function SectionCreatePage() {
     async (data: SectionFormData) => {
       const payload: CreateSectionDto = {
         courseId: data.courseId,
+        // shared-types 0.80.0 requires sectionType; this create flow is for
+        // subject ("instructional") Classrooms. Homeroom designation is a
+        // separate flow (S3.T6).
+        sectionType: 'instructional',
         schoolId,
         academicYearId: data.academicYearId,
         termId: data.termId || undefined,

@@ -11,7 +11,7 @@
     "lint": "eslint src/"
   },
   "dependencies": {
-    "@aibrains/shared-types": "^0.76.0",
+    "@aibrains/shared-types": "^0.80.0",
     "@dicebear/collection": "9.4.2",
     "@dicebear/core": "^9.4.2",
     "@edforge/abac": "workspace:*",

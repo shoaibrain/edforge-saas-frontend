@@ -504,7 +504,7 @@ function GradebookTab() {
           onClose={() => setShowBulkModal(false)}
           students={roster?.students ?? []}
           sectionId={selectedSectionId}
-          courseId={selectedSection.courseId}
+          courseId={selectedSection.courseId ?? ''}
           courseName={selectedSection.courseName}
           schoolId={schoolId}
           termId={effectiveTermId}
@@ -517,7 +517,7 @@ function GradebookTab() {
         <AssignmentEditor
           onClose={() => setShowAssignmentEditor(false)}
           sectionId={selectedSectionId}
-          courseId={selectedSection.courseId}
+          courseId={selectedSection.courseId ?? ''}
           schoolId={schoolId}
           termId={effectiveTermId}
           academicYearId={currentYear.yearId}
