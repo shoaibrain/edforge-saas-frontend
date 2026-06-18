@@ -166,7 +166,7 @@ const classroomsIndexRoute = createRoute({
 
         return {
             tab: z
-                .enum(['overview', 'gradebook', 'policies', 'attendance'])
+                .enum(['overview', 'homerooms', 'gradebook', 'policies', 'attendance'])
                 .optional()
                 .catch(undefined)
                 .parse(tab),
