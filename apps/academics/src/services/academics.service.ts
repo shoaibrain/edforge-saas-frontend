@@ -1027,6 +1027,87 @@ export async function updateAttendance(
 }
 
 // ============================================================================
+// HOMEROOM & DAILY ATTENDANCE (PABSON `daily` mode — Attendance Domain epic)
+// ============================================================================
+
+import type {
+  DesignateHomeroomDto,
+  RecordDailyAttendanceDto,
+  RecordDailyAttendanceResponseDto,
+  SectionResponseDto as HomeroomSectionResponseDto,
+  AttendancePolicy,
+  AttendanceCountingPolicy,
+} from '@aibrains/shared-types'
+
+export type {
+  DesignateHomeroomDto,
+  RecordDailyAttendanceDto,
+  RecordDailyAttendanceResponseDto,
+} from '@aibrains/shared-types'
+
+/**
+ * Resolved attendance policy for a school.
+ * `effectiveMode` drives whether the school takes daily homeroom roll-call
+ * (`daily` — PABSON) or per-subject-section attendance (`period` — today's
+ * default). `both` means daily is authoritative but sections are also recorded.
+ */
+export interface AttendancePolicyResponse {
+  effectiveMode: AttendancePolicy
+  countingPolicy: AttendanceCountingPolicy
+  source: string
+}
+
+/**
+ * Get the school's resolved attendance policy/mode.
+ * GET /academics/attendance/policy?schoolId=
+ */
+export async function getAttendancePolicy(
+  schoolId: string,
+): Promise<AttendancePolicyResponse> {
+  if (DEBUG) console.debug('[Academics Service] getAttendancePolicy', { schoolId })
+  return apiGet<AttendancePolicyResponse>('/academics/attendance/policy', { schoolId })
+}
+
+/**
+ * Designate a homeroom Section (sectionType:'homeroom', no subject course).
+ * POST /academics/sections/homeroom
+ */
+export async function designateHomeroom(
+  data: DesignateHomeroomDto,
+): Promise<HomeroomSectionResponseDto> {
+  return apiPost<HomeroomSectionResponseDto>('/academics/sections/homeroom', data)
+}
+
+/**
+ * Assign ONE student to a homeroom (one-homeroom rule enforced server-side;
+ * a move is a drop-then-assign). There is no bulk endpoint — callers loop.
+ * POST /academics/sections/:id/homeroom-students
+ */
+export async function assignToHomeroom(
+  sectionId: string,
+  data: { schoolId: string; studentId: string },
+): Promise<void> {
+  return apiPost(`/academics/sections/${sectionId}/homeroom-students`, data)
+}
+
+/**
+ * Record a daily homeroom roll-call. Only marked exceptions need to be sent
+ * in `marks`; unmarked roster students default to `present` server-side.
+ * POST /academics/attendance/daily/bulk
+ */
+export async function recordDailyAttendance(
+  data: RecordDailyAttendanceDto,
+): Promise<RecordDailyAttendanceResponseDto> {
+  if (DEBUG) console.debug('[Academics Service] recordDailyAttendance', {
+    schoolId: data.schoolId,
+    homeroomSectionId: data.homeroomSectionId,
+    date: data.date,
+    marks: data.marks?.length ?? 0,
+  })
+  return apiPost<RecordDailyAttendanceResponseDto>('/academics/attendance/daily/bulk', data)
+}
+
+// ============================================================================
 // SECTION ATTENDANCE (Ed-Fi: StudentSectionAttendanceEvent)
 // ============================================================================
 

@@ -39,10 +39,12 @@ import {
 } from '../../hooks/useSectionAttendance'
 import { useSections, flattenSectionPages, useSectionRoster } from '../../hooks'
 import { useCurrentAcademicYear } from '../../hooks'
+import { useAttendancePolicy } from '../../hooks/useHomeroom'
 import { useOfflineAttendance } from '../../hooks/useOfflineAttendance'
 import { DateSelector } from '../../components/attendance/DateSelector'
 import { AttendanceGrid } from '../../components/attendance/AttendanceGrid'
 import { DailySummary } from '../../components/attendance/DailySummary'
+import { DailyHomeroomEntry } from '../../components/attendance/DailyHomeroomEntry'
 import { AttendanceDashboard } from './dashboard'
 import { NoCurrentAcademicYearEmptyState } from '../../components/common'
 import type { AttendanceStatus } from '../../services/academics.service'
@@ -271,6 +273,11 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
   // ABAC: check if user can create/edit attendance
   const canCreateAttendance = usePermission('create', 'attendance')
 
+  // FE-S5: resolve the school's attendance mode. `daily`/`both` schools take a
+  // homeroom roll-call; `period` schools keep the per-section path unchanged.
+  const { data: policy } = useAttendancePolicy(schoolId)
+  const isDailyMode = policy?.effectiveMode === 'daily' || policy?.effectiveMode === 'both'
+
   // currentYearId / currentYearName are guaranteed non-empty by the gate in
   // `AttendanceModule` above (Sprint 1 / Ticket 1.3a). Defensive `?.` falsy
   // defaults on `currentYear` were removed in Ticket 1.3b.
@@ -426,7 +433,7 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
             <div>
               <div className="text-base font-semibold tracking-[-0.2px] text-[rgb(var(--text-primary))]">Attendance</div>
               <div className="text-3xs text-[rgb(var(--text-disabled))]">
-                Record and review attendance by class section · {currentYearName || 'Academic Year'}
+                Record and review attendance {isDailyMode ? 'by homeroom roll-call' : 'by class section'} · {currentYearName || 'Academic Year'}
               </div>
             </div>
           </div>
@@ -440,8 +447,9 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
         {/* Sub-Tabs */}
         <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
 
-        {/* Controls Row (only for daily entry) */}
-        {activeTab === 'daily-entry' && (
+        {/* Controls Row (per-section daily entry only — the homeroom roll-call
+            path renders its own homeroom + date controls). */}
+        {activeTab === 'daily-entry' && !isDailyMode && (
           <div className="flex items-center gap-6 flex-wrap mt-3 mb-1">
             <SectionSelector
               sections={sections}
@@ -483,7 +491,11 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
               />
             )}
 
-            {activeTab === 'daily-entry' && (
+            {activeTab === 'daily-entry' && isDailyMode && (
+              <DailyHomeroomEntry schoolId={schoolId} academicYearId={currentYearId} />
+            )}
+
+            {activeTab === 'daily-entry' && !isDailyMode && (
               <div className="space-y-6">
                 {/* Calendar Non-Instructional Banner */}
                 {isNonInstructional && (

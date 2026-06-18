@@ -35,6 +35,7 @@ import {
   Users,
   Gauge,
   UsersRound,
+  Home,
 } from 'lucide-react'
 import { useActiveSchoolId } from '../../stores/app.store'
 
@@ -52,6 +53,7 @@ import { SectionTable } from '../../components/scheduling/SectionTable'
 import { SectionFilters } from '../../components/scheduling/SectionFilters'
 import type { SectionResponseDto } from '@aibrains/shared-types'
 import { ClassroomCardGrid } from '../../components/classrooms/ClassroomCardGrid'
+import { HomeroomsTab } from '../../components/homerooms/HomeroomsTab'
 
 // --- Grades imports ---
 import { useGradesStore } from '../../stores/grades.store'
@@ -74,10 +76,11 @@ import { useAttendanceOverview } from '../../hooks/useAttendance'
 // TYPES
 // ============================================================================
 
-type ClassroomTabId = 'overview' | 'gradebook' | 'policies' | 'attendance'
+type ClassroomTabId = 'overview' | 'homerooms' | 'gradebook' | 'policies' | 'attendance'
 
 const TABS: { id: ClassroomTabId; label: string; icon: typeof School }[] = [
   { id: 'overview', label: 'Overview', icon: School },
+  { id: 'homerooms', label: 'Homerooms', icon: Home },
   { id: 'gradebook', label: 'Gradebook', icon: BookCheck },
   { id: 'policies', label: 'Grading Policies', icon: Settings },
   { id: 'attendance', label: 'Attendance', icon: ClipboardCheck },
@@ -772,6 +775,12 @@ export function ClassroomsModule() {
             {activeTab === 'overview' && (
               <TabErrorBoundary tabName="Overview">
                 <OverviewTab />
+              </TabErrorBoundary>
+            )}
+
+            {activeTab === 'homerooms' && (
+              <TabErrorBoundary tabName="Homerooms">
+                <HomeroomsTab />
               </TabErrorBoundary>
             )}
 

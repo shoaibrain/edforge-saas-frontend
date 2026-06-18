@@ -81,6 +81,14 @@ export {
   useStudentSectionAttendance,
   sectionAttendanceKeys,
 } from './useSectionAttendance'
+export {
+  useAttendancePolicy,
+  useHomerooms,
+  useDesignateHomeroom,
+  useAssignToHomeroom,
+  useRecordDailyAttendance,
+  homeroomKeys,
+} from './useHomeroom'
 export { useOfflineAttendance } from './useOfflineAttendance'
 export type { SaveStatus } from './useOfflineAttendance'
 export {

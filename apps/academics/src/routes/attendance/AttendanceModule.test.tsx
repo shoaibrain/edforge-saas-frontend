@@ -76,6 +76,11 @@ vi.mock('../../hooks/useOfflineAttendance', () => ({
   }),
 }))
 
+vi.mock('../../hooks/useHomeroom', () => ({
+  // undefined policy → not daily mode → existing per-section Daily Entry path
+  useAttendancePolicy: () => ({ data: undefined, isLoading: false }),
+}))
+
 vi.mock('./dashboard', () => ({
   AttendanceDashboard: () => <div data-testid="attendance-dashboard" />,
 }))
