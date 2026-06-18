@@ -24,6 +24,7 @@ import {
   AlertTriangle,
   Building2,
   RefreshCw,
+  ClipboardCheck,
 } from 'lucide-react'
 import { Button, FieldLockTooltip, FieldLockIcon, InlineAlert, Select, Switch } from '@edforge/ui'
 import { useAuthStore } from '@/stores/auth.store'
@@ -143,12 +144,11 @@ const NUMBER_FORMAT_OPTIONS = [
   { value: 'south_asian', label: 'South Asian (1,00,000)' },
 ]
 
-// COMING SOON — re-enable when Attendance Defaults section ships
-// const ATTENDANCE_POLICY_OPTIONS = [
-//   { value: 'daily', label: 'Daily Attendance' },
-//   { value: 'period', label: 'Period-by-Period' },
-//   { value: 'both', label: 'Both Daily & Period' },
-// ]
+const ATTENDANCE_POLICY_OPTIONS = [
+  { value: 'daily', label: 'Daily roll-call' },
+  { value: 'period', label: 'By subject section' },
+  { value: 'both', label: 'Both' },
+]
 
 type WorkspaceSelectOption = {
   value: string
@@ -743,7 +743,24 @@ export default function WorkspaceSettingsPage() {
 
         {/* COMING SOON — Organization Branding section (re-enable when branding customization ships) */}
 
-        {/* COMING SOON — Attendance Defaults section (re-enable when attendance policy config ships) */}
+        {/* Attendance Defaults */}
+        <SettingsSection
+          title="Attendance Defaults"
+          icon={ClipboardCheck}
+          description="Default attendance mode applied to schools that don't set their own"
+        >
+          <SettingsFieldRow
+            label="Attendance Mode"
+            description="Schools inherit this unless they override it in their School Configuration"
+            inline
+          >
+            <WorkspaceSelect
+              value={displaySettings.policies.defaultAttendancePolicy}
+              onChange={(value) => updateField('policies', 'defaultAttendancePolicy', value)}
+              options={ATTENDANCE_POLICY_OPTIONS}
+            />
+          </SettingsFieldRow>
+        </SettingsSection>
 
         {/* Lock taxonomy + permissions hint — replaces the older single "Important" note */}
         <motion.div variants={fadeInUp} className="space-y-3">
@@ -774,9 +791,9 @@ export default function WorkspaceSettingsPage() {
                 </li>
                 <li>
                   <strong className="font-medium text-[rgb(var(--text-primary))]">
-                    Branding &amp; Policies
+                    Attendance Defaults
                   </strong>{' '}
-                  (coming soon) remain editable at any time, independent of academic-year state.
+                  (and Branding, coming soon) remain editable at any time, independent of academic-year state.
                 </li>
               </ul>
               <p className="text-xs text-[rgb(var(--text-tertiary))] mt-2">

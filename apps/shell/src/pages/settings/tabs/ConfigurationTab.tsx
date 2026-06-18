@@ -11,10 +11,11 @@
  */
 
 import { useState, useEffect, useMemo } from 'react'
+import { ChevronDown } from 'lucide-react'
 import { toast } from 'sonner'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { tenantService } from '@/services/tenant.service'
-import { Field, Input, Select } from '@edforge/ui'
+import { Field, Input, InlineAlert, Select, Switch } from '@edforge/ui'
 import type { School } from '@edforge/types'
 import type { UpdateSchoolDto, UpdateSchoolConfigDto } from '@aibrains/shared-types'
 import { useLocaleDefaults } from '@/hooks/useLocaleDefaults'
@@ -35,6 +36,12 @@ const SCHOOL_TYPE_OPTIONS = [
   { value: 'private', label: 'Private School' },
   { value: 'vocational', label: 'Vocational School' },
   { value: 'special_education', label: 'Special Education' },
+]
+
+const ATTENDANCE_POLICY_OPTIONS = [
+  { value: 'daily', label: 'Daily roll-call' },
+  { value: 'period', label: 'By subject section' },
+  { value: 'both', label: 'Both' },
 ]
 
 const DAY_LABELS: { key: DayOfWeek; short: string }[] = [
@@ -142,6 +149,16 @@ export default function ConfigurationTab({ schoolId, school }: ConfigurationTabP
   })
   const [scheduleOriginal, setScheduleOriginal] = useState(schedule)
 
+  // ── Attendance form state ──
+  // `policy` empty string === unset === inherit workspace default.
+  const [attendance, setAttendance] = useState({
+    policy: '' as '' | 'daily' | 'period' | 'both',
+    attendanceRequired: true,
+    tardyThresholdMinutes: 10,
+  })
+  const [attendanceOriginal, setAttendanceOriginal] = useState(attendance)
+  const [attendanceAdvancedOpen, setAttendanceAdvancedOpen] = useState(false)
+
   // Initialize from API data
   useEffect(() => {
     if (school && apiConfig) {
@@ -177,6 +194,15 @@ export default function ConfigurationTab({ schoolId, school }: ConfigurationTabP
       }
       setSchedule(sched)
       setScheduleOriginal(sched)
+
+      const apiAttendance = (apiConfig as any).attendance || {}
+      const att = {
+        policy: (apiAttendance.policy ?? '') as '' | 'daily' | 'period' | 'both',
+        attendanceRequired: apiAttendance.attendanceRequired ?? true,
+        tardyThresholdMinutes: apiAttendance.tardyThresholdMinutes ?? 10,
+      }
+      setAttendance(att)
+      setAttendanceOriginal(att)
     }
   }, [school, apiConfig, localeDefaults.schoolDayIndices])
 
@@ -251,9 +277,28 @@ export default function ConfigurationTab({ schoolId, school }: ConfigurationTabP
     }
   }
 
+  const saveAttendance = async () => {
+    try {
+      await updateConfigMutation.mutateAsync({
+        attendance: {
+          // Empty string means "inherit workspace default" — send undefined.
+          policy: attendance.policy || undefined,
+          attendanceRequired: attendance.attendanceRequired,
+          tardyThresholdMinutes: attendance.tardyThresholdMinutes,
+        },
+      } as any)
+      setAttendanceOriginal(attendance)
+      toast.success('Attendance settings saved')
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to save attendance settings')
+    }
+  }
+
   const identityDirty = JSON.stringify(identity) !== JSON.stringify(identityOriginal)
   const locationDirty = JSON.stringify(location) !== JSON.stringify(locationOriginal)
   const scheduleDirty = JSON.stringify(schedule) !== JSON.stringify(scheduleOriginal)
+  const attendanceDirty = JSON.stringify(attendance) !== JSON.stringify(attendanceOriginal)
+  const attendanceInherited = attendance.policy === ''
 
   const toggleDay = (dayIndex: number) => {
     setSchedule(prev => ({
@@ -508,6 +553,87 @@ export default function ConfigurationTab({ schoolId, school }: ConfigurationTabP
                 onChange={e => setSchedule(prev => ({ ...prev, periodDuration: parseInt(e.target.value) || 45 }))}
               />
             </Field>
+          </div>
+        </div>
+      </SectionCard>
+
+      {/* ── Section 4: Attendance ── */}
+      <SectionCard
+        icon="📋"
+        iconBg="bg-[rgba(127,119,221,0.1)]"
+        title="Attendance"
+        subtitle="How attendance is recorded for this school"
+        footer={
+          <>
+            <button
+              onClick={() => setAttendance(attendanceOriginal)}
+              disabled={!attendanceDirty}
+              className="px-3 py-1.5 text-xs font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)] disabled:opacity-40 transition-all"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={saveAttendance}
+              disabled={!attendanceDirty || updateConfigMutation.isPending}
+              className="px-3 py-1.5 text-xs font-medium rounded-lg bg-[#1D9E75] text-[rgb(var(--action-primary-fg))] hover:opacity-90 disabled:opacity-40 transition-all"
+            >
+              Save Attendance
+            </button>
+          </>
+        }
+      >
+        <div className="p-4 space-y-4">
+          {attendanceInherited && (
+            <InlineAlert variant="info" className="text-xs">
+              Using workspace default. Pick a mode below to override it for this school only.
+            </InlineAlert>
+          )}
+
+          <Select
+            label="Attendance Mode"
+            size="sm"
+            value={attendance.policy}
+            onChange={v => setAttendance(prev => ({ ...prev, policy: (v ?? '') as '' | 'daily' | 'period' | 'both' }))}
+            options={ATTENDANCE_POLICY_OPTIONS}
+            placeholder="Inherit workspace default"
+          />
+
+          {/* Advanced disclosure */}
+          <div className="border-t border-[rgba(255,255,255,0.05)] pt-3">
+            <button
+              type="button"
+              onClick={() => setAttendanceAdvancedOpen(o => !o)}
+              className="flex items-center gap-1.5 text-xs font-medium text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] transition-colors"
+            >
+              <ChevronDown className={`w-3.5 h-3.5 transition-transform ${attendanceAdvancedOpen ? 'rotate-180' : ''}`} />
+              Advanced
+            </button>
+
+            {attendanceAdvancedOpen && (
+              <div className="mt-3 space-y-4">
+                <div className="flex items-center justify-between gap-4">
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-[rgb(var(--text-primary))]">Attendance required</p>
+                    <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">
+                      Teachers must record attendance for every session.
+                    </p>
+                  </div>
+                  <Switch
+                    checked={attendance.attendanceRequired}
+                    onChange={checked => setAttendance(prev => ({ ...prev, attendanceRequired: checked }))}
+                  />
+                </div>
+
+                <Field label="Tardy Threshold (min)" optionalText={null} density="compact">
+                  <Input
+                    type="number"
+                    min={0}
+                    value={attendance.tardyThresholdMinutes}
+                    onChange={e => setAttendance(prev => ({ ...prev, tardyThresholdMinutes: parseInt(e.target.value) || 0 }))}
+                  />
+                </Field>
+              </div>
+            )}
           </div>
         </div>
       </SectionCard>

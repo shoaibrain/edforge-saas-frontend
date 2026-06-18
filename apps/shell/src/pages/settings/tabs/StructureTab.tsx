@@ -6,8 +6,9 @@
  */
 
 import { useState } from 'react'
+import { Link } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Plus, X, Trash2 } from 'lucide-react'
+import { Plus, X, Trash2, Users, ArrowRight } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { toast } from 'sonner'
 import { tenantService } from '@/services/tenant.service'
@@ -75,9 +76,44 @@ interface StructureTabProps {
 
 export default function StructureTab({ schoolId }: StructureTabProps) {
   return (
-    <div className="grid grid-cols-2 gap-5">
-      <DepartmentsColumn schoolId={schoolId} />
-      <RoomsColumn schoolId={schoolId} />
+    <div className="space-y-5">
+      <div className="grid grid-cols-2 gap-5">
+        <DepartmentsColumn schoolId={schoolId} />
+        <RoomsColumn schoolId={schoolId} />
+      </div>
+      <HomeroomsCard />
+    </div>
+  )
+}
+
+// ============================================================================
+// HOMEROOMS SUMMARY CARD
+// ============================================================================
+
+function HomeroomsCard() {
+  return (
+    <div className="bg-[rgb(var(--background-primary))] border border-[rgba(255,255,255,0.06)] rounded-xl">
+      <div className="px-4 py-4 flex items-start justify-between gap-4">
+        <div className="flex items-start gap-3 min-w-0">
+          <div className="w-9 h-9 rounded-lg bg-[rgba(55,138,221,0.1)] flex items-center justify-center flex-shrink-0">
+            <Users className="w-4 h-4 text-[#378ADD]" />
+          </div>
+          <div className="min-w-0">
+            <h4 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Homerooms</h4>
+            <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5 leading-relaxed max-w-xl">
+              Daily attendance is taken at the homeroom. Set up one homeroom per grade/section
+              and assign a class teacher.
+            </p>
+          </div>
+        </div>
+        <Link
+          to={'/academics/classrooms?tab=homerooms' as any}
+          className="flex-shrink-0 bg-[#1D9E75] text-[rgb(var(--action-primary-fg))] text-xs font-medium px-3 py-1.5 rounded-lg flex items-center gap-1.5 hover:opacity-90 transition-opacity"
+        >
+          Manage homerooms
+          <ArrowRight className="w-3.5 h-3.5" />
+        </Link>
+      </div>
     </div>
   )
 }
