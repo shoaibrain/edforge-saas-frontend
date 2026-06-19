@@ -86,8 +86,14 @@ export {
   useHomerooms,
   useDesignateHomeroom,
   useAssignToHomeroom,
+  useAssignStudentsToHomeroom,
   useRecordDailyAttendance,
   homeroomKeys,
+} from './useHomeroom'
+export type {
+  AssignStudentsProgress,
+  AssignStudentsResult,
+  AssignStudentsToHomeroomVariables,
 } from './useHomeroom'
 export { useOfflineAttendance } from './useOfflineAttendance'
 export type { SaveStatus } from './useOfflineAttendance'

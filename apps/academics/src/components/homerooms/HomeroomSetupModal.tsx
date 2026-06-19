@@ -2,21 +2,31 @@
  * HomeroomSetupModal
  *
  * Assisted "Set up homerooms" flow for the PABSON daily-attendance model.
- * Proposes one homeroom per enabled grade level (operator can split a grade
- * into multiple sections, e.g. Grade 1 A / B), REQUIRES a class teacher
- * (primary) per homeroom, and creates each via `designateHomeroom`.
+ * Renders one **grade card** per enabled grade level (vertical stack, no
+ * horizontal scroll). Each card REQUIRES a class teacher, offers an optional
+ * co-teacher + max, can be split into lettered sections (A/B…), and is created
+ * via `designateHomeroom`.
  *
- * No bulk-create endpoint exists — rows are created one POST at a time with
- * an aggregate progress indicator (FE-S4).
+ * Auto-roster (FE-S4): when a homeroom is created for a grade, that grade's
+ * currently-enrolled students are automatically assigned into it. Per-grade
+ * student counts + the studentIds to enroll come from grouping the enrollment
+ * list (status:'enrolled') by the stored LOCAL grade label
+ * (`enrollment.gradeLevel`, e.g. "3", "NUR") — not a canonical descriptor.
+ *
+ * No bulk-create endpoint exists — homerooms are created one POST at a time,
+ * and each grade's students are assigned via the looping
+ * `useAssignStudentsToHomeroom` hook, with aggregate progress.
  */
 
 import { useEffect, useMemo, useState } from 'react'
-import { Plus, Trash2, Loader2, CheckCircle, UsersRound } from 'lucide-react'
-import { Modal, ModalFooter, Button, Field, Input, Select } from '@edforge/ui'
+import { Plus, Trash2, Loader2, CheckCircle, UsersRound, UserCog } from 'lucide-react'
+import { Modal, ModalFooter, Button, Field, Input, Select, StatusBadge } from '@edforge/ui'
 import { useSchoolEnabledGradeOptions } from '../../hooks/useGradeOptions'
 import { useSchoolStaff, flattenStaffData, getStaffDisplayName } from '../../hooks/useStaff'
-import { useDesignateHomeroom } from '../../hooks/useHomeroom'
+import { useEnrollments, flattenEnrollmentPages } from '../../hooks/useEnrollments'
+import { useDesignateHomeroom, useAssignStudentsToHomeroom } from '../../hooks/useHomeroom'
 import { parseApiError, type DesignateHomeroomDto } from '../../services/academics.service'
+import { toast } from 'sonner'
 
 // ============================================================================
 // TYPES
@@ -26,6 +36,8 @@ interface ProposedHomeroom {
   /** Local row id (grade + suffix) for React keys + edits. */
   rowId: string
   gradeLabel: string
+  /** Local grade code used to look up enrolled students for auto-roster. */
+  gradeValue: string
   /** sectionNumber sent to the API (e.g. "1", "1-A"). */
   sectionNumber: string
   sectionName: string
@@ -61,10 +73,40 @@ export function HomeroomSetupModal({
   )
   const { data: staffData } = useSchoolStaff(schoolId)
   const teachers = useMemo(() => flattenStaffData(staffData), [staffData])
+
+  // Currently-enrolled students for auto-roster. status MUST be 'enrolled'
+  // (rows are stored that way; 'active' would return nothing).
+  const { data: enrollmentData } = useEnrollments({
+    schoolId,
+    yearId: academicYearId,
+    filters: { status: 'enrolled' },
+    enabled: open && !!schoolId && !!academicYearId,
+  })
+  const enrollments = useMemo(() => flattenEnrollmentPages(enrollmentData), [enrollmentData])
+
+  // Map<localGradeLabel, studentId[]> — grouped by the STORED grade label.
+  const studentsByGrade = useMemo(() => {
+    const map = new Map<string, string[]>()
+    for (const e of enrollments) {
+      const grade = e.gradeLevel
+      if (!grade) continue
+      const list = map.get(grade)
+      if (list) list.push(e.studentId)
+      else map.set(grade, [e.studentId])
+    }
+    return map
+  }, [enrollments])
+
   const designate = useDesignateHomeroom()
+  const assignStudents = useAssignStudentsToHomeroom()
 
   const [rows, setRows] = useState<ProposedHomeroom[]>([])
-  const [progress, setProgress] = useState<{ done: number; total: number } | null>(null)
+  const [progress, setProgress] = useState<{
+    phase: 'creating' | 'assigning'
+    label: string
+    done: number
+    total: number
+  } | null>(null)
   const [failures, setFailures] = useState<Array<{ label: string; message: string }>>([])
 
   // Seed one proposed homeroom per enabled grade not already covered.
@@ -75,6 +117,7 @@ export function HomeroomSetupModal({
       .map((g) => ({
         rowId: g.value,
         gradeLabel: g.label,
+        gradeValue: g.value,
         sectionNumber: g.value,
         sectionName: `${g.label} Homeroom`,
         primaryTeacherId: '',
@@ -97,11 +140,12 @@ export function HomeroomSetupModal({
   const splitGrade = (row: ProposedHomeroom) => {
     // Append a lettered section under the same grade (A / B / C …).
     setRows((prev) => {
-      const sameGrade = prev.filter((r) => r.gradeLabel === row.gradeLabel)
+      const sameGrade = prev.filter((r) => r.gradeValue === row.gradeValue)
       const suffix = String.fromCharCode(65 + sameGrade.length) // next letter
       const newRow: ProposedHomeroom = {
-        rowId: `${row.rowId}-${suffix}`,
+        rowId: `${row.gradeValue}-${suffix}`,
         gradeLabel: row.gradeLabel,
+        gradeValue: row.gradeValue,
         sectionNumber: `${row.sectionNumber.split('-')[0]}-${suffix}`,
         sectionName: `${row.gradeLabel} Homeroom ${suffix}`,
         primaryTeacherId: '',
@@ -115,22 +159,23 @@ export function HomeroomSetupModal({
     })
   }
 
-  const allHaveTeacher = rows.length > 0 && rows.every((r) => r.primaryTeacherId)
-  const isCreating = progress !== null && progress.done < progress.total
-
   const teacherOptions = useMemo(
     () => teachers.map((t) => ({ value: t.staffId, label: getStaffDisplayName(t) })),
     [teachers],
   )
 
+  const needsTeacherCount = rows.filter((r) => !r.primaryTeacherId).length
+  const allHaveTeacher = rows.length > 0 && needsTeacherCount === 0
+  const isBusy = progress !== null
+
   const handleCreate = async () => {
     setFailures([])
     const created: string[] = []
     const errs: Array<{ label: string; message: string }> = []
-    setProgress({ done: 0, total: rows.length })
 
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i]
+      const cardLabel = row.sectionName || `${row.gradeLabel} (#${row.sectionNumber})`
       const dto: DesignateHomeroomDto = {
         schoolId,
         academicYearId,
@@ -140,14 +185,38 @@ export function HomeroomSetupModal({
         coTeacherIds: row.coTeacherId ? [row.coTeacherId] : undefined,
         maxEnrollment: row.maxEnrollment,
       }
+
+      setProgress({ phase: 'creating', label: cardLabel, done: i, total: rows.length })
+
+      let sectionId: string
       try {
-        await designate.mutateAsync(dto)
+        const section = await designate.mutateAsync(dto)
+        sectionId = section.sectionId
         created.push(row.rowId)
       } catch (error) {
         const parsed = parseApiError(error)
-        errs.push({ label: row.sectionName || row.sectionNumber, message: parsed.message })
+        errs.push({ label: cardLabel, message: parsed.message })
+        continue
       }
-      setProgress({ done: i + 1, total: rows.length })
+
+      // Auto-roster: assign this grade's currently-enrolled students.
+      const studentIds = studentsByGrade.get(row.gradeValue) ?? []
+      if (studentIds.length > 0) {
+        const result = await assignStudents.mutateAsync({
+          sectionId,
+          schoolId,
+          studentIds,
+          onProgress: ({ done, total }) =>
+            setProgress({ phase: 'assigning', label: cardLabel, done, total }),
+        })
+        const assignedMsg =
+          result.skipped.length > 0
+            ? `${row.gradeLabel} homeroom created — ${result.assigned.length} students assigned, ${result.skipped.length} skipped (already in a homeroom)`
+            : `${row.gradeLabel} homeroom created — ${result.assigned.length} student${result.assigned.length === 1 ? '' : 's'} assigned`
+        toast.success(assignedMsg)
+      } else {
+        toast.success(`${row.gradeLabel} homeroom created — no enrolled students to assign yet`)
+      }
     }
 
     // Drop successfully-created rows; keep failures visible for retry.
@@ -160,17 +229,38 @@ export function HomeroomSetupModal({
   return (
     <Modal
       open={open}
-      onClose={isCreating ? () => {} : onClose}
+      onClose={isBusy ? () => {} : onClose}
       title="Set up homerooms"
-      description="One homeroom per grade for daily roll-call. Split a grade into sections if needed. Each homeroom needs a class teacher."
+      description="One homeroom per grade for daily roll-call. Each grade's currently-enrolled students are assigned automatically. Split a grade into sections if needed."
       size="2xl"
-      showCloseButton={!isCreating}
+      showCloseButton={!isBusy}
     >
       <div className="space-y-4">
+        {/* Summary header */}
+        {!gradesLoading && rows.length > 0 && (
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <p className="text-sm text-text-secondary">
+              <span className="font-medium text-text-primary">{rows.length}</span> grade
+              {rows.length === 1 ? '' : 's'}
+              {needsTeacherCount > 0 ? (
+                <>
+                  {' · '}
+                  <span className="font-medium text-[rgb(var(--state-warning-fg))]">
+                    {needsTeacherCount}
+                  </span>{' '}
+                  still need a teacher
+                </>
+              ) : (
+                <span className="text-[rgb(var(--state-success-fg))]"> · all ready</span>
+              )}
+            </p>
+          </div>
+        )}
+
         {gradesLoading ? (
-          <div className="space-y-2">
+          <div className="space-y-3">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="h-12 bg-surface-secondary rounded-lg animate-pulse" />
+              <div key={i} className="h-28 bg-surface-secondary rounded-xl animate-pulse" />
             ))}
           </div>
         ) : rows.length === 0 ? (
@@ -184,100 +274,144 @@ export function HomeroomSetupModal({
             </p>
           </div>
         ) : (
-          <div className="space-y-2 max-h-[52vh] overflow-y-auto pr-1">
-            {/* Header row (desktop) */}
-            <div className="hidden sm:grid grid-cols-[1fr_1.4fr_1.4fr_5rem_2rem] gap-2 px-1 text-2xs font-medium text-text-tertiary">
-              <span>Grade / Section</span>
-              <span>Class Teacher *</span>
-              <span>Co-Teacher</span>
-              <span>Max</span>
-              <span />
-            </div>
+          <div className="space-y-3 max-h-[60vh] overflow-y-auto overflow-x-hidden pr-1">
+            {rows.map((row) => {
+              const studentCount = (studentsByGrade.get(row.gradeValue) ?? []).length
+              const ready = !!row.primaryTeacherId
+              return (
+                <div
+                  key={row.rowId}
+                  className="rounded-xl border border-border-secondary bg-surface-primary p-4 space-y-3"
+                >
+                  {/* Card header: grade + count + status + remove */}
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h4 className="text-sm font-semibold text-text-primary truncate">
+                          {row.gradeLabel}
+                        </h4>
+                        <span className="text-2xs font-medium text-text-tertiary tabular-nums">
+                          #{row.sectionNumber}
+                        </span>
+                      </div>
+                      <p className="text-xs text-text-tertiary mt-0.5 flex items-center gap-1">
+                        <UsersRound className="w-3.5 h-3.5 shrink-0" />
+                        {studentCount} enrolled student{studentCount === 1 ? '' : 's'} will be
+                        assigned
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      {ready ? (
+                        <StatusBadge tone="success" dot>
+                          Ready
+                        </StatusBadge>
+                      ) : (
+                        <StatusBadge tone="warning" dot>
+                          Needs a teacher
+                        </StatusBadge>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => removeRow(row.rowId)}
+                        disabled={isBusy}
+                        title="Remove"
+                        aria-label={`Remove ${row.gradeLabel} homeroom`}
+                        className="p-1.5 rounded-md text-text-tertiary hover:text-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--state-danger-bg)/0.18)] transition-colors disabled:opacity-40"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
 
-            {rows.map((row) => (
-              <div
-                key={row.rowId}
-                className="grid grid-cols-1 sm:grid-cols-[1fr_1.4fr_1.4fr_5rem_2rem] gap-2 items-end rounded-lg border border-border-secondary p-2.5"
-              >
-                <Field label="Section #" error={undefined} className="sm:[&_label]:sr-only">
-                  <Input
-                    value={row.sectionNumber}
-                    onChange={(e) => updateRow(row.rowId, { sectionNumber: e.target.value })}
-                    aria-label={`Section number for ${row.gradeLabel}`}
-                    disabled={isCreating}
-                  />
-                </Field>
+                  {/* Fields: stack on narrow, responsive row on wider. min-w-0 prevents overflow. */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_6rem] gap-3">
+                    <div className="min-w-0">
+                      <Select
+                        label="Class teacher"
+                        required
+                        optionalText={null}
+                        value={row.primaryTeacherId || ''}
+                        onChange={(v) => updateRow(row.rowId, { primaryTeacherId: v ?? '' })}
+                        placeholder="Select teacher…"
+                        options={teacherOptions}
+                        disabled={isBusy}
+                        error={!row.primaryTeacherId ? 'Required' : undefined}
+                      />
+                    </div>
 
-                <Select
-                  label="Class Teacher"
-                  optionalText={null}
-                  value={row.primaryTeacherId || ''}
-                  onChange={(v) => updateRow(row.rowId, { primaryTeacherId: v ?? '' })}
-                  placeholder="Required — select teacher..."
-                  options={teacherOptions}
-                  disabled={isCreating}
-                  className="sm:[&_label]:sr-only"
-                  error={!row.primaryTeacherId ? ' ' : undefined}
-                />
+                    <div className="min-w-0">
+                      <Select
+                        label="Co-teacher"
+                        clearable
+                        value={row.coTeacherId || ''}
+                        onChange={(v) => updateRow(row.rowId, { coTeacherId: v ?? '' })}
+                        placeholder="Optional…"
+                        options={teacherOptions.filter((t) => t.value !== row.primaryTeacherId)}
+                        disabled={isBusy}
+                      />
+                    </div>
 
-                <Select
-                  label="Co-Teacher"
-                  optionalText={null}
-                  clearable
-                  value={row.coTeacherId || ''}
-                  onChange={(v) => updateRow(row.rowId, { coTeacherId: v ?? '' })}
-                  placeholder="Optional..."
-                  options={teacherOptions.filter((t) => t.value !== row.primaryTeacherId)}
-                  disabled={isCreating}
-                  className="sm:[&_label]:sr-only"
-                />
+                    <div className="min-w-0">
+                      <Field label="Max">
+                        <Input
+                          type="number"
+                          min={1}
+                          max={200}
+                          value={row.maxEnrollment}
+                          onChange={(e) =>
+                            updateRow(row.rowId, {
+                              maxEnrollment: Number(e.target.value) || DEFAULT_MAX,
+                            })
+                          }
+                          aria-label={`Max enrollment for ${row.gradeLabel}`}
+                          disabled={isBusy}
+                        />
+                      </Field>
+                    </div>
+                  </div>
 
-                <Field label="Max" className="sm:[&_label]:sr-only">
-                  <Input
-                    type="number"
-                    min={1}
-                    max={200}
-                    value={row.maxEnrollment}
-                    onChange={(e) =>
-                      updateRow(row.rowId, { maxEnrollment: Number(e.target.value) || DEFAULT_MAX })
-                    }
-                    aria-label={`Max enrollment for ${row.gradeLabel}`}
-                    disabled={isCreating}
-                  />
-                </Field>
-
-                <div className="flex items-center gap-1 pb-1.5">
-                  <button
-                    type="button"
-                    onClick={() => splitGrade(row)}
-                    disabled={isCreating}
-                    title="Split grade into another section"
-                    aria-label={`Split ${row.gradeLabel} into another section`}
-                    className="p-1.5 rounded-md text-text-tertiary hover:text-[rgb(var(--accent-academics-text))] hover:bg-[rgb(var(--accent-academics)/0.1)] transition-colors disabled:opacity-40"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => removeRow(row.rowId)}
-                    disabled={isCreating}
-                    title="Remove"
-                    aria-label={`Remove ${row.gradeLabel} homeroom`}
-                    className="p-1.5 rounded-md text-text-tertiary hover:text-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--state-danger-bg)/0.18)] transition-colors disabled:opacity-40"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                  {/* Secondary action: split into sections */}
+                  <div className="flex items-center justify-between gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => splitGrade(row)}
+                      disabled={isBusy}
+                      className="inline-flex items-center gap-1.5 text-xs font-medium text-[rgb(var(--accent-academics-text))] hover:opacity-80 transition-opacity disabled:opacity-40"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      Split into sections (A/B…)
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
 
         {/* Progress */}
         {progress && (
-          <div className="flex items-center gap-2 text-sm text-text-secondary">
-            <Loader2 className="w-4 h-4 animate-spin" />
-            Creating homerooms… {progress.done} / {progress.total}
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-sm text-text-secondary">
+              <span className="flex items-center gap-2 min-w-0">
+                <Loader2 className="w-4 h-4 animate-spin shrink-0" />
+                <span className="truncate">
+                  {progress.phase === 'creating'
+                    ? `Creating ${progress.label}…`
+                    : `Assigning students to ${progress.label}…`}
+                </span>
+              </span>
+              <span className="tabular-nums shrink-0">
+                {progress.done} / {progress.total}
+              </span>
+            </div>
+            <div className="w-full h-2 bg-surface-secondary rounded-full overflow-hidden">
+              <div
+                className="h-full bg-[rgb(var(--accent-academics))] rounded-full transition-all duration-200"
+                style={{
+                  width: `${progress.total > 0 ? (progress.done / progress.total) * 100 : 0}%`,
+                }}
+              />
+            </div>
           </div>
         )}
 
@@ -295,27 +429,28 @@ export function HomeroomSetupModal({
           </div>
         )}
 
-        {!allHaveTeacher && rows.length > 0 && (
-          <p className="text-xs text-[rgb(var(--state-warning-fg))]">
+        {!allHaveTeacher && rows.length > 0 && !isBusy && (
+          <p className="text-xs text-[rgb(var(--state-warning-fg))] flex items-center gap-1.5">
+            <UserCog className="w-3.5 h-3.5 shrink-0" />
             Assign a class teacher to every homeroom before creating.
           </p>
         )}
       </div>
 
       <ModalFooter>
-        <Button type="button" variant="outline" onClick={onClose} disabled={isCreating}>
+        <Button type="button" variant="outline" onClick={onClose} disabled={isBusy}>
           Cancel
         </Button>
         <Button
           type="button"
           onClick={handleCreate}
-          disabled={isCreating || rows.length === 0 || !allHaveTeacher}
-          className="min-w-40"
+          disabled={isBusy || rows.length === 0 || !allHaveTeacher}
+          className="min-w-44"
         >
-          {isCreating ? (
+          {isBusy ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Creating…
+              Working…
             </>
           ) : (
             <>

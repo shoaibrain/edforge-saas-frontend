@@ -138,6 +138,80 @@ export function useAssignToHomeroom() {
 }
 
 // ============================================================================
+// BULK ASSIGN STUDENTS TO HOMEROOM (auto-roster on create)
+// ============================================================================
+
+export interface AssignStudentsProgress {
+  /** Number of assign attempts completed (success + skip). */
+  done: number
+  /** Total number of students in the batch. */
+  total: number
+}
+
+export interface AssignStudentsResult {
+  /** studentIds that were newly assigned. */
+  assigned: string[]
+  /** Students that could not be assigned (e.g. already in another homeroom). */
+  skipped: Array<{ studentId: string; reason: string }>
+}
+
+export interface AssignStudentsToHomeroomVariables {
+  sectionId: string
+  schoolId: string
+  studentIds: string[]
+  /** Called after each student so the UI can render aggregate progress. */
+  onProgress?: (progress: AssignStudentsProgress) => void
+}
+
+/**
+ * Assign many students to a single homeroom.
+ *
+ * There is no bulk endpoint yet, so this loops the single-student
+ * `assignToHomeroom` POST. A student already in another homeroom 409s — we
+ * skip + report that student rather than aborting the batch (the one-homeroom
+ * rule is server-enforced; an existing assignment is not a failure of the
+ * roster operation). The whole batch is exposed as ONE function call so it can
+ * later be swapped to a single bulk POST without touching the UI.
+ *
+ * Returns `{ assigned, skipped }`; the UI surfaces progress via `onProgress`
+ * and an end summary.
+ */
+export function useAssignStudentsToHomeroom() {
+  const queryClient = useQueryClient()
+
+  return useMutation<
+    AssignStudentsResult,
+    Error,
+    AssignStudentsToHomeroomVariables
+  >({
+    mutationFn: async ({ sectionId, schoolId, studentIds, onProgress }) => {
+      const assigned: string[] = []
+      const skipped: Array<{ studentId: string; reason: string }> = []
+
+      for (let i = 0; i < studentIds.length; i++) {
+        const studentId = studentIds[i]
+        try {
+          await assignToHomeroom(sectionId, { schoolId, studentId })
+          assigned.push(studentId)
+        } catch (error) {
+          const parsed = parseApiError(error)
+          // 409 = already in another homeroom; skip + report, do not abort.
+          skipped.push({ studentId, reason: parsed.message })
+        }
+        onProgress?.({ done: i + 1, total: studentIds.length })
+      }
+
+      return { assigned, skipped }
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: sectionKeys.roster(variables.sectionId) })
+      queryClient.invalidateQueries({ queryKey: homeroomKeys.list(variables.schoolId) })
+    },
+    // No toast here — the caller renders the aggregate summary.
+  })
+}
+
+// ============================================================================
 // RECORD DAILY ATTENDANCE (homeroom roll-call, absentees-only fast path)
 // ============================================================================
 
