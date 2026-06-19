@@ -211,8 +211,8 @@ export function HomeroomSetupModal({
         })
         const assignedMsg =
           result.skipped.length > 0
-            ? `${row.gradeLabel} homeroom created — ${result.assigned.length} students assigned, ${result.skipped.length} skipped (already in a homeroom)`
-            : `${row.gradeLabel} homeroom created — ${result.assigned.length} student${result.assigned.length === 1 ? '' : 's'} assigned`
+            ? `${row.gradeLabel} homeroom created — ${result.assigned} students assigned, ${result.skipped.length} skipped`
+            : `${row.gradeLabel} homeroom created — ${result.assigned} student${result.assigned === 1 ? '' : 's'} assigned`
         toast.success(assignedMsg)
       } else {
         toast.success(`${row.gradeLabel} homeroom created — no enrolled students to assign yet`)

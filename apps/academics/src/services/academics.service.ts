@@ -1081,7 +1081,7 @@ export async function designateHomeroom(
 
 /**
  * Assign ONE student to a homeroom (one-homeroom rule enforced server-side;
- * a move is a drop-then-assign). There is no bulk endpoint — callers loop.
+ * a move is a drop-then-assign).
  * POST /academics/sections/:id/homeroom-students
  */
 export async function assignToHomeroom(
@@ -1089,6 +1089,28 @@ export async function assignToHomeroom(
   data: { schoolId: string; studentId: string },
 ): Promise<void> {
   return apiPost(`/academics/sections/${sectionId}/homeroom-students`, data)
+}
+
+export interface BulkAssignHomeroomResult {
+  /** Count of students assigned (incl. idempotent re-assigns). */
+  assigned: number
+  /** Students not (re)assigned, each with a reason. */
+  skipped: Array<{ studentId: string; reason: string }>
+}
+
+/**
+ * Assign many students to a homeroom in one call — loops `assignToHomeroom`
+ * server-side and returns an aggregate result (partial progress preserved).
+ * POST /academics/sections/:id/homeroom-students/bulk
+ */
+export async function bulkAssignToHomeroom(
+  sectionId: string,
+  data: { schoolId: string; studentIds: string[] },
+): Promise<BulkAssignHomeroomResult> {
+  return apiPost<BulkAssignHomeroomResult>(
+    `/academics/sections/${sectionId}/homeroom-students/bulk`,
+    data,
+  )
 }
 
 /**

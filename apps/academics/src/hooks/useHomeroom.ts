@@ -21,6 +21,7 @@ import {
   getSections,
   designateHomeroom,
   assignToHomeroom,
+  bulkAssignToHomeroom,
   recordDailyAttendance,
   parseApiError,
   type AttendancePolicyResponse,
@@ -149,8 +150,8 @@ export interface AssignStudentsProgress {
 }
 
 export interface AssignStudentsResult {
-  /** studentIds that were newly assigned. */
-  assigned: string[]
+  /** Count of students assigned (incl. idempotent re-assigns). */
+  assigned: number
   /** Students that could not be assigned (e.g. already in another homeroom). */
   skipped: Array<{ studentId: string; reason: string }>
 }
@@ -185,23 +186,12 @@ export function useAssignStudentsToHomeroom() {
     AssignStudentsToHomeroomVariables
   >({
     mutationFn: async ({ sectionId, schoolId, studentIds, onProgress }) => {
-      const assigned: string[] = []
-      const skipped: Array<{ studentId: string; reason: string }> = []
-
-      for (let i = 0; i < studentIds.length; i++) {
-        const studentId = studentIds[i]
-        try {
-          await assignToHomeroom(sectionId, { schoolId, studentId })
-          assigned.push(studentId)
-        } catch (error) {
-          const parsed = parseApiError(error)
-          // 409 = already in another homeroom; skip + report, do not abort.
-          skipped.push({ studentId, reason: parsed.message })
-        }
-        onProgress?.({ done: i + 1, total: studentIds.length })
-      }
-
-      return { assigned, skipped }
+      // One bulk call; the server loops assignToHomeroom per student and returns
+      // the aggregate (partial progress preserved, skip-and-report on conflicts).
+      onProgress?.({ done: 0, total: studentIds.length })
+      const result = await bulkAssignToHomeroom(sectionId, { schoolId, studentIds })
+      onProgress?.({ done: studentIds.length, total: studentIds.length })
+      return { assigned: result.assigned, skipped: result.skipped }
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: sectionKeys.roster(variables.sectionId) })
