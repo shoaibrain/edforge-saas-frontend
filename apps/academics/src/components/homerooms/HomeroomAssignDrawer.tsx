@@ -33,7 +33,10 @@ export function HomeroomAssignDrawer({
   const { data, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } = useEnrollments({
     schoolId,
     yearId: academicYearId,
-    filters: { status: 'active' },
+    // Enrollment rows are stored as status:'enrolled' (not 'active'); the list
+    // endpoint has no isActive flag, so an unfiltered query would also return
+    // withdrawn/transferred students — filter to enrolled.
+    filters: { status: 'enrolled' },
     enabled: open && !!schoolId && !!academicYearId,
   })
   const enrollments = useMemo(() => flattenEnrollmentPages(data), [data])

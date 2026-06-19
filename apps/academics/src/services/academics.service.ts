@@ -739,6 +739,7 @@ export async function getSections(
   if (params.academicYearId) queryParams.academicYearId = params.academicYearId
   if (params.termId) queryParams.termId = params.termId
   if (params.teacherId) queryParams.teacherId = params.teacherId
+  if (params.sectionType) queryParams.sectionType = params.sectionType
   if (params.isActive !== undefined) queryParams.isActive = params.isActive
   if (params.searchTerm) queryParams.search = params.searchTerm
   if (params.limit) queryParams.limit = params.limit
