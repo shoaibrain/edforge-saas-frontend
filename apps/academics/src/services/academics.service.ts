@@ -1082,13 +1082,21 @@ export async function designateHomeroom(
 /**
  * Assign ONE student to a homeroom (one-homeroom rule enforced server-side;
  * a move is a drop-then-assign).
- * POST /academics/sections/:id/homeroom-students
+ * POST /academics/sections/:id/homeroom-students?schoolId=xxx
+ *
+ * The controller reads schoolId from the query string (`@Query('schoolId')`),
+ * matching every other section-roster endpoint (enroll/roster/drop). Sending
+ * it in the JSON body yields schoolId=undefined server-side → SECTION#undefined#…
+ * → 404 "Section not found". Only studentId belongs in the body.
  */
 export async function assignToHomeroom(
   sectionId: string,
   data: { schoolId: string; studentId: string },
 ): Promise<void> {
-  return apiPost(`/academics/sections/${sectionId}/homeroom-students`, data)
+  return apiPost(
+    `/academics/sections/${sectionId}/homeroom-students?schoolId=${encodeURIComponent(data.schoolId)}`,
+    { studentId: data.studentId },
+  )
 }
 
 export interface BulkAssignHomeroomResult {
