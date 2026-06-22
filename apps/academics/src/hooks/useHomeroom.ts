@@ -100,8 +100,8 @@ export function useDesignateHomeroom() {
 
   return useMutation<SectionResponseDto, Error, DesignateHomeroomDto>({
     mutationFn: (data) => designateHomeroom(data),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: homeroomKeys.list(variables.schoolId) })
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: homeroomKeys.all })
       queryClient.invalidateQueries({ queryKey: sectionKeys.lists() })
       toast.success('Homeroom created')
     },
@@ -128,7 +128,7 @@ export function useAssignToHomeroom() {
       assignToHomeroom(sectionId, { schoolId, studentId }),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: sectionKeys.roster(variables.sectionId) })
-      queryClient.invalidateQueries({ queryKey: homeroomKeys.list(variables.schoolId) })
+      queryClient.invalidateQueries({ queryKey: homeroomKeys.all })
     },
     // No per-call toast — callers loop over students and report aggregate progress.
     onError: (error) => {
@@ -195,7 +195,7 @@ export function useAssignStudentsToHomeroom() {
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: sectionKeys.roster(variables.sectionId) })
-      queryClient.invalidateQueries({ queryKey: homeroomKeys.list(variables.schoolId) })
+      queryClient.invalidateQueries({ queryKey: homeroomKeys.all })
     },
     // No toast here — the caller renders the aggregate summary.
   })

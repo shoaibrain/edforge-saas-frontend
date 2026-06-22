@@ -8,10 +8,11 @@
  */
 
 import { useEffect, useMemo, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { Loader2, Search, UserCheck, X } from 'lucide-react'
 import { Drawer, DrawerFooter, Button, Input, Checkbox } from '@edforge/ui'
 import { useEnrollments, flattenEnrollmentPages } from '../../hooks/useEnrollments'
-import { useAssignToHomeroom } from '../../hooks/useHomeroom'
+import { useAssignToHomeroom, homeroomKeys } from '../../hooks/useHomeroom'
 import { parseApiError, type SectionResponseDto } from '../../services/academics.service'
 import { toast } from 'sonner'
 
@@ -30,16 +31,36 @@ export function HomeroomAssignDrawer({
   academicYearId,
   homeroom,
 }: HomeroomAssignDrawerProps) {
+  const queryClient = useQueryClient()
+  // Key off the homeroom's OWN school/year, not the ambient active-school
+  // context — a stale/switched active school would otherwise send the wrong
+  // section key and 404 ("Section not found"). The props are a fallback only.
+  const effSchoolId = homeroom.schoolId || schoolId
+  const effYearId = homeroom.academicYearId || academicYearId
+  // The homeroom is a grade's homeroom; its grade is the sectionNumber prefix
+  // ("12" or "12-A" → "12"). (Interim until the homeroom carries an explicit
+  // gradeLevel field — see the backend model fix.)
+  const homeroomGrade = (homeroom.sectionNumber || '').split('-')[0].trim()
+
   const { data, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } = useEnrollments({
-    schoolId,
-    yearId: academicYearId,
+    schoolId: effSchoolId,
+    yearId: effYearId,
     // Enrollment rows are stored as status:'enrolled' (not 'active'); the list
     // endpoint has no isActive flag, so an unfiltered query would also return
     // withdrawn/transferred students — filter to enrolled.
     filters: { status: 'enrolled' },
-    enabled: open && !!schoolId && !!academicYearId,
+    enabled: open && !!effSchoolId && !!effYearId,
   })
-  const enrollments = useMemo(() => flattenEnrollmentPages(data), [data])
+  // Scope to the homeroom's grade — a Grade 12 homeroom should only offer Grade
+  // 12 students. If the grade can't be derived, fall back to all (don't hide).
+  const gradeScoped = useMemo(
+    () =>
+      homeroomGrade
+        ? flattenEnrollmentPages(data).filter((e) => (e.gradeLevel || '') === homeroomGrade)
+        : flattenEnrollmentPages(data),
+    [data, homeroomGrade],
+  )
+  const enrollments = gradeScoped
   const assign = useAssignToHomeroom()
 
   const [search, setSearch] = useState('')
@@ -88,16 +109,29 @@ export function HomeroomAssignDrawer({
     if (ids.length === 0) return
     setProgress({ done: 0, total: ids.length })
     let failures = 0
+    let sectionGone = false
     for (let i = 0; i < ids.length; i++) {
       try {
-        await assign.mutateAsync({ sectionId: homeroom.sectionId, schoolId, studentId: ids[i] })
+        await assign.mutateAsync({ sectionId: homeroom.sectionId, schoolId: effSchoolId, studentId: ids[i] })
       } catch (error) {
         failures++
-        parseApiError(error) // mutation onError already toasts the first failure
+        const parsed = parseApiError(error) // mutation onError already toasts the first failure
+        // The homeroom itself is gone (stale list row) — every student will fail
+        // the same way; stop and self-heal by refetching the list.
+        if (/not found/i.test(parsed.message)) {
+          sectionGone = true
+          break
+        }
       }
       setProgress({ done: i + 1, total: ids.length })
     }
     setProgress(null)
+    if (sectionGone) {
+      queryClient.invalidateQueries({ queryKey: homeroomKeys.all })
+      toast.error('This homeroom is no longer available — the list has been refreshed.')
+      onClose()
+      return
+    }
     const ok = ids.length - failures
     if (failures === 0) {
       toast.success(`Assigned ${ok} student${ok === 1 ? '' : 's'} to ${homeroomLabel}`)
@@ -116,7 +150,11 @@ export function HomeroomAssignDrawer({
       open={open}
       onClose={isAssigning ? () => {} : onClose}
       title={`Assign students — ${homeroomLabel}`}
-      description="Select enrolled students to assign to this homeroom. Moving a student from another homeroom is handled automatically."
+      description={
+        homeroomGrade
+          ? `Assign Grade ${homeroomGrade} students to this homeroom. Moving a student from another homeroom is handled automatically.`
+          : 'Select enrolled students to assign to this homeroom. Moving a student from another homeroom is handled automatically.'
+      }
       size="lg"
       showCloseButton={!isAssigning}
     >
@@ -166,7 +204,9 @@ export function HomeroomAssignDrawer({
           ) : filtered.length === 0 ? (
             <div className="py-10 text-center text-sm text-text-tertiary">
               {enrollments.length === 0
-                ? 'No active enrollments for this academic year.'
+                ? homeroomGrade
+                  ? `No enrolled students in Grade ${homeroomGrade} for this year.`
+                  : 'No enrolled students for this year.'
                 : 'No students match your search.'}
             </div>
           ) : (

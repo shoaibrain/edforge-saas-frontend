@@ -189,9 +189,13 @@ export function HomeroomSetupModal({
       setProgress({ phase: 'creating', label: cardLabel, done: i, total: rows.length })
 
       let sectionId: string
+      let sectionSchoolId: string
       try {
         const section = await designate.mutateAsync(dto)
         sectionId = section.sectionId
+        // Use the created section's own school for the roster assign, not the
+        // ambient active-school context.
+        sectionSchoolId = section.schoolId
         created.push(row.rowId)
       } catch (error) {
         const parsed = parseApiError(error)
@@ -204,7 +208,7 @@ export function HomeroomSetupModal({
       if (studentIds.length > 0) {
         const result = await assignStudents.mutateAsync({
           sectionId,
-          schoolId,
+          schoolId: sectionSchoolId,
           studentIds,
           onProgress: ({ done, total }) =>
             setProgress({ phase: 'assigning', label: cardLabel, done, total }),
