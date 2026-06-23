@@ -45,10 +45,14 @@ export function HomeroomAssignDrawer({
   const { data, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } = useEnrollments({
     schoolId: effSchoolId,
     yearId: effYearId,
-    // Enrollment rows are stored as status:'enrolled' (not 'active'); the list
-    // endpoint has no isActive flag, so an unfiltered query would also return
-    // withdrawn/transferred students — filter to enrolled.
-    filters: { status: 'enrolled' },
+    // status:'enrolled' (rows aren't stored 'active'). Also scope to this
+    // homeroom's grade server-side AND raise the page size: enrollments are
+    // GSI-ordered by gradeLevel ASCENDING-LEXICOGRAPHIC ("1","10","2",…) and the
+    // gradeLevel match is a post-Limit FilterExpression, so the default 50-row
+    // page can sit entirely on a low grade and return ZERO of this grade. A high
+    // limit (the list ceiling) guarantees the scan reaches this grade's cohort.
+    filters: { status: 'enrolled', gradeLevel: homeroomGrade || undefined },
+    limit: 1000,
     enabled: open && !!effSchoolId && !!effYearId,
   })
   const allEnrolled = useMemo(() => flattenEnrollmentPages(data), [data])

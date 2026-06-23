@@ -19,12 +19,13 @@
  */
 
 import { useEffect, useMemo, useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { Plus, Trash2, Loader2, CheckCircle, UsersRound, UserCog } from 'lucide-react'
 import { Modal, ModalFooter, Button, Field, Input, Select, StatusBadge } from '@edforge/ui'
 import { useSchoolEnabledGradeOptions } from '../../hooks/useGradeOptions'
 import { useSchoolStaff, flattenStaffData, getStaffDisplayName } from '../../hooks/useStaff'
 import { useEnrollments, flattenEnrollmentPages } from '../../hooks/useEnrollments'
-import { useDesignateHomeroom, useAssignStudentsToHomeroom } from '../../hooks/useHomeroom'
+import { useDesignateHomeroom, useAssignStudentsToHomeroom, homeroomKeys } from '../../hooks/useHomeroom'
 import { parseApiError, type DesignateHomeroomDto } from '../../services/academics.service'
 import { toast } from 'sonner'
 
@@ -75,14 +76,24 @@ export function HomeroomSetupModal({
   const teachers = useMemo(() => flattenStaffData(staffData), [staffData])
 
   // Currently-enrolled students for auto-roster. status MUST be 'enrolled'
-  // (rows are stored that way; 'active' would return nothing).
-  const { data: enrollmentData } = useEnrollments({
+  // (rows are stored that way; 'active' would return nothing). Load the FULL
+  // cohort (all grades) — the default 50-row page misses grades past page 1
+  // (enrollments are GSI-ordered by gradeLevel), which would silently create
+  // homerooms with 0 students. limit 1000 = the enrollment-list ceiling; the
+  // Create button is gated below until the load completes.
+  const {
+    data: enrollmentData,
+    isLoading: enrollmentsLoading,
+    hasNextPage: hasMoreEnrollments,
+  } = useEnrollments({
     schoolId,
     yearId: academicYearId,
     filters: { status: 'enrolled' },
+    limit: 1000,
     enabled: open && !!schoolId && !!academicYearId,
   })
   const enrollments = useMemo(() => flattenEnrollmentPages(enrollmentData), [enrollmentData])
+  const enrollmentsIncomplete = enrollmentsLoading || hasMoreEnrollments
 
   // Map<localGradeLabel, studentId[]> — grouped by the STORED grade label.
   const studentsByGrade = useMemo(() => {
@@ -99,6 +110,7 @@ export function HomeroomSetupModal({
 
   const designate = useDesignateHomeroom()
   const assignStudents = useAssignStudentsToHomeroom()
+  const queryClient = useQueryClient()
 
   const [rows, setRows] = useState<ProposedHomeroom[]>([])
   const [progress, setProgress] = useState<{
@@ -225,6 +237,12 @@ export function HomeroomSetupModal({
         toast.success(`${row.gradeLabel} homeroom created — no enrolled students to assign yet`)
       }
     }
+
+    // Final fresh read AFTER the create/roster loop — by now enough time has
+    // elapsed for the new homeroom rows to propagate to the GSI, so the
+    // Homerooms list shows them (the immediate per-create invalidation can race
+    // GSI eventual-consistency).
+    await queryClient.refetchQueries({ queryKey: homeroomKeys.all })
 
     // Drop successfully-created rows; keep failures visible for retry.
     setRows((prev) => prev.filter((r) => !created.includes(r.rowId)))
@@ -442,6 +460,13 @@ export function HomeroomSetupModal({
             Assign a class teacher to every homeroom before creating.
           </p>
         )}
+
+        {enrollmentsIncomplete && rows.length > 0 && !isBusy && (
+          <p className="text-xs text-text-tertiary flex items-center gap-1.5">
+            <Loader2 className="w-3.5 h-3.5 shrink-0 animate-spin" />
+            Loading enrolled students for auto-roster…
+          </p>
+        )}
       </div>
 
       <ModalFooter>
@@ -451,7 +476,7 @@ export function HomeroomSetupModal({
         <Button
           type="button"
           onClick={handleCreate}
-          disabled={isBusy || rows.length === 0 || !allHaveTeacher}
+          disabled={isBusy || rows.length === 0 || !allHaveTeacher || enrollmentsIncomplete}
           className="min-w-44"
         >
           {isBusy ? (

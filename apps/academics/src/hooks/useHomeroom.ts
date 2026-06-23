@@ -92,6 +92,10 @@ export function useHomerooms(schoolId: string, academicYearId?: string, enabled 
     enabled: enabled && !!schoolId,
     staleTime: 2 * 60 * 1000,
     refetchOnWindowFocus: false,
+    // A just-created homeroom is written to a DDB GSI (eventually consistent),
+    // so the immediate post-create refetch can race and miss it. Always refetch
+    // when the tab mounts so navigating back self-heals the list.
+    refetchOnMount: 'always',
   })
 }
 

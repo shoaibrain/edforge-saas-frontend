@@ -127,6 +127,10 @@ function OverviewTab() {
   } = useSections({
     schoolId,
     filters: {
+      // Overview lists INSTRUCTIONAL classrooms only — homerooms are a distinct
+      // concept (grade-level daily-attendance units) and live in the Homerooms
+      // tab. The backend treats legacy untyped rows as instructional.
+      sectionType: 'instructional',
       courseId: filters.courseId || undefined,
       teacherId: filters.teacherId || undefined,
       academicYearId: filters.academicYearId || undefined,
@@ -559,10 +563,10 @@ function ContextBanner({
   activeTab: ClassroomTabId
   schoolId: string
 }) {
-  // Overview data — from sections
+  // Overview data — from sections (instructional only; homerooms excluded)
   const { data: sectionsPages } = useSections({
     schoolId,
-    filters: { isActive: true },
+    filters: { isActive: true, sectionType: 'instructional' },
     enabled: !!schoolId && activeTab === 'overview',
   })
   const overviewSections = useMemo(() => flattenSectionPages(sectionsPages), [sectionsPages])
@@ -669,8 +673,8 @@ export function ClassroomsModule() {
   const schedPerms = useResourcePermissions('scheduling')
   const schoolId = useActiveSchoolId() || ''
 
-  // Lightweight section count for tab badge
-  const { data: sectionPages } = useSections({ schoolId, enabled: !!schoolId, limit: 1 })
+  // Lightweight section count for tab badge (instructional only — matches the Overview grid)
+  const { data: sectionPages } = useSections({ schoolId, enabled: !!schoolId, limit: 1, filters: { sectionType: 'instructional' } })
   const sectionCount = getSectionTotalFromPages(sectionPages)
 
   // Tab state from URL search params (type-safe via validateSearch)
