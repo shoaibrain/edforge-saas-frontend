@@ -60,8 +60,8 @@ export const attendanceKeys = {
     [...attendanceKeys.all, 'alerts', schoolId] as const,
   studentTrends: (schoolId: string, studentIds: string, startDate: string, endDate: string) =>
     [...attendanceKeys.all, 'student-trends', schoolId, studentIds, startDate, endDate] as const,
-  records: (schoolId: string, date: string) =>
-    [...attendanceKeys.all, 'records', schoolId, date] as const,
+  records: (schoolId: string, date: string, limit?: number) =>
+    [...attendanceKeys.all, 'records', schoolId, date, ...(limit ? [limit] : [])] as const,
   calendarDate: (schoolId: string, date: string) =>
     [...attendanceKeys.all, 'calendar-date', schoolId, date] as const,
   overview: (schoolId: string, academicYearId: string, date: string) =>
@@ -108,16 +108,20 @@ export function useAttendanceSummary({
 export function useAttendanceRecords({
   schoolId,
   date,
+  limit,
   enabled = true,
 }: {
   schoolId: string
   date: string
+  /** Page size for the school-wide day read. Daily homeroom roll-call passes a
+   *  high value so a homeroom's students aren't stranded past the 100 default. */
+  limit?: number
   enabled?: boolean
 }) {
   return useQuery<AttendanceRecord[], Error>({
-    queryKey: attendanceKeys.records(schoolId, date),
+    queryKey: attendanceKeys.records(schoolId, date, limit),
     queryFn: async () => {
-      const result = await getAttendanceByDate(schoolId, date)
+      const result = await getAttendanceByDate(schoolId, date, limit)
       return result.items
     },
     enabled: enabled && !!schoolId && !!date,

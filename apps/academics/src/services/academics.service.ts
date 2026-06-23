@@ -975,12 +975,17 @@ export async function recordBulkAttendance(
  */
 export async function getAttendanceByDate(
   schoolId: string,
-  date: string
+  date: string,
+  limit?: number,
 ): Promise<{ items: AttendanceRecord[]; hasMore: boolean }> {
-  return apiGet<{ items: AttendanceRecord[]; hasMore: boolean }>('/academics/attendance', {
-    schoolId,
-    date,
-  })
+  // The endpoint defaults to 100 rows and exposes no cursor to page further, so
+  // callers needing a full day (e.g. daily homeroom roll-call, which reads the
+  // school-wide day then scopes to a homeroom) must pass a limit covering the
+  // school's roll. NOTE: a homeroom/roster-scoped server read is the robust
+  // long-term fix — see PR #188 review.
+  const params: Record<string, unknown> = { schoolId, date }
+  if (limit) params.limit = limit
+  return apiGet<{ items: AttendanceRecord[]; hasMore: boolean }>('/academics/attendance', params)
 }
 
 /**

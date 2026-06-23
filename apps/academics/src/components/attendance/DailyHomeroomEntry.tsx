@@ -82,6 +82,12 @@ export function DailyHomeroomEntry({ schoolId, academicYearId }: DailyHomeroomEn
   const { data: schoolDayRecords } = useAttendanceRecords({
     schoolId,
     date: selectedDate,
+    // The read is school-wide (then scoped to this homeroom's roster below), and
+    // the endpoint defaults to 100 rows with no cursor — so request a page large
+    // enough to hold a full school's day, or a homeroom's marks could fall past
+    // page 1 and a reopened roll-call would show blanks. (A roster-scoped server
+    // read is the robust follow-up — PR #188 review.)
+    limit: 2000,
     enabled: !!schoolId && !!selectedHomeroomId,
   })
   const rosterStudentIds = useMemo(
