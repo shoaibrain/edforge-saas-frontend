@@ -11,22 +11,25 @@
  */
 
 import { useMemo, useState } from 'react'
-import { Home, UsersRound, UserPlus, Wand2 } from 'lucide-react'
+import { Home, UsersRound, UserPlus, Wand2, Pencil, Trash2, Loader2 } from 'lucide-react'
 import {
   TanstackDataTable,
   createActionsColumn,
   StatusBadge,
   StatCard,
   Button,
+  Modal,
+  ModalFooter,
   type ColumnDef,
 } from '@edforge/ui'
 import { useActiveSchoolId } from '../../stores/app.store'
 import { useCurrentAcademicYear } from '../../hooks/useSchool'
-import { useHomerooms } from '../../hooks/useHomeroom'
+import { useHomerooms, useDeleteHomeroom } from '../../hooks/useHomeroom'
 import { NoCurrentAcademicYearEmptyState } from '../common'
 import type { SectionResponseDto } from '@aibrains/shared-types'
 import { HomeroomSetupModal } from './HomeroomSetupModal'
 import { HomeroomAssignDrawer } from './HomeroomAssignDrawer'
+import { HomeroomEditModal } from './HomeroomEditModal'
 
 // ============================================================================
 // COMPONENT
@@ -44,6 +47,10 @@ export function HomeroomsTab() {
 
   const [showSetup, setShowSetup] = useState(false)
   const [assignTarget, setAssignTarget] = useState<SectionResponseDto | null>(null)
+  const [editTarget, setEditTarget] = useState<SectionResponseDto | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<SectionResponseDto | null>(null)
+  const [deleting, setDeleting] = useState(false)
+  const deleteHomeroom = useDeleteHomeroom()
 
   const existingSectionNumbers = useMemo(
     () => new Set(homerooms.map((h) => h.sectionNumber)),
@@ -122,19 +129,46 @@ export function HomeroomsTab() {
         ),
       },
       createActionsColumn<SectionResponseDto>({
-        cell: ({ row }) => (
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={(e) => {
-              e.stopPropagation()
-              setAssignTarget(row.original)
-            }}
-          >
-            <UserPlus className="w-3.5 h-3.5" />
-            Assign
-          </Button>
-        ),
+        cell: ({ row }) => {
+          const label = row.original.sectionName || `Homeroom ${row.original.sectionNumber}`
+          return (
+            <div className="flex items-center gap-1.5">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setAssignTarget(row.original)
+                }}
+              >
+                <UserPlus className="w-3.5 h-3.5" />
+                Assign
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setEditTarget(row.original)
+                }}
+                aria-label={`Edit ${label}`}
+              >
+                <Pencil className="w-3.5 h-3.5" />
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setDeleteTarget(row.original)
+                }}
+                aria-label={`Delete ${label}`}
+              >
+                <Trash2 className="w-3.5 h-3.5 text-[rgb(var(--state-danger-fg))]" />
+              </Button>
+            </div>
+          )
+        },
       }),
     ],
     [],
@@ -240,6 +274,79 @@ export function HomeroomsTab() {
           academicYearId={yearId}
           homeroom={assignTarget}
         />
+      )}
+
+      {/* Edit homeroom */}
+      {editTarget && (
+        <HomeroomEditModal
+          open={!!editTarget}
+          onClose={() => setEditTarget(null)}
+          schoolId={schoolId}
+          homeroom={editTarget}
+        />
+      )}
+
+      {/* Hard-delete homeroom (confirm) */}
+      {deleteTarget && (
+        <Modal
+          open={!!deleteTarget}
+          onClose={deleting ? () => {} : () => setDeleteTarget(null)}
+          title="Delete homeroom?"
+          description="This permanently removes the homeroom and unassigns its students. Their enrollment and attendance history are kept. This cannot be undone."
+          size="md"
+          showCloseButton={!deleting}
+        >
+          <div className="text-sm text-text-secondary">
+            <span className="font-medium text-text-primary">
+              {deleteTarget.sectionName || `Homeroom ${deleteTarget.sectionNumber}`}
+            </span>{' '}
+            currently has{' '}
+            <span className="font-medium text-text-primary">{deleteTarget.currentEnrollment}</span>{' '}
+            assigned student{deleteTarget.currentEnrollment === 1 ? '' : 's'}, who will be unassigned.
+          </div>
+          <ModalFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setDeleteTarget(null)}
+              disabled={deleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="danger"
+              className="min-w-36"
+              disabled={deleting}
+              onClick={async () => {
+                setDeleting(true)
+                try {
+                  await deleteHomeroom.mutateAsync({
+                    sectionId: deleteTarget.sectionId,
+                    schoolId: deleteTarget.schoolId || schoolId,
+                  })
+                  setDeleteTarget(null)
+                } catch {
+                  // useDeleteHomeroom toasts the error; keep the dialog open.
+                } finally {
+                  setDeleting(false)
+                }
+              }}
+            >
+              {deleting ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Deleting…
+                </>
+              ) : (
+                <>
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Delete homeroom
+                </>
+              )}
+            </Button>
+          </ModalFooter>
+        </Modal>
       )}
     </div>
   )

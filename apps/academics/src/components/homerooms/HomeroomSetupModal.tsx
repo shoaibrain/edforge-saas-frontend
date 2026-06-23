@@ -179,6 +179,9 @@ export function HomeroomSetupModal({
       const dto: DesignateHomeroomDto = {
         schoolId,
         academicYearId,
+        // First-class grade (the school's local code) — lets the roster be
+        // grade-scoped from authoritative data instead of parsing sectionNumber.
+        gradeLevel: row.gradeValue,
         sectionNumber: row.sectionNumber,
         sectionName: row.sectionName || undefined,
         primaryTeacherId: row.primaryTeacherId,

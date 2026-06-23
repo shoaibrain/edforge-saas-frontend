@@ -22,11 +22,15 @@ import {
   designateHomeroom,
   assignToHomeroom,
   bulkAssignToHomeroom,
+  updateSection,
+  hardDeleteHomeroom,
+  removeStudentFromSection,
   recordDailyAttendance,
   parseApiError,
   type AttendancePolicyResponse,
   type SectionResponseDto,
   type DesignateHomeroomDto,
+  type UpdateSectionDto,
   type RecordDailyAttendanceDto,
   type RecordDailyAttendanceResponseDto,
 } from '../services/academics.service'
@@ -198,6 +202,78 @@ export function useAssignStudentsToHomeroom() {
       queryClient.invalidateQueries({ queryKey: homeroomKeys.all })
     },
     // No toast here — the caller renders the aggregate summary.
+  })
+}
+
+// ============================================================================
+// EDIT HOMEROOM (class teacher / co-teacher / name / capacity)
+// ============================================================================
+
+export function useUpdateHomeroom() {
+  const queryClient = useQueryClient()
+
+  return useMutation<
+    SectionResponseDto,
+    Error,
+    { sectionId: string; schoolId: string; data: UpdateSectionDto }
+  >({
+    mutationFn: ({ sectionId, schoolId, data }) => updateSection(sectionId, schoolId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: homeroomKeys.all })
+      queryClient.invalidateQueries({ queryKey: sectionKeys.lists() })
+      toast.success('Homeroom updated')
+    },
+    onError: (error) => {
+      const parsed = parseApiError(error)
+      toast.error(parsed.message)
+    },
+  })
+}
+
+// ============================================================================
+// HARD-DELETE HOMEROOM (cascade: section + roster rows + Enrollment pointers)
+// ============================================================================
+
+export function useDeleteHomeroom() {
+  const queryClient = useQueryClient()
+
+  return useMutation<void, Error, { sectionId: string; schoolId: string }>({
+    mutationFn: ({ sectionId, schoolId }) => hardDeleteHomeroom(sectionId, schoolId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: homeroomKeys.all })
+      queryClient.invalidateQueries({ queryKey: sectionKeys.lists() })
+      toast.success('Homeroom deleted')
+    },
+    onError: (error) => {
+      const parsed = parseApiError(error)
+      toast.error(parsed.message)
+    },
+  })
+}
+
+// ============================================================================
+// REMOVE STUDENT FROM HOMEROOM (drop — server clears the Enrollment pointer,
+// which is what enables a "move" = remove here, then assign in the target)
+// ============================================================================
+
+export function useRemoveFromHomeroom() {
+  const queryClient = useQueryClient()
+
+  return useMutation<
+    void,
+    Error,
+    { sectionId: string; schoolId: string; studentId: string }
+  >({
+    mutationFn: ({ sectionId, schoolId, studentId }) =>
+      removeStudentFromSection(sectionId, schoolId, studentId),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: sectionKeys.roster(variables.sectionId) })
+      queryClient.invalidateQueries({ queryKey: homeroomKeys.all })
+    },
+    onError: (error) => {
+      const parsed = parseApiError(error)
+      toast.error(parsed.message)
+    },
   })
 }
 

@@ -795,6 +795,20 @@ export async function deleteSection(
   return apiDelete(`/academics/sections/${sectionId}?schoolId=${schoolId}`)
 }
 
+/**
+ * HARD-delete a homeroom — cascades the section row, every roster row, and the
+ * homeroom pointer on each student's annual Enrollment. Distinct from
+ * deleteSection (soft, blocks while students are enrolled): homerooms are torn
+ * down, not tombstoned. Daily attendance (school-scoped) is preserved.
+ * DELETE /academics/sections/:id/homeroom?schoolId=
+ */
+export async function hardDeleteHomeroom(
+  sectionId: string,
+  schoolId: string,
+): Promise<void> {
+  return apiDelete(`/academics/sections/${sectionId}/homeroom?schoolId=${schoolId}`)
+}
+
 // ============================================================================
 // SECTION ROSTER OPERATIONS
 // ============================================================================

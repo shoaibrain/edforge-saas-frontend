@@ -9,10 +9,10 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { Loader2, Search, UserCheck, X } from 'lucide-react'
+import { Loader2, Search, UserCheck, UserMinus, X } from 'lucide-react'
 import { Drawer, DrawerFooter, Button, Input, Checkbox } from '@edforge/ui'
-import { useEnrollments, flattenEnrollmentPages } from '../../hooks/useEnrollments'
-import { useAssignToHomeroom, homeroomKeys } from '../../hooks/useHomeroom'
+import { useEnrollments, flattenEnrollmentPages, enrollmentKeys } from '../../hooks/useEnrollments'
+import { useAssignToHomeroom, useRemoveFromHomeroom, homeroomKeys } from '../../hooks/useHomeroom'
 import { parseApiError, type SectionResponseDto } from '../../services/academics.service'
 import { toast } from 'sonner'
 
@@ -37,10 +37,10 @@ export function HomeroomAssignDrawer({
   // section key and 404 ("Section not found"). The props are a fallback only.
   const effSchoolId = homeroom.schoolId || schoolId
   const effYearId = homeroom.academicYearId || academicYearId
-  // The homeroom is a grade's homeroom; its grade is the sectionNumber prefix
-  // ("12" or "12-A" → "12"). (Interim until the homeroom carries an explicit
-  // gradeLevel field — see the backend model fix.)
-  const homeroomGrade = (homeroom.sectionNumber || '').split('-')[0].trim()
+  // The homeroom's grade is authoritative (gradeLevel); fall back to the
+  // sectionNumber prefix ("12-A" → "12") only for legacy homerooms created
+  // before gradeLevel shipped.
+  const homeroomGrade = (homeroom.gradeLevel || (homeroom.sectionNumber || '').split('-')[0]).trim()
 
   const { data, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } = useEnrollments({
     schoolId: effSchoolId,
@@ -51,17 +51,27 @@ export function HomeroomAssignDrawer({
     filters: { status: 'enrolled' },
     enabled: open && !!effSchoolId && !!effYearId,
   })
-  // Scope to the homeroom's grade — a Grade 12 homeroom should only offer Grade
-  // 12 students. If the grade can't be derived, fall back to all (don't hide).
-  const gradeScoped = useMemo(
-    () =>
-      homeroomGrade
-        ? flattenEnrollmentPages(data).filter((e) => (e.gradeLevel || '') === homeroomGrade)
-        : flattenEnrollmentPages(data),
-    [data, homeroomGrade],
+  const allEnrolled = useMemo(() => flattenEnrollmentPages(data), [data])
+  // Students already in THIS homeroom (enrollment.sectionId is the homeroom
+  // pointer) — shown as the current roster, each removable.
+  const members = useMemo(
+    () => allEnrolled.filter((e) => e.sectionId === homeroom.sectionId),
+    [allEnrolled, homeroom.sectionId],
   )
-  const enrollments = gradeScoped
+  // Candidates to ADD: UNASSIGNED (no homeroom pointer) and in this homeroom's
+  // grade. Excluding already-assigned students is what stops the re-assign 409s
+  // — a student in another homeroom must be removed there first (a move).
+  const available = useMemo(
+    () =>
+      allEnrolled.filter(
+        (e) => !e.sectionId && (homeroomGrade ? (e.gradeLevel || '') === homeroomGrade : true),
+      ),
+    [allEnrolled, homeroomGrade],
+  )
+  const enrollments = available
   const assign = useAssignToHomeroom()
+  const removeStudent = useRemoveFromHomeroom()
+  const [removingId, setRemovingId] = useState<string | null>(null)
 
   const [search, setSearch] = useState('')
   const [selected, setSelected] = useState<Set<string>>(new Set())
@@ -126,6 +136,9 @@ export function HomeroomAssignDrawer({
       setProgress({ done: i + 1, total: ids.length })
     }
     setProgress(null)
+    // Refresh candidate + member lists so assigned students drop out of
+    // "available" and appear under the current roster without reopening.
+    queryClient.invalidateQueries({ queryKey: enrollmentKeys.lists() })
     if (sectionGone) {
       queryClient.invalidateQueries({ queryKey: homeroomKeys.all })
       toast.error('This homeroom is no longer available — the list has been refreshed.')
@@ -135,10 +148,24 @@ export function HomeroomAssignDrawer({
     const ok = ids.length - failures
     if (failures === 0) {
       toast.success(`Assigned ${ok} student${ok === 1 ? '' : 's'} to ${homeroomLabel}`)
-      onClose()
+      setSelected(new Set())
     } else {
       toast.warning(`Assigned ${ok} of ${ids.length} — ${failures} failed`)
       setSelected(new Set())
+    }
+  }
+
+  const handleRemove = async (studentId: string) => {
+    setRemovingId(studentId)
+    try {
+      await removeStudent.mutateAsync({
+        sectionId: homeroom.sectionId,
+        schoolId: effSchoolId,
+        studentId,
+      })
+      queryClient.invalidateQueries({ queryKey: enrollmentKeys.lists() })
+    } finally {
+      setRemovingId(null)
     }
   }
 
@@ -152,13 +179,56 @@ export function HomeroomAssignDrawer({
       title={`Assign students — ${homeroomLabel}`}
       description={
         homeroomGrade
-          ? `Assign Grade ${homeroomGrade} students to this homeroom. Moving a student from another homeroom is handled automatically.`
-          : 'Select enrolled students to assign to this homeroom. Moving a student from another homeroom is handled automatically.'
+          ? `Only unassigned Grade ${homeroomGrade} students are shown below. To move a student already in another homeroom, remove them there first.`
+          : 'Only unassigned students are shown below. To move a student already in another homeroom, remove them there first.'
       }
       size="lg"
       showCloseButton={!isAssigning}
     >
       <div className="space-y-3">
+        {/* Current roster — remove frees a student (and is how you move one). */}
+        {members.length > 0 && (
+          <div className="space-y-1.5">
+            <h4 className="text-xs font-semibold text-text-secondary uppercase tracking-wide">
+              Current members ({members.length}
+              {homeroom.maxEnrollment ? ` / ${homeroom.maxEnrollment}` : ''})
+            </h4>
+            <div className="rounded-xl border border-border-secondary overflow-hidden divide-y divide-border-secondary max-h-[28vh] overflow-y-auto">
+              {members.map((m) => (
+                <div
+                  key={m.studentId}
+                  className="flex items-center gap-3 px-4 py-2 hover:bg-surface-secondary transition-colors"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm text-text-primary truncate">
+                      {m.studentName || m.studentId}
+                    </p>
+                    <p className="text-2xs text-text-tertiary">Grade {m.gradeLevel}</p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleRemove(m.studentId)}
+                    disabled={removingId !== null || isAssigning}
+                    aria-label={`Remove ${m.studentName || m.studentId} from this homeroom`}
+                  >
+                    {removingId === m.studentId ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <UserMinus className="w-3.5 h-3.5" />
+                    )}
+                    Remove
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <h4 className="text-xs font-semibold text-text-secondary uppercase tracking-wide pt-1">
+          Add students
+        </h4>
         <div className="flex items-center gap-3">
           <div className="flex-1">
             <Input
@@ -205,8 +275,8 @@ export function HomeroomAssignDrawer({
             <div className="py-10 text-center text-sm text-text-tertiary">
               {enrollments.length === 0
                 ? homeroomGrade
-                  ? `No enrolled students in Grade ${homeroomGrade} for this year.`
-                  : 'No enrolled students for this year.'
+                  ? `No unassigned Grade ${homeroomGrade} students — everyone in this grade already has a homeroom.`
+                  : 'No unassigned students for this year.'
                 : 'No students match your search.'}
             </div>
           ) : (
