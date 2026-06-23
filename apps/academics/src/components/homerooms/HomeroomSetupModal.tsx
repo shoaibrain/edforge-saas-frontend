@@ -85,6 +85,8 @@ export function HomeroomSetupModal({
     data: enrollmentData,
     isLoading: enrollmentsLoading,
     hasNextPage: hasMoreEnrollments,
+    isFetchingNextPage: fetchingMoreEnrollments,
+    fetchNextPage: fetchMoreEnrollments,
   } = useEnrollments({
     schoolId,
     yearId: academicYearId,
@@ -92,6 +94,12 @@ export function HomeroomSetupModal({
     limit: 1000,
     enabled: open && !!schoolId && !!academicYearId,
   })
+  // Auto-drain remaining pages so studentsByGrade covers EVERY grade before
+  // auto-roster runs. limit:1000 covers most schools in one page; this loop
+  // handles larger ones (without it, the Create gate would deadlock forever).
+  useEffect(() => {
+    if (hasMoreEnrollments && !fetchingMoreEnrollments) fetchMoreEnrollments()
+  }, [hasMoreEnrollments, fetchingMoreEnrollments, fetchMoreEnrollments])
   const enrollments = useMemo(() => flattenEnrollmentPages(enrollmentData), [enrollmentData])
   const enrollmentsIncomplete = enrollmentsLoading || hasMoreEnrollments
 
@@ -150,23 +158,41 @@ export function HomeroomSetupModal({
   }
 
   const splitGrade = (row: ProposedHomeroom) => {
-    // Append a lettered section under the same grade (A / B / C …).
+    // Split a grade into lettered sections A / B / C…. The FIRST split relabels
+    // the bare grade row ("6") to "6-A" so the set reads A/B (not 6 / 6-B); the
+    // grade's whole-cohort auto-roster is then suppressed (see handleCreate) so
+    // students aren't dumped into the first split — operators assign each
+    // section's students manually via the Assign drawer.
     setRows((prev) => {
       const sameGrade = prev.filter((r) => r.gradeValue === row.gradeValue)
-      const suffix = String.fromCharCode(65 + sameGrade.length) // next letter
+      const firstSplit = sameGrade.length === 1 && !sameGrade[0].sectionNumber.includes('-')
+      const working = firstSplit
+        ? prev.map((r) =>
+            r.gradeValue === row.gradeValue
+              ? {
+                  ...r,
+                  rowId: `${r.gradeValue}-A`,
+                  sectionNumber: `${r.gradeValue}-A`,
+                  sectionName: `${r.gradeLabel} Homeroom A`,
+                }
+              : r,
+          )
+        : prev
+      const count = working.filter((r) => r.gradeValue === row.gradeValue).length
+      const suffix = String.fromCharCode(65 + count) // A is index 0 → next free letter
       const newRow: ProposedHomeroom = {
         rowId: `${row.gradeValue}-${suffix}`,
         gradeLabel: row.gradeLabel,
         gradeValue: row.gradeValue,
-        sectionNumber: `${row.sectionNumber.split('-')[0]}-${suffix}`,
+        sectionNumber: `${row.gradeValue}-${suffix}`,
         sectionName: `${row.gradeLabel} Homeroom ${suffix}`,
         primaryTeacherId: '',
         coTeacherId: '',
         maxEnrollment: DEFAULT_MAX,
       }
-      const idx = prev.findIndex((r) => r.rowId === row.rowId)
-      const next = [...prev]
-      next.splice(idx + 1, 0, newRow)
+      const lastIdx = working.map((r) => r.gradeValue).lastIndexOf(row.gradeValue)
+      const next = [...working]
+      next.splice(lastIdx + 1, 0, newRow)
       return next
     })
   }
@@ -184,6 +210,15 @@ export function HomeroomSetupModal({
     setFailures([])
     const created: string[] = []
     const errs: Array<{ label: string; message: string }> = []
+
+    // Grades split into A/B/C must NOT auto-roster — the whole cohort would land
+    // in the first split and the rest would skip everyone (already-assigned).
+    // Split grades are created empty; the operator assigns each section's
+    // students via the Assign drawer.
+    const gradeRowCounts = rows.reduce<Record<string, number>>((m, r) => {
+      m[r.gradeValue] = (m[r.gradeValue] || 0) + 1
+      return m
+    }, {})
 
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i]
@@ -218,8 +253,10 @@ export function HomeroomSetupModal({
         continue
       }
 
-      // Auto-roster: assign this grade's currently-enrolled students.
-      const studentIds = studentsByGrade.get(row.gradeValue) ?? []
+      // Auto-roster the grade's enrolled students — but only when the grade is
+      // NOT split (one homeroom per grade). Split grades are created empty.
+      const isSplitGrade = (gradeRowCounts[row.gradeValue] || 0) > 1
+      const studentIds = isSplitGrade ? [] : (studentsByGrade.get(row.gradeValue) ?? [])
       if (studentIds.length > 0) {
         const result = await assignStudents.mutateAsync({
           sectionId,
@@ -230,11 +267,13 @@ export function HomeroomSetupModal({
         })
         const assignedMsg =
           result.skipped.length > 0
-            ? `${row.gradeLabel} homeroom created — ${result.assigned} students assigned, ${result.skipped.length} skipped`
-            : `${row.gradeLabel} homeroom created — ${result.assigned} student${result.assigned === 1 ? '' : 's'} assigned`
+            ? `${cardLabel} created — ${result.assigned} students assigned, ${result.skipped.length} skipped`
+            : `${cardLabel} created — ${result.assigned} student${result.assigned === 1 ? '' : 's'} assigned`
         toast.success(assignedMsg)
+      } else if (isSplitGrade) {
+        toast.success(`${cardLabel} created — assign its students via "Assign" (grade is split into sections)`)
       } else {
-        toast.success(`${row.gradeLabel} homeroom created — no enrolled students to assign yet`)
+        toast.success(`${cardLabel} created — no enrolled students to assign yet`)
       }
     }
 

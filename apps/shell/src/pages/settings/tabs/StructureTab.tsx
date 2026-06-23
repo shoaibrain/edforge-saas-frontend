@@ -107,7 +107,8 @@ function HomeroomsCard() {
           </div>
         </div>
         <Link
-          to={'/academics/classrooms?tab=homerooms' as any}
+          to="/academics/$"
+          params={{ _splat: 'classrooms?tab=homerooms' }}
           className="flex-shrink-0 bg-[#1D9E75] text-[rgb(var(--action-primary-fg))] text-xs font-medium px-3 py-1.5 rounded-lg flex items-center gap-1.5 hover:opacity-90 transition-opacity"
         >
           Manage homerooms

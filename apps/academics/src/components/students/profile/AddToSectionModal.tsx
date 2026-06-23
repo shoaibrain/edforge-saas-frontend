@@ -45,9 +45,11 @@ export function AddToSectionModal({
   const [selectedSectionId, setSelectedSectionId] = useState('')
   const [error, setError] = useState('')
 
-  // Fetch sections for this school
+  // Fetch instructional sections — a student is added to a subject section
+  // here; homerooms use the separate homeroom-assign flow.
   const { data: sectionsData } = useSections({
     schoolId,
+    filters: { sectionType: 'instructional' },
     enabled: !!schoolId && open,
   })
   const sections = flattenSectionPages(sectionsData)

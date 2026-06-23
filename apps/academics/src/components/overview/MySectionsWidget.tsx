@@ -52,9 +52,10 @@ function SectionsSkeleton() {
 export function MySectionsWidget({ schoolId }: MySectionsWidgetProps) {
   const { data: currentYear } = useCurrentAcademicYear(schoolId)
 
+  // Instructional sections only — homerooms aren't classroom cards here.
   const { data: sectionsData, isLoading } = useSections({
     schoolId,
-    filters: { isActive: true, academicYearId: currentYear?.yearId },
+    filters: { isActive: true, academicYearId: currentYear?.yearId, sectionType: 'instructional' },
     enabled: !!schoolId,
   })
 

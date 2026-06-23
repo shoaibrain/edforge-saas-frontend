@@ -444,9 +444,12 @@ export function BulkRosteringPage() {
     fetchNextPage: fetchMoreSections,
   } = useSections({
     schoolId,
+    // Rostering enrolls students into instructional sections; homerooms have
+    // their own assignment flow and must not appear here.
     filters: {
       isActive: true,
       academicYearId: currentYear?.yearId,
+      sectionType: 'instructional',
     },
     enabled: !!schoolId && !!currentYear?.yearId,
   })

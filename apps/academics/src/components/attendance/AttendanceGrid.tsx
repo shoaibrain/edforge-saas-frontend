@@ -62,6 +62,14 @@ interface AttendanceGridProps {
   saveStatus?: SaveStatus
   /** Task 4.6: Correction callback for past-date updates */
   onCorrection?: (record: { studentId: string; status: AttendanceStatus; notes?: string; excuseType?: string }) => void
+  /**
+   * 'section' (default): explicit per-student marking — Save requires ≥1 mark.
+   * 'daily': homeroom roll-call — everyone is present by default, only
+   * exceptions are marked, and Save is enabled even with zero marks so the
+   * all-present day can be recorded. Prior exceptions are corrected by setting
+   * the student back to an explicit 'present' (sent as a present mark).
+   */
+  mode?: 'section' | 'daily'
 }
 
 type SortKey = 'name' | 'number' | 'status'
@@ -179,6 +187,7 @@ export function AttendanceGrid({
   disabled = false,
   saveStatus,
   onCorrection,
+  mode = 'section',
 }: AttendanceGridProps) {
   // Task 4.6: Determine if this is a past date
   const isPastDate = useMemo(() => {
@@ -465,14 +474,22 @@ export function AttendanceGrid({
           <ProgressBar marked={markedCount} total={totalCount} />
           <SaveStatusBadge status={saveStatus} />
           <span className="text-xs text-text-tertiary">
-            {markedCount} / {totalCount} marked
+            {mode === 'daily'
+              ? `${markedCount} flagged · ${Math.max(0, totalCount - markedCount)} present`
+              : `${markedCount} / ${totalCount} marked`}
           </span>
           {/* Task 5.5: full-width save on small screens */}
           {!isPastDate && (
             <button
               type="button"
               onClick={handleSave}
-              disabled={isSaving || markedCount === 0 || !hasChanges || disabled}
+              disabled={
+                isSaving ||
+                disabled ||
+                (mode === 'daily'
+                  ? totalCount === 0
+                  : markedCount === 0 || !hasChanges)
+              }
               className="flex items-center justify-center gap-1.5 w-full sm:w-auto px-4 py-2.5 sm:py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg-hover))] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSaving ? (
@@ -480,7 +497,7 @@ export function AttendanceGrid({
               ) : (
                 <Save className="w-4 h-4" />
               )}
-              Save Attendance
+              {mode === 'daily' ? 'Save roll-call' : 'Save Attendance'}
             </button>
           )}
         </div>

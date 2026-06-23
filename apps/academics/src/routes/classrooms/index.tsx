@@ -318,7 +318,8 @@ function GradebookTab() {
 
   const { data: sectionsData, isLoading: sectionsLoading } = useSections({
     schoolId,
-    filters: { isActive: true, academicYearId: currentYear?.yearId },
+    // Gradebook is per instructional section — never homerooms.
+    filters: { isActive: true, academicYearId: currentYear?.yearId, sectionType: 'instructional' },
     enabled: !!schoolId,
   })
   const sections = useMemo(() => flattenSectionPages(sectionsData), [sectionsData])

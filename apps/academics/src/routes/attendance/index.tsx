@@ -275,8 +275,12 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
 
   // FE-S5: resolve the school's attendance mode. `daily`/`both` schools take a
   // homeroom roll-call; `period` schools keep the per-section path unchanged.
-  const { data: policy } = useAttendancePolicy(schoolId)
+  const { data: policy, isLoading: policyLoading } = useAttendancePolicy(schoolId)
   const isDailyMode = policy?.effectiveMode === 'daily' || policy?.effectiveMode === 'both'
+  // Until the policy resolves we don't know the school's mode. Don't default to
+  // the period/class-section surface (that flashes the wrong UI for a PABSON
+  // daily school) — gate the daily-entry tab on resolution below.
+  const attendanceModeResolving = policyLoading && !policy
 
   // currentYearId / currentYearName are guaranteed non-empty by the gate in
   // `AttendanceModule` above (Sprint 1 / Ticket 1.3a). Defensive `?.` falsy
@@ -288,9 +292,12 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
     isLoading: sectionsLoading,
   } = useSections({
     schoolId,
+    // Period/section attendance is for instructional sections only; homerooms
+    // take a separate daily roll-call and must not appear as classroom options.
     filters: {
       isActive: true,
       academicYearId: currentYearId,
+      sectionType: 'instructional',
     },
     enabled: !!schoolId,
   })
@@ -449,7 +456,7 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
 
         {/* Controls Row (per-section daily entry only — the homeroom roll-call
             path renders its own homeroom + date controls). */}
-        {activeTab === 'daily-entry' && !isDailyMode && (
+        {activeTab === 'daily-entry' && !isDailyMode && !attendanceModeResolving && (
           <div className="flex items-center gap-6 flex-wrap mt-3 mb-1">
             <SectionSelector
               sections={sections}
@@ -491,11 +498,18 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
               />
             )}
 
+            {activeTab === 'daily-entry' && attendanceModeResolving && (
+              <div className="flex items-center justify-center py-16 text-sm text-text-tertiary gap-2">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Resolving attendance mode…
+              </div>
+            )}
+
             {activeTab === 'daily-entry' && isDailyMode && (
               <DailyHomeroomEntry schoolId={schoolId} academicYearId={currentYearId} />
             )}
 
-            {activeTab === 'daily-entry' && !isDailyMode && (
+            {activeTab === 'daily-entry' && !isDailyMode && !attendanceModeResolving && (
               <div className="space-y-6">
                 {/* Calendar Non-Instructional Banner */}
                 {isNonInstructional && (

@@ -237,6 +237,7 @@ export function DailyHomeroomEntry({ schoolId, academicYearId }: DailyHomeroomEn
       ) : (
         <AttendanceGrid
           key={`${selectedHomeroomId}-${selectedDate}`}
+          mode="daily"
           students={roster.students}
           date={selectedDate}
           existingRecords={existingRecords}
