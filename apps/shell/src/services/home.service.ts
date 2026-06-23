@@ -208,6 +208,12 @@ export async function getTeacherSections(
     schoolId,
     isActive: true,
     limit: 50,
+    // A teacher's "My Sections" / classroom-attendance surfaces are for
+    // instructional sections only. A homeroom (sectionType:'homeroom') is a
+    // daily-attendance unit — its class teacher must NOT see it listed here as a
+    // classroom. Filtering server-side keeps homerooms off both the KPI count
+    // and the section-attendance fallback path (useSectionAttendanceItems).
+    sectionType: 'instructional',
   }
   if (academicYearId) params.academicYearId = academicYearId
   return apiGet<{ items: TeacherSectionItem[] }>('/academics/sections', params)

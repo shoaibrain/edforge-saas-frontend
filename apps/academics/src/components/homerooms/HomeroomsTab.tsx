@@ -22,6 +22,7 @@ import {
   ModalFooter,
   type ColumnDef,
 } from '@edforge/ui'
+import { usePermission } from '@edforge/abac'
 import { useActiveSchoolId } from '../../stores/app.store'
 import { useCurrentAcademicYear } from '../../hooks/useSchool'
 import { useHomerooms, useDeleteHomeroom } from '../../hooks/useHomeroom'
@@ -52,6 +53,14 @@ export function HomeroomsTab() {
   const [deleting, setDeleting] = useState(false)
   const deleteHomeroom = useDeleteHomeroom()
 
+  // Homeroom management is governed by the backend `scheduling` ABAC resource
+  // (designate=create, assign/edit=edit, hard-delete=delete). Teachers hold only
+  // `scheduling:['view']`, so hide the controls they cannot use — the API
+  // already 403s them; this keeps the UI honest about it.
+  const canCreate = usePermission('create', 'scheduling')
+  const canEdit = usePermission('edit', 'scheduling')
+  const canDelete = usePermission('delete', 'scheduling')
+
   const existingSectionNumbers = useMemo(
     () => new Set(homerooms.map((h) => h.sectionNumber)),
     [homerooms],
@@ -65,7 +74,8 @@ export function HomeroomsTab() {
   }, [homerooms])
 
   const columns: ColumnDef<SectionResponseDto, unknown>[] = useMemo(
-    () => [
+    () => {
+      const cols: ColumnDef<SectionResponseDto, unknown>[] = [
       {
         accessorKey: 'sectionNumber',
         header: 'Homeroom',
@@ -128,50 +138,62 @@ export function HomeroomsTab() {
           </StatusBadge>
         ),
       },
-      createActionsColumn<SectionResponseDto>({
-        cell: ({ row }) => {
-          const label = row.original.sectionName || `Homeroom ${row.original.sectionNumber}`
-          return (
-            <div className="flex items-center gap-1.5">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setAssignTarget(row.original)
-                }}
-              >
-                <UserPlus className="w-3.5 h-3.5" />
-                Assign
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setEditTarget(row.original)
-                }}
-                aria-label={`Edit ${label}`}
-              >
-                <Pencil className="w-3.5 h-3.5" />
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setDeleteTarget(row.original)
-                }}
-                aria-label={`Delete ${label}`}
-              >
-                <Trash2 className="w-3.5 h-3.5 text-[rgb(var(--state-danger-fg))]" />
-              </Button>
-            </div>
-          )
-        },
-      }),
-    ],
-    [],
+      ]
+      if (canEdit || canDelete) {
+        cols.push(
+          createActionsColumn<SectionResponseDto>({
+            cell: ({ row }) => {
+              const label = row.original.sectionName || `Homeroom ${row.original.sectionNumber}`
+              return (
+                <div className="flex items-center gap-1.5">
+                  {canEdit && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setAssignTarget(row.original)
+                      }}
+                    >
+                      <UserPlus className="w-3.5 h-3.5" />
+                      Assign
+                    </Button>
+                  )}
+                  {canEdit && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setEditTarget(row.original)
+                      }}
+                      aria-label={`Edit ${label}`}
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                    </Button>
+                  )}
+                  {canDelete && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setDeleteTarget(row.original)
+                      }}
+                      aria-label={`Delete ${label}`}
+                    >
+                      <Trash2 className="w-3.5 h-3.5 text-[rgb(var(--state-danger-fg))]" />
+                    </Button>
+                  )}
+                </div>
+              )
+            },
+          }),
+        )
+      }
+      return cols
+    },
+    [canEdit, canDelete],
   )
 
   if (yearLoading) {
@@ -231,10 +253,12 @@ export function HomeroomsTab() {
         <p className="text-sm text-text-secondary">
           A homeroom is where each student's single daily attendance roll-call is taken.
         </p>
-        <Button onClick={() => setShowSetup(true)}>
-          <Wand2 className="w-4 h-4" />
-          Set up homerooms
-        </Button>
+        {canCreate && (
+          <Button onClick={() => setShowSetup(true)}>
+            <Wand2 className="w-4 h-4" />
+            Set up homerooms
+          </Button>
+        )}
       </div>
 
       {/* Homeroom list */}

@@ -14,6 +14,7 @@ import {
   useQuery,
   useMutation,
   useQueryClient,
+  type QueryClient,
 } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import {
@@ -47,6 +48,34 @@ export const homeroomKeys = {
   policy: (schoolId: string) => ['attendance-policy', schoolId] as const,
   list: (schoolId: string, academicYearId?: string) =>
     [...homeroomKeys.all, 'list', schoolId, academicYearId] as const,
+}
+
+/**
+ * Optimistically adjust a homeroom's `currentEnrollment` across every cached
+ * homeroom list.
+ *
+ * The homeroom list is read over an eventually-consistent DDB GSI, so a refetch
+ * fired immediately after an assign/remove can read the STALE projected counter
+ * — assigning a full grade and then seeing "0 / 40" in the table. We apply the
+ * delta to the cache now (instantly correct, and the stat-card sum derives from
+ * the same cache) and let the next natural refetch reconcile once the GSI has
+ * caught up. That's why the mutations below mark the list stale with
+ * `refetchType: 'none'` (no immediate refetch to clobber the optimistic value)
+ * and `useHomerooms` carries `refetchOnMount: 'always'`. Clamped to
+ * [0, maxEnrollment].
+ */
+function bumpHomeroomCount(queryClient: QueryClient, sectionId: string, delta: number) {
+  queryClient.setQueriesData<SectionResponseDto[]>(
+    { queryKey: homeroomKeys.all },
+    (old) => {
+      if (!old) return old
+      return old.map((h) => {
+        if (h.sectionId !== sectionId) return h
+        const max = h.maxEnrollment ?? Number.POSITIVE_INFINITY
+        return { ...h, currentEnrollment: Math.max(0, Math.min(max, h.currentEnrollment + delta)) }
+      })
+    },
+  )
 }
 
 // ============================================================================
@@ -135,8 +164,9 @@ export function useAssignToHomeroom() {
     mutationFn: ({ sectionId, schoolId, studentId }) =>
       assignToHomeroom(sectionId, { schoolId, studentId }),
     onSuccess: (_, variables) => {
+      bumpHomeroomCount(queryClient, variables.sectionId, 1)
       queryClient.invalidateQueries({ queryKey: sectionKeys.roster(variables.sectionId) })
-      queryClient.invalidateQueries({ queryKey: homeroomKeys.all })
+      queryClient.invalidateQueries({ queryKey: homeroomKeys.all, refetchType: 'none' })
     },
     // No per-call toast — callers loop over students and report aggregate progress.
     onError: (error) => {
@@ -201,9 +231,10 @@ export function useAssignStudentsToHomeroom() {
       onProgress?.({ done: studentIds.length, total: studentIds.length })
       return { assigned: result.assigned, skipped: result.skipped }
     },
-    onSuccess: (_, variables) => {
+    onSuccess: (result, variables) => {
+      bumpHomeroomCount(queryClient, variables.sectionId, result.assigned)
       queryClient.invalidateQueries({ queryKey: sectionKeys.roster(variables.sectionId) })
-      queryClient.invalidateQueries({ queryKey: homeroomKeys.all })
+      queryClient.invalidateQueries({ queryKey: homeroomKeys.all, refetchType: 'none' })
     },
     // No toast here — the caller renders the aggregate summary.
   })
@@ -271,8 +302,9 @@ export function useRemoveFromHomeroom() {
     mutationFn: ({ sectionId, schoolId, studentId }) =>
       removeStudentFromSection(sectionId, schoolId, studentId),
     onSuccess: (_, variables) => {
+      bumpHomeroomCount(queryClient, variables.sectionId, -1)
       queryClient.invalidateQueries({ queryKey: sectionKeys.roster(variables.sectionId) })
-      queryClient.invalidateQueries({ queryKey: homeroomKeys.all })
+      queryClient.invalidateQueries({ queryKey: homeroomKeys.all, refetchType: 'none' })
     },
     onError: (error) => {
       const parsed = parseApiError(error)
