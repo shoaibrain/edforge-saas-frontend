@@ -19,13 +19,12 @@ import {
   useAttendanceStore,
   useAttendanceDateActions,
 } from '../../stores/attendance.store'
-import { useCalendarDate } from '../../hooks/useAttendance'
+import { useAttendanceRecords, useCalendarDate } from '../../hooks/useAttendance'
 import { useSectionRoster } from '../../hooks/useSections'
 import {
   useHomerooms,
   useRecordDailyAttendance,
 } from '../../hooks/useHomeroom'
-import { useSectionAttendanceRecords } from '../../hooks/useSectionAttendance'
 import { DateSelector } from './DateSelector'
 import { AttendanceGrid } from './AttendanceGrid'
 import { DailySummary } from './DailySummary'
@@ -76,21 +75,29 @@ export function DailyHomeroomEntry({ schoolId, academicYearId }: DailyHomeroomEn
     enabled: !!selectedHomeroomId && !!schoolId,
   })
 
-  // Existing same-day marks (so a reopened day shows what was already recorded).
-  const { data: dayRecords } = useSectionAttendanceRecords({
-    sectionId: selectedHomeroomId || '',
+  // Daily roll-call is stored as SCHOOL attendance (SCH_ATTEND#{date}#{student}),
+  // NOT section attendance — so read the school-day records and scope them to
+  // this homeroom's roster. (Reading the section-attendance store here returned
+  // nothing, so a reopened day never showed its saved marks.)
+  const { data: schoolDayRecords } = useAttendanceRecords({
     schoolId,
     date: selectedDate,
     enabled: !!schoolId && !!selectedHomeroomId,
   })
+  const rosterStudentIds = useMemo(
+    () => new Set((roster?.students ?? []).map((s) => s.studentId)),
+    [roster],
+  )
+  const dayRecords = useMemo(
+    () => (schoolDayRecords ?? []).filter((r) => rosterStudentIds.has(r.studentId)),
+    [schoolDayRecords, rosterStudentIds],
+  )
 
   const existingRecords = useMemo(() => {
-    if (!dayRecords) return []
     return dayRecords.map((r) => ({
       studentId: r.studentId,
       status: r.status as AttendanceStatus,
       notes: r.notes,
-      excuseReason: r.excuseReason,
     }))
   }, [dayRecords])
 

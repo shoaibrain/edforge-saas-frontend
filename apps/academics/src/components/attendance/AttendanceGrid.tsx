@@ -362,9 +362,16 @@ export function AttendanceGrid({
         notes: e.notes || undefined,
         excuseReason: e.excuseType || undefined,
       }))
-    if (records.length === 0) return
+    // Daily roll-call: an all-present day (zero exceptions) is a valid save —
+    // onSave([]) tells the backend the roll-call was taken and defaults the
+    // whole roster to present. Section mode still requires ≥1 mark.
+    if (records.length === 0 && mode !== 'daily') return
     onSave(records)
-    setAnnouncement(`Attendance saved for ${records.length} students`)
+    setAnnouncement(
+      mode === 'daily'
+        ? `Roll-call saved — ${records.length} exception${records.length === 1 ? '' : 's'} flagged, rest present`
+        : `Attendance saved for ${records.length} students`,
+    )
   }
 
   // Task 4.6: Correction handler for individual past-date edits
@@ -409,6 +416,9 @@ export function AttendanceGrid({
   }
 
   const markedCount = entries.filter((e) => e.status !== null).length
+  // Daily roll-call: "flagged" = real exceptions (not present), since on reopen
+  // an all-present day loads every student as an explicit 'present'.
+  const exceptionCount = entries.filter((e) => e.status !== null && e.status !== 'present').length
   const totalCount = entries.length
 
   if (students.length === 0) {
@@ -475,7 +485,7 @@ export function AttendanceGrid({
           <SaveStatusBadge status={saveStatus} />
           <span className="text-xs text-text-tertiary">
             {mode === 'daily'
-              ? `${markedCount} flagged · ${Math.max(0, totalCount - markedCount)} present`
+              ? `${exceptionCount} flagged · ${Math.max(0, totalCount - exceptionCount)} present`
               : `${markedCount} / ${totalCount} marked`}
           </span>
           {/* Task 5.5: full-width save on small screens */}
