@@ -17,8 +17,10 @@ import { FeeTypeChip } from '../shared'
 interface FeeStructureListProps {
   feeStructures: FeeStructure[]
   isLoading?: boolean
-  onEdit: (fee: FeeStructure) => void
-  onDelete: (fee: FeeStructure) => void
+  /** Omit to hide the Edit action (caller lacks `billing:edit`). */
+  onEdit?: (fee: FeeStructure) => void
+  /** Omit to hide the Delete action (caller lacks `billing:delete`). */
+  onDelete?: (fee: FeeStructure) => void
 }
 
 const FREQUENCY_LABELS: Record<string, string> = {
@@ -39,7 +41,8 @@ export function FeeStructureList({
   const safeList = Array.isArray(feeStructures) ? feeStructures : []
 
   const columns = useMemo<ColumnDef<FeeStructure, unknown>[]>(
-    () => [
+    () => {
+      const cols: ColumnDef<FeeStructure, unknown>[] = [
       {
         accessorKey: 'name',
         header: 'Name',
@@ -119,29 +122,39 @@ export function FeeStructureList({
           )
         },
       },
-      createActionsColumn<FeeStructure>({
-        cell: ({ row }) => (
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              onClick={() => onEdit(row.original)}
-              className="p-1.5 rounded-lg hover:bg-[rgb(var(--background-tertiary))] transition-colors"
-              aria-label="Edit fee structure"
-            >
-              <Pencil className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))]" />
-            </button>
-            <button
-              type="button"
-              onClick={() => onDelete(row.original)}
-              className="p-1.5 rounded-lg hover:bg-[rgb(var(--state-danger-bg)/0.18)] transition-colors"
-              aria-label="Delete fee structure"
-            >
-              <Trash2 className="w-3.5 h-3.5 text-[rgb(var(--state-danger-fg))]" />
-            </button>
-          </div>
-        ),
-      }),
-    ],
+      ]
+      if (onEdit || onDelete) {
+        cols.push(
+          createActionsColumn<FeeStructure>({
+            cell: ({ row }) => (
+              <div className="flex items-center gap-1">
+                {onEdit && (
+                  <button
+                    type="button"
+                    onClick={() => onEdit(row.original)}
+                    className="p-1.5 rounded-lg hover:bg-[rgb(var(--background-tertiary))] transition-colors"
+                    aria-label="Edit fee structure"
+                  >
+                    <Pencil className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))]" />
+                  </button>
+                )}
+                {onDelete && (
+                  <button
+                    type="button"
+                    onClick={() => onDelete(row.original)}
+                    className="p-1.5 rounded-lg hover:bg-[rgb(var(--state-danger-bg)/0.18)] transition-colors"
+                    aria-label="Delete fee structure"
+                  >
+                    <Trash2 className="w-3.5 h-3.5 text-[rgb(var(--state-danger-fg))]" />
+                  </button>
+                )}
+              </div>
+            ),
+          }),
+        )
+      }
+      return cols
+    },
     [onEdit, onDelete],
   )
 

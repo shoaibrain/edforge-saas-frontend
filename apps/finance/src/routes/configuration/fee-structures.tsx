@@ -25,6 +25,7 @@ import {
 } from '@aibrains/shared-types'
 import { Button, StatCard, WidgetErrorBoundaryV2 } from '@edforge/ui'
 import { Plus, AlertTriangle, DollarSign, Layers, TrendingUp } from 'lucide-react'
+import { usePermission } from '@edforge/abac'
 import { useAppStore } from '../../stores/app.store'
 import {
   useFeeStructures,
@@ -112,6 +113,13 @@ export default function FeeStructuresPage() {
   const schoolId = useAppStore((s) => s.activeSchoolId)
   const settings = useFinanceSettings()
   const { formatCompact } = useCurrency(settings)
+
+  // Fee-structure CRUD maps to the backend `billing` ABAC resource:
+  // add=create, edit=edit, delete=delete. The API 403s users without these;
+  // hiding keeps the UI honest.
+  const canCreateBilling = usePermission('create', 'billing')
+  const canEditBilling = usePermission('edit', 'billing')
+  const canDeleteBilling = usePermission('delete', 'billing')
 
   const [showForm, setShowForm] = useState(false)
   const [editingFee, setEditingFee] = useState<FeeStructure | null>(null)
@@ -286,14 +294,16 @@ export default function FeeStructuresPage() {
         title="Fee Structures"
         subtitle="Configure the fee types and amounts for your school."
         actions={
-          <button
-            type="button"
-            onClick={() => setShowForm(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            Add Fee Structure
-          </button>
+          canCreateBilling ? (
+            <button
+              type="button"
+              onClick={() => setShowForm(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Add Fee Structure
+            </button>
+          ) : undefined
         }
       />
 
@@ -362,8 +372,8 @@ export default function FeeStructuresPage() {
       <FeeStructureList
         feeStructures={filteredFeeStructures}
         isLoading={isLoading}
-        onEdit={(fee) => setEditingFee(fee)}
-        onDelete={(fee) => setDeletingFee(fee)}
+        onEdit={canEditBilling ? (fee) => setEditingFee(fee) : undefined}
+        onDelete={canDeleteBilling ? (fee) => setDeletingFee(fee) : undefined}
       />
 
       {/* Create form modal */}

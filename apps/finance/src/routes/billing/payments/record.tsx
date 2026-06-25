@@ -15,8 +15,10 @@ import {
   CheckCircle2,
   RotateCcw,
   FileText,
+  ShieldAlert,
 } from 'lucide-react'
 import { useSearch } from '@tanstack/react-router'
+import { usePermission } from '@edforge/abac'
 import { useAppStore } from '../../../stores/app.store'
 import { useRecordManualPayment, useInvoices } from '@edforge/finance-services'
 import type { Invoice } from '@edforge/types'
@@ -158,6 +160,10 @@ function StudentInvoiceList({
 
 export default function RecordPaymentPage() {
   const schoolId = useAppStore((s) => s.activeSchoolId)
+  // Recording a manual payment maps to the backend `billing:create` ABAC
+  // action. The API 403s users without it; show an access notice instead of
+  // the form.
+  const canCreateBilling = usePermission('create', 'billing')
   const settings = useFinanceSettings()
   const { format: formatCurr } = useCurrency(settings)
   const searchParams = useSearch({ strict: false }) as {
@@ -251,6 +257,25 @@ export default function RecordPaymentPage() {
     return (
       <div className="p-6 text-center text-sm text-[rgb(var(--text-tertiary))]">
         Select a school to record payments.
+      </div>
+    )
+  }
+
+  if (!canCreateBilling) {
+    return (
+      <div className="p-6 max-w-lg mx-auto">
+        <div className="flex flex-col items-center text-center gap-3 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))] p-8 mt-10">
+          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[rgb(var(--state-warning-bg)/0.18)]">
+            <ShieldAlert className="w-6 h-6 text-[rgb(var(--state-warning-fg))]" />
+          </div>
+          <h2 className="text-base font-semibold text-[rgb(var(--text-primary))]">
+            You don&apos;t have access to record payments
+          </h2>
+          <p className="text-sm text-[rgb(var(--text-secondary))] max-w-sm">
+            Recording manual payments is managed by your principal or school
+            admin.
+          </p>
+        </div>
       </div>
     )
   }

@@ -33,6 +33,7 @@ import {
   Download,
 } from 'lucide-react'
 import { useTranslation } from '@edforge/i18n'
+import { usePermission } from '@edforge/abac'
 import { useAppStore } from '../../../stores/app.store'
 import {
   useSchoolPayments,
@@ -488,6 +489,7 @@ function usePaymentColumns(
   handleRefundClick: (payment: Payment) => void,
   voidIsPending: boolean,
   formatAmount: (amount: number, opts?: { decimals?: number }) => string,
+  canManage: boolean,
 ): ColumnDef<Payment, unknown>[] {
   const colSettings = useFinanceSettings()
   // M1.5-FU.3 — used by the View Receipt eye-icon cell below to
@@ -626,7 +628,7 @@ function usePaymentColumns(
                   />
                 )}
               {/* Void (for completed only) */}
-              {payment.status === 'completed' && (
+              {canManage && payment.status === 'completed' && (
                 <button
                   onClick={() => handleVoidClick(payment)}
                   disabled={voidIsPending}
@@ -637,7 +639,8 @@ function usePaymentColumns(
                 </button>
               )}
               {/* Refund (for completed or partially_refunded) */}
-              {(payment.status === 'completed' ||
+              {canManage &&
+                (payment.status === 'completed' ||
                 payment.status === 'partially_refunded') && (
                 <button
                   onClick={() => handleRefundClick(payment)}
@@ -652,7 +655,7 @@ function usePaymentColumns(
         },
       }),
     ],
-    [handleVoidClick, handleRefundClick, voidIsPending, formatAmount, colSettings, navigate, activeSchoolId],
+    [handleVoidClick, handleRefundClick, voidIsPending, formatAmount, colSettings, navigate, activeSchoolId, canManage],
   )
 }
 
@@ -688,6 +691,12 @@ export default function PaymentsPage() {
   const schoolId = useAppStore((s) => s.activeSchoolId)
   const settings = useFinanceSettings()
   const { format, formatCompact } = useCurrency(settings)
+
+  // Mutating money controls map to the backend `billing` ABAC resource.
+  // Void/refund require `manage`; recording a payment requires `create`.
+  // The API 403s users without these; hiding keeps the UI honest.
+  const canManageBilling = usePermission('manage', 'billing')
+  const canCreateBilling = usePermission('create', 'billing')
 
   const [statusFilter, setStatusFilter] = useState('')
   const [gatewayFilter, setGatewayFilter] = useState('')
@@ -760,6 +769,7 @@ export default function PaymentsPage() {
     handleRefundClick,
     voidMutation.isPending,
     format,
+    canManageBilling,
   )
 
   if (!schoolId) {
@@ -777,13 +787,15 @@ export default function PaymentsPage() {
         title="Payments"
         subtitle="View and manage all payment transactions."
         actions={
-          <button
-            type="button"
-            onClick={() => navigate({ to: '/payments/record' })}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
-          >
-            Record Payment
-          </button>
+          canCreateBilling ? (
+            <button
+              type="button"
+              onClick={() => navigate({ to: '/payments/record' })}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
+            >
+              Record Payment
+            </button>
+          ) : undefined
         }
       />
 
@@ -877,10 +889,12 @@ export default function PaymentsPage() {
           icon: <CreditCard className="w-10 h-10" />,
           title: 'No payments found',
           description: 'Payments will appear here once students start paying invoices.',
-          action: {
-            label: 'Record Manual Payment',
-            onClick: () => navigate({ to: '/payments/record' }),
-          },
+          action: canCreateBilling
+            ? {
+                label: 'Record Manual Payment',
+                onClick: () => navigate({ to: '/payments/record' }),
+              }
+            : undefined,
         }}
         maxHeight="calc(100vh - 24rem)"
       />

@@ -10,8 +10,9 @@
 
 import { toast } from 'sonner'
 import type { PaymentGateway } from '@edforge/types'
-import { Loader2, AlertTriangle } from 'lucide-react'
+import { Loader2, AlertTriangle, ShieldAlert } from 'lucide-react'
 import { ContextBar } from '@edforge/ui'
+import { usePermission } from '@edforge/abac'
 import { useAppStore } from '../../stores/app.store'
 import { useGatewayConfigs, useSaveGatewayConfig } from '@edforge/finance-services'
 import { GatewayConfigCard } from '../../components/configuration/GatewayConfigCard'
@@ -27,6 +28,11 @@ const GATEWAYS: PaymentGateway[] = [
 
 export default function PaymentGatewaysPage() {
   const schoolId = useAppStore((s) => s.activeSchoolId)
+
+  // Saving/editing gateway credentials maps to the backend `billing:manage`
+  // ABAC action. The API 403s users without it; hiding the editable cards
+  // keeps the UI honest.
+  const canManageBilling = usePermission('manage', 'billing')
 
   const { data: configs, isLoading, isError } = useGatewayConfigs(schoolId ?? '')
   const saveMutation = useSaveGatewayConfig(schoolId ?? '')
@@ -54,6 +60,25 @@ export default function PaymentGatewaysPage() {
     return (
       <div className="max-w-3xl mx-auto px-6 py-8 text-center text-[rgb(var(--text-tertiary))]">
         Select a school to manage payment gateways.
+      </div>
+    )
+  }
+
+  if (!canManageBilling) {
+    return (
+      <div className="max-w-3xl mx-auto px-6 py-16">
+        <div className="flex flex-col items-center text-center gap-3 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))] p-8">
+          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[rgb(var(--state-warning-bg)/0.18)]">
+            <ShieldAlert className="w-6 h-6 text-[rgb(var(--state-warning-fg))]" />
+          </div>
+          <h2 className="text-base font-semibold text-[rgb(var(--text-primary))]">
+            You don&apos;t have access to payment gateway settings
+          </h2>
+          <p className="text-sm text-[rgb(var(--text-secondary))] max-w-sm">
+            Configuring payment gateway credentials is managed by your principal
+            or school admin.
+          </p>
+        </div>
       </div>
     )
   }

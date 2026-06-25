@@ -73,6 +73,12 @@ vi.mock('@edforge/i18n', () => ({
   useTranslation: () => ({ t: (k: string) => k }),
 }))
 
+// InvoicesPage now gates its mutating controls on ABAC; this pagination test
+// only cares about Next/loadMore, so grant permission unconditionally.
+vi.mock('@edforge/abac', () => ({
+  usePermission: () => true,
+}))
+
 vi.mock('@edforge/types/use-currency', () => ({
   useCurrency: () => ({
     format: (n: number) => String(n),

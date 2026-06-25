@@ -13,6 +13,7 @@ import { UuidBadge } from '@edforge/archetype'
 import { ArrowLeft, Check, X, Loader2, Download, AlertTriangle } from 'lucide-react'
 import { useNavigate, useParams } from '@tanstack/react-router'
 import { useTranslation } from '@edforge/i18n'
+import { usePermission } from '@edforge/abac'
 import { useAppStore } from '../../../stores/app.store'
 import {
   useInvoice,
@@ -39,6 +40,10 @@ export default function InvoiceDetailPage() {
   const cancelMutation = useCancelInvoice(schoolId ?? '')
   const downloadInvoice = useDownloadInvoicePdf()
   const { t } = useTranslation('payments')
+
+  // Issue / cancel an invoice map to the backend `billing:edit` ABAC action.
+  // The API 403s users without it; hiding keeps the UI honest.
+  const canEditBilling = usePermission('edit', 'billing')
 
   const [showCancelDialog, setShowCancelDialog] = useState(false)
 
@@ -133,7 +138,7 @@ export default function InvoiceDetailPage() {
             )}
             {t('actions.downloadPdf')}
           </Button>
-          {invoice.status === 'draft' && (
+          {canEditBilling && invoice.status === 'draft' && (
             <>
               <Button onClick={handleIssue} disabled={issueMutation.isPending}>
                 {issueMutation.isPending ? (
@@ -149,7 +154,7 @@ export default function InvoiceDetailPage() {
               </Button>
             </>
           )}
-          {(invoice.status === 'issued' || invoice.status === 'overdue') && (
+          {canEditBilling && (invoice.status === 'issued' || invoice.status === 'overdue') && (
             <Button variant="outline" onClick={() => setShowCancelDialog(true)} disabled={cancelMutation.isPending}>
               <X className="w-4 h-4 mr-1.5" />
               Cancel Invoice

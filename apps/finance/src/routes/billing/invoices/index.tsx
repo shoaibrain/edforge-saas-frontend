@@ -39,6 +39,7 @@ import {
 import type { RowSelectionState } from '@tanstack/react-table'
 import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from '@edforge/i18n'
+import { usePermission } from '@edforge/abac'
 import { useAppStore } from '../../../stores/app.store'
 import {
   useInvoicesInfinite,
@@ -127,6 +128,12 @@ export default function InvoicesPage() {
   const schoolId = useAppStore((s) => s.activeSchoolId)
   const settings = useFinanceSettings()
   const { format, formatCompact } = useCurrency(settings)
+
+  // Mutating invoice controls map to the backend `billing` ABAC resource.
+  // Create/bulk-generate require `create`; issue/cancel/bulk-issue require
+  // `edit`. The API 403s users without these; hiding keeps the UI honest.
+  const canCreateBilling = usePermission('create', 'billing')
+  const canEditBilling = usePermission('edit', 'billing')
 
   const [statusFilter, setStatusFilter] = useState<InvoiceStatusFilter>('')
   const [showGenerateForm, setShowGenerateForm] = useState(false)
@@ -331,7 +338,7 @@ export default function InvoicesPage() {
                   invoiceNumber={invoice.invoiceNumber}
                 />
               )}
-              {invoice.status === 'draft' && (
+              {canEditBilling && invoice.status === 'draft' && (
                 <>
                   <button
                     onClick={() => handleIssue(invoice.id)}
@@ -351,7 +358,7 @@ export default function InvoicesPage() {
                   </button>
                 </>
               )}
-              {(invoice.status === 'issued' || invoice.status === 'overdue') && (
+              {canEditBilling && (invoice.status === 'issued' || invoice.status === 'overdue') && (
                 <button
                   onClick={() => openCancelDialog(invoice.id)}
                   disabled={cancelMutation.isPending}
@@ -366,7 +373,7 @@ export default function InvoicesPage() {
         },
       }),
     ],
-    [navigate, issueMutation.isPending, cancelMutation.isPending]
+    [navigate, issueMutation.isPending, cancelMutation.isPending, canEditBilling]
   )
 
   if (!schoolId) {
@@ -394,24 +401,26 @@ export default function InvoicesPage() {
         title="Invoices"
         subtitle="Generate, issue, and manage student invoices."
         actions={
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => navigate({ to: '/invoices/bulk-generate' })}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
-            >
-              <Users className="w-3.5 h-3.5" />
-              Bulk Generate
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowGenerateForm(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              Generate Invoice
-            </button>
-          </div>
+          canCreateBilling ? (
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => navigate({ to: '/invoices/bulk-generate' })}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
+              >
+                <Users className="w-3.5 h-3.5" />
+                Bulk Generate
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowGenerateForm(true)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                Generate Invoice
+              </button>
+            </div>
+          ) : undefined
         }
       />
 
@@ -503,23 +512,29 @@ export default function InvoicesPage() {
         pagination={{ pageSize: 20 }}
         serverPagination={serverPagination}
         searchPlaceholder="Search by invoice # or student..."
-        bulkActions={[
-          {
-            label: `Issue Selected (${selectedDraftIds.length})`,
-            onClick: () => setShowBulkIssueConfirm(true),
-            icon: <Send className="w-4 h-4" />,
-            variant: 'primary',
-            disabled: selectedDraftIds.length === 0 || bulkIssueMutation.isPending,
-          },
-        ]}
+        bulkActions={
+          canEditBilling
+            ? [
+                {
+                  label: `Issue Selected (${selectedDraftIds.length})`,
+                  onClick: () => setShowBulkIssueConfirm(true),
+                  icon: <Send className="w-4 h-4" />,
+                  variant: 'primary',
+                  disabled: selectedDraftIds.length === 0 || bulkIssueMutation.isPending,
+                },
+              ]
+            : []
+        }
         emptyState={{
           icon: <FileText className="w-10 h-10 text-[rgb(var(--text-tertiary))] opacity-40" />,
           title: 'No invoices found',
           description: 'Generate your first invoice to get started.',
-          action: {
-            label: 'Generate Invoice',
-            onClick: () => setShowGenerateForm(true),
-          },
+          action: canCreateBilling
+            ? {
+                label: 'Generate Invoice',
+                onClick: () => setShowGenerateForm(true),
+              }
+            : undefined,
         }}
         maxHeight="calc(100vh - 24rem)"
       />
