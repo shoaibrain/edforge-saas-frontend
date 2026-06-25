@@ -13,7 +13,7 @@
 
 import { useCallback } from 'react'
 import { useParams, useSearch, useNavigate } from '@tanstack/react-router'
-import { useResourcePermissions } from '@edforge/abac'
+import { useResourcePermissions, usePermission } from '@edforge/abac'
 import { useTranslation } from '@edforge/i18n'
 import { z } from 'zod'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -146,9 +146,15 @@ export function StudentProfilePage() {
   )
   const { t } = useTranslation('academics')
 
-  // ABAC: check student permissions
+  // ABAC: check student permissions. Enroll and add-to-classroom hit DIFFERENT
+  // backend resources than student edit — enroll = enrollment:create, add-to-
+  // classroom = scheduling:edit — so gate them on their own permission, not the
+  // student:edit flag (a VicePrincipal can edit students but not create
+  // enrollments, and would otherwise 403).
   const studentPerms = useResourcePermissions('students')
   const canEdit = !!studentPerms.edit
+  const canEnroll = usePermission('create', 'enrollment')
+  const canAddToSection = usePermission('edit', 'scheduling')
 
   // Actions hook — must be called before any conditional returns (Rules of Hooks)
   const actions = useStudentProfileActions()
@@ -216,7 +222,7 @@ export function StudentProfilePage() {
           <ProfileHeader
             student={student}
             onEdit={canEdit ? actions.openEdit : undefined}
-            onEnroll={canEdit ? actions.openEnroll : undefined}
+            onEnroll={canEnroll ? actions.openEnroll : undefined}
             canEdit={canEdit}
           />
         </div>
@@ -260,8 +266,8 @@ export function StudentProfilePage() {
               {activeTab === 'enrollment' && (
                 <EnrollmentTab
                   student={student}
-                  onEnroll={canEdit ? actions.openEnroll : undefined}
-                  onAddToSection={canEdit ? actions.openAddToSection : undefined}
+                  onEnroll={canEnroll ? actions.openEnroll : undefined}
+                  onAddToSection={canAddToSection ? actions.openAddToSection : undefined}
                 />
               )}
               {activeTab === 'family' && (
@@ -297,30 +303,34 @@ export function StudentProfilePage() {
         </div>
       </div>
 
-      {/* Modals — only rendered when user has edit permission */}
+      {/* Modals — each gated on the permission its action actually requires. */}
+      {canEnroll && (
+        <EnrollExistingStudentModal
+          open={actions.enrollModalOpen}
+          onClose={() => actions.setEnrollModalOpen(false)}
+          student={student}
+        />
+      )}
       {canEdit && (
-        <>
-          <EnrollExistingStudentModal
-            open={actions.enrollModalOpen}
-            onClose={() => actions.setEnrollModalOpen(false)}
-            student={student}
-          />
-          <EditStudentModal
-            open={actions.editModalOpen}
-            onClose={() => actions.setEditModalOpen(false)}
-            student={student}
-          />
-          <AddToSectionModal
-            open={actions.addToSectionModalOpen}
-            onClose={() => actions.setAddToSectionModalOpen(false)}
-            student={student}
-          />
-          <AddGuardianModal
-            open={actions.addGuardianModalOpen}
-            onClose={() => actions.setAddGuardianModalOpen(false)}
-            student={student}
-          />
-        </>
+        <EditStudentModal
+          open={actions.editModalOpen}
+          onClose={() => actions.setEditModalOpen(false)}
+          student={student}
+        />
+      )}
+      {canAddToSection && (
+        <AddToSectionModal
+          open={actions.addToSectionModalOpen}
+          onClose={() => actions.setAddToSectionModalOpen(false)}
+          student={student}
+        />
+      )}
+      {canEdit && (
+        <AddGuardianModal
+          open={actions.addGuardianModalOpen}
+          onClose={() => actions.setAddGuardianModalOpen(false)}
+          student={student}
+        />
       )}
     </div>
   )

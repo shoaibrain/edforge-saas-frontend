@@ -132,7 +132,7 @@ export const ROLE_PERMISSIONS: PermissionMap = {
     dashboard: ['view'],
     students: ['view', 'create', 'edit', 'delete', 'manage'],
     teachers: ['view', 'create', 'edit', 'delete', 'manage'],
-    grades: ['view', 'create', 'edit', 'approve'],
+    grades: ['view', 'create', 'edit', 'delete'],
     gradelevels: ['view', 'create', 'edit', 'delete', 'manage'],
     classes: ['view', 'create', 'edit', 'delete', 'manage'],
     classrooms: ['view', 'create', 'edit', 'delete', 'manage'],

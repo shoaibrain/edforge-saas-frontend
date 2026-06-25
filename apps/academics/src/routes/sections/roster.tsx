@@ -25,6 +25,7 @@ import { z } from 'zod'
 import { toast } from 'sonner'
 import { useSection, useSectionRoster, useEnrollStudent, useRemoveStudent } from '../../hooks/useSections'
 import { useStudents, flattenStudentPages } from '../../hooks/useStudents'
+import { usePermission } from '@edforge/abac'
 import { useActiveSchoolId } from '../../stores/app.store'
 import {
   getCapacityColor,
@@ -171,6 +172,10 @@ export function SectionRosterPage() {
   const { sectionId } = useParams({ from: '/sections/$sectionId/roster' })
   const navigate = useNavigate()
   const schoolId = useActiveSchoolId() || ''
+  // Roster management is an admin action (enroll=scheduling:edit, remove=delete).
+  const canEdit = usePermission('edit', 'scheduling')
+  const canRemove = usePermission('delete', 'scheduling')
+  const canManageRoster = canEdit || canRemove
 
   // Validate sectionId
   const isValidId = useMemo(() => {
@@ -316,6 +321,29 @@ export function SectionRosterPage() {
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Scheduling
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // Read-only roles (Teacher) get a clear notice instead of an enroll/remove UI.
+  if (!canManageRoster) {
+    return (
+      <div className="min-h-full flex items-center justify-center p-6">
+        <div className="text-center max-w-md">
+          <Users className="w-12 h-12 mx-auto text-text-tertiary mb-4" />
+          <h2 className="text-lg font-semibold text-text-primary mb-2">You don't have access to manage this roster</h2>
+          <p className="text-sm text-text-secondary mb-4">
+            Adding or removing students is managed by your principal or school admin.
+          </p>
+          <button
+            type="button"
+            onClick={() => navigate({ to: `/classrooms/${sectionId}` })}
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--action-primary-bg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to classroom
           </button>
         </div>
       </div>

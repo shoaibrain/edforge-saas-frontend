@@ -9,8 +9,9 @@ import { useState, useCallback } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useForm, FormProvider } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowLeft, Loader2 } from 'lucide-react'
+import { ArrowLeft, Loader2, ShieldAlert } from 'lucide-react'
 import type { CreateSectionDto } from '@aibrains/shared-types'
+import { usePermission } from '@edforge/abac'
 import { useActiveSchoolId } from '../../stores/app.store'
 import { useCreateSection } from '../../hooks/useSections'
 import {
@@ -24,6 +25,7 @@ import { ConfirmationDialog } from '../../components/common/ConfirmationDialog'
 export function SectionCreatePage() {
   const navigate = useNavigate()
   const schoolId = useActiveSchoolId() || ''
+  const canCreate = usePermission('create', 'scheduling')
   const createMutation = useCreateSection()
   const [showDiscardDialog, setShowDiscardDialog] = useState(false)
 
@@ -85,6 +87,30 @@ export function SectionCreatePage() {
     ) {
       e.preventDefault()
     }
+  }
+
+  // Deep-link guard — the entry button is already permission-gated, but the
+  // route is directly navigable, so block roles without scheduling:create.
+  if (!canCreate) {
+    return (
+      <div className="min-h-full flex items-center justify-center p-6">
+        <div className="text-center max-w-md">
+          <ShieldAlert className="w-12 h-12 mx-auto text-text-tertiary mb-4" />
+          <h2 className="text-lg font-semibold text-text-primary mb-2">You don't have access to create classrooms</h2>
+          <p className="text-sm text-text-secondary mb-4">
+            Creating classrooms is managed by your principal or school admin.
+          </p>
+          <button
+            type="button"
+            onClick={() => navigate({ to: '/classrooms', search: { tab: undefined } })}
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--action-primary-bg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to classrooms
+          </button>
+        </div>
+      </div>
+    )
   }
 
   return (

@@ -9,9 +9,10 @@ import { useState, useMemo, useCallback, useEffect } from 'react'
 import { useParams, useNavigate } from '@tanstack/react-router'
 import { useForm, FormProvider } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowLeft, Loader2 } from 'lucide-react'
+import { ArrowLeft, Loader2, ShieldAlert } from 'lucide-react'
 import { z } from 'zod'
 import type { UpdateSectionDto } from '@aibrains/shared-types'
+import { usePermission } from '@edforge/abac'
 import { useActiveSchoolId } from '../../stores/app.store'
 import { useSection, useUpdateSection } from '../../hooks/useSections'
 import {
@@ -26,6 +27,7 @@ export function SectionEditPage() {
   const sectionId = params.sectionId || ''
   const navigate = useNavigate()
   const schoolId = useActiveSchoolId() || ''
+  const canEdit = usePermission('edit', 'scheduling')
   const updateMutation = useUpdateSection()
   const [showDiscardDialog, setShowDiscardDialog] = useState(false)
 
@@ -117,6 +119,29 @@ export function SectionEditPage() {
     ) {
       e.preventDefault()
     }
+  }
+
+  // Deep-link guard — entry buttons are gated, but the route is navigable.
+  if (!canEdit) {
+    return (
+      <div className="min-h-full flex items-center justify-center p-6">
+        <div className="text-center max-w-md">
+          <ShieldAlert className="w-12 h-12 mx-auto text-text-tertiary mb-4" />
+          <h2 className="text-lg font-semibold text-text-primary mb-2">You don't have access to edit classrooms</h2>
+          <p className="text-sm text-text-secondary mb-4">
+            Editing classrooms is managed by your principal or school admin.
+          </p>
+          <button
+            type="button"
+            onClick={() => navigate({ to: `/classrooms/${sectionId}` })}
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--action-primary-bg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to classroom
+          </button>
+        </div>
+      </div>
+    )
   }
 
   if (isLoading) {

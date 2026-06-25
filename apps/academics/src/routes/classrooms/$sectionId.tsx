@@ -278,7 +278,7 @@ function SectionGradesTab({ sectionId, section }: { sectionId: string; section: 
         termId={effectiveTermId || ''}
         academicYearId={currentYear.yearId}
         teacherId={section?.primaryTeacherId}
-        disabled={hasAllFinalized || !effectiveTermId || !gradePerms.edit}
+        disabled={hasAllFinalized || !effectiveTermId || !gradePerms.create}
         onAddAssignment={gradePerms.create && effectiveTermId ? () => setShowAssignmentEditor(true) : undefined}
         onViewReportCard={handleViewReportCard}
       />

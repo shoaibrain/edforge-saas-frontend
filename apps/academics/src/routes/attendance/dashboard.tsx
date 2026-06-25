@@ -215,7 +215,7 @@ function TodaySummaryStrip({
   const stats = [
     { label: 'Present', value: summary.present, color: V2.success, sub: `${summary.totalRecorded ?? summary.present} of ${summary.totalStudents} recorded` },
     { label: 'Absent', value: summary.absent, color: V2.danger, sub: pct(summary.absent) },
-    { label: 'Late / Tardy', value: summary.late, color: V2.warning, sub: pct(summary.late) },
+    { label: 'Late', value: summary.late, color: V2.warning, sub: pct(summary.late) },
     { label: 'Excused', value: summary.excused, color: V2.info, sub: pct(summary.excused) },
   ]
 
@@ -291,7 +291,7 @@ function AbsenceBreakdownCard({
   const categories = [
     { label: 'Unexcused', count: breakdown.unexcused, color: V2.danger },
     { label: 'Excused', count: breakdown.excused, color: V2.info },
-    { label: 'Late / Tardy', count: breakdown.late, color: V2.warning },
+    { label: 'Late', count: breakdown.late, color: V2.warning },
     { label: 'Half Day', count: breakdown.halfDay, color: V2.purple },
     { label: 'Remote', count: breakdown.remote, color: V2.success },
   ]

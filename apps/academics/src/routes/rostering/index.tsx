@@ -17,6 +17,7 @@ import { useState, useMemo, useCallback, useRef } from 'react'
 import { Grid3x3, Loader2, AlertTriangle, Check, Plus, Minus, Save } from 'lucide-react'
 import { toast } from 'sonner'
 import { ContextBar, ContextBarYear, ContextBarSep } from '@edforge/ui'
+import { usePermission } from '@edforge/abac'
 import { useActiveSchoolId } from '../../stores/app.store'
 import { useSchoolEnabledGradeOptions } from '../../hooks/useGradeOptions'
 import { useCurrentAcademicYear } from '../../hooks'
@@ -385,6 +386,12 @@ function SummaryBar({
 
 export function BulkRosteringPage() {
   const schoolId = useActiveSchoolId() || ''
+  // Bulk rostering mutates section membership (enroll=scheduling:edit,
+  // remove=scheduling:delete). A view-only role (Teacher) must not be able to
+  // open the matrix and 403 on Apply.
+  const canEdit = usePermission('edit', 'scheduling')
+  const canRemove = usePermission('delete', 'scheduling')
+  const canRoster = canEdit || canRemove
   const { data: currentYear, isLoading: yearLoading } = useCurrentAcademicYear(schoolId)
   // Gate dropdown on profile-load — see EnrollmentTable comment.
   const { options: gradeLevelOptions, isLoading: gradeOptionsLoading } =
@@ -664,6 +671,22 @@ export function BulkRosteringPage() {
         <NoCurrentAcademicYearEmptyState
           secondaryMessage="Set up an academic year in school settings before rostering students."
         />
+      </div>
+    )
+  }
+
+  // Bulk rostering is an admin action — read-only roles get a clear access notice
+  // instead of a matrix whose Apply would 403.
+  if (!canRoster) {
+    return (
+      <div className="p-6">
+        <div className="bg-surface-secondary rounded-xl border border-border-secondary p-12 text-center">
+          <Grid3x3 className="w-12 h-12 mx-auto text-text-tertiary mb-4" />
+          <h4 className="text-lg font-medium text-text-primary mb-2">You don't have access to rostering</h4>
+          <p className="text-text-secondary max-w-md mx-auto">
+            Assigning students to classrooms is managed by your principal or school admin.
+          </p>
+        </div>
       </div>
     )
   }

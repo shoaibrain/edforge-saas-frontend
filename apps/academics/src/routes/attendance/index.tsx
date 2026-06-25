@@ -159,10 +159,10 @@ function CalendarBanner({
       <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
       <div>
         <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
-          Non-Instructional Day
+          No classes today
         </p>
         <p className="text-xs text-[rgb(var(--state-warning-fg))] mt-0.5">
-          {description || `This is a ${eventType} day.`} Attendance cannot be submitted for this date.
+          {description || `This is a ${eventType} day.`} You can't record attendance for this date.
         </p>
       </div>
     </div>
@@ -501,7 +501,7 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
             {activeTab === 'daily-entry' && attendanceModeResolving && (
               <div className="flex items-center justify-center py-16 text-sm text-text-tertiary gap-2">
                 <Loader2 className="w-4 h-4 animate-spin" />
-                Resolving attendance mode…
+                Loading attendance…
               </div>
             )}
 

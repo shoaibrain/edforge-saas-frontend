@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import type { SectionResponseDto, StudentSectionResponseDto } from '@aibrains/shared-types'
 import { TanstackDataTable, createActionsColumn, StatusBadge, type ColumnDef } from '@edforge/ui'
+import { usePermission } from '@edforge/abac'
 import { useSectionRoster, useRemoveStudent } from '../../hooks/useSections'
 import { useActiveSchoolId } from '../../stores/app.store'
 import {
@@ -118,11 +119,13 @@ function CapacityBar({
   max,
   isFull,
   onAddStudents,
+  canAdd,
 }: {
   current: number
   max: number
   isFull: boolean
   onAddStudents: () => void
+  canAdd: boolean
 }) {
   const percent = getCapacityPercent(current, max)
   const barColor = getCapacityColor(current, max)
@@ -140,16 +143,18 @@ function CapacityBar({
           />
         </div>
       </div>
-      <button
-        type="button"
-        onClick={onAddStudents}
-        disabled={isFull}
-        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--text-primary))] bg-[rgb(var(--state-info-bg)/0.18)] hover:bg-[rgb(var(--state-info-bg)/0.26)]  dark:hover:bg-[rgb(var(--state-info-bg)/0.18)] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        aria-label="Add students to section"
-      >
-        <UserPlus className="w-3.5 h-3.5" />
-        Add Students
-      </button>
+      {canAdd && (
+        <button
+          type="button"
+          onClick={onAddStudents}
+          disabled={isFull}
+          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--text-primary))] bg-[rgb(var(--state-info-bg)/0.18)] hover:bg-[rgb(var(--state-info-bg)/0.26)]  dark:hover:bg-[rgb(var(--state-info-bg)/0.18)] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          aria-label="Add students to section"
+        >
+          <UserPlus className="w-3.5 h-3.5" />
+          Add Students
+        </button>
+      )}
     </div>
   )
 }
@@ -160,6 +165,10 @@ function CapacityBar({
 
 export function SectionRoster({ section }: SectionRosterProps) {
   const schoolId = useActiveSchoolId() || ''
+  // Roster management is the backend `scheduling` resource (add=edit, remove=delete).
+  // Teachers hold scheduling[view] only, so hide controls they can't use.
+  const canEdit = usePermission('edit', 'scheduling')
+  const canRemove = usePermission('delete', 'scheduling')
   const [showSelector, setShowSelector] = useState(false)
   const [removeTarget, setRemoveTarget] = useState<StudentSectionResponseDto | null>(null)
 
@@ -187,7 +196,8 @@ export function SectionRoster({ section }: SectionRosterProps) {
 
   // ---- Column Definitions ----
   const columns: ColumnDef<StudentSectionResponseDto, unknown>[] = useMemo(
-    () => [
+    () => {
+      const cols: ColumnDef<StudentSectionResponseDto, unknown>[] = [
       {
         accessorKey: 'studentName',
         header: 'Name',
@@ -248,24 +258,30 @@ export function SectionRoster({ section }: SectionRosterProps) {
           </span>
         ),
       },
-      createActionsColumn<StudentSectionResponseDto>({
-        cell: ({ row }) => {
-          const student = row.original
-          const displayName = student.studentName || student.studentId
-          const isCurrentlyRemoving =
-            removeMutation.isPending &&
-            removeMutation.variables?.studentId === student.studentId
-          return (
-            <RowActions
-              onRemove={() => setRemoveTarget(student)}
-              isRemoving={isCurrentlyRemoving}
-              studentName={displayName}
-            />
-          )
-        },
-      }),
-    ],
-    [removeMutation.isPending, removeMutation.variables?.studentId]
+      ]
+      if (canRemove) {
+        cols.push(
+          createActionsColumn<StudentSectionResponseDto>({
+            cell: ({ row }) => {
+              const student = row.original
+              const displayName = student.studentName || student.studentId
+              const isCurrentlyRemoving =
+                removeMutation.isPending &&
+                removeMutation.variables?.studentId === student.studentId
+              return (
+                <RowActions
+                  onRemove={() => setRemoveTarget(student)}
+                  isRemoving={isCurrentlyRemoving}
+                  studentName={displayName}
+                />
+              )
+            },
+          }),
+        )
+      }
+      return cols
+    },
+    [removeMutation.isPending, removeMutation.variables?.studentId, canRemove]
   )
 
   return (
@@ -297,6 +313,7 @@ export function SectionRoster({ section }: SectionRosterProps) {
         max={section.maxEnrollment}
         isFull={isFull}
         onAddStudents={() => setShowSelector(true)}
+        canAdd={canEdit}
       />
 
       {/* Data Table */}
@@ -311,11 +328,13 @@ export function SectionRoster({ section }: SectionRosterProps) {
         emptyState={{
           icon: <Users className="w-10 h-10" />,
           title: 'No students enrolled yet',
-          description: 'Add students to this section to build your class roster.',
-          action: {
-            label: 'Add Students',
-            onClick: () => setShowSelector(true),
-          },
+          description: 'Add students to this classroom to build your roster.',
+          action: canEdit
+            ? {
+                label: 'Add Students',
+                onClick: () => setShowSelector(true),
+              }
+            : undefined,
         }}
         onRowClick={(_student) => {
           // Row click preserved for future navigation

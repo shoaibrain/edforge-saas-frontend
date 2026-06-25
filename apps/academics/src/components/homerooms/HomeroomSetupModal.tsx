@@ -503,7 +503,7 @@ export function HomeroomSetupModal({
         {enrollmentsIncomplete && rows.length > 0 && !isBusy && (
           <p className="text-xs text-text-tertiary flex items-center gap-1.5">
             <Loader2 className="w-3.5 h-3.5 shrink-0 animate-spin" />
-            Loading enrolled students for auto-roster…
+            Loading students to add automatically…
           </p>
         )}
       </div>
