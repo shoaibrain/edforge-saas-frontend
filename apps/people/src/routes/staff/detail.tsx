@@ -14,6 +14,7 @@ import { useQuery, useQueries } from '@tanstack/react-query'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
 import { Tabs } from '@edforge/ui'
+import { useIsTenantAdmin } from '@edforge/abac'
 import {
     User,
     Mail,
@@ -1478,6 +1479,10 @@ export default function StaffDetailPage() {
     const { staffId } = useParams({ from: '/staff/$staffId' })
     const [activeTab, setActiveTab] = useState<StaffTab>('overview')
     const [isAssignModalOpen, setIsAssignModalOpen] = useState(false)
+    // Staff management (assign-to-school, edit/remove assignments) is
+    // TenantAdmin-only on the backend (@RequireGlobalRole). Hide the actions menu
+    // for everyone else so it doesn't 403.
+    const canManageStaff = useIsTenantAdmin()
 
     // Schools lookup for resolving schoolId → name
     const { schoolMap } = useSchools()
@@ -1592,8 +1597,10 @@ export default function StaffDetailPage() {
                             </div>
                         </div>
 
-                        {/* Actions Menu */}
-                        <StaffActionsDropdown onAssignToSchool={() => setIsAssignModalOpen(true)} />
+                        {/* Actions Menu — tenant admins only (backend staff CRUD is admin-only) */}
+                        {canManageStaff && (
+                            <StaffActionsDropdown onAssignToSchool={() => setIsAssignModalOpen(true)} />
+                        )}
                     </div>
 
                     {/* Tabs — left-aligned (shared Tabs primitive) */}

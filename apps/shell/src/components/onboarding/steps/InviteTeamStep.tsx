@@ -5,6 +5,7 @@
 
 import { useState } from 'react'
 import { Select } from '@edforge/ui'
+import { GLOBAL_ROLE_LABELS } from '@edforge/types'
 import { usersService } from '../../../services/users.service'
 import type { OnboardingStepProps } from '../onboarding.types'
 
@@ -16,15 +17,15 @@ interface Invitee {
 }
 
 const ROLE_OPTIONS = [
-  { value: 'TenantAdmin', label: 'Admin' },
-  { value: 'StandardUser', label: 'Staff' },
+  { value: 'TenantAdmin', label: GLOBAL_ROLE_LABELS.TenantAdmin },
+  { value: 'TenantUser', label: GLOBAL_ROLE_LABELS.TenantUser },
 ]
 
 export function InviteTeamStep({ data, setData, onNext, onBack }: OnboardingStepProps) {
   const [email, setEmail] = useState('')
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
-  const [role, setRole] = useState('StandardUser')
+  const [role, setRole] = useState('TenantUser')
   const [invitees, setInvitees] = useState<Invitee[]>(data.invitees || [])
   const [sending, setSending] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -50,7 +51,7 @@ export function InviteTeamStep({ data, setData, onNext, onBack }: OnboardingStep
     setEmail('')
     setFirstName('')
     setLastName('')
-    setRole('StandardUser')
+    setRole('TenantUser')
   }
 
   const handleRemove = (emailToRemove: string) => {

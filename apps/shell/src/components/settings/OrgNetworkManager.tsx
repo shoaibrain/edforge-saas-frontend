@@ -20,7 +20,7 @@ import {
   AlertTriangle,
 } from 'lucide-react'
 import { Button, Modal, ModalFooter, Select, TanstackDataTable, createActionsColumn, type ColumnDef } from '@edforge/ui'
-import { usePermission } from '@edforge/abac'
+import { useIsTenantAdmin } from '@edforge/abac'
 import type {
   NetworkResponseDto,
   NetworkAssociationResponseDto,
@@ -86,7 +86,7 @@ function MemberPanel({ network }: { network: NetworkResponseDto }) {
   const { data: membersData, isLoading } = useNetworkMembers(network.id)
   const addMemberMutation = useAddNetworkMember()
   const removeMemberMutation = useRemoveNetworkMember()
-  const canManage = usePermission('manage', 'education-organizations')
+  const canManage = useIsTenantAdmin()
 
   const { data: leas } = useLocalEducationAgencies()
   const { data: escs } = useEducationServiceCenters()
@@ -323,7 +323,7 @@ function DeleteNetworkModal({
 // ============================================================================
 
 export function OrgNetworkManager() {
-  const canManage = usePermission('manage', 'education-organizations')
+  const canManage = useIsTenantAdmin()
   const { data: networksData, isLoading } = useNetworks()
   const formModal = useModalState<{ id: string }>()
   const deleteModal = useModalState<NetworkResponseDto>()

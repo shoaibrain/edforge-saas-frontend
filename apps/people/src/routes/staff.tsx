@@ -37,7 +37,7 @@ import {
 } from '@edforge/ui'
 import type { StaffResponseDto } from '@aibrains/shared-types'
 import type { StaffRole, EmploymentStatus } from '@aibrains/shared-types'
-import { usePermission } from '@edforge/abac'
+import { useIsTenantAdmin } from '@edforge/abac'
 import { getRoleI18nKey } from '../components/staff/StaffRoleBadge'
 
 import { usePaginatedQuery, useDebounce, useModalState } from '../hooks'
@@ -82,10 +82,14 @@ export default function StaffPage() {
   const navigate = useNavigate()
   const schoolId = useActiveSchoolId()
 
-  // ABAC permission checks
-  const canCreate = usePermission('create', 'staff')
-  const canEdit = usePermission('edit', 'staff')
-  const canDelete = usePermission('delete', 'staff')
+  // Staff records are managed by tenant admins only — the backend staff CRUD
+  // routes are @RequireGlobalRole('TenantAdmin'), not permission-gated. A
+  // Principal (who holds staff:* in the FE matrix) would otherwise see Add/Edit
+  // and 403. Gate on the account-level role to match the API.
+  const canManageStaff = useIsTenantAdmin()
+  const canCreate = canManageStaff
+  const canEdit = canManageStaff
+  const canDelete = canManageStaff
 
   // Search state with debounce
   const [search, setSearch] = useState('')

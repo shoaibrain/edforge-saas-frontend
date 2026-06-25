@@ -7,7 +7,7 @@
  * what actions a user can perform in each school context.
  */
 
-export type GlobalRole = 'TenantAdmin' | 'StandardUser'
+export type GlobalRole = 'TenantAdmin' | 'TenantUser'
 
 /**
  * School-level roles that determine permissions within a specific school.
@@ -72,6 +72,47 @@ export interface UserIdentity {
   childrenIds?: string[]
   /** Avatar URL */
   avatarUrl?: string
+}
+
+/**
+ * Canonical, user-facing labels for the account-level global role.
+ * "Member" (not "Staff"/"User"/"Standard User") avoids colliding with the
+ * school-scoped `Staff` role and reads cleanly to a non-technical operator.
+ */
+export const GLOBAL_ROLE_LABELS: Record<GlobalRole, string> = {
+  TenantAdmin: 'Admin',
+  TenantUser: 'Member',
+}
+
+/**
+ * Canonical, user-facing labels for school-scoped roles.
+ */
+export const SCHOOL_ROLE_LABELS: Record<SchoolRole, string> = {
+  Principal: 'Principal',
+  VicePrincipal: 'Vice Principal',
+  Teacher: 'Teacher',
+  Accountant: 'Accountant',
+  Counselor: 'Counselor',
+  Nurse: 'Nurse',
+  Staff: 'Staff',
+  Student: 'Student',
+  Parent: 'Parent',
+}
+
+/**
+ * The role label to show a user. Prefers the school-scoped role for the active
+ * school (the persona that matches what they can actually do on this screen),
+ * and falls back to the account-level global role. Never surfaces a raw enum
+ * token like "TenantUser" to the UI.
+ */
+export function getDisplayRole(
+  user: Pick<UserIdentity, 'globalRole' | 'assignments'> | null,
+  activeSchoolId?: string | null,
+): string {
+  if (!user) return ''
+  const schoolRole = activeSchoolId ? user.assignments?.[activeSchoolId] : undefined
+  if (schoolRole && SCHOOL_ROLE_LABELS[schoolRole]) return SCHOOL_ROLE_LABELS[schoolRole]
+  return GLOBAL_ROLE_LABELS[user.globalRole] ?? user.globalRole
 }
 
 /**

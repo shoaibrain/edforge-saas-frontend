@@ -19,6 +19,7 @@ import {
   Check
 } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { GLOBAL_ROLE_LABELS, type GlobalRole } from '@edforge/types'
 import { Button } from '@edforge/ui'
 import { TextField, SelectField } from '@/components/forms/fields'
 import { useAuthStore } from '@/stores/auth.store'
@@ -360,7 +361,10 @@ export default function AccountPage() {
     user?.name || 
     'User'
   
-  const displayRole = userProfile?.globalRole || user?.globalRole || 'User'
+  const rawRole = userProfile?.globalRole || user?.globalRole
+  const displayRole = rawRole
+    ? (GLOBAL_ROLE_LABELS[rawRole as GlobalRole] ?? rawRole)
+    : GLOBAL_ROLE_LABELS.TenantUser
 
   // Loading state
   if (isLoading) {

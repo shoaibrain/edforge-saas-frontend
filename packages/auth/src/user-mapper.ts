@@ -16,7 +16,7 @@ function mapGlobalRole(cognitoRole: string): GlobalRole {
   if (cognitoRole === 'TenantAdmin') {
     return 'TenantAdmin'
   }
-  return 'StandardUser'
+  return 'TenantUser'
 }
 
 /**

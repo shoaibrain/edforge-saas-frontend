@@ -12,6 +12,7 @@ import { useThemeStore } from '../../stores/theme.store'
 import { useHomeStore } from '../../stores/home.store'
 import { useAppStore } from '../../stores/app.store'
 import { Avatar } from '@edforge/ui'
+import { useDisplayRole } from '@edforge/abac'
 import { useTranslation } from '@edforge/i18n'
 import { getGreeting } from '../../lib/greeting'
 import { adToBS, formatBSLong } from '@edforge/date-utils'
@@ -196,6 +197,7 @@ function UserMenu() {
   const user = useAuthStore((s) => s.user)
   const logout = useAuthStore((s) => s.logout)
   const navigate = useNavigate()
+  const displayRole = useDisplayRole()
   const { t: tNav } = useTranslation('nav')
 
   if (!user) return null
@@ -234,7 +236,7 @@ function UserMenu() {
                 </p>
                 <p className="text-xs text-[rgb(var(--text-tertiary))] truncate">{user.email}</p>
                 <span className="inline-block mt-1.5 px-2 py-0.5 text-xs font-semibold rounded-full bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]  ">
-                  {user.globalRole}
+                  {displayRole}
                 </span>
               </div>
             </div>

@@ -18,7 +18,7 @@ import { useAuthStore } from '@/stores/auth.store'
 import { useAppStore } from '@/stores/app.store'
 import { can } from '@edforge/abac'
 import { ROLE_PERMISSIONS } from '@edforge/abac'
-import type { SchoolRole } from '@edforge/types'
+import { GLOBAL_ROLE_LABELS, type GlobalRole, type SchoolRole } from '@edforge/types'
 import { usersService } from '@/services/users.service'
 import type { UserResponseDto } from '@/services/users.service'
 import AssignUserModal from '@/components/modals/AssignUserModal'
@@ -299,7 +299,7 @@ export default function RBACSecurityPage() {
             }`}
           >
             <Shield className="w-3 h-3" />
-            {isAdmin ? 'Tenant Admin' : 'Standard User'}
+            {GLOBAL_ROLE_LABELS[row.original.globalRole as GlobalRole] ?? row.original.globalRole}
           </span>
         )
       },

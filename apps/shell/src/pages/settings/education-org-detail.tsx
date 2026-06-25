@@ -22,7 +22,7 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import { Button } from '@edforge/ui'
-import { usePermission } from '@edforge/abac'
+import { useIsTenantAdmin } from '@edforge/abac'
 import {
   useStateEducationAgency,
   useLocalEducationAgency,
@@ -186,7 +186,7 @@ export default function EducationOrgDetailPage() {
   const orgId = params.orgId || ''
 
   const [activeTab, setActiveTab] = useState<DetailTab>('overview')
-  const canManage = usePermission('manage', 'education-organizations')
+  const canManage = useIsTenantAdmin()
 
   // Modal state for edit forms
   const seaModal = useModalState<null>()

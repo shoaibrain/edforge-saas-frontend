@@ -250,7 +250,7 @@ export function ShellProvider({ children }: ShellProviderProps) {
       return schoolsList
     }
 
-    // StandardUser only sees assigned schools
+    // TenantUser only sees assigned schools
     const assignedSchoolIds = Object.keys(user.assignments)
     return schoolsList.filter((s) => assignedSchoolIds.includes(s.id))
   }, [user, effectiveSchools])

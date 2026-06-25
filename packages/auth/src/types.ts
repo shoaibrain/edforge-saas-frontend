@@ -41,7 +41,7 @@ export interface CognitoIdTokenPayload {
   'custom:tenantName': string
   /** Tenant subscription tier (BASIC, PROFESSIONAL, ENTERPRISE) */
   'custom:tenantTier': string
-  /** Global role: TenantAdmin or StandardUser */
+  /** Global role: TenantAdmin or TenantUser */
   'custom:userRole': string
   
   // Standard JWT claims

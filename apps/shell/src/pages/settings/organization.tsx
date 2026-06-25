@@ -17,7 +17,7 @@ import {
   AlertTriangle,
 } from 'lucide-react'
 import { Button, Modal, ModalFooter } from '@edforge/ui'
-import { usePermission } from '@edforge/abac'
+import { useIsTenantAdmin } from '@edforge/abac'
 import { useQueryClient, useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { extractApiErrorMessage } from '@edforge/api-client'
@@ -195,7 +195,7 @@ function DeleteEdOrgModal({
 // ============================================================================
 
 function OrgEmptyState({ onSetupSea }: { onSetupSea?: () => void }) {
-  const canManage = usePermission('manage', 'education-organizations')
+  const canManage = useIsTenantAdmin()
 
   return (
     <div className="relative min-h-[calc(100vh-300px)] flex flex-col">
@@ -307,7 +307,7 @@ function OrgEmptyState({ onSetupSea }: { onSetupSea?: () => void }) {
 
 export default function OrganizationSettingsPage() {
   const [activeTab, setActiveTab] = useState<TabId>('hierarchy')
-  const canManage = usePermission('manage', 'education-organizations')
+  const canManage = useIsTenantAdmin()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [showAllSchoolsManager, setShowAllSchoolsManager] = useState(false)

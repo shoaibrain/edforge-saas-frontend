@@ -12,7 +12,7 @@ import {
   ArrowRight,
 } from 'lucide-react'
 import { Button } from '@edforge/ui'
-import { usePermission } from '@edforge/abac'
+import { useIsTenantAdmin } from '@edforge/abac'
 import { cn } from '@/lib/utils'
 import type { HierarchyNode } from '@aibrains/shared-types'
 import { SchoolAssignmentManager } from './SchoolAssignmentManager'
@@ -27,7 +27,7 @@ export interface OrphanedSchoolsBannerProps {
 
 export function OrphanedSchoolsBanner({ orphanedSchools }: OrphanedSchoolsBannerProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const canManage = usePermission('manage', 'education-organizations')
+  const canManage = useIsTenantAdmin()
 
   if (orphanedSchools.length === 0) return null
 

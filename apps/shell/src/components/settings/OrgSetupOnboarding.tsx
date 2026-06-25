@@ -17,7 +17,7 @@ import {
   X,
   Sparkles,
 } from 'lucide-react'
-import { usePermission } from '@edforge/abac'
+import { useIsTenantAdmin } from '@edforge/abac'
 import { useStateEducationAgency, useLocalEducationAgencies } from '@/hooks/useEducationOrgs'
 
 // ============================================================================
@@ -154,7 +154,7 @@ export function OrgSetupOnboarding({
   onCreateLea,
   onAddSchool,
 }: OrgSetupOnboardingProps) {
-  const canManage = usePermission('manage', 'education-organizations')
+  const canManage = useIsTenantAdmin()
   const [dismissed, setDismissed] = useState(isOnboardingDismissed)
 
   const { data: sea } = useStateEducationAgency()

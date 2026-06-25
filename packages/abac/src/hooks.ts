@@ -6,7 +6,7 @@
  */
 
 import { createContext, useContext, useMemo } from 'react'
-import type { UserIdentity } from '@edforge/types'
+import { getDisplayRole, type UserIdentity } from '@edforge/types'
 import {
   can,
   canAccess,
@@ -35,6 +35,34 @@ function useABACContext(): ABACContextValue {
     throw new Error('useABACContext must be used within an ABACProvider')
   }
   return context
+}
+
+/**
+ * Hook to read the current authenticated user (or null).
+ * Use when a control is governed by the account-level globalRole rather than a
+ * school-scoped ABAC permission (e.g. tenant-admin-only surfaces).
+ */
+export function useCurrentUser(): UserIdentity | null {
+  return useABACContext().user
+}
+
+/**
+ * Hook: is the current user a tenant administrator?
+ * The backend guards some surfaces (staff CRUD, org structure, workspace
+ * settings) with `@RequireGlobalRole('TenantAdmin')` rather than a permission,
+ * so the UI gates them on this rather than a `usePermission` resource.
+ */
+export function useIsTenantAdmin(): boolean {
+  return useABACContext().user?.globalRole === 'TenantAdmin'
+}
+
+/**
+ * Hook: the user-facing role label for the current user, scoped to the active
+ * school (so a teacher reads "Teacher", not the account-level "Member").
+ */
+export function useDisplayRole(): string {
+  const { user, activeSchoolId } = useABACContext()
+  return useMemo(() => getDisplayRole(user, activeSchoolId), [user, activeSchoolId])
 }
 
 // ============================================================================

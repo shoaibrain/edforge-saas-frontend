@@ -38,7 +38,7 @@ export function can(
     return true
   }
 
-  // For StandardUsers, we need a school context
+  // For TenantUsers, we need a school context
   const targetSchoolId = schoolId
   if (!targetSchoolId) {
     // No school context - can only check if user has ANY school with permission

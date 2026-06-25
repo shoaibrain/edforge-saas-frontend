@@ -4,8 +4,12 @@
  * Defines navigation items for each module/context with ABAC permissions.
  * The sidebar dynamically renders items based on the active module and user permissions.
  * 
- * Role-Based Navigation:
- * - Administrators (TenantAdmin, Principal, Staff, Accountant) see the full admin navigation
+ * Role-Based Navigation (every item is ABAC permission-gated; roles below are
+ * the typical personas, not a hardcoded allow-list):
+ * - Admins / Principals see the full admin navigation; other school roles
+ *   (Accountant, Counselor, Nurse, Staff) see only the items their permissions
+ *   allow. NOTE: "Staff" here is the school-scoped role — distinct from the
+ *   account-level role labelled "Member" (TenantUser).
  * - Teachers see educator-focused navigation
  * - Students see student portal navigation (grades, schedule, assignments)
  * - Parents see parent portal navigation (children's data, fees)

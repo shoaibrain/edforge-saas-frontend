@@ -14,7 +14,7 @@ import type { SchoolRole, UserIdentity } from '@edforge/types'
 
 // Helper to create a mock user matching UserIdentity interface
 function mockUser(
-  globalRole: 'TenantAdmin' | 'StandardUser',
+  globalRole: 'TenantAdmin' | 'TenantUser',
   assignments: Record<string, SchoolRole> = {},
 ): UserIdentity {
   return {
@@ -40,7 +40,7 @@ describe('ABAC Engine', () => {
     })
 
     it('should allow Principal to view grades at their school', () => {
-      const user = mockUser('StandardUser', { 'school-1': 'Principal' })
+      const user = mockUser('TenantUser', { 'school-1': 'Principal' })
       expect(
         can(user, { action: 'view', resource: 'grades', schoolId: 'school-1' }),
       ).toBe(true)
@@ -54,7 +54,7 @@ describe('ABAC Engine', () => {
     })
 
     it('should allow Principal to view + configure branding at their school', () => {
-      const user = mockUser('StandardUser', { 'school-1': 'Principal' })
+      const user = mockUser('TenantUser', { 'school-1': 'Principal' })
       expect(
         can(user, { action: 'view', resource: 'branding', schoolId: 'school-1' }),
       ).toBe(true)
@@ -67,7 +67,7 @@ describe('ABAC Engine', () => {
       // Teacher / Accountant / Counselor / Student / Parent / Staff / Nurse
       // none have a branding grant. Spot-check a representative subset.
       for (const role of ['Teacher', 'Accountant', 'Counselor', 'Student'] as const) {
-        const user = mockUser('StandardUser', { 'school-1': role })
+        const user = mockUser('TenantUser', { 'school-1': role })
         expect(
           can(user, { action: 'view', resource: 'branding', schoolId: 'school-1' }),
         ).toBe(false)
@@ -78,60 +78,60 @@ describe('ABAC Engine', () => {
     })
 
     it('should deny Principal from configuring branding at a school they are NOT assigned to', () => {
-      const user = mockUser('StandardUser', { 'school-1': 'Principal' })
+      const user = mockUser('TenantUser', { 'school-1': 'Principal' })
       expect(
         can(user, { action: 'configure', resource: 'branding', schoolId: 'school-2' }),
       ).toBe(false)
     })
 
     it('should deny Teacher from deleting students', () => {
-      const user = mockUser('StandardUser', { 'school-1': 'Teacher' })
+      const user = mockUser('TenantUser', { 'school-1': 'Teacher' })
       expect(
         can(user, { action: 'delete', resource: 'students', schoolId: 'school-1' }),
       ).toBe(false)
     })
 
     it('should allow Teacher to edit grades', () => {
-      const user = mockUser('StandardUser', { 'school-1': 'Teacher' })
+      const user = mockUser('TenantUser', { 'school-1': 'Teacher' })
       expect(
         can(user, { action: 'edit', resource: 'grades', schoolId: 'school-1' }),
       ).toBe(true)
     })
 
     it('should deny when user has no role at the specified school', () => {
-      const user = mockUser('StandardUser', { 'school-1': 'Teacher' })
+      const user = mockUser('TenantUser', { 'school-1': 'Teacher' })
       expect(
         can(user, { action: 'view', resource: 'grades', schoolId: 'school-2' }),
       ).toBe(false)
     })
 
     it('should check all assignments when no schoolId is provided', () => {
-      const user = mockUser('StandardUser', { 'school-1': 'Principal' })
+      const user = mockUser('TenantUser', { 'school-1': 'Principal' })
       // Without schoolId, the engine checks across all school assignments
       expect(can(user, { action: 'view', resource: 'grades' })).toBe(true)
     })
 
     it('should deny when user has no assignments and no schoolId', () => {
-      const user = mockUser('StandardUser', {})
+      const user = mockUser('TenantUser', {})
       expect(can(user, { action: 'view', resource: 'grades' })).toBe(false)
     })
 
     it('should deny Student from creating grades', () => {
-      const user = mockUser('StandardUser', { 'school-1': 'Student' })
+      const user = mockUser('TenantUser', { 'school-1': 'Student' })
       expect(
         can(user, { action: 'create', resource: 'grades', schoolId: 'school-1' }),
       ).toBe(false)
     })
 
     it('should allow Parent to view parent-portal:grades', () => {
-      const user = mockUser('StandardUser', { 'school-1': 'Parent' })
+      const user = mockUser('TenantUser', { 'school-1': 'Parent' })
       expect(
         can(user, { action: 'view', resource: 'parent-portal:grades', schoolId: 'school-1' }),
       ).toBe(true)
     })
 
     it('should deny for unknown resource', () => {
-      const user = mockUser('StandardUser', { 'school-1': 'Principal' })
+      const user = mockUser('TenantUser', { 'school-1': 'Principal' })
       expect(
         can(user, { action: 'view', resource: 'nonexistent-resource' as any, schoolId: 'school-1' }),
       ).toBe(false)
@@ -144,12 +144,12 @@ describe('ABAC Engine', () => {
 
   describe('canAccess()', () => {
     it('should return true when user can view a resource', () => {
-      const user = mockUser('StandardUser', { 'school-1': 'Teacher' })
+      const user = mockUser('TenantUser', { 'school-1': 'Teacher' })
       expect(canAccess(user, 'attendance', 'school-1')).toBe(true)
     })
 
     it('should return false for resource user has no access to', () => {
-      const user = mockUser('StandardUser', { 'school-1': 'Student' })
+      const user = mockUser('TenantUser', { 'school-1': 'Student' })
       expect(canAccess(user, 'billing', 'school-1')).toBe(false)
     })
 
@@ -159,7 +159,7 @@ describe('ABAC Engine', () => {
     })
 
     it('should return false for user with no assignments', () => {
-      const user = mockUser('StandardUser', {})
+      const user = mockUser('TenantUser', {})
       expect(canAccess(user, 'grades', 'school-1')).toBe(false)
     })
   })
@@ -178,7 +178,7 @@ describe('ABAC Engine', () => {
     })
 
     it('should return correct actions for Teacher on grades', () => {
-      const user = mockUser('StandardUser', { 'school-1': 'Teacher' })
+      const user = mockUser('TenantUser', { 'school-1': 'Teacher' })
       const perms = getPermissions(user, 'grades', 'school-1')
       expect(perms).toEqual(expect.arrayContaining(['view', 'create', 'edit']))
       expect(perms).not.toContain('delete')
@@ -186,13 +186,13 @@ describe('ABAC Engine', () => {
     })
 
     it('should return empty array for unknown resource', () => {
-      const user = mockUser('StandardUser', { 'school-1': 'Teacher' })
+      const user = mockUser('TenantUser', { 'school-1': 'Teacher' })
       const perms = getPermissions(user, 'nonexistent' as any, 'school-1')
       expect(perms).toEqual([])
     })
 
     it('should return empty array when user has no role at school', () => {
-      const user = mockUser('StandardUser', {})
+      const user = mockUser('TenantUser', {})
       const perms = getPermissions(user, 'grades', 'school-1')
       expect(perms).toEqual([])
     })

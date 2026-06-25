@@ -44,7 +44,7 @@ const PRINCIPAL_USER: UserIdentity = {
   id: 'u-principal',
   email: 'principal@example.test',
   name: 'Pat Principal',
-  globalRole: 'StandardUser',
+  globalRole: 'TenantUser',
   tenantId: 'tenant-1',
   assignments: { [SCHOOL_ID]: 'Principal' },
 }
@@ -53,7 +53,7 @@ const TEACHER_USER: UserIdentity = {
   id: 'u-teacher',
   email: 'teach@example.test',
   name: 'Terri Teacher',
-  globalRole: 'StandardUser',
+  globalRole: 'TenantUser',
   tenantId: 'tenant-1',
   assignments: { [SCHOOL_ID]: 'Teacher' },
 }

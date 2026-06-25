@@ -510,6 +510,11 @@ export default function WorkspaceSettingsPage() {
     return <AccessDenied message="You don't have permission to view workspace settings." />
   }
 
+  // Workspace settings are editable by tenant admins only — the backend PATCH is
+  // @RequireGlobalRole('TenantAdmin'). Non-admins may VIEW (gate above) but the
+  // inputs are read-only and the Save bar is hidden so they never hit a 403.
+  const canEditTenant = user.globalRole === 'TenantAdmin'
+
   // Loading state
   if (isLoading) {
     return (
@@ -662,7 +667,7 @@ export default function WorkspaceSettingsPage() {
             <WorkspaceSelect
               value={displaySettings.regional.defaultTimezone}
               onChange={(value) => updateField('regional', 'defaultTimezone', value)}
-              disabled={lkTimezone.locked}
+              disabled={!canEditTenant || lkTimezone.locked}
               options={constrainOptionsByArchetype(TIMEZONE_OPTIONS, 'timezone', { archetype, country, current: displaySettings.regional.defaultTimezone })}
             />
           </SettingsFieldRow>
@@ -671,7 +676,7 @@ export default function WorkspaceSettingsPage() {
             <WorkspaceSelect
               value={displaySettings.regional.defaultLocale}
               onChange={(value) => updateField('regional', 'defaultLocale', value)}
-              disabled={lkLocale.locked}
+              disabled={!canEditTenant || lkLocale.locked}
               options={LOCALE_OPTIONS}
             />
           </SettingsFieldRow>
@@ -680,7 +685,7 @@ export default function WorkspaceSettingsPage() {
             <WorkspaceSelect
               value={displaySettings.regional.defaultDateFormat}
               onChange={(value) => updateField('regional', 'defaultDateFormat', value)}
-              disabled={lkDateFormat.locked}
+              disabled={!canEditTenant || lkDateFormat.locked}
               options={DATE_FORMAT_OPTIONS}
             />
           </SettingsFieldRow>
@@ -689,7 +694,7 @@ export default function WorkspaceSettingsPage() {
             <WorkspaceSelect
               value={displaySettings.regional.defaultTimeFormat}
               onChange={(value) => updateField('regional', 'defaultTimeFormat', value)}
-              disabled={lkTimeFormat.locked}
+              disabled={!canEditTenant || lkTimeFormat.locked}
               options={TIME_FORMAT_OPTIONS}
             />
           </SettingsFieldRow>
@@ -698,7 +703,7 @@ export default function WorkspaceSettingsPage() {
             <WorkspaceSelect
               value={displaySettings.regional.defaultWeekStartsOn}
               onChange={(value) => updateField('regional', 'defaultWeekStartsOn', value)}
-              disabled={lkWeekStartsOn.locked}
+              disabled={!canEditTenant || lkWeekStartsOn.locked}
               options={WEEK_START_OPTIONS}
             />
           </SettingsFieldRow>
@@ -707,7 +712,7 @@ export default function WorkspaceSettingsPage() {
             <WorkspaceSelect
               value={displaySettings.regional.defaultCurrency}
               onChange={(value) => updateField('regional', 'defaultCurrency', value)}
-              disabled={lkCurrency.locked}
+              disabled={!canEditTenant || lkCurrency.locked}
               options={constrainOptionsByArchetype(CURRENCY_OPTIONS, 'currency', { archetype, country, current: displaySettings.regional.defaultCurrency })}
             />
           </SettingsFieldRow>
@@ -716,7 +721,7 @@ export default function WorkspaceSettingsPage() {
             <WorkspaceSelect
               value={displaySettings.regional.defaultCalendarSystem}
               onChange={(value) => updateField('regional', 'defaultCalendarSystem', value)}
-              disabled={lkCalendarSystem.locked}
+              disabled={!canEditTenant || lkCalendarSystem.locked}
               options={constrainOptionsByArchetype(CALENDAR_SYSTEM_OPTIONS, 'calendarSystem', { archetype, country, current: displaySettings.regional.defaultCalendarSystem })}
             />
           </SettingsFieldRow>
@@ -726,7 +731,7 @@ export default function WorkspaceSettingsPage() {
               <Switch
                 checked={displaySettings.regional.enableDualDateDisplay}
                 onChange={(checked) => updateField('regional', 'enableDualDateDisplay', checked)}
-                disabled={lkDualDate.locked}
+                disabled={!canEditTenant || lkDualDate.locked}
               />
             </SettingsFieldRow>
           )}
@@ -735,7 +740,7 @@ export default function WorkspaceSettingsPage() {
             <WorkspaceSelect
               value={displaySettings.regional.defaultNumberFormat}
               onChange={(value) => updateField('regional', 'defaultNumberFormat', value)}
-              disabled={lkNumberFormat.locked}
+              disabled={!canEditTenant || lkNumberFormat.locked}
               options={NUMBER_FORMAT_OPTIONS}
             />
           </SettingsFieldRow>
@@ -817,13 +822,15 @@ export default function WorkspaceSettingsPage() {
         </motion.div>
       </motion.div>
 
-      {/* Floating Save Bar */}
-      <UnsavedChangesBar
-        isDirty={isDirty}
-        onReset={handleReset}
-        onSave={handleSave}
-        isSaving={updateMutation.isPending}
-      />
+      {/* Floating Save Bar — tenant admins only (backend PATCH is admin-only) */}
+      {canEditTenant && (
+        <UnsavedChangesBar
+          isDirty={isDirty}
+          onReset={handleReset}
+          onSave={handleSave}
+          isSaving={updateMutation.isPending}
+        />
+      )}
     </div>
   )
 }

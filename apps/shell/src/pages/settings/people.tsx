@@ -32,7 +32,7 @@ import { useAppStore } from '@/stores/app.store'
 import { can } from '@edforge/abac'
 import { useUsers, useChangeGlobalRole, useUpdateUserStatus, useDeleteUser } from '@/hooks/useUsers'
 import type { UserResponseDto, ListUsersParams } from '@/services/users.service'
-import type { GlobalRole } from '@edforge/types'
+import { GLOBAL_ROLE_LABELS, type GlobalRole } from '@edforge/types'
 import {
   SettingsPageHeader,
   fadeInUp,
@@ -44,8 +44,8 @@ import {
 // ============================================================================
 
 const ROLE_OPTIONS: { value: GlobalRole; label: string }[] = [
-  { value: 'TenantAdmin', label: 'Tenant Admin' },
-  { value: 'StandardUser', label: 'Standard User' },
+  { value: 'TenantAdmin', label: GLOBAL_ROLE_LABELS.TenantAdmin },
+  { value: 'TenantUser', label: GLOBAL_ROLE_LABELS.TenantUser },
 ]
 
 const STATUS_OPTIONS = [
@@ -459,7 +459,7 @@ export default function PeopleSettingsPage() {
         return (
           <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${badge.bg} ${badge.text}`}>
             <Shield className="w-3 h-3" />
-            {u.globalRole === 'TenantAdmin' ? 'Admin' : 'User'}
+            {GLOBAL_ROLE_LABELS[u.globalRole] ?? u.globalRole}
           </span>
         )
       },

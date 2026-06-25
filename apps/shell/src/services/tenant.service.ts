@@ -42,7 +42,7 @@ export interface UserProfile {
   displayName?: string
   tenantId: string
   tenantName: string
-  globalRole: 'TenantAdmin' | 'StandardUser'
+  globalRole: 'TenantAdmin' | 'TenantUser'
   assignments: SchoolAssignment[]
   createdAt: string
   updatedAt: string

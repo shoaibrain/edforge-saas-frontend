@@ -452,7 +452,9 @@ export async function changeGlobalRole(
   userId: string,
   newRole: GlobalRole
 ): Promise<{ userId: string; previousRole: string; newRole: string; sessionsRevoked: number }> {
-  return apiPatch(`/users/${userId}/global-role`, { newRole })
+  // Backend schema is { globalRole } (changeGlobalRoleSchema); sending { newRole }
+  // silently fails validation (400). Field name must match.
+  return apiPatch(`/users/${userId}/global-role`, { globalRole: newRole })
 }
 
 /**
