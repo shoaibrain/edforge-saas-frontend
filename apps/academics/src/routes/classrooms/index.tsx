@@ -183,7 +183,7 @@ function OverviewTab() {
       <WidgetErrorBoundaryV2 fallbackMessage="Failed to load statistics">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <StatCard
-            label="Total Sections"
+            label="Total Classrooms"
             value={String(total ?? stats.totalSections)}
             icon={LayoutGrid}
             accentColor="rgb(var(--accent-academics)/0.1)"
@@ -199,7 +199,7 @@ function OverviewTab() {
             accentColor="rgb(var(--accent-enrollment)/0.1)"
             iconColor="rgb(var(--accent-enrollment))"
             barColor="rgb(var(--accent-enrollment))"
-            hint="across all sections"
+            hint="across all classrooms"
             loading={isLoading}
           />
           <StatCard
@@ -372,7 +372,7 @@ function GradebookTab() {
       <div className="flex items-center gap-3 flex-wrap">
         {!sectionsLoading && sections.length === 0 ? (
           <div className="px-3 py-2 text-sm text-text-tertiary bg-surface-secondary border border-border-secondary rounded-lg min-w-64">
-            No sections assigned. Contact your administrator.
+            No classrooms assigned. Contact your administrator.
           </div>
         ) : (
           <Select
@@ -484,8 +484,8 @@ function GradebookTab() {
       {!selectedSectionId ? (
         <div className="bg-surface-secondary rounded-xl border border-border-secondary p-12 text-center">
           <GraduationCap className="w-12 h-12 mx-auto text-text-tertiary mb-4" />
-          <h4 className="text-lg font-medium text-text-primary mb-2">Select a Class Section</h4>
-          <p className="text-text-secondary max-w-md mx-auto">Choose a section from the dropdown to view and manage student grades.</p>
+          <h4 className="text-lg font-medium text-text-primary mb-2">Select a classroom</h4>
+          <p className="text-text-secondary max-w-md mx-auto">Choose a classroom from the dropdown to view and manage student grades.</p>
         </div>
       ) : (
         <GradebookGrid
@@ -601,7 +601,7 @@ function ContextBanner({
     if (activeTab === 'overview') {
       return (
         <>
-          <em className="not-italic text-[rgb(var(--accent-academics-text))]">{overviewStats.total} active sections</em>
+          <em className="not-italic text-[rgb(var(--accent-academics-text))]">{overviewStats.total} active classrooms</em>
           {' '}across{' '}
           <em className="not-italic text-[rgb(var(--accent-academics-text))]">{overviewStats.courses} courses</em>
           {' '}&mdash;{' '}

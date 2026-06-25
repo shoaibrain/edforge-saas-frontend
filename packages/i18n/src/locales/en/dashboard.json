@@ -89,7 +89,7 @@
     "refresh": "Refresh",
     "kpi": {
       "studentsEnrolled": "Students enrolled",
-      "activeSections": "Active sections",
+      "activeSections": "Active classrooms",
       "todaysAttendance": "Today's attendance",
       "outstandingFees": "Outstanding fees",
       "thisAcademicYear": "this academic year",
@@ -109,11 +109,11 @@
     "attendance": {
       "classroomAttendance": "Classroom attendance",
       "todayRate": "{{rate}}% today",
-      "sectionsTotal": "{{count}} section total",
-      "sectionsTotal_plural": "{{count}} sections total",
+      "sectionsTotal": "{{count}} classroom total",
+      "sectionsTotal_plural": "{{count}} classrooms total",
       "recorded": "{{taken}}/{{total}} recorded",
       "overallRate": "{{rate}}% overall",
-      "section": "Section",
+      "section": "Classroom",
       "students": "Students",
       "recordedCol": "Recorded",
       "rate": "Rate",
@@ -121,10 +121,10 @@
       "taken": "Taken",
       "partial": "Partial",
       "pending": "Pending",
-      "noSectionsToday": "No sections scheduled today",
+      "noSectionsToday": "No classrooms scheduled today",
       "noAcademicYear": "No active academic year.",
       "setupAcademicYear": "Set up an academic year in Settings",
-      "captionPrefix": "Today's classroom attendance status by section."
+      "captionPrefix": "Today's attendance status by classroom."
     },
     "trend": {
       "attendanceTrend": "Attendance trend",
@@ -151,14 +151,14 @@
       "noActivity": "No recent activity"
     },
     "teacher": {
-      "mySections": "My Sections",
+      "mySections": "My Classrooms",
       "totalStudents": "Total Students",
-      "assignedClasses": "assigned classes",
-      "acrossAllSections": "across all sections",
+      "assignedClasses": "assigned classrooms",
+      "acrossAllSections": "across all classrooms",
       "completionRate": "completion rate",
       "viewAll": "View all",
-      "noSectionsAssigned": "No sections assigned",
-      "contactAdmin": "Contact your administrator to be assigned to class sections.",
+      "noSectionsAssigned": "No classrooms assigned",
+      "contactAdmin": "Ask your school admin to assign you to a classroom.",
       "takeAttendance": "Take Attendance",
       "enterGrades": "Enter Grades"
     },
@@ -178,7 +178,7 @@
       "unableToLoadKpi": "Unable to load KPI data",
       "unableToLoadInsights": "Unable to load insights",
       "unableToLoadDetails": "Unable to load details",
-      "unableToLoadSections": "Unable to load sections",
+      "unableToLoadSections": "Unable to load classrooms",
       "unableToLoadAttendance": "Unable to load attendance data",
       "unableToLoadDashboard": "Unable to load dashboard",
       "somethingWentWrong": "Something went wrong"

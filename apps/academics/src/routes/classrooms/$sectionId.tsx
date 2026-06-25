@@ -120,7 +120,7 @@ function ActionsDropdown({
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="p-2 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-surface-secondary transition-colors"
-        aria-label="Section actions"
+        aria-label="Classroom actions"
         aria-expanded={isOpen}
         aria-haspopup="menu"
       >
@@ -129,7 +129,7 @@ function ActionsDropdown({
       {isOpen && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} aria-hidden="true" />
-          <div className="absolute right-0 z-20 mt-1 w-48 rounded-lg bg-surface-primary border border-border-primary shadow-lg py-1" role="menu" aria-label="Section actions">
+          <div className="absolute right-0 z-20 mt-1 w-48 rounded-lg bg-surface-primary border border-border-primary shadow-lg py-1" role="menu" aria-label="Classroom actions">
             <button
               type="button"
               role="menuitem"
@@ -137,7 +137,7 @@ function ActionsDropdown({
               className="flex items-center gap-2 w-full px-3 py-2 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-secondary transition-colors"
             >
               <Pencil className="w-4 h-4" aria-hidden="true" />
-              Edit Section
+              Edit classroom
             </button>
             <button
               type="button"
@@ -668,9 +668,9 @@ export function ClassroomDetailPage() {
       <div className="min-h-full flex items-center justify-center p-6">
         <div className="text-center">
           <AlertCircle className="w-12 h-12 mx-auto text-text-tertiary mb-4" />
-          <h2 className="text-lg font-semibold text-text-primary mb-2">Section Not Found</h2>
+          <h2 className="text-lg font-semibold text-text-primary mb-2">Classroom not found</h2>
           <p className="text-sm text-text-secondary mb-4">
-            This section may have been removed or you don't have access.
+            This classroom may have been removed or you don't have access.
           </p>
           <button
             type="button"
@@ -726,7 +726,7 @@ export function ClassroomDetailPage() {
 
           {/* Title + meta on banner — tighter layout */}
           <h1 className="text-2xl font-bold text-[rgb(var(--action-primary-fg))] drop-shadow-sm">
-            {section.sectionName || `Section ${section.sectionNumber}`}
+            {section.sectionName || `Classroom ${section.sectionNumber}`}
           </h1>
           <p className="text-[rgb(var(--action-primary-fg))]/80 text-sm mt-0.5 drop-shadow-sm">
             {section.courseName}

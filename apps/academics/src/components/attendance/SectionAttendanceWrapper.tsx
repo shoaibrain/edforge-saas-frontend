@@ -257,9 +257,9 @@ export function SectionAttendanceWrapper({ sectionId }: SectionAttendanceWrapper
       ) : !roster?.students?.length ? (
         <div className="bg-surface-secondary rounded-xl border border-border-secondary p-12 text-center">
           <ClipboardCheck className="w-12 h-12 mx-auto text-text-tertiary mb-4" />
-          <h4 className="text-lg font-medium text-text-primary mb-2">No Students Enrolled</h4>
+          <h4 className="text-lg font-medium text-text-primary mb-2">No students yet</h4>
           <p className="text-text-secondary max-w-md mx-auto">
-            This section has no students enrolled yet. Add students from the People tab.
+            This classroom has no students enrolled yet. Add students from the People tab.
           </p>
         </div>
       ) : (

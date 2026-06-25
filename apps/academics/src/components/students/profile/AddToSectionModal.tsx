@@ -68,7 +68,7 @@ export function AddToSectionModal({
 
   const handleSubmit = async () => {
     if (!selectedSectionId) {
-      setError('Please select a section')
+      setError('Please select a classroom')
       return
     }
 
@@ -82,9 +82,9 @@ export function AddToSectionModal({
     } catch (err) {
       const parsed = parseApiError(err as Error)
       if (parsed.statusCode === 409) {
-        setError('Student is already rostered in this section')
+        setError('This student is already in this classroom')
       } else {
-        setError(parsed.message || 'Failed to add student to section')
+        setError(parsed.message || "Couldn't add the student to the classroom. Please try again.")
       }
     }
   }
@@ -93,8 +93,8 @@ export function AddToSectionModal({
     <Modal
       open={open}
       onClose={onClose}
-      title="Add to Section"
-      description={`Add ${student.fullName} to a class section`}
+      title="Add to classroom"
+      description={`Add ${student.fullName} to a classroom`}
       size="md"
     >
       <div className="space-y-4">

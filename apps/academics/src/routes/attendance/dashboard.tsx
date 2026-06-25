@@ -542,8 +542,8 @@ function SectionCompletionCard({
       <CardHeader
         icon={<CheckSquareIcon />}
         iconBg="rgba(127,119,221,0.10)"
-        title="Section Completion"
-        subtitle="Today's recording status per section"
+        title="Classroom Completion"
+        subtitle="Today's recording status per classroom"
       />
       <div className={CARD_BODY}>
         <div className="flex gap-5 items-start">
@@ -577,7 +577,7 @@ function SectionCompletionCard({
           <div className="flex-1 min-w-0 overflow-hidden">
             {/* Header row */}
             <div className="flex items-center gap-2.5 mb-1.5 pb-1.5" style={{ borderBottom: `1px solid ${V2.borderSeparator}` }}>
-              <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px] flex-1">Section</span>
+              <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px] flex-1">Classroom</span>
               <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px] text-center" style={{ width: 28 }}>Enr.</span>
               <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px] text-center" style={{ width: 36 }}>Rec.</span>
               <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px] text-right" style={{ width: 70 }}>Status</span>
