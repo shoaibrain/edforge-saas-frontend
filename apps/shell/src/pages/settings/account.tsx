@@ -19,7 +19,7 @@ import {
   Check
 } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Button } from '@edforge/ui'
+import { Button, PageShell } from '@edforge/ui'
 import { TextField, SelectField } from '@/components/forms/fields'
 import { useAuthStore } from '@/stores/auth.store'
 import { 
@@ -123,9 +123,9 @@ const US_STATE_OPTIONS = [
 
 function AccountPageSkeleton() {
   return (
-    <div className="max-w-3xl mx-auto px-6 py-8">
+    <PageShell as="div" variant="settings" className="max-w-6xl">
       <SettingsSkeleton rows={5} showHeader />
-    </div>
+    </PageShell>
   )
 }
 
@@ -135,13 +135,13 @@ function AccountPageSkeleton() {
 
 function AccountPageError({ error, onRetry }: { error: string; onRetry: () => void }) {
   return (
-    <div className="max-w-3xl mx-auto px-6 py-8">
+    <PageShell as="div" variant="settings" className="max-w-6xl">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="flex flex-col items-center justify-center py-12"
       >
-        <div className="w-16 h-16 rounded-full bg-[rgb(var(--state-danger-bg)/0.18)]0/10 flex items-center justify-center mb-4">
+        <div className="w-16 h-16 rounded-full bg-[rgb(var(--state-danger-bg)/0.18)] flex items-center justify-center mb-4">
           <User className="w-8 h-8 text-[rgb(var(--state-danger-fg))]" />
         </div>
         <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))] mb-2">
@@ -154,7 +154,7 @@ function AccountPageError({ error, onRetry }: { error: string; onRetry: () => vo
           Try Again
         </Button>
       </motion.div>
-    </div>
+    </PageShell>
   )
 }
 
@@ -378,7 +378,7 @@ export default function AccountPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-8 pb-24">
+    <PageShell as="div" variant="settings" className="max-w-6xl pb-24">
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <motion.div
@@ -396,7 +396,7 @@ export default function AccountPage() {
             {/* Profile Photo Section */}
             <motion.div variants={fadeInUp}>
               <SettingsFormCard>
-                <div className="flex items-start gap-6">
+                <div className="flex items-start justify-between gap-6">
                   <AvatarUpload
                     avatarUrl={avatarUrl}
                     displayName={displayName}
@@ -413,7 +413,7 @@ export default function AccountPage() {
                           ? 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] ' 
                           : userProfile.status === 'pending'
                             ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
-                            : 'bg-[rgb(var(--background-tertiary))]0/10 text-[rgb(var(--text-secondary))] '
+                            : 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))] '
                         }
                       `}>
                         {userProfile.status.charAt(0).toUpperCase() + userProfile.status.slice(1)}
@@ -426,6 +426,9 @@ export default function AccountPage() {
 
             <SettingsDivider />
 
+            {/* Editable profile sections — two columns on large screens so the
+                form fills the settings width instead of stacking in one tall column. */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
             {/* Personal Information Section */}
             <SettingsSection
               title="Personal Information"
@@ -471,7 +474,8 @@ export default function AccountPage() {
               </div>
             </SettingsSection>
 
-            {/* Address Section */}
+            {/* Address Section — spans both columns */}
+            <div className="lg:col-span-2">
             <SettingsSection
               title="Address"
               icon={MapPin}
@@ -506,6 +510,8 @@ export default function AccountPage() {
                 />
               </div>
             </SettingsSection>
+            </div>
+            </div>
 
             {/* Account Metadata */}
             {userProfile && (
@@ -513,7 +519,7 @@ export default function AccountPage() {
                 <SettingsDivider />
                 <motion.div variants={fadeInUp} className="space-y-3">
                   <h2 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Account Details</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm p-4 rounded-xl bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))]">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm p-4 rounded-xl bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))]">
                     <div className="space-y-1">
                       <span className="text-[rgb(var(--text-tertiary))]">User ID</span>
                       <div className="flex items-center gap-2">
@@ -561,6 +567,6 @@ export default function AccountPage() {
           />
         </form>
       </FormProvider>
-    </div>
+    </PageShell>
   )
 }

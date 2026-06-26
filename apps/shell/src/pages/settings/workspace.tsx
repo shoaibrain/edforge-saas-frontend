@@ -25,7 +25,7 @@ import {
   Building2,
   RefreshCw,
 } from 'lucide-react'
-import { Button, FieldLockTooltip, FieldLockIcon, InlineAlert, Select, Switch } from '@edforge/ui'
+import { Button, FieldLockTooltip, FieldLockIcon, InlineAlert, PageShell, Select, Switch } from '@edforge/ui'
 import { useAuthStore } from '@/stores/auth.store'
 import { useAppStore } from '@/stores/app.store'
 import { can } from '@edforge/abac'
@@ -304,7 +304,7 @@ function TenantInfoCard({
 
 function AccessDenied({ message }: { message: string }) {
   return (
-    <div className="max-w-3xl mx-auto px-6 py-8">
+    <PageShell as="div" variant="settings" className="max-w-6xl">
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -316,7 +316,7 @@ function AccessDenied({ message }: { message: string }) {
         <h2 className="text-xl font-semibold text-[rgb(var(--text-primary))] mb-2">Access Denied</h2>
         <p className="text-[rgb(var(--text-tertiary))]">{message}</p>
       </motion.div>
-    </div>
+    </PageShell>
   )
 }
 
@@ -513,16 +513,16 @@ export default function WorkspaceSettingsPage() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="max-w-3xl mx-auto px-6 py-8">
+      <PageShell as="div" variant="settings" className="max-w-6xl">
         <SettingsSkeleton rows={6} showHeader />
-      </div>
+      </PageShell>
     )
   }
 
   // Error state
   if (isError && !formState) {
     return (
-      <div className="max-w-3xl mx-auto px-6 py-8">
+      <PageShell as="div" variant="settings" className="max-w-6xl">
         <SettingsPageHeader
           title="Workspace Settings"
           description="Organization-wide configuration that applies to all schools"
@@ -543,7 +543,7 @@ export default function WorkspaceSettingsPage() {
             Retry
           </Button>
         </div>
-      </div>
+      </PageShell>
     )
   }
 
@@ -577,7 +577,7 @@ export default function WorkspaceSettingsPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-6 py-8 pb-24">
+    <PageShell as="div" variant="settings" className="max-w-6xl pb-24">
       <motion.div
         initial="hidden"
         animate="visible"
@@ -591,6 +591,10 @@ export default function WorkspaceSettingsPage() {
           icon={Building2}
         />
 
+        {/* Tenant context band — read-only identity + governance defaults sit
+            side by side on large screens so the page opens with a compact
+            context row instead of two stacked full-width cards. */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
         {/* Tenant Info Card — read-only identity fields (immutable at provisioning) */}
         <TenantInfoCard
           tenantName={tenantName}
@@ -605,6 +609,7 @@ export default function WorkspaceSettingsPage() {
             Regional Settings so the constrained dropdowns below (GF3.2) have a
             visible "why". */}
         <GovernanceProfileCard archetype={archetype} country={country} />
+        </div>
 
         {/* Note: lock status is now surfaced inside Regional Settings (section-scoped),
             because Regional is the only subtree that actually locks — Tenant Info is
@@ -658,6 +663,10 @@ export default function WorkspaceSettingsPage() {
             )}
           </InlineAlert>
 
+          {/* Two-column field grid on xl screens — uses the settings width and
+              roughly halves the section height; stays single column below xl so
+              each label + select keeps room to breathe. */}
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-x-8">
           <SettingsFieldRow label={renderLabel('Default Timezone', lkTimezone)} description="Organization's primary timezone for scheduling and timestamps" inline>
             <WorkspaceSelect
               value={displaySettings.regional.defaultTimezone}
@@ -739,6 +748,7 @@ export default function WorkspaceSettingsPage() {
               options={NUMBER_FORMAT_OPTIONS}
             />
           </SettingsFieldRow>
+          </div>
         </SettingsSection>
 
         {/* COMING SOON — Organization Branding section (re-enable when branding customization ships) */}
@@ -746,7 +756,7 @@ export default function WorkspaceSettingsPage() {
         {/* COMING SOON — Attendance Defaults section (re-enable when attendance policy config ships) */}
 
         {/* Lock taxonomy + permissions hint — replaces the older single "Important" note */}
-        <motion.div variants={fadeInUp} className="space-y-3">
+        <motion.div variants={fadeInUp} className="grid grid-cols-1 lg:grid-cols-2 gap-3 items-start">
           <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))]">
             <Info className="w-4 h-4 text-[rgb(var(--text-tertiary))] flex-shrink-0 mt-0.5" />
             <div className="flex-1">
@@ -807,6 +817,6 @@ export default function WorkspaceSettingsPage() {
         onSave={handleSave}
         isSaving={updateMutation.isPending}
       />
-    </div>
+    </PageShell>
   )
 }
