@@ -18,7 +18,7 @@ import {
 } from 'lucide-react'
 import { TanstackDataTable, createActionsColumn, StatusBadge, type ColumnDef } from '@edforge/ui'
 import type { CourseResponseDto } from '@aibrains/shared-types'
-import { getDurationLabel } from '../../schemas/course.form'
+import { getDurationLabel, sortGradeCodes } from '../../schemas/course.form'
 import { formatCourseType } from '../../utils/course-type'
 import { CourseTypeChip } from './CourseTypeChip'
 import { SubjectChip } from './SubjectChip'
@@ -157,9 +157,10 @@ function RowActions({ course, onView, onEdit, onToggleActive, onNavigate }: RowA
 function GradeLevelChips({ grades }: { grades: string[] }) {
   if (!grades || grades.length === 0) return <span className="text-text-tertiary">—</span>
 
-  const showAll = grades.length <= 4
-  const display = showAll ? grades : grades.slice(0, 3)
-  const remaining = grades.length - 3
+  const sorted = sortGradeCodes(grades)
+  const showAll = sorted.length <= 4
+  const display = showAll ? sorted : sorted.slice(0, 3)
+  const remaining = sorted.length - 3
 
   return (
     <div className="flex gap-0.5 flex-wrap">

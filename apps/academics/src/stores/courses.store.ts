@@ -19,6 +19,7 @@ export interface CourseFiltersState {
   subjectArea: CourseSubjectArea | null
   courseType: CourseType | null
   creditType: CreditType | null
+  gradeLevel: string | null
   isActive: boolean | null
 }
 
@@ -32,6 +33,7 @@ interface CoursesStoreState extends CourseFiltersState {
   setSubjectArea: (area: CourseSubjectArea | null) => void
   setCourseType: (type: CourseType | null) => void
   setCreditType: (type: CreditType | null) => void
+  setGradeLevel: (grade: string | null) => void
   setIsActive: (active: boolean | null) => void
   resetFilters: () => void
 
@@ -49,6 +51,7 @@ const defaultFilters: CourseFiltersState = {
   subjectArea: null,
   courseType: null,
   creditType: null,
+  gradeLevel: null,
   isActive: null,
 }
 
@@ -75,6 +78,10 @@ export const useCoursesStore = create<CoursesStoreState>((set, get) => ({
     set({ creditType: type })
   },
 
+  setGradeLevel: (grade: string | null) => {
+    set({ gradeLevel: grade })
+  },
+
   setIsActive: (active: boolean | null) => {
     set({ isActive: active })
   },
@@ -90,6 +97,7 @@ export const useCoursesStore = create<CoursesStoreState>((set, get) => ({
       state.subjectArea !== null ||
       state.courseType !== null ||
       state.creditType !== null ||
+      state.gradeLevel !== null ||
       state.isActive !== null
     )
   },
@@ -101,6 +109,7 @@ export const useCoursesStore = create<CoursesStoreState>((set, get) => ({
     if (state.subjectArea !== null) count++
     if (state.courseType !== null) count++
     if (state.creditType !== null) count++
+    if (state.gradeLevel !== null) count++
     if (state.isActive !== null) count++
     return count
   },
@@ -120,6 +129,7 @@ export const useCourseFilters = () =>
       subjectArea: state.subjectArea,
       courseType: state.courseType,
       creditType: state.creditType,
+      gradeLevel: state.gradeLevel,
       isActive: state.isActive,
     }))
   )
@@ -134,6 +144,7 @@ export const useCourseFilterActions = () =>
       setSubjectArea: state.setSubjectArea,
       setCourseType: state.setCourseType,
       setCreditType: state.setCreditType,
+      setGradeLevel: state.setGradeLevel,
       setIsActive: state.setIsActive,
       resetFilters: state.resetFilters,
       hasActiveFilters: state.hasActiveFilters,

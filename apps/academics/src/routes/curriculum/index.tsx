@@ -9,8 +9,9 @@
  * V2 redesign — matches Academics Overview header pattern.
  */
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { useNavigate } from '@tanstack/react-router'
+import { toast } from 'sonner'
 import { useResourcePermissions } from '@edforge/abac'
 import { StatCard, ContextBar, ContextBarSep, ContextBarYear } from '@edforge/ui'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -34,6 +35,8 @@ import { CourseTable } from '../../components/curriculum/CourseTable'
 import { CourseFilters } from '../../components/curriculum/CourseFilters'
 import { CourseDrawer, type DrawerMode } from '../../components/curriculum/CourseDrawer'
 import { GradeLevelsTab } from '../../components/curriculum/GradeLevelsTab'
+import { downloadCoursesCsv } from '../../components/curriculum/course-csv-export'
+import { getAllCourses, parseApiError } from '../../services/academics.service'
 import type { CourseResponseDto } from '@aibrains/shared-types'
 
 // ============================================================================
@@ -170,6 +173,7 @@ export function CurriculumModule() {
     if (filters.subjectArea) f.subjectArea = filters.subjectArea
     if (filters.courseType) f.courseType = filters.courseType
     if (filters.creditType) f.creditType = filters.creditType
+    if (filters.gradeLevel) f.gradeLevel = filters.gradeLevel
     if (filters.isActive !== null) f.isActive = filters.isActive
     if (filters.searchTerm) f.searchTerm = filters.searchTerm
     return f
@@ -185,14 +189,28 @@ export function CurriculumModule() {
   const courses = flattenCoursePages(coursesData)
   const totalCount = getCourseTotalFromPages(coursesData)
 
-  // Computed stats
+  // Grade-level filter is applied client-side over the loaded set: the list
+  // endpoint accepts the `gradeLevel` param (sent above) but does not yet honor
+  // it server-side (tracked in a backend issue). Until then this keeps the
+  // control functional for the loaded page; it becomes a pass-through once the
+  // server filters across all pages.
+  const visibleCourses = filters.gradeLevel
+    ? courses.filter((c) => c.gradeLevels?.includes(filters.gradeLevel as string))
+    : courses
+
+  // Computed stats. `total` is the server truth when unfiltered; with a
+  // client-side grade filter it reflects the filtered loaded set. The
+  // subject/elective/specialized breakdowns are derived from loaded rows, so
+  // `allLoaded` gates whether they cover the whole catalog (see header copy).
   const stats = useMemo(() => {
-    const total = totalCount ?? courses.length
-    const active = courses.filter((c) => c.isActive).length
-    const elective = courses.filter((c) => c.courseType === 'elective').length
-    const subjects = new Set(courses.map((c) => c.subjectArea)).size
+    const base = visibleCourses
+    const gradeFiltered = !!filters.gradeLevel
+    const total = gradeFiltered ? base.length : totalCount ?? courses.length
+    const active = base.filter((c) => c.isActive).length
+    const elective = base.filter((c) => c.courseType === 'elective').length
+    const subjects = new Set(base.map((c) => c.subjectArea)).size
     const specializedTypes = new Set(
-      courses
+      base
         .filter((c) =>
           ['honors', 'ap', 'dual_enrollment'].includes(c.courseType)
         )
@@ -200,10 +218,21 @@ export function CurriculumModule() {
     ).size
     const electiveName =
       elective === 1
-        ? courses.find((c) => c.courseType === 'elective')?.courseName
+        ? base.find((c) => c.courseType === 'elective')?.courseName
         : undefined
-    return { total, active, elective, subjects, specializedTypes, electiveName }
-  }, [courses, totalCount])
+    const allLoaded =
+      !gradeFiltered && totalCount != null && courses.length >= totalCount
+    return {
+      total,
+      active,
+      elective,
+      subjects,
+      specializedTypes,
+      electiveName,
+      allLoaded,
+      gradeFiltered,
+    }
+  }, [visibleCourses, courses, totalCount, filters.gradeLevel])
 
   // Drawer handlers
   const openCreateDrawer = () => {
@@ -245,6 +274,22 @@ export function CurriculumModule() {
     setSelectedCourse(null)
   }
 
+  // Export the current (filtered) catalog. Fetches all pages so the CSV covers
+  // the whole catalog, then applies the client-side grade filter (mirrors the
+  // on-screen view) until the backend honors `gradeLevel`.
+  const handleExportCsv = useCallback(async () => {
+    if (!schoolId) return
+    try {
+      const rows = await getAllCourses({ schoolId, ...queryFilters })
+      const filtered = filters.gradeLevel
+        ? rows.filter((c) => c.gradeLevels?.includes(filters.gradeLevel as string))
+        : rows
+      downloadCoursesCsv(filtered, `courses-${schoolId}.csv`)
+    } catch (e) {
+      toast.error(parseApiError(e).message)
+    }
+  }, [schoolId, queryFilters, filters.gradeLevel])
+
   const today = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
     month: 'short',
@@ -279,6 +324,12 @@ export function CurriculumModule() {
               {stats.specializedTypes}
             </span>{' '}
             specialized course types (Honors, AP, Dual Enrollment)
+            {!stats.allLoaded && (
+              <span className="text-[rgb(var(--text-disabled))]">
+                {' '}
+                · based on loaded courses
+              </span>
+            )}
           </p>
         }
         actions={
@@ -318,7 +369,7 @@ export function CurriculumModule() {
           accentColor="rgb(var(--accent-academics)/0.1)"
           iconColor="rgb(var(--accent-academics))"
           barColor="rgb(var(--accent-academics))"
-          hint="Math · Science · ELA · SS · Arts · Voc."
+          hint={stats.allLoaded ? 'Math · Science · ELA · SS · Arts · Voc.' : 'Based on loaded courses'}
           loading={isLoading}
         />
         <StatCard
@@ -421,13 +472,16 @@ export function CurriculumModule() {
           {activeTab === 'courses' && (
             <div>
               {/* Filter strip */}
-              <CourseFilters totalCount={totalCount} />
+              <CourseFilters
+                totalCount={totalCount}
+                schoolId={schoolId}
+                onExport={handleExportCsv}
+              />
 
               {/* Course Table */}
               <div className="mt-3">
                 <CourseTable
-                
-                  courses={courses}
+                  courses={visibleCourses}
                   isLoading={isLoading}
                   onAddCourse={coursePerms.create ? openCreateDrawer : undefined}
                   onViewCourse={openViewDrawer}
@@ -462,6 +516,7 @@ export function CurriculumModule() {
         mode={drawerMode}
         course={selectedCourse}
         onModeChange={setDrawerMode}
+        existingCourseCodes={courses.map((c) => c.courseCode)}
       />
     </div>
   )

@@ -8,6 +8,7 @@
 import { z } from 'zod'
 import {
   ACADEMIC_SUBJECT_DESCRIPTORS,
+  GRADE_LEVEL_OPTIONS,
   type AcademicSubjectDescriptor,
   type CourseSubjectArea,
 } from '@aibrains/shared-types'
@@ -93,6 +94,113 @@ export function deriveSubjectAreaFromAcademicSubject(
   return ACADEMIC_SUBJECT_TO_SUBJECT_AREA[descriptor]
 }
 
+// ============================================================================
+// COURSE CODE GENERATION
+// ============================================================================
+
+// Granular academicSubject → 3-letter course-code prefix. Same drift-guard
+// shape as ACADEMIC_SUBJECT_TO_SUBJECT_AREA above: a `Record<…>` so a new
+// descriptor in shared-types fails tsc until a prefix is chosen. Aligned with
+// the pilot mnemonics (ENG/MAT/NEP/SCI/SOC) and the backend PABSON seed catalog.
+export const ACADEMIC_SUBJECT_TO_CODE_PREFIX: Record<AcademicSubjectDescriptor, string> = {
+  mathematics: 'MAT',
+  science: 'SCI',
+  english: 'ENG',
+  nepali: 'NEP',
+  social_studies: 'SOC',
+  environment_population_health: 'EPH',
+  health_physical_creative_arts: 'HPE',
+  local_subject: 'LOC',
+  optional_mathematics: 'OMA',
+  optional_computer_science: 'CMP',
+  optional_economics: 'ECO',
+  accounting: 'ACC',
+  physics: 'PHY',
+  chemistry: 'CHE',
+  biology: 'BIO',
+}
+
+// courseCode max length (mirrors the schema cap below).
+const COURSE_CODE_MAX = 20
+
+function gradeOrderIndex(code: string): number {
+  const i = GRADE_LEVEL_OPTIONS.findIndex((o) => o.value === code)
+  return i === -1 ? Number.MAX_SAFE_INTEGER : i
+}
+
+function isNumericGrade(code: string): boolean {
+  const n = Number(code)
+  return Number.isInteger(n) && String(n) === code.trim()
+}
+
+/**
+ * Sort grade codes into canonical catalog order (PG → NUR → … → 10), deduped.
+ * Unknown codes sink to the end. Shared by the code generator (Part 1) and the
+ * table/detail grade chips (Part 4). Do NOT use gradeSort from
+ * packages/types/src/academics-utils.ts — it only knows PK/K/1-12.
+ */
+export function sortGradeCodes(codes: string[]): string[] {
+  return [...new Set(codes)].sort((a, b) => gradeOrderIndex(a) - gradeOrderIndex(b))
+}
+
+/**
+ * Build the pilot-style grade-band suffix from a course's grade levels:
+ *   [9,10] → "0910"   [8] → "08"   [6,7] → "067"   [4,5] → "045"   [1,2,3] → "0123"
+ * Rule: sort canonically, drop unknowns, zero-pad the LOWEST numeric grade to
+ * two digits, then append the rest in natural form (1 digit for 1-9, 2 for ≥10).
+ * Early-childhood codes (PG/NUR/LKG/UKG) contribute their uppercased token.
+ * (The pilot's one-off "123" for the 1-3 band normalises to "0123" here.)
+ */
+export function gradeBandToken(gradeLevels: string[]): string {
+  const sorted = sortGradeCodes(gradeLevels).filter(
+    (c) => gradeOrderIndex(c) !== Number.MAX_SAFE_INTEGER
+  )
+  return sorted
+    .map((code, i) => {
+      if (!isNumericGrade(code)) return code.toUpperCase()
+      const n = Number(code)
+      // Lowest grade fixes a 2-digit start; the rest follow in natural form.
+      return i === 0 && n < 10 ? `0${n}` : String(n)
+    })
+    .join('')
+}
+
+/**
+ * Suggest a course code from the granular subject + grade levels, e.g.
+ * ('english', ['9','10']) → "ENG-0910". Returns '' when either input is missing
+ * (caller decides whether to write). Output satisfies /^[A-Z0-9_-]+$/ by
+ * construction and is capped at COURSE_CODE_MAX.
+ */
+export function generateCourseCode(
+  academicSubject: AcademicSubjectDescriptor | undefined | null,
+  gradeLevels: string[],
+): string {
+  if (!academicSubject || !gradeLevels || gradeLevels.length === 0) return ''
+  const prefix = ACADEMIC_SUBJECT_TO_CODE_PREFIX[academicSubject]
+  if (!prefix) return ''
+  const band = gradeBandToken(gradeLevels)
+  return (band ? `${prefix}-${band}` : prefix).slice(0, COURSE_CODE_MAX)
+}
+
+/**
+ * Ensure `base` doesn't collide with `existingCodes` (case-insensitive). On
+ * collision, append -2, -3, … while respecting the 20-char cap. This is a
+ * best-effort client guard over the loaded catalog; the backend 409 on create
+ * is the authoritative uniqueness check.
+ */
+export function dedupeCourseCode(base: string, existingCodes: Iterable<string>): string {
+  if (!base) return base
+  const taken = new Set<string>()
+  for (const c of existingCodes) taken.add(c.trim().toUpperCase())
+  if (!taken.has(base.toUpperCase())) return base
+  for (let n = 2; n < 100; n++) {
+    const suffix = `-${n}`
+    const candidate = `${base.slice(0, COURSE_CODE_MAX - suffix.length)}${suffix}`
+    if (!taken.has(candidate.toUpperCase())) return candidate
+  }
+  return base
+}
+
 export const COURSE_TYPE_OPTIONS = [
   { value: 'required', label: 'Required' },
   { value: 'elective', label: 'Elective' },
@@ -122,7 +230,7 @@ export const DURATION_OPTIONS = [
 ] as const
 
 // Re-exported from shared-types (canonical source of truth)
-export { GRADE_LEVEL_OPTIONS } from '@aibrains/shared-types'
+export { GRADE_LEVEL_OPTIONS }
 
 export const MATERIAL_TYPE_OPTIONS = [
   { value: 'textbook', label: 'Textbook' },

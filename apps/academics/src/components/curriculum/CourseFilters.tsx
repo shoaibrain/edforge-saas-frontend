@@ -6,7 +6,7 @@
  * Matches the V2 filter strip pattern from StudentsFilterRow.
  */
 
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { Search, X, Download } from 'lucide-react'
 import { Select, Input, Button } from '@edforge/ui'
 import {
@@ -18,6 +18,7 @@ import {
   COURSE_TYPE_OPTIONS,
   CREDIT_TYPE_OPTIONS,
 } from '../../schemas/course.form'
+import { useSchoolEnabledGradeOptions } from '../../hooks/useGradeOptions'
 
 // ============================================================================
 // TYPES
@@ -26,17 +27,33 @@ import {
 interface CourseFiltersProps {
   /** Total count of courses matching current filters */
   totalCount?: number
+  /** Active school — scopes the grade-level filter to the school's enabled grades */
+  schoolId: string | null
+  /** Export the current (filtered) catalog as CSV. Owner fetches all pages. */
+  onExport?: () => Promise<void>
 }
 
 // ============================================================================
 // COURSE FILTERS
 // ============================================================================
 
-export function CourseFilters({ totalCount: _totalCount }: CourseFiltersProps) {
+export function CourseFilters({ totalCount: _totalCount, schoolId, onExport }: CourseFiltersProps) {
   const filters = useCourseFilters()
   const actions = useCourseFilterActions()
+  const { options: gradeOptions } = useSchoolEnabledGradeOptions(schoolId)
+  const [isExporting, setIsExporting] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const handleExport = async () => {
+    if (!onExport) return
+    setIsExporting(true)
+    try {
+      await onExport()
+    } finally {
+      setIsExporting(false)
+    }
+  }
 
   const handleSearchChange = (value: string) => {
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current)
@@ -96,6 +113,19 @@ export function CourseFilters({ totalCount: _totalCount }: CourseFiltersProps) {
         options={[{ value: '', label: 'All Credit Types' }, ...CREDIT_TYPE_OPTIONS]}
       />
 
+      {/* Grade Level */}
+      <Select
+        aria-label="Grade level"
+        size="sm"
+        className="w-36"
+        value={filters.gradeLevel ?? ''}
+        onChange={(v) => actions.setGradeLevel(v || null)}
+        options={[
+          { value: '', label: 'All Grades' },
+          ...gradeOptions.map((o) => ({ value: o.value, label: o.label })),
+        ]}
+      />
+
       {/* Status chips */}
       <div className="flex gap-1.5">
         {statusChips.map((chip) => {
@@ -139,6 +169,9 @@ export function CourseFilters({ totalCount: _totalCount }: CourseFiltersProps) {
           variant="outline"
           size="sm"
           aria-label="Export courses as CSV"
+          onClick={handleExport}
+          isLoading={isExporting}
+          disabled={!onExport || isExporting}
         >
           <Download className="w-3 h-3 mr-1.5" />
           Export CSV
