@@ -6,6 +6,9 @@ import {
   User,
   Settings,
   LogOut,
+  Sun,
+  Moon,
+  Languages,
 } from 'lucide-react'
 import { useAuthStore } from '../../stores/auth.store'
 import { useThemeStore } from '../../stores/theme.store'
@@ -15,7 +18,6 @@ import { Avatar } from '@edforge/ui'
 import { useTranslation } from '@edforge/i18n'
 import { getGreeting } from '../../lib/greeting'
 import { adToBS, formatBSLong } from '@edforge/date-utils'
-import { cn } from '../../lib/utils'
 
 import { Breadcrumbs } from './Breadcrumbs'
 import { SchoolSwitcher } from './SchoolSwitcher'
@@ -98,39 +100,55 @@ function HamburgerButton() {
 }
 
 // ============================================================================
-// THEME PILL — Light | Dark toggle in topbar
+// APPEARANCE SLIDING TOGGLE — Light | Dark (mirrors LanguageToggle; lives in
+// the avatar menu's Preferences group, not the topbar)
 // ============================================================================
 
-function ThemePill() {
+const THEME_OPTIONS = [
+  { code: 'light', label: 'Light' },
+  { code: 'dark', label: 'Dark' },
+] as const
+
+function AppearanceToggle() {
   const { resolvedTheme, setTheme } = useThemeStore()
+
+  const handleSwitch = (code: 'light' | 'dark') => (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setTheme(code)
+  }
 
   return (
     <div
-      className="flex items-center gap-0.5 rounded-2xl flex-shrink-0 p-0.5 border-[0.5px] bg-[var(--shell-theme-pill-bg)] border-[var(--shell-border-color)]"
-      style={{ transition: 'background 0.3s' }}
+      className="flex items-center gap-1 p-1 bg-[rgb(var(--background-tertiary))] rounded-lg border border-[rgb(var(--border-primary))]"
+      role="radiogroup"
+      aria-label="Appearance"
     >
-      <button
-        className={cn(
-          'rounded-xl text-xs font-medium transition-all duration-150 border-none font-[inherit] px-2.5 py-0.5 cursor-pointer',
-          resolvedTheme === 'light'
-            ? 'bg-[var(--shell-cp-bg)] text-[color:var(--shell-text-1)] shadow-[0_1px_2px_rgba(0,0,0,0.12)]'
-            : 'bg-transparent text-[color:var(--shell-text-3)] shadow-none',
-        )}
-        onClick={() => setTheme('light')}
-      >
-        Light
-      </button>
-      <button
-        className={cn(
-          'rounded-xl text-xs font-medium transition-all duration-150 border-none font-[inherit] px-2.5 py-0.5 cursor-pointer',
-          resolvedTheme === 'dark'
-            ? 'bg-[var(--shell-cp-bg)] text-[color:var(--shell-text-1)] shadow-[0_1px_2px_rgba(0,0,0,0.12)]'
-            : 'bg-transparent text-[color:var(--shell-text-3)] shadow-none',
-        )}
-        onClick={() => setTheme('dark')}
-      >
-        Dark
-      </button>
+      {THEME_OPTIONS.map(({ code, label }) => {
+        const isActive = resolvedTheme === code
+        return (
+          <button
+            key={code}
+            role="radio"
+            aria-checked={isActive}
+            onClick={handleSwitch(code)}
+            className={`relative px-3 py-1.5 rounded-md text-xs font-bold tracking-wider transition-colors duration-200 ${
+              isActive
+                ? 'text-[rgb(var(--action-primary-fg))]'
+                : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))]'
+            }`}
+          >
+            {isActive && (
+              <motion.div
+                layoutId="appearance-toggle-pill"
+                className="absolute inset-0 bg-[rgb(var(--action-primary-bg))]  rounded-md shadow-sm"
+                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+              />
+            )}
+            <span className="relative z-10">{label}</span>
+          </button>
+        )
+      })}
     </div>
   )
 }
@@ -197,6 +215,7 @@ function UserMenu() {
   const logout = useAuthStore((s) => s.logout)
   const navigate = useNavigate()
   const { t: tNav } = useTranslation('nav')
+  const { resolvedTheme } = useThemeStore()
 
   if (!user) return null
 
@@ -240,10 +259,34 @@ function UserMenu() {
             </div>
           </div>
 
-          {/* Language Toggle */}
+          {/* Preferences — appearance + language, one consolidated group */}
           <div className="px-4 py-3 border-b border-[rgb(var(--border-secondary))]">
-            <div className="flex items-center justify-end">
-              <LanguageToggle />
+            <p className="px-1 mb-2 text-2xs font-bold uppercase tracking-wider text-[rgb(var(--text-tertiary))]">
+              {tNav('preferences')}
+            </p>
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  {resolvedTheme === 'dark' ? (
+                    <Moon className="w-4 h-4 flex-shrink-0 text-[rgb(var(--text-tertiary))]" />
+                  ) : (
+                    <Sun className="w-4 h-4 flex-shrink-0 text-[rgb(var(--text-tertiary))]" />
+                  )}
+                  <span className="text-sm font-medium text-[rgb(var(--text-secondary))]">
+                    {tNav('appearance')}
+                  </span>
+                </div>
+                <AppearanceToggle />
+              </div>
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <Languages className="w-4 h-4 flex-shrink-0 text-[rgb(var(--text-tertiary))]" />
+                  <span className="text-sm font-medium text-[rgb(var(--text-secondary))]">
+                    {tNav('language')}
+                  </span>
+                </div>
+                <LanguageToggle />
+              </div>
             </div>
           </div>
 
@@ -331,9 +374,8 @@ export function Header() {
         {isHomeV2 ? <HomeTopbarCenter /> : <Breadcrumbs />}
       </div>
 
-      {/* RIGHT ZONE: Theme pill + User avatar */}
-      <div className="flex items-center gap-0.5 flex-shrink-0 pr-4">
-        <ThemePill />
+      {/* RIGHT ZONE: User avatar (theme moved into the avatar menu) */}
+      <div className="flex items-center flex-shrink-0 pr-4">
         <UserMenu />
       </div>
     </header>
