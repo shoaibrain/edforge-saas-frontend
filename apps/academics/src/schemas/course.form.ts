@@ -128,11 +128,6 @@ function gradeOrderIndex(code: string): number {
   return i === -1 ? Number.MAX_SAFE_INTEGER : i
 }
 
-function isNumericGrade(code: string): boolean {
-  const n = Number(code)
-  return Number.isInteger(n) && String(n) === code.trim()
-}
-
 /**
  * Sort grade codes into canonical catalog order (PG → NUR → … → 10), deduped.
  * Unknown codes sink to the end. Shared by the code generator (Part 1) and the
@@ -144,30 +139,21 @@ export function sortGradeCodes(codes: string[]): string[] {
 }
 
 /**
- * Build the pilot-style grade-band suffix from a course's grade levels:
- *   [9,10] → "0910"   [8] → "08"   [6,7] → "067"   [4,5] → "045"   [1,2,3] → "0123"
- * Rule: sort canonically, drop unknowns, zero-pad the LOWEST numeric grade to
- * two digits, then append the rest in natural form (1 digit for 1-9, 2 for ≥10).
- * Early-childhood codes (PG/NUR/LKG/UKG) contribute their uppercased token.
- * (The pilot's one-off "123" for the 1-3 band normalises to "0123" here.)
+ * Build the grade-band suffix: the course's grade codes, canonically sorted and
+ * concatenated (numeric as-is, early-childhood codes uppercased). Unknown codes
+ * are dropped.
+ *   [9,10] → "910"   [8] → "8"   [6,7] → "67"   [4,5] → "45"   [1,2,3] → "123"   [PG] → "PG"
  */
 export function gradeBandToken(gradeLevels: string[]): string {
-  const sorted = sortGradeCodes(gradeLevels).filter(
-    (c) => gradeOrderIndex(c) !== Number.MAX_SAFE_INTEGER
-  )
-  return sorted
-    .map((code, i) => {
-      if (!isNumericGrade(code)) return code.toUpperCase()
-      const n = Number(code)
-      // Lowest grade fixes a 2-digit start; the rest follow in natural form.
-      return i === 0 && n < 10 ? `0${n}` : String(n)
-    })
+  return sortGradeCodes(gradeLevels)
+    .filter((c) => gradeOrderIndex(c) !== Number.MAX_SAFE_INTEGER)
+    .map((c) => c.toUpperCase())
     .join('')
 }
 
 /**
  * Suggest a course code from the granular subject + grade levels, e.g.
- * ('english', ['9','10']) → "ENG-0910". Returns '' when either input is missing
+ * ('english', ['9','10']) → "ENG-910". Returns '' when either input is missing
  * (caller decides whether to write). Output satisfies /^[A-Z0-9_-]+$/ by
  * construction and is capped at COURSE_CODE_MAX.
  */

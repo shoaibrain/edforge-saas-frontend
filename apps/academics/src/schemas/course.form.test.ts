@@ -37,25 +37,22 @@ describe('sortGradeCodes', () => {
 })
 
 describe('gradeBandToken', () => {
-  it('reproduces the endorsed pilot bands', () => {
-    expect(gradeBandToken(['9', '10'])).toBe('0910')
-    expect(gradeBandToken(['8'])).toBe('08')
-    expect(gradeBandToken(['6', '7'])).toBe('067')
-    expect(gradeBandToken(['4', '5'])).toBe('045')
-  })
-
-  it('normalises the primary 1-3 band to a zero-padded start', () => {
-    expect(gradeBandToken(['1', '2', '3'])).toBe('0123')
+  it('concatenates sorted grade codes (no padding)', () => {
+    expect(gradeBandToken(['9', '10'])).toBe('910')
+    expect(gradeBandToken(['8'])).toBe('8')
+    expect(gradeBandToken(['6', '7'])).toBe('67')
+    expect(gradeBandToken(['4', '5'])).toBe('45')
+    expect(gradeBandToken(['1', '2', '3'])).toBe('123')
   })
 
   it('is order-independent (sorts before encoding)', () => {
-    expect(gradeBandToken(['7', '6'])).toBe('067')
-    expect(gradeBandToken(['10', '9'])).toBe('0910')
+    expect(gradeBandToken(['7', '6'])).toBe('67')
+    expect(gradeBandToken(['10', '9'])).toBe('910')
   })
 
-  it('handles non-contiguous numeric grades (only the lowest is zero-padded)', () => {
-    expect(gradeBandToken(['1', '3'])).toBe('013')
-    expect(gradeBandToken(['6', '8'])).toBe('068')
+  it('handles non-contiguous numeric grades', () => {
+    expect(gradeBandToken(['1', '3'])).toBe('13')
+    expect(gradeBandToken(['6', '8'])).toBe('68')
   })
 
   it('uses uppercased tokens for early-childhood codes', () => {
@@ -71,10 +68,10 @@ describe('gradeBandToken', () => {
 
 describe('generateCourseCode', () => {
   it('builds SUBJECT-GRADEBAND codes', () => {
-    expect(generateCourseCode('english', ['9', '10'])).toBe('ENG-0910')
-    expect(generateCourseCode('mathematics', ['6', '7'])).toBe('MAT-067')
-    expect(generateCourseCode('science', ['8'])).toBe('SCI-08')
-    expect(generateCourseCode('nepali', ['1', '2', '3'])).toBe('NEP-0123')
+    expect(generateCourseCode('english', ['9', '10'])).toBe('ENG-910')
+    expect(generateCourseCode('mathematics', ['6', '7'])).toBe('MAT-67')
+    expect(generateCourseCode('science', ['8'])).toBe('SCI-8')
+    expect(generateCourseCode('nepali', ['1', '2', '3'])).toBe('NEP-123')
   })
 
   it('returns empty when subject or grades are missing', () => {

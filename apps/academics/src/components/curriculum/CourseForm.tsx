@@ -14,7 +14,7 @@ import {
   TextareaField,
   FormSection,
 } from '@edforge/forms'
-import { Input } from '@edforge/ui'
+import { Input, Tooltip, InlineAlert } from '@edforge/ui'
 import {
   Hash,
   BookOpen,
@@ -24,6 +24,7 @@ import {
   Plus,
   X,
   RotateCw,
+  AlertTriangle,
 } from 'lucide-react'
 import type { AcademicSubjectDescriptor } from '@aibrains/shared-types'
 import {
@@ -362,8 +363,21 @@ function MaterialsList() {
 // ============================================================================
 
 export function CourseForm({ isEdit = false, schoolId, existingCourseCodes }: CourseFormProps) {
+  const { watch } = useFormContext<CourseFormData>()
+  const academicSubject = watch('academicSubject')
+  // Legacy courses created before academicSubject became required can load without
+  // it; surface the gap in edit mode so the operator can complete the record.
+  const subjectMissing = isEdit && !academicSubject
+
   return (
     <div className="space-y-8">
+      {subjectMissing && (
+        <InlineAlert variant="warning" title="Incomplete course data">
+          This course has no granular Academic Subject. Set it below so report cards and the Ed-Fi
+          subject rollup label correctly, then Save.
+        </InlineAlert>
+      )}
+
       {/* Section 1: Identity */}
       <FormSection
         title="Course Identity"
@@ -397,7 +411,18 @@ export function CourseForm({ isEdit = false, schoolId, existingCourseCodes }: Co
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <SelectField
             name="academicSubject"
-            label="Academic Subject"
+            label={
+              subjectMissing ? (
+                <span className="inline-flex items-center gap-1">
+                  Academic Subject
+                  <Tooltip content="Missing — required for report-card labels and the Ed-Fi subject rollup.">
+                    <AlertTriangle className="w-3.5 h-3.5 text-[rgb(var(--state-warning-fg))]" />
+                  </Tooltip>
+                </span>
+              ) : (
+                'Academic Subject'
+              )
+            }
             placeholder="Select academic subject"
             options={ACADEMIC_SUBJECT_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
             icon={GraduationCap}
