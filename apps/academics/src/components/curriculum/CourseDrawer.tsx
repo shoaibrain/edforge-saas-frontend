@@ -30,6 +30,7 @@ import { FormProvider, useForm, zodResolver } from '@edforge/forms'
 import type { CourseResponseDto, CreateCourseDto, UpdateCourseDto } from '@aibrains/shared-types'
 import { CourseForm } from './CourseForm'
 import { useCreateCourse, useUpdateCourse } from '../../hooks/useCourses'
+import { parseApiError } from '../../services/academics.service'
 import { useActiveSchoolId } from '../../stores/app.store'
 import { DrawerFooterCTA } from '../common/DrawerFooterCTA'
 import {
@@ -42,6 +43,7 @@ import {
   getCreditTypeLabel,
   getDurationLabel,
   getGradeLevelLabel,
+  sortGradeCodes,
   SUBJECT_AREA_COLORS,
   COURSE_TYPE_COLORS,
 } from '../../schemas/course.form'
@@ -63,6 +65,8 @@ interface CourseDrawerProps {
   course?: CourseResponseDto | null
   /** Callback when mode changes */
   onModeChange?: (mode: DrawerMode) => void
+  /** Existing course codes (loaded catalog) for auto-generated-code de-dup */
+  existingCourseCodes?: string[]
 }
 
 // ============================================================================
@@ -177,7 +181,7 @@ function CourseDetailView({
       <div>
         <SectionHeader icon={Layers} title="Grade Levels" />
         <div className="flex flex-wrap gap-2">
-          {course.gradeLevels.map((g) => (
+          {sortGradeCodes(course.gradeLevels).map((g) => (
             <span
               key={g}
               className="px-2.5 py-1 text-sm font-medium bg-surface-tertiary text-text-primary rounded-lg"
@@ -282,11 +286,13 @@ function CourseFormView({
   mode,
   onClose,
   onSuccess,
+  existingCourseCodes,
 }: {
   course?: CourseResponseDto | null
   mode: 'create' | 'edit'
   onClose: () => void
   onSuccess: () => void
+  existingCourseCodes?: string[]
 }) {
   const schoolId = useActiveSchoolId()
   const createMutation = useCreateCourse()
@@ -336,8 +342,23 @@ function CourseFormView({
           periodsPerWeek: data.periodsPerWeek ?? undefined,
           objectives: data.objectives && data.objectives.length > 0 ? data.objectives : undefined,
         }
-        await createMutation.mutateAsync(payload)
-        onSuccess()
+        try {
+          await createMutation.mutateAsync(payload)
+          onSuccess()
+        } catch (err) {
+          // Authoritative uniqueness backstop: a duplicate code 409s server-side
+          // (the client de-dup only sees loaded pages). Surface it on the field
+          // so the operator can Regenerate or edit it without leaving the drawer.
+          if (parseApiError(err).statusCode === 409) {
+            form.setError('courseCode', {
+              type: 'manual',
+              message: 'That course code is already in use — Regenerate or edit it.',
+            })
+            form.setFocus('courseCode')
+            return
+          }
+          throw err
+        }
       } else if (course) {
         const payload: UpdateCourseDto = {
           courseName: data.courseName,
@@ -361,7 +382,7 @@ function CourseFormView({
         onSuccess()
       }
     },
-    [mode, course, schoolId, createMutation, updateMutation, onSuccess]
+    [mode, course, schoolId, createMutation, updateMutation, onSuccess, form]
   )
 
   // Prevent Enter key in text inputs from submitting the form
@@ -385,7 +406,11 @@ function CourseFormView({
       >
         {/* Scrollable form content */}
         <div className="flex-1 overflow-y-auto px-6 py-4">
-          <CourseForm isEdit={mode === 'edit'} schoolId={schoolId} />
+          <CourseForm
+            isEdit={mode === 'edit'}
+            schoolId={schoolId}
+            existingCourseCodes={existingCourseCodes}
+          />
         </div>
 
         {/* Footer — always visible at bottom */}
@@ -430,6 +455,7 @@ export function CourseDrawer({
   mode: initialMode,
   course,
   onModeChange: _onModeChange,
+  existingCourseCodes,
 }: CourseDrawerProps) {
   const [internalMode, setInternalMode] = useState<DrawerMode>(initialMode)
   const panelRef = useRef<HTMLDivElement>(null)
@@ -577,6 +603,7 @@ export function CourseDrawer({
                     mode={internalMode === 'edit' ? 'edit' : 'create'}
                     onClose={handleClose}
                     onSuccess={handleSuccess}
+                    existingCourseCodes={existingCourseCodes}
                   />
                 ) : (
                   <div className="flex-1 flex items-center justify-center text-text-tertiary">

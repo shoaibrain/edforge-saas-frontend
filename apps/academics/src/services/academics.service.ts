@@ -678,6 +678,25 @@ export async function getCourses(
 }
 
 /**
+ * Fetch every course matching `params` by walking the cursor across all pages.
+ * Used by the catalog CSV export so the file reflects the full filtered set,
+ * not just the loaded page. Iteration is capped defensively.
+ */
+export async function getAllCourses(
+  params: CourseFilterDto
+): Promise<CourseResponseDto[]> {
+  const all: CourseResponseDto[] = []
+  let cursor: string | undefined
+  for (let i = 0; i < 50; i++) {
+    const page = await getCourses({ ...params, limit: 100, cursor })
+    all.push(...page.items)
+    cursor = page.hasMore ? page.lastEvaluatedKey : undefined
+    if (!cursor) break
+  }
+  return all
+}
+
+/**
  * Get course by ID
  * GET /academics/courses/:id?schoolId=
  */
