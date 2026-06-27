@@ -202,9 +202,19 @@ export function DataTable<TData>({
                 {headerGroup.headers.map((header) => {
                   const meta = header.column.columnDef
                     .meta as DataTableColumnMeta | undefined
+                  const sorted = header.column.getIsSorted()
+                  const ariaSort = header.column.getCanSort()
+                    ? sorted === 'asc'
+                      ? 'ascending'
+                      : sorted === 'desc'
+                        ? 'descending'
+                        : 'none'
+                    : undefined
                   return (
                     <th
                       key={header.id}
+                      scope="col"
+                      aria-sort={ariaSort}
                       className={cn(
                         'px-4 py-2.5 text-xs font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))]',
                         meta?.align === 'right'
