@@ -13,13 +13,54 @@
 
 import { Fragment, useMemo } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
-import { X, Calendar } from 'lucide-react'
+import { X, Calendar, TrendingUp, TrendingDown, Minus } from 'lucide-react'
 import {
   useStudentAttendance,
   useStudentAttendanceSummary,
 } from '../../hooks/useAttendance'
 import { StatusBadge } from './StatusBadge'
+import { summarizeByBucket } from './attendanceStatus'
 import type { AttendanceStatus } from '../../services/academics.service'
+
+// ============================================================================
+// TREND (F3.T1) — recent-half vs older-half attending rate over the window.
+// Self-contained from the fetched history; no extra request.
+// ============================================================================
+
+type Trend = 'improving' | 'declining' | 'stable'
+
+function halfAttendingRate(rows: Array<{ status: AttendanceStatus }>): number | null {
+  const b = summarizeByBucket(rows.map((r) => r.status))
+  if (b.total === 0) return null
+  return (b.present / b.total) * 100
+}
+
+function computeTrend(history: Array<{ date: string; status: AttendanceStatus }>): Trend | null {
+  if (history.length < 4) return null
+  const sorted = [...history].sort((a, b) => a.date.localeCompare(b.date))
+  const mid = Math.floor(sorted.length / 2)
+  const older = halfAttendingRate(sorted.slice(0, mid))
+  const recent = halfAttendingRate(sorted.slice(mid))
+  if (older == null || recent == null) return null
+  const delta = recent - older
+  if (delta > 5) return 'improving'
+  if (delta < -5) return 'declining'
+  return 'stable'
+}
+
+function TrendChip({ trend }: { trend: Trend }) {
+  const cfg = {
+    improving: { Icon: TrendingUp, text: 'Improving', cls: 'text-[rgb(var(--state-success-fg))]' },
+    declining: { Icon: TrendingDown, text: 'Declining', cls: 'text-[rgb(var(--state-danger-fg))]' },
+    stable: { Icon: Minus, text: 'Stable', cls: 'text-text-tertiary' },
+  }[trend]
+  return (
+    <span className={`inline-flex items-center gap-1 text-xs font-medium ${cfg.cls}`} title="Trend over the window (recent vs earlier)">
+      <cfg.Icon className="w-3.5 h-3.5" />
+      {cfg.text}
+    </span>
+  )
+}
 
 interface StudentAttendanceModalProps {
   open: boolean
@@ -235,6 +276,9 @@ export function StudentAttendanceModal({
     }))
   }, [history])
 
+  // F3.T1 — directional trend for the student detail.
+  const trend = useMemo(() => computeTrend(heatmapRecords), [heatmapRecords])
+
   return (
     <Transition appear show={open} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={onClose}>
@@ -280,8 +324,9 @@ export function StudentAttendanceModal({
                         {studentName}
                       </Dialog.Title>
                       {summary && (
-                        <div className="mt-0.5">
+                        <div className="mt-0.5 flex items-center gap-2">
                           <RateBadge rate={summary.attendanceRate} />
+                          {trend && <TrendChip trend={trend} />}
                         </div>
                       )}
                     </div>
