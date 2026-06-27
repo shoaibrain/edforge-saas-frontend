@@ -596,13 +596,6 @@ export default function WorkspaceSettingsPage() {
         variants={staggerChildren}
         className="space-y-8"
       >
-        {/* Header */}
-        <SettingsPageHeader
-          title="Workspace Settings"
-          description="Organization-wide configuration that applies to all schools"
-          icon={Building2}
-        />
-
         {/* Two-zone layout: a sticky context rail (read-only identity + the
             governance defaults that explain the locks) beside the editable
             regional canvas. Collapses to one column below lg. */}

@@ -30,7 +30,10 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
           'rounded-2xl border transition-all duration-base ease-standard',
           glass
             ? 'glass'
-            : 'bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.6)] shadow-raised hover:shadow-overlay',
+            : 'bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.6)] shadow-raised',
+          // Only interactive (clickable) cards lift on hover; static content
+          // cards keep a flat resting elevation.
+          isInteractive && !glass && 'hover:shadow-overlay',
           isInteractive && ['cursor-pointer', focusRing],
           className
         )}

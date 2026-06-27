@@ -31,7 +31,6 @@ import {
 } from '@/schemas/person.schema'
 import { getUserAvatar } from '@/lib/avatar'
 import {
-  SettingsPageHeader,
   SettingsSkeleton,
   UnsavedChangesBar,
   staggerChildren,
@@ -383,9 +382,6 @@ export default function AccountPage() {
             variants={staggerChildren}
             className="space-y-8"
           >
-            {/* Header */}
-            <SettingsPageHeader title="My Account" description="Manage your personal information" />
-
             {/* Two-zone layout: a sticky identity rail (read-only summary) beside
                 the editable profile canvas. Collapses to one column below lg. */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
@@ -475,6 +471,7 @@ export default function AccountPage() {
                 <SectionCard
                   title={<SectionTitle icon={MapPin}>Address</SectionTitle>}
                   description="Your mailing address"
+                  className="overflow-visible"
                   contentClassName="space-y-4"
                 >
                   <TextField
