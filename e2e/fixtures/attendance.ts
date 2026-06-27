@@ -34,7 +34,13 @@ const USER = {
   assignments: { [SCHOOL_ID]: 'Principal' },
 }
 
+// Scope the seeded auth cookies to whatever origin the run targets (localhost
+// dev server OR a Vercel Preview) — pinning to `domain: localhost` would silently
+// no-op against a Preview host and every route would bounce to login.
+const TARGET_URL = process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:3000'
+
 export async function seedAttendanceSession(page: Page): Promise<void> {
+  const expires = Math.floor(Date.now() / 1000) + 60 * 60
   await page.context().addCookies([
     {
       name: 'edforge-auth',
@@ -44,10 +50,9 @@ export async function seedAttendanceSession(page: Page): Promise<void> {
           version: 0,
         }),
       ),
-      domain: 'localhost',
-      path: '/',
+      url: TARGET_URL,
       sameSite: 'Lax',
-      expires: Math.floor(Date.now() / 1000) + 60 * 60,
+      expires,
     },
     {
       name: 'edforge-app',
@@ -57,10 +62,9 @@ export async function seedAttendanceSession(page: Page): Promise<void> {
           version: 0,
         }),
       ),
-      domain: 'localhost',
-      path: '/',
+      url: TARGET_URL,
       sameSite: 'Lax',
-      expires: Math.floor(Date.now() / 1000) + 60 * 60,
+      expires,
     },
   ])
 }

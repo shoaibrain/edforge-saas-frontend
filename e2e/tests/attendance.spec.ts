@@ -7,8 +7,18 @@
  *
  * ⚠️ Run in CI or a resourced environment. PLAYWRIGHT_START_SERVER=1 boots the full
  * `pnpm dev:mvp` Module-Federation server (shell + 3 MFEs) — that is memory-heavy and
- * has OOM-crashed dev laptops. Against a Vercel Preview, point at it instead and skip
- * the local server: `PLAYWRIGHT_BASE_URL=<preview-url> ATTENDANCE_E2E=1 pnpm playwright test`.
+ * has OOM-crashed dev laptops.
+ *
+ * Preferred (lightweight — chromium against a remote URL, no local server):
+ *   VERCEL_AUTOMATION_BYPASS_SECRET=<secret> \
+ *   PLAYWRIGHT_BASE_URL=<preview-url> ATTENDANCE_E2E=1 \
+ *     pnpm playwright test e2e/tests/attendance.spec.ts
+ *
+ * The bypass secret is required because Vercel Preview URLs sit behind Deployment
+ * Protection (a Vercel login wall) — without it every route bounces to Vercel's
+ * login and no app assertion can run. Get it from Vercel → Project → Settings →
+ * Deployment Protection → "Protection Bypass for Automation" (or disable protection
+ * for the Preview). The playwright config forwards it as x-vercel-protection-bypass.
  *
  * All backend calls are mocked with page.route (e2e/fixtures/attendance.ts), so
  * these run against the frontend dev server only — no live tenant/JWT needed.
