@@ -73,7 +73,7 @@ interface BillingHealthCardProps {
 
 // ─── Skeletons ───────────────────────────────────────────────────────────────
 
-function SectionSkeleton({ rows = 4 }: { rows?: number }) {
+function GatewayRowsSkeleton({ rows = 3 }: { rows?: number }) {
   return (
     <div className="space-y-3">
       {Array.from({ length: rows }).map((_, i) => (
@@ -86,6 +86,47 @@ function SectionSkeleton({ rows = 4 }: { rows?: number }) {
         </div>
       ))}
     </div>
+  )
+}
+
+/**
+ * Mirrors the loaded card's full height envelope (donut + legend, aging
+ * spectrum, payment methods) so the card reserves its populated size during
+ * load instead of growing from a short stub — the source of the dashboard's
+ * layout shift.
+ */
+function BillingHealthSkeleton() {
+  return (
+    <>
+      <div className="flex items-start gap-4">
+        <div
+          className="flex-shrink-0 rounded-full v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]"
+          style={{ width: 110, height: 110 }}
+        />
+        <div className="flex-1 space-y-2 pt-1">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="flex justify-between">
+              <div className="h-3 w-24 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
+              <div className="h-3 w-8 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="my-4 h-px bg-[rgb(var(--border-primary)/0.35)]" />
+
+      <div className="mb-4">
+        <div className="h-3 w-24 mb-2 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
+        <SpectrumSkeleton />
+      </div>
+
+      <div className="mb-4 h-px bg-[rgb(var(--border-primary)/0.35)]" />
+
+      <div>
+        <div className="h-3 w-28 mb-2.5 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
+        <GatewayRowsSkeleton />
+      </div>
+    </>
   )
 }
 
@@ -214,7 +255,7 @@ export function BillingHealthCard({
 
       {/* ── Invoice Status: Donut + Legend ── */}
       {isLoading ? (
-        <SectionSkeleton />
+        <BillingHealthSkeleton />
       ) : totalInvoiceCount === 0 ? (
         <div className="flex flex-col items-center py-6">
           <CheckCircle2 className="w-8 h-8 mb-2 opacity-40 text-[rgb(var(--text-tertiary))]" />
