@@ -10,7 +10,7 @@
  * - Policies (attendance defaults)
  */
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, type ReactNode } from 'react'
 import { Navigate } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
 import { toast } from 'sonner'
@@ -23,9 +23,24 @@ import {
   Info,
   AlertTriangle,
   Building2,
+  Coins,
   RefreshCw,
+  type LucideIcon,
 } from 'lucide-react'
-import { Button, FieldLockTooltip, FieldLockIcon, InlineAlert, PageShell, Select, Switch } from '@edforge/ui'
+import {
+  Button,
+  FieldLockIcon,
+  InlineAlert,
+  PageShell,
+  Select,
+  Switch,
+  Card,
+  CardContent,
+  SectionCard,
+  StatusBadge,
+  Heading,
+  Text,
+} from '@edforge/ui'
 import { useAuthStore } from '@/stores/auth.store'
 import { useAppStore } from '@/stores/app.store'
 import { can } from '@edforge/abac'
@@ -69,13 +84,16 @@ interface WorkspaceSettings {
 }
 import {
   SettingsPageHeader,
-  SettingsSection,
   SettingsFieldRow,
   SettingsSkeleton,
   UnsavedChangesBar,
   staggerChildren,
   fadeInUp,
 } from '@/components/settings/SettingsShared'
+import {
+  DescriptionList,
+  type DescriptionListItem,
+} from '@/components/settings/DescriptionList'
 
 // ============================================================================
 // CONSTANTS
@@ -217,6 +235,21 @@ const DEFAULT_SETTINGS: Omit<WorkspaceSettings, 'tenantId'> = {
 }
 
 // ============================================================================
+// SECTION TITLE — icon chip + label for SectionCard headers
+// ============================================================================
+
+function SectionTitle({ icon: Icon, children }: { icon: LucideIcon; children: ReactNode }) {
+  return (
+    <span className="flex items-center gap-2.5">
+      <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]">
+        <Icon className="h-4 w-4" />
+      </span>
+      <span>{children}</span>
+    </span>
+  )
+}
+
+// ============================================================================
 // TENANT INFO CARD — read-only identity fields (archetype, country, tier, created)
 // ============================================================================
 
@@ -226,28 +259,6 @@ interface TenantInfoCardProps {
   country: string | null
   tier: string | null
   createdAt: string | null
-}
-
-function TenantInfoField({
-  label,
-  value,
-}: {
-  label: string
-  value: string
-}) {
-  return (
-    <div className="flex items-center justify-between py-2.5 border-b border-[rgb(var(--border-tertiary))] last:border-b-0">
-      <div className="flex items-center gap-2">
-        <span className="text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase tracking-wide">
-          {label}
-        </span>
-        <FieldLockTooltip />
-      </div>
-      <span className="text-sm font-semibold text-[rgb(var(--text-primary))]">
-        {value}
-      </span>
-    </div>
-  )
 }
 
 function TenantInfoCard({
@@ -265,35 +276,36 @@ function TenantInfoCard({
       })
     : null
 
+  const items: DescriptionListItem[] = [
+    ...(tenantName ? [{ label: 'Name', value: tenantName }] : []),
+    ...(archetype
+      ? [{ label: 'Archetype', value: <StatusBadge tone="info">{archetype}</StatusBadge> }]
+      : []),
+    ...(country ? [{ label: 'Country', value: country }] : []),
+    ...(tier ? [{ label: 'Tier', value: <StatusBadge tone="neutral">{tier}</StatusBadge> }] : []),
+    ...(createdAtDisplay ? [{ label: 'Created', value: createdAtDisplay }] : []),
+  ]
+
   return (
     <motion.div variants={fadeInUp}>
-      <div
-        data-testid="tenant-info-card"
-        className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] p-4"
-      >
-        <div className="flex items-center gap-3 mb-3">
-          <div className="p-2 rounded-lg bg-[rgb(var(--background-tertiary))]">
-            <Building2 className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] " />
+      <Card data-testid="tenant-info-card">
+        <CardContent className="space-y-3">
+          <div className="flex items-center gap-3">
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]">
+              <Building2 className="h-4 w-4" />
+            </span>
+            <div className="min-w-0">
+              <Heading level={2} variant="subsection">
+                Tenant Info
+              </Heading>
+              <Text variant="caption">
+                Read-only — set at provisioning and cannot be changed.
+              </Text>
+            </div>
           </div>
-          <div>
-            <h2 className="text-sm font-semibold text-[rgb(var(--text-primary))]">
-              Tenant Info
-            </h2>
-            <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">
-              Read-only. These fields are set at provisioning and cannot be changed.
-            </p>
-          </div>
-        </div>
-        <div className="space-y-0">
-          {tenantName && <TenantInfoField label="Name" value={tenantName} />}
-          {archetype && <TenantInfoField label="Archetype" value={archetype} />}
-          {country && <TenantInfoField label="Country" value={country} />}
-          {tier && <TenantInfoField label="Tier" value={tier} />}
-          {createdAtDisplay && (
-            <TenantInfoField label="Created" value={createdAtDisplay} />
-          )}
-        </div>
-      </div>
+          <DescriptionList items={items} />
+        </CardContent>
+      </Card>
     </motion.div>
   )
 }
@@ -591,47 +603,33 @@ export default function WorkspaceSettingsPage() {
           icon={Building2}
         />
 
-        {/* Tenant context band — read-only identity + governance defaults sit
-            side by side on large screens so the page opens with a compact
-            context row instead of two stacked full-width cards. */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-        {/* Tenant Info Card — read-only identity fields (immutable at provisioning) */}
-        <TenantInfoCard
-          tenantName={tenantName}
-          archetype={archetype}
-          country={country}
-          tier={tenantTier}
-          createdAt={createdAt}
-        />
+        {/* Two-zone layout: a sticky context rail (read-only identity + the
+            governance defaults that explain the locks) beside the editable
+            regional canvas. Collapses to one column below lg. */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+          {/* Context rail */}
+          <motion.div variants={fadeInUp} className="lg:col-span-1 lg:sticky lg:top-6 space-y-6">
+            <TenantInfoCard
+              tenantName={tenantName}
+              archetype={archetype}
+              country={country}
+              tier={tenantTier}
+              createdAt={createdAt}
+            />
+            <GovernanceProfileCard archetype={archetype} country={country} />
+          </motion.div>
 
-        {/* Governance Profile (GF3.4) — read-only resolved archetype + the
-            regional defaults the governance body locks. Sits directly above
-            Regional Settings so the constrained dropdowns below (GF3.2) have a
-            visible "why". */}
-        <GovernanceProfileCard archetype={archetype} country={country} />
-        </div>
-
-        {/* Note: lock status is now surfaced inside Regional Settings (section-scoped),
-            because Regional is the only subtree that actually locks — Tenant Info is
-            permanently locked, and Branding/Policies are always editable. */}
-
-        {/* Regional Settings */}
-        <SettingsSection
-          title="Regional Settings"
-          icon={Globe}
-          description="Default timezone, language, and date/time formatting"
-        >
-          {/* Forewarning banner.
-              - Unlocked: muted heads-up that these fields WILL lock.
-              - Locked: amber notice with specific lockHolders so a multi-school
-                admin learns exactly which school+year to close to unlock.
-              Display-only fields (locale, date/time/number format,
-              enableDualDateDisplay) remain editable in either state. */}
-          <InlineAlert
-            variant={isLocked ? 'warning' : 'info'}
-            icon={<Lock className="w-3.5 h-3.5" />}
-            className="mb-2 text-xs"
-          >
+          {/* Regional canvas */}
+          <motion.div variants={fadeInUp} className="lg:col-span-2 space-y-6">
+            {/* Forewarning banner — unlocked: a muted heads-up that these fields
+                WILL lock; locked: an amber notice naming the specific school +
+                academic year an admin must close to unlock. Display-only fields
+                stay editable either way. */}
+            <InlineAlert
+              variant={isLocked ? 'warning' : 'info'}
+              icon={<Lock className="w-3.5 h-3.5" />}
+              className="text-xs"
+            >
             {isLocked ? (
               <>
                 <p>
@@ -663,10 +661,11 @@ export default function WorkspaceSettingsPage() {
             )}
           </InlineAlert>
 
-          {/* Two-column field grid on xl screens — uses the settings width and
-              roughly halves the section height; stays single column below xl so
-              each label + select keeps room to breathe. */}
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-x-8">
+            <SectionCard
+              title={<SectionTitle icon={Globe}>Localization</SectionTitle>}
+              description="Language, timezone, and date/time formatting"
+              contentClassName="py-2"
+            >
           <SettingsFieldRow label={renderLabel('Default Timezone', lkTimezone)} description="Organization's primary timezone for scheduling and timestamps" inline>
             <WorkspaceSelect
               value={displaySettings.regional.defaultTimezone}
@@ -711,7 +710,13 @@ export default function WorkspaceSettingsPage() {
               options={WEEK_START_OPTIONS}
             />
           </SettingsFieldRow>
+            </SectionCard>
 
+            <SectionCard
+              title={<SectionTitle icon={Coins}>Finance &amp; Calendar</SectionTitle>}
+              description="Currency, calendar system, and number formatting"
+              contentClassName="py-2"
+            >
           <SettingsFieldRow label={renderLabel('Default Currency', lkCurrency)} description="Currency used for invoices, payments, and financial reports" inline>
             <WorkspaceSelect
               value={displaySettings.regional.defaultCurrency}
@@ -748,15 +753,13 @@ export default function WorkspaceSettingsPage() {
               options={NUMBER_FORMAT_OPTIONS}
             />
           </SettingsFieldRow>
-          </div>
-        </SettingsSection>
+            </SectionCard>
+          </motion.div>
+        </div>
 
-        {/* COMING SOON — Organization Branding section (re-enable when branding customization ships) */}
-
-        {/* COMING SOON — Attendance Defaults section (re-enable when attendance policy config ships) */}
-
-        {/* Lock taxonomy + permissions hint — replaces the older single "Important" note */}
-        <motion.div variants={fadeInUp} className="grid grid-cols-1 lg:grid-cols-2 gap-3 items-start">
+        {/* Lock taxonomy + permissions — full-width informational footer below
+            the two-zone grid. */}
+        <motion.div variants={fadeInUp} className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-start">
           <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))]">
             <Info className="w-4 h-4 text-[rgb(var(--text-tertiary))] flex-shrink-0 mt-0.5" />
             <div className="flex-1">

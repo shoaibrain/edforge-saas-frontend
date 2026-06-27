@@ -21,9 +21,11 @@
  */
 
 import { motion } from 'framer-motion'
-import { ShieldCheck, Lock } from 'lucide-react'
+import { ShieldCheck } from 'lucide-react'
 import { useTranslation } from '@edforge/i18n'
 import { getArchetypeProfile, allowedValuesFor } from '@edforge/archetype'
+import { Card, CardContent, Heading, Text } from '@edforge/ui'
+import { DescriptionList, type DescriptionListItem } from './DescriptionList'
 
 interface GovernanceProfileCardProps {
   archetype: string | null
@@ -42,32 +44,6 @@ const ARCHETYPE_LABEL_FALLBACK: Record<string, string> = {
 const CALENDAR_LABEL_FALLBACK: Record<string, string> = {
   gregorian: 'Gregorian',
   bikram_sambat: 'Bikram Sambat (BS)',
-}
-
-function GovernanceField({
-  label,
-  valueText,
-  locked,
-  lockedLabel,
-}: {
-  label: string
-  valueText: string
-  locked: boolean
-  lockedLabel: string
-}) {
-  return (
-    <div className="flex items-center justify-between py-2.5 border-b border-[rgb(var(--border-tertiary))] last:border-b-0">
-      <span className="text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase tracking-wide">
-        {label}
-      </span>
-      <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-[rgb(var(--text-primary))]">
-        {locked && (
-          <Lock className="w-3 h-3 text-[rgb(var(--text-tertiary))]" aria-label={lockedLabel} />
-        )}
-        {valueText}
-      </span>
-    </div>
-  )
 }
 
 export function GovernanceProfileCard({ archetype, country }: GovernanceProfileCardProps) {
@@ -109,51 +85,40 @@ export function GovernanceProfileCard({ archetype, country }: GovernanceProfileC
     { label: t('workspace.governanceProfile.calendar', { defaultValue: 'Calendar' }), control: 'calendarSystem' },
   ]
 
+  const items: DescriptionListItem[] = [
+    {
+      label: t('workspace.governanceProfile.governanceBody', { defaultValue: 'Governance Body' }),
+      value: archetypeLabel,
+    },
+    ...rows.map(({ label, control }): DescriptionListItem => {
+      const { locked, valueText } = valueFor(control)
+      return { label, value: valueText, locked, lockLabel: lockedLabel }
+    }),
+  ]
+
   return (
     <motion.div variants={fadeInUpFallback}>
-      <div
-        data-testid="governance-profile-card"
-        className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] p-4"
-      >
-        <div className="flex items-center gap-3 mb-3">
-          <div className="p-2 rounded-lg bg-[rgb(var(--background-tertiary))]">
-            <ShieldCheck className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] " />
-          </div>
-          <div>
-            <h2 className="text-sm font-semibold text-[rgb(var(--text-primary))]">
-              {t('workspace.governanceProfile.title', { defaultValue: 'Governance Profile' })}
-            </h2>
-            <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">
-              {t('workspace.governanceProfile.subtitle', {
-                defaultValue:
-                  'Regional defaults your governance body locks. Set at provisioning, applied tenant-wide.',
-              })}
-            </p>
-          </div>
-        </div>
-        <div className="space-y-0">
-          <div className="flex items-center justify-between py-2.5 border-b border-[rgb(var(--border-tertiary))]">
-            <span className="text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase tracking-wide">
-              {t('workspace.governanceProfile.governanceBody', { defaultValue: 'Governance Body' })}
+      <Card data-testid="governance-profile-card">
+        <CardContent className="space-y-3">
+          <div className="flex items-center gap-3">
+            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]">
+              <ShieldCheck className="h-4 w-4" />
             </span>
-            <span className="text-sm font-semibold text-[rgb(var(--text-primary))]">
-              {archetypeLabel}
-            </span>
+            <div className="min-w-0">
+              <Heading level={2} variant="subsection">
+                {t('workspace.governanceProfile.title', { defaultValue: 'Governance Profile' })}
+              </Heading>
+              <Text variant="caption">
+                {t('workspace.governanceProfile.subtitle', {
+                  defaultValue:
+                    'Regional defaults your governance body locks. Set at provisioning, applied tenant-wide.',
+                })}
+              </Text>
+            </div>
           </div>
-          {rows.map(({ label, control }) => {
-            const { locked, valueText } = valueFor(control)
-            return (
-              <GovernanceField
-                key={control}
-                label={label}
-                valueText={valueText}
-                locked={locked}
-                lockedLabel={lockedLabel}
-              />
-            )
-          })}
-        </div>
-      </div>
+          <DescriptionList items={items} />
+        </CardContent>
+      </Card>
     </motion.div>
   )
 }
