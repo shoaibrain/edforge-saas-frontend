@@ -1,42 +1,45 @@
 /**
  * Account Settings Page
- * 
+ *
  * Manage personal information, profile photo, and contact details.
  * Integrated with backend Users API via TanStack Query.
  */
 
-import { useState, useEffect, useCallback } from 'react'
+import { useEffect, useCallback, type ReactNode } from 'react'
 import { useForm, FormProvider } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { toast } from 'sonner'
-import {
-  Mail,
-  User,
-  MapPin,
-  Phone,
-  Copy,
-  Check
-} from 'lucide-react'
+import { Mail, User, MapPin, Phone, type LucideIcon } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Button } from '@edforge/ui'
+import {
+  Button,
+  PageShell,
+  Card,
+  CardContent,
+  SectionCard,
+  StatusBadge,
+  Avatar,
+  Heading,
+  Text,
+} from '@edforge/ui'
 import { TextField, SelectField } from '@/components/forms/fields'
 import { useAuthStore } from '@/stores/auth.store'
-import { 
-  userProfileSchema, 
-  type UserProfileFormValues 
+import {
+  userProfileSchema,
+  type UserProfileFormValues,
 } from '@/schemas/person.schema'
 import { getUserAvatar } from '@/lib/avatar'
 import {
-  SettingsPageHeader,
-  SettingsSection,
-  SettingsFormCard,
   SettingsSkeleton,
-  SettingsDivider,
   UnsavedChangesBar,
   staggerChildren,
   fadeInUp,
 } from '@/components/settings/SettingsShared'
+import {
+  DescriptionList,
+  type DescriptionListItem,
+} from '@/components/settings/DescriptionList'
 import {
   usersService,
   type UpdateUserDto,
@@ -116,6 +119,20 @@ const US_STATE_OPTIONS = [
   { value: 'WY', label: 'Wyoming' },
 ]
 
+// ============================================================================
+// SECTION TITLE — icon chip + label for SectionCard headers
+// ============================================================================
+
+function SectionTitle({ icon: Icon, children }: { icon: LucideIcon; children: ReactNode }) {
+  return (
+    <span className="flex items-center gap-2.5">
+      <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]">
+        <Icon className="h-4 w-4" />
+      </span>
+      <span>{children}</span>
+    </span>
+  )
+}
 
 // ============================================================================
 // LOADING SKELETON
@@ -123,9 +140,9 @@ const US_STATE_OPTIONS = [
 
 function AccountPageSkeleton() {
   return (
-    <div className="max-w-3xl mx-auto px-6 py-8">
+    <PageShell as="div" variant="settings" className="max-w-6xl">
       <SettingsSkeleton rows={5} showHeader />
-    </div>
+    </PageShell>
   )
 }
 
@@ -135,13 +152,13 @@ function AccountPageSkeleton() {
 
 function AccountPageError({ error, onRetry }: { error: string; onRetry: () => void }) {
   return (
-    <div className="max-w-3xl mx-auto px-6 py-8">
+    <PageShell as="div" variant="settings" className="max-w-6xl">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         className="flex flex-col items-center justify-center py-12"
       >
-        <div className="w-16 h-16 rounded-full bg-[rgb(var(--state-danger-bg)/0.18)]0/10 flex items-center justify-center mb-4">
+        <div className="w-16 h-16 rounded-full bg-[rgb(var(--state-danger-bg)/0.18)] flex items-center justify-center mb-4">
           <User className="w-8 h-8 text-[rgb(var(--state-danger-fg))]" />
         </div>
         <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))] mb-2">
@@ -154,80 +171,7 @@ function AccountPageError({ error, onRetry }: { error: string; onRetry: () => vo
           Try Again
         </Button>
       </motion.div>
-    </div>
-  )
-}
-
-// ============================================================================
-// AVATAR DISPLAY COMPONENT
-// ============================================================================
-
-interface AvatarUploadProps {
-  avatarUrl: string
-  displayName: string
-}
-
-function AvatarUpload({ avatarUrl, displayName }: AvatarUploadProps) {
-  return (
-    <div className="flex items-start gap-6">
-      <div className="relative">
-        <img
-          src={avatarUrl}
-          alt={displayName}
-          className="w-24 h-24 rounded-xl object-cover ring-2 ring-[rgb(var(--border-primary))]"
-        />
-      </div>
-
-      <div className="flex-1 min-w-0">
-        <p className="text-lg font-semibold text-[rgb(var(--text-primary))] truncate">{displayName}</p>
-      </div>
-    </div>
-  )
-}
-
-
-// ============================================================================
-// COPY USER ID BUTTON
-// ============================================================================
-
-function CopyButton({ text }: { text: string }) {
-  const [copied, setCopied] = useState(false)
-
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(text)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
-
-  return (
-    <button
-      type="button"
-      onClick={handleCopy}
-      className="p-1 rounded hover:bg-[rgb(var(--background-tertiary))] transition-colors"
-      title="Copy to clipboard"
-    >
-      <AnimatePresence mode="wait">
-        {copied ? (
-          <motion.div
-            key="check"
-            initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.5, opacity: 0 }}
-          >
-            <Check className="w-3.5 h-3.5 text-[rgb(var(--state-success-fg))]" />
-          </motion.div>
-        ) : (
-          <motion.div
-            key="copy"
-            initial={{ scale: 0.5, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.5, opacity: 0 }}
-          >
-            <Copy className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))]" />
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </button>
+    </PageShell>
   )
 }
 
@@ -286,7 +230,11 @@ export default function AccountPage() {
     },
   })
 
-  const { handleSubmit, formState: { isDirty }, reset } = methods
+  const {
+    handleSubmit,
+    formState: { isDirty },
+    reset,
+  } = methods
 
   const handleReset = useCallback(() => {
     reset()
@@ -350,17 +298,28 @@ export default function AccountPage() {
   }
 
   // Computed values
-  const avatarUrl = userProfile?.avatarUrl || getUserAvatar(
-    userProfile ? `${userProfile.firstName} ${userProfile.lastName}` : user?.name || 'User'
-  )
-  
-  const displayName = userProfile?.displayName || 
-    (userProfile ? `${userProfile.firstName} ${userProfile.lastName}`.trim() : '') || 
-    userProfile?.email || 
-    user?.name || 
+  const avatarUrl =
+    userProfile?.avatarUrl ||
+    getUserAvatar(
+      userProfile ? `${userProfile.firstName} ${userProfile.lastName}` : user?.name || 'User'
+    )
+
+  const displayName =
+    userProfile?.displayName ||
+    (userProfile ? `${userProfile.firstName} ${userProfile.lastName}`.trim() : '') ||
+    userProfile?.email ||
+    user?.name ||
     'User'
-  
+
   const displayRole = userProfile?.globalRole || user?.globalRole || 'User'
+
+  // Map domain status -> semantic StatusBadge tone.
+  const statusTone =
+    userProfile?.status === 'active'
+      ? 'success'
+      : userProfile?.status === 'pending'
+        ? 'warning'
+        : 'neutral'
 
   // Loading state
   if (isLoading) {
@@ -370,15 +329,51 @@ export default function AccountPage() {
   // Error state
   if (isError && !userProfile) {
     return (
-      <AccountPageError 
-        error={error instanceof Error ? error.message : 'Failed to load profile'} 
-        onRetry={() => refetch()} 
+      <AccountPageError
+        error={error instanceof Error ? error.message : 'Failed to load profile'}
+        onRetry={() => refetch()}
       />
     )
   }
 
+  // Read-only identity metadata, surfaced in the rail.
+  const accountDetailItems: DescriptionListItem[] = userProfile
+    ? [
+        {
+          label: 'User ID',
+          value: userProfile.userId,
+          copyable: userProfile.userId,
+          mono: true,
+        },
+        {
+          label: 'Created',
+          value: new Date(userProfile.createdAt).toLocaleDateString(undefined, {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          }),
+        },
+        ...(userProfile.lastLoginAt
+          ? [
+              {
+                label: 'Last login',
+                value: new Date(userProfile.lastLoginAt).toLocaleString(),
+              },
+            ]
+          : []),
+        {
+          label: 'MFA',
+          value: (
+            <StatusBadge tone={userProfile.mfaEnabled ? 'success' : 'neutral'} dot>
+              {userProfile.mfaEnabled ? 'Enabled' : 'Not enabled'}
+            </StatusBadge>
+          ),
+        },
+      ]
+    : []
+
   return (
-    <div className="max-w-3xl mx-auto px-6 py-8 pb-24">
+    <PageShell as="div" variant="settings" className="max-w-6xl pb-24">
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <motion.div
@@ -387,170 +382,127 @@ export default function AccountPage() {
             variants={staggerChildren}
             className="space-y-8"
           >
-            {/* Header */}
-            <SettingsPageHeader
-              title="My Account"
-              description="Manage your personal information"
-            />
-
-            {/* Profile Photo Section */}
-            <motion.div variants={fadeInUp}>
-              <SettingsFormCard>
-                <div className="flex items-start gap-6">
-                  <AvatarUpload
-                    avatarUrl={avatarUrl}
-                    displayName={displayName}
-                  />
-                  
-                  <div className="flex flex-col items-end gap-2">
-                    <span className="text-sm font-medium text-[rgb(var(--action-secondary-fg))] ">
-                      {displayRole}
-                    </span>
-                    {userProfile?.status && (
-                      <span className={`
-                        inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium
-                        ${userProfile.status === 'active' 
-                          ? 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] ' 
-                          : userProfile.status === 'pending'
-                            ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
-                            : 'bg-[rgb(var(--background-tertiary))]0/10 text-[rgb(var(--text-secondary))] '
-                        }
-                      `}>
-                        {userProfile.status.charAt(0).toUpperCase() + userProfile.status.slice(1)}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </SettingsFormCard>
-            </motion.div>
-
-            <SettingsDivider />
-
-            {/* Personal Information Section */}
-            <SettingsSection
-              title="Personal Information"
-              icon={User}
-              description="Your name and identity"
-            >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <TextField name="firstName" label="First Name" placeholder="Enter first name" required />
-                <TextField name="lastName" label="Last Name" placeholder="Enter last name" required />
-              </div>
-              <TextField
-                name="displayName"
-                label="Display Name"
-                placeholder="How you want to be called"
-                helperText="This is how your name appears to others"
-              />
-            </SettingsSection>
-
-            {/* Contact Information Section */}
-            <SettingsSection
-              title="Contact Information"
-              icon={Mail}
-              description="Email and phone details"
-            >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <TextField 
-                  name="email" 
-                  label="Email" 
-                  type="email" 
-                  placeholder="email@example.com" 
-                  icon={Mail}
-                  disabled
-                  helperText="Contact support to change your email"
-                />
-                <TextField 
-                  name="phone" 
-                  label="Phone Number" 
-                  type="tel" 
-                  placeholder="+1 555-123-4567" 
-                  icon={Phone}
-                  helperText="Include country code"
-                />
-              </div>
-            </SettingsSection>
-
-            {/* Address Section */}
-            <SettingsSection
-              title="Address"
-              icon={MapPin}
-              description="Your mailing address"
-            >
-              <div className="space-y-4">
-                <TextField 
-                  name="address.street" 
-                  label="Street Address" 
-                  placeholder="123 Main Street"
-                  icon={MapPin}
-                />
-                <TextField 
-                  name="address.street2" 
-                  label="Apartment, Suite, etc." 
-                  placeholder="Apt 4B (optional)"
-                />
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <TextField name="address.city" label="City" placeholder="San Francisco" />
-                  <SelectField 
-                    name="address.state" 
-                    label="State / Province"
-                    options={US_STATE_OPTIONS}
-                  />
-                  <TextField name="address.postalCode" label="Postal Code" placeholder="94102" />
-                </div>
-                <SelectField 
-                  name="address.country" 
-                  label="Country"
-                  options={COUNTRY_OPTIONS}
-                  className="max-w-xs"
-                />
-              </div>
-            </SettingsSection>
-
-            {/* Account Metadata */}
-            {userProfile && (
-              <>
-                <SettingsDivider />
-                <motion.div variants={fadeInUp} className="space-y-3">
-                  <h2 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Account Details</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm p-4 rounded-xl bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))]">
-                    <div className="space-y-1">
-                      <span className="text-[rgb(var(--text-tertiary))]">User ID</span>
-                      <div className="flex items-center gap-2">
-                        <p className="font-mono text-xs text-[rgb(var(--text-secondary))] truncate" title={userProfile.userId}>
-                          {userProfile.userId}
-                        </p>
-                        <CopyButton text={userProfile.userId} />
+            {/* Two-zone layout: a sticky identity rail (read-only summary) beside
+                the editable profile canvas. Collapses to one column below lg. */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+              {/* Identity rail */}
+              <motion.div variants={fadeInUp} className="lg:col-span-1 lg:sticky lg:top-6">
+                <Card>
+                  <CardContent className="space-y-5">
+                    <div className="flex flex-col items-center gap-3 text-center">
+                      <Avatar
+                        size="2xl"
+                        shape="rounded"
+                        src={avatarUrl}
+                        name={displayName}
+                        alt={displayName}
+                      />
+                      <div className="min-w-0 space-y-2">
+                        <Heading level={2} variant="subsection" className="truncate">
+                          {displayName}
+                        </Heading>
+                        <div className="flex flex-wrap items-center justify-center gap-1.5">
+                          <StatusBadge tone="info">{displayRole}</StatusBadge>
+                          {userProfile?.status && (
+                            <StatusBadge tone={statusTone} dot>
+                              {userProfile.status.charAt(0).toUpperCase() +
+                                userProfile.status.slice(1)}
+                            </StatusBadge>
+                          )}
+                        </div>
                       </div>
                     </div>
-                    <div className="space-y-1">
-                      <span className="text-[rgb(var(--text-tertiary))]">Created</span>
-                      <p className="text-[rgb(var(--text-secondary))]">
-                        {new Date(userProfile.createdAt).toLocaleDateString(undefined, {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                        })}
-                      </p>
-                    </div>
-                    {userProfile.lastLoginAt && (
-                      <div className="space-y-1">
-                        <span className="text-[rgb(var(--text-tertiary))]">Last Login</span>
-                        <p className="text-[rgb(var(--text-secondary))]">
-                          {new Date(userProfile.lastLoginAt).toLocaleString()}
-                        </p>
+
+                    {userProfile && (
+                      <div className="space-y-2 border-t border-[rgb(var(--border-tertiary))] pt-4">
+                        <Text variant="label">Account Details</Text>
+                        <DescriptionList layout="stacked" items={accountDetailItems} />
                       </div>
                     )}
-                    <div className="space-y-1">
-                      <span className="text-[rgb(var(--text-tertiary))]">MFA Status</span>
-                      <p className={`font-medium ${userProfile.mfaEnabled ? 'text-[rgb(var(--state-success-fg))] ' : 'text-[rgb(var(--text-secondary))]'}`}>
-                        {userProfile.mfaEnabled ? 'Enabled' : 'Not enabled'}
-                      </p>
-                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+
+              {/* Editable canvas */}
+              <motion.div variants={fadeInUp} className="lg:col-span-2 space-y-6">
+                <SectionCard
+                  title={<SectionTitle icon={User}>Personal Information</SectionTitle>}
+                  description="Your name and identity"
+                  contentClassName="space-y-4"
+                >
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <TextField name="firstName" label="First Name" placeholder="Enter first name" required />
+                    <TextField name="lastName" label="Last Name" placeholder="Enter last name" required />
                   </div>
-                </motion.div>
-              </>
-            )}
+                  <TextField
+                    name="displayName"
+                    label="Display Name"
+                    placeholder="How you want to be called"
+                    helperText="This is how your name appears to others"
+                  />
+                </SectionCard>
+
+                <SectionCard
+                  title={<SectionTitle icon={Mail}>Contact Information</SectionTitle>}
+                  description="Email and phone details"
+                  contentClassName="space-y-4"
+                >
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <TextField
+                      name="email"
+                      label="Email"
+                      type="email"
+                      placeholder="email@example.com"
+                      icon={Mail}
+                      disabled
+                      helperText="Contact support to change your email"
+                    />
+                    <TextField
+                      name="phone"
+                      label="Phone Number"
+                      type="tel"
+                      placeholder="+1 555-123-4567"
+                      icon={Phone}
+                      helperText="Include country code"
+                    />
+                  </div>
+                </SectionCard>
+
+                <SectionCard
+                  title={<SectionTitle icon={MapPin}>Address</SectionTitle>}
+                  description="Your mailing address"
+                  className="overflow-visible"
+                  contentClassName="space-y-4"
+                >
+                  <TextField
+                    name="address.street"
+                    label="Street Address"
+                    placeholder="123 Main Street"
+                    icon={MapPin}
+                  />
+                  <TextField
+                    name="address.street2"
+                    label="Apartment, Suite, etc."
+                    placeholder="Apt 4B (optional)"
+                  />
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <TextField name="address.city" label="City" placeholder="San Francisco" />
+                    <SelectField
+                      name="address.state"
+                      label="State / Province"
+                      options={US_STATE_OPTIONS}
+                    />
+                    <TextField name="address.postalCode" label="Postal Code" placeholder="94102" />
+                  </div>
+                  <SelectField
+                    name="address.country"
+                    label="Country"
+                    options={COUNTRY_OPTIONS}
+                    className="max-w-xs"
+                  />
+                </SectionCard>
+              </motion.div>
+            </div>
           </motion.div>
 
           <UnsavedChangesBar
@@ -561,6 +513,6 @@ export default function AccountPage() {
           />
         </form>
       </FormProvider>
-    </div>
+    </PageShell>
   )
 }
