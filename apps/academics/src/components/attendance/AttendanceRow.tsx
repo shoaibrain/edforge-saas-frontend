@@ -16,6 +16,13 @@ import { useState, useRef, forwardRef, useImperativeHandle } from 'react'
 import { MessageSquare, Edit2, X, Lock } from 'lucide-react'
 import { Select, Input } from '@edforge/ui'
 import { StatusBadge } from './StatusBadge'
+import {
+  ENTRY_STATUSES,
+  ATTENDANCE_STATUS_META,
+  TONE_CLASSES,
+  statusForShortcut,
+  LOCKED_OVERRIDE_STATUSES,
+} from './attendanceStatus'
 import type { AttendanceStatus } from '../../services/academics.service'
 
 // ============================================================================
@@ -57,19 +64,23 @@ export interface AttendanceRowRef {
 // CONSTANTS
 // ============================================================================
 
-const statusButtons: {
-  status: AttendanceStatus
-  label: string
-  shortcut: string
-  color: string
-  activeColor: string
-}[] = [
-  { status: 'present', label: 'P', shortcut: 'P', color: 'hover:bg-[rgb(var(--state-success-bg)/0.18)] hover:text-[rgb(var(--state-success-fg))]', activeColor: 'bg-[rgb(var(--state-success-fg))] text-[rgb(var(--action-primary-fg))]' },
-  { status: 'absent', label: 'A', shortcut: 'A', color: 'hover:bg-[rgb(var(--state-danger-bg)/0.18)] hover:text-[rgb(var(--state-danger-fg))]', activeColor: 'bg-[rgb(var(--state-danger-fg))] text-[rgb(var(--action-primary-fg))]' },
-  { status: 'late', label: 'L', shortcut: 'L', color: 'hover:bg-[rgb(var(--state-warning-bg)/0.18)] hover:text-[rgb(var(--state-warning-fg))]', activeColor: 'bg-[rgb(var(--state-warning-fg))] text-[rgb(var(--action-primary-fg))]' },
-  { status: 'excused', label: 'E', shortcut: 'E', color: 'hover:bg-[rgb(var(--state-info-bg)/0.18)] hover:text-[rgb(var(--state-info-fg))]', activeColor: 'bg-[rgb(var(--state-info-fg))] text-[rgb(var(--action-primary-fg))]' },
-  { status: 'remote', label: 'R', shortcut: 'R', color: 'hover:bg-[rgb(var(--state-info-bg)/0.18)] hover:text-[rgb(var(--state-info-fg))]', activeColor: 'bg-[rgb(var(--state-info-fg))] text-[rgb(var(--action-primary-fg))]' },
-]
+// Entry-grid toggle buttons, derived from the single status source (F0.T2).
+const buildButton = (status: AttendanceStatus) => {
+  const meta = ATTENDANCE_STATUS_META[status]
+  const tone = TONE_CLASSES[meta.tone]
+  return {
+    status,
+    label: meta.shortLabel,
+    shortcut: meta.shortcut ?? meta.shortLabel,
+    title: meta.label,
+    color: tone.btnHover,
+    activeColor: tone.btnActive,
+  }
+}
+
+const statusButtons = ENTRY_STATUSES.map(buildButton)
+// F2.T4 — the only statuses a locked (day-presence) row may still record.
+const lockedOverrideButtons = LOCKED_OVERRIDE_STATUSES.map(buildButton)
 
 // Task 4.5: Structured absence reasons
 const EXCUSE_TYPES = [
@@ -142,15 +153,15 @@ export const AttendanceRow = forwardRef<AttendanceRowRef, AttendanceRowProps>(fu
       return
     }
 
-    // Don't process shortcuts in view mode or when the day-presence is locked
-    if (isViewMode || locked) return
+    // Don't process shortcuts in view (past-date) mode.
+    if (isViewMode) return
 
-    const key = e.key.toUpperCase()
-    const match = statusButtons.find((b) => b.shortcut === key)
-    if (match) {
-      e.preventDefault()
-      onStatusChange(match.status)
-    }
+    const match = statusForShortcut(e.key)
+    if (!match) return
+    // F2.T4 — a locked row may still record Tardy/Excused, but not flip presence.
+    if (locked && !LOCKED_OVERRIDE_STATUSES.includes(match)) return
+    e.preventDefault()
+    onStatusChange(match)
   }
 
   // Task 4.6: Correction handlers
@@ -192,12 +203,33 @@ export const AttendanceRow = forwardRef<AttendanceRowRef, AttendanceRowProps>(fu
         {/* Status Buttons or View-Mode Badge */}
         <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
           {locked ? (
-            <div className="flex items-center gap-2" title={lockedHint}>
-              {currentStatus && <StatusBadge status={currentStatus} />}
-              <span className="flex items-center gap-1 text-xs text-text-tertiary">
+            // F2.T4 — day-presence locked by an earlier section: show where it was
+            // recorded, and still allow Tardy/Excused overrides for THIS section.
+            // Present↔Absent is intentionally not offered.
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="flex items-center gap-1 text-xs text-text-tertiary" title={lockedHint}>
                 <Lock className="w-3.5 h-3.5" />
                 {lockedHint || 'Day-presence already recorded'}
               </span>
+              <div className="flex items-center gap-1.5">
+                {lockedOverrideButtons.map((btn) => (
+                  <button
+                    key={btn.status}
+                    type="button"
+                    onClick={() => onStatusChange(btn.status)}
+                    className={`px-2.5 h-9 sm:h-8 rounded-lg text-xs font-semibold transition-all ${
+                      currentStatus === btn.status
+                        ? btn.activeColor
+                        : `bg-surface-secondary text-text-tertiary ${btn.color}`
+                    }`}
+                    title={`Mark ${btn.title} (allowed on a locked row)`}
+                    aria-label={`Mark ${btn.title}`}
+                    aria-pressed={currentStatus === btn.status}
+                  >
+                    {btn.title}
+                  </button>
+                ))}
+              </div>
             </div>
           ) : isViewMode ? (
             <>
@@ -225,8 +257,8 @@ export const AttendanceRow = forwardRef<AttendanceRowRef, AttendanceRowProps>(fu
                       ? btn.activeColor
                       : `bg-surface-secondary text-text-tertiary ${btn.color}`
                   }`}
-                  title={`${btn.status} (${btn.shortcut})`}
-                  aria-label={`Mark ${btn.status}`}
+                  title={`${btn.title} (${btn.shortcut})`}
+                  aria-label={`Mark ${btn.title}`}
                   aria-pressed={currentStatus === btn.status}
                 >
                   {btn.label}

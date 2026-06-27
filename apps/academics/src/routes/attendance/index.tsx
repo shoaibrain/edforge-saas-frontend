@@ -411,11 +411,13 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
   })
 
   const handleSave = useCallback(
-    (records: Array<{ studentId: string; status: AttendanceStatus; notes?: string }>) => {
+    (records: Array<{ studentId: string; status: AttendanceStatus; notes?: string; excuseReason?: string }>) => {
       if (!schoolId || !selectedSectionId) return
-      // Persist locally for offline resilience
+      // Persist locally for offline resilience. F2.T6 — carry excuseReason through
+      // the offline round-trip; the route previously stripped it before
+      // persistLocally, so absence reasons never reached the server on save.
       offlineState.persistLocally(
-        records.map(r => ({ studentId: r.studentId, status: r.status, notes: r.notes ?? '' }))
+        records.map(r => ({ studentId: r.studentId, status: r.status, notes: r.notes ?? '', excuseReason: r.excuseReason }))
       )
       // Then save to server
       offlineState.save()

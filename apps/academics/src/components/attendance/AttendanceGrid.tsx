@@ -32,6 +32,7 @@ import { Input } from '@edforge/ui'
 import type { AttendanceStatus } from '../../services/academics.service'
 import type { StudentSectionResponseDto } from '@aibrains/shared-types'
 import { AttendanceRow, type AttendanceRowRef } from './AttendanceRow'
+import { ENTRY_STATUSES, ATTENDANCE_STATUS_META, isLockedOverrideStatus } from './attendanceStatus'
 import type { SaveStatus } from '../../hooks/useOfflineAttendance'
 
 // ============================================================================
@@ -68,6 +69,14 @@ interface AttendanceGridProps {
    * read-only with the hint; they're excluded from this section's save set.
    */
   lockedStudents?: Map<string, string>
+  /**
+   * F2.T1 — absentee-first default. On a fresh day (no existing record for a
+   * student), unmarked students start at this status so the teacher only marks
+   * exceptions ("everyone present unless told otherwise"). Applies to both
+   * policy modes (Decision D-C). Pass `null` to keep the legacy unmarked grid
+   * (e.g. past-date correction never auto-fills).
+   */
+  defaultStatus?: AttendanceStatus | null
 }
 
 type SortKey = 'name' | 'number' | 'status'
@@ -186,6 +195,7 @@ export function AttendanceGrid({
   saveStatus,
   onCorrection,
   lockedStudents,
+  defaultStatus = 'present',
 }: AttendanceGridProps) {
   // Task 4.6: Determine if this is a past date
   const isPastDate = useMemo(() => {
@@ -193,30 +203,49 @@ export function AttendanceGrid({
     return date < today
   }, [date])
 
-  // Initialize entries from students + any existing records
+  // F2.T1 — absentee-first default only applies for a fresh present/future day.
+  // Past dates are correction mode (start from saved values, never auto-fill).
+  const freshDefault: AttendanceStatus | null = isPastDate ? null : defaultStatus
+
+  // F2.T1 — studentIds the user has explicitly touched. The async backfill below
+  // overrides the absentee-first default with saved records, but must NOT clobber
+  // a real user edit; a `null` status is no longer a reliable "untouched" signal
+  // once we pre-fill present, so we track touch explicitly.
+  const touchedRef = useRef<Set<string>>(new Set())
+
+  // Initialize entries from students + any existing records (absentee-first default
+  // for fresh, non-locked students).
   const initialEntries = useMemo(() => {
     return students.map((s) => {
       const existing = existingRecords.find((r) => r.studentId === s.studentId)
+      const isLocked = lockedStudents?.has(s.studentId) ?? false
+      const status: AttendanceStatus | null = existing
+        ? (existing.status as AttendanceStatus)
+        : isLocked
+          ? null // locked elsewhere — never default; excluded from this section's save
+          : freshDefault
       return {
         studentId: s.studentId,
         studentName: s.studentName || s.studentId,
         studentNumber: s.studentNumber,
-        status: (existing?.status ?? null) as AttendanceStatus | null,
+        status,
         notes: existing?.notes ?? '',
         excuseType: existing?.excuseReason as string | undefined,
       }
     })
-  }, [students, existingRecords])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [students, existingRecords, freshDefault])
 
   const [entries, setEntries] = useState<StudentAttendanceEntry[]>(initialEntries)
 
-  // Ticket 5: Sync entries when existingRecords load asynchronously.
-  // Only backfill entries where the user hasn't made a local edit (status is still null).
+  // Ticket 5 + F2.T1: Sync entries when existingRecords load asynchronously.
+  // Backfill from saved records for any student the user hasn't touched — this
+  // overrides the absentee-first default with the real saved value on return.
   useEffect(() => {
     if (existingRecords.length === 0) return
     setEntries((prev) =>
       prev.map((entry) => {
-        if (entry.status !== null) return entry // User already set a status, don't overwrite
+        if (touchedRef.current.has(entry.studentId)) return entry // preserve user edit
         const existing = existingRecords.find((r) => r.studentId === entry.studentId)
         if (!existing) return entry
         return { ...entry, status: existing.status as AttendanceStatus, notes: existing.notes ?? '', excuseType: existing.excuseReason }
@@ -302,49 +331,72 @@ export function AttendanceGrid({
   }
 
   const handleStatusChange = useCallback((studentId: string, status: AttendanceStatus) => {
+    touchedRef.current.add(studentId)
     setEntries((prev) =>
       prev.map((e) => (e.studentId === studentId ? { ...e, status } : e))
     )
   }, [])
 
   const handleNotesChange = useCallback((studentId: string, notes: string) => {
+    touchedRef.current.add(studentId)
     setEntries((prev) =>
       prev.map((e) => (e.studentId === studentId ? { ...e, notes } : e))
     )
   }, [])
 
   const handleExcuseTypeChange = useCallback((studentId: string, excuseType: string) => {
+    touchedRef.current.add(studentId)
     setEntries((prev) =>
       prev.map((e) => (e.studentId === studentId ? { ...e, excuseType } : e))
     )
   }, [])
 
+  // Bulk actions count as touching every (non-locked) row so a late-arriving
+  // existingRecords backfill can't silently revert them.
   const markAllPresent = useCallback(() => {
     setEntries((prev) =>
-      prev.map((e) => ({ ...e, status: 'present' as AttendanceStatus }))
+      prev.map((e) => {
+        if (lockedStudents?.has(e.studentId)) return e
+        touchedRef.current.add(e.studentId)
+        return { ...e, status: 'present' as AttendanceStatus }
+      })
     )
     setAnnouncement('All students marked present')
-  }, [])
+  }, [lockedStudents])
 
   const markAllAbsent = useCallback(() => {
     setEntries((prev) =>
-      prev.map((e) => ({ ...e, status: 'absent' as AttendanceStatus }))
+      prev.map((e) => {
+        if (lockedStudents?.has(e.studentId)) return e
+        touchedRef.current.add(e.studentId)
+        return { ...e, status: 'absent' as AttendanceStatus }
+      })
     )
     setAnnouncement('All students marked absent')
-  }, [])
+  }, [lockedStudents])
 
   const clearAll = useCallback(() => {
     setEntries((prev) =>
-      prev.map((e) => ({ ...e, status: null, notes: '', excuseType: undefined }))
+      prev.map((e) => {
+        if (lockedStudents?.has(e.studentId)) return e
+        touchedRef.current.add(e.studentId)
+        return { ...e, status: null, notes: '', excuseType: undefined }
+      })
     )
     setAnnouncement('All entries cleared')
-  }, [])
+  }, [lockedStudents])
 
   const handleSave = () => {
     // Only send records that actually changed (dirty records)
     const records = entries
       .filter((e) => {
         if (e.status === null) return false
+        // Locked students' day-presence is owned by an earlier section. Only an
+        // explicit Tardy/Excused override the teacher set here is persisted
+        // (F2.T4); the absentee-first present default is never written for them.
+        if (lockedStudents?.has(e.studentId)) {
+          if (!(touchedRef.current.has(e.studentId) && isLockedOverrideStatus(e.status))) return false
+        }
         const existing = existingRecords.find((r) => r.studentId === e.studentId)
         if (!existing) return true // New record (no prior attendance)
         // Changed status, notes, or reason
@@ -524,14 +576,22 @@ export function AttendanceGrid({
         )}
       </div>
 
-      {/* Keyboard Hint (hide on past dates and on mobile) */}
+      {/* Keyboard Hint (hide on past dates and on mobile) — derived from the
+          single status source (F0.T2/F2.T3) so labels + shortcuts can't drift. */}
       {!isPastDate && (
         <div className="text-xs text-text-tertiary px-1 hidden sm:block">
-          Keyboard shortcuts: <kbd className="px-1 py-0.5 bg-surface-secondary rounded text-text-secondary">P</kbd> Present{' '}
-          <kbd className="px-1 py-0.5 bg-surface-secondary rounded text-text-secondary">A</kbd> Absent{' '}
-          <kbd className="px-1 py-0.5 bg-surface-secondary rounded text-text-secondary">L</kbd> Late{' '}
-          <kbd className="px-1 py-0.5 bg-surface-secondary rounded text-text-secondary">E</kbd> Excused{' '}
-          <kbd className="px-1 py-0.5 bg-surface-secondary rounded text-text-secondary">R</kbd> Remote{' '}
+          Keyboard shortcuts:{' '}
+          {ENTRY_STATUSES.map((s) => {
+            const meta = ATTENDANCE_STATUS_META[s]
+            return (
+              <span key={s}>
+                <kbd className="px-1 py-0.5 bg-surface-secondary rounded text-text-secondary">
+                  {meta.shortcut ?? meta.shortLabel}
+                </kbd>{' '}
+                {meta.label}{' '}
+              </span>
+            )
+          })}
           <kbd className="px-1 py-0.5 bg-surface-secondary rounded text-text-secondary">↑↓</kbd> Navigate
         </div>
       )}

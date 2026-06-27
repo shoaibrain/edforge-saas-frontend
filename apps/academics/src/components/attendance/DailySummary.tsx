@@ -5,6 +5,7 @@
  */
 
 import type { DailyAttendanceSummary } from '../../services/academics.service'
+import { ATTENDANCE_STATUS_META, TONE_CLASSES } from './attendanceStatus'
 
 interface DailySummaryProps {
   summary: DailyAttendanceSummary | undefined
@@ -40,12 +41,16 @@ export function DailySummary({ summary, isLoading }: DailySummaryProps) {
         ? 'text-[rgb(var(--state-warning-fg))]'
         : 'text-[rgb(var(--state-danger-fg))]'
 
+  // Labels + dot colors come from the single status source (F0.T2) so the
+  // summary can't drift from the badges/entry grid (e.g. "Late" → "Tardy").
+  const dot = (status: keyof typeof ATTENDANCE_STATUS_META) =>
+    TONE_CLASSES[ATTENDANCE_STATUS_META[status].tone].dot
   const stats = [
-    { label: 'Present', value: summary.present, dot: 'bg-[rgb(var(--state-success-fg))]' },
-    { label: 'Absent', value: summary.absent, dot: 'bg-[rgb(var(--state-danger-fg))]' },
-    { label: 'Late', value: summary.late, dot: 'bg-[rgb(var(--state-warning-fg))]' },
-    { label: 'Excused', value: summary.excused, dot: 'bg-[rgb(var(--state-info-fg))]' },
-    ...(summary.remote ? [{ label: 'Remote', value: summary.remote, dot: 'bg-[rgb(var(--state-info-fg))]' }] : []),
+    { label: ATTENDANCE_STATUS_META.present.label, value: summary.present, dot: dot('present') },
+    { label: ATTENDANCE_STATUS_META.absent.label, value: summary.absent, dot: dot('absent') },
+    { label: ATTENDANCE_STATUS_META.late.label, value: summary.late, dot: dot('late') },
+    { label: ATTENDANCE_STATUS_META.excused.label, value: summary.excused, dot: dot('excused') },
+    ...(summary.remote ? [{ label: ATTENDANCE_STATUS_META.remote.label, value: summary.remote, dot: dot('remote') }] : []),
   ]
 
   return (

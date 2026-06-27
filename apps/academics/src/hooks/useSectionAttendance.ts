@@ -26,6 +26,7 @@ import {
   type AttendanceStatus,
 } from '../services/academics.service'
 import { attendanceKeys } from './useAttendance'
+import { summarizeByBucket } from '../components/attendance/attendanceStatus'
 
 // ============================================================================
 // QUERY KEYS — sectionId is ALWAYS in the key to prevent cross-section leaks
@@ -110,10 +111,14 @@ export function useRecordBulkSectionAttendance() {
       queryClient.invalidateQueries({
         queryKey: attendanceKeys.all,
       })
+      // F2.T2 — surface the present/absent/excused breakdown the teacher just saved
+      // (Story 1: "✓ recorded for 70 students (68 present, 2 absent, 1 excused)").
+      const b = summarizeByBucket(variables.records.map((r) => r.status))
+      const breakdown = `${b.present} present, ${b.absent} absent, ${b.excused} excused`
       if (result.errors.length > 0) {
-        toast.warning(`Attendance saved with ${result.errors.length} error(s)`)
+        toast.warning(`Attendance saved with ${result.errors.length} error(s) — ${breakdown}`)
       } else {
-        toast.success(`Attendance recorded for ${result.totalProcessed} students`)
+        toast.success(`Attendance recorded for ${result.totalProcessed} students (${breakdown})`)
       }
     },
     onError: (error, variables) => {
