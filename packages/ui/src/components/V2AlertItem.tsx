@@ -11,7 +11,7 @@ const SEVERITY_CONFIG = {
   critical: {
     bg: 'rgba(226, 75, 74, 0.07)',
     border: 'rgba(226, 75, 74, 0.18)',
-    titleColor: '#f09595',
+    titleColor: 'rgb(var(--state-danger-fg))',
     countColor: '#E24B4A',
     iconBg: 'rgba(226, 75, 74, 0.15)',
     iconColor: '#E24B4A',
@@ -22,7 +22,7 @@ const SEVERITY_CONFIG = {
   warning: {
     bg: 'rgba(239, 159, 39, 0.07)',
     border: 'rgba(239, 159, 39, 0.18)',
-    titleColor: '#FAC775',
+    titleColor: 'rgb(var(--state-warning-fg))',
     countColor: '#EF9F27',
     iconBg: 'rgba(239, 159, 39, 0.15)',
     iconColor: '#EF9F27',
@@ -33,7 +33,7 @@ const SEVERITY_CONFIG = {
   info: {
     bg: 'rgba(55, 138, 221, 0.07)',
     border: 'rgba(55, 138, 221, 0.18)',
-    titleColor: '#85B7EB',
+    titleColor: 'rgb(var(--state-info-fg))',
     countColor: '#378ADD',
     iconBg: 'rgba(55, 138, 221, 0.15)',
     iconColor: '#378ADD',

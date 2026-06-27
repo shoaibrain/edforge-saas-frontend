@@ -194,6 +194,13 @@
   --state-info-fg: 0 95 115;
   --state-info-border: 0 122 147;
 
+  /* Semantic color aliases — resolved (not undefined) so component fallbacks
+     to light, sub-AA hex (#1D9E75/#EF9F27/#E24B4A) never fire. Map to the
+     AA-compliant state foregrounds above. */
+  --color-success: rgb(var(--state-success-fg));
+  --color-warning: rgb(var(--state-warning-fg));
+  --color-danger: rgb(var(--state-danger-fg));
+
   /* Module accent palette — low-opacity tints for module cards/headers.
      Theme-agnostic hues (the tint reads over any surface). */
   --accent-academics: 55 138 221; /* blue */
@@ -283,6 +290,11 @@
   --state-info-bg: 0 78 94;
   --state-info-fg: 125 244 247;
   --state-info-border: 0 122 147;
+
+  /* Semantic color aliases (dark) — bright-on-dark state foregrounds. */
+  --color-success: rgb(var(--state-success-fg));
+  --color-warning: rgb(var(--state-warning-fg));
+  --color-danger: rgb(var(--state-danger-fg));
 
   /* Accent foreground (text/icon) — the bright base accents already clear AA on
      the dark surface, so accent text stays vibrant in dark mode. */
