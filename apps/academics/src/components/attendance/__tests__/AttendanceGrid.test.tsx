@@ -117,3 +117,29 @@ describe('AttendanceGrid — existing records (return visit)', () => {
     expect(getByText('3 / 3 marked')).toBeInTheDocument()
   })
 })
+
+describe('AttendanceGrid — filter chips', () => {
+  it('renders filter chips and hides the Locked chip when there are no locks', () => {
+    const { getByRole } = setup()
+    const chips = within(getByRole('group', { name: 'Filter students' }))
+    expect(chips.getByRole('button', { name: /Unmarked/ })).toBeInTheDocument()
+    expect(chips.queryByRole('button', { name: /Locked/ })).toBeNull()
+  })
+
+  it('shows the Locked chip when a student is locked', () => {
+    const locked = new Map([['s2', 'Already present in Math']])
+    const { getByRole } = setup({ lockedStudents: locked })
+    const chips = within(getByRole('group', { name: 'Filter students' }))
+    expect(chips.getByRole('button', { name: /Locked/ })).toBeInTheDocument()
+  })
+
+  it('the Unmarked filter narrows the roster to unmarked students', () => {
+    const { getByRole, getAllByLabelText } = setup()
+    // Mark one of the three present, then focus the Unmarked subset.
+    fireEvent.click(getAllByLabelText('Mark Present')[0])
+    const chips = within(getByRole('group', { name: 'Filter students' }))
+    fireEvent.click(chips.getByRole('button', { name: /Unmarked/ }))
+    // Two students remain unmarked → two rows (each with its status control).
+    expect(getAllByLabelText('Mark Present')).toHaveLength(2)
+  })
+})

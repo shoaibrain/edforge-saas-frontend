@@ -14,26 +14,14 @@
  */
 
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react'
-import {
-  CheckCircle,
-  XCircle,
-  Loader2,
-  Save,
-  Users,
-  Check,
-  WifiOff,
-  CloudOff,
-  Search,
-  X,
-  ChevronUp,
-  ChevronDown,
-} from 'lucide-react'
-import { Input } from '@edforge/ui'
+import { Users, ChevronUp, ChevronDown } from 'lucide-react'
 import type { AttendanceStatus } from '../../services/academics.service'
 import type { StudentSectionResponseDto } from '@aibrains/shared-types'
 import { RosterList } from './roster/RosterList'
+import { RosterToolbar, type RosterFilter } from './roster/RosterToolbar'
+import { RosterSummaryStrip } from './roster/RosterSummaryStrip'
 import { useHasHover } from '../../hooks/useHasHover'
-import { ENTRY_STATUSES, ATTENDANCE_STATUS_META, isLockedOverrideStatus } from './attendanceStatus'
+import { ENTRY_STATUSES, ATTENDANCE_STATUS_META, isLockedOverrideStatus, summarizeByBucket } from './attendanceStatus'
 import type { SaveStatus } from '../../hooks/useOfflineAttendance'
 
 // ============================================================================
@@ -83,71 +71,6 @@ interface AttendanceGridProps {
 
 type SortKey = 'name' | 'number' | 'status'
 type SortDir = 'asc' | 'desc'
-
-// ============================================================================
-// SAVE STATUS BADGE
-// ============================================================================
-
-function SaveStatusBadge({ status }: { status?: SaveStatus }) {
-  if (!status || status === 'idle') return null
-
-  const configs: Record<string, { icon: typeof Check; text: string; className: string }> = {
-    saved: {
-      icon: Check,
-      text: 'Saved',
-      className: 'text-[rgb(var(--state-success-fg))]',
-    },
-    saving: {
-      icon: Loader2,
-      text: 'Auto-saving...',
-      className: 'text-[rgb(var(--state-warning-fg))]',
-    },
-    offline: {
-      icon: WifiOff,
-      text: 'Offline',
-      className: 'text-[rgb(var(--state-danger-fg))]',
-    },
-    error: {
-      icon: CloudOff,
-      text: 'Save failed',
-      className: 'text-[rgb(var(--state-danger-fg))]',
-    },
-  }
-
-  const config = configs[status]
-  if (!config) return null
-
-  const Icon = config.icon
-
-  return (
-    <span className={`flex items-center gap-1 text-xs ${config.className}`}>
-      <Icon className={`w-3 h-3 ${status === 'saving' ? 'animate-spin' : ''}`} />
-      {config.text}
-    </span>
-  )
-}
-
-// ============================================================================
-// PROGRESS BAR (Task 4.8)
-// ============================================================================
-
-function ProgressBar({ marked, total }: { marked: number; total: number }) {
-  const pct = total > 0 ? (marked / total) * 100 : 0
-  const isComplete = marked === total && total > 0
-
-  return (
-    <div className="w-32 h-2 bg-surface-secondary rounded-full overflow-hidden">
-      <div
-        className={`h-full rounded-full transition-all duration-300 ${
-          isComplete
-            ? 'bg-[rgb(var(--state-success-fg))] animate-pulse'
-            : 'bg-[rgb(var(--state-info-fg))]'
-        }`}
-        style={{ width: `${pct}%` }}
-      />
-    </div>
-  )
-}
 
 // ============================================================================
 // SORTABLE HEADER (Task 4.3)
@@ -259,6 +182,9 @@ export function AttendanceGrid({
   // Task 4.2: Search filter
   const [searchQuery, setSearchQuery] = useState('')
 
+  // Filter chip (All / Unmarked / Absent / Flagged / Locked) — focuses the view.
+  const [activeFilter, setActiveFilter] = useState<RosterFilter>('all')
+
   // Task 4.3: Sort state
   const [sortKey, setSortKey] = useState<SortKey>('name')
   const [sortDir, setSortDir] = useState<SortDir>('asc')
@@ -289,16 +215,48 @@ export function AttendanceGrid({
     })
   }, [entries, existingRecords])
 
-  // Task 4.2: Filtered entries
+  // Chip filter (independent of search). Counts come from the full roster so a
+  // chip shows the true total even while a search narrows the visible rows.
+  const matchesFilter = useCallback(
+    (e: StudentAttendanceEntry): boolean => {
+      switch (activeFilter) {
+        case 'unmarked':
+          return e.status === null && !lockedStudents?.has(e.studentId)
+        case 'absent':
+          return e.status === 'absent'
+        case 'flagged':
+          return !!e.notes || !!e.excuseType
+        case 'locked':
+          return !!lockedStudents?.has(e.studentId)
+        default:
+          return true
+      }
+    },
+    [activeFilter, lockedStudents],
+  )
+
+  const filterCounts = useMemo<Record<RosterFilter, number>>(
+    () => ({
+      all: entries.length,
+      unmarked: entries.filter((e) => e.status === null && !lockedStudents?.has(e.studentId)).length,
+      absent: entries.filter((e) => e.status === 'absent').length,
+      flagged: entries.filter((e) => !!e.notes || !!e.excuseType).length,
+      locked: entries.filter((e) => !!lockedStudents?.has(e.studentId)).length,
+    }),
+    [entries, lockedStudents],
+  )
+
+  // Task 4.2: chip filter, then search.
   const filteredEntries = useMemo(() => {
-    if (!searchQuery.trim()) return entries
+    const byChip = entries.filter(matchesFilter)
+    if (!searchQuery.trim()) return byChip
     const q = searchQuery.toLowerCase()
-    return entries.filter(
+    return byChip.filter(
       (e) =>
         e.studentName.toLowerCase().includes(q) ||
-        (e.studentNumber && e.studentNumber.toLowerCase().includes(q))
+        (e.studentNumber && e.studentNumber.toLowerCase().includes(q)),
     )
-  }, [entries, searchQuery])
+  }, [entries, matchesFilter, searchQuery])
 
   // Task 4.3: Sorted entries
   const sortedEntries = useMemo(() => {
@@ -485,6 +443,7 @@ export function AttendanceGrid({
 
   const markedCount = entries.filter((e) => e.status !== null).length
   const totalCount = entries.length
+  const buckets = useMemo(() => summarizeByBucket(entries.map((e) => e.status)), [entries])
 
   if (students.length === 0) {
     return (
@@ -505,100 +464,6 @@ export function AttendanceGrid({
       {/* Task 5.3: Screen reader announcements */}
       <div className="sr-only" aria-live="polite" aria-atomic="true">
         {announcement}
-      </div>
-
-      {/* Quick Actions Bar — Task 5.5: responsive wrapping */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div className="flex items-center gap-2 flex-wrap">
-          {!isPastDate && (
-            <>
-              <button
-                type="button"
-                onClick={markAllPresent}
-                disabled={disabled}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[rgb(var(--state-success-fg))] bg-[rgb(var(--state-success-bg)/0.18)] hover:bg-[rgb(var(--state-success-bg)/0.26)] dark:bg-[rgb(var(--state-success-bg)/0.18)] dark:hover:bg-[rgb(var(--state-success-fg)/0.2)]  rounded-lg transition-colors disabled:opacity-50"
-              >
-                <CheckCircle className="w-3.5 h-3.5" />
-                All Present
-              </button>
-              <button
-                type="button"
-                onClick={markAllAbsent}
-                disabled={disabled}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[rgb(var(--state-danger-fg))] bg-[rgb(var(--state-danger-bg)/0.18)] hover:bg-[rgb(var(--state-danger-bg)/0.26)] dark:bg-[rgb(var(--state-danger-bg)/0.18)] dark:hover:bg-[rgb(var(--state-danger-fg)/0.2)]  rounded-lg transition-colors disabled:opacity-50"
-              >
-                <XCircle className="w-3.5 h-3.5" />
-                All Absent
-              </button>
-              {markedCount > 0 && (
-                <button
-                  type="button"
-                  onClick={clearAll}
-                  disabled={disabled}
-                  className="px-3 py-1.5 text-xs font-medium text-text-secondary hover:text-text-primary bg-surface-secondary hover:bg-surface-hover rounded-lg transition-colors disabled:opacity-50"
-                >
-                  Clear All
-                </button>
-              )}
-            </>
-          )}
-        </div>
-
-        <div className="flex items-center gap-3 flex-wrap">
-          {/* Task 4.8: Progress bar */}
-          <ProgressBar marked={markedCount} total={totalCount} />
-          <SaveStatusBadge status={saveStatus} />
-          <span className="text-xs text-text-tertiary">
-            {markedCount} / {totalCount} marked
-          </span>
-          {/* Task 5.5: full-width save on small screens */}
-          {!isPastDate && (
-            <button
-              type="button"
-              onClick={handleSave}
-              disabled={isSaving || markedCount === 0 || !hasChanges || disabled}
-              className="flex items-center justify-center gap-1.5 w-full sm:w-auto px-4 py-2.5 sm:py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg-hover))] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSaving ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Save className="w-4 h-4" />
-              )}
-              Save Attendance
-            </button>
-          )}
-        </div>
-      </div>
-
-      {/* Task 4.2: Search + Filter — Task 5.5: full-width on mobile */}
-      <div className="flex items-center gap-3">
-        <div className="flex-1 sm:max-w-xs">
-          <Input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search students..."
-            aria-label="Search students by name or number"
-            prefix={<Search className="w-4 h-4" />}
-            suffix={
-              searchQuery ? (
-                <button
-                  type="button"
-                  onClick={() => setSearchQuery('')}
-                  className="p-0.5 text-text-tertiary hover:text-text-primary transition-colors"
-                  aria-label="Clear search"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              ) : undefined
-            }
-          />
-        </div>
-        {searchQuery && (
-          <span className="text-xs text-text-tertiary">
-            {filteredEntries.length} of {entries.length} students
-          </span>
-        )}
       </div>
 
       {/* Keyboard Hint (hide on past dates and on mobile) — derived from the
@@ -630,6 +495,33 @@ export function AttendanceGrid({
         role="grid"
         aria-label="Attendance entry grid"
       >
+        <RosterToolbar
+          search={searchQuery}
+          onSearchChange={setSearchQuery}
+          activeFilter={activeFilter}
+          onFilterChange={setActiveFilter}
+          counts={filterCounts}
+          showLockedChip={(lockedStudents?.size ?? 0) > 0}
+          canBulk={!isPastDate && !disabled}
+          onMarkAllPresent={markAllPresent}
+          onMarkAllAbsent={markAllAbsent}
+          onClearAll={clearAll}
+          bulkScopeCount={null}
+          markedCount={markedCount}
+        />
+
+        <RosterSummaryStrip
+          marked={markedCount}
+          total={totalCount}
+          buckets={buckets}
+          saveStatus={saveStatus}
+          isPastDate={isPastDate}
+          isSaving={isSaving}
+          hasChanges={hasChanges}
+          disabled={disabled}
+          onSave={handleSave}
+        />
+
         {/* Hide column headers on mobile (stacked layout doesn't need them). */}
         <div className="hidden flex-shrink-0 items-center gap-3 border-b border-border-secondary bg-surface-secondary px-4 py-2 sm:flex">
           <div className="min-w-0 flex-1">

@@ -14,13 +14,8 @@ import { usePermission } from '@edforge/abac'
 import { Select } from '@edforge/ui'
 import {
   ClipboardCheck,
-  Loader2,
   BarChart3,
   AlertTriangle,
-  Wifi,
-  WifiOff,
-  Check,
-  CloudOff,
   Info,
   FileSpreadsheet,
 } from 'lucide-react'
@@ -59,58 +54,6 @@ const TABS: { id: TabId; label: string; icon: typeof BarChart3 }[] = [
   { id: 'daily-entry', label: 'Daily Entry', icon: ClipboardCheck },
   { id: 'iemis-export', label: 'IEMiS Export', icon: FileSpreadsheet },
 ]
-
-// ============================================================================
-// SAVE STATUS INDICATOR
-// ============================================================================
-
-function SaveStatusIndicator({
-  status,
-  isOnline,
-}: {
-  status: 'idle' | 'saved' | 'saving' | 'offline' | 'error'
-  isOnline: boolean
-}) {
-  if (status === 'idle' && isOnline) return null
-
-  const config = {
-    saved: {
-      icon: Check,
-      text: 'Saved',
-      className: 'text-[rgb(var(--state-success-fg))]',
-    },
-    saving: {
-      icon: Loader2,
-      text: 'Saving...',
-      className: 'text-[rgb(var(--state-warning-fg))]',
-    },
-    offline: {
-      icon: WifiOff,
-      text: 'Offline — changes saved locally',
-      className: 'text-[rgb(var(--state-danger-fg))]',
-    },
-    error: {
-      icon: CloudOff,
-      text: 'Save failed — will retry',
-      className: 'text-[rgb(var(--state-danger-fg))]',
-    },
-    idle: {
-      icon: Wifi,
-      text: '',
-      className: 'text-text-tertiary',
-    },
-  }
-
-  const { icon: Icon, text, className } = config[status]
-  if (!text) return null
-
-  return (
-    <div className={`flex items-center gap-1.5 text-xs ${className}`}>
-      <Icon className={`w-3.5 h-3.5 ${status === 'saving' ? 'animate-spin' : ''}`} />
-      <span>{text}</span>
-    </div>
-  )
-}
 
 // ============================================================================
 // TAB BAR (framer-motion animated underline — consistent with other modules)
@@ -334,6 +277,10 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
       studentId: r.studentId,
       status: r.status as AttendanceStatus,
       notes: r.notes,
+      // PR5 — carry the saved reason so it hydrates the row (and a reason-only
+      // edit is correctly detected as dirty). The route previously dropped
+      // excuseReason here, so reasons never round-tripped on return.
+      excuseReason: r.excuseReason,
     }))
   }, [sectionRecords])
 
@@ -498,10 +445,6 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
               onPrevious={dateActions.goToPreviousDay}
               onNext={dateActions.goToNextDay}
               onToday={dateActions.goToToday}
-            />
-            <SaveStatusIndicator
-              status={offlineState.saveStatus}
-              isOnline={offlineState.isOnline}
             />
           </div>
         )}
