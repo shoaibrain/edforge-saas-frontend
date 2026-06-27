@@ -13,7 +13,7 @@
  */
 
 import { useState, useRef, forwardRef, useImperativeHandle } from 'react'
-import { MessageSquare, Edit2, X } from 'lucide-react'
+import { MessageSquare, Edit2, X, Lock } from 'lucide-react'
 import { Select, Input } from '@edforge/ui'
 import { StatusBadge } from './StatusBadge'
 import type { AttendanceStatus } from '../../services/academics.service'
@@ -40,6 +40,13 @@ export interface AttendanceRowProps {
   /** Task 4.4: Arrow key navigation */
   onArrowUp?: () => void
   onArrowDown?: () => void
+  /**
+   * Attendance realignment (daily_presence): the student's day-presence is already
+   * locked by an earlier section, so this row is read-only here. `lockedHint`
+   * explains where (e.g. "Already present in Middle School Social Studies").
+   */
+  locked?: boolean
+  lockedHint?: string
 }
 
 export interface AttendanceRowRef {
@@ -95,6 +102,8 @@ export const AttendanceRow = forwardRef<AttendanceRowRef, AttendanceRowProps>(fu
     onCorrectionCancel,
     onArrowUp,
     onArrowDown,
+    locked = false,
+    lockedHint,
   },
   ref
 ) {
@@ -133,8 +142,8 @@ export const AttendanceRow = forwardRef<AttendanceRowRef, AttendanceRowProps>(fu
       return
     }
 
-    // Don't process shortcuts in view mode
-    if (isViewMode) return
+    // Don't process shortcuts in view mode or when the day-presence is locked
+    if (isViewMode || locked) return
 
     const key = e.key.toUpperCase()
     const match = statusButtons.find((b) => b.shortcut === key)
@@ -182,7 +191,15 @@ export const AttendanceRow = forwardRef<AttendanceRowRef, AttendanceRowProps>(fu
 
         {/* Status Buttons or View-Mode Badge */}
         <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-          {isViewMode ? (
+          {locked ? (
+            <div className="flex items-center gap-2" title={lockedHint}>
+              {currentStatus && <StatusBadge status={currentStatus} />}
+              <span className="flex items-center gap-1 text-xs text-text-tertiary">
+                <Lock className="w-3.5 h-3.5" />
+                {lockedHint || 'Day-presence already recorded'}
+              </span>
+            </div>
+          ) : isViewMode ? (
             <>
               {currentStatus && <StatusBadge status={currentStatus} />}
               {/* Task 4.6: Edit button for corrections */}
@@ -219,7 +236,7 @@ export const AttendanceRow = forwardRef<AttendanceRowRef, AttendanceRowProps>(fu
           )}
 
           {/* Notes Toggle */}
-          {!isViewMode && (
+          {!isViewMode && !locked && (
             <button
               type="button"
               onClick={() => setShowNotes(!showNotes)}

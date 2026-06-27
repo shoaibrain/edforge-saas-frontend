@@ -198,7 +198,7 @@ describe('StudentQuickProfile V3', () => {
   })
 
   it('renders the Enrollment block with BS date below the Gregorian "Enrolled" date', () => {
-    const { getByText, container } = render(
+    const { getByText, queryByText, container } = render(
       <ContentPane>
         <StudentQuickProfile
           open={true}
@@ -220,8 +220,9 @@ describe('StudentQuickProfile V3', () => {
     expect(container.textContent).toMatch(/BS \d{4}\//)
     // Academic year passed via prop
     expect(getByText('2024–2025')).toBeInTheDocument()
-    // Homeroom — em-dash because StudentResponseDto has no homeroom field
-    expect(getByText('Homeroom')).toBeInTheDocument()
+    // Attendance realignment: the "Homeroom" field was removed — homeroom is no
+    // longer a stored per-student attribute (it's a per-day derived role).
+    expect(queryByText('Homeroom')).toBeNull()
     cleanup()
   })
 

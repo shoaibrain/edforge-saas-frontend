@@ -27,6 +27,7 @@ import {
   getAttendanceOverview,
   getAttendancePolicy,
   getPresenceLocks,
+  exportIemisAttendance,
   parseApiError,
   type CreateAttendanceParams,
   type BulkAttendanceParams,
@@ -43,6 +44,7 @@ import {
 import type {
   AttendancePolicyResponseDto,
   PresenceLockResponseDto,
+  IemisAttendanceExportResponseDto,
 } from '@aibrains/shared-types'
 
 // ============================================================================
@@ -467,5 +469,29 @@ export function usePresenceLocks(schoolId?: string, date?: string) {
     queryFn: () => getPresenceLocks(schoolId!, date!),
     enabled: !!schoolId && !!date,
     staleTime: 30 * 1000,
+  })
+}
+
+// ============================================================================
+// IEMiS MONTHLY ATTENDANCE EXPORT (Layer 4)
+// ============================================================================
+
+/**
+ * Trigger the IEMiS monthly attendance export. Mutation (not a query) because the
+ * POST recomputes + persists the monthly aggregate server-side, then returns the
+ * IEMiS Flash II rows. No refetchInterval / cache — the panel renders the result
+ * directly and offers a client-side CSV download.
+ */
+export function useExportIemisAttendance() {
+  return useMutation<
+    IemisAttendanceExportResponseDto,
+    Error,
+    { schoolId: string; yearMonth: string; academicYearId: string }
+  >({
+    mutationFn: ({ schoolId, yearMonth, academicYearId }) =>
+      exportIemisAttendance(schoolId, yearMonth, academicYearId),
+    onError: (error) => {
+      toast.error(parseApiError(error).message)
+    },
   })
 }

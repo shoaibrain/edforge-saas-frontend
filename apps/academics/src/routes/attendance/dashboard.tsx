@@ -221,6 +221,20 @@ function TodaySummaryStrip({
 
   const sevenDayUp = periodAverages.last7Days > periodAverages.last30Days
 
+  // Attendance realignment — coverage truth: recorded ÷ enrolled, distinct from
+  // the attendance RATE. A low rate caused by unrecorded sections must read as
+  // low coverage, not low attendance; 0 recorded reads "Not taken yet", not "0%".
+  const totalRecorded = summary.totalRecorded ?? summary.present
+  const coveragePct = summary.totalStudents > 0 ? (totalRecorded / summary.totalStudents) * 100 : 0
+  const notTakenYet = totalRecorded === 0
+  const coverageColor = notTakenYet
+    ? V2.textHint
+    : coveragePct < 60
+      ? V2.danger
+      : coveragePct < 90
+        ? V2.warning
+        : V2.success
+
   return (
     <div className={`${CARD} px-4 py-3.5 mb-3 flex items-center gap-0`}>
       {stats.map((s, i) => (
@@ -272,6 +286,26 @@ function TodaySummaryStrip({
             30-day: {periodAverages.last30Days.toFixed(1)}%
           </span>
         </div>
+      </div>
+
+      {/* Divider */}
+      <div className="w-px h-12 bg-[rgb(var(--border-primary)/0.35)] shrink-0 mx-4" />
+
+      {/* Coverage truth (realignment) — recorded ÷ enrolled, distinct from rate */}
+      <div className="flex flex-col items-center gap-0.5 flex-1">
+        <span
+          // allow-presentation-style: coverage severity color
+          className="text-xl font-bold leading-none"
+          style={{ color: coverageColor }}
+        >
+          {notTakenYet ? '—' : `${coveragePct.toFixed(0)}%`}
+        </span>
+        <span className="text-4xs font-bold uppercase tracking-[0.5px] text-[rgb(var(--text-disabled))]">
+          Coverage
+        </span>
+        <span className="text-4xs text-[rgb(var(--text-disabled))]">
+          {notTakenYet ? 'Not taken yet' : `${totalRecorded} of ${summary.totalStudents} recorded`}
+        </span>
       </div>
     </div>
   )

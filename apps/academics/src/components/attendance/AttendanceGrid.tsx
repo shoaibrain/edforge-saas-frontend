@@ -62,6 +62,12 @@ interface AttendanceGridProps {
   saveStatus?: SaveStatus
   /** Task 4.6: Correction callback for past-date updates */
   onCorrection?: (record: { studentId: string; status: AttendanceStatus; notes?: string; excuseType?: string }) => void
+  /**
+   * Attendance realignment (daily_presence): studentId → hint for students whose
+   * day-presence is already locked by an earlier section. Those rows render
+   * read-only with the hint; they're excluded from this section's save set.
+   */
+  lockedStudents?: Map<string, string>
 }
 
 type SortKey = 'name' | 'number' | 'status'
@@ -179,6 +185,7 @@ export function AttendanceGrid({
   disabled = false,
   saveStatus,
   onCorrection,
+  lockedStudents,
 }: AttendanceGridProps) {
   // Task 4.6: Determine if this is a past date
   const isPastDate = useMemo(() => {
@@ -565,6 +572,8 @@ export function AttendanceGrid({
               onCorrectionCancel={() => handleCorrectionCancel(entry.studentId)}
               onArrowUp={() => focusRow(index - 1)}
               onArrowDown={() => focusRow(index + 1)}
+              locked={lockedStudents?.has(entry.studentId)}
+              lockedHint={lockedStudents?.get(entry.studentId)}
             />
           ))
         )}
