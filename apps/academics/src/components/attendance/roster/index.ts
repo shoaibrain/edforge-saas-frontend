@@ -1,4 +1,5 @@
 export { IdentityCell, type IdentityCellProps } from './IdentityCell'
 export { StatusControl, type StatusControlProps } from './StatusControl'
+export { RosterList, type RosterListProps, type RosterEntry } from './RosterList'
 export { RowDetailsPopover, type RowDetailsPopoverProps } from './RowDetailsPopover'
 export { EXCUSE_TYPES } from './excuseTypes'

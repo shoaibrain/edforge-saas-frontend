@@ -12,8 +12,13 @@ import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, cleanup, fireEvent, within } from '@testing-library/react'
 import { AttendanceGrid } from '../AttendanceGrid'
 import type { StudentSectionResponseDto } from '@aibrains/shared-types'
+import { mockListViewport } from '../../../../../../test-utils/virtualizer'
 
 afterEach(cleanup)
+
+// The roster is virtualized; give jsdom a non-zero viewport so every fixture row
+// renders (otherwise react-virtual windows down to nothing without layout).
+mockListViewport()
 
 const students = [
   { studentId: 's1', studentName: 'Aarav Sharma', studentNumber: '001' },

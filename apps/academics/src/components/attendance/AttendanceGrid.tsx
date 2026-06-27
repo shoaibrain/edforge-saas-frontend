@@ -13,7 +13,7 @@
  * - Task 5.3: aria-live announcements
  */
 
-import { useState, useCallback, useMemo, useRef, useEffect, createRef } from 'react'
+import { useState, useCallback, useMemo, useRef, useEffect } from 'react'
 import {
   CheckCircle,
   XCircle,
@@ -31,7 +31,8 @@ import {
 import { Input } from '@edforge/ui'
 import type { AttendanceStatus } from '../../services/academics.service'
 import type { StudentSectionResponseDto } from '@aibrains/shared-types'
-import { AttendanceRow, type AttendanceRowRef } from './AttendanceRow'
+import { RosterList } from './roster/RosterList'
+import { useHasHover } from '../../hooks/useHasHover'
 import { ENTRY_STATUSES, ATTENDANCE_STATUS_META, isLockedOverrideStatus } from './attendanceStatus'
 import type { SaveStatus } from '../../hooks/useOfflineAttendance'
 
@@ -265,6 +266,14 @@ export function AttendanceGrid({
   // Task 5.3: aria-live announcement
   const [announcement, setAnnouncement] = useState('')
 
+  // Past-date correction edit state, lifted out of the row so it survives a row
+  // unmount/remount under virtualization.
+  const [editingIds, setEditingIds] = useState<Set<string>>(new Set())
+
+  // Hover-capable pointers get the compact reveal control; touch/coarse pointers
+  // always see the full status set (no hover to reveal it).
+  const expandTrigger: 'hover' | 'always' = useHasHover() ? 'hover' : 'always'
+
   // Task 4.8: Previous day status map
 
   // Track if anything has changed
@@ -316,21 +325,7 @@ export function AttendanceGrid({
     return list
   }, [filteredEntries, sortKey, sortDir])
 
-  // Task 4.4: Row refs for keyboard navigation
-  const rowRefs = useRef<Map<string, React.RefObject<AttendanceRowRef | null>>>(new Map())
-  const getRowRef = (studentId: string) => {
-    if (!rowRefs.current.has(studentId)) {
-      rowRefs.current.set(studentId, createRef<AttendanceRowRef>())
-    }
-    return rowRefs.current.get(studentId)!
-  }
-
-  const focusRow = (index: number) => {
-    if (index >= 0 && index < sortedEntries.length) {
-      const ref = rowRefs.current.get(sortedEntries[index].studentId)
-      ref?.current?.focus()
-    }
-  }
+  // Row focus + keyboard navigation now live in RosterList (virtualized).
 
   const handleStatusChange = useCallback((studentId: string, status: AttendanceStatus) => {
     touchedRef.current.add(studentId)
@@ -449,6 +444,34 @@ export function AttendanceGrid({
       }
     },
     [existingRecords]
+  )
+
+  const startEdit = useCallback((studentId: string) => {
+    setEditingIds((prev) => new Set(prev).add(studentId))
+  }, [])
+
+  const finishEdit = useCallback((studentId: string) => {
+    setEditingIds((prev) => {
+      const next = new Set(prev)
+      next.delete(studentId)
+      return next
+    })
+  }, [])
+
+  const onRowCorrectionSave = useCallback(
+    (studentId: string) => {
+      finishEdit(studentId)
+      handleCorrectionSave(studentId)
+    },
+    [finishEdit, handleCorrectionSave],
+  )
+
+  const onRowCorrectionCancel = useCallback(
+    (studentId: string) => {
+      finishEdit(studentId)
+      handleCorrectionCancel(studentId)
+    },
+    [finishEdit, handleCorrectionCancel],
   )
 
   const toggleSort = (key: SortKey) => {
@@ -598,47 +621,38 @@ export function AttendanceGrid({
         </div>
       )}
 
-      {/* Task 4.3: Sortable Column Headers + Student Rows */}
-      <div className="rounded-xl border border-border-secondary overflow-hidden" role="grid" aria-label="Attendance entry grid">
-        {/* Task 5.5: Hide column headers on mobile (stacked layout doesn't need them) */}
-        <div className="hidden sm:flex items-center gap-4 py-2 px-4 bg-surface-secondary border-b border-border-secondary">
-          <div className="flex-1 min-w-0">
+      {/* Bounded, virtualized roster (Task 4.3 sort header + windowed rows). Only
+          the inner list scrolls — the column header stays put — so page height is
+          capped regardless of roster size. */}
+      <div
+        className="flex flex-col overflow-hidden rounded-xl border border-border-secondary"
+        style={{ maxHeight: 'min(70vh, 720px)' }}
+        role="grid"
+        aria-label="Attendance entry grid"
+      >
+        {/* Hide column headers on mobile (stacked layout doesn't need them). */}
+        <div className="hidden flex-shrink-0 items-center gap-3 border-b border-border-secondary bg-surface-secondary px-4 py-2 sm:flex">
+          <div className="min-w-0 flex-1">
             <SortableHeader label="Name" field="name" currentSort={sortKey} currentDir={sortDir} onSort={toggleSort} />
           </div>
-          <div className="w-56">
+          <div className="pr-2">
             <SortableHeader label="Status" field="status" currentSort={sortKey} currentDir={sortDir} onSort={toggleSort} />
           </div>
-          <div className="w-10" />
         </div>
 
-        {sortedEntries.length === 0 ? (
-          <div className="py-8 text-center text-sm text-text-tertiary">
-            No students match your search.
-          </div>
-        ) : (
-          sortedEntries.map((entry, index) => (
-            <AttendanceRow
-              key={entry.studentId}
-              ref={getRowRef(entry.studentId)}
-              studentId={entry.studentId}
-              studentName={entry.studentName}
-              studentNumber={entry.studentNumber}
-              currentStatus={entry.status}
-              notes={entry.notes}
-              excuseType={entry.excuseType}
-              onStatusChange={(status) => handleStatusChange(entry.studentId, status)}
-              onNotesChange={(notes) => handleNotesChange(entry.studentId, notes)}
-              onExcuseTypeChange={(excuseType) => handleExcuseTypeChange(entry.studentId, excuseType)}
-              isPastDate={isPastDate}
-              onCorrectionSave={() => handleCorrectionSave(entry.studentId)}
-              onCorrectionCancel={() => handleCorrectionCancel(entry.studentId)}
-              onArrowUp={() => focusRow(index - 1)}
-              onArrowDown={() => focusRow(index + 1)}
-              locked={lockedStudents?.has(entry.studentId)}
-              lockedHint={lockedStudents?.get(entry.studentId)}
-            />
-          ))
-        )}
+        <RosterList
+          entries={sortedEntries}
+          isPastDate={isPastDate}
+          expandTrigger={expandTrigger}
+          lockedStudents={lockedStudents}
+          editingIds={editingIds}
+          onStatusChange={handleStatusChange}
+          onNotesChange={handleNotesChange}
+          onExcuseTypeChange={handleExcuseTypeChange}
+          onStartEdit={startEdit}
+          onCorrectionSave={onRowCorrectionSave}
+          onCorrectionCancel={onRowCorrectionCancel}
+        />
       </div>
     </div>
   )
