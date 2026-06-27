@@ -89,10 +89,6 @@ vi.mock('../../components/attendance/DateSelector', () => ({
 vi.mock('../../components/attendance/AttendanceGrid', () => ({
   AttendanceGrid: () => <div data-testid="attendance-grid" />,
 }))
-vi.mock('../../components/attendance/DailySummary', () => ({
-  DailySummary: () => <div data-testid="daily-summary" />,
-}))
-
 import { AttendanceModule } from './index'
 
 afterEach(() => {
