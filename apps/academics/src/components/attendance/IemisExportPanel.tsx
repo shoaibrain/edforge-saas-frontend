@@ -11,14 +11,42 @@
 import { useState } from 'react'
 import { Button, Input } from '@edforge/ui'
 import { Download, FileSpreadsheet, Loader2, AlertTriangle } from 'lucide-react'
+import { gregorianToBs } from '@edforge/date-utils'
 import { useExportIemisAttendance } from '../../hooks/useAttendance'
 import type { IemisAttendanceExportResponseDto } from '@aibrains/shared-types'
 
 const YEAR_MONTH_RE = /^\d{4}-(0[1-9]|1[0-2])$/
 
+const BS_MONTH_NAMES = [
+  'Baisakh', 'Jestha', 'Ashadh', 'Shrawan', 'Bhadra', 'Ashwin',
+  'Kartik', 'Mangsir', 'Poush', 'Magh', 'Falgun', 'Chaitra',
+]
+
 function currentYearMonth(): string {
   const now = new Date()
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+}
+
+/**
+ * F3.T3 — a Gregorian calendar month spans ~two Bikram Sambat months, so we show
+ * the BS span the selected export month covers (first day → last day) for PABSON
+ * operators who think in BS. Best-effort: if the converter is out of its
+ * supported BS range we just omit the hint.
+ */
+function bsSpanLabel(yearMonth: string): string | null {
+  if (!YEAR_MONTH_RE.test(yearMonth)) return null
+  try {
+    const [y, m] = yearMonth.split('-').map(Number)
+    const lastDay = new Date(y, m, 0).getDate()
+    const start = gregorianToBs(`${yearMonth}-01T12:00:00`)
+    const end = gregorianToBs(`${yearMonth}-${String(lastDay).padStart(2, '0')}T12:00:00`)
+    const fmt = (d: { year: number; month: number }) => `${BS_MONTH_NAMES[d.month - 1]} ${d.year}`
+    const a = fmt(start)
+    const b = fmt(end)
+    return a === b ? `BS ${a}` : `BS ${a} – ${b}`
+  } catch {
+    return null
+  }
 }
 
 const CSV_HEADER = [
@@ -68,6 +96,7 @@ export function IemisExportPanel({ schoolId, academicYearId }: IemisExportPanelP
 
   const isValid = YEAR_MONTH_RE.test(yearMonth)
   const canGenerate = isValid && !!schoolId && !!academicYearId && !exportMutation.isPending
+  const bsSpan = bsSpanLabel(yearMonth)
 
   const handleGenerate = () => {
     if (!canGenerate) return
@@ -76,7 +105,7 @@ export function IemisExportPanel({ schoolId, academicYearId }: IemisExportPanelP
 
   const handleDownload = () => {
     if (!result) return
-    downloadCsv(`iemis-attendance-${result.schoolId}-${result.yearMonth}.csv`, buildCsv(result))
+    downloadCsv(`iemis-attendance-${result.yearMonth}.csv`, buildCsv(result))
   }
 
   return (
@@ -105,6 +134,9 @@ export function IemisExportPanel({ schoolId, academicYearId }: IemisExportPanelP
               className="w-44"
               aria-label="Export month (YYYY-MM)"
             />
+            {bsSpan && (
+              <p className="mt-1 text-3xs text-text-tertiary" data-testid="iemis-bs-span">{bsSpan}</p>
+            )}
           </div>
           <Button onClick={handleGenerate} disabled={!canGenerate}>
             {exportMutation.isPending ? (
