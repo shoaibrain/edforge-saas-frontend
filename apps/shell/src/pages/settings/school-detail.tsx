@@ -1,7 +1,7 @@
 /**
  * School Detail Page — V2 Redesign
  *
- * 4-tab architecture: Configuration | Academic Setup | Structure | Audit Log
+ * Tabs: Configuration | Academic Setup | Attendance | Structure | Grade Levels | Audit Log
  * URL-based tab routing via ?tab= search param.
  * Locale-aware defaults via useLocaleDefaults().
  */
@@ -39,6 +39,7 @@ import { Button } from '@edforge/ui'
 // V2 Tab components
 import ConfigurationTab from './tabs/ConfigurationTab'
 import AcademicSetupTab from './tabs/AcademicSetupTab'
+import AttendancePolicyTab from './tabs/AttendancePolicyTab'
 import StructureTab from './tabs/StructureTab'
 import GradeLevelsTab from './tabs/GradeLevelsTab'
 import AuditLogTab from './tabs/AuditLogTab'
@@ -128,17 +129,18 @@ const STATUS_ACTIONS: Record<SchoolStatus, { label: string; targetStatus: School
 // V2 TAB CONFIG
 // ============================================================================
 
-type SchoolTab = 'config' | 'academic-setup' | 'structure' | 'grade-levels' | 'audit-log'
+type SchoolTab = 'config' | 'academic-setup' | 'attendance' | 'structure' | 'grade-levels' | 'audit-log'
 
 const TABS: { id: SchoolTab; label: string; emoji: string }[] = [
   { id: 'config', label: 'Configuration', emoji: '⚙️' },
   { id: 'academic-setup', label: 'Academic Setup', emoji: '📅' },
+  { id: 'attendance', label: 'Attendance', emoji: '🟢' },
   { id: 'structure', label: 'Structure', emoji: '🏛️' },
   { id: 'grade-levels', label: 'Grade Levels', emoji: '🎯' },
   { id: 'audit-log', label: 'Audit Log', emoji: '🛡️' },
 ]
 
-const VALID_TABS = new Set<string>(['config', 'academic-setup', 'structure', 'grade-levels', 'audit-log'])
+const VALID_TABS = new Set<string>(['config', 'academic-setup', 'attendance', 'structure', 'grade-levels', 'audit-log'])
 
 // ============================================================================
 // SETUP TASKS
@@ -699,6 +701,9 @@ export default function SchoolDetailPage() {
               )}
               {activeTab === 'academic-setup' && (
                 <AcademicSetupTab schoolId={schoolId} school={displaySchool} />
+              )}
+              {activeTab === 'attendance' && (
+                <AttendancePolicyTab schoolId={schoolId} school={displaySchool} />
               )}
               {activeTab === 'structure' && (
                 <StructureTab schoolId={schoolId} />

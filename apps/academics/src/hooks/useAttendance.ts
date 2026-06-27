@@ -25,6 +25,9 @@ import {
   getAttendanceAlerts,
   getAttendanceStudentTrends,
   getAttendanceOverview,
+  getAttendancePolicy,
+  getPresenceLocks,
+  exportIemisAttendance,
   parseApiError,
   type CreateAttendanceParams,
   type BulkAttendanceParams,
@@ -38,6 +41,11 @@ import {
   type AttendanceOverviewResponse,
   type StudentAttendanceTrend,
 } from '../services/academics.service'
+import type {
+  AttendancePolicyResponseDto,
+  PresenceLockResponseDto,
+  IemisAttendanceExportResponseDto,
+} from '@aibrains/shared-types'
 
 // ============================================================================
 // QUERY KEYS
@@ -66,6 +74,10 @@ export const attendanceKeys = {
     [...attendanceKeys.all, 'calendar-date', schoolId, date] as const,
   overview: (schoolId: string, academicYearId: string, date: string) =>
     [...attendanceKeys.all, 'overview', schoolId, academicYearId, date] as const,
+  policy: (schoolId: string) =>
+    [...attendanceKeys.all, 'policy', schoolId] as const,
+  presenceLocks: (schoolId: string, date: string) =>
+    [...attendanceKeys.all, 'presence-locks', schoolId, date] as const,
 }
 
 // ============================================================================
@@ -421,5 +433,65 @@ export function useAttendanceOverview({
     enabled: enabled && !!schoolId && !!academicYearId && !!date,
     staleTime: 60 * 1000, // 60 seconds - matches backend cache
     placeholderData: keepPreviousData, // Prevents loading flicker on date change
+  })
+}
+
+// ============================================================================
+// ATTENDANCE POLICY (realigned: daily_presence | per_section_granular)
+// ============================================================================
+
+/**
+ * Resolve the effective attendance policy + counting policy for a school.
+ * Mode rarely changes, so a longer staleTime is fine. Legacy daily/period/both
+ * stored values are coerced server-side to the realigned enum.
+ */
+export function useAttendancePolicy(schoolId?: string) {
+  return useQuery<AttendancePolicyResponseDto, Error>({
+    queryKey: attendanceKeys.policy(schoolId ?? ''),
+    queryFn: () => getAttendancePolicy(schoolId!),
+    enabled: !!schoolId,
+    staleTime: 5 * 60 * 1000,
+  })
+}
+
+// ============================================================================
+// CROSS-SECTION PRESENCE LOCKS (daily_presence: first section locks the day)
+// ============================================================================
+
+/**
+ * Day-presence locks for a school + date — each student's day-presence is locked
+ * by the first section that marked them. Event-driven (changes on a section save),
+ * so no refetchInterval; the bulk-section-attendance mutation invalidates this key.
+ */
+export function usePresenceLocks(schoolId?: string, date?: string) {
+  return useQuery<PresenceLockResponseDto, Error>({
+    queryKey: attendanceKeys.presenceLocks(schoolId ?? '', date ?? ''),
+    queryFn: () => getPresenceLocks(schoolId!, date!),
+    enabled: !!schoolId && !!date,
+    staleTime: 30 * 1000,
+  })
+}
+
+// ============================================================================
+// IEMiS MONTHLY ATTENDANCE EXPORT (Layer 4)
+// ============================================================================
+
+/**
+ * Trigger the IEMiS monthly attendance export. Mutation (not a query) because the
+ * POST recomputes + persists the monthly aggregate server-side, then returns the
+ * IEMiS Flash II rows. No refetchInterval / cache — the panel renders the result
+ * directly and offers a client-side CSV download.
+ */
+export function useExportIemisAttendance() {
+  return useMutation<
+    IemisAttendanceExportResponseDto,
+    Error,
+    { schoolId: string; yearMonth: string; academicYearId: string }
+  >({
+    mutationFn: ({ schoolId, yearMonth, academicYearId }) =>
+      exportIemisAttendance(schoolId, yearMonth, academicYearId),
+    onError: (error) => {
+      toast.error(parseApiError(error).message)
+    },
   })
 }

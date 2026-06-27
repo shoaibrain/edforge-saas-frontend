@@ -55,6 +55,9 @@ vi.mock('../../hooks/useAttendance', () => ({
   useAttendanceSummary: () => ({ data: undefined, isLoading: false }),
   useCalendarDate: () => ({ data: undefined }),
   useAttendanceOverview: () => ({ data: undefined, isLoading: false }),
+  useAttendancePolicy: () => ({ data: undefined }),
+  usePresenceLocks: () => ({ data: undefined }),
+  useExportIemisAttendance: () => ({ mutate: vi.fn(), isPending: false, data: undefined, isError: false }),
 }))
 
 vi.mock('../../hooks/useSectionAttendance', () => ({

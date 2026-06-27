@@ -5,6 +5,7 @@
  */
 
 import type { DailyAttendanceSummary } from '../../services/academics.service'
+import { ATTENDANCE_STATUS_META, TONE_CLASSES } from './attendanceStatus'
 
 interface DailySummaryProps {
   summary: DailyAttendanceSummary | undefined
@@ -32,6 +33,21 @@ export function DailySummary({ summary, isLoading }: DailySummaryProps) {
     )
   }
 
+  // A summary with zero recorded students must NOT read as "0.0% rate" (that looks
+  // like everyone was absent). Show an explicit not-recorded state instead.
+  const recordedCount =
+    summary.totalRecorded ??
+    summary.present + summary.absent + summary.late + summary.excused +
+      (summary.halfDay ?? 0) + (summary.remote ?? 0)
+  if (recordedCount === 0) {
+    return (
+      <div className="flex items-center gap-2 px-4 py-3 bg-surface-secondary rounded-xl border border-border-secondary">
+        <span className="w-2 h-2 rounded-full bg-[rgb(var(--text-tertiary))]" />
+        <span className="text-sm text-text-tertiary">Attendance not recorded for this date</span>
+      </div>
+    )
+  }
+
   const rate = summary.attendanceRate
   const rateColor =
     rate >= 95
@@ -40,12 +56,16 @@ export function DailySummary({ summary, isLoading }: DailySummaryProps) {
         ? 'text-[rgb(var(--state-warning-fg))]'
         : 'text-[rgb(var(--state-danger-fg))]'
 
+  // Labels + dot colors come from the single status source (F0.T2) so the
+  // summary can't drift from the badges/entry grid (e.g. "Late" → "Tardy").
+  const dot = (status: keyof typeof ATTENDANCE_STATUS_META) =>
+    TONE_CLASSES[ATTENDANCE_STATUS_META[status].tone].dot
   const stats = [
-    { label: 'Present', value: summary.present, dot: 'bg-[rgb(var(--state-success-fg))]' },
-    { label: 'Absent', value: summary.absent, dot: 'bg-[rgb(var(--state-danger-fg))]' },
-    { label: 'Late', value: summary.late, dot: 'bg-[rgb(var(--state-warning-fg))]' },
-    { label: 'Excused', value: summary.excused, dot: 'bg-[rgb(var(--state-info-fg))]' },
-    ...(summary.remote ? [{ label: 'Remote', value: summary.remote, dot: 'bg-[rgb(var(--state-info-fg))]' }] : []),
+    { label: ATTENDANCE_STATUS_META.present.label, value: summary.present, dot: dot('present') },
+    { label: ATTENDANCE_STATUS_META.absent.label, value: summary.absent, dot: dot('absent') },
+    { label: ATTENDANCE_STATUS_META.late.label, value: summary.late, dot: dot('late') },
+    { label: ATTENDANCE_STATUS_META.excused.label, value: summary.excused, dot: dot('excused') },
+    ...(summary.remote ? [{ label: ATTENDANCE_STATUS_META.remote.label, value: summary.remote, dot: dot('remote') }] : []),
   ]
 
   return (

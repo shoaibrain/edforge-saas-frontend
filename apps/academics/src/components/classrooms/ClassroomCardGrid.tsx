@@ -60,7 +60,7 @@ export function ClassroomCardGrid({
           <ClassroomCard
             key={section.sectionId}
             section={section}
-            subjectAreaOverride={subjectAreaMap?.get(section.courseId)}
+            subjectAreaOverride={section.courseId ? subjectAreaMap?.get(section.courseId) : undefined}
             onNavigate={onNavigate}
             onEdit={onEdit}
             onToggleActive={onToggleActive}

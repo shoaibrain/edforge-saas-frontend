@@ -221,6 +221,20 @@ function TodaySummaryStrip({
 
   const sevenDayUp = periodAverages.last7Days > periodAverages.last30Days
 
+  // Attendance realignment — coverage truth: recorded ÷ enrolled, distinct from
+  // the attendance RATE. A low rate caused by unrecorded sections must read as
+  // low coverage, not low attendance; 0 recorded reads "Not taken yet", not "0%".
+  const totalRecorded = summary.totalRecorded ?? summary.present
+  const coveragePct = summary.totalStudents > 0 ? (totalRecorded / summary.totalStudents) * 100 : 0
+  const notTakenYet = totalRecorded === 0
+  const coverageColor = notTakenYet
+    ? V2.textHint
+    : coveragePct < 60
+      ? V2.danger
+      : coveragePct < 90
+        ? V2.warning
+        : V2.success
+
   return (
     <div className={`${CARD} px-4 py-3.5 mb-3 flex items-center gap-0`}>
       {stats.map((s, i) => (
@@ -272,6 +286,31 @@ function TodaySummaryStrip({
             30-day: {periodAverages.last30Days.toFixed(1)}%
           </span>
         </div>
+      </div>
+
+      {/* Divider */}
+      <div className="w-px h-12 bg-[rgb(var(--border-primary)/0.35)] shrink-0 mx-4" />
+
+      {/* Coverage truth (realignment) — recorded ÷ enrolled, distinct from rate.
+          F3.T4 — the title spells out the coverage-vs-rate distinction so the two
+          KPIs in this strip aren't read as the same number. */}
+      <div
+        className="flex flex-col items-center gap-0.5 flex-1"
+        title="Coverage = students recorded ÷ enrolled (how much of today's roll-call is done). This is different from the attendance rate, which is how many of the recorded students were present."
+      >
+        <span
+          // allow-presentation-style: coverage severity color
+          className="text-xl font-bold leading-none"
+          style={{ color: coverageColor }}
+        >
+          {notTakenYet ? '—' : `${coveragePct.toFixed(0)}%`}
+        </span>
+        <span className="text-4xs font-bold uppercase tracking-[0.5px] text-[rgb(var(--text-disabled))]">
+          Coverage
+        </span>
+        <span className="text-4xs text-[rgb(var(--text-disabled))]">
+          {notTakenYet ? 'Not taken yet' : `${totalRecorded} of ${summary.totalStudents} recorded`}
+        </span>
       </div>
     </div>
   )
@@ -676,13 +715,19 @@ function getRateColorHex(rate: number): string {
   return V2.textMuted
 }
 
+const ALERT_THRESHOLD_OPTIONS = [90, 85, 80, 75, 70, 60]
+
 function AlertsTableV2({
   alerts,
   totalAtRiskCount,
+  threshold = 90,
+  onThresholdChange,
   onStudentClick,
 }: {
   alerts: AttendanceAlert[]
   totalAtRiskCount: number
+  threshold?: number
+  onThresholdChange?: (n: number) => void
   onStudentClick?: (studentId: string) => void
 }) {
   const [sortKey, setSortKey] = useState<AlertSortKey>('attendanceRate')
@@ -744,11 +789,28 @@ function AlertsTableV2({
         icon={<WarningTriangleIcon />}
         iconBg="rgba(239,159,39,0.10)"
         title="Attendance Alerts"
-        subtitle="Students below 90% attendance rate · sorted by severity"
+        subtitle={`Students below ${threshold}% attendance rate · sorted by severity`}
         right={
-          alerts.length > 0
-            ? <span className="text-3xs text-[rgb(var(--text-disabled))]">Showing {alerts.length} of {totalAtRiskCount} at-risk student{totalAtRiskCount !== 1 ? 's' : ''}</span>
-            : undefined
+          <div className="flex items-center gap-3">
+            {onThresholdChange && (
+              <label className="flex items-center gap-1.5 text-3xs text-[rgb(var(--text-disabled))]">
+                Below
+                <select
+                  value={threshold}
+                  onChange={(e) => onThresholdChange(Number(e.target.value))}
+                  aria-label="Low-attendance alert threshold"
+                  className="rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-1.5 py-0.5 text-3xs text-[rgb(var(--text-secondary))] focus:outline-none focus:ring-1 focus:ring-[rgb(var(--border-focus))]"
+                >
+                  {ALERT_THRESHOLD_OPTIONS.map((t) => (
+                    <option key={t} value={t}>{t}%</option>
+                  ))}
+                </select>
+              </label>
+            )}
+            {alerts.length > 0 && (
+              <span className="text-3xs text-[rgb(var(--text-disabled))]">Showing {alerts.length} of {totalAtRiskCount} at-risk student{totalAtRiskCount !== 1 ? 's' : ''}</span>
+            )}
+          </div>
         }
       />
       <div className={CARD_BODY}>
@@ -840,6 +902,11 @@ export function AttendanceDashboard({
     studentName: string
   } | null>(null)
 
+  // F3.T2 — principal-set low-attendance threshold. The overview returns
+  // students below the archetype at-risk threshold (~90%); this control lets a
+  // principal tighten the visible list client-side (≤ the server threshold).
+  const [alertThreshold, setAlertThreshold] = useState(90)
+
   // Scope indicator
   const isSchoolWide = usePermission('manage', 'attendance')
 
@@ -864,6 +931,12 @@ export function AttendanceDashboard({
   const isLoading = queryLoading
 
   const summary = data?.todaySummary
+
+  // F3.T2 — client-side tightening of the at-risk list to the principal's threshold.
+  const visibleAlerts = useMemo(
+    () => (data?.atRiskStudents ?? []).filter((a) => a.attendanceRate < alertThreshold),
+    [data?.atRiskStudents, alertThreshold],
+  )
 
   // Error state
   if (error) {
@@ -951,8 +1024,10 @@ export function AttendanceDashboard({
       ) : (
         <WidgetErrorBoundaryV2>
           <AlertsTableV2
-            alerts={data?.atRiskStudents ?? []}
+            alerts={visibleAlerts}
             totalAtRiskCount={data?.totalAtRiskCount ?? 0}
+            threshold={alertThreshold}
+            onThresholdChange={setAlertThreshold}
             onStudentClick={(studentId) => {
               const student = data?.atRiskStudents?.find((s) => s.studentId === studentId)
               if (student) {

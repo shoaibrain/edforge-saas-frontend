@@ -213,7 +213,6 @@ export function StudentQuickProfile({
             </div>
             <div className="grid grid-cols-2 gap-x-[14px] gap-y-[10px]">
               <Field label="Grade Level" value={student.currentGradeLevel ? `Grade ${student.currentGradeLevel}` : '—'} />
-              <Field label="Homeroom" value="—" />
               <Field label="Enrolled" value={enrollPrimary} sub={enrollSub} />
               <Field label="Academic Year" value={academicYearName || '—'} />
             </div>

@@ -2,93 +2,52 @@
  * StatusBadge Component
  *
  * Reusable color-coded badge for attendance status display.
+ * Vocabulary + colors come from the single source (attendanceStatus.ts) — see
+ * Sprint F0.T2. `statusConfig` is re-derived for any legacy importer.
  */
 
 import type { AttendanceStatus } from '../../services/academics.service'
+import { ATTENDANCE_STATUS_META, TONE_CLASSES } from './attendanceStatus'
 
 interface StatusBadgeProps {
   status: AttendanceStatus
   variant?: 'full' | 'compact'
 }
 
-const statusConfig: Record<
-  AttendanceStatus,
-  { label: string; shortLabel: string; bg: string; text: string; dot: string }
-> = {
-  present: {
-    label: 'Present',
-    shortLabel: 'P',
-    bg: 'bg-[rgb(var(--state-success-bg)/0.18)]',
-    text: 'text-[rgb(var(--state-success-fg))]',
-    dot: 'bg-[rgb(var(--state-success-fg))]',
-  },
-  absent: {
-    label: 'Absent',
-    shortLabel: 'A',
-    bg: 'bg-[rgb(var(--state-danger-bg)/0.18)]',
-    text: 'text-[rgb(var(--state-danger-fg))]',
-    dot: 'bg-[rgb(var(--state-danger-fg))]',
-  },
-  late: {
-    label: 'Late',
-    shortLabel: 'L',
-    bg: 'bg-[rgb(var(--state-warning-bg)/0.18)]',
-    text: 'text-[rgb(var(--state-warning-fg))]',
-    dot: 'bg-[rgb(var(--state-warning-fg))]',
-  },
-  excused: {
-    label: 'Excused',
-    shortLabel: 'E',
-    bg: 'bg-[rgb(var(--state-info-bg)/0.18)]',
-    text: 'text-[rgb(var(--state-info-fg))]',
-    dot: 'bg-[rgb(var(--state-info-fg))]',
-  },
-  half_day: {
-    label: 'Half Day',
-    shortLabel: 'H',
-    bg: 'bg-[rgb(var(--state-info-bg)/0.18)]',
-    text: 'text-[rgb(var(--state-info-fg))]',
-    dot: 'bg-[rgb(var(--state-info-fg))]',
-  },
-  early_departure: {
-    label: 'Early Dep.',
-    shortLabel: 'ED',
-    bg: 'bg-[rgb(var(--state-warning-bg)/0.18)]',
-    text: 'text-[rgb(var(--state-warning-fg))]',
-    dot: 'bg-[rgb(var(--state-warning-fg))]',
-  },
-  remote: {
-    label: 'Remote',
-    shortLabel: 'R',
-    bg: 'bg-[rgb(var(--state-info-bg)/0.18)]',
-    text: 'text-[rgb(var(--state-info-fg))]',
-    dot: 'bg-[rgb(var(--state-info-fg))]',
-  },
-}
-
 export function StatusBadge({ status, variant = 'full' }: StatusBadgeProps) {
-  const config = statusConfig[status]
-  if (!config) return null
+  const meta = ATTENDANCE_STATUS_META[status]
+  if (!meta) return null
+  const tone = TONE_CLASSES[meta.tone]
 
   if (variant === 'compact') {
     return (
       <span
-        className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold ${config.bg} ${config.text}`}
-        title={config.label}
+        className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold ${tone.badgeBg} ${tone.fg}`}
+        title={meta.label}
       >
-        {config.shortLabel}
+        {meta.shortLabel}
       </span>
     )
   }
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${config.bg} ${config.text}`}
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${tone.badgeBg} ${tone.fg}`}
     >
-      <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`} />
-      {config.label}
+      <span className={`w-1.5 h-1.5 rounded-full ${tone.dot}`} />
+      {meta.label}
     </span>
   )
 }
 
-export { statusConfig }
+/**
+ * Back-compat: the legacy `{label, shortLabel, bg, text, dot}` map, derived from
+ * the single source so it can't drift. Prefer importing from attendanceStatus.ts.
+ */
+export const statusConfig = Object.fromEntries(
+  (Object.keys(ATTENDANCE_STATUS_META) as AttendanceStatus[]).map((s) => {
+    const meta = ATTENDANCE_STATUS_META[s]
+    const tone = TONE_CLASSES[meta.tone]
+    return [s, { label: meta.label, shortLabel: meta.shortLabel, bg: tone.badgeBg, text: tone.fg, dot: tone.dot }]
+  }),
+) as Record<AttendanceStatus, { label: string; shortLabel: string; bg: string; text: string; dot: string }>

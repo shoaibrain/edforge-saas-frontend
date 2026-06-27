@@ -498,7 +498,7 @@ function GradebookTab() {
       )}
 
       {/* Modals */}
-      {showBulkModal && selectedSectionId && selectedSection && effectiveTermId && currentYear?.yearId && (
+      {showBulkModal && selectedSectionId && selectedSection && selectedSection.courseId && effectiveTermId && currentYear?.yearId && (
         <BulkGradeModal
           open={showBulkModal}
           onClose={() => setShowBulkModal(false)}
@@ -513,7 +513,7 @@ function GradebookTab() {
           categories={policyCategories}
         />
       )}
-      {showAssignmentEditor && selectedSectionId && selectedSection && effectiveTermId && currentYear?.yearId && (
+      {showAssignmentEditor && selectedSectionId && selectedSection && selectedSection.courseId && effectiveTermId && currentYear?.yearId && (
         <AssignmentEditor
           onClose={() => setShowAssignmentEditor(false)}
           sectionId={selectedSectionId}

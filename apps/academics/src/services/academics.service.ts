@@ -85,6 +85,9 @@ export type {
 
 // Import for internal use
 import type {
+  AttendancePolicyResponseDto,
+  PresenceLockResponseDto,
+  IemisAttendanceExportResponseDto,
   StudentResponseDto,
   StudentListResponseDto,
   StudentProfileResponseDto,
@@ -1192,6 +1195,47 @@ export async function updateSectionAttendance(
     ? `/academics/section-attendance/${date}/${sectionId}/${studentId}?schoolId=${schoolId}`
     : `/academics/section-attendance/${date}/${sectionId}/${studentId}`
   return apiPatch<SectionAttendanceRecord>(url, data)
+}
+
+/**
+ * Resolve the effective attendance policy (mode + counting policy) for a school.
+ * Mode is the realigned enum (daily_presence | per_section_granular); legacy
+ * daily/period/both values are coerced server-side. Source is school override →
+ * archetype → platform.
+ * GET /academics/attendance/policy?schoolId=
+ */
+export async function getAttendancePolicy(
+  schoolId: string,
+): Promise<AttendancePolicyResponseDto> {
+  return apiGet<AttendancePolicyResponseDto>('/academics/attendance/policy', { schoolId })
+}
+
+/**
+ * Cross-section presence locks for a school + date: each student's day-presence is
+ * "locked" by the first section that marked them, so subsequent sections show the
+ * lock under daily_presence. Read-only / policy-agnostic.
+ * GET /academics/attendance/presence-locks?schoolId=&date=
+ */
+export async function getPresenceLocks(
+  schoolId: string,
+  date: string,
+): Promise<PresenceLockResponseDto> {
+  return apiGet<PresenceLockResponseDto>('/academics/attendance/presence-locks', { schoolId, date })
+}
+
+/**
+ * IEMiS monthly attendance export (Layer 4). POST because it recomputes + persists
+ * the monthly aggregate, then returns IEMiS Flash II rows. academicYearId enriches
+ * each row with the student's school-local grade.
+ * POST /academics/attendance/iemis-export?schoolId=&yearMonth=YYYY-MM&academicYearId=
+ */
+export async function exportIemisAttendance(
+  schoolId: string,
+  yearMonth: string,
+  academicYearId: string,
+): Promise<IemisAttendanceExportResponseDto> {
+  const qs = new URLSearchParams({ schoolId, yearMonth, academicYearId }).toString()
+  return apiPost<IemisAttendanceExportResponseDto>(`/academics/attendance/iemis-export?${qs}`)
 }
 
 // ============================================================================

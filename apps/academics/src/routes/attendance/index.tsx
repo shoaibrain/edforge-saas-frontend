@@ -21,6 +21,8 @@ import {
   WifiOff,
   Check,
   CloudOff,
+  Info,
+  FileSpreadsheet,
 } from 'lucide-react'
 import { useActiveSchoolId } from '../../stores/app.store'
 import {
@@ -31,6 +33,8 @@ import {
   useAttendanceSummary,
   useCalendarDate,
   useAttendanceOverview,
+  useAttendancePolicy,
+  usePresenceLocks,
 } from '../../hooks/useAttendance'
 import {
   useSectionAttendanceRecords,
@@ -43,15 +47,17 @@ import { useOfflineAttendance } from '../../hooks/useOfflineAttendance'
 import { DateSelector } from '../../components/attendance/DateSelector'
 import { AttendanceGrid } from '../../components/attendance/AttendanceGrid'
 import { DailySummary } from '../../components/attendance/DailySummary'
+import { IemisExportPanel } from '../../components/attendance/IemisExportPanel'
 import { AttendanceDashboard } from './dashboard'
 import { NoCurrentAcademicYearEmptyState } from '../../components/common'
 import type { AttendanceStatus } from '../../services/academics.service'
 
-type TabId = 'overview' | 'daily-entry'
+type TabId = 'overview' | 'daily-entry' | 'iemis-export'
 
 const TABS: { id: TabId; label: string; icon: typeof BarChart3 }[] = [
   { id: 'overview', label: 'Overview', icon: BarChart3 },
   { id: 'daily-entry', label: 'Daily Entry', icon: ClipboardCheck },
+  { id: 'iemis-export', label: 'IEMiS Export', icon: FileSpreadsheet },
 ]
 
 // ============================================================================
@@ -113,13 +119,15 @@ function SaveStatusIndicator({
 function TabBar({
   activeTab,
   onTabChange,
+  tabs,
 }: {
   activeTab: TabId
   onTabChange: (tab: TabId) => void
+  tabs: { id: TabId; label: string; icon: typeof BarChart3 }[]
 }) {
   return (
     <nav className="flex gap-1" aria-label="Attendance tabs">
-      {TABS.map((tab) => {
+      {tabs.map((tab) => {
         const isActive = activeTab === tab.id
         return (
           <button
@@ -270,6 +278,13 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
 
   // ABAC: check if user can create/edit attendance
   const canCreateAttendance = usePermission('create', 'attendance')
+  // ABAC: IEMiS export is gated on attendance:export (Principal/VP/admin); hide
+  // the tab for view-only roles (matches the export-gated backend route).
+  const canExportAttendance = usePermission('export', 'attendance')
+  const visibleTabs = useMemo(
+    () => (canExportAttendance ? TABS : TABS.filter((t) => t.id !== 'iemis-export')),
+    [canExportAttendance],
+  )
 
   // currentYearId / currentYearName are guaranteed non-empty by the gate in
   // `AttendanceModule` above (Sprint 1 / Ticket 1.3a). Defensive `?.` falsy
@@ -331,6 +346,7 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
 
   const isNonInstructional = calendarDate != null &&
     !calendarDate.isInstructionalDay
+  const isPastDate = selectedDate < new Date().toISOString().split('T')[0]
 
   // Section-level mutations
   const bulkMutation = useRecordBulkSectionAttendance()
@@ -355,6 +371,30 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
     return ids
   }, [overviewData])
 
+  // Attendance realignment: resolve the effective policy (daily_presence |
+  // per_section_granular). Mode drives the presence-lock overlay below.
+  const { data: policy } = useAttendancePolicy(schoolId)
+  const isDailyPresence = policy?.effectiveMode === 'daily_presence'
+
+  // Under daily_presence, a student's day-presence is locked by their FIRST
+  // section. Fetch the cross-section locks (only in this mode) and mark students
+  // already locked by ANOTHER section as read-only in the current section's grid.
+  const { data: presenceLockData } = usePresenceLocks(
+    isDailyPresence && activeTab === 'daily-entry' ? schoolId : undefined,
+    isDailyPresence && activeTab === 'daily-entry' ? selectedDate : undefined,
+  )
+  const lockedStudents = useMemo(() => {
+    const map = new Map<string, string>()
+    if (!isDailyPresence || !presenceLockData?.locks || !selectedSectionId) return map
+    for (const lock of presenceLockData.locks) {
+      if (lock.lockedBySectionId !== selectedSectionId) {
+        const where = lock.lockedBySectionName ? ` in ${lock.lockedBySectionName}` : ''
+        map.set(lock.studentId, `Already ${lock.status}${where}`)
+      }
+    }
+    return map
+  }, [isDailyPresence, presenceLockData, selectedSectionId])
+
   // Offline resilience (Sprint 5)
   const offlineState = useOfflineAttendance({
     schoolId,
@@ -372,11 +412,13 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
   })
 
   const handleSave = useCallback(
-    (records: Array<{ studentId: string; status: AttendanceStatus; notes?: string }>) => {
+    (records: Array<{ studentId: string; status: AttendanceStatus; notes?: string; excuseReason?: string }>) => {
       if (!schoolId || !selectedSectionId) return
-      // Persist locally for offline resilience
+      // Persist locally for offline resilience. F2.T6 — carry excuseReason through
+      // the offline round-trip; the route previously stripped it before
+      // persistLocally, so absence reasons never reached the server on save.
       offlineState.persistLocally(
-        records.map(r => ({ studentId: r.studentId, status: r.status, notes: r.notes ?? '' }))
+        records.map(r => ({ studentId: r.studentId, status: r.status, notes: r.notes ?? '', excuseReason: r.excuseReason }))
       )
       // Then save to server
       offlineState.save()
@@ -438,7 +480,7 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
         </div>
 
         {/* Sub-Tabs */}
-        <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
+        <TabBar activeTab={activeTab} onTabChange={setActiveTab} tabs={visibleTabs} />
 
         {/* Controls Row (only for daily entry) */}
         {activeTab === 'daily-entry' && (
@@ -493,6 +535,38 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
                   />
                 )}
 
+                {/* Attendance policy banner (realignment) */}
+                {policy && (
+                  <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-[rgb(var(--state-info-bg)/0.12)] border border-[rgb(var(--state-info-fg)/0.2)] text-xs text-text-secondary">
+                    <Info className="w-3.5 h-3.5 mt-0.5 text-[rgb(var(--state-info-fg))] shrink-0" />
+                    <span>
+                      Attendance mode:{' '}
+                      <strong>{isDailyPresence ? 'Daily presence' : 'Per-section'}</strong>
+                      {isDailyPresence
+                        ? ' — a student present in any section counts present for the day; later sections show them locked.'
+                        : ' — each section is recorded independently.'}
+                    </span>
+                  </div>
+                )}
+
+                {/* Missing-data affordance for an instructional day with no saved
+                    records. The grid no longer pre-fills Present — so make the
+                    "not recorded" state explicit (a misleading 0% / blank table is
+                    worse than nothing), and point at the one-click "All Present"
+                    path for today/future days. Past days get a plain not-recorded
+                    notice (they're in per-row correction mode). */}
+                {selectedSectionId && !isNonInstructional && existingRecords.length === 0 &&
+                  (roster?.students?.length ?? 0) > 0 && (
+                    <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-[rgb(var(--state-warning-bg)/0.12)] border border-[rgb(var(--state-warning-fg)/0.2)] text-xs text-text-secondary">
+                      <Info className="w-3.5 h-3.5 mt-0.5 text-[rgb(var(--state-warning-fg))] shrink-0" />
+                      <span>
+                        {isPastDate
+                          ? 'Attendance was not recorded for this day. Use Edit on a student to backfill a record.'
+                          : 'Attendance has not been recorded for this day yet. Use “All Present” then mark the exceptions — or mark students individually — and Save.'}
+                      </span>
+                    </div>
+                  )}
+
                 {/* Daily Summary */}
                 <DailySummary summary={summary} isLoading={summaryLoading} />
 
@@ -528,9 +602,14 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
                     disabled={isNonInstructional || !canCreateAttendance}
                     saveStatus={offlineState.saveStatus}
                     onCorrection={handleCorrection}
+                    lockedStudents={lockedStudents}
                   />
                 )}
               </div>
+            )}
+
+            {activeTab === 'iemis-export' && canExportAttendance && (
+              <IemisExportPanel schoolId={schoolId} academicYearId={currentYearId} />
             )}
           </motion.div>
         </AnimatePresence>

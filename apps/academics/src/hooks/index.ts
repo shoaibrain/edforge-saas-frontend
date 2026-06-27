@@ -71,6 +71,8 @@ export {
   useCalendarDate,
   useAttendanceTrend,
   useAttendanceAlerts,
+  useAttendancePolicy,
+  usePresenceLocks,
   attendanceKeys,
 } from './useAttendance'
 export {

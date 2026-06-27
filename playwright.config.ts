@@ -3,6 +3,18 @@ import { defineConfig, devices } from '@playwright/test'
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:3000'
 const shouldStartServer = process.env.PLAYWRIGHT_START_SERVER === '1'
 
+// Vercel Deployment Protection guards Preview URLs behind a Vercel login wall.
+// When targeting a protected Preview, pass the project's automation-bypass secret
+// (Vercel → Project → Settings → Deployment Protection → Protection Bypass for
+// Automation) so Playwright requests clear the wall. No-op for local runs.
+const vercelBypassSecret = process.env.VERCEL_AUTOMATION_BYPASS_SECRET
+const bypassHeaders = vercelBypassSecret
+  ? {
+      'x-vercel-protection-bypass': vercelBypassSecret,
+      'x-vercel-set-bypass-cookie': 'true',
+    }
+  : undefined
+
 export default defineConfig({
   testDir: './e2e/tests',
   outputDir: './e2e/test-results',
@@ -15,6 +27,7 @@ export default defineConfig({
     baseURL,
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
+    ...(bypassHeaders ? { extraHTTPHeaders: bypassHeaders } : {}),
   },
   expect: {
     toHaveScreenshot: {
