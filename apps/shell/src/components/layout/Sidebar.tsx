@@ -137,6 +137,7 @@ function NavItemLink({
   const linkContent = (
     <Link
       to={item.href || '#'}
+      aria-label={translatedLabel}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className="block relative"
@@ -334,6 +335,7 @@ function HomeNavButton({
   const linkContent = (
     <Link
       to="/home"
+      aria-label={label}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       className="block relative"
