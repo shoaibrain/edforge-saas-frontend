@@ -98,6 +98,20 @@ describe('AttendanceGrid — per_section_granular has no locks (Story 3 / F2.T5)
   })
 })
 
+describe('AttendanceGrid — non-instructional day has no default-present (F2.T7)', () => {
+  it('does NOT pre-fill Present when defaultStatus is null (weekend/holiday)', () => {
+    const { getByText, queryByText } = setup({ defaultStatus: null })
+    // Nothing marked → roll-call is empty, not "all present".
+    expect(getByText('0 / 3 marked')).toBeInTheDocument()
+    expect(queryByText('3 / 3 marked')).toBeNull()
+  })
+
+  it('keeps Save disabled when nothing is marked on a non-instructional day', () => {
+    const { getByText } = setup({ defaultStatus: null })
+    expect(getByText('Save Attendance').closest('button')).toBeDisabled()
+  })
+})
+
 describe('AttendanceGrid — existing records (return visit)', () => {
   it('shows saved values rather than re-defaulting to Present', () => {
     const { getByText } = setup({

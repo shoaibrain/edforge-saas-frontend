@@ -548,6 +548,21 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
                   </div>
                 )}
 
+                {/* Missing-data-on-an-instructional-day affordance. A valid school
+                    day with no saved records is "not taken yet" — make that explicit
+                    and explain the absentee-first default, rather than letting the
+                    pre-filled grid read as if attendance were already recorded. */}
+                {selectedSectionId && !isNonInstructional && existingRecords.length === 0 &&
+                  (roster?.students?.length ?? 0) > 0 && (
+                    <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-[rgb(var(--state-warning-bg)/0.12)] border border-[rgb(var(--state-warning-fg)/0.2)] text-xs text-text-secondary">
+                      <Info className="w-3.5 h-3.5 mt-0.5 text-[rgb(var(--state-warning-fg))] shrink-0" />
+                      <span>
+                        Attendance has not been recorded for this day yet. Students default to{' '}
+                        <strong>Present</strong> — mark the exceptions, then Save.
+                      </span>
+                    </div>
+                  )}
+
                 {/* Daily Summary */}
                 <DailySummary summary={summary} isLoading={summaryLoading} />
 
@@ -584,6 +599,10 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
                     saveStatus={offlineState.saveStatus}
                     onCorrection={handleCorrection}
                     lockedStudents={lockedStudents}
+                    // Absentee-first only on instructional days. On a weekend/holiday
+                    // we must NOT pre-fill everyone present (there is no school day to
+                    // record); leave the roster unmarked behind the disabled overlay.
+                    defaultStatus={isNonInstructional ? null : 'present'}
                   />
                 )}
               </div>
