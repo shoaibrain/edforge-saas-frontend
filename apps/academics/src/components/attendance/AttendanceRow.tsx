@@ -111,7 +111,7 @@ export const AttendanceRow = forwardRef<AttendanceRowRef, AttendanceRowProps>(fu
   return (
     <div
       ref={rowRef}
-      className="group/row h-full border-b border-border-secondary outline-none last:border-0 focus-visible:bg-surface-secondary/40"
+      className="group/row h-full border-b border-border-secondary outline-none transition-colors last:border-0 hover:bg-surface-secondary/30 focus-visible:bg-surface-secondary/40"
       onKeyDown={handleKeyDown}
       tabIndex={tabIndex}
       role="row"

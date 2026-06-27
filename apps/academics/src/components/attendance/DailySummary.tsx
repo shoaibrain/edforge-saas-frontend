@@ -14,9 +14,9 @@ interface DailySummaryProps {
 
 function SkeletonBar() {
   return (
-    <div className="flex items-center gap-6 px-4 py-3 bg-surface-secondary rounded-xl border border-border-secondary animate-pulse">
+    <div className="flex items-center gap-6 px-4 py-3 bg-surface-secondary rounded-xl border border-border-secondary">
       {Array.from({ length: 4 }).map((_, i) => (
-        <div key={i} className="h-4 w-20 bg-surface-hover rounded" />
+        <div key={i} className="v2-skeleton-pulse h-4 w-20 rounded bg-[rgb(var(--background-tertiary))]" />
       ))}
     </div>
   )

@@ -143,3 +143,12 @@ describe('AttendanceGrid — filter chips', () => {
     expect(getAllByLabelText('Mark Present')).toHaveLength(2)
   })
 })
+
+describe('AttendanceGrid — completion moment', () => {
+  it('celebrates once every student is marked', () => {
+    const { getByText, queryByText } = setup()
+    expect(queryByText(/nicely done/i)).toBeNull()
+    fireEvent.click(getByText('All Present'))
+    expect(getByText(/nicely done/i)).toBeInTheDocument()
+  })
+})

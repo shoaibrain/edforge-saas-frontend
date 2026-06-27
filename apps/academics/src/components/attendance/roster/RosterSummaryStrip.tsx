@@ -7,7 +7,7 @@
  * one save-status indicator, and the single Save button (so it never scrolls away).
  */
 
-import { Loader2, Save, Check, WifiOff, CloudOff } from 'lucide-react'
+import { Loader2, Save, Check, WifiOff, CloudOff, CheckCircle } from 'lucide-react'
 import { ATTENDANCE_STATUS_META, TONE_CLASSES } from '../attendanceStatus'
 import type { AttendanceBucket } from '../attendanceStatus'
 import type { SaveStatus } from '../../../hooks/useOfflineAttendance'
@@ -65,25 +65,34 @@ export function RosterSummaryStrip({
 
   return (
     <div className="flex flex-shrink-0 flex-wrap items-center gap-x-4 gap-y-2 border-b border-border-secondary bg-[rgb(var(--surface-secondary)/0.5)] px-4 py-2">
-      <div className="flex items-center gap-3 text-xs">
-        <span className="flex items-center gap-1.5">
-          <span className={`h-2 w-2 rounded-full ${dotFor('present')}`} />
-          <span className="font-medium tabular-nums text-text-primary">{buckets.present}</span>
-          <span className="text-text-tertiary">present</span>
+      {complete ? (
+        // Humanized completion moment — fires once on the complete edge (the chip
+        // mounts), gently popping in. `v2-pop-in` is reduced-motion-gated.
+        <span className="v2-pop-in flex items-center gap-1.5 rounded-full bg-[rgb(var(--state-success-bg)/0.18)] px-2.5 py-1 text-xs font-medium text-[rgb(var(--state-success-fg))]">
+          <CheckCircle className="h-3.5 w-3.5" />
+          All {total} marked — nicely done
         </span>
-        <span className="flex items-center gap-1.5">
-          <span className={`h-2 w-2 rounded-full ${dotFor('absent')}`} />
-          <span className="font-medium tabular-nums text-text-primary">{buckets.absent}</span>
-          <span className="text-text-tertiary">absent</span>
-        </span>
-        {buckets.excused > 0 && (
+      ) : (
+        <div className="flex items-center gap-3 text-xs">
           <span className="flex items-center gap-1.5">
-            <span className={`h-2 w-2 rounded-full ${dotFor('excused')}`} />
-            <span className="font-medium tabular-nums text-text-primary">{buckets.excused}</span>
-            <span className="text-text-tertiary">excused</span>
+            <span className={`h-2 w-2 rounded-full ${dotFor('present')}`} />
+            <span className="font-medium tabular-nums text-text-primary">{buckets.present}</span>
+            <span className="text-text-tertiary">present</span>
           </span>
-        )}
-      </div>
+          <span className="flex items-center gap-1.5">
+            <span className={`h-2 w-2 rounded-full ${dotFor('absent')}`} />
+            <span className="font-medium tabular-nums text-text-primary">{buckets.absent}</span>
+            <span className="text-text-tertiary">absent</span>
+          </span>
+          {buckets.excused > 0 && (
+            <span className="flex items-center gap-1.5">
+              <span className={`h-2 w-2 rounded-full ${dotFor('excused')}`} />
+              <span className="font-medium tabular-nums text-text-primary">{buckets.excused}</span>
+              <span className="text-text-tertiary">excused</span>
+            </span>
+          )}
+        </div>
+      )}
 
       <div className="ml-auto flex items-center gap-3">
         <div className="h-2 w-24 overflow-hidden rounded-full bg-surface-secondary">
