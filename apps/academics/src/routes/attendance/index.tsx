@@ -14,15 +14,11 @@ import { usePermission } from '@edforge/abac'
 import { Select } from '@edforge/ui'
 import {
   ClipboardCheck,
-  Loader2,
   BarChart3,
   AlertTriangle,
-  Wifi,
-  WifiOff,
-  Check,
-  CloudOff,
   Info,
   FileSpreadsheet,
+  Check,
 } from 'lucide-react'
 import { useActiveSchoolId } from '../../stores/app.store'
 import {
@@ -30,7 +26,6 @@ import {
   useAttendanceDateActions,
 } from '../../stores/attendance.store'
 import {
-  useAttendanceSummary,
   useCalendarDate,
   useAttendanceOverview,
   useAttendancePolicy,
@@ -46,7 +41,7 @@ import { useCurrentAcademicYear } from '../../hooks'
 import { useOfflineAttendance } from '../../hooks/useOfflineAttendance'
 import { DateSelector } from '../../components/attendance/DateSelector'
 import { AttendanceGrid } from '../../components/attendance/AttendanceGrid'
-import { DailySummary } from '../../components/attendance/DailySummary'
+import { useAcknowledged } from '../../hooks/useAcknowledged'
 import { IemisExportPanel } from '../../components/attendance/IemisExportPanel'
 import { AttendanceDashboard } from './dashboard'
 import { NoCurrentAcademicYearEmptyState } from '../../components/common'
@@ -59,58 +54,6 @@ const TABS: { id: TabId; label: string; icon: typeof BarChart3 }[] = [
   { id: 'daily-entry', label: 'Daily Entry', icon: ClipboardCheck },
   { id: 'iemis-export', label: 'IEMiS Export', icon: FileSpreadsheet },
 ]
-
-// ============================================================================
-// SAVE STATUS INDICATOR
-// ============================================================================
-
-function SaveStatusIndicator({
-  status,
-  isOnline,
-}: {
-  status: 'idle' | 'saved' | 'saving' | 'offline' | 'error'
-  isOnline: boolean
-}) {
-  if (status === 'idle' && isOnline) return null
-
-  const config = {
-    saved: {
-      icon: Check,
-      text: 'Saved',
-      className: 'text-[rgb(var(--state-success-fg))]',
-    },
-    saving: {
-      icon: Loader2,
-      text: 'Saving...',
-      className: 'text-[rgb(var(--state-warning-fg))]',
-    },
-    offline: {
-      icon: WifiOff,
-      text: 'Offline — changes saved locally',
-      className: 'text-[rgb(var(--state-danger-fg))]',
-    },
-    error: {
-      icon: CloudOff,
-      text: 'Save failed — will retry',
-      className: 'text-[rgb(var(--state-danger-fg))]',
-    },
-    idle: {
-      icon: Wifi,
-      text: '',
-      className: 'text-text-tertiary',
-    },
-  }
-
-  const { icon: Icon, text, className } = config[status]
-  if (!text) return null
-
-  return (
-    <div className={`flex items-center gap-1.5 text-xs ${className}`}>
-      <Icon className={`w-3.5 h-3.5 ${status === 'saving' ? 'animate-spin' : ''}`} />
-      <span>{text}</span>
-    </div>
-  )
-}
 
 // ============================================================================
 // TAB BAR (framer-motion animated underline — consistent with other modules)
@@ -312,14 +255,6 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
     enabled: !!selectedSectionId && !!schoolId,
   })
 
-  // Fetch daily summary (with academicYearId for enrollment-based totalStudents)
-  const { data: summary, isLoading: summaryLoading } = useAttendanceSummary({
-    schoolId,
-    date: selectedDate,
-    academicYearId: currentYearId,
-    enabled: !!schoolId,
-  })
-
   // Fetch section-specific attendance records (no client-side filtering needed)
   const { data: sectionRecords } = useSectionAttendanceRecords({
     sectionId: selectedSectionId || '',
@@ -334,6 +269,10 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
       studentId: r.studentId,
       status: r.status as AttendanceStatus,
       notes: r.notes,
+      // PR5 — carry the saved reason so it hydrates the row (and a reason-only
+      // edit is correctly detected as dirty). The route previously dropped
+      // excuseReason here, so reasons never round-tripped on return.
+      excuseReason: r.excuseReason,
     }))
   }, [sectionRecords])
 
@@ -375,6 +314,11 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
   // per_section_granular). Mode drives the presence-lock overlay below.
   const { data: policy } = useAttendancePolicy(schoolId)
   const isDailyPresence = policy?.effectiveMode === 'daily_presence'
+
+  // Dismissable mode banner — acknowledged per mode (reappears if the mode changes).
+  const [modeBannerAcked, ackModeBanner] = useAcknowledged(
+    `attendance.modeBanner.${policy?.effectiveMode ?? 'pending'}`,
+  )
 
   // Under daily_presence, a student's day-presence is locked by their FIRST
   // section. Fetch the cross-section locks (only in this mode) and mark students
@@ -448,7 +392,7 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
           date: selectedDate,
           schoolId,
           sectionId: selectedSectionId,
-          records: [{ studentId: record.studentId, status: record.status, notes: record.notes }],
+          records: [{ studentId: record.studentId, status: record.status, notes: record.notes, excuseReason: record.excuseType }],
         })
       }
     },
@@ -499,10 +443,6 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
               onNext={dateActions.goToNextDay}
               onToday={dateActions.goToToday}
             />
-            <SaveStatusIndicator
-              status={offlineState.saveStatus}
-              isOnline={offlineState.isOnline}
-            />
           </div>
         )}
       </div>
@@ -535,17 +475,26 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
                   />
                 )}
 
-                {/* Attendance policy banner (realignment) */}
-                {policy && (
+                {/* Attendance policy banner (realignment) — dismissable per mode */}
+                {policy && !modeBannerAcked && (
                   <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-[rgb(var(--state-info-bg)/0.12)] border border-[rgb(var(--state-info-fg)/0.2)] text-xs text-text-secondary">
                     <Info className="w-3.5 h-3.5 mt-0.5 text-[rgb(var(--state-info-fg))] shrink-0" />
-                    <span>
+                    <span className="flex-1">
                       Attendance mode:{' '}
                       <strong>{isDailyPresence ? 'Daily presence' : 'Per-section'}</strong>
                       {isDailyPresence
                         ? ' — a student present in any section counts present for the day; later sections show them locked.'
                         : ' — each section is recorded independently.'}
                     </span>
+                    <button
+                      type="button"
+                      onClick={ackModeBanner}
+                      className="flex shrink-0 items-center gap-1 rounded-md px-2 py-1 font-medium text-[rgb(var(--state-info-fg))] transition-colors hover:bg-[rgb(var(--state-info-bg)/0.2)]"
+                      aria-label="Got it, dismiss attendance mode notice"
+                    >
+                      <Check className="h-3.5 w-3.5" />
+                      Got it
+                    </button>
                   </div>
                 )}
 
@@ -566,9 +515,6 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
                       </span>
                     </div>
                   )}
-
-                {/* Daily Summary */}
-                <DailySummary summary={summary} isLoading={summaryLoading} />
 
                 {/* Attendance Grid */}
                 {!selectedSectionId ? (

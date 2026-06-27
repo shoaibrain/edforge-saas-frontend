@@ -12,8 +12,13 @@ import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, cleanup, fireEvent, within } from '@testing-library/react'
 import { AttendanceGrid } from '../AttendanceGrid'
 import type { StudentSectionResponseDto } from '@aibrains/shared-types'
+import { mockListViewport } from '../../../../../../test-utils/virtualizer'
 
 afterEach(cleanup)
+
+// The roster is virtualized; give jsdom a non-zero viewport so every fixture row
+// renders (otherwise react-virtual windows down to nothing without layout).
+mockListViewport()
 
 const students = [
   { studentId: 's1', studentName: 'Aarav Sharma', studentNumber: '001' },
@@ -110,5 +115,40 @@ describe('AttendanceGrid — existing records (return visit)', () => {
       ],
     })
     expect(getByText('3 / 3 marked')).toBeInTheDocument()
+  })
+})
+
+describe('AttendanceGrid — filter chips', () => {
+  it('renders filter chips and hides the Locked chip when there are no locks', () => {
+    const { getByRole } = setup()
+    const chips = within(getByRole('group', { name: 'Filter students' }))
+    expect(chips.getByRole('button', { name: /Unmarked/ })).toBeInTheDocument()
+    expect(chips.queryByRole('button', { name: /Locked/ })).toBeNull()
+  })
+
+  it('shows the Locked chip when a student is locked', () => {
+    const locked = new Map([['s2', 'Already present in Math']])
+    const { getByRole } = setup({ lockedStudents: locked })
+    const chips = within(getByRole('group', { name: 'Filter students' }))
+    expect(chips.getByRole('button', { name: /Locked/ })).toBeInTheDocument()
+  })
+
+  it('the Unmarked filter narrows the roster to unmarked students', () => {
+    const { getByRole, getAllByLabelText } = setup()
+    // Mark one of the three present, then focus the Unmarked subset.
+    fireEvent.click(getAllByLabelText('Mark Present')[0])
+    const chips = within(getByRole('group', { name: 'Filter students' }))
+    fireEvent.click(chips.getByRole('button', { name: /Unmarked/ }))
+    // Two students remain unmarked → two rows (each with its status control).
+    expect(getAllByLabelText('Mark Present')).toHaveLength(2)
+  })
+})
+
+describe('AttendanceGrid — completion moment', () => {
+  it('celebrates once every student is marked', () => {
+    const { getByText, queryByText } = setup()
+    expect(queryByText(/nicely done/i)).toBeNull()
+    fireEvent.click(getByText('All Present'))
+    expect(getByText(/nicely done/i)).toBeInTheDocument()
   })
 })

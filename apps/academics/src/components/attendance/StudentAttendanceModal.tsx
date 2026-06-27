@@ -19,7 +19,7 @@ import {
   useStudentAttendanceSummary,
 } from '../../hooks/useAttendance'
 import { StatusBadge } from './StatusBadge'
-import { summarizeByBucket } from './attendanceStatus'
+import { ATTENDANCE_STATUS_META, TONE_CLASSES, summarizeByBucket } from './attendanceStatus'
 import type { AttendanceStatus } from '../../services/academics.service'
 
 // ============================================================================
@@ -75,12 +75,10 @@ interface StudentAttendanceModalProps {
 // ============================================================================
 
 function RateBadge({ rate }: { rate: number }) {
-  const style =
-    rate >= 95
-      ? 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] dark:bg-[rgb(var(--state-success-fg)/0.2)] '
-      : rate >= 90
-        ? 'bg-[rgb(var(--state-warning-bg)/0.18)] text-amber-700 dark:bg-[rgb(var(--state-warning-fg))]/20 dark:text-amber-400'
-        : 'bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))] dark:bg-[rgb(var(--state-danger-fg)/0.2)] '
+  // Derive from the single tone source so the badge can't drift (and to drop the
+  // hardcoded amber-700/amber-400 that diverged from the Tardy/warning amber).
+  const tone: 'success' | 'warning' | 'danger' = rate >= 95 ? 'success' : rate >= 90 ? 'warning' : 'danger'
+  const style = `${TONE_CLASSES[tone].badgeBg} ${TONE_CLASSES[tone].fg}`
   return (
     <span className={`inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${style}`}>
       {rate.toFixed(1)}%
@@ -92,15 +90,15 @@ function RateBadge({ rate }: { rate: number }) {
 // CALENDAR HEATMAP
 // ============================================================================
 
-const statusColorMap: Record<string, string> = {
-  present: 'bg-[rgb(var(--state-success-fg))] dark:bg-[rgb(var(--state-success-fg))]',
-  absent: 'bg-[rgb(var(--state-danger-fg))] dark:bg-[rgb(var(--state-danger-fg))]',
-  late: 'bg-amber-400 dark:bg-[rgb(var(--state-warning-fg))]',
-  tardy: 'bg-amber-400 dark:bg-[rgb(var(--state-warning-fg))]',
-  excused: 'bg-[rgb(var(--state-info-fg))] dark:bg-[rgb(var(--state-info-fg))]',
-  half_day: 'bg-[rgb(var(--state-info-fg))] dark:bg-[rgb(var(--state-info-fg))]',
-  remote: 'bg-[rgb(var(--state-info-fg))] dark:bg-[rgb(var(--state-info-fg))]',
-  early_departure: 'bg-[rgb(var(--state-warning-fg))] dark:bg-[rgb(var(--state-warning-fg))]',
+// Heatmap cell + legend colors derive from the single status source
+// (attendanceStatus.ts) so they can't drift from the badges/summary. Warning
+// (Tardy / early-departure) resolves to the amber `--state-warning-border` via
+// `TONE_CLASSES.warning.dot`, keeping it amber in both light and dark — replacing
+// the old hardcoded `bg-amber-400`.
+const statusCellColor = (status: string): string => {
+  const key = (status === 'tardy' ? 'late' : status) as AttendanceStatus
+  const meta = ATTENDANCE_STATUS_META[key]
+  return meta ? TONE_CLASSES[meta.tone].dot : 'bg-[rgb(var(--border-secondary))]'
 }
 
 function CalendarHeatmap({
@@ -139,7 +137,7 @@ function CalendarHeatmap({
             key={day.date}
             className={`w-full aspect-square rounded-sm ${
               day.status
-                ? statusColorMap[day.status] || 'bg-[rgb(var(--border-secondary))] '
+                ? statusCellColor(day.status)
                 : 'bg-[rgb(var(--background-tertiary))] '
             }`}
             title={`${day.label}: ${day.status || 'No record'}`}
@@ -149,10 +147,10 @@ function CalendarHeatmap({
       {/* Legend */}
       <div className="flex flex-wrap gap-3 mt-2">
         {[
-          { label: 'Present', color: 'bg-[rgb(var(--state-success-fg))]' },
-          { label: 'Absent', color: 'bg-[rgb(var(--state-danger-fg))]' },
-          { label: 'Late', color: 'bg-amber-400' },
-          { label: 'Excused', color: 'bg-[rgb(var(--state-info-fg))]' },
+          { label: 'Present', color: statusCellColor('present') },
+          { label: 'Absent', color: statusCellColor('absent') },
+          { label: 'Late', color: statusCellColor('late') },
+          { label: 'Excused', color: statusCellColor('excused') },
           { label: 'No Record', color: 'bg-[rgb(var(--background-tertiary))] ' },
         ].map((item) => (
           <span key={item.label} className="flex items-center gap-1 text-xs text-text-tertiary">

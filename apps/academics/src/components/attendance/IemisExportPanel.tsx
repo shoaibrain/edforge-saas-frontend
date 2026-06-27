@@ -9,11 +9,14 @@
  */
 
 import { useState } from 'react'
-import { Button, Input } from '@edforge/ui'
+import { Button, Input, TanstackDataTable, type ColumnDef } from '@edforge/ui'
 import { Download, FileSpreadsheet, Loader2, AlertTriangle } from 'lucide-react'
 import { gregorianToBs } from '@edforge/date-utils'
 import { useExportIemisAttendance } from '../../hooks/useAttendance'
 import type { IemisAttendanceExportResponseDto } from '@aibrains/shared-types'
+import { IdentityCell } from './roster/IdentityCell'
+
+type IemisExportRow = IemisAttendanceExportResponseDto['rows'][number]
 
 const YEAR_MONTH_RE = /^\d{4}-(0[1-9]|1[0-2])$/
 
@@ -83,6 +86,37 @@ function downloadCsv(filename: string, csv: string) {
   document.body.removeChild(a)
   URL.revokeObjectURL(url)
 }
+
+const numericCell = (value: number) => (
+  <div className="text-right tabular-nums text-text-secondary">{value}</div>
+)
+
+// Bounded, sortable, paginated report table (whole-school month, ~255–779 rows).
+// Student column reuses the roster IdentityCell so the export matches the roll-call
+// roster (avatar + name; the export row carries no studentNumber).
+const COLUMNS: ColumnDef<IemisExportRow, unknown>[] = [
+  {
+    accessorKey: 'studentName',
+    header: 'Student',
+    size: 260,
+    cell: ({ row }) => (
+      <IdentityCell
+        studentId={row.original.studentId}
+        studentName={row.original.studentName ?? row.original.studentId}
+      />
+    ),
+  },
+  {
+    accessorKey: 'gradeLevel',
+    header: 'Grade',
+    size: 100,
+    cell: ({ row }) => <span className="text-sm text-text-secondary">{row.original.gradeLevel ?? '—'}</span>,
+  },
+  { accessorKey: 'presentDays', header: 'Present', size: 90, cell: ({ row }) => numericCell(row.original.presentDays) },
+  { accessorKey: 'absentDays', header: 'Absent', size: 90, cell: ({ row }) => numericCell(row.original.absentDays) },
+  { accessorKey: 'excusedDays', header: 'Excused', size: 90, cell: ({ row }) => numericCell(row.original.excusedDays) },
+  { accessorKey: 'totalSchoolDays', header: 'School Days', size: 110, cell: ({ row }) => numericCell(row.original.totalSchoolDays) },
+]
 
 interface IemisExportPanelProps {
   schoolId: string
@@ -170,8 +204,8 @@ export function IemisExportPanel({ schoolId, academicYearId }: IemisExportPanelP
 
       {/* Result preview */}
       {result && (
-        <div className="bg-surface-secondary border border-border-secondary rounded-xl overflow-hidden">
-          <div className="px-4 py-3 border-b border-border-secondary flex items-center justify-between">
+        <div className="space-y-3">
+          <div className="flex items-center justify-between px-1">
             <div className="text-xs text-text-secondary">
               <strong className="text-text-primary">{result.rowCount}</strong> student
               {result.rowCount !== 1 ? 's' : ''} · {result.yearMonth}
@@ -181,36 +215,19 @@ export function IemisExportPanel({ schoolId, academicYearId }: IemisExportPanelP
             </div>
           </div>
           {result.rowCount === 0 ? (
-            <div className="py-10 text-center text-sm text-text-tertiary">
+            <div className="rounded-xl border border-border-secondary bg-surface-secondary py-10 text-center text-sm text-text-tertiary">
               No attendance recorded for this month.
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs">
-                <thead>
-                  <tr className="text-left text-text-tertiary border-b border-border-secondary">
-                    <th className="font-medium px-4 py-2">Student</th>
-                    <th className="font-medium px-4 py-2">Grade</th>
-                    <th className="font-medium px-4 py-2 text-right">Present</th>
-                    <th className="font-medium px-4 py-2 text-right">Absent</th>
-                    <th className="font-medium px-4 py-2 text-right">Excused</th>
-                    <th className="font-medium px-4 py-2 text-right">School Days</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {result.rows.map((r) => (
-                    <tr key={r.studentId} className="border-b border-border-secondary last:border-0">
-                      <td className="px-4 py-2 text-text-primary">{r.studentName ?? r.studentId}</td>
-                      <td className="px-4 py-2 text-text-secondary">{r.gradeLevel ?? '—'}</td>
-                      <td className="px-4 py-2 text-right text-text-secondary">{r.presentDays}</td>
-                      <td className="px-4 py-2 text-right text-text-secondary">{r.absentDays}</td>
-                      <td className="px-4 py-2 text-right text-text-secondary">{r.excusedDays}</td>
-                      <td className="px-4 py-2 text-right text-text-secondary">{r.totalSchoolDays}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <TanstackDataTable
+              columns={COLUMNS}
+              data={result.rows}
+              getRowId={(r) => r.studentId}
+              enableSorting
+              searchPlaceholder="Search students…"
+              pagination={{ pageSize: 25 }}
+              maxHeight="60vh"
+            />
           )}
         </div>
       )}

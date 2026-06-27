@@ -14,9 +14,9 @@ interface DailySummaryProps {
 
 function SkeletonBar() {
   return (
-    <div className="flex items-center gap-6 px-4 py-3 bg-surface-secondary rounded-xl border border-border-secondary animate-pulse">
+    <div className="flex items-center gap-6 px-4 py-3 bg-surface-secondary rounded-xl border border-border-secondary">
       {Array.from({ length: 4 }).map((_, i) => (
-        <div key={i} className="h-4 w-20 bg-surface-hover rounded" />
+        <div key={i} className="v2-skeleton-pulse h-4 w-20 rounded bg-[rgb(var(--background-tertiary))]" />
       ))}
     </div>
   )
@@ -56,6 +56,21 @@ export function DailySummary({ summary, isLoading }: DailySummaryProps) {
         ? 'text-[rgb(var(--state-warning-fg))]'
         : 'text-[rgb(var(--state-danger-fg))]'
 
+  // Coverage truth (attendance realignment): recorded ÷ enrolled — how much of
+  // the roll-call is done — distinct from the attendance RATE (attending ÷
+  // enrolled). While recording is incomplete the enrolled-denominator rate reads
+  // as a false alarm (a scary-low % that is really just low coverage), so lead
+  // with coverage and only surface the rate once recording is essentially done.
+  const totalStudents = summary.totalStudents || recordedCount
+  const coveragePct = totalStudents > 0 ? (recordedCount / totalStudents) * 100 : 0
+  const recordingComplete = coveragePct >= 90
+  const coverageColor =
+    coveragePct >= 90
+      ? 'text-[rgb(var(--state-success-fg))]'
+      : coveragePct >= 60
+        ? 'text-[rgb(var(--state-warning-fg))]'
+        : 'text-[rgb(var(--state-danger-fg))]'
+
   // Labels + dot colors come from the single status source (F0.T2) so the
   // summary can't drift from the badges/entry grid (e.g. "Late" → "Tardy").
   const dot = (status: keyof typeof ATTENDANCE_STATUS_META) =>
@@ -78,9 +93,21 @@ export function DailySummary({ summary, isLoading }: DailySummaryProps) {
         </div>
       ))}
 
-      <div className="ml-auto flex items-center gap-1.5 text-sm">
-        <span className={`font-semibold ${rateColor}`}>{rate.toFixed(1)}%</span>
-        <span className="text-text-tertiary">Rate</span>
+      <div className="ml-auto flex items-center gap-4 text-sm">
+        <div
+          className="flex items-center gap-1.5"
+          title="Coverage = students recorded ÷ enrolled (how much of the roll-call is done). This is different from the attendance rate."
+        >
+          <span className={`font-semibold tabular-nums ${coverageColor}`}>{coveragePct.toFixed(0)}%</span>
+          <span className="text-text-tertiary">coverage</span>
+          <span className="text-text-tertiary">· {recordedCount} of {totalStudents}</span>
+        </div>
+        {recordingComplete && (
+          <div className="flex items-center gap-1.5" title="Attendance rate = attending students ÷ enrolled.">
+            <span className={`font-semibold tabular-nums ${rateColor}`}>{rate.toFixed(1)}%</span>
+            <span className="text-text-tertiary">rate</span>
+          </div>
+        )}
       </div>
     </div>
   )
