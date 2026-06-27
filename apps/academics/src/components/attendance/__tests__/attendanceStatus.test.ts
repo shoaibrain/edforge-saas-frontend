@@ -8,6 +8,7 @@ import { describe, it, expect } from 'vitest'
 import {
   ATTENDANCE_STATUS_META,
   ENTRY_STATUSES,
+  TONE_CLASSES,
   statusLabel,
   statusForShortcut,
   summarizeByBucket,
@@ -70,5 +71,22 @@ describe('summarizeByBucket', () => {
       excused: 0,
       total: 0,
     })
+  })
+})
+
+describe('TONE_CLASSES — Tardy/warning amber consistency', () => {
+  it('drives the warning dot/swatch from the theme-stable amber `--state-warning-border`', () => {
+    // `--state-warning-fg` is a muddy brown in light mode (tuned for text legibility);
+    // the dot must use the amber border token so Tardy reads amber in both themes.
+    expect(TONE_CLASSES.warning.dot).toContain('--state-warning-border')
+    expect(TONE_CLASSES.warning.dot).not.toContain('--state-warning-fg')
+  })
+
+  it('keeps warning TEXT (`fg`) on `--state-warning-fg` for contrast', () => {
+    expect(TONE_CLASSES.warning.fg).toContain('--state-warning-fg')
+  })
+
+  it('resolves the Tardy status (`late`) to the warning tone', () => {
+    expect(ATTENDANCE_STATUS_META.late.tone).toBe('warning')
   })
 })

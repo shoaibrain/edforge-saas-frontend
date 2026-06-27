@@ -63,7 +63,12 @@ export const TONE_CLASSES: Record<
   warning: {
     badgeBg: 'bg-[rgb(var(--state-warning-bg)/0.18)]',
     fg: 'text-[rgb(var(--state-warning-fg))]',
-    dot: 'bg-[rgb(var(--state-warning-fg))]',
+    // Dot/swatch uses the amber `--state-warning-border` (identical in light + dark),
+    // NOT `--state-warning-fg` — the latter is tuned to a muddy brown in light mode for
+    // text legibility, which made Tardy read brown on light themes. The border token keeps
+    // Tardy amber in both themes. `fg` (text) + `btnActive` (filled control, contrast-tuned
+    // against near-white `--action-primary-fg`) intentionally stay on `--state-warning-fg`.
+    dot: 'bg-[rgb(var(--state-warning-border))]',
     btnHover: 'hover:bg-[rgb(var(--state-warning-bg)/0.18)] hover:text-[rgb(var(--state-warning-fg))]',
     btnActive: 'bg-[rgb(var(--state-warning-fg))] text-[rgb(var(--action-primary-fg))]',
   },

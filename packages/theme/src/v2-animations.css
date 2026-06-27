@@ -22,6 +22,17 @@
   animation: v2-bar-fill 600ms ease-out forwards;
 }
 
+@keyframes v2-pop-in {
+  0% { opacity: 0; transform: scale(0.9); }
+  60% { transform: scale(1.04); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* One-shot scale+fade for small celebratory chips (e.g. "all marked"). */
+.v2-pop-in {
+  animation: v2-pop-in 200ms ease-out;
+}
+
 /* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .v2-skeleton-pulse {
@@ -30,6 +41,10 @@
   }
 
   .v2-bar-fill {
+    animation: none;
+  }
+
+  .v2-pop-in {
     animation: none;
   }
 }
