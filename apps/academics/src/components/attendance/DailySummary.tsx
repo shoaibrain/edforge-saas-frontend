@@ -33,6 +33,21 @@ export function DailySummary({ summary, isLoading }: DailySummaryProps) {
     )
   }
 
+  // A summary with zero recorded students must NOT read as "0.0% rate" (that looks
+  // like everyone was absent). Show an explicit not-recorded state instead.
+  const recordedCount =
+    summary.totalRecorded ??
+    summary.present + summary.absent + summary.late + summary.excused +
+      (summary.halfDay ?? 0) + (summary.remote ?? 0)
+  if (recordedCount === 0) {
+    return (
+      <div className="flex items-center gap-2 px-4 py-3 bg-surface-secondary rounded-xl border border-border-secondary">
+        <span className="w-2 h-2 rounded-full bg-[rgb(var(--text-tertiary))]" />
+        <span className="text-sm text-text-tertiary">Attendance not recorded for this date</span>
+      </div>
+    )
+  }
+
   const rate = summary.attendanceRate
   const rateColor =
     rate >= 95

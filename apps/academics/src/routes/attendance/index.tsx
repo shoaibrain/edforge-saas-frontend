@@ -346,6 +346,7 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
 
   const isNonInstructional = calendarDate != null &&
     !calendarDate.isInstructionalDay
+  const isPastDate = selectedDate < new Date().toISOString().split('T')[0]
 
   // Section-level mutations
   const bulkMutation = useRecordBulkSectionAttendance()
@@ -548,17 +549,20 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
                   </div>
                 )}
 
-                {/* Missing-data-on-an-instructional-day affordance. A valid school
-                    day with no saved records is "not taken yet" — make that explicit
-                    and explain the absentee-first default, rather than letting the
-                    pre-filled grid read as if attendance were already recorded. */}
+                {/* Missing-data affordance for an instructional day with no saved
+                    records. The grid no longer pre-fills Present — so make the
+                    "not recorded" state explicit (a misleading 0% / blank table is
+                    worse than nothing), and point at the one-click "All Present"
+                    path for today/future days. Past days get a plain not-recorded
+                    notice (they're in per-row correction mode). */}
                 {selectedSectionId && !isNonInstructional && existingRecords.length === 0 &&
                   (roster?.students?.length ?? 0) > 0 && (
                     <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-[rgb(var(--state-warning-bg)/0.12)] border border-[rgb(var(--state-warning-fg)/0.2)] text-xs text-text-secondary">
                       <Info className="w-3.5 h-3.5 mt-0.5 text-[rgb(var(--state-warning-fg))] shrink-0" />
                       <span>
-                        Attendance has not been recorded for this day yet. Students default to{' '}
-                        <strong>Present</strong> — mark the exceptions, then Save.
+                        {isPastDate
+                          ? 'Attendance was not recorded for this day. Use Edit on a student to backfill a record.'
+                          : 'Attendance has not been recorded for this day yet. Use “All Present” then mark the exceptions — or mark students individually — and Save.'}
                       </span>
                     </div>
                   )}
@@ -599,10 +603,6 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
                     saveStatus={offlineState.saveStatus}
                     onCorrection={handleCorrection}
                     lockedStudents={lockedStudents}
-                    // Absentee-first only on instructional days. On a weekend/holiday
-                    // we must NOT pre-fill everyone present (there is no school day to
-                    // record); leave the roster unmarked behind the disabled overlay.
-                    defaultStatus={isNonInstructional ? null : 'present'}
                   />
                 )}
               </div>

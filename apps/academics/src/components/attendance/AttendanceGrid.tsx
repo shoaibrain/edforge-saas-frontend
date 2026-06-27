@@ -70,11 +70,12 @@ interface AttendanceGridProps {
    */
   lockedStudents?: Map<string, string>
   /**
-   * F2.T1 — absentee-first default. On a fresh day (no existing record for a
-   * student), unmarked students start at this status so the teacher only marks
-   * exceptions ("everyone present unless told otherwise"). Applies to both
-   * policy modes (Decision D-C). Pass `null` to keep the legacy unmarked grid
-   * (e.g. past-date correction never auto-fills).
+   * Seed status for unmarked students on a fresh day. Default is `null` — the
+   * grid does NOT pre-select anyone (operator feedback 2026-06-27, reversing the
+   * earlier absentee-first auto-Present): the existing "All Present" quick action
+   * is the one-click path, and a blank grid never mis-reports Present on a
+   * weekend/holiday or a not-yet-recorded day. Callers may still pass 'present'
+   * to opt into pre-fill.
    */
   defaultStatus?: AttendanceStatus | null
 }
@@ -195,7 +196,7 @@ export function AttendanceGrid({
   saveStatus,
   onCorrection,
   lockedStudents,
-  defaultStatus = 'present',
+  defaultStatus = null,
 }: AttendanceGridProps) {
   // Task 4.6: Determine if this is a past date
   const isPastDate = useMemo(() => {
@@ -203,8 +204,9 @@ export function AttendanceGrid({
     return date < today
   }, [date])
 
-  // F2.T1 — absentee-first default only applies for a fresh present/future day.
-  // Past dates are correction mode (start from saved values, never auto-fill).
+  // A non-null defaultStatus (pre-fill) only applies to a fresh present/future
+  // day. Past dates are correction mode (start from saved values, never fill).
+  // With the default `null`, the grid stays blank until the operator acts.
   const freshDefault: AttendanceStatus | null = isPastDate ? null : defaultStatus
 
   // F2.T1 — studentIds the user has explicitly touched. The async backfill below

@@ -1,11 +1,11 @@
 /// <reference types="@testing-library/jest-dom" />
 /**
- * AttendanceGrid — absentee-first default tests (Story 1 / F2.T1).
+ * AttendanceGrid — entry behavior tests.
  *
- * On a fresh day every roster student defaults to Present so the teacher only
- * marks exceptions, and Save submits the full roster. Locked students (Story 2)
- * are never auto-defaulted or saved unless given an explicit Tardy/Excused
- * override.
+ * The grid does NOT pre-select anyone (operator feedback 2026-06-27, reversing the
+ * earlier absentee-first auto-Present). A fresh roster starts unmarked; the
+ * "All Present" quick action is the one-click path. Locked students (Story 2) are
+ * never bulk-marked and are only saved with an explicit Tardy/Excused override.
  */
 
 import { describe, it, expect, vi, afterEach } from 'vitest'
@@ -26,7 +26,7 @@ function setup(overrides: Partial<React.ComponentProps<typeof AttendanceGrid>> =
   const utils = render(
     <AttendanceGrid
       students={students}
-      date="2090-01-15" // future date → not past → absentee-first applies
+      date="2090-01-15" // future date → not past
       onSave={onSave}
       isSaving={false}
       {...overrides}
@@ -35,85 +35,73 @@ function setup(overrides: Partial<React.ComponentProps<typeof AttendanceGrid>> =
   return { onSave, ...utils }
 }
 
-describe('AttendanceGrid — absentee-first (F2.T1)', () => {
-  it('defaults every student to Present on a fresh day (progress full)', () => {
+describe('AttendanceGrid — no auto pre-select', () => {
+  it('starts with an unmarked roster (0/N) and Save disabled', () => {
     const { getByText } = setup()
-    expect(getByText('3 / 3 marked')).toBeInTheDocument()
+    expect(getByText('0 / 3 marked')).toBeInTheDocument()
+    expect(getByText('Save Attendance').closest('button')).toBeDisabled()
   })
 
-  it('Save submits the full roster as Present', () => {
-    const { onSave, getByText } = setup()
+  it('"All Present" marks everyone and enables Save', () => {
+    const { getByText } = setup()
+    fireEvent.click(getByText('All Present'))
+    expect(getByText('3 / 3 marked')).toBeInTheDocument()
+    expect(getByText('Save Attendance').closest('button')).not.toBeDisabled()
+  })
+
+  it('All Present then one Absent saves a correct mixed roster', () => {
+    const { onSave, getByText, getAllByLabelText } = setup()
+    fireEvent.click(getByText('All Present'))
+    fireEvent.click(getAllByLabelText('Mark Absent')[0])
     fireEvent.click(getByText('Save Attendance'))
-    expect(onSave).toHaveBeenCalledTimes(1)
     const records = onSave.mock.calls[0][0]
     expect(records).toHaveLength(3)
-    expect(records.every((r: any) => r.status === 'present')).toBe(true)
-  })
-
-  it('marking one Absent yields a mixed roster on Save', () => {
-    const { onSave, getByLabelText, getAllByLabelText, getByText } = setup()
-    // First student's Absent button.
-    const absentButtons = getAllByLabelText('Mark Absent')
-    fireEvent.click(absentButtons[0])
-    fireEvent.click(getByText('Save Attendance'))
-    const records = onSave.mock.calls[0][0]
     expect(records.filter((r: any) => r.status === 'absent')).toHaveLength(1)
     expect(records.filter((r: any) => r.status === 'present')).toHaveLength(2)
-    // sanity: the matcher is real
-    expect(getByLabelText).toBeTruthy()
   })
 
-  it('does NOT auto-default or save a locked student (no explicit override)', () => {
+  it('saving only the marked students when the rest are left blank', () => {
+    const { onSave, getByText, getAllByLabelText } = setup()
+    // Mark just one student present; leave the other two blank.
+    fireEvent.click(getAllByLabelText('Mark Present')[0])
+    fireEvent.click(getByText('Save Attendance'))
+    expect(onSave.mock.calls[0][0]).toHaveLength(1)
+  })
+})
+
+describe('AttendanceGrid — locked students (Story 2)', () => {
+  it('does not bulk-mark or save a locked student via All Present', () => {
     const locked = new Map([['s2', 'Already present in Math']])
     const { onSave, getByText } = setup({ lockedStudents: locked })
-    // s2 is locked → not counted in the present default (2 of 3 marked).
+    fireEvent.click(getByText('All Present'))
+    // s2 is locked → excluded from the bulk action (2 of 3 marked).
     expect(getByText('2 / 3 marked')).toBeInTheDocument()
     fireEvent.click(getByText('Save Attendance'))
-    const records = onSave.mock.calls[0][0]
-    expect(records.map((r: any) => r.studentId).sort()).toEqual(['s1', 's3'])
+    expect(onSave.mock.calls[0][0].map((r: any) => r.studentId).sort()).toEqual(['s1', 's3'])
   })
 
   it('persists an explicit Tardy override on a locked student', () => {
     const locked = new Map([['s2', 'Already present in Math']])
     const { onSave, getByText } = setup({ lockedStudents: locked })
-    // Scope to the locked row (other rows also have a Tardy entry button).
     const lockedRow = getByText('Already present in Math').closest('[role="row"]') as HTMLElement
     fireEvent.click(within(lockedRow).getByLabelText('Mark Tardy'))
     fireEvent.click(getByText('Save Attendance'))
-    const records = onSave.mock.calls[0][0]
-    const s2 = records.find((r: any) => r.studentId === 's2')
+    const s2 = onSave.mock.calls[0][0].find((r: any) => r.studentId === 's2')
     expect(s2?.status).toBe('late')
   })
 })
 
-describe('AttendanceGrid — per_section_granular has no locks (Story 3 / F2.T5)', () => {
-  it('renders the identical full entry grid with no lock affordance when no students are locked', () => {
-    // per_section_granular never passes lockedStudents → grid is identical to Story 1.
+describe('AttendanceGrid — per_section_granular has no locks (Story 3)', () => {
+  it('renders the full entry grid with no lock affordance', () => {
     const { queryByText, getAllByLabelText } = setup({ lockedStudents: undefined })
-    // No "recorded in another section" hint anywhere.
     expect(queryByText(/Already .* in /i)).toBeNull()
-    // Every row exposes the full presence buttons (3 students × Present).
     expect(getAllByLabelText('Mark Present')).toHaveLength(3)
     expect(getAllByLabelText('Mark Absent')).toHaveLength(3)
   })
 })
 
-describe('AttendanceGrid — non-instructional day has no default-present (F2.T7)', () => {
-  it('does NOT pre-fill Present when defaultStatus is null (weekend/holiday)', () => {
-    const { getByText, queryByText } = setup({ defaultStatus: null })
-    // Nothing marked → roll-call is empty, not "all present".
-    expect(getByText('0 / 3 marked')).toBeInTheDocument()
-    expect(queryByText('3 / 3 marked')).toBeNull()
-  })
-
-  it('keeps Save disabled when nothing is marked on a non-instructional day', () => {
-    const { getByText } = setup({ defaultStatus: null })
-    expect(getByText('Save Attendance').closest('button')).toBeDisabled()
-  })
-})
-
 describe('AttendanceGrid — existing records (return visit)', () => {
-  it('shows saved values rather than re-defaulting to Present', () => {
+  it('shows saved values (marked) rather than a blank roster', () => {
     const { getByText } = setup({
       existingRecords: [
         { studentId: 's1', status: 'absent' as const },
@@ -121,7 +109,6 @@ describe('AttendanceGrid — existing records (return visit)', () => {
         { studentId: 's3', status: 'excused' as const },
       ],
     })
-    // All three have a saved status → 3/3 marked, but not all present.
     expect(getByText('3 / 3 marked')).toBeInTheDocument()
   })
 })

@@ -45,18 +45,19 @@ test.describe('Attendance realignment E2E', () => {
     await seedAttendanceSession(page)
   })
 
-  // ── Story 1 — teacher records daily attendance (absentee-first) ───────────
-  test('Story 1: roster defaults to Present, marking an absentee saves a correct breakdown', async ({ page }) => {
+  // ── Story 1 — teacher records daily attendance (All Present, then exceptions) ─
+  test('Story 1: All Present then an absentee saves a correct breakdown', async ({ page }) => {
     const captured = await mockAttendanceApi(page, { mode: 'daily_presence', instructional: true })
     await page.goto(ATTENDANCE_URL)
     await page.getByRole('button', { name: 'Daily Entry' }).click()
 
-    // Absentee-first: the section auto-selects and every student starts Present.
-    await expect(page.getByText('3 / 3 marked')).toBeVisible()
-    // The missing-data affordance explains the default on a not-yet-recorded day.
-    await expect(page.getByText(/Attendance has not been recorded for this day yet/i)).toBeVisible()
+    // No auto pre-select — the roster starts unmarked; the affordance points at All Present.
+    await expect(page.getByText('0 / 3 marked')).toBeVisible()
+    await expect(page.getByText(/Use .All Present./i)).toBeVisible()
 
-    // Mark the first student Absent, then save.
+    // One-click absentee-first via the quick action, then mark one Absent.
+    await page.getByRole('button', { name: 'All Present' }).click()
+    await expect(page.getByText('3 / 3 marked')).toBeVisible()
     await page.getByLabel('Mark Absent').first().click()
     await page.getByRole('button', { name: 'Save Attendance' }).click()
 
@@ -93,7 +94,8 @@ test.describe('Attendance realignment E2E', () => {
     await expect(page.getByText(/each section is recorded independently/i)).toBeVisible()
     // Even though a lock exists server-side, per_section_granular never fetches/shows it.
     await expect(page.getByText(/Already present in/i)).toHaveCount(0)
-    await expect(page.getByText('3 / 3 marked')).toBeVisible()
+    // Full entry grid, no pre-select.
+    await expect(page.getByLabel('Mark Present')).toHaveCount(3)
   })
 
   // ── Calendar guard — non-instructional day must not pre-fill Present ───────
