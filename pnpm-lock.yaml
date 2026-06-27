@@ -90,8 +90,8 @@ importers:
   apps/academics:
     dependencies:
       '@aibrains/shared-types':
-        specifier: ^0.76.0
-        version: 0.76.0(zod@3.24.4)
+        specifier: ^0.84.0
+        version: 0.84.0(zod@3.24.4)
       '@dicebear/collection':
         specifier: 9.4.2
         version: 9.4.2(@dicebear/core@9.4.2)
@@ -1108,8 +1108,8 @@ packages:
     peerDependencies:
       zod: ~3.24.4
 
-  '@aibrains/shared-types@0.76.0':
-    resolution: {integrity: sha512-kuRDExbQAOPcAT6BqKCejkNCcLBV/oBLITu6hqhUcgXQiVL7CdAibKxEwug1OTaMJeaRqICt/LMtt4FcJBFJsA==}
+  '@aibrains/shared-types@0.84.0':
+    resolution: {integrity: sha512-UoCwjw7iDKQxGJEaK0N7l2DhNS4Xy74oM3c5ajPaZVaBO7beYuQMLeuouhowdmnVQN2oG2iOCPKDztO80RngJQ==}
     peerDependencies:
       zod: ~3.24.4
 
@@ -5537,7 +5537,7 @@ snapshots:
     dependencies:
       zod: 3.24.4
 
-  '@aibrains/shared-types@0.76.0(zod@3.24.4)':
+  '@aibrains/shared-types@0.84.0(zod@3.24.4)':
     dependencies:
       zod: 3.24.4
 

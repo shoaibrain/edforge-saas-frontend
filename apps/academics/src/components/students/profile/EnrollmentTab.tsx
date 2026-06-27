@@ -9,7 +9,6 @@ import {
   GraduationCap,
   Calendar,
   Clock,
-  Building2,
   CheckCircle2,
   Plus,
   BookOpen,
@@ -81,13 +80,6 @@ function CurrentEnrollmentSection({ enrollment }: { enrollment: CurrentEnrollmen
             <p className="text-sm text-text-primary flex items-center gap-1.5">
               <Clock className="w-3.5 h-3.5 text-text-tertiary" />
               <DateDisplay date={enrollment.enrollmentDate} format="long" />
-            </p>
-          </div>
-          <div>
-            <p className="text-xs font-medium text-text-tertiary uppercase tracking-wide mb-1">{t('fields.homeroom')}</p>
-            <p className="text-sm text-text-primary flex items-center gap-1.5">
-              <Building2 className="w-3.5 h-3.5 text-text-tertiary" />
-              {enrollment.homeroomName || '—'}
             </p>
           </div>
         </div>
