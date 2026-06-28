@@ -32,6 +32,8 @@ function setup(entries: RosterEntry[]) {
       onStartEdit={noop}
       onCorrectionSave={noop}
       onCorrectionCancel={noop}
+      detailsOpenIds={new Set()}
+      onToggleDetails={noop}
     />,
   )
 }

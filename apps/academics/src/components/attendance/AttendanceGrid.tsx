@@ -196,6 +196,18 @@ export function AttendanceGrid({
   // unmount/remount under virtualization.
   const [editingIds, setEditingIds] = useState<Set<string>>(new Set())
 
+  // Inline Reason/Note panel open state, lifted so it survives a row unmount /
+  // remount under virtualization.
+  const [detailsOpenIds, setDetailsOpenIds] = useState<Set<string>>(new Set())
+  const toggleDetails = useCallback((studentId: string) => {
+    setDetailsOpenIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(studentId)) next.delete(studentId)
+      else next.add(studentId)
+      return next
+    })
+  }, [])
+
   // Hover-capable pointers get the compact reveal control; touch/coarse pointers
   // always see the full status set (no hover to reveal it).
   const expandTrigger: 'hover' | 'always' = useHasHover() ? 'hover' : 'always'
@@ -544,6 +556,8 @@ export function AttendanceGrid({
           onStartEdit={startEdit}
           onCorrectionSave={onRowCorrectionSave}
           onCorrectionCancel={onRowCorrectionCancel}
+          detailsOpenIds={detailsOpenIds}
+          onToggleDetails={toggleDetails}
         />
       </div>
     </div>
