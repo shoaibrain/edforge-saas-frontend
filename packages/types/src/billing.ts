@@ -213,6 +213,12 @@ export interface InvoiceFilterDto {
   status?: InvoiceStatus | InvoiceStatus[]
   studentId?: string
   academicYear?: string
+  /**
+   * Sprint B.1 — gradeLevel filter routes the backend through GSI14.
+   * Snapshot value captured at invoice issue time (immutable through
+   * student promotion).
+   */
+  gradeLevel?: string
   /** Server-side cursor pagination — prefer over deprecated page/pageSize. */
   limit?: number
   cursor?: string

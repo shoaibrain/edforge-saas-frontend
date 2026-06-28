@@ -39,6 +39,7 @@ import {
 import type { RowSelectionState } from '@tanstack/react-table'
 import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from '@edforge/i18n'
+import { useSchoolGradeOptions } from '../../../hooks/useSchoolGradeOptions'
 import { useAppStore } from '../../../stores/app.store'
 import {
   useInvoicesInfinite,
@@ -129,6 +130,8 @@ export default function InvoicesPage() {
   const { format, formatCompact } = useCurrency(settings)
 
   const [statusFilter, setStatusFilter] = useState<InvoiceStatusFilter>('')
+  // Sprint B.4 — grade filter routes the backend through GSI14.
+  const [gradeFilter, setGradeFilter] = useState('')
   const [showGenerateForm, setShowGenerateForm] = useState(false)
 
   // Row selection state (controlled by DataTable)
@@ -138,9 +141,14 @@ export default function InvoicesPage() {
   // Cancel dialog state
   const [cancelTarget, setCancelTarget] = useState<{ id: string; invoiceNumber: string } | null>(null)
 
+  const { options: gradeOptions } = useSchoolGradeOptions(schoolId ?? null)
+
   const invoiceFilters = useMemo(
-    () => ({ ...(statusFilter && { status: statusFilter as Invoice['status'] }) }),
-    [statusFilter],
+    () => ({
+      ...(statusFilter && { status: statusFilter as Invoice['status'] }),
+      ...(gradeFilter && { gradeLevel: gradeFilter }),
+    }),
+    [statusFilter, gradeFilter],
   )
 
   const {
@@ -473,12 +481,22 @@ export default function InvoicesPage() {
 
       {/* Filter Chips */}
       <div className="flex items-center justify-between flex-wrap gap-2">
-        <FinanceFilterChips
-          options={STATUS_FILTER_OPTIONS}
-          value={statusFilter}
-          onChange={(v) => setStatusFilter(v as InvoiceStatusFilter)}
-          accentColor="#EF9F27"
-        />
+        <div className="flex items-center gap-3 flex-wrap">
+          <FinanceFilterChips
+            options={STATUS_FILTER_OPTIONS}
+            value={statusFilter}
+            onChange={(v) => setStatusFilter(v as InvoiceStatusFilter)}
+            accentColor="#EF9F27"
+          />
+          {/* Sprint B.4 — grade filter chip */}
+          <Select
+            size="sm"
+            className="w-40"
+            value={gradeFilter}
+            onChange={(v) => setGradeFilter(v ?? '')}
+            options={gradeOptions}
+          />
+        </div>
       </div>
 
       {/* DataTable */}

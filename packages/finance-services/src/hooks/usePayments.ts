@@ -283,7 +283,9 @@ export { useStudentLedgerInfinite } from './useStudentLedgerInfinite'
 
 export function useSchoolPayments(
   schoolId: string,
-  params?: { status?: string; gateway?: string },
+  // Sprint B.2 — gradeLevel filter routes the backend through GSI14;
+  // sparse on unresolved-snapshot rows.
+  params?: { status?: string; gateway?: string; gradeLevel?: string },
 ) {
   const paginated = useSchoolPaymentsInfinite(schoolId, params)
   return {
