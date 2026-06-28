@@ -10,6 +10,7 @@ import { useMemo, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { ClipboardList, Flag, Plus, RefreshCw, X } from 'lucide-react'
 import { toast } from 'sonner'
+import type { RowSelectionState } from '@tanstack/react-table'
 import { usePermission } from '@edforge/abac'
 import { ContextBar, ContextBarSep, ContextBarYear, type BulkAction } from '@edforge/ui'
 import type { ExamResponseDto } from '@aibrains/shared-types'
@@ -18,6 +19,7 @@ import { useCurrentAcademicYear, useGradingPeriods } from '../../hooks/useSchool
 import { useExams, useExamPattern } from '../../hooks/useExams'
 import { ExamTable } from '../../components/exams/ExamTable'
 import { ExamDrawer } from '../../components/exams/ExamDrawer'
+import { BulkExamStatusDrawer } from '../../components/exams/BulkExamStatusDrawer'
 import {
   ExamSummary,
   filterExamsByBucket,
@@ -36,6 +38,12 @@ export function ExamsModule() {
   const canCreateExam = usePermission('create', 'assessments')
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [activeBucket, setActiveBucket] = useState<ExamBucket>('total')
+  // Lifted so the BulkExamStatusDrawer can clear selection after a
+  // successful apply (the table's selection lives in tableId-persisted
+  // state otherwise; lifting it here is a no-op for the floating bulk
+  // bar and only matters when the page wants to reset).
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+  const [bulkStatusTarget, setBulkStatusTarget] = useState<ExamResponseDto[] | null>(null)
 
   const { data: currentYear } = useCurrentAcademicYear(schoolId, !!schoolId)
   const academicYearId = currentYear?.yearId ?? ''
@@ -74,18 +82,16 @@ export function ExamsModule() {
 
   const canOpenDrawer = canCreateExam && terms.length > 0 && examPattern.length > 0
 
-  // Bulk actions wired to no-op toasts until the bulk status/results flows
-  // ship. The shared <DataTable /> still surfaces the floating bulk bar and
-  // built-in CSV export from these declarations.
+  // Change status → BulkExamStatusDrawer (issue #238). Generate results
+  // is still a toast — the result-batch backend doesn't expose a bulk
+  // surface yet and is filed as a separate follow-up.
   const bulkActions: BulkAction<ExamResponseDto>[] = useMemo(
     () => [
       {
         id: 'change-status',
         label: 'Change status',
         icon: <Flag className="w-4 h-4" />,
-        onRun: (rows) => {
-          toast.info(`Bulk change status for ${rows.length} exam${rows.length === 1 ? '' : 's'} — coming soon`)
-        },
+        onRun: (rows) => setBulkStatusTarget(rows),
       },
       {
         id: 'generate-results',
@@ -189,6 +195,8 @@ export function ExamsModule() {
             isLoading={isLoading}
             onSelectExam={(exam) => navigate({ to: '/exams/$examId', params: { examId: exam.examId } })}
             bulkActions={bulkActions}
+            rowSelection={rowSelection}
+            onRowSelectionChange={setRowSelection}
           />
         </>
       )}
@@ -203,6 +211,13 @@ export function ExamsModule() {
           examPattern={examPattern}
         />
       )}
+
+      <BulkExamStatusDrawer
+        open={!!bulkStatusTarget}
+        exams={bulkStatusTarget ?? []}
+        onClose={() => setBulkStatusTarget(null)}
+        onComplete={() => setRowSelection({})}
+      />
     </div>
   )
 }
