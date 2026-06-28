@@ -41,6 +41,7 @@ import {
   useExportPaymentsCsv,
   useDownloadReceiptPdf,
 } from '@edforge/finance-services'
+import { useSchoolGradeOptions } from '../../../hooks/useSchoolGradeOptions'
 import { formatGatewayLabel } from '@edforge/types'
 import type { Payment } from '@edforge/types'
 import { useCurrency } from '@edforge/types/use-currency'
@@ -709,14 +710,20 @@ export default function PaymentsPage() {
 
   const [statusFilter, setStatusFilter] = useState('')
   const [gatewayFilter, setGatewayFilter] = useState('')
+  // Sprint B.5 — grade filter routes the backend through GSI14 (sparse;
+  // unresolved-snapshot rows do NOT appear on this filter).
+  const [gradeFilter, setGradeFilter] = useState('')
 
   // Dialog state: which payment is being voided or refunded
   const [voidTarget, setVoidTarget] = useState<Payment | null>(null)
   const [refundTarget, setRefundTarget] = useState<Payment | null>(null)
 
+  const { options: gradeOptions } = useSchoolGradeOptions(schoolId ?? null)
+
   const { data: payments, isLoading } = useSchoolPayments(schoolId ?? '', {
     ...(statusFilter && { status: statusFilter }),
     ...(gatewayFilter && { gateway: gatewayFilter }),
+    ...(gradeFilter && { gradeLevel: gradeFilter }),
   })
   const voidMutation = useVoidPayment(schoolId ?? '')
   const refundMutation = useCreateRefund(schoolId ?? '')
@@ -854,7 +861,8 @@ export default function PaymentsPage() {
       {/* Data Table — filters + export live INSIDE the table toolbar
           (toolbarStart / toolbarExtra slots) so search/filters/export
           read as a single coherent toolbar instead of an orphan strip
-          floating above the table. */}
+          floating above the table. Sprint B.5 grade filter chip lives
+          alongside status + gateway in toolbarStart below. */}
       <TanstackDataTable<Payment>
         className="min-h-96"
         columns={columns}
@@ -879,6 +887,14 @@ export default function PaymentsPage() {
               value={gatewayFilter}
               onChange={(v) => setGatewayFilter(v ?? '')}
               options={GATEWAY_OPTIONS}
+            />
+            {/* Sprint B.5 — grade filter routes through GSI14 (sparse) */}
+            <Select
+              size="sm"
+              className="w-40"
+              value={gradeFilter}
+              onChange={(v) => setGradeFilter(v ?? '')}
+              options={gradeOptions}
             />
           </div>
         }

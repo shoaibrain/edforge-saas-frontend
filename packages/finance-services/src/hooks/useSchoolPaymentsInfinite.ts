@@ -15,7 +15,8 @@ interface UseSchoolPaymentsInfiniteOptions {
 
 export function useSchoolPaymentsInfinite(
   schoolId: string,
-  filters?: { status?: string; gateway?: string },
+  // Sprint B.2 — gradeLevel routes through GSI14 on the backend.
+  filters?: { status?: string; gateway?: string; gradeLevel?: string },
   options: UseSchoolPaymentsInfiniteOptions = {},
 ) {
   const { limit = DEFAULT_LIMIT } = options
