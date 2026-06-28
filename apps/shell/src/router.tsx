@@ -543,6 +543,9 @@ const settingsSecurityPoliciesRoute = createRoute({
   getParentRoute: () => settingsRoute,
   path: '/security-policies',
   component: RBACSecurityPage,
+  validateSearch: (search: Record<string, unknown>) => ({
+    tab: search.tab === 'assignments' ? 'assignments' : 'roles',
+  }),
 })
 
 const settingsAuthDebugRoute = createRoute({

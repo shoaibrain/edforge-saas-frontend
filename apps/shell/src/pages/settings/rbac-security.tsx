@@ -1,7 +1,19 @@
-// ... imports
-import { useState, useMemo, Fragment } from 'react'
-import { Navigate } from '@tanstack/react-router'
-import { motion, AnimatePresence } from 'framer-motion'
+/**
+ * Security Policies (RBAC) — master–detail roles & permissions + user assignments.
+ *
+ * Two tabs, tab state persisted in the URL (?tab=roles | ?tab=assignments) via
+ * the route's `validateSearch`. The page fills the settings pane: header + tabs
+ * are fixed and the matrix / user table scroll inside their own panels rather
+ * than growing the page.
+ *
+ * The permission matrix is READ-ONLY: `ROLE_PERMISSIONS` is a static
+ * client-side constant with no mutation endpoint, and per-user role editing has
+ * no backend yet. Editable matrix, role CRUD, and inline/bulk role changes are
+ * tracked in the "Enterprise RBAC/ABAC backend" epic.
+ */
+import { useState, useMemo, useCallback, Fragment } from 'react'
+import { Navigate, useNavigate, useSearch } from '@tanstack/react-router'
+import type { RowSelectionState } from '@tanstack/react-table'
 import { useQuery } from '@tanstack/react-query'
 import {
   Shield,
@@ -9,501 +21,814 @@ import {
   Key,
   Search,
   Check,
-  X,
   UserPlus,
-  ChevronRight,
+  Plus,
+  ChevronDown,
+  Download,
+  Copy,
 } from 'lucide-react'
-import { Avatar, TanstackDataTable, type ColumnDef } from '@edforge/ui'
+import {
+  Avatar,
+  TanstackDataTable,
+  type ColumnDef,
+  createSelectColumn,
+  StatusBadge,
+  SegmentedControl,
+  AnimatedProgressBar,
+  Button,
+  DataTableRowActions,
+  Input,
+  cn,
+} from '@edforge/ui'
+import { can, ROLE_PERMISSIONS, type Action } from '@edforge/abac'
+import type { SchoolRole } from '@edforge/types'
 import { useAuthStore } from '@/stores/auth.store'
 import { useAppStore } from '@/stores/app.store'
-import { can } from '@edforge/abac'
-import { ROLE_PERMISSIONS } from '@edforge/abac'
-import type { SchoolRole } from '@edforge/types'
 import { usersService } from '@/services/users.service'
 import type { UserResponseDto } from '@/services/users.service'
 import AssignUserModal from '@/components/modals/AssignUserModal'
-import {
-  SettingsPageHeader,
-  SettingsSection,
-  staggerChildren,
-  fadeInUp,
-} from '@/components/settings/SettingsShared'
+import { SettingsPageHeader } from '@/components/settings/SettingsShared'
 
 // ============================================================================
-// TYPES
+// TYPES & CONSTANTS
 // ============================================================================
 
-type TabId = 'roles' | 'users'
+type TabId = 'roles' | 'assignments'
+type Tone = 'neutral' | 'info' | 'success' | 'warning' | 'danger'
 
-interface RoleInfo {
-  id: SchoolRole
-  name: string
-  description: string
-  category: 'administrator' | 'educator' | 'staff' | 'student' | 'parent'
-  color: string
-  permissionCount: number
-}
-
-// ============================================================================
-// CONSTANTS
-// ============================================================================
-
-const TABS: { id: TabId; label: string; icon: typeof Key }[] = [
-  { id: 'roles', label: 'Roles & Permissions', icon: Key },
-  { id: 'users', label: 'User Assignments', icon: Users },
-]
-
-const SYSTEM_ROLES: RoleInfo[] = [
-  {
-    id: 'Principal',
-    name: 'Principal',
-    description: 'Full school access with administrative privileges',
-    category: 'administrator',
-    color: 'teal',
-    permissionCount: Object.keys(ROLE_PERMISSIONS.Principal).length,
-  },
-  {
-    id: 'Teacher',
-    name: 'Teacher',
-    description: 'Classroom management, grading, and attendance',
-    category: 'educator',
-    color: 'cyan',
-    permissionCount: Object.keys(ROLE_PERMISSIONS.Teacher).length,
-  },
-  {
-    id: 'Accountant',
-    name: 'Accountant',
-    description: 'Financial operations across schools',
-    category: 'staff',
-    color: 'golden',
-    permissionCount: Object.keys(ROLE_PERMISSIONS.Accountant).length,
-  },
-  {
-    id: 'Staff',
-    name: 'Staff',
-    description: 'Limited operational access',
-    category: 'staff',
-    color: 'slate',
-    permissionCount: Object.keys(ROLE_PERMISSIONS.Staff).length,
-  },
-  {
-    id: 'Student',
-    name: 'Student',
-    description: 'Student portal access',
-    category: 'student',
-    color: 'blue',
-    permissionCount: Object.keys(ROLE_PERMISSIONS.Student).length,
-  },
-  {
-    id: 'Parent',
-    name: 'Parent',
-    description: 'Parent portal with child information',
-    category: 'parent',
-    color: 'purple',
-    permissionCount: Object.keys(ROLE_PERMISSIONS.Parent).length,
-  },
-]
-
-const RESOURCE_CATEGORIES: { label: string; resources: string[] }[] = [
-  {
-    label: 'Academics',
-    resources: ['students', 'grades', 'attendance', 'enrollment', 'courses', 'scheduling', 'assessments', 'gradebook', 'calendar'],
-  },
-  {
-    label: 'People',
-    resources: ['staff', 'teachers', 'guardians', 'parents', 'departments'],
-  },
-  {
-    label: 'Settings',
-    resources: ['settings'],
-  },
-]
-
+/** Action columns mirrored in the matrix (the five CRUD-style primitives). */
 const MATRIX_ACTIONS = ['view', 'create', 'edit', 'delete', 'manage'] as const
 
-// ============================================================================
-// ROLE CARD COMPONENT
-// ============================================================================
-
-interface RoleCardProps {
-  role: RoleInfo
-  isSelected: boolean
-  onSelect: () => void
+interface RoleMeta {
+  tier: string
+  description: string
+  /** Per-role accent hue (hex) — drives the icon tint, accent rail, and bar. */
+  accent: string
 }
 
-function RoleCard({ role, isSelected, onSelect }: RoleCardProps) {
-  const colorClasses: Record<string, string> = {
-    teal: 'bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--state-info-fg))]  border-[rgb(var(--border-focus)/0.35)]',
-    cyan: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]  border-[rgb(var(--state-info-border)/0.35)]',
-    golden: 'bg-golden-500/10 text-golden-700 dark:text-golden-400 border-golden-500/20',
-    slate: 'bg-[rgb(var(--background-tertiary))]0/10 text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))] border-[rgb(var(--border-secondary))]',
-    blue: 'bg-[rgb(var(--state-info-bg)/0.18)]0/10 text-[rgb(var(--state-info-fg))] dark:text-[rgb(var(--state-info-fg))] border-[rgb(var(--state-info-border)/0.35)]',
-    purple: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]  border-[rgb(var(--state-info-border)/0.35)]',
+const ROLE_ORDER: SchoolRole[] = [
+  'Principal',
+  'VicePrincipal',
+  'Teacher',
+  'Accountant',
+  'Counselor',
+  'Nurse',
+  'Staff',
+  'Student',
+  'Parent',
+]
+
+const ROLE_META: Record<SchoolRole, RoleMeta> = {
+  Principal: { tier: 'Administrator', description: 'Full school access with administrative privileges', accent: '#7c5cff' },
+  VicePrincipal: { tier: 'Administrator', description: 'Deputy administrative access', accent: '#6366f1' },
+  Teacher: { tier: 'Educator', description: 'Classroom management, grading, and attendance', accent: '#2563eb' },
+  Accountant: { tier: 'Staff', description: 'Financial operations across schools', accent: '#d97706' },
+  Counselor: { tier: 'Staff', description: 'Student guidance and wellbeing', accent: '#0d9488' },
+  Nurse: { tier: 'Staff', description: 'Health records and student care', accent: '#db2777' },
+  Staff: { tier: 'Staff', description: 'Limited operational access', accent: '#64748b' },
+  Student: { tier: 'Student', description: 'Student portal access', accent: '#0ea5e9' },
+  Parent: { tier: 'Parent', description: 'Parent portal with child information', accent: '#9333ea' },
+}
+
+const MATRIX_CATEGORIES: { label: string; resources: string[] }[] = [
+  { label: 'Academics', resources: ['students', 'grades', 'attendance', 'enrollment', 'courses', 'scheduling', 'assessments', 'gradebook', 'calendar'] },
+  { label: 'People', resources: ['staff', 'teachers', 'guardians', 'parents', 'departments'] },
+  { label: 'Finance', resources: ['billing', 'payroll', 'expenses', 'tuition', 'reports:finance'] },
+  { label: 'Settings', resources: ['settings', 'branding', 'edfi', 'integrations'] },
+]
+
+const ALL_RESOURCES = MATRIX_CATEGORIES.flatMap((c) => c.resources)
+
+const RESOURCE_LABELS: Record<string, string> = {
+  'reports:finance': 'Finance Reports',
+  edfi: 'Ed-Fi',
+}
+
+function resourceLabel(r: string): string {
+  return RESOURCE_LABELS[r] ?? r.charAt(0).toUpperCase() + r.slice(1)
+}
+
+// ============================================================================
+// PERMISSION HELPERS (read-only, derived from ROLE_PERMISSIONS)
+// ============================================================================
+
+function isGranted(role: SchoolRole, resource: string, action: string): boolean {
+  const perms = ROLE_PERMISSIONS[role][resource as keyof (typeof ROLE_PERMISSIONS)[SchoolRole]]
+  return Array.isArray(perms) && (perms as readonly Action[]).includes(action as Action)
+}
+
+function grantsForResource(role: SchoolRole, resource: string): number {
+  return MATRIX_ACTIONS.reduce((n, a) => n + (isGranted(role, resource, a) ? 1 : 0), 0)
+}
+
+function fractionFor(role: SchoolRole, resources: string[], action?: string) {
+  const total = action ? resources.length : resources.length * MATRIX_ACTIONS.length
+  let granted = 0
+  for (const r of resources) {
+    if (action) granted += isGranted(role, r, action) ? 1 : 0
+    else granted += grantsForResource(role, r)
   }
+  return { granted, total }
+}
+
+function roleSummary(role: SchoolRole) {
+  const { granted, total } = fractionFor(role, ALL_RESOURCES)
+  return { granted, total, pct: total ? Math.round((granted / total) * 100) : 0 }
+}
+
+// ============================================================================
+// TAB 1 — ROLES & PERMISSIONS
+// ============================================================================
+
+function RoleRail({
+  selected,
+  onSelect,
+}: {
+  selected: SchoolRole
+  onSelect: (r: SchoolRole) => void
+}) {
+  const [query, setQuery] = useState('')
+  const roles = ROLE_ORDER.filter((r) =>
+    r.toLowerCase().includes(query.toLowerCase()) ||
+    ROLE_META[r].tier.toLowerCase().includes(query.toLowerCase()),
+  )
 
   return (
-    <motion.button
-      variants={fadeInUp}
-      onClick={onSelect}
-      className={`w-full p-4 rounded-xl border transition-all text-left group ${
-        isSelected
-          ? 'border-[rgb(var(--border-focus)/0.40)] ring-1 ring-[rgb(var(--border-focus))]/20 bg-[rgb(var(--background-secondary))]'
-          : 'border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] hover:border-[rgb(var(--border-focus)/0.35)]'
-      }`}
-    >
-      <div className="flex items-start justify-between">
-        <div className="flex items-start gap-3">
-          <div className={`p-2 rounded-lg ${colorClasses[role.color]}`}>
-            <Shield className="w-5 h-5" />
-          </div>
-          <div>
-            <h3 className="font-semibold text-[rgb(var(--text-primary))]">{role.name}</h3>
-            <p className="text-sm text-[rgb(var(--text-tertiary))] mt-0.5">{role.description}</p>
-            <div className="flex items-center gap-2 mt-2">
-              <span className="text-xs px-2 py-0.5 rounded-full bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))]">
-                {role.permissionCount} resources
-              </span>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))] capitalize">
-                {role.category}
-              </span>
-            </div>
-          </div>
+    <div className="flex w-80 shrink-0 flex-col overflow-hidden rounded-2xl border border-[rgb(var(--border-primary)/0.5)] bg-[rgb(var(--background-secondary))]">
+      <div className="shrink-0 border-b border-[rgb(var(--border-primary)/0.4)] p-3">
+        <div className="mb-2.5 flex items-center justify-between">
+          <span className="text-xs font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))]">
+            System Roles
+          </span>
+          <button
+            type="button"
+            disabled
+            title="Custom roles need the RBAC backend (tracked in the platform epic)"
+            className="inline-flex cursor-not-allowed items-center gap-1 rounded-lg border border-[rgb(var(--border-primary)/0.6)] px-2 py-1 text-xs font-medium text-[rgb(var(--text-tertiary))] opacity-60"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            New
+          </button>
         </div>
-        <ChevronRight className="w-5 h-5 text-[rgb(var(--text-tertiary))] group-hover:text-[rgb(var(--text-secondary))] group-hover:translate-x-0.5 transition-all" />
+        <Input
+          size="sm"
+          prefix={<Search className="h-4 w-4" />}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search roles…"
+        />
       </div>
-    </motion.button>
+
+      <div className="flex-1 space-y-1.5 overflow-y-auto p-2 scrollbar-thin">
+        {roles.map((role) => {
+          const meta = ROLE_META[role]
+          const { granted, pct } = roleSummary(role)
+          const isSelected = role === selected
+          return (
+            <button
+              key={role}
+              type="button"
+              onClick={() => onSelect(role)}
+              // allow-presentation-style: selected-role accent border is data-driven (per-role hue)
+              style={isSelected ? { borderColor: meta.accent } : undefined}
+              className={cn(
+                'w-full rounded-xl border p-3 text-left transition-all',
+                isSelected
+                  ? 'bg-[rgb(var(--background-primary))] shadow-sm ring-1'
+                  : 'border-[rgb(var(--border-primary)/0.4)] hover:border-[rgb(var(--border-primary)/0.7)] hover:bg-[rgb(var(--background-primary)/0.5)]',
+              )}
+            >
+              <div className="flex items-start gap-3">
+                <span
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+                  // allow-presentation-style: per-role accent tint is data-driven (per-role hue)
+                  style={{ backgroundColor: `${meta.accent}1f`, color: meta.accent }}
+                >
+                  <Shield className="h-5 w-5" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <span className="truncate font-semibold text-[rgb(var(--text-primary))]">{role}</span>
+                  </div>
+                  <p className="mt-0.5 text-xs text-[rgb(var(--text-tertiary))]">
+                    {meta.tier}
+                  </p>
+                  <p className="mt-1 line-clamp-2 text-xs text-[rgb(var(--text-secondary))]">
+                    {meta.description}
+                  </p>
+                  <div className="mt-2">
+                    <AnimatedProgressBar
+                      percentage={pct}
+                      color={meta.accent}
+                      label={`${role} permission coverage`}
+                      height={4}
+                    />
+                    <p className="mt-1 text-xs text-[rgb(var(--text-tertiary))]">
+                      {granted} perms · {pct}%
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </button>
+          )
+        })}
+      </div>
+    </div>
   )
 }
 
-// ============================================================================
-// PERMISSION MATRIX
-// ============================================================================
+function PermissionCell({ granted }: { granted: boolean }) {
+  if (granted) {
+    return (
+      <span className="mx-auto inline-flex h-6 w-6 items-center justify-center rounded-md bg-[rgb(var(--state-success-bg))]">
+        <Check className="h-3.5 w-3.5 text-[rgb(var(--state-success-fg))]" strokeWidth={3} />
+      </span>
+    )
+  }
+  // Denial is the quiet default — a subtle hollow outline, not a loud red X.
+  return (
+    <span className="mx-auto inline-flex h-6 w-6 items-center justify-center rounded-md border border-[rgb(var(--border-primary)/0.45)]" aria-label="not granted" />
+  )
+}
 
-function PermissionMatrix({ selectedRole }: { selectedRole: SchoolRole }) {
-  const rolePerms = ROLE_PERMISSIONS[selectedRole]
+function MatrixPanel({ role }: { role: SchoolRole }) {
+  const [query, setQuery] = useState('')
+  const [collapsed, setCollapsed] = useState<Set<string>>(new Set())
+  const meta = ROLE_META[role]
+
+  const categories = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    return MATRIX_CATEGORIES.map((cat) => ({
+      ...cat,
+      resources: q ? cat.resources.filter((r) => resourceLabel(r).toLowerCase().includes(q)) : cat.resources,
+    })).filter((cat) => cat.resources.length > 0)
+  }, [query])
+
+  const visibleResources = categories.flatMap((c) => c.resources)
+
+  const toggleCategory = (label: string) =>
+    setCollapsed((prev) => {
+      const next = new Set(prev)
+      if (next.has(label)) next.delete(label)
+      else next.add(label)
+      return next
+    })
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b border-[rgb(var(--border-primary))]">
-            <th className="text-left py-3 px-4 font-medium text-[rgb(var(--text-secondary))]">Resource</th>
-            {MATRIX_ACTIONS.map((action) => (
-              <th key={action} className="text-center py-3 px-2 font-medium text-[rgb(var(--text-secondary))] capitalize">
-                {action}
+    <div className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-2xl border border-[rgb(var(--border-primary)/0.5)] bg-[rgb(var(--background-secondary))]">
+      {/* Panel header */}
+      <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-[rgb(var(--border-primary)/0.4)] p-4">
+        <div className="flex items-center gap-2.5">
+          <span
+            className="flex h-8 w-8 items-center justify-center rounded-lg"
+            // allow-presentation-style: per-role accent tint is data-driven (per-role hue)
+            style={{ backgroundColor: `${meta.accent}1f`, color: meta.accent }}
+          >
+            <Key className="h-4 w-4" />
+          </span>
+          <div>
+            <div className="flex items-center gap-2">
+              <h2 className="font-semibold text-[rgb(var(--text-primary))]">Permission Matrix</h2>
+              <span
+                className="rounded-full px-2 py-0.5 text-xs font-medium"
+                // allow-presentation-style: per-role accent tint is data-driven (per-role hue)
+                style={{ backgroundColor: `${meta.accent}1f`, color: meta.accent }}
+              >
+                {role}
+              </span>
+            </div>
+            <p className="text-xs text-[rgb(var(--text-tertiary))]">Read-only view of granted access for this role</p>
+          </div>
+        </div>
+        <Input
+          size="sm"
+          className="w-56"
+          prefix={<Search className="h-4 w-4" />}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Filter resources…"
+        />
+      </div>
+
+      {/* Scroll container */}
+      <div className="flex-1 overflow-auto scrollbar-thin">
+        <table className="w-full border-collapse text-sm">
+          <thead>
+            <tr>
+              <th className="sticky left-0 top-0 z-30 min-w-56 bg-[rgb(var(--background-secondary))] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))]">
+                Resource
               </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {RESOURCE_CATEGORIES.map((category) => {
-            const categoryResources = category.resources.filter(
-              (r) => rolePerms[r as keyof typeof rolePerms],
-            )
-            if (categoryResources.length === 0) return null
-            return (
-              <Fragment key={category.label}>
-                <tr>
-                  <td
-                    colSpan={MATRIX_ACTIONS.length + 1}
-                    className="py-2 px-4 text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider bg-[rgb(var(--background-tertiary))]"
+              {MATRIX_ACTIONS.map((action) => {
+                const { granted, total } = fractionFor(role, visibleResources, action)
+                return (
+                  <th
+                    key={action}
+                    className="sticky top-0 z-20 min-w-20 bg-[rgb(var(--background-secondary))] px-2 py-2.5 text-center"
                   >
-                    {category.label}
-                  </td>
-                </tr>
-                {categoryResources.map((resource) => {
-                  const actions = rolePerms[resource as keyof typeof rolePerms] || []
-                  return (
-                    <tr key={resource} className="border-b border-[rgb(var(--border-secondary))]">
-                      <td className="py-2.5 px-4 font-medium text-[rgb(var(--text-primary))] capitalize">
-                        {resource.replace(':', ' / ')}
-                      </td>
-                      {MATRIX_ACTIONS.map((action) => (
-                        <td key={action} className="text-center py-2.5 px-2">
-                          {(actions as readonly string[]).includes(action) ? (
-                            <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[rgb(var(--state-success-bg)/0.6)] mx-auto">
-                              <Check className="w-3.5 h-3.5 text-[rgb(var(--state-success-fg))]" strokeWidth={3} />
+                    <span className="block text-xs font-semibold capitalize text-[rgb(var(--text-secondary))]">{action}</span>
+                    <span className="block text-xs tabular-nums text-[rgb(var(--text-tertiary))]">
+                      {granted}/{total}
+                    </span>
+                  </th>
+                )
+              })}
+            </tr>
+          </thead>
+          <tbody>
+            {categories.map((category) => {
+              const isOpen = !collapsed.has(category.label)
+              const { granted, total } = fractionFor(role, category.resources)
+              return (
+                <Fragment key={category.label}>
+                  <tr>
+                    <td
+                      colSpan={MATRIX_ACTIONS.length + 1}
+                      className="sticky left-0 z-10 border-y border-[rgb(var(--border-primary)/0.3)] bg-[rgb(var(--background-tertiary))]"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => toggleCategory(category.label)}
+                        className="flex w-full items-center gap-2 px-4 py-2 text-left"
+                      >
+                        <ChevronDown
+                          className={cn('h-4 w-4 text-[rgb(var(--text-tertiary))] transition-transform', !isOpen && '-rotate-90')}
+                        />
+                        <span className="text-xs font-semibold uppercase tracking-wider text-[rgb(var(--text-secondary))]">
+                          {category.label}
+                        </span>
+                        <span className="text-xs tabular-nums text-[rgb(var(--text-tertiary))]">
+                          {granted}/{total} granted
+                        </span>
+                      </button>
+                    </td>
+                  </tr>
+                  {isOpen &&
+                    category.resources.map((resource) => (
+                      <tr key={resource} className="border-b border-[rgb(var(--border-primary)/0.2)] hover:bg-[rgb(var(--background-primary)/0.4)]">
+                        <td className="sticky left-0 z-10 bg-[rgb(var(--background-secondary))] px-4 py-2.5">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="font-medium text-[rgb(var(--text-primary))]">{resourceLabel(resource)}</span>
+                            <span className="text-xs tabular-nums text-[rgb(var(--text-tertiary))]">
+                              {grantsForResource(role, resource)}/{MATRIX_ACTIONS.length}
                             </span>
-                          ) : (
-                            <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-[rgb(var(--state-danger-bg)/0.45)] mx-auto">
-                              <X className="w-3.5 h-3.5 text-[rgb(var(--state-danger-fg))]" strokeWidth={3} />
-                            </span>
-                          )}
+                          </div>
                         </td>
-                      ))}
-                    </tr>
-                  )
-                })}
-              </Fragment>
-            )
-          })}
-        </tbody>
-      </table>
+                        {MATRIX_ACTIONS.map((action) => (
+                          <td key={action} className="px-2 py-2.5 text-center">
+                            <PermissionCell granted={isGranted(role, resource, action)} />
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                </Fragment>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  )
+}
+
+function RolesTab() {
+  const [selected, setSelected] = useState<SchoolRole>('Principal')
+  return (
+    <div className="flex h-full min-h-0 gap-4">
+      <RoleRail selected={selected} onSelect={setSelected} />
+      <MatrixPanel role={selected} />
     </div>
   )
 }
 
 // ============================================================================
-// MAIN COMPONENT
+// TAB 2 — USER ASSIGNMENTS
 // ============================================================================
 
-export default function RBACSecurityPage() {
-  const user = useAuthStore((s) => s.user)
-  const { activeSchoolId } = useAppStore.getState()
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedTab, setSelectedTab] = useState<TabId>('roles')
-  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false)
-  const [matrixRole, setMatrixRole] = useState<SchoolRole>('Principal')
+type StatusBucket = 'all' | 'active' | 'invited' | 'suspended'
 
-  // Fetch Users — query key matches AssignUserModal for cache sharing
-  const { data: usersData, isLoading: isLoadingUsers } = useQuery({
+function statusMeta(status: UserResponseDto['status']): { label: string; tone: Tone; bucket: Exclude<StatusBucket, 'all'> } {
+  switch (status) {
+    case 'active':
+      return { label: 'Active', tone: 'success', bucket: 'active' }
+    case 'pending':
+      return { label: 'Invited', tone: 'info', bucket: 'invited' }
+    case 'suspended':
+      return { label: 'Suspended', tone: 'danger', bucket: 'suspended' }
+    default:
+      return { label: 'Inactive', tone: 'neutral', bucket: 'suspended' }
+  }
+}
+
+function roleLabel(u: UserResponseDto): { label: string; tone: Tone } {
+  return u.globalRole === 'TenantAdmin'
+    ? { label: 'Tenant Admin', tone: 'info' }
+    : { label: 'Standard User', tone: 'neutral' }
+}
+
+function fullName(u: UserResponseDto): string {
+  return `${u.firstName ?? ''} ${u.lastName ?? ''}`.trim() || u.email
+}
+
+function relativeTime(iso?: string): string {
+  if (!iso) return '—'
+  const diff = Date.now() - new Date(iso).getTime()
+  if (Number.isNaN(diff)) return '—'
+  const m = Math.floor(diff / 60000)
+  if (m < 1) return 'just now'
+  if (m < 60) return `${m}m ago`
+  const h = Math.floor(m / 60)
+  if (h < 24) return `${h}h ago`
+  const d = Math.floor(h / 24)
+  if (d < 30) return `${d}d ago`
+  return new Date(iso).toLocaleDateString()
+}
+
+function downloadCsv(filename: string, users: UserResponseDto[]) {
+  const esc = (v: string) => `"${v.replace(/"/g, '""')}"`
+  const header = ['Name', 'Email', 'Role', 'Status', 'Last active']
+  const rows = users.map((u) =>
+    [fullName(u), u.email, roleLabel(u).label, statusMeta(u.status).label, u.lastLoginAt ?? ''].map(esc).join(','),
+  )
+  const csv = [header.map(esc).join(','), ...rows].join('\n')
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
+function DistributionRow({
+  label,
+  count,
+  max,
+  color,
+  active,
+  onClick,
+}: {
+  label: string
+  count: number
+  max: number
+  color: string
+  active: boolean
+  onClick: () => void
+}) {
+  const pct = max ? Math.round((count / max) * 100) : 0
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        'w-full rounded-lg px-2 py-1.5 text-left transition-colors',
+        active ? 'bg-[rgb(var(--background-tertiary))]' : 'hover:bg-[rgb(var(--background-tertiary)/0.6)]',
+      )}
+    >
+      <div className="flex items-center justify-between text-sm">
+        <span className="flex items-center gap-2 text-[rgb(var(--text-secondary))]">
+          <span
+            className="h-2 w-2 rounded-full"
+            // allow-presentation-style: distribution dot color is data-driven (per-role hue)
+            style={{ backgroundColor: color }}
+          />
+          {label}
+        </span>
+        <span className="tabular-nums text-[rgb(var(--text-tertiary))]">{count}</span>
+      </div>
+      <div className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-[rgb(var(--background-tertiary))]">
+        <div
+          className="h-full rounded-full"
+          // allow-presentation-style: data-driven distribution bar width + per-role hue
+          style={{ width: `${pct}%`, backgroundColor: color }}
+        />
+      </div>
+    </button>
+  )
+}
+
+function UsersTab({ onAssign }: { onAssign: () => void }) {
+  const [roleFilter, setRoleFilter] = useState<'all' | 'TenantAdmin' | 'StandardUser'>('all')
+  const [statusFilter, setStatusFilter] = useState<StatusBucket>('all')
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+
+  const { data, isLoading } = useQuery({
     queryKey: ['users', 'list'],
     queryFn: () => usersService.listUsers({ limit: 100 }),
     staleTime: 5 * 60 * 1000,
   })
 
-  // User Assignments table columns. No row action: this view lists Cognito
-  // system-access accounts, and Staff↔User linking is future work — so there
-  // is intentionally no per-row edit affordance.
-  const userColumns: ColumnDef<UserResponseDto, unknown>[] = useMemo(() => [
-    {
-      id: 'user',
-      accessorFn: (u) => `${u.firstName} ${u.lastName} ${u.email}`,
-      header: 'User',
-      cell: ({ row }) => {
-        const u = row.original
-        const fullName = `${u.firstName ?? ''} ${u.lastName ?? ''}`.trim() || u.email
-        return (
-          <div className="flex items-center gap-3">
-            <Avatar name={fullName} size="sm" className="shrink-0" />
-            <div className="min-w-0">
-              <p className="font-medium text-[rgb(var(--text-primary))] truncate">{u.firstName} {u.lastName}</p>
-              <p className="text-xs text-[rgb(var(--text-tertiary))] truncate">{u.email}</p>
+  const allUsers = useMemo(() => data?.items ?? [], [data])
+
+  const counts = useMemo(() => {
+    const byRole = { TenantAdmin: 0, StandardUser: 0 }
+    let active = 0
+    for (const u of allUsers) {
+      if (u.globalRole === 'TenantAdmin') byRole.TenantAdmin++
+      else byRole.StandardUser++
+      if (u.status === 'active') active++
+    }
+    return { byRole, active, total: allUsers.length }
+  }, [allUsers])
+
+  const filtered = useMemo(
+    () =>
+      allUsers.filter((u) => {
+        if (roleFilter !== 'all' && u.globalRole !== roleFilter) return false
+        if (statusFilter !== 'all' && statusMeta(u.status).bucket !== statusFilter) return false
+        return true
+      }),
+    [allUsers, roleFilter, statusFilter],
+  )
+
+  const columns: ColumnDef<UserResponseDto, unknown>[] = useMemo(
+    () => [
+      createSelectColumn<UserResponseDto>(),
+      {
+        id: 'user',
+        accessorFn: (u) => `${u.firstName} ${u.lastName} ${u.email}`,
+        header: 'User',
+        cell: ({ row }) => {
+          const u = row.original
+          return (
+            <div className="flex items-center gap-3">
+              <Avatar name={fullName(u)} size="sm" className="shrink-0" />
+              <div className="min-w-0">
+                <p className="truncate font-medium text-[rgb(var(--text-primary))]">{fullName(u)}</p>
+                <p className="truncate text-xs text-[rgb(var(--text-tertiary))]">{u.email}</p>
+              </div>
+            </div>
+          )
+        },
+      },
+      {
+        accessorKey: 'globalRole',
+        header: 'Role',
+        size: 160,
+        cell: ({ row }) => {
+          const { label, tone } = roleLabel(row.original)
+          return (
+            <StatusBadge tone={tone}>
+              <Shield className="h-3 w-3" />
+              {label}
+            </StatusBadge>
+          )
+        },
+      },
+      {
+        accessorKey: 'status',
+        header: 'Status',
+        size: 130,
+        cell: ({ row }) => {
+          const { label, tone } = statusMeta(row.original.status)
+          return (
+            <StatusBadge tone={tone} dot>
+              {label}
+            </StatusBadge>
+          )
+        },
+      },
+      {
+        accessorKey: 'lastLoginAt',
+        header: 'Last active',
+        size: 120,
+        cell: ({ row }) => (
+          <span className="text-sm text-[rgb(var(--text-tertiary))]">{relativeTime(row.original.lastLoginAt)}</span>
+        ),
+      },
+      {
+        id: 'actions',
+        header: '',
+        size: 48,
+        cell: ({ row }) => (
+          <DataTableRowActions
+            row={row.original}
+            actions={[
+              {
+                label: 'Copy email',
+                icon: <Copy className="h-4 w-4" />,
+                onClick: (u) => navigator.clipboard?.writeText(u.email),
+              },
+              {
+                label: 'Export row',
+                icon: <Download className="h-4 w-4" />,
+                onClick: (u) => downloadCsv(`user-${u.email}.csv`, [u]),
+              },
+            ]}
+          />
+        ),
+      },
+    ],
+    [],
+  )
+
+  const roleDistMax = Math.max(counts.byRole.TenantAdmin, counts.byRole.StandardUser, 1)
+
+  return (
+    <div className="flex h-full min-h-0 gap-4">
+      {/* Left aside — summary + filters */}
+      <aside className="flex w-64 shrink-0 flex-col gap-4 overflow-y-auto scrollbar-thin">
+        <div className="rounded-2xl border border-[rgb(var(--border-primary)/0.5)] bg-[rgb(var(--background-secondary))] p-4">
+          <div className="flex items-baseline gap-6">
+            <div>
+              <p className="text-2xl font-bold tabular-nums text-[rgb(var(--text-primary))]">{counts.total}</p>
+              <p className="text-xs text-[rgb(var(--text-tertiary))]">Total users</p>
+            </div>
+            <div>
+              <p className="text-2xl font-bold tabular-nums text-[rgb(var(--state-success-fg))]">{counts.active}</p>
+              <p className="text-xs text-[rgb(var(--text-tertiary))]">Active</p>
             </div>
           </div>
-        )
-      },
-    },
-    {
-      accessorKey: 'globalRole',
-      header: 'Role',
-      size: 170,
-      cell: ({ row }) => {
-        const isAdmin = row.original.globalRole === 'TenantAdmin'
-        return (
-          <span
-            className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${
-              isAdmin
-                ? 'bg-violet-100 dark:bg-violet-500/20 text-violet-700 dark:text-violet-400'
-                : 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]'
-            }`}
-          >
-            <Shield className="w-3 h-3" />
-            {isAdmin ? 'Tenant Admin' : 'Standard User'}
-          </span>
-        )
-      },
-    },
-  ], [])
+        </div>
 
-  if (!user) {
-    return <Navigate to="/login" />
-  }
+        <div className="rounded-2xl border border-[rgb(var(--border-primary)/0.5)] bg-[rgb(var(--background-secondary))] p-3">
+          <p className="mb-2 px-2 text-xs font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))]">By role</p>
+          <div className="space-y-1">
+            <DistributionRow
+              label="All roles"
+              count={counts.total}
+              max={counts.total || 1}
+              color="rgb(var(--text-tertiary))"
+              active={roleFilter === 'all'}
+              onClick={() => setRoleFilter('all')}
+            />
+            <DistributionRow
+              label="Tenant Admin"
+              count={counts.byRole.TenantAdmin}
+              max={roleDistMax}
+              color="#7c5cff"
+              active={roleFilter === 'TenantAdmin'}
+              onClick={() => setRoleFilter((p) => (p === 'TenantAdmin' ? 'all' : 'TenantAdmin'))}
+            />
+            <DistributionRow
+              label="Standard User"
+              count={counts.byRole.StandardUser}
+              max={roleDistMax}
+              color="#64748b"
+              active={roleFilter === 'StandardUser'}
+              onClick={() => setRoleFilter((p) => (p === 'StandardUser' ? 'all' : 'StandardUser'))}
+            />
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-[rgb(var(--border-primary)/0.5)] bg-[rgb(var(--background-secondary))] p-3">
+          <p className="mb-2 px-1 text-xs font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))]">Status</p>
+          <SegmentedControl
+            aria-label="Filter by status"
+            value={statusFilter}
+            onChange={(v) => setStatusFilter(v as StatusBucket)}
+            tabs={[
+              { id: 'all', label: 'All' },
+              { id: 'active', label: 'Active' },
+              { id: 'invited', label: 'Invited' },
+              { id: 'suspended', label: 'Suspended' },
+            ]}
+          />
+        </div>
+      </aside>
+
+      {/* Main — table */}
+      <div className="flex min-w-0 flex-1 flex-col">
+        <TanstackDataTable
+          className="flex-1 min-h-0"
+          columns={columns}
+          data={filtered}
+          getRowId={(u) => u.userId}
+          isLoading={isLoading}
+          enableSorting
+          enableRowSelection
+          rowSelection={rowSelection}
+          onRowSelectionChange={setRowSelection}
+          searchPlaceholder="Search by name or email…"
+          pagination={{ pageSize: 10, pageSizeOptions: [10, 25, 50] }}
+          toolbarExtra={
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={() => downloadCsv('users.csv', filtered)}>
+                <Download className="h-4 w-4" />
+                Export
+              </Button>
+              <Button variant="primary" size="sm" onClick={onAssign}>
+                <UserPlus className="h-4 w-4" />
+                Assign User
+              </Button>
+            </div>
+          }
+          bulkActions={[
+            {
+              label: 'Export selected',
+              icon: <Download className="h-4 w-4" />,
+              variant: 'outline',
+              onClick: (rows) => downloadCsv('users-selected.csv', rows),
+            },
+          ]}
+          emptyState={{
+            icon: <Users className="h-10 w-10 text-[rgb(var(--text-tertiary))] opacity-40" />,
+            title: 'No users found',
+            description: 'Adjust your filters or assign a user to grant system access.',
+          }}
+        />
+      </div>
+    </div>
+  )
+}
+
+// ============================================================================
+// PAGE
+// ============================================================================
+
+const TABS: { id: TabId; label: string; icon: typeof Key }[] = [
+  { id: 'roles', label: 'Roles & Permissions', icon: Key },
+  { id: 'assignments', label: 'User Assignments', icon: Users },
+]
+
+export default function RBACSecurityPage() {
+  const user = useAuthStore((s) => s.user)
+  const { activeSchoolId } = useAppStore.getState()
+  const navigate = useNavigate()
+  const search = useSearch({ strict: false }) as { tab?: string }
+  const activeTab: TabId = search.tab === 'assignments' ? 'assignments' : 'roles'
+  const [isAssignOpen, setIsAssignOpen] = useState(false)
+
+  const switchTab = useCallback(
+    (tab: TabId) => {
+      navigate({ search: { tab } as never, replace: false })
+    },
+    [navigate],
+  )
+
+  if (!user) return <Navigate to="/login" />
 
   const hasPermission = can(user, {
     action: 'manage',
     resource: 'settings',
     schoolId: activeSchoolId ?? undefined,
   })
-
   if (!hasPermission) {
     return <AccessDenied message="You don't have permission to manage access policies." />
   }
 
-  const filteredUsers = usersData?.items.filter(u =>
-    `${u.firstName} ${u.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    u.email.toLowerCase().includes(searchQuery.toLowerCase())
-  ) || []
-
-  // Select a role card → update the Permission Matrix
-  const handleSelectRole = (roleId: SchoolRole) => {
-    setMatrixRole(roleId)
-  }
-
   return (
-    <div className="max-w-4xl mx-auto px-6 py-8">
-      <AssignUserModal
-        isOpen={isAssignModalOpen}
-        onClose={() => setIsAssignModalOpen(false)}
-      />
+    <div className="flex h-full flex-col px-6 pb-6 pt-6">
+      <AssignUserModal isOpen={isAssignOpen} onClose={() => setIsAssignOpen(false)} />
 
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={staggerChildren}
-        className="space-y-0"
-      >
-        {/* Header */}
-        <div className="mb-6">
-          <SettingsPageHeader
-            title="Security Policies"
-            description="Manage roles, permissions, and user access across your organization"
-            icon={Shield}
-          />
-        </div>
+      {/* Header */}
+      <div className="shrink-0">
+        <SettingsPageHeader
+          title="Security Policies"
+          description="Manage roles, permissions, and user access across your organization"
+          icon={Shield}
+        />
+      </div>
 
-        {/* Tab Navigation — EdForge standard pattern */}
-        <div className="flex items-center space-x-1 overflow-x-auto no-scrollbar border-b border-[rgb(var(--border-primary))]">
+      {/* Tabs */}
+      <div className="mt-4 shrink-0 border-b border-[rgb(var(--border-primary))]">
+        <div className="flex items-center gap-1">
           {TABS.map((tab) => {
             const Icon = tab.icon
-            const isActive = selectedTab === tab.id
+            const isActive = activeTab === tab.id
             return (
               <button
                 key={tab.id}
-                onClick={() => setSelectedTab(tab.id)}
-                className={`
-                  relative px-4 py-3 text-sm font-medium transition-colors whitespace-nowrap outline-none
-                  ${isActive
-                    ? 'text-[rgb(var(--text-primary))]'
-                    : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))]'
-                  }
-                `}
+                onClick={() => switchTab(tab.id)}
+                className={cn(
+                  'relative px-4 py-3 text-sm font-medium outline-none transition-colors',
+                  isActive ? 'text-[rgb(var(--text-primary))]' : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))]',
+                )}
               >
-                <span className="relative z-10 flex items-center gap-2">
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-[rgb(var(--action-secondary-fg))]' : 'opacity-70'}`} />
+                <span className="flex items-center gap-2">
+                  <Icon className={cn('h-4 w-4', isActive ? 'text-[rgb(var(--action-primary-bg))]' : 'opacity-70')} />
                   {tab.label}
                 </span>
-
-                {/* Animated underline indicator */}
                 {isActive && (
-                  <motion.div
-                    layoutId="securityPolicyTab"
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-[rgb(var(--action-primary-bg))] rounded-t-full"
-                    initial={false}
-                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                  />
+                  <span className="absolute inset-x-0 bottom-0 h-0.5 rounded-t-full bg-[rgb(var(--action-primary-bg))]" />
                 )}
               </button>
             )
           })}
         </div>
+      </div>
 
-        {/* Tab Content with AnimatePresence */}
-        <div className="min-h-96 pt-6">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={selectedTab}
-              initial="hidden"
-              animate="visible"
-              exit="hidden"
-              variants={staggerChildren}
-              className="space-y-6"
-            >
-              {/* Roles Tab */}
-              {selectedTab === 'roles' && (
-                <>
-                  {/* System Roles */}
-                  <SettingsSection
-                    title="System Roles"
-                    icon={Shield}
-                    description="Click a role to view its permissions in the matrix below"
-                  >
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {SYSTEM_ROLES.map((role) => (
-                        <RoleCard
-                          key={role.id}
-                          role={role}
-                          isSelected={matrixRole === role.id}
-                          onSelect={() => handleSelectRole(role.id)}
-                        />
-                      ))}
-                    </div>
-                  </SettingsSection>
-
-                  {/* Permission Matrix */}
-                  <SettingsSection
-                    title="Permission Matrix"
-                    icon={Key}
-                    description={`Showing permissions for ${matrixRole}`}
-                  >
-                    <PermissionMatrix selectedRole={matrixRole} />
-                  </SettingsSection>
-                </>
-              )}
-
-              {/* Users Tab */}
-              {selectedTab === 'users' && (
-                <SettingsSection
-                  title="User Assignments"
-                  icon={Users}
-                  description="Users and their role assignments"
-                >
-                  {/* Search and Add */}
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="relative flex-1">
-                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[rgb(var(--text-tertiary))]" />
-                      <input
-                        type="text"
-                        placeholder="Search users..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))]/50 focus:border-[rgb(var(--border-focus))]"
-                      />
-                    </div>
-                    <button
-                      onClick={() => setIsAssignModalOpen(true)}
-                      className="px-4 py-2.5 rounded-xl bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] font-medium hover:bg-[rgb(var(--action-primary-bg))] transition-colors inline-flex items-center gap-2"
-                    >
-                      <UserPlus className="w-4 h-4" />
-                      Assign User
-                    </button>
-                  </div>
-
-                  {/* User List */}
-                  <TanstackDataTable
-                    columns={userColumns}
-                    data={filteredUsers}
-                    getRowId={(u) => u.userId}
-                    isLoading={isLoadingUsers}
-                    enableSorting
-                    pagination={{ pageSize: 10 }}
-                    emptyState={{
-                      icon: <Users className="w-10 h-10" />,
-                      title: 'No users found',
-                      description: searchQuery
-                        ? 'Try adjusting your search.'
-                        : 'Assign a user to grant system access.',
-                    }}
-                  />
-                </SettingsSection>
-              )}
-
-            </motion.div>
-          </AnimatePresence>
-        </div>
-      </motion.div>
+      {/* Content — fills remaining height; panels scroll internally */}
+      <div className="mt-4 min-h-0 flex-1">
+        {activeTab === 'roles' ? <RolesTab /> : <UsersTab onAssign={() => setIsAssignOpen(true)} />}
+      </div>
     </div>
   )
 }
 
 // ============================================================================
-// ACCESS DENIED COMPONENT
+// ACCESS DENIED
 // ============================================================================
 
 function AccessDenied({ message }: { message: string }) {
   return (
-    <div className="max-w-3xl mx-auto px-6 py-8">
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-center py-16"
-      >
-        <div className="p-4 rounded-full bg-rust-500/10 inline-flex mb-4">
-          <Shield className="w-8 h-8 text-rust-500" />
+    <div className="mx-auto max-w-3xl px-6 py-8">
+      <div className="py-16 text-center">
+        <div className="mb-4 inline-flex rounded-full bg-[rgb(var(--state-danger-bg))] p-4">
+          <Shield className="h-8 w-8 text-[rgb(var(--state-danger-fg))]" />
         </div>
-        <h2 className="text-xl font-semibold text-[rgb(var(--text-primary))] mb-2">Access Denied</h2>
+        <h2 className="mb-2 text-xl font-semibold text-[rgb(var(--text-primary))]">Access Denied</h2>
         <p className="text-[rgb(var(--text-tertiary))]">{message}</p>
-      </motion.div>
+      </div>
     </div>
   )
 }
