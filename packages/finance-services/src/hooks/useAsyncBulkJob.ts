@@ -74,6 +74,16 @@ export function useAsyncBulkJob(
     refetchIntervalInBackground: false,
     staleTime: 0,
     gcTime: 60_000,
+    // BE returns 404 for missing OR cross-school jobs (PR #339 non-enumerability
+    // contract: a caller cannot distinguish "doesn't exist" from "not yours").
+    // The shell QueryClient default is retry: 1, so without this override a
+    // 404 in the 2s polling loop would double DDB reads + log noise. Skip the
+    // retry on 404 only; preserve retry-once on genuine 5xx / network errors.
+    retry: (failureCount, error: unknown) => {
+      const status = (error as { response?: { status?: number } })?.response?.status
+      if (status === 404) return false
+      return failureCount < 1
+    },
     select: (data) => {
       if (data.status === 'succeeded') {
         queryClient.invalidateQueries({ queryKey: paymentKeys.all })
