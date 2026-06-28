@@ -6,38 +6,25 @@
  * are fixed and the matrix / user table scroll inside their own panels rather
  * than growing the page.
  *
- * The permission matrix is READ-ONLY: `ROLE_PERMISSIONS` is a static
- * client-side constant with no mutation endpoint, and per-user role editing has
- * no backend yet. Editable matrix, role CRUD, and inline/bulk role changes are
- * tracked in the "Enterprise RBAC/ABAC backend" epic.
+ * Scope: this surface only renders what the platform supports today. The
+ * permission matrix is READ-ONLY (`ROLE_PERMISSIONS` is a static client-side
+ * constant with no mutation endpoint) and the user role is display-only (no
+ * per-user role-edit API). Editable matrix, role CRUD, search/filter/export,
+ * and inline/bulk role changes are tracked in the "Enterprise RBAC/ABAC
+ * backend" epic and intentionally not stubbed in the UI.
  */
 import { useState, useMemo, useCallback, Fragment } from 'react'
 import { Navigate, useNavigate, useSearch } from '@tanstack/react-router'
-import type { RowSelectionState } from '@tanstack/react-table'
 import { useQuery } from '@tanstack/react-query'
-import {
-  Shield,
-  Users,
-  Key,
-  Search,
-  Check,
-  UserPlus,
-  Plus,
-  ChevronDown,
-  Download,
-  Copy,
-} from 'lucide-react'
+import { Shield, Users, Key, Check, UserPlus, ChevronDown, Copy } from 'lucide-react'
 import {
   Avatar,
   TanstackDataTable,
   type ColumnDef,
-  createSelectColumn,
   StatusBadge,
-  SegmentedControl,
   AnimatedProgressBar,
   Button,
   DataTableRowActions,
-  Input,
   cn,
 } from '@edforge/ui'
 import { can, ROLE_PERMISSIONS, type Action } from '@edforge/abac'
@@ -147,40 +134,16 @@ function RoleRail({
   selected: SchoolRole
   onSelect: (r: SchoolRole) => void
 }) {
-  const [query, setQuery] = useState('')
-  const roles = ROLE_ORDER.filter((r) =>
-    r.toLowerCase().includes(query.toLowerCase()) ||
-    ROLE_META[r].tier.toLowerCase().includes(query.toLowerCase()),
-  )
-
   return (
     <div className="flex w-80 shrink-0 flex-col overflow-hidden rounded-2xl border border-[rgb(var(--border-primary)/0.5)] bg-[rgb(var(--background-secondary))]">
-      <div className="shrink-0 border-b border-[rgb(var(--border-primary)/0.4)] p-3">
-        <div className="mb-2.5 flex items-center justify-between">
-          <span className="text-xs font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))]">
-            System Roles
-          </span>
-          <button
-            type="button"
-            disabled
-            title="Custom roles need the RBAC backend (tracked in the platform epic)"
-            className="inline-flex cursor-not-allowed items-center gap-1 rounded-lg border border-[rgb(var(--border-primary)/0.6)] px-2 py-1 text-xs font-medium text-[rgb(var(--text-tertiary))] opacity-60"
-          >
-            <Plus className="h-3.5 w-3.5" />
-            New
-          </button>
-        </div>
-        <Input
-          size="sm"
-          prefix={<Search className="h-4 w-4" />}
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search roles…"
-        />
+      <div className="shrink-0 border-b border-[rgb(var(--border-primary)/0.4)] px-3 py-3">
+        <span className="text-xs font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))]">
+          System Roles
+        </span>
       </div>
 
       <div className="flex-1 space-y-1.5 overflow-y-auto p-2 scrollbar-thin">
-        {roles.map((role) => {
+        {ROLE_ORDER.map((role) => {
           const meta = ROLE_META[role]
           const { granted, pct } = roleSummary(role)
           const isSelected = role === selected
@@ -252,19 +215,8 @@ function PermissionCell({ granted }: { granted: boolean }) {
 }
 
 function MatrixPanel({ role }: { role: SchoolRole }) {
-  const [query, setQuery] = useState('')
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set())
   const meta = ROLE_META[role]
-
-  const categories = useMemo(() => {
-    const q = query.trim().toLowerCase()
-    return MATRIX_CATEGORIES.map((cat) => ({
-      ...cat,
-      resources: q ? cat.resources.filter((r) => resourceLabel(r).toLowerCase().includes(q)) : cat.resources,
-    })).filter((cat) => cat.resources.length > 0)
-  }, [query])
-
-  const visibleResources = categories.flatMap((c) => c.resources)
 
   const toggleCategory = (label: string) =>
     setCollapsed((prev) => {
@@ -277,37 +229,27 @@ function MatrixPanel({ role }: { role: SchoolRole }) {
   return (
     <div className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-2xl border border-[rgb(var(--border-primary)/0.5)] bg-[rgb(var(--background-secondary))]">
       {/* Panel header */}
-      <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-[rgb(var(--border-primary)/0.4)] p-4">
-        <div className="flex items-center gap-2.5">
-          <span
-            className="flex h-8 w-8 items-center justify-center rounded-lg"
-            // allow-presentation-style: per-role accent tint is data-driven (per-role hue)
-            style={{ backgroundColor: `${meta.accent}1f`, color: meta.accent }}
-          >
-            <Key className="h-4 w-4" />
-          </span>
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="font-semibold text-[rgb(var(--text-primary))]">Permission Matrix</h2>
-              <span
-                className="rounded-full px-2 py-0.5 text-xs font-medium"
-                // allow-presentation-style: per-role accent tint is data-driven (per-role hue)
-                style={{ backgroundColor: `${meta.accent}1f`, color: meta.accent }}
-              >
-                {role}
-              </span>
-            </div>
-            <p className="text-xs text-[rgb(var(--text-tertiary))]">Read-only view of granted access for this role</p>
+      <div className="flex shrink-0 items-center gap-2.5 border-b border-[rgb(var(--border-primary)/0.4)] p-4">
+        <span
+          className="flex h-8 w-8 items-center justify-center rounded-lg"
+          // allow-presentation-style: per-role accent tint is data-driven (per-role hue)
+          style={{ backgroundColor: `${meta.accent}1f`, color: meta.accent }}
+        >
+          <Key className="h-4 w-4" />
+        </span>
+        <div>
+          <div className="flex items-center gap-2">
+            <h2 className="font-semibold text-[rgb(var(--text-primary))]">Permission Matrix</h2>
+            <span
+              className="rounded-full px-2 py-0.5 text-xs font-medium"
+              // allow-presentation-style: per-role accent tint is data-driven (per-role hue)
+              style={{ backgroundColor: `${meta.accent}1f`, color: meta.accent }}
+            >
+              {role}
+            </span>
           </div>
+          <p className="text-xs text-[rgb(var(--text-tertiary))]">Read-only view of granted access for this role</p>
         </div>
-        <Input
-          size="sm"
-          className="w-56"
-          prefix={<Search className="h-4 w-4" />}
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Filter resources…"
-        />
       </div>
 
       {/* Scroll container */}
@@ -319,7 +261,7 @@ function MatrixPanel({ role }: { role: SchoolRole }) {
                 Resource
               </th>
               {MATRIX_ACTIONS.map((action) => {
-                const { granted, total } = fractionFor(role, visibleResources, action)
+                const { granted, total } = fractionFor(role, ALL_RESOURCES, action)
                 return (
                   <th
                     key={action}
@@ -335,7 +277,7 @@ function MatrixPanel({ role }: { role: SchoolRole }) {
             </tr>
           </thead>
           <tbody>
-            {categories.map((category) => {
+            {MATRIX_CATEGORIES.map((category) => {
               const isOpen = !collapsed.has(category.label)
               const { granted, total } = fractionFor(role, category.resources)
               return (
@@ -404,18 +346,16 @@ function RolesTab() {
 // TAB 2 — USER ASSIGNMENTS
 // ============================================================================
 
-type StatusBucket = 'all' | 'active' | 'invited' | 'suspended'
-
-function statusMeta(status: UserResponseDto['status']): { label: string; tone: Tone; bucket: Exclude<StatusBucket, 'all'> } {
+function statusMeta(status: UserResponseDto['status']): { label: string; tone: Tone } {
   switch (status) {
     case 'active':
-      return { label: 'Active', tone: 'success', bucket: 'active' }
+      return { label: 'Active', tone: 'success' }
     case 'pending':
-      return { label: 'Invited', tone: 'info', bucket: 'invited' }
+      return { label: 'Invited', tone: 'info' }
     case 'suspended':
-      return { label: 'Suspended', tone: 'danger', bucket: 'suspended' }
+      return { label: 'Suspended', tone: 'danger' }
     default:
-      return { label: 'Inactive', tone: 'neutral', bucket: 'suspended' }
+      return { label: 'Inactive', tone: 'neutral' }
   }
 }
 
@@ -441,22 +381,6 @@ function relativeTime(iso?: string): string {
   const d = Math.floor(h / 24)
   if (d < 30) return `${d}d ago`
   return new Date(iso).toLocaleDateString()
-}
-
-function downloadCsv(filename: string, users: UserResponseDto[]) {
-  const esc = (v: string) => `"${v.replace(/"/g, '""')}"`
-  const header = ['Name', 'Email', 'Role', 'Status', 'Last active']
-  const rows = users.map((u) =>
-    [fullName(u), u.email, roleLabel(u).label, statusMeta(u.status).label, u.lastLoginAt ?? ''].map(esc).join(','),
-  )
-  const csv = [header.map(esc).join(','), ...rows].join('\n')
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = filename
-  a.click()
-  URL.revokeObjectURL(url)
 }
 
 function DistributionRow({
@@ -508,8 +432,6 @@ function DistributionRow({
 
 function UsersTab({ onAssign }: { onAssign: () => void }) {
   const [roleFilter, setRoleFilter] = useState<'all' | 'TenantAdmin' | 'StandardUser'>('all')
-  const [statusFilter, setStatusFilter] = useState<StatusBucket>('all')
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
   const { data, isLoading } = useQuery({
     queryKey: ['users', 'list'],
@@ -531,18 +453,12 @@ function UsersTab({ onAssign }: { onAssign: () => void }) {
   }, [allUsers])
 
   const filtered = useMemo(
-    () =>
-      allUsers.filter((u) => {
-        if (roleFilter !== 'all' && u.globalRole !== roleFilter) return false
-        if (statusFilter !== 'all' && statusMeta(u.status).bucket !== statusFilter) return false
-        return true
-      }),
-    [allUsers, roleFilter, statusFilter],
+    () => (roleFilter === 'all' ? allUsers : allUsers.filter((u) => u.globalRole === roleFilter)),
+    [allUsers, roleFilter],
   )
 
   const columns: ColumnDef<UserResponseDto, unknown>[] = useMemo(
     () => [
-      createSelectColumn<UserResponseDto>(),
       {
         id: 'user',
         accessorFn: (u) => `${u.firstName} ${u.lastName} ${u.email}`,
@@ -608,11 +524,6 @@ function UsersTab({ onAssign }: { onAssign: () => void }) {
                 icon: <Copy className="h-4 w-4" />,
                 onClick: (u) => navigator.clipboard?.writeText(u.email),
               },
-              {
-                label: 'Export row',
-                icon: <Download className="h-4 w-4" />,
-                onClick: (u) => downloadCsv(`user-${u.email}.csv`, [u]),
-              },
             ]}
           />
         ),
@@ -625,7 +536,7 @@ function UsersTab({ onAssign }: { onAssign: () => void }) {
 
   return (
     <div className="flex h-full min-h-0 gap-4">
-      {/* Left aside — summary + filters */}
+      {/* Left aside — summary + by-role filter */}
       <aside className="flex w-64 shrink-0 flex-col gap-4 overflow-y-auto scrollbar-thin">
         <div className="rounded-2xl border border-[rgb(var(--border-primary)/0.5)] bg-[rgb(var(--background-secondary))] p-4">
           <div className="flex items-baseline gap-6">
@@ -669,21 +580,6 @@ function UsersTab({ onAssign }: { onAssign: () => void }) {
             />
           </div>
         </div>
-
-        <div className="rounded-2xl border border-[rgb(var(--border-primary)/0.5)] bg-[rgb(var(--background-secondary))] p-3">
-          <p className="mb-2 px-1 text-xs font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))]">Status</p>
-          <SegmentedControl
-            aria-label="Filter by status"
-            value={statusFilter}
-            onChange={(v) => setStatusFilter(v as StatusBucket)}
-            tabs={[
-              { id: 'all', label: 'All' },
-              { id: 'active', label: 'Active' },
-              { id: 'invited', label: 'Invited' },
-              { id: 'suspended', label: 'Suspended' },
-            ]}
-          />
-        </div>
       </aside>
 
       {/* Main — table */}
@@ -695,35 +591,17 @@ function UsersTab({ onAssign }: { onAssign: () => void }) {
           getRowId={(u) => u.userId}
           isLoading={isLoading}
           enableSorting
-          enableRowSelection
-          rowSelection={rowSelection}
-          onRowSelectionChange={setRowSelection}
-          searchPlaceholder="Search by name or email…"
           pagination={{ pageSize: 10, pageSizeOptions: [10, 25, 50] }}
           toolbarExtra={
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={() => downloadCsv('users.csv', filtered)}>
-                <Download className="h-4 w-4" />
-                Export
-              </Button>
-              <Button variant="primary" size="sm" onClick={onAssign}>
-                <UserPlus className="h-4 w-4" />
-                Assign User
-              </Button>
-            </div>
+            <Button variant="primary" size="sm" onClick={onAssign}>
+              <UserPlus className="h-4 w-4" />
+              Assign User
+            </Button>
           }
-          bulkActions={[
-            {
-              label: 'Export selected',
-              icon: <Download className="h-4 w-4" />,
-              variant: 'outline',
-              onClick: (rows) => downloadCsv('users-selected.csv', rows),
-            },
-          ]}
           emptyState={{
             icon: <Users className="h-10 w-10 text-[rgb(var(--text-tertiary))] opacity-40" />,
             title: 'No users found',
-            description: 'Adjust your filters or assign a user to grant system access.',
+            description: 'Assign a user to grant system access.',
           }}
         />
       </div>
