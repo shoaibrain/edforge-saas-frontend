@@ -20,7 +20,7 @@ import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Loader2, Save, Wallet } from 'lucide-react'
-import { Modal, ModalFooter, Button, Field, Input, Select, BsDatePicker } from '@edforge/ui'
+import { Modal, ModalFooter, Button, Field, Input, Select, DateInput } from '@edforge/ui'
 import {
   useStudentAccounts,
   useSetOpeningBalance,
@@ -290,7 +290,7 @@ export function EditStudentModal({
       onClose={handleClose}
       title="Edit Student"
       description={`Update information for ${student.fullName}`}
-      size="md"
+      size="2xl"
     >
       <form onSubmit={onSubmit} className="space-y-4">
         {/* Student Number (read-only) */}
@@ -429,17 +429,14 @@ export function EditStudentModal({
                   name="openingBalanceAsOf"
                   control={control}
                   render={({ field }) => (
-                    <Field
+                    <DateInput
                       label="As of"
-                      optionalText={null}
+                      value={field.value || undefined}
+                      onChange={field.onChange}
+                      disabled={isSubmitting}
+                      calendarSystem="bikram_sambat"
                       error={errors.openingBalanceAsOf?.message}
-                    >
-                      <BsDatePicker
-                        value={field.value || undefined}
-                        onChange={field.onChange}
-                        disabled={isSubmitting}
-                      />
-                    </Field>
+                    />
                   )}
                 />
               </div>
