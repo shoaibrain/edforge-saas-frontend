@@ -131,17 +131,34 @@ export async function getStudentLedger(
 export interface BulkGenerateInvoiceResponse {
   generated: number
   skipped: number
-  invoiceIds: string[]
-  errors?: { studentId: string; reason: string }[]
+  invoiceIds?: string[]
+  errors?: { studentId: string; reason: string }[] | string[]
+  /** Sprint C — populated when caller used grades/legacy paths; mirrors resolvedStudentCount on the BE. */
+  resolvedStudentCount?: number
 }
 
+/**
+ * Sprint C Phase 1 — three operator-facing modes (single object schema +
+ * .refine() on the BE per `bulkGenerateInvoiceSchema`). All shapes share
+ * the base fields; only `studentIds[]` / `gradeLevels[]` differ.
+ *
+ *   - selectionMode 'students' → flat studentIds[]
+ *   - selectionMode 'grades'   → gradeLevels[] (or ['ALL']) → server resolves
+ *   - selectionMode omitted    → legacy flat studentIds[]
+ */
 export interface BulkGenerateInvoiceDto {
-  studentIds: string[]
+  selectionMode?: 'students' | 'grades'
+  studentIds?: string[]
+  gradeLevels?: string[]
   academicYear: string
   billingPeriod?: string
   feeStructureIds: string[]
   dueDate: string
   notes?: string
+  /** Sprint C Phase 1 — operator-supplied ad-hoc line items. Cap 10 BE-side. */
+  customLineItems?: Array<{ name: string; amount: number }>
+  /** Sprint C Phase 1 — when true, BE pre-filter drops zero-total students. */
+  skipZeroTotal?: boolean
 }
 
 export async function bulkGenerateInvoices(
@@ -151,6 +168,66 @@ export async function bulkGenerateInvoices(
   return apiPost<BulkGenerateInvoiceResponse, BulkGenerateInvoiceDto>(
     `/finance/schools/${schoolId}/invoices/bulk-generate`,
     data,
+  )
+}
+
+// ============================================================================
+// BULK PREVIEW (Sprint C.6 + Phase 1 segment counters)
+// ============================================================================
+
+export interface BulkPreviewParams {
+  selectionMode?: 'students' | 'grades'
+  studentIds?: string[]
+  gradeLevels?: string[]
+  feeStructureIds?: string[]
+  billingPeriod?: string
+}
+
+export interface BulkPreviewResponse {
+  studentCount: number
+  eligibleCount: number
+  duplicateCount: number
+  estimatedDurationSec: number
+  /**
+   * Sprint C Phase 1 — three derivable-segment counters powering the wizard
+   * Step 1 rail. Each is optional (best-effort BE-side; undefined when the
+   * underlying query fails OR — for studentsNotBilledThisPeriod — when no
+   * billingPeriod was supplied). Frontend renders as "—" on undefined.
+   */
+  studentsWithBalance?: number
+  studentsNotBilledThisPeriod?: number
+  studentsNewAdmission?: number
+}
+
+/**
+ * GET /finance/schools/:schoolId/invoices/bulk-preview
+ *
+ * Read-only — same resolution + duplicate-detection as bulk-generate but
+ * NO DDB writes. Query params are CSV strings (NOT repeated array syntax)
+ * to keep the route shape consistent with the BE's CSV-based parser.
+ *
+ * Empty / undefined fields are omitted from the URL so the BE sees only
+ * the explicitly-supplied filters.
+ */
+export async function getBulkPreview(
+  schoolId: string,
+  params: BulkPreviewParams,
+): Promise<BulkPreviewResponse> {
+  const q: Record<string, string> = {}
+  if (params.selectionMode) q.selectionMode = params.selectionMode
+  if (params.studentIds && params.studentIds.length > 0) {
+    q.studentIds = params.studentIds.join(',')
+  }
+  if (params.gradeLevels && params.gradeLevels.length > 0) {
+    q.gradeLevels = params.gradeLevels.join(',')
+  }
+  if (params.feeStructureIds && params.feeStructureIds.length > 0) {
+    q.feeStructureIds = params.feeStructureIds.join(',')
+  }
+  if (params.billingPeriod) q.billingPeriod = params.billingPeriod
+  return apiGet<BulkPreviewResponse>(
+    `/finance/schools/${schoolId}/invoices/bulk-preview`,
+    q,
   )
 }
 

@@ -26,10 +26,13 @@ import {
   bulkGenerateInvoices,
   bulkIssueInvoices,
   downloadInvoicePdf,
+  getBulkPreview,
 } from '../services/invoices.service'
 import type {
   BulkGenerateInvoiceDto,
   BulkIssueInvoicesDto,
+  BulkPreviewParams,
+  BulkPreviewResponse,
 } from '../services/invoices.service'
 import {
   initiatePayment,
@@ -370,6 +373,51 @@ export function useBulkGenerateInvoices(schoolId: string) {
       queryClient.invalidateQueries({ queryKey: paymentKeys.invoices(schoolId) })
       queryClient.invalidateQueries({ queryKey: paymentKeys.studentAccounts(schoolId) })
     },
+  })
+}
+
+// ============================================================================
+// BULK PREVIEW (Sprint C.6 + Phase 1 segment counters)
+// ============================================================================
+
+/**
+ * Read-only preview that drives the wizard confirmation step. The query
+ * key is a STABLE signature of every input that changes the response —
+ * including the actual `studentIds[]` (joined, not just `.length`) so two
+ * different N-student sets within the 30s stale window do NOT reuse each
+ * other's preview.
+ *
+ * Gate on `options.enabled` to skip the call until Step 4 — Step 1 doesn't
+ * yet know the fee structures the duplicate detection needs, and the rail
+ * counters are a Step-4 concern anyway.
+ */
+export function useBulkPreview(
+  schoolId: string,
+  params: BulkPreviewParams,
+  options: { enabled?: boolean } = {},
+) {
+  const enabled = options.enabled !== false && !!schoolId
+  return useQuery<BulkPreviewResponse>({
+    queryKey: [
+      ...paymentKeys.invoices(schoolId),
+      'bulk-preview',
+      params.selectionMode ?? 'legacy',
+      // Stable signature: real IDs, not just .length — otherwise two
+      // disjoint sets of the same size reuse each other's cache.
+      params.studentIds && params.studentIds.length > 0
+        ? params.studentIds.slice().sort().join(',')
+        : '',
+      params.gradeLevels && params.gradeLevels.length > 0
+        ? params.gradeLevels.slice().sort().join(',')
+        : '',
+      params.feeStructureIds && params.feeStructureIds.length > 0
+        ? params.feeStructureIds.slice().sort().join(',')
+        : '',
+      params.billingPeriod ?? '',
+    ],
+    queryFn: () => getBulkPreview(schoolId, params),
+    enabled,
+    staleTime: 30 * 1000,
   })
 }
 
