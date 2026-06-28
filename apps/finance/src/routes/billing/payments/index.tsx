@@ -13,11 +13,13 @@ import {
   Button,
   TanstackDataTable,
   createActionsColumn,
+  createSelectColumn,
   StatCard,
   WidgetErrorBoundaryV2,
   Select,
 } from '@edforge/ui'
 import type { ColumnDef } from '@edforge/ui'
+import type { RowSelectionState } from '@tanstack/react-table'
 import { EntityIdDisplay } from '@edforge/archetype'
 import {
   Loader2,
@@ -503,6 +505,10 @@ function usePaymentColumns(
   const activeSchoolId = useAppStore((s) => s.activeSchoolId)
   return useMemo(
     () => [
+      // Sprint G.1 — row selection on payments table. Enables future
+      // bulk-receipt-pdf-export (Sprint G.3/G.4) and any bulk-void /
+      // bulk-export flows downstream.
+      createSelectColumn<Payment>(),
       {
         accessorKey: 'receiptNumber',
         header: 'Receipt #',
@@ -714,6 +720,11 @@ export default function PaymentsPage() {
   // unresolved-snapshot rows do NOT appear on this filter).
   const [gradeFilter, setGradeFilter] = useState('')
 
+  // Sprint G.1 — row selection state (controlled by DataTable). Foundation
+  // for future bulk-receipt-pdf-export (Sprint G.3/G.4); the empty bulk-
+  // actions slot below renders only when at least one row is selected.
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+
   // Dialog state: which payment is being voided or refunded
   const [voidTarget, setVoidTarget] = useState<Payment | null>(null)
   const [refundTarget, setRefundTarget] = useState<Payment | null>(null)
@@ -870,6 +881,9 @@ export default function PaymentsPage() {
         getRowId={(row) => row.id}
         isLoading={isLoading}
         enableSorting
+        enableRowSelection={true}
+        rowSelection={rowSelection}
+        onRowSelectionChange={setRowSelection}
         pagination={{ pageSize: 20 }}
         searchPlaceholder="Search by receipt #, invoice #, or student..."
         toolbarStart={
