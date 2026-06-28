@@ -58,6 +58,20 @@ export function useFinanceJob(
     refetchIntervalInBackground: false,
     staleTime: 0,
     gcTime: 60_000,
+    /**
+     * Address PR #240 review (P2): the BE intentionally returns a bare 404
+     * for a missing OR cross-school job (non-enumerability contract from
+     * D.3). Without an explicit retry policy this hook would inherit the
+     * shell QueryClient's default `retry: 1` and re-poll the same 404 once
+     * before giving up — wasted RTT, noisy logs, and (in a polling loop)
+     * doubled DDB read pressure. We skip retry on 404 specifically; keep
+     * the shell's retry-once on genuine transient errors (network, 5xx).
+     */
+    retry: (failureCount, error: unknown) => {
+      const status = (error as { response?: { status?: number } })?.response?.status
+      if (status === 404) return false
+      return failureCount < 1
+    },
   })
 
   // Invalidate the invoice list cache exactly once when the job reaches

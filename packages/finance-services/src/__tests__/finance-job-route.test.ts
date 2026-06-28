@@ -233,4 +233,77 @@ describe('useFinanceJob (Sprint D.5)', () => {
 
     expect(mockApiGet).not.toHaveBeenCalled()
   })
+
+  // ==========================================================================
+  // Address PR #240 review (P2): the hook MUST NOT retry on 404. The BE
+  // intentionally returns 404 for a missing OR cross-school job
+  // (non-enumerability contract from D.3). Without an explicit retry policy
+  // the hook would inherit the shell QueryClient default `retry: 1` and
+  // re-poll the same 404 once before giving up.
+  //
+  // The shell defaults are simulated below by NOT passing `retry: false` on
+  // the test QueryClient — so the test's QueryClient picks up TanStack's
+  // own default (retry: 3) and any retry-related call in the hook itself is
+  // what gets exercised.
+  // ==========================================================================
+
+  it('does NOT retry on 404 (BE non-enumerability contract; one request only)', async () => {
+    const err404 = Object.assign(new Error('Not Found'), {
+      response: { status: 404, data: { message: 'Job not found' } },
+    })
+    mockApiGet.mockRejectedValue(err404)
+
+    // No retry override on the client — relies on the hook's own retry policy
+    // to short-circuit the 404 instead of inheriting the shell default.
+    const client = new QueryClient()
+
+    const { result } = renderHook(() => useFinanceJob(JOB_ID), {
+      wrapper: wrapper(client),
+    })
+
+    await waitFor(() => expect(result.current.isError).toBe(true))
+    // Exactly ONE call — no retry, no second probe of the 404.
+    expect(mockApiGet).toHaveBeenCalledTimes(1)
+  })
+
+  it('DOES retry once on a transient 5xx (preserves the shell retry-once default)', async () => {
+    const err500 = Object.assign(new Error('Internal Server Error'), {
+      response: { status: 500, data: { message: 'oops' } },
+    })
+    // 1st call: 500; 2nd call (retry): succeeds.
+    mockApiGet
+      .mockRejectedValueOnce(err500)
+      .mockResolvedValueOnce(buildJob({ status: 'succeeded' }))
+
+    // retryDelay: 0 — TanStack defaults to exp-backoff starting at 1s, which
+    // races waitFor's 1s default; pinning to 0 makes the test deterministic.
+    const client = new QueryClient({
+      defaultOptions: { queries: { retryDelay: 0 } },
+    })
+    const { result } = renderHook(() => useFinanceJob(JOB_ID), {
+      wrapper: wrapper(client),
+    })
+
+    await waitFor(() => expect(result.current.data?.status).toBe('succeeded'))
+    // Two calls: the failed 500 + the recovered retry.
+    expect(mockApiGet).toHaveBeenCalledTimes(2)
+  })
+
+  it('does NOT retry indefinitely on repeated transient errors (caps at retry-once)', async () => {
+    const err503 = Object.assign(new Error('Service Unavailable'), {
+      response: { status: 503 },
+    })
+    mockApiGet.mockRejectedValue(err503)
+
+    const client = new QueryClient({
+      defaultOptions: { queries: { retryDelay: 0 } },
+    })
+    const { result } = renderHook(() => useFinanceJob(JOB_ID), {
+      wrapper: wrapper(client),
+    })
+
+    await waitFor(() => expect(result.current.isError).toBe(true))
+    // 1 initial + 1 retry = 2; the hook caps via `failureCount < 1`.
+    expect(mockApiGet).toHaveBeenCalledTimes(2)
+  })
 })
