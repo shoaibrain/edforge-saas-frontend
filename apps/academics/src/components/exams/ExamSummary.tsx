@@ -1,10 +1,16 @@
 /**
- * ExamSummary — 5-card strip above the Examinations table.
+ * ExamSummary — compact 5-tile filter strip above the Examinations table.
  *
- * Cards are derived from the loaded `exams: ExamResponseDto[]` (no extra
- * API hit) and the first four are click-to-filter — clicking one sets a
- * bucket on the parent which pre-filters the table data. The fifth card
- * ("Result Readiness") is a read-only progress indicator.
+ * Tiles are derived from the loaded `exams: ExamResponseDto[]` (no extra
+ * API hit). The first four are click-to-filter — clicking one sets a
+ * bucket on the parent which pre-filters the table data. The fifth tile
+ * ("Result Readiness") is a read-only progress indicator with an inline
+ * mint donut on the right.
+ *
+ * Visual: a single horizontal row of low-chrome tiles (~64–72px tall) so
+ * the table itself stays above the fold. Replaces the original
+ * `StatCard`-based design which was hero-tile sized and dominated the
+ * first paint at the typical academics content-pane width.
  */
 
 import { useMemo, type ReactNode } from 'react'
@@ -13,9 +19,11 @@ import {
   ClipboardList,
   Flag,
   PlayCircle,
+  Target,
+  type LucideIcon,
 } from 'lucide-react'
 import type { ExamResponseDto } from '@aibrains/shared-types'
-import { cn, StatCard, focusRing } from '@edforge/ui'
+import { cn, focusRing } from '@edforge/ui'
 
 // ============================================================================
 // PUBLIC API
@@ -24,7 +32,7 @@ import { cn, StatCard, focusRing } from '@edforge/ui'
 /**
  * 'total' is the default "view all" state — selecting any other bucket
  * narrows the table; selecting Total resets back to the unfiltered view.
- * Total is never "off" (the prototype always highlights one card).
+ * Total is never "off" (the prototype always highlights one tile).
  */
 export type ExamBucket = 'total' | 'live' | 'upcoming' | 'awaiting'
 
@@ -88,21 +96,18 @@ export function ExamSummary({
   return (
     <nav
       aria-label="Exam summary filters"
-      className="grid gap-3 grid-cols-2 lg:grid-cols-5"
+      className="grid gap-2 grid-cols-2 sm:grid-cols-3 md:grid-cols-5"
     >
       <SummaryButton
         active={activeBucket === 'total'}
         onClick={() => toggle('total')}
         label="Total Exams"
       >
-        <StatCard
-          label="Total Exams"
-          value={String(summary.total)}
+        <CompactTile
           icon={ClipboardList}
-          accentColor="rgba(15, 110, 86, 0.12)"
-          iconColor="rgb(var(--action-primary-bg))"
-          barColor="rgb(var(--action-primary-bg))"
-          hint={`${summary.typeCount} type${summary.typeCount === 1 ? '' : 's'} · ${summary.termCount} term${summary.termCount === 1 ? '' : 's'}`}
+          label="Total Exams"
+          value={summary.total}
+          sub={`${summary.typeCount} type${summary.typeCount === 1 ? '' : 's'} · ${summary.termCount} term${summary.termCount === 1 ? '' : 's'}`}
           loading={isLoading}
         />
       </SummaryButton>
@@ -112,14 +117,11 @@ export function ExamSummary({
         onClick={() => toggle('live')}
         label="Live Now"
       >
-        <StatCard
-          label="Live Now"
-          value={String(summary.live)}
+        <CompactTile
           icon={PlayCircle}
-          accentColor="rgba(29, 158, 117, 0.12)"
-          iconColor="rgb(var(--state-success-fg))"
-          barColor="rgb(var(--state-success-fg))"
-          hint={summary.live > 0 ? 'Currently in session' : 'Nothing live'}
+          label="Live Now"
+          value={summary.live}
+          sub={summary.live > 0 ? 'In session' : 'Nothing live'}
           loading={isLoading}
         />
       </SummaryButton>
@@ -129,14 +131,11 @@ export function ExamSummary({
         onClick={() => toggle('upcoming')}
         label="Upcoming"
       >
-        <StatCard
-          label="Upcoming"
-          value={String(summary.upcoming)}
+        <CompactTile
           icon={CalendarClock}
-          accentColor="rgba(55, 138, 221, 0.12)"
-          iconColor="rgb(var(--accent-academics))"
-          barColor="rgb(var(--accent-academics))"
-          hint={summary.nextHint}
+          label="Upcoming"
+          value={summary.upcoming}
+          sub={summary.nextHint}
           loading={isLoading}
         />
       </SummaryButton>
@@ -146,34 +145,103 @@ export function ExamSummary({
         onClick={() => toggle('awaiting')}
         label="Awaiting Results"
       >
-        <StatCard
-          label="Awaiting Results"
-          value={String(summary.awaiting)}
+        <CompactTile
           icon={Flag}
-          accentColor="rgba(239, 159, 39, 0.12)"
-          iconColor="rgb(var(--state-warning-fg))"
-          barColor="rgb(var(--state-warning-fg))"
-          tag={
-            summary.awaiting > 0
-              ? {
-                  text: 'Action needed',
-                  color: 'rgb(var(--state-warning-fg))',
-                  bg: 'rgba(239, 159, 39, 0.12)',
-                }
-              : undefined
-          }
-          hint={summary.awaiting === 0 ? 'All caught up' : undefined}
+          label="Awaiting Results"
+          value={summary.awaiting}
+          sub={summary.awaiting === 0 ? 'All caught up' : 'Action needed'}
+          emphasize={summary.awaiting > 0 ? 'warning' : undefined}
           loading={isLoading}
         />
       </SummaryButton>
 
-      <ReadinessCard
-        percent={summary.readinessPercent}
-        generated={summary.readinessGenerated}
-        total={summary.readinessTotal}
+      {/* Result Readiness — read-only, not wrapped in SummaryButton. */}
+      <CompactTile
+        icon={Target}
+        label="Result Readiness"
+        value={`${summary.readinessPercent}%`}
+        sub={
+          summary.readinessTotal === 0
+            ? 'No closed exams'
+            : `${summary.readinessGenerated}/${summary.readinessTotal} generated`
+        }
+        rightSlot={
+          summary.readinessTotal > 0 ? (
+            <ReadinessRing percent={summary.readinessPercent} />
+          ) : undefined
+        }
         loading={isLoading}
+        ariaLabel={`Result Readiness: ${summary.readinessPercent}% (${summary.readinessGenerated} of ${summary.readinessTotal} generated)`}
       />
     </nav>
+  )
+}
+
+// ============================================================================
+// COMPACT TILE
+// ============================================================================
+
+interface CompactTileProps {
+  icon: LucideIcon
+  label: string
+  value: ReactNode
+  sub?: ReactNode
+  /** Tints the value text — currently only 'warning' (used for Awaiting Results). */
+  emphasize?: 'warning'
+  /** Optional visual rendered on the right edge (e.g. the readiness ring). */
+  rightSlot?: ReactNode
+  loading?: boolean
+  /** Overrides the auto-generated aria-label for screen readers. */
+  ariaLabel?: string
+}
+
+function CompactTile({
+  icon: Icon,
+  label,
+  value,
+  sub,
+  emphasize,
+  rightSlot,
+  loading,
+  ariaLabel,
+}: CompactTileProps) {
+  if (loading) {
+    return (
+      <div className="h-11 rounded-lg border border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-secondary))] px-3 flex items-center">
+        <div className="h-3 w-24 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
+      </div>
+    )
+  }
+
+  const valueClass = cn(
+    'text-xl font-semibold leading-none tabular-nums',
+    emphasize === 'warning'
+      ? 'text-[rgb(var(--state-warning-fg))]'
+      : 'text-[rgb(var(--text-primary))]',
+  )
+
+  return (
+    <div
+      className="flex items-center gap-2.5 px-3 py-2 rounded-lg border border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-secondary))]"
+      role="status"
+      aria-label={ariaLabel ?? `${label}: ${typeof value === 'string' || typeof value === 'number' ? value : ''}`}
+    >
+      <Icon className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))] flex-shrink-0" aria-hidden />
+      <div className="min-w-0 flex-1">
+        <div className="text-3xs font-medium uppercase tracking-wide text-[rgb(var(--text-tertiary))] truncate">
+          {label}
+        </div>
+        <div className="flex items-baseline gap-2 mt-0.5">
+          <span className={valueClass}>{value}</span>
+          {sub != null && (
+            <span className="text-2xs text-[rgb(var(--text-tertiary))] truncate">
+              {sub}
+            </span>
+          )}
+        </div>
+      </div>
+      {rightSlot}
+    </div>
   )
 }
 
@@ -199,12 +267,11 @@ function SummaryButton({
       aria-pressed={active}
       aria-label={`Filter by ${label}`}
       className={cn(
-        'rounded-xl text-left transition-shadow duration-150',
+        'rounded-lg text-left transition-colors duration-150',
         'motion-reduce:transition-none',
         focusRing,
-        active
-          ? 'ring-2 ring-[var(--mint-border)] ring-offset-2 ring-offset-[rgb(var(--background-primary))]'
-          : '',
+        // Active state: thin mint outline + soft mint fill, no offset ring.
+        active && 'ring-1 ring-[var(--mint-border)] [&>div]:bg-[var(--mint-soft)]',
       )}
     >
       {children}
@@ -213,70 +280,15 @@ function SummaryButton({
 }
 
 // ============================================================================
-// RESULT READINESS CARD
+// READINESS RING (inline donut — see comment below for why not reused)
 // ============================================================================
 
-function ReadinessCard({
-  percent,
-  generated,
-  total,
-  loading,
-}: {
-  percent: number
-  generated: number
-  total: number
-  loading: boolean
-}) {
-  // Read-only sibling of StatCard's visual; we render our own layout because
-  // StatCard exposes no slot for a right-aligned visual element, and we want
-  // the donut ring on the right side per the prototype.
-  if (loading) {
-    return (
-      <div className="relative overflow-hidden rounded-xl border p-4 bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]">
-        <div className="h-3 w-32 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))] mb-2.5" />
-        <div className="h-7 w-20 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))] mb-1.5" />
-        <div className="h-3 w-24 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
-      </div>
-    )
-  }
-
-  return (
-    <div
-      className="relative overflow-hidden rounded-xl border pt-4 px-4 pb-3 bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]"
-      role="status"
-      aria-label={`Result Readiness: ${percent}% (${generated} of ${total} generated)`}
-    >
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0 flex-1">
-          <span className="text-xs font-medium uppercase tracking-[0.5px] text-[rgb(var(--text-disabled))]">
-            Result Readiness
-          </span>
-          <div className="mt-2.5 text-2xl font-semibold leading-none tracking-tight text-[rgb(var(--text-primary))] tabular-nums">
-            {percent}%
-          </div>
-          <div className="mt-1.5 text-xs text-[rgb(var(--text-disabled))] tabular-nums">
-            {generated}/{total} generated
-          </div>
-        </div>
-        <ReadinessRing percent={percent} />
-      </div>
-      <div
-        // allow-presentation-style: accent bar uses the prototype's `--mint`
-        // alias; encoding it as a Tailwind class would require a brittle
-        // arbitrary-value bracket reference.
-        className="absolute bottom-0 left-0 right-0 h-0.5"
-        style={{ background: 'var(--mint)' }}
-      />
-    </div>
-  )
-}
-
-// Inline donut — we don't reuse `AttendanceDonutRing` because its color tiers
+// We don't reuse `AttendanceDonutRing` because its color tiers
 // (red <80, orange <90, green ≥90) are attendance-specific; readiness should
 // always read as mint regardless of the completion ratio.
 function ReadinessRing({ percent }: { percent: number }) {
-  const size = 44
-  const stroke = 4
+  const size = 28
+  const stroke = 3
   const half = size / 2
   const radius = half - stroke / 2
   const circumference = 2 * Math.PI * radius
@@ -371,7 +383,7 @@ function computeSummary(exams: ExamResponseDto[]): SummaryShape {
   const nextHint = next
     ? `Next: ${next.examName} · in ${daysFromTodayUntil(next.startDate)}d`
     : exams.length > 0
-      ? 'No upcoming exams'
+      ? 'No upcoming'
       : undefined
 
   const readinessPercent = readinessTotal === 0
