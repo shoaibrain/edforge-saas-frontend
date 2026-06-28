@@ -61,6 +61,23 @@ export {
   feeStructuresService,
 } from './services/fee-structures.service'
 
+// Sprint D.5 — async finance job framework client
+export { getFinanceJob } from './services/jobs.service'
+export type {
+  FinanceJob,
+  FinanceJobStatus,
+  FinanceJobType,
+  FinanceJobOutputFormat,
+  FinanceJobCounters,
+  FinanceJobOutput,
+  FinanceJobErrorEntry,
+} from './services/jobs.service'
+export {
+  financeJobKeys,
+  useFinanceJob,
+} from './hooks/useFinanceJob'
+export type { UseFinanceJobOptions } from './hooks/useFinanceJob'
+
 export {
   searchStudents,
 } from './services/students.service'
