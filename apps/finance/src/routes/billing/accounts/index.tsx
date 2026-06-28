@@ -15,12 +15,17 @@ import {
   Receipt,
   AlertTriangle,
   Wallet,
+  Mail,
+  Pencil,
 } from 'lucide-react'
+import { toast } from 'sonner'
 import { useNavigate } from '@tanstack/react-router'
 import {
   TanstackDataTable,
   createExpandColumn,
+  createSelectColumn,
   FilterTabs,
+  type BulkAction,
   type ColumnDef,
   StatCard,
   WidgetErrorBoundaryV2,
@@ -448,8 +453,24 @@ function getAvatarUrl(seed: string): string {
 // COLUMN DEFINITIONS
 // ============================================================================
 
+// Bucket a numeric balance into the facet keys we expose in the dropdown.
+function balanceBucket(balance: number): 'zero' | 'low' | 'mid' | 'high' {
+  if (balance <= 0) return 'zero'
+  if (balance < 500) return 'low'
+  if (balance < 2000) return 'mid'
+  return 'high'
+}
+
+const BALANCE_OPTIONS = [
+  { value: 'zero', label: 'No balance' },
+  { value: 'low', label: '< 500' },
+  { value: 'mid', label: '500 – 2,000' },
+  { value: 'high', label: '2,000+' },
+]
+
 function buildColumns(format: (amount: number) => string, settings: ReturnType<typeof useFinanceSettings>): ColumnDef<StudentAccount, unknown>[] {
   return [
+  createSelectColumn<StudentAccount>(),
   createExpandColumn<StudentAccount>(),
   {
     accessorKey: 'studentName',
@@ -489,6 +510,20 @@ function buildColumns(format: (amount: number) => string, settings: ReturnType<t
           {format(account.balance)}
         </span>
       )
+    },
+  },
+  // Hidden column that the Balance facet filters against — derives a stable
+  // bucket key from the numeric balance so the dropdown options stay finite.
+  {
+    id: 'balanceBucket',
+    accessorFn: (row) => balanceBucket(row.balance),
+    header: 'Balance bucket',
+    enableHiding: true,
+    enableSorting: false,
+    filterFn: 'arrIncludesSome',
+    cell: () => null,
+    meta: {
+      hideable: true,
     },
   },
   {
@@ -539,6 +574,29 @@ export default function StudentAccountsPage() {
     const overdueCount = accountList.filter((a) => a.balance > 0).length
     return { totalStudents, totalOutstanding, fullyPaidCount, overdueCount }
   }, [accountList])
+
+  // Bulk action placeholders — server endpoints for bulk statements / balance
+  // adjustments are follow-up work; the row-level adjust flow lives in the
+  // expanded detail.
+  const accountBulkActions = useMemo<BulkAction<StudentAccount>[]>(
+    () => [
+      {
+        id: 'send-statement',
+        label: 'Send statement',
+        icon: <Mail className="w-4 h-4" />,
+        onRun: (rows) =>
+          toast.info(`Send statement to ${rows.length} account${rows.length === 1 ? '' : 's'} — coming soon`),
+      },
+      {
+        id: 'adjust-balance',
+        label: 'Adjust balance',
+        icon: <Pencil className="w-4 h-4" />,
+        onRun: (rows) =>
+          toast.info(`Adjust balance for ${rows.length} account${rows.length === 1 ? '' : 's'} — coming soon`),
+      },
+    ],
+    [],
+  )
 
   if (!schoolId) {
     return (
@@ -609,10 +667,21 @@ export default function StudentAccountsPage() {
         data={accountList}
         getRowId={(row) => row.id}
         isLoading={isLoading}
+        tableId="finance.accounts"
         searchPlaceholder="Search by student name..."
         enableSorting={true}
+        enableRowSelection
         enableExpanding={true}
+        enableColumnVisibility
         pagination={{ pageSize: 20 }}
+        pageSizes={[10, 20, 50]}
+        defaultSort={[{ id: 'balance', desc: true }]}
+        facets={[
+          { columnId: 'balanceBucket', title: 'Balance', options: BALANCE_OPTIONS },
+        ]}
+        initialColumnVisibility={{ balanceBucket: false }}
+        bulkActions={accountBulkActions}
+        exportOptions={{ filename: 'student-accounts', formats: ['csv'] }}
         renderSubComponent={({ row }) => (
           <AccountDetail account={row.original} schoolId={schoolId} />
         )}

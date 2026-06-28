@@ -26,7 +26,8 @@ import {
   Clock,
   ShieldAlert,
 } from 'lucide-react'
-import { Button, Select, TanstackDataTable, createActionsColumn, type ColumnDef } from '@edforge/ui'
+import { toast } from 'sonner'
+import { Button, Select, TanstackDataTable, createActionsColumn, createSelectColumn, type BulkAction, type ColumnDef } from '@edforge/ui'
 import { useAuthStore } from '@/stores/auth.store'
 import { useAppStore } from '@/stores/app.store'
 import { can } from '@edforge/abac'
@@ -428,8 +429,39 @@ export default function PeopleSettingsPage() {
   const handleChangeRole = useCallback((u: UserResponseDto) => setRoleModalUser(u), [])
   const handleAction = useCallback((u: UserResponseDto, action: ConfirmAction) => setConfirmModal({ user: u, action }), [])
 
+  // Bulk action placeholders — single-row mutations stay in the row actions
+  // dropdown. Bulk role / status / re-invite endpoints are a follow-up.
+  const userBulkActions = useMemo<BulkAction<UserResponseDto>[]>(
+    () => [
+      {
+        id: 'change-role',
+        label: 'Change role',
+        icon: <UserCog className="w-4 h-4" />,
+        onRun: (rows) =>
+          toast.info(`Change role for ${rows.length} user${rows.length === 1 ? '' : 's'} — coming soon`),
+      },
+      {
+        id: 'suspend',
+        label: 'Suspend',
+        icon: <ShieldAlert className="w-4 h-4" />,
+        tone: 'critical',
+        onRun: (rows) =>
+          toast.info(`Suspend ${rows.length} user${rows.length === 1 ? '' : 's'} — coming soon`),
+      },
+      {
+        id: 'reinvite',
+        label: 'Re-invite',
+        icon: <UserCheck className="w-4 h-4" />,
+        onRun: (rows) =>
+          toast.info(`Re-invite ${rows.length} user${rows.length === 1 ? '' : 's'} — coming soon`),
+      },
+    ],
+    [],
+  )
+
   // Table columns
   const columns: ColumnDef<UserResponseDto, unknown>[] = useMemo(() => [
+    createSelectColumn<UserResponseDto>(),
     {
       id: 'name',
       accessorFn: (u) => `${u.firstName} ${u.lastName}`,
@@ -580,15 +612,25 @@ export default function PeopleSettingsPage() {
           />
         </motion.div>
 
-        {/* Data Table */}
+        {/* Data Table — search / role / status drive the server query
+            (`useUsers({ search, globalRole, status })`) so they stay above
+            the table as page-level filters; only persistence, density, bulk,
+            and Export come from the shared DataTable. */}
         <motion.div variants={fadeInUp}>
           <TanstackDataTable
             columns={columns}
             data={users}
             getRowId={(u) => u.userId}
             isLoading={isLoading}
+            tableId="shell.people"
             enableSorting={true}
+            enableRowSelection
+            enableColumnVisibility
             pagination={{ pageSize: 20 }}
+            pageSizes={[10, 20, 50]}
+            defaultSort={[{ id: 'name', desc: false }]}
+            bulkActions={userBulkActions}
+            exportOptions={{ filename: 'users', formats: ['csv'] }}
             maxHeight="calc(100vh - 18rem)"
             emptyState={{
               icon: <Users className="w-10 h-10" />,

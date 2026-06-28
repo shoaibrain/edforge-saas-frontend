@@ -9,11 +9,14 @@
  */
 
 import { useMemo, useState, type ReactNode } from 'react'
-import { User, MoreVertical, UserMinus, ExternalLink } from 'lucide-react'
+import { User, MoreVertical, UserMinus, ExternalLink, MessageSquare, ArrowRightLeft, Archive } from 'lucide-react'
+import { toast } from 'sonner'
 import {
   TanstackDataTable,
   AttendanceTrend,
+  createSelectColumn,
   type AttendanceTrendDirection,
+  type BulkAction,
   type ColumnDef,
   type DataTableColumnMeta,
 } from '@edforge/ui'
@@ -73,9 +76,9 @@ function formatDate(dateStr: string | undefined): string {
 
 const CENTER: DataTableColumnMeta = { align: 'center' }
 
-// Responsive initial visibility, read synchronously at mount so the table
-// doesn't flash the wrong column set (effect-based hooks capture `false` on
-// first paint). Resize-reactivity + persistence are a follow-up (STU-TBL-1.8b).
+// Responsive initial visibility, used only on first mount when no persisted
+// `dt:academics.students` localStorage entry exists. After the first paint,
+// the shared DataTable owns visibility via tableId persistence.
 function computeInitialVisibility(): Record<string, boolean> {
   if (typeof window === 'undefined') return {}
   const xl = window.matchMedia('(min-width: 1280px)').matches
@@ -158,6 +161,7 @@ export function StudentTable({
 }: StudentTableProps) {
   const columns: ColumnDef<StudentResponseDto, unknown>[] = useMemo(() => {
     const cols: ColumnDef<StudentResponseDto, unknown>[] = [
+      createSelectColumn<StudentResponseDto>(),
       {
         accessorKey: 'fullName',
         header: 'Student',
@@ -266,19 +270,54 @@ export function StudentTable({
     ? { hasMore: Boolean(hasMore), isFetching: Boolean(isFetchingMore), onLoadMore, serverTotalHint }
     : undefined
 
+  // Bulk action placeholders — backend endpoints for messaging / move / archive
+  // are not wired yet; the toasts surface the contract so reviewers can see
+  // the operator-facing shape ahead of the per-domain server slices.
+  const bulkActions = useMemo<BulkAction<StudentResponseDto>[]>(
+    () => [
+      {
+        id: 'message',
+        label: 'Message',
+        icon: <MessageSquare className="w-4 h-4" />,
+        onRun: (rows) =>
+          toast.info(`Message ${rows.length} student${rows.length === 1 ? '' : 's'} — coming soon`),
+      },
+      {
+        id: 'move',
+        label: 'Move section',
+        icon: <ArrowRightLeft className="w-4 h-4" />,
+        onRun: (rows) =>
+          toast.info(`Move ${rows.length} student${rows.length === 1 ? '' : 's'} — coming soon`),
+      },
+      {
+        id: 'archive',
+        label: 'Archive',
+        icon: <Archive className="w-4 h-4" />,
+        tone: 'critical',
+        onRun: (rows) =>
+          toast.info(`Archive ${rows.length} student${rows.length === 1 ? '' : 's'} — coming soon`),
+      },
+    ],
+    [],
+  )
+
   return (
     <TanstackDataTable
       columns={columns}
       data={students}
       isLoading={isLoading}
       enableSorting={true}
+      enableRowSelection
       enableColumnVisibility
-      tableId="academics-students-table"
+      tableId="academics.students"
       initialColumnVisibility={initialColumnVisibility}
       toolbarStart={toolbarStart}
       toolbarExtra={toolbarExtra}
       pagination={{ pageSize: 50 }}
+      pageSizes={[25, 50, 100]}
+      defaultSort={[{ id: 'fullName', desc: false }]}
       serverPagination={serverPagination}
+      bulkActions={bulkActions}
       emptyState={{
         icon: <User className="w-12 h-12" />,
         title: 'No students found',
