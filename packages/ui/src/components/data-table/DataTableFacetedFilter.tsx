@@ -1,9 +1,9 @@
-import { Fragment } from 'react'
+import { Fragment, useMemo } from 'react'
 import { Popover, PopoverButton, PopoverPanel, Transition } from '@headlessui/react'
 import { Check, ListFilter } from 'lucide-react'
 import type { Column } from '@tanstack/react-table'
 import { cn, focusRingInset } from '../../utils'
-import type { FacetedFilterOption } from './types'
+import type { DataTableColumnMeta, FacetedFilterOption } from './types'
 
 interface DataTableFacetedFilterProps<TData> {
   column: Column<TData>
@@ -20,6 +20,29 @@ export function DataTableFacetedFilter<TData>({
     (column.getFilterValue() as string[] | undefined) ?? []
   )
 
+  const meta = column.columnDef.meta as DataTableColumnMeta | undefined
+
+  // Live per-value counts driven by TanStack's faceted unique values. Map keys
+  // are the underlying cell values — coerced to string to match option values.
+  const facetedCounts = useMemo(() => {
+    const map = column.getFacetedUniqueValues?.()
+    const result = new Map<string, number>()
+    if (!map) return result
+    map.forEach((count, value) => {
+      if (Array.isArray(value)) {
+        // Array-valued cells (e.g. gradeLevels: ['G9','G10']) contribute one
+        // count to each member so the dropdown count matches what users see.
+        value.forEach((v) => {
+          const k = String(v)
+          result.set(k, (result.get(k) ?? 0) + count)
+        })
+        return
+      }
+      result.set(String(value), count)
+    })
+    return result
+  }, [column])
+
   const toggleValue = (value: string) => {
     const next = new Set(selectedValues)
     if (next.has(value)) {
@@ -35,17 +58,18 @@ export function DataTableFacetedFilter<TData>({
     <Popover className="relative">
       <PopoverButton
         className={cn(
-          'inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg border transition-colors',
+          'inline-flex items-center gap-1.5 px-3 h-9 text-sm font-medium rounded-lg border transition-colors',
           focusRingInset,
           selectedValues.size > 0
-            ? 'border-[rgb(var(--state-info-border)/0.35)] bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--text-primary))]'
+            ? 'bg-[var(--mint-soft)] border-[var(--mint-border)] text-[rgb(var(--text-primary))]'
             : 'border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-secondary))]'
         )}
+        aria-label={`${title} filter`}
       >
         <ListFilter className="w-3.5 h-3.5" />
         {title}
         {selectedValues.size > 0 && (
-          <span className="ml-1 px-1.5 py-0.5 text-xs font-semibold rounded-full bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]">
+          <span className="ml-1 px-1.5 py-0.5 text-xs font-semibold tabular-nums rounded-full bg-[var(--mint)] text-[rgb(var(--text-on-accent))]">
             {selectedValues.size}
           </span>
         )}
@@ -60,10 +84,14 @@ export function DataTableFacetedFilter<TData>({
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <PopoverPanel className="absolute z-50 mt-1 w-56 origin-top-left rounded-xl bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] shadow-lg focus:outline-none overflow-hidden">
+        <PopoverPanel className="absolute z-50 mt-1 w-60 origin-top-left rounded-xl bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] shadow-popover focus:outline-none overflow-hidden">
           <div className="py-1 max-h-64 overflow-y-auto">
             {options.map((option) => {
               const isSelected = selectedValues.has(option.value)
+              const labelText = meta?.facetLabelMap
+                ? meta.facetLabelMap(option.value)
+                : option.label
+              const count = facetedCounts.get(option.value) ?? 0
               return (
                 <button
                   key={option.value}
@@ -73,29 +101,34 @@ export function DataTableFacetedFilter<TData>({
                     'flex items-center w-full px-3 py-2 text-sm transition-colors',
                     'hover:bg-[rgb(var(--background-secondary))]',
                     focusRingInset,
-                    isSelected && 'text-[rgb(var(--action-secondary-fg))]'
+                    isSelected && 'text-[rgb(var(--text-primary))] font-medium'
                   )}
                 >
                   <div
                     className={cn(
                       'flex items-center justify-center w-4 h-4 rounded border mr-2.5 flex-shrink-0',
                       isSelected
-                        ? 'bg-[rgb(var(--action-primary-bg))] border-[rgb(var(--action-primary-bg))]'
+                        ? 'bg-[var(--mint)] border-[var(--mint)]'
                         : 'border-[rgb(var(--border-primary))]'
                     )}
                   >
-                    {isSelected && <Check className="w-3 h-3 text-[rgb(var(--action-primary-fg))]" />}
+                    {isSelected && <Check className="w-3 h-3 text-[rgb(var(--text-on-accent))]" />}
                   </div>
                   {option.icon && (
                     <span className="flex-shrink-0 mr-2">{option.icon}</span>
                   )}
-                  <span className={cn(
-                    'text-left',
-                    isSelected
-                      ? 'text-[rgb(var(--text-primary))] font-medium'
-                      : 'text-[rgb(var(--text-secondary))]'
-                  )}>
-                    {option.label}
+                  <span
+                    className={cn(
+                      'flex-1 text-left',
+                      isSelected
+                        ? 'text-[rgb(var(--text-primary))]'
+                        : 'text-[rgb(var(--text-secondary))]'
+                    )}
+                  >
+                    {labelText}
+                  </span>
+                  <span className="ml-2 text-xs tabular-nums text-[rgb(var(--text-tertiary))]">
+                    {count}
                   </span>
                 </button>
               )

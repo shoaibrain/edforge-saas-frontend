@@ -8,8 +8,11 @@
 
 import { useMemo, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { ClipboardList, Plus } from 'lucide-react'
+import { ClipboardList, Flag, Plus, RefreshCw } from 'lucide-react'
+import { toast } from 'sonner'
 import { usePermission } from '@edforge/abac'
+import type { BulkAction } from '@edforge/ui'
+import type { ExamResponseDto } from '@aibrains/shared-types'
 import { useActiveSchoolId } from '../../stores/app.store'
 import { useCurrentAcademicYear, useGradingPeriods } from '../../hooks/useSchool'
 import { useExams, useExamPattern } from '../../hooks/useExams'
@@ -54,6 +57,36 @@ export function ExamsModule() {
   const exams = examList?.items ?? []
 
   const canOpenDrawer = canCreateExam && terms.length > 0 && examPattern.length > 0
+
+  // Bulk actions wired to no-op toasts until the bulk status/results flows
+  // ship. The shared <DataTable /> still surfaces the floating bulk bar and
+  // built-in CSV export from these declarations.
+  const bulkActions: BulkAction<ExamResponseDto>[] = useMemo(
+    () => [
+      {
+        id: 'change-status',
+        label: 'Change status',
+        icon: <Flag className="w-4 h-4" />,
+        onRun: (rows) => {
+          toast.info(`Bulk change status for ${rows.length} exam${rows.length === 1 ? '' : 's'} — coming soon`)
+        },
+      },
+      {
+        id: 'generate-results',
+        label: 'Generate results',
+        icon: <RefreshCw className="w-4 h-4" />,
+        onRun: (rows) => {
+          const closable = rows.filter((r) => r.status === 'closed')
+          if (closable.length === 0) {
+            toast.error('Only closed exams can generate result cards.')
+            return
+          }
+          toast.info(`Will queue result generation for ${closable.length} exam${closable.length === 1 ? '' : 's'} — coming soon`)
+        },
+      },
+    ],
+    []
+  )
 
   return (
     <div className="min-h-full">
@@ -103,6 +136,7 @@ export function ExamsModule() {
             termNameById={termNameById}
             isLoading={isLoading}
             onSelectExam={(exam) => navigate({ to: '/exams/$examId', params: { examId: exam.examId } })}
+            bulkActions={bulkActions}
           />
         )}
       </div>

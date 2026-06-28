@@ -1,3 +1,4 @@
+import { X } from 'lucide-react'
 import type { DataTableEmptyStateConfig } from './types'
 import { cn, focusRing } from '../../utils'
 
@@ -7,9 +8,17 @@ interface DataTableEmptyProps {
   /** Render without the card chrome (border/shadow/bg) — for nesting inside an
    *  existing card so a persistent toolbar stays above the empty body. */
   bare?: boolean
+  /** When set, swaps the primary CTA for a "Clear filters" shortcut. The
+   *  consumer wires this to the same logic as the toolbar's `Clear (N)`. */
+  onClearFilters?: () => void
 }
 
-export function DataTableEmpty({ config, className, bare = false }: DataTableEmptyProps) {
+export function DataTableEmpty({
+  config,
+  className,
+  bare = false,
+  onClearFilters,
+}: DataTableEmptyProps) {
   return (
     <div
       className={cn(
@@ -32,17 +41,33 @@ export function DataTableEmpty({ config, className, bare = false }: DataTableEmp
           {config.description}
         </p>
       )}
-      {config.action && (
+      {onClearFilters ? (
         <button
           type="button"
-          onClick={config.action.onClick}
+          onClick={onClearFilters}
           className={cn(
-            'inline-flex items-center gap-2 px-4 py-2 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors',
+            'inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg',
+            'border border-[rgb(var(--border-primary))] text-[rgb(var(--text-primary))]',
+            'hover:bg-[rgb(var(--background-secondary))] transition-colors',
             focusRing
           )}
         >
-          {config.action.label}
+          <X className="w-3.5 h-3.5" />
+          Clear filters
         </button>
+      ) : (
+        config.action && (
+          <button
+            type="button"
+            onClick={config.action.onClick}
+            className={cn(
+              'inline-flex items-center gap-2 px-4 py-2 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors',
+              focusRing
+            )}
+          >
+            {config.action.label}
+          </button>
+        )
       )}
     </div>
   )

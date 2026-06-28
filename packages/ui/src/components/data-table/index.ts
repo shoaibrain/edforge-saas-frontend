@@ -10,6 +10,8 @@ export { DataTableViewOptions } from './DataTableViewOptions'
 export { DataTableRowActions } from './DataTableRowActions'
 export { DataTableSkeleton } from './DataTableSkeleton'
 export { DataTableEmpty } from './DataTableEmpty'
+export { DataTableDensityToggle } from './DataTableDensityToggle'
+export { DataTableExport } from './DataTableExport'
 
 // Column helpers
 export {
@@ -20,17 +22,26 @@ export {
 
 // Hooks
 export { useDataTable } from './hooks/useDataTable'
+export {
+  readPersistedTableState,
+  usePersistTableState,
+  clearPersistedTableState,
+} from './hooks/useTablePersistence'
 
 // Types
 export type {
   DataTableProps,
   DataTableEmptyStateConfig,
   DataTableColumnMeta,
+  DataTableDensity,
+  DataTableExportOptions,
+  DataTableExportFormat,
   FacetedFilterOption,
   FacetedFilterConfig,
   BulkAction,
   RowAction,
   PaginationConfig,
+  ServerPaginationConfig,
 } from './types'
 
 // Re-export TanStack Table utilities for convenience
