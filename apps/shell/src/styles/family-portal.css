@@ -1,5 +1,6 @@
 /* Family Portal — Premium Scoped Design Tokens & Classes */
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..900,0..100&family=Geist:wght@300..800&family=Geist+Mono:wght@400..600&display=swap');
+/* Fonts (Fraunces + Geist + Geist Mono) are loaded via <link> in index.html,
+   not a render-blocking @import. Fraunces is already loaded app-wide. */
 
 [data-family-portal] {
   --fp-paper: #FAF7F2; --fp-paper-2: #F4EFE6; --fp-paper-edge: #ECE5D8;

@@ -47,13 +47,6 @@ export function DataTableColumnHeader<TData, TValue>({
         align === 'center' && 'mx-auto',
         className
       )}
-      aria-sort={
-        sorted === 'asc'
-          ? 'ascending'
-          : sorted === 'desc'
-            ? 'descending'
-            : 'none'
-      }
     >
       <span>{title}</span>
       {sorted === 'asc' ? (

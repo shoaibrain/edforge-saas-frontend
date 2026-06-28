@@ -195,7 +195,7 @@ export function StudentQuickProfile({
               ) : (
                 <div className="w-5 h-5 rounded-full border-2 border-[rgb(var(--text-disabled))]" />
               )}
-              <div className="text-xs font-semibold uppercase tracking-[0.5px] mt-[2px] text-[rgb(var(--text-disabled))]">
+              <div className="text-xs font-semibold uppercase tracking-[0.5px] mt-[2px] text-[rgb(var(--text-tertiary))]">
                 Attendance
               </div>
               <div
@@ -208,7 +208,7 @@ export function StudentQuickProfile({
 
           {/* ── Enrollment card ── */}
           <div className="bg-[rgb(var(--background-tertiary)/0.5)] border border-[rgb(var(--border-primary)/0.35)] rounded-[10px] pt-3 px-3.5 pb-3.5">
-            <div className="text-xs font-bold uppercase tracking-[0.6px] mb-[10px] pb-[6px] text-[rgb(var(--text-disabled))] border-b border-[rgb(var(--border-primary)/0.35)]">
+            <div className="text-xs font-bold uppercase tracking-[0.6px] mb-[10px] pb-[6px] text-[rgb(var(--text-tertiary))] border-b border-[rgb(var(--border-primary)/0.35)]">
               Enrollment
             </div>
             <div className="grid grid-cols-2 gap-x-[14px] gap-y-[10px]">
@@ -265,7 +265,7 @@ function Tile({
       <div className={`text-lg font-semibold leading-none tracking-[-0.4px] ${muted ? 'text-[rgb(var(--text-tertiary))]' : 'text-[rgb(var(--text-primary))]'}`}>
         {value}
       </div>
-      <div className="text-xs font-semibold uppercase tracking-[0.5px] text-[rgb(var(--text-disabled))]">
+      <div className="text-xs font-semibold uppercase tracking-[0.5px] text-[rgb(var(--text-tertiary))]">
         {label}
       </div>
       <div
@@ -281,7 +281,7 @@ function Field({ label, value, sub }: { label: string; value: string; sub?: stri
   const empty = !value || value === '—'
   return (
     <div className="flex flex-col gap-0.5">
-      <div className="text-xs font-semibold uppercase tracking-[0.5px] text-[rgb(var(--text-disabled))]">
+      <div className="text-xs font-semibold uppercase tracking-[0.5px] text-[rgb(var(--text-tertiary))]">
         {label}
       </div>
       <div className={`text-xs font-medium leading-tight ${empty ? 'text-[rgb(var(--text-tertiary))]' : 'text-[rgb(var(--text-secondary))]'}`}>

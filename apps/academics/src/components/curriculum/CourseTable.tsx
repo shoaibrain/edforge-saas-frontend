@@ -173,7 +173,7 @@ function GradeLevelChips({ grades }: { grades: string[] }) {
         </span>
       ))}
       {!showAll && remaining > 0 && (
-        <span className="text-3xs font-medium py-px px-1.5 rounded-[5px] text-[rgb(var(--text-disabled))] bg-[rgb(var(--background-tertiary)/0.5)]">
+        <span className="text-3xs font-medium py-px px-1.5 rounded-[5px] text-[rgb(var(--text-tertiary))] bg-[rgb(var(--background-tertiary)/0.5)]">
           +{remaining} more
         </span>
       )}

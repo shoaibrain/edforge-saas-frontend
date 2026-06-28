@@ -59,7 +59,7 @@ export function createExpandColumn<TData>(): ColumnDef<TData, unknown> {
     size: 40,
     enableSorting: false,
     enableHiding: false,
-    header: () => null,
+    header: () => <span className="sr-only">Expand row</span>,
     cell: ({ row }) => {
       if (!row.getCanExpand()) return null
       return (
@@ -102,7 +102,7 @@ export function createActionsColumn<TData>(
     size: config.size ?? 80,
     enableSorting: false,
     enableHiding: false,
-    header: () => null,
+    header: () => <span className="sr-only">Actions</span>,
     cell: ({ row }) => (
       <div onClick={(e) => e.stopPropagation()}>
         {config.cell({ row })}
