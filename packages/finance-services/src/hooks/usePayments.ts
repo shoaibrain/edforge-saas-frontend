@@ -26,10 +26,12 @@ import {
   bulkGenerateInvoices,
   bulkIssueInvoices,
   downloadInvoicePdf,
+  getBulkPreview,
 } from '../services/invoices.service'
 import type {
   BulkGenerateInvoiceDto,
   BulkIssueInvoicesDto,
+  BulkPreviewParams,
 } from '../services/invoices.service'
 import {
   initiatePayment,
@@ -370,6 +372,37 @@ export function useBulkGenerateInvoices(schoolId: string) {
       queryClient.invalidateQueries({ queryKey: paymentKeys.invoices(schoolId) })
       queryClient.invalidateQueries({ queryKey: paymentKeys.studentAccounts(schoolId) })
     },
+  })
+}
+
+// ============================================================================
+// BULK PREVIEW — Sprint C.6
+// ============================================================================
+
+/**
+ * Read-only counts for the bulk-generate wizard's confirm step. Pass
+ * `enabled: false` to gate fetches until the operator has actually
+ * filled in enough of the form to make a preview meaningful (e.g. has
+ * picked at least one fee structure + one student/grade selection).
+ */
+export function useBulkPreview(
+  schoolId: string,
+  params: BulkPreviewParams,
+  options?: { enabled?: boolean },
+) {
+  return useQuery({
+    queryKey: [
+      ...paymentKeys.invoices(schoolId),
+      'bulk-preview',
+      params.selectionMode,
+      params.studentIds?.length ?? 0,
+      params.gradeLevels?.join(',') ?? '',
+      params.feeStructureIds?.join(',') ?? '',
+      params.billingPeriod ?? '',
+    ],
+    queryFn: () => getBulkPreview(schoolId, params),
+    enabled: !!schoolId && (options?.enabled ?? true),
+    staleTime: 30 * 1000, // 30s — operator likely tweaks form fields rapidly
   })
 }
 

@@ -131,18 +131,49 @@ export async function getStudentLedger(
 export interface BulkGenerateInvoiceResponse {
   generated: number
   skipped: number
-  invoiceIds: string[]
-  errors?: { studentId: string; reason: string }[]
+  invoiceIds?: string[]
+  errors?: ({ studentId: string; reason: string } | string)[]
+  resolvedStudentCount?: number
 }
 
-export interface BulkGenerateInvoiceDto {
-  studentIds: string[]
-  academicYear: string
-  billingPeriod?: string
-  feeStructureIds: string[]
-  dueDate: string
-  notes?: string
-}
+/**
+ * Bulk Ops Sprint C.1 — discriminated union shape (mirrors backend
+ * `bulkGenerateInvoiceSchema`). Local definition so the frontend
+ * doesn't have to wait on the npm publish of @aibrains/shared-types
+ * 0.87.0 (the schema lives there but the published version trails the
+ * backend by one release cycle). Will be replaced by direct import
+ * after the version bumps land.
+ */
+export type BulkGenerateInvoiceDto =
+  | {
+      // Sprint C.1 tagged "students" mode.
+      selectionMode: 'students'
+      studentIds: string[]
+      academicYear: string
+      billingPeriod?: string
+      feeStructureIds: string[]
+      dueDate: string
+      notes?: string
+    }
+  | {
+      // Sprint C.1 tagged "grades" mode.
+      selectionMode: 'grades'
+      gradeLevels: string[] // canonical grade codes OR the literal ['ALL']
+      academicYear: string
+      billingPeriod?: string
+      feeStructureIds: string[]
+      dueDate: string
+      notes?: string
+    }
+  | {
+      // Legacy flat shape — kept for back-compat with pre-C.1 callers.
+      studentIds: string[]
+      academicYear: string
+      billingPeriod?: string
+      feeStructureIds: string[]
+      dueDate: string
+      notes?: string
+    }
 
 export async function bulkGenerateInvoices(
   schoolId: string,
@@ -151,6 +182,47 @@ export async function bulkGenerateInvoices(
   return apiPost<BulkGenerateInvoiceResponse, BulkGenerateInvoiceDto>(
     `/finance/schools/${schoolId}/invoices/bulk-generate`,
     data,
+  )
+}
+
+/**
+ * Bulk Ops Sprint C.6 — read-only counts for the wizard confirm step.
+ * Calls `GET /finance/schools/:schoolId/invoices/bulk-preview`.
+ * No DDB writes; safe to fire from a form-render effect (debounce
+ * client-side to avoid spamming on every keystroke).
+ */
+export interface BulkPreviewParams {
+  selectionMode?: 'students' | 'grades'
+  studentIds?: string[]
+  gradeLevels?: string[]
+  feeStructureIds?: string[]
+  billingPeriod?: string
+}
+
+export interface BulkPreviewResponse {
+  studentCount: number
+  eligibleCount: number
+  duplicateCount: number
+  estimatedDurationSec: number
+}
+
+export async function getBulkPreview(
+  schoolId: string,
+  params: BulkPreviewParams,
+): Promise<BulkPreviewResponse> {
+  // Backend reads these as CSV query params (one schoolId path segment
+  // + flat csv lists). axios encodes arrays as repeated params by
+  // default — we send strings instead so the controller's
+  // `csv.split(',')` shape matches.
+  const flat: Record<string, string> = {}
+  if (params.selectionMode) flat.selectionMode = params.selectionMode
+  if (params.studentIds?.length) flat.studentIds = params.studentIds.join(',')
+  if (params.gradeLevels?.length) flat.gradeLevels = params.gradeLevels.join(',')
+  if (params.feeStructureIds?.length) flat.feeStructureIds = params.feeStructureIds.join(',')
+  if (params.billingPeriod) flat.billingPeriod = params.billingPeriod
+  return apiGet<BulkPreviewResponse>(
+    `/finance/schools/${schoolId}/invoices/bulk-preview`,
+    flat,
   )
 }
 

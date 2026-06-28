@@ -34,12 +34,14 @@ import {
 import {
   useEnrolledStudents,
   useBulkGenerateInvoices,
+  useBulkPreview,
   useFeeStructures,
   useAcademicYears,
 } from '@edforge/finance-services'
 import type { StudentSearchResult } from '@edforge/finance-services'
 import { UuidBadge } from '@edforge/archetype'
 import { formatDate } from '../../utils/format-date'
+import { useSchoolGradeOptions } from '../../hooks/useSchoolGradeOptions'
 
 // ============================================================================
 // TYPES
@@ -47,6 +49,10 @@ import { formatDate } from '../../utils/format-date'
 
 type Step = 1 | 2 | 3 | 4
 type FormState = 'editing' | 'submitting' | 'done'
+// Bulk Ops Sprint C.5 — Step 1 split into a 2-tab selector. Operator
+// either picks individual students (existing flow) or one+ grade levels
+// (new flow — backend resolves studentIds via the C.3 helper).
+type SelectionMode = 'students' | 'grades'
 
 interface BulkInvoiceFormProps {
   schoolId: string
@@ -147,9 +153,17 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
   const [formState, setFormState] = useState<FormState>('editing')
   const [result, setResult] = useState<BulkResult | null>(null)
 
-  // Step 1 — Student selection
+  // Step 1 — Selection mode (Sprint C.5)
+  const [selectionMode, setSelectionMode] = useState<SelectionMode>('students')
+
+  // Step 1a — Student selection (Students mode)
   const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([])
   const [studentSearch, setStudentSearch] = useState('')
+
+  // Step 1b — Grade selection (Grades mode — Sprint C.5)
+  const [selectedGradeCodes, setSelectedGradeCodes] = useState<string[]>([])
+  const [useAllGrades, setUseAllGrades] = useState(false)
+  const { gradeCodes: availableGradeCodes } = useSchoolGradeOptions(schoolId)
 
   // Step 2 — Fee structures
   const [selectedFeeIds, setSelectedFeeIds] = useState<string[]>([])
@@ -194,11 +208,39 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
   const perStudentTotal = perStudentSubtotal + perStudentTax
   const grandTotal = perStudentTotal * selectedStudentIds.length
 
+  // Sprint C.5 — bulk preview (server-computed counts). Only fires on
+  // Step 4 once the selection is non-empty AND at least one fee
+  // structure is picked. Disabled on earlier steps to avoid spamming
+  // the academics + finance services as the operator tweaks the form.
+  const previewEnabled =
+    step === 4 &&
+    selectedFeeIds.length > 0 &&
+    (selectionMode === 'students'
+      ? selectedStudentIds.length > 0
+      : useAllGrades || selectedGradeCodes.length > 0)
+  const previewParams =
+    selectionMode === 'grades'
+      ? {
+          selectionMode: 'grades' as const,
+          gradeLevels: useAllGrades ? ['ALL'] : selectedGradeCodes,
+          feeStructureIds: selectedFeeIds,
+          billingPeriod: billingPeriod.trim() || undefined,
+        }
+      : {
+          selectionMode: 'students' as const,
+          studentIds: selectedStudentIds,
+          feeStructureIds: selectedFeeIds,
+          billingPeriod: billingPeriod.trim() || undefined,
+        }
+  const previewQuery = useBulkPreview(schoolId, previewParams, { enabled: previewEnabled })
+
   // Validation per step
   const canProceed = (s: Step): boolean => {
     switch (s) {
       case 1:
-        return selectedStudentIds.length > 0
+        return selectionMode === 'students'
+          ? selectedStudentIds.length > 0
+          : useAllGrades || selectedGradeCodes.length > 0
       case 2:
         return selectedFeeIds.length > 0
       case 3:
@@ -218,27 +260,62 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
     if (step > 1) setStep((step - 1) as Step)
   }
 
-  // Submit
+  // Submit — Sprint C.5 honors the new discriminated-union payload.
   const handleSubmit = async () => {
     setFormState('submitting')
     try {
-      const response = await bulkGenerateMutation.mutateAsync({
-        studentIds: selectedStudentIds,
+      const basePayload = {
         feeStructureIds: selectedFeeIds,
         academicYear: academicYear.trim(),
         billingPeriod: billingPeriod.trim() || undefined,
         dueDate,
         notes: notes.trim() || undefined,
-      })
+      }
+      const payload =
+        selectionMode === 'grades'
+          ? {
+              ...basePayload,
+              selectionMode: 'grades' as const,
+              gradeLevels: useAllGrades ? ['ALL'] : selectedGradeCodes,
+            }
+          : {
+              ...basePayload,
+              selectionMode: 'students' as const,
+              studentIds: selectedStudentIds,
+            }
+      const response = await bulkGenerateMutation.mutateAsync(payload)
+      // Normalize errors → {studentId, reason} so the result table renders
+      // whether the backend returned the rich shape or just string messages
+      const normalizedErrors = (response.errors ?? []).map(e =>
+        typeof e === 'string' ? { studentId: '', reason: e } : e,
+      )
       setResult({
         generated: response.generated ?? response.invoiceIds?.length ?? 0,
         skipped: response.skipped ?? 0,
-        errors: response.errors,
+        errors: normalizedErrors,
       })
       setFormState('done')
-      toast.success(`Generated ${response.generated ?? response.invoiceIds?.length ?? 0} invoices`)
-    } catch {
-      toast.error('Failed to generate invoices. Please try again.')
+      const resolved =
+        response.resolvedStudentCount ??
+        response.generated ??
+        response.invoiceIds?.length ??
+        0
+      toast.success(`Generated ${response.generated ?? 0} of ${resolved} invoices`)
+    } catch (err: any) {
+      // Sprint C.4 — backend returns 413 with code BULK_GENERATE_SYNC_LIMIT_EXCEEDED
+      // when the resolved student count > 25. Surface the operator-actionable
+      // message instead of the generic toast.
+      const data = err?.response?.data
+      if (data?.code === 'BULK_GENERATE_SYNC_LIMIT_EXCEEDED') {
+        const n = data.resolvedStudentCount ?? '?'
+        toast.error(
+          `${n} students > sync limit of ${data.syncLimit ?? 25}. ` +
+            `Async path (Sprint E) is not yet shipped — narrow the selection.`,
+          { duration: 6000 },
+        )
+      } else {
+        toast.error('Failed to generate invoices. Please try again.')
+      }
       setFormState('editing')
     }
   }
@@ -268,11 +345,16 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
 
   // Submitting state
   if (formState === 'submitting') {
+    const submittingCount =
+      previewQuery.data?.eligibleCount ??
+      (selectionMode === 'students' ? selectedStudentIds.length : null)
     return (
       <div className="flex flex-col items-center justify-center py-16 space-y-4">
         <Loader2 className="w-8 h-8 text-[rgb(var(--action-secondary-fg))] animate-spin" />
         <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
-          Generating invoices for {selectedStudentIds.length} students...
+          {submittingCount !== null
+            ? `Generating invoices for ${submittingCount} students...`
+            : 'Generating invoices...'}
         </p>
         <p className="text-xs text-[rgb(var(--text-tertiary))]">
           This may take a moment.
@@ -373,86 +455,178 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
           exit={{ opacity: 0, x: -20 }}
           transition={{ duration: 0.15 }}
         >
-          {/* Step 1: Select Students */}
+          {/* Step 1: Select Students or Grades — Sprint C.5 */}
           {step === 1 && (
             <div className="space-y-4">
               <div>
                 <h2 className="text-base font-semibold text-[rgb(var(--text-primary))]">
-                  Select Students
+                  Select Recipients
                 </h2>
                 <p className="text-sm text-[rgb(var(--text-tertiary))] mt-0.5">
-                  Choose which students to generate invoices for.
+                  Pick individual students, or generate for entire grade level(s).
                 </p>
               </div>
 
-              {/* Search */}
-              <div className="relative max-w-sm">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[rgb(var(--text-tertiary))]" />
-                <input
-                  type="text"
-                  placeholder="Search by name or student number..."
-                  value={studentSearch}
-                  onChange={(e) => setStudentSearch(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
-                />
-              </div>
-
-              {/* Selection summary */}
-              <div className="flex items-center gap-3 text-xs text-[rgb(var(--text-secondary))]">
-                <span>{selectedStudentIds.length} selected</span>
+              {/* Sprint C.5 — tab toggle between Students and Grades modes */}
+              <div className="inline-flex rounded-lg border border-[rgb(var(--border-primary))] p-0.5 bg-[rgb(var(--background-secondary))]">
                 <button
                   type="button"
-                  onClick={toggleAllStudents}
-                  className="text-[rgb(var(--action-secondary-fg))]  hover:underline"
+                  onClick={() => setSelectionMode('students')}
+                  className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                    selectionMode === 'students'
+                      ? 'bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] shadow-sm'
+                      : 'text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))]'
+                  }`}
                 >
-                  {selectedStudentIds.length === filteredStudents.length && filteredStudents.length > 0
-                    ? 'Deselect All'
-                    : 'Select All'}
+                  By Student
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSelectionMode('grades')}
+                  className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                    selectionMode === 'grades'
+                      ? 'bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] shadow-sm'
+                      : 'text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))]'
+                  }`}
+                >
+                  By Grade
                 </button>
               </div>
 
-              {/* Student list */}
-              {studentsLoading ? (
-                <div className="flex items-center justify-center py-12">
-                  <Loader2 className="w-5 h-5 text-[rgb(var(--action-secondary-fg))] animate-spin" />
-                </div>
-              ) : filteredStudents.length === 0 ? (
-                <div className="text-center py-12">
-                  <Users className="w-8 h-8 mx-auto mb-2 text-[rgb(var(--text-tertiary))] opacity-40" />
-                  <p className="text-sm text-[rgb(var(--text-tertiary))]">
-                    {studentSearch ? 'No students match your search.' : 'No enrolled students found.'}
-                  </p>
-                </div>
-              ) : (
-                <div className="border border-[rgb(var(--border-primary))] rounded-lg max-h-72 overflow-y-auto divide-y divide-[rgb(var(--border-primary))]">
-                  {filteredStudents.map((student) => (
-                    <label
-                      key={student.studentId}
-                      className="flex items-center gap-3 px-4 py-2.5 hover:bg-[rgb(var(--background-secondary))] cursor-pointer transition-colors"
+              {/* By Student (existing flow) */}
+              {selectionMode === 'students' && (
+                <>
+                  <div className="relative max-w-sm">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[rgb(var(--text-tertiary))]" />
+                    <input
+                      type="text"
+                      placeholder="Search by name or student number..."
+                      value={studentSearch}
+                      onChange={(e) => setStudentSearch(e.target.value)}
+                      className="w-full pl-9 pr-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-3 text-xs text-[rgb(var(--text-secondary))]">
+                    <span>{selectedStudentIds.length} selected</span>
+                    <button
+                      type="button"
+                      onClick={toggleAllStudents}
+                      className="text-[rgb(var(--action-secondary-fg))]  hover:underline"
                     >
-                      <input
-                        type="checkbox"
-                        checked={selectedStudentIds.includes(student.studentId)}
-                        onChange={() => toggleAccount(student.studentId)}
-                        className="rounded border-[rgb(var(--border-primary))] text-[rgb(var(--action-secondary-fg))] focus:ring-[rgb(var(--border-focus))]"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <span className="text-sm text-[rgb(var(--text-primary))]">
-                          {student.fullName}
-                        </span>
-                        {student.currentGradeLevel && (
-                          <span className="ml-2 text-xs text-[rgb(var(--text-tertiary))]">
-                            Grade {student.currentGradeLevel}
-                          </span>
+                      {selectedStudentIds.length === filteredStudents.length && filteredStudents.length > 0
+                        ? 'Deselect All'
+                        : 'Select All'}
+                    </button>
+                  </div>
+
+                  {studentsLoading ? (
+                    <div className="flex items-center justify-center py-12">
+                      <Loader2 className="w-5 h-5 text-[rgb(var(--action-secondary-fg))] animate-spin" />
+                    </div>
+                  ) : filteredStudents.length === 0 ? (
+                    <div className="text-center py-12">
+                      <Users className="w-8 h-8 mx-auto mb-2 text-[rgb(var(--text-tertiary))] opacity-40" />
+                      <p className="text-sm text-[rgb(var(--text-tertiary))]">
+                        {studentSearch ? 'No students match your search.' : 'No enrolled students found.'}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="border border-[rgb(var(--border-primary))] rounded-lg max-h-72 overflow-y-auto divide-y divide-[rgb(var(--border-primary))]">
+                      {filteredStudents.map((student) => (
+                        <label
+                          key={student.studentId}
+                          className="flex items-center gap-3 px-4 py-2.5 hover:bg-[rgb(var(--background-secondary))] cursor-pointer transition-colors"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedStudentIds.includes(student.studentId)}
+                            onChange={() => toggleAccount(student.studentId)}
+                            className="rounded border-[rgb(var(--border-primary))] text-[rgb(var(--action-secondary-fg))] focus:ring-[rgb(var(--border-focus))]"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <span className="text-sm text-[rgb(var(--text-primary))]">
+                              {student.fullName}
+                            </span>
+                            {student.currentGradeLevel && (
+                              <span className="ml-2 text-xs text-[rgb(var(--text-tertiary))]">
+                                Grade {student.currentGradeLevel}
+                              </span>
+                            )}
+                          </div>
+                          {student.studentNumber && (
+                            <span className="text-xs text-[rgb(var(--text-tertiary))] font-mono">
+                              {student.studentNumber}
+                            </span>
+                          )}
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+
+              {/* By Grade (Sprint C.5 new flow) */}
+              {selectionMode === 'grades' && (
+                <div className="space-y-3">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={useAllGrades}
+                      onChange={(e) => {
+                        setUseAllGrades(e.target.checked)
+                        if (e.target.checked) setSelectedGradeCodes([])
+                      }}
+                      className="rounded border-[rgb(var(--border-primary))] text-[rgb(var(--action-secondary-fg))] focus:ring-[rgb(var(--border-focus))]"
+                    />
+                    <span className="text-sm text-[rgb(var(--text-primary))]">
+                      All grade levels enabled at this school
+                    </span>
+                  </label>
+
+                  {!useAllGrades && (
+                    <>
+                      <p className="text-xs text-[rgb(var(--text-tertiary))]">
+                        {selectedGradeCodes.length} grade
+                        {selectedGradeCodes.length === 1 ? '' : 's'} selected
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {availableGradeCodes.length === 0 ? (
+                          <p className="text-xs text-[rgb(var(--text-tertiary))]">
+                            Loading available grade levels…
+                          </p>
+                        ) : (
+                          availableGradeCodes.map(code => {
+                            const isSelected = selectedGradeCodes.includes(code)
+                            return (
+                              <button
+                                key={code}
+                                type="button"
+                                onClick={() =>
+                                  setSelectedGradeCodes(prev =>
+                                    isSelected ? prev.filter(c => c !== code) : [...prev, code],
+                                  )
+                                }
+                                className={`px-3 py-1.5 text-xs font-medium rounded-lg border transition-colors ${
+                                  isSelected
+                                    ? 'bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] border-transparent'
+                                    : 'bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-secondary))]'
+                                }`}
+                              >
+                                {code}
+                              </button>
+                            )
+                          })
                         )}
                       </div>
-                      {student.studentNumber && (
-                        <span className="text-xs text-[rgb(var(--text-tertiary))] font-mono">
-                          {student.studentNumber}
-                        </span>
-                      )}
-                    </label>
-                  ))}
+                    </>
+                  )}
+
+                  <p className="text-xs text-[rgb(var(--text-tertiary))]">
+                    Students are resolved from the academics service at submit time.
+                    The preview on Step 4 shows the exact count + duplicate skips before
+                    you commit. Sync limit is 25 students.
+                  </p>
                 </div>
               )}
             </div>
@@ -617,15 +791,74 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
                 </p>
               </div>
 
+              {/* Sprint C.5 — server-resolved preview banner. Renders when
+                  the bulk-preview query has resolved. Falls back to a
+                  loading hint while in-flight, or to the local
+                  selection-mode summary if the query is disabled. */}
+              {selectionMode === 'grades' && previewQuery.isLoading && (
+                <div className="border border-[rgb(var(--border-primary))] rounded-lg px-4 py-3 bg-[rgb(var(--background-secondary))] flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin text-[rgb(var(--text-tertiary))]" />
+                  <span className="text-xs text-[rgb(var(--text-tertiary))]">
+                    Resolving students from selected grade(s)…
+                  </span>
+                </div>
+              )}
+              {previewQuery.data && (
+                <div className="border border-[rgb(var(--border-primary))] rounded-lg px-4 py-3 bg-[rgb(var(--background-secondary))] space-y-1">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-[rgb(var(--text-secondary))]">Resolved students</span>
+                    <span className="font-semibold text-[rgb(var(--text-primary))]">
+                      {previewQuery.data.studentCount}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-[rgb(var(--text-secondary))]">Will generate</span>
+                    <span className="font-semibold text-[rgb(var(--state-success-fg))]">
+                      {previewQuery.data.eligibleCount}
+                    </span>
+                  </div>
+                  {previewQuery.data.duplicateCount > 0 && (
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-[rgb(var(--text-secondary))]">Skipped (duplicates)</span>
+                      <span className="font-semibold text-[rgb(var(--state-warning-fg))]">
+                        {previewQuery.data.duplicateCount}
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between text-xs pt-1 border-t border-[rgb(var(--border-primary))]">
+                    <span className="text-[rgb(var(--text-tertiary))]">Estimated time</span>
+                    <span className="text-[rgb(var(--text-tertiary))]">
+                      ~{previewQuery.data.estimatedDurationSec}s
+                    </span>
+                  </div>
+                  {previewQuery.data.studentCount > 25 && (
+                    <div className="mt-2 pt-2 border-t border-[rgb(var(--border-primary))] flex items-start gap-2 text-xs text-[rgb(var(--state-warning-fg))]">
+                      <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
+                      <span>
+                        {previewQuery.data.studentCount} students exceeds the 25-student
+                        sync limit. Async path (Sprint E) is not yet shipped — narrow
+                        the selection before submitting.
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+
               <div className="border border-[rgb(var(--border-primary))] rounded-lg divide-y divide-[rgb(var(--border-primary))]">
-                {/* Students count */}
+                {/* Students count — local view (not server-resolved) */}
                 <div className="flex items-center justify-between px-4 py-3">
                   <div className="flex items-center gap-2">
                     <Users className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
-                    <span className="text-sm text-[rgb(var(--text-secondary))]">Students</span>
+                    <span className="text-sm text-[rgb(var(--text-secondary))]">
+                      {selectionMode === 'grades' ? 'Grade selection' : 'Students'}
+                    </span>
                   </div>
                   <span className="text-sm font-medium text-[rgb(var(--text-primary))]">
-                    {selectedStudentIds.length}
+                    {selectionMode === 'grades'
+                      ? useAllGrades
+                        ? 'All grades'
+                        : `${selectedGradeCodes.length} grade${selectedGradeCodes.length === 1 ? '' : 's'}`
+                      : selectedStudentIds.length}
                   </span>
                 </div>
 
@@ -722,9 +955,22 @@ export function BulkInvoiceForm({ schoolId, onComplete, onCancel }: BulkInvoiceF
               <ChevronRight className="w-4 h-4 ml-1" />
             </Button>
           ) : (
-            <Button onClick={handleSubmit} disabled={!canProceed(step)}>
+            <Button
+              onClick={handleSubmit}
+              disabled={
+                !canProceed(step) ||
+                // Sprint C.5 — block submit when the server preview says
+                // we'd exceed the 25-student sync limit. Avoids 413.
+                (previewQuery.data ? previewQuery.data.studentCount > 25 : false)
+              }
+            >
               <Eye className="w-4 h-4 mr-1.5" />
-              Generate {selectedStudentIds.length} Invoices
+              Generate{' '}
+              {previewQuery.data
+                ? `${previewQuery.data.eligibleCount} Invoice${previewQuery.data.eligibleCount === 1 ? '' : 's'}`
+                : selectionMode === 'students'
+                  ? `${selectedStudentIds.length} Invoice${selectedStudentIds.length === 1 ? '' : 's'}`
+                  : 'Invoices'}
             </Button>
           )}
         </div>

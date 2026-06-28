@@ -16,6 +16,7 @@ export {
   getStudentAccounts,
   getStudentLedger,
   bulkGenerateInvoices,
+  getBulkPreview,
   bulkIssueInvoices,
   downloadInvoicePdf,
   invoicesService,
@@ -26,6 +27,8 @@ export type {
   BulkGenerateInvoiceDto,
   BulkIssueInvoicesDto,
   BulkIssueInvoicesResponse,
+  BulkPreviewParams,
+  BulkPreviewResponse,
 } from './services/invoices.service'
 export type {
   FinancePaginatedResponse,
@@ -114,6 +117,7 @@ export {
   useVoidPayment,
   useCreateRefund,
   useBulkGenerateInvoices,
+  useBulkPreview,
   useBulkIssueInvoices,
   useDashboardSummary,
   useExportInvoicesCsv,
