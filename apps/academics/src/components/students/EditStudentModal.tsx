@@ -6,14 +6,26 @@
  * @edforge/ui Modal, dirty form guard, field error mapping.
  *
  * Sprint 8 - EDIT-01
+ *
+ * Pilot Onboarding Hardening PD.3.4 — adds a Financial section gated
+ * on the student's BillingAccount existing (accounts are lazy-created
+ * on first invoice). Operator may set / revise the opening balance
+ * (previous dues) inline; revisions trigger an explicit confirmation
+ * because they emit an adjustment ledger entry that survives in the
+ * audit trail.
  */
 
 import { useEffect, useRef, useMemo } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Loader2, Save } from 'lucide-react'
-import { Modal, ModalFooter, Button, Field, Input, Select } from '@edforge/ui'
+import { Loader2, Save, Wallet } from 'lucide-react'
+import { Modal, ModalFooter, Button, Field, Input, Select, BsDatePicker } from '@edforge/ui'
+import {
+  useStudentAccounts,
+  useSetOpeningBalance,
+} from '@edforge/finance-services'
+import type { StudentAccount } from '@edforge/types'
 import { useUpdateStudent } from '../../hooks'
 import { parseApiError } from '../../services/academics.service'
 import { useActiveSchoolId } from '../../stores/app.store'
@@ -44,6 +56,21 @@ const editStudentFormSchema = z.object({
   currentGradeLevel: z.string().min(1, 'Grade level is required'),
   email: z.string().email('Invalid email').optional().or(z.literal('')),
   phone: z.string().max(20).optional().or(z.literal('')),
+  // PD.3.4 — opening balance (previous dues). All three fields are
+  // optional; the financial section is only submitted to the backend if
+  // the operator changed at least one of them AND a BillingAccount
+  // exists for this student.
+  openingBalance: z
+    .number({ invalid_type_error: 'Amount must be a number' })
+    .nonnegative('Amount must be ≥ 0')
+    .optional()
+    .or(z.literal('').transform(() => undefined)),
+  openingBalanceAsOf: z.string().optional().or(z.literal('')),
+  openingBalanceNote: z
+    .string()
+    .max(500, 'Note must be at most 500 characters')
+    .optional()
+    .or(z.literal('')),
 })
 
 type EditStudentFormData = z.infer<typeof editStudentFormSchema>
@@ -60,6 +87,27 @@ const GENDER_OPTIONS = [
 ] as const
 
 // ============================================================================
+// HELPERS
+// ============================================================================
+
+/** Find the BillingAccount belonging to `studentId` within the loaded
+ *  search result. The list endpoint does not filter by studentId
+ *  (see invoices.service comment B-2), so we search by name and
+ *  resolve by studentId on the client. */
+function pickAccountForStudent(
+  items: StudentAccount[] | undefined,
+  studentId: string,
+): StudentAccount | null {
+  if (!items) return null
+  return items.find(a => a.studentId === studentId) ?? null
+}
+
+function formatNpr(amount: number | undefined): string {
+  if (amount === undefined || amount === null) return 'NPR 0'
+  return `NPR ${amount.toLocaleString('en-NP', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`
+}
+
+// ============================================================================
 // MAIN COMPONENT
 // ============================================================================
 
@@ -72,6 +120,26 @@ export function EditStudentModal({
   const updateMutation = useUpdateStudent()
   const schoolId = useActiveSchoolId()
   const { options: filteredGradeOptions } = useSchoolEnabledGradeOptions(schoolId)
+
+  // PD.3.4 — lazy-fetch BillingAccount via name search (backend's only
+  // supported filter), then client-side narrow to this studentId.
+  // Disabled until the modal is open + schoolId is known so we don't
+  // pre-fetch for every row in a closed list.
+  const accountsQuery = useStudentAccounts(
+    schoolId ?? '',
+    open && schoolId
+      ? { searchTerm: `${student.firstName} ${student.lastName}`.trim() }
+      : undefined,
+  )
+  const billingAccount = useMemo(
+    () => pickAccountForStudent(accountsQuery.data, student.studentId),
+    [accountsQuery.data, student.studentId],
+  )
+  const accountId = billingAccount?.id ?? null
+  const accountReady = !accountsQuery.isLoading
+  const hasAccount = Boolean(billingAccount)
+
+  const setOpeningBalanceMutation = useSetOpeningBalance(schoolId ?? '')
 
   // Include student's current grade even if outside school range
   const gradeOptions = useMemo(() => {
@@ -93,7 +161,9 @@ export function EditStudentModal({
     resolver: zodResolver(editStudentFormSchema),
   })
 
-  // Reset form when student changes or modal opens
+  // Reset form when student or account changes. Re-running after
+  // accountsQuery resolves prefills the financial fields without a
+  // second mount.
   useEffect(() => {
     if (open && student) {
       reset({
@@ -105,9 +175,12 @@ export function EditStudentModal({
         currentGradeLevel: student.currentGradeLevel || '',
         email: student.contactInfo?.email || '',
         phone: student.contactInfo?.phone || '',
+        openingBalance: billingAccount?.openingBalance,
+        openingBalanceAsOf: billingAccount?.openingBalanceAsOf || '',
+        openingBalanceNote: billingAccount?.openingBalanceNote || '',
       })
     }
-  }, [open, student, reset])
+  }, [open, student, billingAccount, reset])
 
   // Auto-focus first input when modal opens
   useEffect(() => {
@@ -126,7 +199,45 @@ export function EditStudentModal({
     onClose()
   }
 
+  // PD.3.4 — detect a financial mutation. Comparing against the
+  // prefilled BillingAccount values (NOT the local form's isDirty,
+  // which fires on any field touch including non-financial).
+  const isFinancialChanged = (data: EditStudentFormData): boolean => {
+    if (!hasAccount) return false
+    const amtCurrent = typeof data.openingBalance === 'number' ? data.openingBalance : undefined
+    const amtOriginal = billingAccount?.openingBalance
+    const asOfCurrent = data.openingBalanceAsOf || undefined
+    const asOfOriginal = billingAccount?.openingBalanceAsOf
+    const noteCurrent = data.openingBalanceNote || undefined
+    const noteOriginal = billingAccount?.openingBalanceNote
+    return (
+      amtCurrent !== amtOriginal ||
+      asOfCurrent !== asOfOriginal ||
+      noteCurrent !== noteOriginal
+    )
+  }
+
   const onSubmit = handleSubmit(async (data) => {
+    const financialChanged = isFinancialChanged(data)
+    const isRevision =
+      financialChanged &&
+      billingAccount?.openingBalance !== undefined &&
+      data.openingBalance !== billingAccount.openingBalance
+
+    // PD.3.4 revision confirmation — gated on the AMOUNT changing
+    // (not just the note or asOf). Operators expect a hard checkpoint
+    // when money is being adjusted; a typo in the note shouldn't trip
+    // the same dialog.
+    if (isRevision) {
+      const ok = window.confirm(
+        `Revise opening balance from ${formatNpr(billingAccount.openingBalance)} ` +
+          `to ${formatNpr(typeof data.openingBalance === 'number' ? data.openingBalance : 0)}?\n\n` +
+          'This creates an audit-trailed adjustment ledger entry; the original ' +
+          'opening-balance entry stays in the ledger.',
+      )
+      if (!ok) return
+    }
+
     try {
       await updateMutation.mutateAsync({
         studentId: student.studentId,
@@ -143,6 +254,25 @@ export function EditStudentModal({
           },
         },
       })
+
+      // Run the opening-balance PUT only when financial fields actually
+      // changed AND we have an accountId resolved. Sequential — student
+      // update first (the visible "Save Changes" intent), then the
+      // finance write.
+      if (financialChanged && accountId) {
+        const amount = typeof data.openingBalance === 'number' ? data.openingBalance : 0
+        await setOpeningBalanceMutation.mutateAsync({
+          accountId,
+          payload: {
+            amount,
+            // backend defends asOf format + future date; fall back to
+            // today when operator left it blank so the operator-time
+            // intent is captured even without an explicit pick
+            asOf: data.openingBalanceAsOf || new Date().toISOString().slice(0, 10),
+            note: data.openingBalanceNote || undefined,
+          },
+        })
+      }
       onClose()
     } catch (error) {
       const parsed = parseApiError(error as Error)
@@ -255,6 +385,91 @@ export function EditStudentModal({
           <Field label="Phone" optionalText={null} error={errors.phone?.message}>
             <Input type="tel" {...register('phone')} placeholder="+1 (555) 123-4567" disabled={isSubmitting} />
           </Field>
+        </div>
+
+        {/* PD.3.4 — Financial Section. Renders only when a BillingAccount
+            already exists for this student (lazy-created on first invoice).
+            Pre-account state shows a small advisory note instead. */}
+        <div className="border-t border-border-secondary pt-4 mt-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Wallet className="w-4 h-4 text-text-secondary" />
+            <h3 className="text-sm font-semibold text-text-primary">Financial</h3>
+          </div>
+
+          {!accountReady && (
+            <p className="text-xs text-text-tertiary">Loading billing account…</p>
+          )}
+
+          {accountReady && !hasAccount && (
+            <p className="text-xs text-text-tertiary">
+              Billing account is created automatically when the first invoice is
+              generated for this student. Opening balance becomes editable here
+              after that.
+            </p>
+          )}
+
+          {accountReady && hasAccount && (
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-4">
+                <Field
+                  label="Opening Balance (NPR)"
+                  optionalText={null}
+                  error={errors.openingBalance?.message}
+                >
+                  <Input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    placeholder="0"
+                    disabled={isSubmitting}
+                    {...register('openingBalance', { valueAsNumber: true })}
+                  />
+                </Field>
+                <Controller
+                  name="openingBalanceAsOf"
+                  control={control}
+                  render={({ field }) => (
+                    <Field
+                      label="As of"
+                      optionalText={null}
+                      error={errors.openingBalanceAsOf?.message}
+                    >
+                      <BsDatePicker
+                        value={field.value || undefined}
+                        onChange={field.onChange}
+                        disabled={isSubmitting}
+                      />
+                    </Field>
+                  )}
+                />
+              </div>
+              <Field
+                label="Note"
+                optionalText={null}
+                error={errors.openingBalanceNote?.message}
+              >
+                <Input
+                  type="text"
+                  placeholder="e.g. BS 2082 carry-forward"
+                  disabled={isSubmitting}
+                  {...register('openingBalanceNote')}
+                />
+              </Field>
+              {billingAccount?.openingBalanceLastSetAt && (
+                <p className="text-xs text-text-tertiary">
+                  Last set: {new Date(billingAccount.openingBalanceLastSetAt).toLocaleString()}
+                  {billingAccount.openingBalanceLastSetBy
+                    ? ` by ${billingAccount.openingBalanceLastSetBy}`
+                    : ''}
+                </p>
+              )}
+              {billingAccount?.openingBalanceRemaining !== undefined && (
+                <p className="text-xs text-text-secondary">
+                  Remaining unsettled: {formatNpr(billingAccount.openingBalanceRemaining)}
+                </p>
+              )}
+            </div>
+          )}
         </div>
 
         {isDirty && (
