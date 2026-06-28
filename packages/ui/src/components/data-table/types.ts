@@ -15,11 +15,25 @@ import type {
 export interface DataTableColumnMeta {
   /** Alignment for header and cell content */
   align?: 'left' | 'center' | 'right'
-  /** Whether this column should be hideable in view options */
+  /** Whether this column should be hideable in view options (alias: hideable) */
   enableHiding?: boolean
+  /** Convenience alias of enableHiding, matching the prototype API. */
+  hideable?: boolean
   /** Filter variant for toolbar integration */
   filterVariant?: 'text' | 'select' | 'multi-select'
+  /** Pin column to the left while the body scrolls horizontally. */
+  sticky?: boolean
+  /** Extra className applied to the matching `<th>` and `<td>`. */
+  className?: string
+  /** Display label for a faceted filter option whose raw value is an id/enum. */
+  facetLabelMap?: (value: unknown) => string
 }
+
+// ============================================================================
+// DENSITY
+// ============================================================================
+
+export type DataTableDensity = 'comfortable' | 'compact'
 
 // ============================================================================
 // EMPTY STATE
@@ -56,10 +70,16 @@ export interface FacetedFilterConfig {
 // ============================================================================
 
 export interface BulkAction<TData> {
+  /** Stable id (used for React keys + analytics). Optional for back-compat. */
+  id?: string
   label: string
-  onClick: (selectedRows: TData[]) => void
+  /** Primary handler; `onRun` is accepted as an alias to match the prototype. */
+  onClick?: (selectedRows: TData[]) => void
+  onRun?: (selectedRows: TData[]) => void
   icon?: ReactNode
+  /** Stylistic variant. `tone: 'critical'` from the prototype maps to 'danger'. */
   variant?: 'primary' | 'danger' | 'outline'
+  tone?: 'critical' | 'primary' | 'outline'
   disabled?: boolean
 }
 
@@ -110,6 +130,19 @@ export interface ServerPaginationConfig {
 }
 
 // ============================================================================
+// EXPORT OPTIONS
+// ============================================================================
+
+export type DataTableExportFormat = 'csv' | 'xlsx'
+
+export interface DataTableExportOptions {
+  /** Filename stem (no extension). */
+  filename: string
+  /** Formats to offer. Defaults to ['csv']. XLSX is reserved for follow-up. */
+  formats?: DataTableExportFormat[]
+}
+
+// ============================================================================
 // MAIN DATA TABLE PROPS
 // ============================================================================
 
@@ -144,18 +177,22 @@ export interface DataTableProps<TData> {
    * `ServerPaginationConfig` docstring for Next-button semantics.
    */
   serverPagination?: ServerPaginationConfig
+  /** Convenience alias for `pagination.pageSizeOptions`; matches the prototype. */
+  pageSizes?: number[]
 
   // -- Sorting --
   enableSorting?: boolean
   /** Controlled sorting change handler (for server-side sorting) */
   onSortingChange?: OnChangeFn<SortingState>
+  /** Initial sort state. Persisted state takes precedence when `tableId` is set. */
+  defaultSort?: SortingState
 
   // -- Filtering --
   enableColumnFilters?: boolean
 
   // -- Column Visibility --
   enableColumnVisibility?: boolean
-  /** Table ID for persisting column visibility to localStorage */
+  /** Table ID for persisting column visibility / density / page size / filters. */
   tableId?: string
   /** Initial column visibility state */
   initialColumnVisibility?: VisibilityState
@@ -176,14 +213,28 @@ export interface DataTableProps<TData> {
 
   // -- Toolbar --
   searchPlaceholder?: string
+  /** Faceted filters. `facets` is the prototype name; `facetedFilters` kept for back-compat. */
   facetedFilters?: FacetedFilterConfig[]
+  facets?: FacetedFilterConfig[]
   /** Extra element rendered at the START (left) of the toolbar — e.g. filter chips. */
   toolbarStart?: ReactNode
-  /** Extra element to render in the toolbar (e.g., export button) — right side. */
+  /** Extra element to render in the toolbar right cluster.
+   *  Alias: `rightToolbarSlot` (prototype name). */
   toolbarExtra?: ReactNode
+  rightToolbarSlot?: ReactNode
+
+  // -- Density --
+  /** Initial density. Persisted state takes precedence when `tableId` is set. */
+  density?: DataTableDensity
+  /** Show the toolbar density toggle. Defaults to true when bulkActions/facets exist. */
+  enableDensityToggle?: boolean
 
   // -- Bulk Actions --
   bulkActions?: BulkAction<TData>[]
+
+  // -- Export --
+  /** Surfaces a built-in Export button in the toolbar right cluster. */
+  exportOptions?: DataTableExportOptions
 
   // -- Styling --
   className?: string

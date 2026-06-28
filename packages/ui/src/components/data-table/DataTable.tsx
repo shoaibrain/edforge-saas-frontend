@@ -1,6 +1,6 @@
 import { type KeyboardEvent, type ReactNode } from 'react'
 import { flexRender } from '@tanstack/react-table'
-import type { Row } from '@tanstack/react-table'
+import type { Row, Table } from '@tanstack/react-table'
 import { cn, focusRingInset } from '../../utils'
 import { useDataTable } from './hooks/useDataTable'
 import { DataTableColumnHeader } from './DataTableColumnHeader'
@@ -8,8 +8,13 @@ import { DataTableSkeleton } from './DataTableSkeleton'
 import { DataTableEmpty } from './DataTableEmpty'
 import { DataTablePagination } from './DataTablePagination'
 import { DataTableToolbar } from './DataTableToolbar'
-import type { DataTableProps, DataTableColumnMeta } from './types'
-import { AlertCircle, RefreshCw } from 'lucide-react'
+import type {
+  BulkAction,
+  DataTableColumnMeta,
+  DataTableProps,
+  FacetedFilterConfig,
+} from './types'
+import { AlertCircle, RefreshCw, X } from 'lucide-react'
 
 export function DataTable<TData>({
   columns,
@@ -23,11 +28,13 @@ export function DataTable<TData>({
   pagination,
   totalCount,
   serverPagination,
+  pageSizes,
   enableSorting = false,
   onSortingChange,
+  defaultSort,
   enableColumnFilters = false,
   enableColumnVisibility = false,
-  tableId: _tableId,
+  tableId,
   initialColumnVisibility,
   enableRowSelection = false,
   rowSelection,
@@ -37,25 +44,53 @@ export function DataTable<TData>({
   onRowClick,
   searchPlaceholder,
   facetedFilters,
+  facets,
   toolbarStart,
   toolbarExtra,
+  rightToolbarSlot,
+  density: densityProp,
+  enableDensityToggle,
   bulkActions,
+  exportOptions,
   className,
   maxHeight,
 }: DataTableProps<TData>) {
-  const table = useDataTable<TData>({
+  // Resolve prototype-shaped aliases onto the canonical props.
+  const resolvedFacets: FacetedFilterConfig[] | undefined =
+    facets ?? facetedFilters
+  const resolvedToolbarExtra: ReactNode = toolbarExtra ?? rightToolbarSlot
+  const resolvedPagination = pagination
+    ? {
+        ...pagination,
+        pageSizeOptions:
+          pagination.pageSizeOptions ?? pageSizes ?? undefined,
+      }
+    : pageSizes
+      ? { pageSizeOptions: pageSizes }
+      : undefined
+
+  const hasFacets = !!resolvedFacets?.length
+  const hasSearch = !!searchPlaceholder
+  const showDensityToggle =
+    enableDensityToggle ?? (hasFacets || hasSearch || !!bulkActions?.length)
+
+  const { table, density, setDensity } = useDataTable<TData>({
     data,
     columns,
     getRowId,
     enableSorting,
-    enableColumnFilters: enableColumnFilters || !!facetedFilters?.length || !!searchPlaceholder,
+    enableColumnFilters: enableColumnFilters || hasFacets || hasSearch,
+    enableFaceted: hasFacets,
     enableRowSelection,
     enableExpanding,
     onSortingChange,
     rowSelection,
     onRowSelectionChange,
     initialColumnVisibility,
-    pagination,
+    pagination: resolvedPagination,
+    tableId,
+    defaultSort,
+    initialDensity: densityProp,
   })
 
   // Loading skeleton
@@ -63,7 +98,9 @@ export function DataTable<TData>({
     return (
       <DataTableSkeleton
         columnCount={columns.length}
-        rowCount={pagination?.pageSize ? Math.min(pagination.pageSize, 8) : 5}
+        rowCount={
+          resolvedPagination?.pageSize ? Math.min(resolvedPagination.pageSize, 8) : 5
+        }
         className={className}
       />
     )
@@ -99,24 +136,47 @@ export function DataTable<TData>({
     )
   }
 
-  const selectedRowCount = Object.keys(
-    table.getState().rowSelection
-  ).length
+  const selectedRowCount = Object.keys(table.getState().rowSelection).length
 
-  const hasToolbar = searchPlaceholder || facetedFilters?.length || enableColumnVisibility || toolbarExtra || toolbarStart
+  const hasToolbar =
+    hasSearch ||
+    hasFacets ||
+    enableColumnVisibility ||
+    resolvedToolbarExtra ||
+    toolbarStart ||
+    showDensityToggle ||
+    exportOptions
   const hasBulkActions = bulkActions && selectedRowCount > 0
+  const activeFilterCount =
+    table.getState().columnFilters.length +
+    (((table.getState().globalFilter as string) ?? '') ? 1 : 0)
+  const isFiltered = activeFilterCount > 0
+
   // Empty body is rendered INSIDE the card so a toolbar (filters/search) stays
   // visible above it — otherwise a search that returns nothing would hide its
   // own search box. Without a toolbar, render the empty state as a standalone card.
   const isEmpty = data.length === 0 && !!emptyState && !isLoading
+  const handleClearFilters = () => {
+    table.resetColumnFilters()
+    table.setGlobalFilter('')
+    table.setPageIndex(0)
+  }
+
   if (isEmpty && !hasToolbar) {
-    return <DataTableEmpty config={emptyState} className={className} />
+    return (
+      <DataTableEmpty
+        config={emptyState}
+        className={className}
+        onClearFilters={isFiltered ? handleClearFilters : undefined}
+      />
+    )
   }
 
   return (
     <div
+      data-density={density}
       className={cn(
-        'flex flex-col rounded-xl border border-[rgb(var(--border-primary)/0.5)] shadow-[0_1px_3px_0_rgb(0_0_0/0.08),0_1px_2px_-1px_rgb(0_0_0/0.08)] bg-[rgb(var(--background-secondary))] overflow-hidden',
+        'relative flex flex-col rounded-xl border border-[rgb(var(--border-primary)/0.5)] shadow-[0_1px_3px_0_rgb(0_0_0/0.08),0_1px_2px_-1px_rgb(0_0_0/0.08)] bg-[rgb(var(--background-secondary))] overflow-hidden',
         className
       )}
       style={maxHeight ? { maxHeight, height: maxHeight } : undefined}
@@ -127,54 +187,15 @@ export function DataTable<TData>({
           <DataTableToolbar
             table={table}
             searchPlaceholder={searchPlaceholder}
-            facetedFilters={facetedFilters}
+            facetedFilters={resolvedFacets}
             enableColumnVisibility={enableColumnVisibility}
             toolbarStart={toolbarStart}
-            toolbarExtra={toolbarExtra}
+            toolbarExtra={resolvedToolbarExtra}
+            density={density}
+            onDensityChange={setDensity}
+            enableDensityToggle={showDensityToggle}
+            exportOptions={exportOptions}
           />
-        </div>
-      )}
-
-      {/* Bulk Actions Bar — outside scroll area */}
-      {hasBulkActions && (
-        <div className="flex-shrink-0 flex items-center gap-3 px-4 py-2.5 bg-[rgb(var(--state-info-bg)/0.18)] border-b border-[rgb(var(--state-info-border)/0.35)]">
-          <span className="text-sm font-medium text-[rgb(var(--text-primary))]">
-            {selectedRowCount} selected
-          </span>
-          <div className="flex items-center gap-2">
-            {bulkActions!.map((action, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => {
-                  const selectedRows = table
-                    .getFilteredSelectedRowModel()
-                    .rows.map((r) => r.original)
-                  action.onClick(selectedRows)
-                }}
-                disabled={action.disabled}
-                className={cn(
-                  'inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md transition-colors',
-                  action.variant === 'danger'
-                    ? 'bg-[rgb(var(--action-danger-bg))] text-[rgb(var(--action-danger-fg))] hover:brightness-95'
-                    : action.variant === 'outline'
-                      ? 'border border-[rgb(var(--border-primary))] text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-secondary))]'
-                      : 'bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] hover:bg-[rgb(var(--action-primary-bg-hover))]',
-                  action.disabled && 'opacity-50 cursor-not-allowed'
-                )}
-              >
-                {action.icon}
-                {action.label}
-              </button>
-            ))}
-          </div>
-          <button
-            type="button"
-            onClick={() => table.toggleAllRowsSelected(false)}
-            className="ml-auto text-xs text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] transition-colors"
-          >
-            Deselect all
-          </button>
         </div>
       )}
 
@@ -190,94 +211,205 @@ export function DataTable<TData>({
         )}
 
         {isEmpty && emptyState ? (
-          <DataTableEmpty config={emptyState} bare />
+          <DataTableEmpty
+            config={emptyState}
+            bare
+            onClearFilters={isFiltered ? handleClearFilters : undefined}
+          />
         ) : (
-        <table className="w-full" role="grid" style={{ tableLayout: 'fixed' }}>
-          <thead className="sticky top-0 z-10">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr
-                key={headerGroup.id}
-                className="border-b border-[rgb(var(--border-primary)/0.3)] bg-[rgb(var(--background-tertiary))] shadow-[0_1px_3px_-1px_rgb(0_0_0/0.1)]"
-              >
-                {headerGroup.headers.map((header) => {
-                  const meta = header.column.columnDef
-                    .meta as DataTableColumnMeta | undefined
-                  const sorted = header.column.getIsSorted()
-                  const ariaSort = header.column.getCanSort()
-                    ? sorted === 'asc'
-                      ? 'ascending'
-                      : sorted === 'desc'
-                        ? 'descending'
-                        : 'none'
-                    : undefined
-                  return (
-                    <th
-                      key={header.id}
-                      scope="col"
-                      aria-sort={ariaSort}
-                      className={cn(
-                        'px-4 py-2.5 text-xs font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))]',
-                        meta?.align === 'right'
-                          ? 'text-right'
-                          : meta?.align === 'center'
-                            ? 'text-center'
-                            : 'text-left'
-                      )}
-                      style={{ width: header.getSize() }}
-                    >
-                      {header.isPlaceholder
-                        ? null
-                        : header.column.getCanSort()
-                          ? (
-                              <DataTableColumnHeader
-                                column={header.column}
-                                title={
-                                  typeof header.column.columnDef.header === 'string'
-                                    ? header.column.columnDef.header
-                                    : header.id
-                                }
-                              />
-                            )
-                          : (
-                              flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
+          <table className="w-full" role="grid" style={{ tableLayout: 'fixed' }}>
+            <thead className="sticky top-0 z-10">
+              {table.getHeaderGroups().map((headerGroup) => (
+                <tr
+                  key={headerGroup.id}
+                  className="border-b border-[rgb(var(--border-primary)/0.3)] bg-[rgb(var(--background-tertiary))] shadow-[0_1px_3px_-1px_rgb(0_0_0/0.1)]"
+                >
+                  {headerGroup.headers.map((header) => {
+                    const meta = header.column.columnDef.meta as
+                      | DataTableColumnMeta
+                      | undefined
+                    const sorted = header.column.getIsSorted()
+                    const ariaSort = header.column.getCanSort()
+                      ? sorted === 'asc'
+                        ? 'ascending'
+                        : sorted === 'desc'
+                          ? 'descending'
+                          : 'none'
+                      : undefined
+                    return (
+                      <th
+                        key={header.id}
+                        scope="col"
+                        aria-sort={ariaSort}
+                        className={cn(
+                          'px-4 text-2xs font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))]',
+                          'h-[var(--dt-header-h-comfortable)] [[data-density=compact]_&]:h-[var(--dt-header-h-compact)]',
+                          meta?.align === 'right'
+                            ? 'text-right'
+                            : meta?.align === 'center'
+                              ? 'text-center'
+                              : 'text-left',
+                          meta?.className
+                        )}
+                        style={{ width: header.getSize() }}
+                      >
+                        {header.isPlaceholder
+                          ? null
+                          : header.column.getCanSort()
+                            ? (
+                                <DataTableColumnHeader
+                                  column={header.column}
+                                  title={
+                                    typeof header.column.columnDef.header === 'string'
+                                      ? header.column.columnDef.header
+                                      : header.id
+                                  }
+                                />
                               )
-                            )}
-                    </th>
-                  )
-                })}
-              </tr>
-            ))}
-          </thead>
-          <tbody className={cn(isFetching && 'opacity-60 transition-opacity')}>
-            {table.getRowModel().rows.map((row, rowIndex) => (
-              <TableRowWithExpansion
-                key={row.id}
-                row={row}
-                rowIndex={rowIndex}
-                onRowClick={onRowClick}
-                enableExpanding={enableExpanding}
-                renderSubComponent={renderSubComponent}
-                visibleCellCount={table.getVisibleFlatColumns().length}
-              />
-            ))}
-          </tbody>
-        </table>
+                            : (
+                                flexRender(
+                                  header.column.columnDef.header,
+                                  header.getContext()
+                                )
+                              )}
+                      </th>
+                    )
+                  })}
+                </tr>
+              ))}
+            </thead>
+            <tbody className={cn(isFetching && 'opacity-60 transition-opacity')}>
+              {table.getRowModel().rows.map((row, rowIndex) => (
+                <TableRowWithExpansion
+                  key={row.id}
+                  row={row}
+                  rowIndex={rowIndex}
+                  onRowClick={onRowClick}
+                  enableExpanding={enableExpanding}
+                  renderSubComponent={renderSubComponent}
+                  visibleCellCount={table.getVisibleFlatColumns().length}
+                />
+              ))}
+            </tbody>
+          </table>
         )}
       </div>
 
       {/* Pagination — hidden under the empty state */}
-      {pagination && !isEmpty && (
+      {resolvedPagination && !isEmpty && (
         <div className="flex-shrink-0">
           <DataTablePagination
             table={table}
             totalCount={totalCount}
-            pageSizeOptions={pagination.pageSizeOptions}
+            pageSizeOptions={resolvedPagination.pageSizeOptions}
             serverPagination={serverPagination}
           />
         </div>
       )}
+
+      {/* Floating bulk action bar — centered above the footer, on top of the body. */}
+      <FloatingBulkBar
+        visible={!!hasBulkActions}
+        actions={bulkActions ?? []}
+        table={table}
+        hasFooter={!!resolvedPagination && !isEmpty}
+      />
+    </div>
+  )
+}
+
+// ============================================================================
+// FLOATING BULK BAR
+// ============================================================================
+
+function FloatingBulkBar<TData>({
+  visible,
+  actions,
+  table,
+  hasFooter,
+}: {
+  visible: boolean
+  actions: BulkAction<TData>[]
+  table: Table<TData>
+  hasFooter: boolean
+}) {
+  const selectedRows = table.getFilteredSelectedRowModel().rows.map((r) => r.original)
+  const count = selectedRows.length
+
+  return (
+    <div
+      aria-live="polite"
+      role={visible ? 'region' : undefined}
+      aria-label={visible ? `${count} selected` : undefined}
+      // bottom offset matches the prototype's "58px above footer" spec;
+      // inline style avoids the design-system arbitrary-spacing lint rule
+      // since this magic gap is specific to this component's layout.
+      style={{ bottom: hasFooter ? 68 : 16 }}
+      className={cn(
+        'pointer-events-none absolute left-1/2 -translate-x-1/2 z-30',
+        'transition-[opacity,transform] duration-[var(--dt-duration,200ms)] ease-[var(--dt-easing,cubic-bezier(.32,.72,0,1))]',
+        'motion-reduce:transition-none',
+        visible
+          ? 'opacity-100 translate-y-0'
+          : 'opacity-0 translate-y-2'
+      )}
+    >
+      <div
+        // 58px is the prototype's bulk-bar height; inline style for the same
+        // reason as the parent.
+        style={{ height: 58 }}
+        className={cn(
+          'pointer-events-auto flex items-center gap-3 pl-4 pr-2 rounded-full',
+          'bg-[rgb(var(--background-elevated))] border border-[rgb(var(--border-strong))]',
+          'shadow-overlay text-sm text-[rgb(var(--text-primary))]'
+        )}
+      >
+        <span className="font-medium tabular-nums">
+          {count} selected
+        </span>
+        <span className="h-5 w-px bg-[rgb(var(--border-primary)/0.4)]" aria-hidden />
+        <div className="flex items-center gap-1.5">
+          {actions.map((action, i) => {
+            const handler = action.onRun ?? action.onClick
+            const tone = action.tone === 'critical' ? 'danger' : action.variant
+            return (
+              <button
+                key={action.id ?? i}
+                type="button"
+                onClick={() => handler?.(selectedRows)}
+                disabled={action.disabled}
+                aria-label={action.label}
+                title={action.label}
+                className={cn(
+                  'inline-flex items-center gap-1.5 h-9 px-3 text-sm font-medium rounded-full transition-colors',
+                  tone === 'danger'
+                    ? 'text-[rgb(var(--action-danger-bg))] hover:bg-[rgb(var(--action-danger-bg)/0.1)]'
+                    : tone === 'outline'
+                      ? 'border border-[rgb(var(--border-primary))] text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-secondary))]'
+                      : 'text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-tertiary))]',
+                  action.disabled && 'opacity-50 cursor-not-allowed'
+                )}
+              >
+                {action.icon}
+                {action.label}
+              </button>
+            )
+          })}
+          <button
+            type="button"
+            onClick={() => table.toggleAllRowsSelected(false)}
+            aria-label="Clear selection"
+            title="Clear selection"
+            className={cn(
+              'inline-flex items-center justify-center w-9 h-9 rounded-full',
+              'text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-secondary))]',
+              focusRingInset
+            )}
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
     </div>
   )
 }
@@ -317,10 +449,13 @@ function TableRowWithExpansion<TData>({
   return (
     <>
       <tr
+        role={isInteractive ? 'button' : undefined}
         className={cn(
-          'border-b border-[rgb(var(--border-secondary)/0.7)] last:border-b-0 transition-colors duration-150',
+          'border-b border-[rgb(var(--border-secondary)/0.7)] last:border-b-0',
+          'transition-colors duration-[var(--motion-duration-fast)]',
+          'motion-reduce:transition-none',
           isSelected
-            ? 'bg-[rgb(var(--state-info-bg)/0.18)] border-l-2 border-l-[rgb(var(--border-focus))]'
+            ? 'bg-[var(--mint-soft)] border-l-2 border-l-[var(--mint-border)]'
             : isEvenRow
               ? 'bg-[rgb(var(--background-tertiary)/0.35)]'
               : '',
@@ -335,15 +470,18 @@ function TableRowWithExpansion<TData>({
         aria-selected={isSelected || undefined}
       >
         {row.getVisibleCells().map((cell) => {
-          const meta = cell.column.columnDef
-            .meta as DataTableColumnMeta | undefined
+          const meta = cell.column.columnDef.meta as
+            | DataTableColumnMeta
+            | undefined
           return (
             <td
               key={cell.id}
               className={cn(
-                'px-4 py-2.5 text-sm text-[rgb(var(--text-primary))]',
+                'px-4 text-sm text-[rgb(var(--text-primary))]',
+                'h-[var(--dt-row-h-comfortable)] [[data-density=compact]_&]:h-[var(--dt-row-h-compact)]',
                 meta?.align === 'right' && 'text-right',
-                meta?.align === 'center' && 'text-center'
+                meta?.align === 'center' && 'text-center',
+                meta?.className
               )}
               style={{ width: cell.column.getSize() }}
             >
@@ -357,7 +495,7 @@ function TableRowWithExpansion<TData>({
         <tr className="border-b border-[rgb(var(--border-secondary)/0.7)]">
           <td
             colSpan={visibleCellCount}
-            className="bg-[rgb(var(--background-tertiary)/0.2)] border-l-2 border-l-teal-500/30 px-4 py-3"
+            className="bg-[rgb(var(--background-tertiary)/0.2)] border-l-2 border-l-[var(--mint-border)] px-4 py-3"
           >
             {renderSubComponent({ row })}
           </td>

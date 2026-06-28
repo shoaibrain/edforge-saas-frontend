@@ -237,6 +237,17 @@
   --motion-easing-enter: cubic-bezier(0.16, 1, 0.3, 1);
   --motion-easing-exit: cubic-bezier(0.4, 0, 1, 1);
 
+  /* Prototype semantic aliases — Edforge DataTable & future Design imports
+     read these names. They map onto the primitives above; no new colors. */
+  --mint: var(--color-aqua-600);
+  --mint-soft: var(--color-aqua-50);
+  --mint-border: rgb(var(--border-focus));
+  --dt-easing: cubic-bezier(.32, .72, 0, 1);
+  --dt-duration: 200ms;
+  --dt-row-h-comfortable: 60px;
+  --dt-row-h-compact: 44px;
+  --dt-header-h-comfortable: 42px;
+  --dt-header-h-compact: 36px;
 }
 
 .dark {
@@ -319,6 +330,12 @@
   --motion-easing-enter: cubic-bezier(0.16, 1, 0.3, 1);
   --motion-easing-exit: cubic-bezier(0.4, 0, 1, 1);
 
+  /* Prototype semantic aliases (dark) — aqua tints carry over but use a
+     darker, lower-opacity soft fill so selected rows / active facets sit
+     within the dark surface without flashing. */
+  --mint: var(--color-aqua-400);
+  --mint-soft: rgba(20, 50, 41, 0.55);
+  --mint-border: rgb(var(--border-focus));
 }
 
 /* Base layer styles */

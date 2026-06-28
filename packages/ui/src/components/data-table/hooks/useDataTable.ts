@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
   useReactTable,
   getCoreRowModel,
@@ -6,6 +6,8 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   getExpandedRowModel,
+  getFacetedRowModel,
+  getFacetedUniqueValues,
   type SortingState,
   type ColumnFiltersState,
   type VisibilityState,
@@ -16,7 +18,11 @@ import {
   type Row,
   type Table,
 } from '@tanstack/react-table'
-import type { PaginationConfig } from '../types'
+import type { DataTableDensity, PaginationConfig } from '../types'
+import {
+  readPersistedTableState,
+  usePersistTableState,
+} from './useTablePersistence'
 
 interface UseDataTableOptions<TData> {
   data: TData[]
@@ -28,6 +34,7 @@ interface UseDataTableOptions<TData> {
   enableColumnFilters?: boolean
   enableRowSelection?: boolean | ((row: Row<TData>) => boolean)
   enableExpanding?: boolean
+  enableFaceted?: boolean
 
   // Controlled state
   onSortingChange?: OnChangeFn<SortingState>
@@ -39,11 +46,22 @@ interface UseDataTableOptions<TData> {
 
   // Pagination
   pagination?: PaginationConfig
+
+  // Persistence + initial values
+  tableId?: string
+  defaultSort?: SortingState
+  initialDensity?: DataTableDensity
+}
+
+export interface UseDataTableResult<TData> {
+  table: Table<TData>
+  density: DataTableDensity
+  setDensity: (next: DataTableDensity) => void
 }
 
 export function useDataTable<TData>(
   options: UseDataTableOptions<TData>
-): Table<TData> {
+): UseDataTableResult<TData> {
   const {
     data,
     columns,
@@ -52,18 +70,38 @@ export function useDataTable<TData>(
     enableColumnFilters = false,
     enableRowSelection = false,
     enableExpanding = false,
+    enableFaceted = false,
     onSortingChange: controlledOnSortingChange,
     rowSelection: controlledRowSelection,
     onRowSelectionChange: controlledOnRowSelectionChange,
     initialColumnVisibility = {},
     pagination,
+    tableId,
+    defaultSort,
+    initialDensity = 'comfortable',
   } = options
 
-  const [sorting, setSorting] = useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-  const [columnVisibility, setColumnVisibility] =
-    useState<VisibilityState>(initialColumnVisibility)
+  // Read persisted state once on mount. We deliberately drop changes if the
+  // tableId changes mid-life (very rare; would mean the same component is
+  // being repurposed for a different table).
+  const persisted = useMemo(
+    () => readPersistedTableState(tableId),
+    [tableId]
+  )
+
+  const [sorting, setSorting] = useState<SortingState>(
+    persisted?.sorting ?? defaultSort ?? []
+  )
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
+    persisted?.columnFilters ?? []
+  )
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
+    persisted?.columnVisibility ?? initialColumnVisibility
+  )
   const [expanded, setExpanded] = useState<ExpandedState>({})
+  const [density, setDensity] = useState<DataTableDensity>(
+    persisted?.density ?? initialDensity
+  )
 
   // Internal row selection state (used when not controlled)
   const [internalRowSelection, setInternalRowSelection] =
@@ -73,9 +111,14 @@ export function useDataTable<TData>(
   const onRowSelectionChange =
     controlledOnRowSelectionChange ?? setInternalRowSelection
 
-  const pageSize = pagination?.pageSize ?? 20
+  const initialPageSize =
+    persisted?.pageSize ?? pagination?.pageSize ?? 20
 
-  const table = useReactTable({
+  const [pageState, setPageState] = useState<{ pageIndex: number; pageSize: number }>(
+    () => ({ pageIndex: 0, pageSize: initialPageSize })
+  )
+
+  const table = useReactTable<TData>({
     data,
     columns,
     getRowId,
@@ -86,18 +129,39 @@ export function useDataTable<TData>(
       columnVisibility,
       rowSelection,
       expanded,
+      ...(pagination && { pagination: pageState }),
     },
     onSortingChange: controlledOnSortingChange ?? setSorting,
-    onColumnFiltersChange: setColumnFilters,
+    onColumnFiltersChange: (updater) => {
+      // Filter/search changes always snap pagination back to the first page;
+      // sorting and selection are deliberately left alone.
+      setColumnFilters((prev) =>
+        typeof updater === 'function' ? updater(prev) : updater
+      )
+      if (pagination) {
+        setPageState((p) => ({ ...p, pageIndex: 0 }))
+      }
+    },
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange,
     onExpandedChange: setExpanded,
+    ...(pagination && {
+      onPaginationChange: (updater) => {
+        setPageState((prev) =>
+          typeof updater === 'function' ? updater(prev) : updater
+        )
+      },
+    }),
 
     // Row models
     getCoreRowModel: getCoreRowModel(),
     ...(enableSorting && { getSortedRowModel: getSortedRowModel() }),
     ...(enableColumnFilters && {
       getFilteredRowModel: getFilteredRowModel(),
+    }),
+    ...(enableFaceted && {
+      getFacetedRowModel: getFacetedRowModel(),
+      getFacetedUniqueValues: getFacetedUniqueValues(),
     }),
     ...(pagination && { getPaginationRowModel: getPaginationRowModel() }),
     ...(enableExpanding && { getExpandedRowModel: getExpandedRowModel() }),
@@ -111,10 +175,10 @@ export function useDataTable<TData>(
     ...(enableExpanding && { getRowCanExpand: () => true }),
     enableMultiRowSelection: true,
 
-    // Pagination defaults
+    // Pagination defaults (used when state.pagination is absent)
     initialState: {
       pagination: {
-        pageSize,
+        pageSize: initialPageSize,
         pageIndex: 0,
       },
     },
@@ -123,5 +187,14 @@ export function useDataTable<TData>(
     enableGlobalFilter: true,
   })
 
-  return table
+  // Debounced write of the slice of state we care to persist.
+  usePersistTableState(tableId, {
+    density,
+    columnVisibility,
+    pageSize: pageState.pageSize,
+    columnFilters,
+    sorting,
+  })
+
+  return { table, density, setDensity }
 }
