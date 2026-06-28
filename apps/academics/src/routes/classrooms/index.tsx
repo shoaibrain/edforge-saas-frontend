@@ -35,7 +35,13 @@ import {
   Users,
   Gauge,
   UsersRound,
+  Send,
+  ToggleLeft,
+  ToggleRight,
 } from 'lucide-react'
+import { toast } from 'sonner'
+import type { BulkAction } from '@edforge/ui'
+import type { RowSelectionState } from '@tanstack/react-table'
 import { useActiveSchoolId } from '../../stores/app.store'
 
 // --- Scheduling (My Classes) imports ---
@@ -50,6 +56,7 @@ import {
 import { useCourses, flattenCoursePages } from '../../hooks/useCourses'
 import { SectionTable } from '../../components/scheduling/SectionTable'
 import { SectionFilters } from '../../components/scheduling/SectionFilters'
+import { BulkSectionStatusModal } from '../../components/scheduling/BulkSectionStatusModal'
 import type { SectionResponseDto } from '@aibrains/shared-types'
 import { ClassroomCardGrid } from '../../components/classrooms/ClassroomCardGrid'
 
@@ -162,6 +169,38 @@ function OverviewTab() {
     })
   }
 
+  // Bulk activate / deactivate — lift selection so the modal can clear it.
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+  const [bulkStatusTarget, setBulkStatusTarget] = useState<{
+    rows: SectionResponseDto[]
+    targetActive: boolean
+  } | null>(null)
+
+  const bulkActions = useMemo<BulkAction<SectionResponseDto>[]>(
+    () => [
+      {
+        id: 'activate',
+        label: 'Activate',
+        icon: <ToggleRight className="w-4 h-4" />,
+        onRun: (rows) => setBulkStatusTarget({ rows, targetActive: true }),
+      },
+      {
+        id: 'deactivate',
+        label: 'Deactivate',
+        icon: <ToggleLeft className="w-4 h-4" />,
+        onRun: (rows) => setBulkStatusTarget({ rows, targetActive: false }),
+      },
+      {
+        id: 'notify',
+        label: 'Send notification',
+        icon: <Send className="w-4 h-4" />,
+        onRun: (rows) =>
+          toast.info(`Notify ${rows.length} section${rows.length === 1 ? '' : 's'} — coming soon`),
+      },
+    ],
+    [],
+  )
+
   const handleNavigateToDetail = (section: SectionResponseDto) => {
     navigate({ to: `/classrooms/${section.sectionId}` })
   }
@@ -264,8 +303,21 @@ function OverviewTab() {
           onEditSection={schedPerms.edit ? handleNavigateToEdit : undefined}
           onToggleActive={schedPerms.edit ? handleToggleActive : undefined}
           onViewRoster={handleNavigateToDetail}
+          bulkActions={schedPerms.edit ? bulkActions : undefined}
+          rowSelection={rowSelection}
+          onRowSelectionChange={setRowSelection}
         />
       )}
+
+      {/* Bulk activate / deactivate modal (#224) */}
+      <BulkSectionStatusModal
+        open={!!bulkStatusTarget}
+        sections={bulkStatusTarget?.rows ?? []}
+        targetActive={bulkStatusTarget?.targetActive ?? true}
+        schoolId={schoolId}
+        onClose={() => setBulkStatusTarget(null)}
+        onComplete={() => setRowSelection({})}
+      />
     </div>
   )
 }

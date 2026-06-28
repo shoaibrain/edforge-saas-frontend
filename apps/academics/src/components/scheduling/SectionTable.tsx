@@ -17,6 +17,7 @@ import {
   Send,
 } from 'lucide-react'
 import { toast } from 'sonner'
+import type { OnChangeFn, RowSelectionState } from '@tanstack/react-table'
 import {
   TanstackDataTable,
   createActionsColumn,
@@ -45,6 +46,13 @@ interface SectionTableProps {
   onEditSection?: (section: SectionResponseDto) => void
   onToggleActive?: (section: SectionResponseDto) => void
   onViewRoster?: (section: SectionResponseDto) => void
+  /** Override the internal toast-placeholder bulk actions. Pass from the route
+   *  when wiring real bulk drawers (e.g. BulkSectionStatusModal). */
+  bulkActions?: BulkAction<SectionResponseDto>[]
+  /** Controlled row selection — lift state into the page when an action
+   *  needs to clear selection (e.g. after a bulk activate/deactivate). */
+  rowSelection?: RowSelectionState
+  onRowSelectionChange?: OnChangeFn<RowSelectionState>
 }
 
 // ============================================================================
@@ -187,6 +195,9 @@ export function SectionTable({
   onEditSection,
   onToggleActive,
   onViewRoster,
+  bulkActions: bulkActionsProp,
+  rowSelection,
+  onRowSelectionChange,
 }: SectionTableProps) {
   const columns: ColumnDef<SectionResponseDto, unknown>[] = useMemo(
     () => [
@@ -334,7 +345,11 @@ export function SectionTable({
     [courseOptions, periodOptions],
   )
 
-  const bulkActions = useMemo<BulkAction<SectionResponseDto>[]>(
+  // Default bulk action placeholders — used when the route doesn't pass
+  // its own `bulkActions` prop. Activate / Deactivate are upgraded to a
+  // real BulkSectionStatusModal by `apps/academics/src/routes/classrooms/index.tsx`;
+  // Send notification remains a toast pending a backend slice.
+  const defaultBulkActions = useMemo<BulkAction<SectionResponseDto>[]>(
     () => [
       {
         id: 'activate',
@@ -361,6 +376,8 @@ export function SectionTable({
     [],
   )
 
+  const bulkActions = bulkActionsProp ?? defaultBulkActions
+
   return (
     <TanstackDataTable
       columns={columns}
@@ -374,6 +391,8 @@ export function SectionTable({
       searchPlaceholder="Search sections…"
       facets={facets}
       bulkActions={bulkActions}
+      rowSelection={rowSelection}
+      onRowSelectionChange={onRowSelectionChange}
       exportOptions={{ filename: 'sections', formats: ['csv'] }}
       defaultSort={[{ id: 'sectionNumber', desc: false }]}
       pagination={{ pageSize: 20 }}

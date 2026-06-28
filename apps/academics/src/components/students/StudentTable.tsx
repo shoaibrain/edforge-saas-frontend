@@ -11,6 +11,7 @@
 import { useMemo, useState, type ReactNode } from 'react'
 import { User, MoreVertical, UserMinus, ExternalLink, MessageSquare, ArrowRightLeft, Archive } from 'lucide-react'
 import { toast } from 'sonner'
+import type { OnChangeFn, RowSelectionState } from '@tanstack/react-table'
 import {
   TanstackDataTable,
   AttendanceTrend,
@@ -59,6 +60,13 @@ interface StudentTableProps {
   isFetchingMore?: boolean
   onLoadMore?: () => void
   serverTotalHint?: number
+  /** Override the internal toast-placeholder bulk actions. Pass from the route
+   *  when wiring a real bulk drawer (e.g. BulkArchiveStudentsModal). */
+  bulkActions?: BulkAction<StudentResponseDto>[]
+  /** Controlled row selection — lift state into the page when an action
+   *  needs to clear selection (e.g. after a bulk archive). */
+  rowSelection?: RowSelectionState
+  onRowSelectionChange?: OnChangeFn<RowSelectionState>
 }
 
 // ============================================================================
@@ -158,6 +166,9 @@ export function StudentTable({
   isFetchingMore,
   onLoadMore,
   serverTotalHint,
+  bulkActions: bulkActionsProp,
+  rowSelection,
+  onRowSelectionChange,
 }: StudentTableProps) {
   const columns: ColumnDef<StudentResponseDto, unknown>[] = useMemo(() => {
     const cols: ColumnDef<StudentResponseDto, unknown>[] = [
@@ -270,10 +281,11 @@ export function StudentTable({
     ? { hasMore: Boolean(hasMore), isFetching: Boolean(isFetchingMore), onLoadMore, serverTotalHint }
     : undefined
 
-  // Bulk action placeholders — backend endpoints for messaging / move / archive
-  // are not wired yet; the toasts surface the contract so reviewers can see
-  // the operator-facing shape ahead of the per-domain server slices.
-  const bulkActions = useMemo<BulkAction<StudentResponseDto>[]>(
+  // Default bulk action placeholders — used when the route doesn't pass
+  // its own `bulkActions` prop. The Archive action is upgraded to a real
+  // bulk drawer by `apps/academics/src/routes/students/index.tsx`; the
+  // other two (Message, Move) remain toasts pending backend slices.
+  const defaultBulkActions = useMemo<BulkAction<StudentResponseDto>[]>(
     () => [
       {
         id: 'message',
@@ -301,6 +313,8 @@ export function StudentTable({
     [],
   )
 
+  const bulkActions = bulkActionsProp ?? defaultBulkActions
+
   return (
     <TanstackDataTable
       columns={columns}
@@ -318,6 +332,8 @@ export function StudentTable({
       defaultSort={[{ id: 'fullName', desc: false }]}
       serverPagination={serverPagination}
       bulkActions={bulkActions}
+      rowSelection={rowSelection}
+      onRowSelectionChange={onRowSelectionChange}
       emptyState={{
         icon: <User className="w-12 h-12" />,
         title: 'No students found',
