@@ -58,6 +58,7 @@ import { useCurrency } from '@edforge/types/use-currency'
 import { useFinanceSettings } from '../../../layouts/FinanceLayout'
 import { formatDateDual } from '../../../utils/format-date'
 import { StudentSearchInput } from '../../../components/billing/StudentSearchInput'
+import { BulkSendInvoiceReminderDrawer } from '../../../components/billing/BulkSendInvoiceReminderDrawer'
 import {
   FinancePageHeader,
   FinanceInfoBanner,
@@ -137,6 +138,7 @@ export default function InvoicesPage() {
   // Row selection state (controlled by DataTable)
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const [showBulkIssueConfirm, setShowBulkIssueConfirm] = useState(false)
+  const [bulkReminderTarget, setBulkReminderTarget] = useState<Invoice[] | null>(null)
 
   // Cancel dialog state
   const [cancelTarget, setCancelTarget] = useState<{ id: string; invoiceNumber: string } | null>(null)
@@ -543,8 +545,7 @@ export default function InvoicesPage() {
             id: 'send-reminder',
             label: 'Send reminder',
             icon: <Clock className="w-4 h-4" />,
-            onRun: (rows) =>
-              toast.info(`Send reminder for ${rows.length} invoice${rows.length === 1 ? '' : 's'} — coming soon`),
+            onRun: (rows) => setBulkReminderTarget(rows),
           },
         ]}
         exportOptions={{ filename: 'invoices', formats: ['csv'] }}
@@ -567,6 +568,15 @@ export default function InvoicesPage() {
           onClose={() => setShowGenerateForm(false)}
         />
       )}
+
+      {/* Bulk Send Reminder Drawer (#236 — D2) */}
+      <BulkSendInvoiceReminderDrawer
+        open={!!bulkReminderTarget}
+        invoices={bulkReminderTarget ?? []}
+        schoolId={schoolId}
+        onClose={() => setBulkReminderTarget(null)}
+        onComplete={() => setRowSelection({})}
+      />
 
       {/* Bulk Issue Confirmation Modal */}
       <AnimatePresence>
