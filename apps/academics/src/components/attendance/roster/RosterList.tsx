@@ -39,6 +39,8 @@ export interface RosterListProps {
   onStartEdit: (studentId: string) => void
   onCorrectionSave: (studentId: string) => void
   onCorrectionCancel: (studentId: string) => void
+  detailsOpenIds: Set<string>
+  onToggleDetails: (studentId: string) => void
 }
 
 const ROW_H = 56
@@ -55,6 +57,8 @@ export function RosterList({
   onStartEdit,
   onCorrectionSave,
   onCorrectionCancel,
+  detailsOpenIds,
+  onToggleDetails,
 }: RosterListProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const rowRefs = useRef<Map<string, AttendanceRowRef>>(new Map())
@@ -114,12 +118,12 @@ export function RosterList({
             <div
               key={vi.key}
               data-index={vi.index}
+              ref={virtualizer.measureElement}
               style={{
                 position: 'absolute',
                 top: 0,
                 left: 0,
                 width: '100%',
-                height: vi.size,
                 transform: `translateY(${vi.start}px)`,
               }}
             >
@@ -137,6 +141,8 @@ export function RosterList({
                 onStatusChange={(s) => onStatusChange(id, s)}
                 onNotesChange={(n) => onNotesChange(id, n)}
                 onExcuseTypeChange={(e) => onExcuseTypeChange(id, e)}
+                detailsOpen={detailsOpenIds.has(id)}
+                onToggleDetails={() => onToggleDetails(id)}
                 isPastDate={isPastDate}
                 isEditing={editingIds.has(id)}
                 onStartEdit={() => onStartEdit(id)}

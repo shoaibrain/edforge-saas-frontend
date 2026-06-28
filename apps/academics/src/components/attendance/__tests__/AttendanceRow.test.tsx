@@ -71,3 +71,55 @@ describe('AttendanceRow — locked (daily_presence)', () => {
     expect(onStatusChange).toHaveBeenCalledWith('late')
   })
 })
+
+describe('AttendanceRow — inline details (reason + note)', () => {
+  it('toggles the inline panel via the message control and labels it by state', () => {
+    const onToggleDetails = vi.fn()
+    const { getByLabelText, rerender } = render(
+      <AttendanceRow {...baseProps} currentStatus="absent" onStatusChange={vi.fn()} onToggleDetails={onToggleDetails} />,
+    )
+    fireEvent.click(getByLabelText('Add note or reason'))
+    expect(onToggleDetails).toHaveBeenCalledTimes(1)
+    rerender(
+      <AttendanceRow {...baseProps} currentStatus="absent" notes="late bus" onStatusChange={vi.fn()} onToggleDetails={onToggleDetails} />,
+    )
+    expect(getByLabelText('Edit note or reason')).toBeInTheDocument()
+  })
+
+  it('shows the Reason field for absent/excused, and only a Note for present', () => {
+    const { getByText, queryByText, rerender } = render(
+      <AttendanceRow {...baseProps} currentStatus="absent" detailsOpen onStatusChange={vi.fn()} onExcuseTypeChange={vi.fn()} />,
+    )
+    expect(getByText('Reason')).toBeInTheDocument()
+    expect(getByText('Note')).toBeInTheDocument()
+    rerender(<AttendanceRow {...baseProps} currentStatus="present" detailsOpen onStatusChange={vi.fn()} />)
+    expect(queryByText('Reason')).toBeNull()
+    expect(getByText('Note')).toBeInTheDocument()
+  })
+
+  it('flags "reason needed" only when absent/excused with no reason chosen', () => {
+    const { getByTestId, queryByTestId, rerender } = render(
+      <AttendanceRow {...baseProps} currentStatus="absent" onStatusChange={vi.fn()} onExcuseTypeChange={vi.fn()} />,
+    )
+    expect(getByTestId('needs-reason-dot')).toBeInTheDocument()
+    rerender(
+      <AttendanceRow {...baseProps} currentStatus="absent" excuseType="medical" onStatusChange={vi.fn()} onExcuseTypeChange={vi.fn()} />,
+    )
+    expect(queryByTestId('needs-reason-dot')).toBeNull()
+  })
+
+  it('suppresses roll-call shortcuts while typing in the Note, but not from the row', () => {
+    const onStatusChange = vi.fn()
+    const onNotesChange = vi.fn()
+    const { getByLabelText, getByRole } = render(
+      <AttendanceRow {...baseProps} currentStatus="absent" detailsOpen onStatusChange={onStatusChange} onNotesChange={onNotesChange} />,
+    )
+    const note = getByLabelText('Attendance note')
+    fireEvent.change(note, { target: { value: 'parent' } })
+    expect(onNotesChange).toHaveBeenCalledWith('parent')
+    fireEvent.keyDown(note, { key: 'p' }) // typing "p" in the note must NOT mark Present
+    expect(onStatusChange).not.toHaveBeenCalled()
+    fireEvent.keyDown(getByRole('row'), { key: 'p' }) // row-level shortcut still works
+    expect(onStatusChange).toHaveBeenCalledWith('present')
+  })
+})

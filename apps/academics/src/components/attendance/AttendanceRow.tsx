@@ -1,25 +1,29 @@
 /**
- * AttendanceRow — a single, fixed-height roster row (presentational).
+ * AttendanceRow — a single roster row (presentational).
  *
- * Composes IdentityCell (avatar + name) + StatusControl (compact P/A/T/E/R) +
- * RowDetailsPopover (note + reason). UI state that used to live here (note open,
- * editing) is owned by the parent so a row can unmount/remount under
- * virtualization without losing it.
+ * Composes IdentityCell (avatar + name) + StatusControl (compact P/A/T/E/R) + an
+ * INLINE, expand-below details panel (Reason + Note) that animates open under the
+ * row when the message toggle is clicked. Open state + editing state are owned by
+ * the parent (lifted) so a row can unmount/remount under virtualization without
+ * losing them — and the row reports its (variable) height to the virtualizer via
+ * `measureElement`.
  *
- * Keyboard contract (unchanged): the row wrapper owns the fast roll-call
- * shortcuts P/A/T/E/R via `statusForShortcut` and vertical nav ↑/↓ — these keep
- * working even when a StatusControl segment is focused (the control only consumes
- * ←/→). A locked (daily_presence) row may still record Tardy/Excused but never
- * flip Present↔Absent.
+ * Keyboard contract: the row wrapper owns the fast roll-call shortcuts P/A/T/E/R
+ * (via `statusForShortcut`) and vertical nav ↑/↓ — these keep working when a
+ * StatusControl segment is focused (the control only consumes ←/→), but are
+ * suppressed when focus is inside the inline detail fields (so typing a note that
+ * contains "p"/"a" doesn't flip the status). A locked (daily_presence) row may
+ * record Tardy/Excused but never flip Present↔Absent.
  */
 
 import { forwardRef, useImperativeHandle, useRef } from 'react'
-import { Edit2, Lock, X } from 'lucide-react'
+import { Edit2, Lock, X, MessageCircleWarning } from 'lucide-react'
+import { Input, Select, focusRingInset } from '@edforge/ui'
 import { StatusBadge } from './StatusBadge'
 import { statusForShortcut, LOCKED_OVERRIDE_STATUSES } from './attendanceStatus'
 import { IdentityCell } from './roster/IdentityCell'
 import { StatusControl } from './roster/StatusControl'
-import { RowDetailsPopover } from './roster/RowDetailsPopover'
+import { EXCUSE_TYPES } from './roster/excuseTypes'
 import type { AttendanceStatus } from '../../services/academics.service'
 
 export interface AttendanceRowProps {
@@ -32,6 +36,9 @@ export interface AttendanceRowProps {
   onStatusChange: (status: AttendanceStatus) => void
   onNotesChange: (notes: string) => void
   onExcuseTypeChange?: (excuseType: string) => void
+  /** Inline Reason/Note panel open state (lifted to the grid). */
+  detailsOpen?: boolean
+  onToggleDetails?: () => void
   /** Task 4.6: Past date mode — row starts read-only, parent flips `isEditing`. */
   isPastDate?: boolean
   isEditing?: boolean
@@ -69,6 +76,8 @@ export const AttendanceRow = forwardRef<AttendanceRowRef, AttendanceRowProps>(fu
     onStatusChange,
     onNotesChange,
     onExcuseTypeChange,
+    detailsOpen = false,
+    onToggleDetails,
     isPastDate = false,
     isEditing = false,
     onStartEdit,
@@ -87,8 +96,22 @@ export const AttendanceRow = forwardRef<AttendanceRowRef, AttendanceRowProps>(fu
   useImperativeHandle(ref, () => ({ focus: () => rowRef.current?.focus() }))
 
   const isViewMode = isPastDate && !isEditing
+  const showReason = currentStatus === 'absent' || currentStatus === 'excused'
+  const hasDetails = !!notes || !!excuseType
+  const needsReason = showReason && !excuseType
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    // Keys typed inside the inline detail fields (note input / reason select) must
+    // not trigger roll-call shortcuts or row navigation.
+    const target = e.target as HTMLElement
+    if (
+      target.tagName === 'INPUT' ||
+      target.tagName === 'TEXTAREA' ||
+      target.isContentEditable ||
+      target.closest('[data-row-details]')
+    ) {
+      return
+    }
     if (e.key === 'ArrowUp') {
       e.preventDefault()
       onArrowUp?.()
@@ -111,13 +134,14 @@ export const AttendanceRow = forwardRef<AttendanceRowRef, AttendanceRowProps>(fu
   return (
     <div
       ref={rowRef}
-      className="group/row h-full border-b border-border-secondary outline-none transition-colors last:border-0 hover:bg-surface-secondary/30 focus-visible:bg-surface-secondary/40"
+      className="group/row border-b border-border-secondary outline-none transition-colors last:border-0 hover:bg-surface-secondary/30 focus-visible:bg-surface-secondary/40"
       onKeyDown={handleKeyDown}
       tabIndex={tabIndex}
       role="row"
       aria-label={`Attendance for ${studentName}`}
     >
-      <div className="flex h-full items-center gap-3 px-4">
+      {/* Header band (fixed height — the base row) */}
+      <div className="flex h-14 items-center gap-3 px-4">
         <div className="min-w-0 flex-1">
           <IdentityCell
             studentId={studentId}
@@ -130,10 +154,7 @@ export const AttendanceRow = forwardRef<AttendanceRowRef, AttendanceRowProps>(fu
         <div className="flex items-center gap-2">
           {locked ? (
             <>
-              <span
-                className="flex items-center gap-1 text-xs text-text-tertiary"
-                title={lockedHint}
-              >
+              <span className="flex items-center gap-1 text-xs text-text-tertiary" title={lockedHint}>
                 <Lock className="h-3 w-3 flex-shrink-0" />
                 {lockedHint || 'Day-presence already recorded'}
               </span>
@@ -162,13 +183,27 @@ export const AttendanceRow = forwardRef<AttendanceRowRef, AttendanceRowProps>(fu
           )}
 
           {!isViewMode && (
-            <RowDetailsPopover
-              status={currentStatus}
-              notes={notes}
-              excuseType={excuseType}
-              onNotesChange={onNotesChange}
-              onExcuseTypeChange={onExcuseTypeChange}
-            />
+            <button
+              type="button"
+              onClick={onToggleDetails}
+              aria-label={hasDetails ? 'Edit note or reason' : 'Add note or reason'}
+              aria-expanded={detailsOpen}
+              title={hasDetails ? 'Edit note / reason' : 'Add note / reason'}
+              className={`relative rounded-lg p-2 transition-colors ${focusRingInset} ${
+                detailsOpen || hasDetails
+                  ? 'bg-[rgb(var(--accent-attendance)/0.12)] text-[rgb(var(--accent-attendance-text))]'
+                  : 'text-text-tertiary hover:bg-surface-secondary hover:text-text-secondary'
+              }`}
+            >
+              <MessageCircleWarning className="h-4 w-4" />
+              {needsReason && (
+                <span
+                  data-testid="needs-reason-dot"
+                  aria-hidden
+                  className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-[rgb(var(--state-warning-border))]"
+                />
+              )}
+            </button>
           )}
 
           {isPastDate && isEditing && (
@@ -192,6 +227,42 @@ export const AttendanceRow = forwardRef<AttendanceRowRef, AttendanceRowProps>(fu
           )}
         </div>
       </div>
+
+      {/* Inline details — conditionally rendered, so the virtualizer measures one
+          stable height (no animated height churn → no overlapping row that
+          swallows clicks). No boxed border: the row's own divider separates rows,
+          only the fields carry borders. A transform/opacity-only entrance keeps
+          it gentle without affecting layout (reduced-motion-safe). */}
+      {!isViewMode && detailsOpen && (
+        <div data-row-details className="details-in px-4 pb-3">
+          <div className={`grid gap-3 ${showReason ? 'sm:grid-cols-2' : ''}`}>
+            {showReason && (
+              <div>
+                <span className="mb-1 block text-xs font-medium text-text-secondary">Reason</span>
+                <Select
+                  size="sm"
+                  aria-label="Absence reason"
+                  value={excuseType || ''}
+                  onChange={(v) => onExcuseTypeChange?.(v ?? '')}
+                  clearable
+                  placeholder="Select reason…"
+                  options={EXCUSE_TYPES}
+                />
+              </div>
+            )}
+            <div>
+              <span className="mb-1 block text-xs font-medium text-text-secondary">Note</span>
+              <Input
+                type="text"
+                value={notes}
+                onChange={(e) => onNotesChange(e.target.value)}
+                placeholder="Add a note…"
+                aria-label="Attendance note"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 })

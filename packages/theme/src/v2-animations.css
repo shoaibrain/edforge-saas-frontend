@@ -33,6 +33,17 @@
   animation: v2-pop-in 200ms ease-out;
 }
 
+@keyframes details-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Gentle entrance for an inline expandable detail panel. Transform/opacity only
+   (no height change) so it never perturbs a virtualizer row measurement. */
+.details-in {
+  animation: details-in 160ms ease-out;
+}
+
 /* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .v2-skeleton-pulse {
@@ -45,6 +56,10 @@
   }
 
   .v2-pop-in {
+    animation: none;
+  }
+
+  .details-in {
     animation: none;
   }
 }
