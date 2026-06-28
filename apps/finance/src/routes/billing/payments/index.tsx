@@ -55,6 +55,7 @@ import {
   ExportCsvButton,
 } from '../../../components/shared'
 import { BulkVoidPaymentsDrawer } from '../../../components/billing/BulkVoidPaymentsDrawer'
+import { BulkSendReceiptsDrawer } from '../../../components/billing/BulkSendReceiptsDrawer'
 
 // ============================================================================
 // STYLED DIALOG COMPONENTS
@@ -799,10 +800,11 @@ export default function PaymentsPage() {
     format,
   )
 
-  // Void selected now opens a real drawer (closes #229). Send receipt
-  // stays as a toast — separate follow-up pending the backend
-  // bulk-send-receipt slice (#230).
+  // Both bulk actions now open real drawers: Void (#229, cheap-path
+  // fan-out) and Send receipt (#230, D1 of the async-job framework
+  // PR #339).
   const [bulkVoidTarget, setBulkVoidTarget] = useState<Payment[] | null>(null)
+  const [bulkReceiptTarget, setBulkReceiptTarget] = useState<Payment[] | null>(null)
 
   const paymentBulkActions = useMemo<BulkAction<Payment>[]>(
     () => [
@@ -817,8 +819,7 @@ export default function PaymentsPage() {
         id: 'send-receipt',
         label: 'Send receipt',
         icon: <Receipt className="w-4 h-4" />,
-        onRun: (rows) =>
-          toast.info(`Send receipt for ${rows.length} payment${rows.length === 1 ? '' : 's'} — coming soon`),
+        onRun: (rows) => setBulkReceiptTarget(rows),
       },
     ],
     [],
@@ -1000,6 +1001,15 @@ export default function PaymentsPage() {
         payments={bulkVoidTarget ?? []}
         schoolId={schoolId}
         onClose={() => setBulkVoidTarget(null)}
+        onComplete={() => setRowSelection({})}
+      />
+
+      {/* Bulk Send Receipts Drawer (#230 — D1) */}
+      <BulkSendReceiptsDrawer
+        open={!!bulkReceiptTarget}
+        payments={bulkReceiptTarget ?? []}
+        schoolId={schoolId}
+        onClose={() => setBulkReceiptTarget(null)}
         onComplete={() => setRowSelection({})}
       />
     </div>

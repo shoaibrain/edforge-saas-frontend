@@ -18,7 +18,6 @@ import {
   Mail,
   Pencil,
 } from 'lucide-react'
-import { toast } from 'sonner'
 import { useNavigate } from '@tanstack/react-router'
 import {
   TanstackDataTable,
@@ -42,6 +41,9 @@ import { useCurrency } from '@edforge/types/use-currency'
 import { useFinanceSettings } from '../../../layouts/FinanceLayout'
 import { FinancePageHeader, FinanceStatusChip } from '../../../components/shared'
 import { formatDate, formatDateDual } from '../../../utils/format-date'
+import { BulkSendStatementsDrawer } from '../../../components/billing/BulkSendStatementsDrawer'
+import { BulkAdjustBalanceDrawer } from '../../../components/billing/BulkAdjustBalanceDrawer'
+import type { RowSelectionState } from '@tanstack/react-table'
 
 type AccountTab = 'ledger' | 'invoices' | 'payments'
 
@@ -575,24 +577,26 @@ export default function StudentAccountsPage() {
     return { totalStudents, totalOutstanding, fullyPaidCount, overdueCount }
   }, [accountList])
 
-  // Bulk action placeholders — server endpoints for bulk statements / balance
-  // adjustments are follow-up work; the row-level adjust flow lives in the
-  // expanded detail.
+  // Both bulk actions now drive real drawers backed by the D1–D4 finance
+  // async-job framework (PR #339): D3 send-statement (#231) and D4
+  // adjust-balance (#232).
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+  const [bulkStatementsTarget, setBulkStatementsTarget] = useState<StudentAccount[] | null>(null)
+  const [bulkAdjustTarget, setBulkAdjustTarget] = useState<StudentAccount[] | null>(null)
+
   const accountBulkActions = useMemo<BulkAction<StudentAccount>[]>(
     () => [
       {
         id: 'send-statement',
         label: 'Send statement',
         icon: <Mail className="w-4 h-4" />,
-        onRun: (rows) =>
-          toast.info(`Send statement to ${rows.length} account${rows.length === 1 ? '' : 's'} — coming soon`),
+        onRun: (rows) => setBulkStatementsTarget(rows),
       },
       {
         id: 'adjust-balance',
         label: 'Adjust balance',
         icon: <Pencil className="w-4 h-4" />,
-        onRun: (rows) =>
-          toast.info(`Adjust balance for ${rows.length} account${rows.length === 1 ? '' : 's'} — coming soon`),
+        onRun: (rows) => setBulkAdjustTarget(rows),
       },
     ],
     [],
@@ -671,6 +675,8 @@ export default function StudentAccountsPage() {
         searchPlaceholder="Search by student name..."
         enableSorting={true}
         enableRowSelection
+        rowSelection={rowSelection}
+        onRowSelectionChange={setRowSelection}
         enableExpanding={true}
         enableColumnVisibility
         pagination={{ pageSize: 20 }}
@@ -692,6 +698,24 @@ export default function StudentAccountsPage() {
         }}
         maxHeight="calc(100vh - 22rem)"
         className="min-h-96"
+      />
+
+      {/* Bulk Send Statements Drawer (#231 — D3) */}
+      <BulkSendStatementsDrawer
+        open={!!bulkStatementsTarget}
+        accounts={bulkStatementsTarget ?? []}
+        schoolId={schoolId ?? ''}
+        onClose={() => setBulkStatementsTarget(null)}
+        onComplete={() => setRowSelection({})}
+      />
+
+      {/* Bulk Adjust Balance Drawer (#232 — D4) */}
+      <BulkAdjustBalanceDrawer
+        open={!!bulkAdjustTarget}
+        accounts={bulkAdjustTarget ?? []}
+        schoolId={schoolId ?? ''}
+        onClose={() => setBulkAdjustTarget(null)}
+        onComplete={() => setRowSelection({})}
       />
     </div>
   )

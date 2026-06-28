@@ -150,6 +150,33 @@ export {
 // PDF error-toast helper (M1.11)
 export { usePdfErrorToast, type PdfDocType } from './hooks/usePdfErrorToast'
 
+// D1–D4 async-bulk-job framework (PR #339 backend)
+export {
+  bulkSendReceipts,
+  bulkSendInvoiceReminders,
+  bulkSendStatements,
+  bulkAdjustBalances,
+  getAsyncBulkJob,
+} from './services/async-bulk-jobs.service'
+export type { AsyncJobDomain } from './services/async-bulk-jobs.service'
+export type {
+  AsyncBulkJobAck,
+  AsyncBulkJobFailure,
+  AsyncBulkJobResult,
+  AsyncBulkJobStatus,
+  BulkAdjustBalanceDto,
+  BulkSendReceiptDto,
+  BulkSendReminderDto,
+  BulkSendStatementDto,
+} from './types/async-jobs'
+export {
+  useAsyncBulkJob,
+  useBulkAdjustBalances,
+  useBulkSendInvoiceReminders,
+  useBulkSendReceipts,
+  useBulkSendStatements,
+} from './hooks/useAsyncBulkJob'
+
 // Pagination foundation (Sprint 0)
 export { useFinancePaginatedQuery } from './hooks/useFinancePaginatedQuery'
 export type {
