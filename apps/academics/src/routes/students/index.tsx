@@ -9,12 +9,17 @@
 import { useMemo, useState, useCallback } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { motion, useReducedMotion } from 'framer-motion'
+import { toast } from 'sonner'
+import type { RowSelectionState } from '@tanstack/react-table'
 import {
   Users,
   UserPlus,
   Upload,
   AlertCircle,
   AlertTriangle,
+  Archive,
+  ArrowRightLeft,
+  MessageSquare,
   RefreshCw,
   UserMinus,
   ClipboardCheck,
@@ -24,10 +29,12 @@ import {
   Download,
   Loader2,
 } from 'lucide-react'
+import type { BulkAction } from '@edforge/ui'
 import { StatCard, WidgetErrorBoundaryV2, Card, Button, ContextBar, ContextBarSep, ContextBarYear } from '@edforge/ui'
 import { getAttendanceColor } from '@edforge/types'
 import { useResourcePermissions } from '@edforge/abac'
 import { StudentTable, StudentQuickProfile, StudentsFilterRow, CSVImport, type StudentAttendanceSignal } from '../../components/students'
+import { BulkArchiveStudentsModal } from '../../components/students/BulkArchiveStudentsModal'
 import { ConfirmationDialog } from '../../components/common'
 import {
   useStudents,
@@ -369,6 +376,10 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
   const [withdrawStudent, setWithdrawStudent] = useState<StudentResponseDto | null>(null)
   const deleteStudentMutation = useDeleteStudent()
 
+  // Bulk archive — lift selection so the modal can clear it after success.
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+  const [bulkArchiveTarget, setBulkArchiveTarget] = useState<StudentResponseDto[] | null>(null)
+
   const handleAddStudent = () => {
     navigate({ to: '/students/enrollment', search: { tab: 'registration' } })
   }
@@ -404,6 +415,36 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
   const handleClearFilters = useCallback(() => {
     resetFilters()
   }, [resetFilters])
+
+  // Bulk actions surfaced on the floating bulk bar. Archive now opens a
+  // real drawer (closes #223); Message + Move stay as toasts pending their
+  // own backend slices (#221 + #222).
+  const bulkActions = useMemo<BulkAction<StudentResponseDto>[]>(
+    () => [
+      {
+        id: 'message',
+        label: 'Message',
+        icon: <MessageSquare className="w-4 h-4" />,
+        onRun: (rows) =>
+          toast.info(`Message ${rows.length} student${rows.length === 1 ? '' : 's'} — coming soon`),
+      },
+      {
+        id: 'move',
+        label: 'Move section',
+        icon: <ArrowRightLeft className="w-4 h-4" />,
+        onRun: (rows) =>
+          toast.info(`Move ${rows.length} student${rows.length === 1 ? '' : 's'} — coming soon`),
+      },
+      {
+        id: 'archive',
+        label: 'Archive',
+        icon: <Archive className="w-4 h-4" />,
+        tone: 'critical',
+        onRun: (rows) => setBulkArchiveTarget(rows),
+      },
+    ],
+    [],
+  )
 
   const showEmptyFilterState = !studentsLoading && filteredStudents.length === 0 && students.length > 0
 
@@ -610,6 +651,9 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
                   attendanceByStudent={attendanceByStudent}
                   canViewGuardians={guardianPerms.view}
                   canViewLocation={studentPerms.view}
+                  bulkActions={bulkActions}
+                  rowSelection={rowSelection}
+                  onRowSelectionChange={setRowSelection}
                   toolbarStart={<StudentsFilterRow schoolId={schoolId} />}
                   toolbarExtra={
                     <Button
@@ -677,6 +721,14 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
           onSuccess={() => refetch()}
         />
       )}
+
+      {/* Bulk Archive Modal (#223) */}
+      <BulkArchiveStudentsModal
+        open={!!bulkArchiveTarget}
+        students={bulkArchiveTarget ?? []}
+        onClose={() => setBulkArchiveTarget(null)}
+        onComplete={() => setRowSelection({})}
+      />
     </div>
   )
 }

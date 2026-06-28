@@ -54,6 +54,7 @@ import {
   FinanceStatusChip,
   ExportCsvButton,
 } from '../../../components/shared'
+import { BulkVoidPaymentsDrawer } from '../../../components/billing/BulkVoidPaymentsDrawer'
 
 // ============================================================================
 // STYLED DIALOG COMPONENTS
@@ -798,9 +799,11 @@ export default function PaymentsPage() {
     format,
   )
 
-  // Bulk action placeholders — single-row Void / Refund still live in the
-  // row action menu; bulk endpoints are a follow-up per the per-list adoption
-  // plan in cf68105.
+  // Void selected now opens a real drawer (closes #229). Send receipt
+  // stays as a toast — separate follow-up pending the backend
+  // bulk-send-receipt slice (#230).
+  const [bulkVoidTarget, setBulkVoidTarget] = useState<Payment[] | null>(null)
+
   const paymentBulkActions = useMemo<BulkAction<Payment>[]>(
     () => [
       {
@@ -808,8 +811,7 @@ export default function PaymentsPage() {
         label: 'Void selected',
         icon: <Ban className="w-4 h-4" />,
         tone: 'critical',
-        onRun: (rows) =>
-          toast.info(`Void ${rows.length} payment${rows.length === 1 ? '' : 's'} — coming soon`),
+        onRun: (rows) => setBulkVoidTarget(rows),
       },
       {
         id: 'send-receipt',
@@ -991,6 +993,15 @@ export default function PaymentsPage() {
           />
         )}
       </AnimatePresence>
+
+      {/* Bulk Void Drawer (#229) */}
+      <BulkVoidPaymentsDrawer
+        open={!!bulkVoidTarget}
+        payments={bulkVoidTarget ?? []}
+        schoolId={schoolId}
+        onClose={() => setBulkVoidTarget(null)}
+        onComplete={() => setRowSelection({})}
+      />
     </div>
   )
 }

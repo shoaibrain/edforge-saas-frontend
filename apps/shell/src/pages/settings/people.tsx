@@ -27,7 +27,10 @@ import {
   ShieldAlert,
 } from 'lucide-react'
 import { toast } from 'sonner'
+import type { RowSelectionState } from '@tanstack/react-table'
 import { Button, Select, TanstackDataTable, createActionsColumn, createSelectColumn, type BulkAction, type ColumnDef } from '@edforge/ui'
+import { BulkChangeUserRoleModal } from '@/components/people/BulkChangeUserRoleModal'
+import { BulkSuspendUsersModal } from '@/components/people/BulkSuspendUsersModal'
 import { useAuthStore } from '@/stores/auth.store'
 import { useAppStore } from '@/stores/app.store'
 import { can } from '@edforge/abac'
@@ -429,24 +432,29 @@ export default function PeopleSettingsPage() {
   const handleChangeRole = useCallback((u: UserResponseDto) => setRoleModalUser(u), [])
   const handleAction = useCallback((u: UserResponseDto, action: ConfirmAction) => setConfirmModal({ user: u, action }), [])
 
-  // Bulk action placeholders — single-row mutations stay in the row actions
-  // dropdown. Bulk role / status / re-invite endpoints are a follow-up.
+  // Lifted selection + bulk-target state so the modals can clear selection
+  // after a successful apply.
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+  const [bulkChangeRoleTarget, setBulkChangeRoleTarget] = useState<UserResponseDto[] | null>(null)
+  const [bulkSuspendTarget, setBulkSuspendTarget] = useState<UserResponseDto[] | null>(null)
+  const currentUserId = user?.id ?? ''
+
+  // Change role + Suspend now open real modals (closes #233 + #234).
+  // Re-invite stays a toast pending the backend slice (#235).
   const userBulkActions = useMemo<BulkAction<UserResponseDto>[]>(
     () => [
       {
         id: 'change-role',
         label: 'Change role',
         icon: <UserCog className="w-4 h-4" />,
-        onRun: (rows) =>
-          toast.info(`Change role for ${rows.length} user${rows.length === 1 ? '' : 's'} — coming soon`),
+        onRun: (rows) => setBulkChangeRoleTarget(rows),
       },
       {
         id: 'suspend',
         label: 'Suspend',
         icon: <ShieldAlert className="w-4 h-4" />,
         tone: 'critical',
-        onRun: (rows) =>
-          toast.info(`Suspend ${rows.length} user${rows.length === 1 ? '' : 's'} — coming soon`),
+        onRun: (rows) => setBulkSuspendTarget(rows),
       },
       {
         id: 'reinvite',
@@ -626,6 +634,8 @@ export default function PeopleSettingsPage() {
             enableSorting={true}
             enableRowSelection
             enableColumnVisibility
+            rowSelection={rowSelection}
+            onRowSelectionChange={setRowSelection}
             pagination={{ pageSize: 20 }}
             pageSizes={[10, 20, 50]}
             defaultSort={[{ id: 'name', desc: false }]}
@@ -659,6 +669,24 @@ export default function PeopleSettingsPage() {
           onClose={() => setConfirmModal(null)}
         />
       )}
+
+      {/* Bulk Change Role Modal (#233) */}
+      <BulkChangeUserRoleModal
+        open={!!bulkChangeRoleTarget}
+        users={bulkChangeRoleTarget ?? []}
+        currentUserId={currentUserId}
+        onClose={() => setBulkChangeRoleTarget(null)}
+        onComplete={() => setRowSelection({})}
+      />
+
+      {/* Bulk Suspend Modal (#234) */}
+      <BulkSuspendUsersModal
+        open={!!bulkSuspendTarget}
+        users={bulkSuspendTarget ?? []}
+        currentUserId={currentUserId}
+        onClose={() => setBulkSuspendTarget(null)}
+        onComplete={() => setRowSelection({})}
+      />
     </div>
   )
 }
