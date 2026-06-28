@@ -30,6 +30,8 @@ import {
 } from '../services/invoices.service'
 import type {
   BulkGenerateInvoiceDto,
+  BulkGenerateOptions,
+  BulkGenerateResult,
   BulkIssueInvoicesDto,
   BulkPreviewParams,
   BulkPreviewResponse,
@@ -363,15 +365,46 @@ export function useCreateRefund(schoolId: string) {
 // BULK GENERATE INVOICES
 // ============================================================================
 
+/**
+ * Sprint E.5 — the mutation now returns a discriminated `BulkGenerateResult`:
+ *   - sync 200 → { mode: 'sync', generated, skipped, … }
+ *   - async 202 → { mode: 'async', jobId }
+ *
+ * On the async branch the caller MUST stash `jobId` and wire
+ * `useAsyncBulkJob(schoolId, 'invoices', jobId)` for polling. Cache
+ * invalidation for the async branch happens on terminal-succeeded via
+ * `useAsyncBulkJob`'s built-in `paymentKeys.all` invalidation; this
+ * mutation only invalidates eagerly for the sync branch (DDB writes
+ * are already complete by the time the response returns).
+ *
+ * Input shape: pass `{ data, options }` so the caller can opt into
+ * `?async=true`. Backward-compatible with the prior `data`-only callers
+ * via the legacy signature path (no callers in tree right now besides
+ * the wizard, but keeping the shape symmetric with the service).
+ */
 export function useBulkGenerateInvoices(schoolId: string) {
   const queryClient = useQueryClient()
 
-  return useMutation({
-    mutationFn: (data: BulkGenerateInvoiceDto) =>
-      bulkGenerateInvoices(schoolId, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: paymentKeys.invoices(schoolId) })
-      queryClient.invalidateQueries({ queryKey: paymentKeys.studentAccounts(schoolId) })
+  return useMutation<
+    BulkGenerateResult,
+    Error,
+    { data: BulkGenerateInvoiceDto; options?: BulkGenerateOptions } | BulkGenerateInvoiceDto
+  >({
+    mutationFn: (input) => {
+      // Allow both `mutate(dto)` (legacy) and `mutate({ data, options })`.
+      const isWrapped = (v: unknown): v is { data: BulkGenerateInvoiceDto; options?: BulkGenerateOptions } =>
+        !!v && typeof v === 'object' && 'data' in (v as Record<string, unknown>)
+      const { data, options } = isWrapped(input)
+        ? { data: input.data, options: input.options }
+        : { data: input, options: undefined }
+      return bulkGenerateInvoices(schoolId, data, options)
+    },
+    onSuccess: (result) => {
+      if (result.mode === 'sync') {
+        queryClient.invalidateQueries({ queryKey: paymentKeys.invoices(schoolId) })
+        queryClient.invalidateQueries({ queryKey: paymentKeys.studentAccounts(schoolId) })
+      }
+      // async: `useAsyncBulkJob` invalidates on terminal-succeeded.
     },
   })
 }
