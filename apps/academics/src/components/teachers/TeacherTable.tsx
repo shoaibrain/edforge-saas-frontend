@@ -1,14 +1,22 @@
 /**
  * TeacherTable Component
  *
- * DataTable for faculty directory with search and role filtering.
+ * DataTable for faculty directory with search and role / status facets.
  * Uses TanstackDataTable from @edforge/ui for table rendering,
- * sorting, pagination, and built-in search.
+ * sorting, pagination, density / column-visibility persistence, and
+ * the prototype-matched toolbar.
  */
 
-import { useState, useMemo } from 'react'
-import { Mail, Users, X } from 'lucide-react'
-import { TanstackDataTable, type ColumnDef } from '@edforge/ui'
+import { useMemo } from 'react'
+import { Mail, Users, ShieldAlert, UserCog } from 'lucide-react'
+import { toast } from 'sonner'
+import {
+  TanstackDataTable,
+  createSelectColumn,
+  type BulkAction,
+  type ColumnDef,
+  type FacetedFilterConfig,
+} from '@edforge/ui'
 
 // ============================================================================
 // TYPES
@@ -57,11 +65,16 @@ function getRoleBadge(role: string) {
   return styles[role] || 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))] dark:bg-[rgb(var(--background-tertiary)/0.2)] '
 }
 
+function humanizeEnum(value: string): string {
+  return value.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+}
+
 // ============================================================================
 // COLUMN DEFINITIONS
 // ============================================================================
 
 const columns: ColumnDef<StaffMember, unknown>[] = [
+  createSelectColumn<StaffMember>(),
   {
     accessorFn: (row) => `${row.firstName} ${row.lastSurname || row.lastName || ''}`,
     id: 'name',
@@ -92,6 +105,7 @@ const columns: ColumnDef<StaffMember, unknown>[] = [
   {
     accessorKey: 'role',
     header: 'Role',
+    filterFn: 'arrIncludesSome',
     cell: ({ row }) => {
       const role = row.original.role
       return role ? (
@@ -105,11 +119,15 @@ const columns: ColumnDef<StaffMember, unknown>[] = [
       )
     },
     enableSorting: true,
+    meta: {
+      facetLabelMap: (value: unknown) => humanizeEnum(String(value)),
+    },
   },
   {
     accessorFn: (row) => row.employmentStatus || row.status || 'active',
     id: 'status',
     header: 'Status',
+    filterFn: 'arrIncludesSome',
     cell: ({ getValue }) => {
       const status = getValue<string>()
       return (
@@ -121,6 +139,9 @@ const columns: ColumnDef<StaffMember, unknown>[] = [
       )
     },
     enableSorting: true,
+    meta: {
+      facetLabelMap: (value: unknown) => humanizeEnum(String(value)),
+    },
   },
 ]
 
@@ -129,30 +150,72 @@ const columns: ColumnDef<StaffMember, unknown>[] = [
 // ============================================================================
 
 export function TeacherTable({ staff, isLoading, onSelect }: TeacherTableProps) {
-  const [roleFilter, setRoleFilter] = useState<string | null>(null)
+  // Derive facet options from the loaded staff list — counts are computed
+  // live inside the shared DataTable via getFacetedUniqueValues.
+  const roleOptions = useMemo(() => {
+    const set = new Set<string>()
+    staff.forEach((m) => m.role && set.add(m.role))
+    return Array.from(set).sort().map((value) => ({ value, label: humanizeEnum(value) }))
+  }, [staff])
 
-  // Derive unique roles from the full staff list
-  const roles = useMemo(
-    () => [...new Set(staff.map((m) => m.role).filter(Boolean))] as string[],
-    [staff]
+  const statusOptions = useMemo(() => {
+    const set = new Set<string>()
+    staff.forEach((m) => {
+      const s = m.employmentStatus || m.status
+      if (s) set.add(s)
+    })
+    return Array.from(set).sort().map((value) => ({ value, label: humanizeEnum(value) }))
+  }, [staff])
+
+  const facets = useMemo<FacetedFilterConfig[]>(
+    () => [
+      ...(roleOptions.length > 0
+        ? [{ columnId: 'role', title: 'Role', options: roleOptions }]
+        : []),
+      ...(statusOptions.length > 0
+        ? [{ columnId: 'status', title: 'Status', options: statusOptions }]
+        : []),
+    ],
+    [roleOptions, statusOptions],
   )
 
-  // Pre-filter by role before handing data to the DataTable
-  // (search / globalFilter is handled internally by TanstackDataTable)
-  const filteredByRole = useMemo(
-    () => (roleFilter ? staff.filter((m) => m.role === roleFilter) : staff),
-    [staff, roleFilter]
+  const bulkActions = useMemo<BulkAction<StaffMember>[]>(
+    () => [
+      {
+        id: 'change-role',
+        label: 'Change role',
+        icon: <UserCog className="w-4 h-4" />,
+        onRun: (rows) =>
+          toast.info(`Change role for ${rows.length} staff — coming soon`),
+      },
+      {
+        id: 'update-status',
+        label: 'Update status',
+        icon: <ShieldAlert className="w-4 h-4" />,
+        onRun: (rows) =>
+          toast.info(`Update status for ${rows.length} staff — coming soon`),
+      },
+    ],
+    [],
   )
 
   return (
     <TanstackDataTable<StaffMember>
       columns={columns}
-      data={filteredByRole}
+      data={staff}
       getRowId={(row) => row.staffId || row.userId || row.email || ''}
       isLoading={isLoading}
-      enableSorting={true}
+      tableId="academics.teachers"
+      enableSorting
+      enableRowSelection
+      enableColumnVisibility
       pagination={{ pageSize: 20 }}
-      searchPlaceholder="Search by name or email..."
+      pageSizes={[10, 20, 50]}
+      defaultSort={[{ id: 'name', desc: false }]}
+      searchPlaceholder="Search by name or email…"
+      facets={facets}
+      bulkActions={bulkActions}
+      exportOptions={{ filename: 'teachers', formats: ['csv'] }}
       onRowClick={onSelect}
       emptyState={{
         icon: <Users className="w-10 h-10 text-text-tertiary opacity-40" />,
@@ -160,32 +223,6 @@ export function TeacherTable({ staff, isLoading, onSelect }: TeacherTableProps) 
         description: 'Try adjusting your search or filters.',
       }}
       maxHeight="calc(100vh - 13rem)"
-      toolbarExtra={
-        <div className="flex items-center gap-2">
-          <select
-            value={roleFilter ?? ''}
-            onChange={(e) => setRoleFilter(e.target.value || null)}
-            className="px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
-          >
-            <option value="">All Roles</option>
-            {roles.map((r) => (
-              <option key={r} value={r}>
-                {r.replace(/_/g, ' ')}
-              </option>
-            ))}
-          </select>
-          {roleFilter && (
-            <button
-              type="button"
-              onClick={() => setRoleFilter(null)}
-              className="flex items-center gap-1 px-3 py-2 text-sm text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] bg-[rgb(var(--background-secondary))] hover:bg-[rgb(var(--background-tertiary))] rounded-lg transition-colors"
-            >
-              <X className="w-3.5 h-3.5" />
-              Clear
-            </button>
-          )}
-        </div>
-      }
     />
   )
 }

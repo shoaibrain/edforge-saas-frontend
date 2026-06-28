@@ -514,22 +514,40 @@ export default function InvoicesPage() {
         getRowId={(row) => row.id}
         isLoading={isLoading}
         isFetching={isFetching}
+        // Status / grade live as page-level chips above the table because
+        // they drive the server's GSI-backed pagination (`useInvoicesInfinite`).
+        // Promoting them into client-side `facets` would double-filter and
+        // break the infinite-load contract, so we keep them out and only
+        // adopt tableId persistence + a built-in Export + bulk action shell.
+        tableId="finance.invoices"
         enableRowSelection={true}
+        enableColumnVisibility
         rowSelection={rowSelection}
         onRowSelectionChange={setRowSelection}
         enableSorting={true}
         pagination={{ pageSize: 20 }}
+        pageSizes={[10, 20, 50]}
+        defaultSort={[{ id: 'dueDate', desc: false }]}
         serverPagination={serverPagination}
         searchPlaceholder="Search by invoice # or student..."
         bulkActions={[
           {
+            id: 'issue',
             label: `Issue Selected (${selectedDraftIds.length})`,
             onClick: () => setShowBulkIssueConfirm(true),
             icon: <Send className="w-4 h-4" />,
             variant: 'primary',
             disabled: selectedDraftIds.length === 0 || bulkIssueMutation.isPending,
           },
+          {
+            id: 'send-reminder',
+            label: 'Send reminder',
+            icon: <Clock className="w-4 h-4" />,
+            onRun: (rows) =>
+              toast.info(`Send reminder for ${rows.length} invoice${rows.length === 1 ? '' : 's'} — coming soon`),
+          },
         ]}
+        exportOptions={{ filename: 'invoices', formats: ['csv'] }}
         emptyState={{
           icon: <FileText className="w-10 h-10 text-[rgb(var(--text-tertiary))] opacity-40" />,
           title: 'No invoices found',

@@ -14,8 +14,18 @@ import {
   ToggleLeft,
   ToggleRight,
   Users,
+  Send,
 } from 'lucide-react'
-import { TanstackDataTable, createActionsColumn, StatusBadge, type ColumnDef } from '@edforge/ui'
+import { toast } from 'sonner'
+import {
+  TanstackDataTable,
+  createActionsColumn,
+  createSelectColumn,
+  StatusBadge,
+  type BulkAction,
+  type ColumnDef,
+  type FacetedFilterConfig,
+} from '@edforge/ui'
 import type { SectionResponseDto } from '@aibrains/shared-types'
 import {
   getCapacityColor,
@@ -180,6 +190,7 @@ export function SectionTable({
 }: SectionTableProps) {
   const columns: ColumnDef<SectionResponseDto, unknown>[] = useMemo(
     () => [
+      createSelectColumn<SectionResponseDto>(),
       {
         accessorKey: 'sectionNumber',
         header: 'Section',
@@ -266,6 +277,10 @@ export function SectionTable({
         header: 'Status',
         size: 80,
         enableSorting: false,
+        // String-keyed facet values so the facet dropdown shows "active" /
+        // "inactive" pills; the cell still renders the boolean.
+        accessorFn: (row) => (row.isActive ? 'active' : 'inactive'),
+        filterFn: 'arrIncludesSome',
         cell: ({ row }) => (
           <StatusBadge tone={row.original.isActive ? 'success' : 'neutral'} dot>
             {row.original.isActive ? 'Active' : 'Inactive'}
@@ -287,20 +302,88 @@ export function SectionTable({
     [onViewSection, onEditSection, onToggleActive, onViewRoster]
   )
 
+  const courseOptions = useMemo(() => {
+    const set = new Set<string>()
+    sections.forEach((s) => s.courseCode && set.add(s.courseCode))
+    return Array.from(set).sort().map((value) => ({ value, label: value }))
+  }, [sections])
+
+  const periodOptions = useMemo(() => {
+    const set = new Set<string>()
+    sections.forEach((s) => s.periodName && set.add(s.periodName))
+    return Array.from(set).sort().map((value) => ({ value, label: value }))
+  }, [sections])
+
+  const facets: FacetedFilterConfig[] = useMemo(
+    () => [
+      {
+        columnId: 'isActive',
+        title: 'Status',
+        options: [
+          { value: 'active', label: 'Active' },
+          { value: 'inactive', label: 'Inactive' },
+        ],
+      },
+      ...(courseOptions.length > 0
+        ? [{ columnId: 'course', title: 'Course', options: courseOptions }]
+        : []),
+      ...(periodOptions.length > 0
+        ? [{ columnId: 'period', title: 'Period', options: periodOptions }]
+        : []),
+    ],
+    [courseOptions, periodOptions],
+  )
+
+  const bulkActions = useMemo<BulkAction<SectionResponseDto>[]>(
+    () => [
+      {
+        id: 'activate',
+        label: 'Activate',
+        icon: <ToggleRight className="w-4 h-4" />,
+        onRun: (rows) =>
+          toast.info(`Activate ${rows.length} section${rows.length === 1 ? '' : 's'} — coming soon`),
+      },
+      {
+        id: 'deactivate',
+        label: 'Deactivate',
+        icon: <ToggleLeft className="w-4 h-4" />,
+        onRun: (rows) =>
+          toast.info(`Deactivate ${rows.length} section${rows.length === 1 ? '' : 's'} — coming soon`),
+      },
+      {
+        id: 'notify',
+        label: 'Send notification',
+        icon: <Send className="w-4 h-4" />,
+        onRun: (rows) =>
+          toast.info(`Notify ${rows.length} section${rows.length === 1 ? '' : 's'} — coming soon`),
+      },
+    ],
+    [],
+  )
+
   return (
     <TanstackDataTable
       columns={columns}
       data={sections}
       getRowId={(section) => section.sectionId}
       isLoading={isLoading}
+      tableId="academics.sections"
+      enableSorting
+      enableRowSelection
+      enableColumnVisibility
+      searchPlaceholder="Search sections…"
+      facets={facets}
+      bulkActions={bulkActions}
+      exportOptions={{ filename: 'sections', formats: ['csv'] }}
+      defaultSort={[{ id: 'sectionNumber', desc: false }]}
+      pagination={{ pageSize: 20 }}
+      pageSizes={[10, 20, 50]}
       emptyState={{
         icon: <CalendarDays className="w-12 h-12 text-text-tertiary" />,
         title: 'No sections found',
         description:
           'Create your first class section to start building your schedule.',
       }}
-      pagination={{ pageSize: 20 }}
-      enableSorting={true}
       onRowClick={onViewSection}
       maxHeight="calc(100vh - 26rem)"
     />

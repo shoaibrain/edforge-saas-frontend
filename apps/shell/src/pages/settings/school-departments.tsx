@@ -8,6 +8,7 @@
 import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import {
   Users,
   Plus,
@@ -22,7 +23,7 @@ import {
 } from 'lucide-react'
 import { tenantService } from '@/services/tenant.service'
 import type { Department, CreateDepartmentDto } from '@edforge/types'
-import { Button, Select, TanstackDataTable, createActionsColumn, type ColumnDef } from '@edforge/ui'
+import { Button, TanstackDataTable, createActionsColumn, createSelectColumn, type BulkAction, type ColumnDef, type FacetedFilterConfig } from '@edforge/ui'
 
 // ============================================================================
 // DEPARTMENT FORM MODAL
@@ -251,11 +252,11 @@ export default function SchoolDepartmentsPage({ schoolId }: SchoolDepartmentsPag
   const queryClient = useQueryClient()
 
   const [searchQuery, setSearchQuery] = useState('')
-  const [filterScope, setFilterScope] = useState<'all' | 'school' | 'tenant'>('all')
   const [modalState, setModalState] = useState<{
     mode: 'create' | 'edit' | 'delete' | null
     department: Department | null
   }>({ mode: null, department: null })
+  const [bulkDeleteTarget, setBulkDeleteTarget] = useState<Department[] | null>(null)
 
   // Fetch departments
   const { data: departments, isLoading } = useQuery({
@@ -283,30 +284,43 @@ export default function SchoolDepartmentsPage({ schoolId }: SchoolDepartmentsPag
     },
   })
 
-  // Filter departments
+  // Search remains a page-level input (lives outside the DataTable card
+  // alongside the Add Department button). The scope filter has moved into
+  // the DataTable's `facets` slot below — it's purely client-side, so the
+  // facet's per-value counts stay accurate.
   const filteredDepartments = useMemo(() => {
-    let result = departments || []
-    
-    // Apply search filter
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase()
-      result = result.filter(
-        (dept) =>
-          dept.name.toLowerCase().includes(query) ||
-          dept.code.toLowerCase().includes(query)
-      )
-    }
-    
-    // Apply scope filter
-    if (filterScope !== 'all') {
-      result = result.filter((dept) => dept.scope === filterScope)
-    }
-    
-    return result
-  }, [departments, searchQuery, filterScope])
+    const all = departments || []
+    if (!searchQuery.trim()) return all
+    const query = searchQuery.toLowerCase()
+    return all.filter(
+      (dept) =>
+        dept.name.toLowerCase().includes(query) ||
+        dept.code.toLowerCase().includes(query),
+    )
+  }, [departments, searchQuery])
+
+  const scopeFacet: FacetedFilterConfig = {
+    columnId: 'scope',
+    title: 'Scope',
+    options: [
+      { value: 'tenant', label: 'Organization' },
+      { value: 'school', label: 'School' },
+    ],
+  }
+
+  const departmentBulkActions: BulkAction<Department>[] = [
+    {
+      id: 'delete',
+      label: 'Delete selected',
+      icon: <Trash2 className="w-4 h-4" />,
+      tone: 'critical',
+      onRun: (rows) => setBulkDeleteTarget(rows),
+    },
+  ]
 
   // Table columns
   const columns: ColumnDef<Department, unknown>[] = useMemo(() => [
+    createSelectColumn<Department>(),
     {
       accessorKey: 'code',
       header: 'Code',
@@ -335,6 +349,7 @@ export default function SchoolDepartmentsPage({ schoolId }: SchoolDepartmentsPag
     {
       accessorKey: 'scope',
       header: 'Scope',
+      filterFn: 'arrIncludesSome',
       cell: ({ row }) => <ScopeBadge scope={row.original.scope} />,
     },
     {
@@ -391,7 +406,9 @@ export default function SchoolDepartmentsPage({ schoolId }: SchoolDepartmentsPag
         </Button>
       </div>
 
-      {/* Filters */}
+      {/* Search lives outside the DataTable card so it stays visible next to
+          the Add Department button (a settings-page convention). Scope is a
+          DataTable facet for live per-value counts. */}
       <div className="flex items-center gap-3">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[rgb(var(--text-tertiary))]" />
@@ -403,18 +420,6 @@ export default function SchoolDepartmentsPage({ schoolId }: SchoolDepartmentsPag
             className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all"
           />
         </div>
-
-        <Select
-          aria-label="Filter by scope"
-          className="w-44"
-          value={filterScope}
-          onChange={(v) => { if (v) setFilterScope(v as typeof filterScope) }}
-          options={[
-            { value: 'all', label: 'All Scopes' },
-            { value: 'school', label: 'School Only' },
-            { value: 'tenant', label: 'Organization' },
-          ]}
-        />
       </div>
 
       {/* DataTable */}
@@ -423,8 +428,16 @@ export default function SchoolDepartmentsPage({ schoolId }: SchoolDepartmentsPag
         data={filteredDepartments}
         getRowId={(dept) => dept.id}
         isLoading={isLoading}
-        enableSorting={true}
+        tableId="shell.departments"
+        enableSorting
+        enableRowSelection
+        enableColumnVisibility
+        facets={[scopeFacet]}
+        bulkActions={departmentBulkActions}
+        exportOptions={{ filename: 'departments', formats: ['csv'] }}
+        defaultSort={[{ id: 'name', desc: false }]}
         pagination={{ pageSize: 20 }}
+        pageSizes={[10, 20, 50]}
         maxHeight="calc(100vh - 15rem)"
         emptyState={{
           icon: <Users className="w-10 h-10" />,
@@ -472,7 +485,87 @@ export default function SchoolDepartmentsPage({ schoolId }: SchoolDepartmentsPag
             isDeleting={deleteMutation.isPending}
           />
         )}
+        {bulkDeleteTarget && bulkDeleteTarget.length > 0 && (
+          <BulkDeleteConfirmModal
+            departments={bulkDeleteTarget}
+            onClose={() => setBulkDeleteTarget(null)}
+            onConfirm={async () => {
+              // No backend bulk endpoint yet — fan out the existing single-row
+              // mutation and surface aggregate success/failure to the operator.
+              const results = await Promise.allSettled(
+                bulkDeleteTarget.map((d) => deleteMutation.mutateAsync(d.id)),
+              )
+              const failures = results.filter((r) => r.status === 'rejected').length
+              setBulkDeleteTarget(null)
+              if (failures === 0) {
+                toast.success(`Deleted ${results.length} department${results.length === 1 ? '' : 's'}`)
+              } else {
+                toast.error(`Deleted ${results.length - failures}; ${failures} failed`)
+              }
+            }}
+            isDeleting={deleteMutation.isPending}
+          />
+        )}
       </AnimatePresence>
+    </div>
+  )
+}
+
+// ============================================================================
+// BULK DELETE CONFIRM MODAL
+// ============================================================================
+
+function BulkDeleteConfirmModal({
+  departments,
+  onClose,
+  onConfirm,
+  isDeleting,
+}: {
+  departments: Department[]
+  onClose: () => void
+  onConfirm: () => void
+  isDeleting: boolean
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-[rgb(var(--background-overlay)/0.50)] backdrop-blur-sm" onClick={onClose} />
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        className="relative w-full max-w-sm bg-[rgb(var(--background-primary))] rounded-2xl shadow-xl p-6"
+      >
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 rounded-full bg-rust-500/10">
+            <AlertTriangle className="w-5 h-5 text-rust-500" />
+          </div>
+          <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
+            Delete {departments.length} Departments
+          </h2>
+        </div>
+
+        <p className="text-sm text-[rgb(var(--text-secondary))] mb-4">
+          You're about to permanently delete the following departments. This cannot be undone.
+        </p>
+        <ul className="mb-6 max-h-40 overflow-y-auto rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] p-2 space-y-1">
+          {departments.map((d) => (
+            <li key={d.id} className="text-sm text-[rgb(var(--text-primary))]">
+              <span className="font-mono text-xs text-[rgb(var(--text-tertiary))] mr-2">{d.code}</span>
+              {d.name}
+            </li>
+          ))}
+        </ul>
+
+        <div className="flex justify-end gap-3">
+          <Button variant="ghost" onClick={onClose} disabled={isDeleting}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={onConfirm} isLoading={isDeleting}>
+            <Trash2 className="w-4 h-4 mr-1.5" />
+            Delete {departments.length}
+          </Button>
+        </div>
+      </motion.div>
     </div>
   )
 }

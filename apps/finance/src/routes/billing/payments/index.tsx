@@ -18,7 +18,7 @@ import {
   WidgetErrorBoundaryV2,
   Select,
 } from '@edforge/ui'
-import type { ColumnDef } from '@edforge/ui'
+import type { BulkAction, ColumnDef } from '@edforge/ui'
 import type { RowSelectionState } from '@tanstack/react-table'
 import { EntityIdDisplay } from '@edforge/archetype'
 import {
@@ -798,6 +798,30 @@ export default function PaymentsPage() {
     format,
   )
 
+  // Bulk action placeholders — single-row Void / Refund still live in the
+  // row action menu; bulk endpoints are a follow-up per the per-list adoption
+  // plan in cf68105.
+  const paymentBulkActions = useMemo<BulkAction<Payment>[]>(
+    () => [
+      {
+        id: 'void',
+        label: 'Void selected',
+        icon: <Ban className="w-4 h-4" />,
+        tone: 'critical',
+        onRun: (rows) =>
+          toast.info(`Void ${rows.length} payment${rows.length === 1 ? '' : 's'} — coming soon`),
+      },
+      {
+        id: 'send-receipt',
+        label: 'Send receipt',
+        icon: <Receipt className="w-4 h-4" />,
+        onRun: (rows) =>
+          toast.info(`Send receipt for ${rows.length} payment${rows.length === 1 ? '' : 's'} — coming soon`),
+      },
+    ],
+    [],
+  )
+
   if (!schoolId) {
     return (
       <div className="p-6 text-center text-sm text-[rgb(var(--text-tertiary))]">
@@ -869,22 +893,29 @@ export default function PaymentsPage() {
         </div>
       </WidgetErrorBoundaryV2>
 
-      {/* Data Table — filters + export live INSIDE the table toolbar
-          (toolbarStart / toolbarExtra slots) so search/filters/export
-          read as a single coherent toolbar instead of an orphan strip
-          floating above the table. Sprint B.5 grade filter chip lives
-          alongside status + gateway in toolbarStart below. */}
+      {/* Data Table — status / gateway / grade Selects stay in `toolbarStart`
+          because they drive the server `useSchoolPayments` query (GSI14 for
+          grade, indexed lookups for status / gateway). Reshaping them into
+          client-side `facets` would double-filter the already-narrowed
+          payment list, so we keep them as-is and only bring in tableId
+          persistence, density, the built-in CSV export (full-school via
+          useExportPaymentsCsv lives in `toolbarExtra`), and a bulk action
+          shell. */}
       <TanstackDataTable<Payment>
         className="min-h-96"
         columns={columns}
         data={paymentList}
         getRowId={(row) => row.id}
         isLoading={isLoading}
+        tableId="finance.payments"
         enableSorting
         enableRowSelection={true}
         rowSelection={rowSelection}
         onRowSelectionChange={setRowSelection}
+        enableColumnVisibility
         pagination={{ pageSize: 20 }}
+        pageSizes={[10, 20, 50]}
+        defaultSort={[{ id: 'date', desc: true }]}
         searchPlaceholder="Search by receipt #, invoice #, or student..."
         toolbarStart={
           <div className="flex items-center gap-2 flex-wrap">
@@ -924,6 +955,7 @@ export default function PaymentsPage() {
             isExporting={exportCsvMutation.isPending}
           />
         }
+        bulkActions={paymentBulkActions}
         emptyState={{
           icon: <CreditCard className="w-10 h-10" />,
           title: 'No payments found',
