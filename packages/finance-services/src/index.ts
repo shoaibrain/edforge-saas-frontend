@@ -63,6 +63,12 @@ export {
 } from './services/students.service'
 export type { StudentSearchResult } from './services/students.service'
 
+// Pilot Onboarding Hardening PD.3.1 — opening-balance write
+export { setOpeningBalance } from './services/student-accounts.service'
+
+// Pilot Onboarding Hardening PD.3.2 — opening-balance mutation hook
+export { useSetOpeningBalance } from './hooks/useSetOpeningBalance'
+
 export {
   getAcademicYears,
   getCurrentAcademicYear,

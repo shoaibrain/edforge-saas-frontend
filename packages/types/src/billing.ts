@@ -111,6 +111,32 @@ export interface StudentAccount {
   lastPaymentDate: string | null
   createdAt: string
   updatedAt: string
+  // Pilot Onboarding Hardening PD.1.1 + PD.1.6 — opening-balance fields.
+  // Present only when the operator has set a previous-dues / opening balance.
+  openingBalance?: number
+  openingBalanceAsOf?: string // YYYY-MM-DD
+  openingBalanceNote?: string
+  // Server-computed: openingBalance − Σ(payment allocations against opening).
+  openingBalanceRemaining?: number
+  // PD.1.6 mapper exposes "last set" attribution for the revision UX.
+  openingBalanceLastSetAt?: string
+  openingBalanceLastSetBy?: string
+}
+
+/**
+ * Request body for `PUT /finance/schools/:schoolId/student-accounts/:accountId/opening-balance`.
+ * Mirrors `setOpeningBalanceSchema` in @aibrains/shared-types 0.86.0+.
+ */
+export interface SetOpeningBalanceDto {
+  amount: number // ≥ 0
+  asOf: string // YYYY-MM-DD, ≤ today
+  note?: string // ≤ 500 chars
+}
+
+export interface SetOpeningBalanceResponse {
+  account: StudentAccount
+  ledgerEntryId: string | null
+  isRevision: boolean
 }
 
 // ============================================================================

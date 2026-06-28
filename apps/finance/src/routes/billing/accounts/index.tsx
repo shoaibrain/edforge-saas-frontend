@@ -14,6 +14,7 @@ import {
   TrendingUp,
   Receipt,
   AlertTriangle,
+  Wallet,
 } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
 import {
@@ -268,6 +269,91 @@ function PaymentsFromLedger({ schoolId, studentId }: { schoolId: string; student
 // ACCOUNT DETAIL (expanded row content)
 // ============================================================================
 
+// ============================================================================
+// PD.3.5 — OPENING BALANCE SUMMARY CARD
+// ============================================================================
+
+function OpeningBalanceCard({
+  account,
+  format,
+  settings,
+}: {
+  account: StudentAccount
+  format: (amount: number) => string
+  settings: ReturnType<typeof useFinanceSettings>
+}) {
+  const [expanded, setExpanded] = useState(false)
+  const amount = account.openingBalance ?? 0
+  const remaining = account.openingBalanceRemaining ?? amount
+  const settled = Math.max(0, amount - remaining)
+  const note = account.openingBalanceNote
+  const noteIsLong = (note?.length ?? 0) > 80
+
+  return (
+    <div className="rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))] p-3">
+      <div className="flex items-center gap-2 mb-2">
+        <Wallet className="w-4 h-4 text-[rgb(var(--text-secondary))]" />
+        <p className="text-xs uppercase tracking-wider text-[rgb(var(--text-tertiary))]">
+          Opening Balance (Previous Dues)
+        </p>
+      </div>
+      <div className="grid grid-cols-3 gap-4">
+        <div>
+          <p className="text-xs text-[rgb(var(--text-tertiary))]">Amount</p>
+          <p className="text-sm font-semibold text-[rgb(var(--text-primary))]">
+            {format(amount)}
+          </p>
+        </div>
+        <div>
+          <p className="text-xs text-[rgb(var(--text-tertiary))]">As of</p>
+          <p className="text-sm font-semibold text-[rgb(var(--text-primary))]">
+            {account.openingBalanceAsOf
+              ? formatDate(account.openingBalanceAsOf, settings)
+              : '—'}
+          </p>
+        </div>
+        <div>
+          <p className="text-xs text-[rgb(var(--text-tertiary))]">Remaining</p>
+          <p className={`text-sm font-semibold ${
+            remaining > 0
+              ? 'text-[rgb(var(--state-warning-fg))]'
+              : 'text-[rgb(var(--state-success-fg))]'
+          }`}>
+            {format(remaining)}
+            {settled > 0 && (
+              <span className="ml-2 text-xs font-normal text-[rgb(var(--text-tertiary))]">
+                ({format(settled)} settled)
+              </span>
+            )}
+          </p>
+        </div>
+      </div>
+      {note && (
+        <div className="mt-2 pt-2 border-t border-[rgb(var(--border-primary))]">
+          <p className="text-xs text-[rgb(var(--text-tertiary))]">Note</p>
+          <p
+            className={`text-sm text-[rgb(var(--text-secondary))] ${
+              expanded ? '' : 'line-clamp-1'
+            }`}
+            title={note}
+          >
+            {note}
+          </p>
+          {noteIsLong && (
+            <button
+              type="button"
+              className="text-xs text-[rgb(var(--text-link))] hover:underline mt-0.5"
+              onClick={() => setExpanded(prev => !prev)}
+            >
+              {expanded ? 'Show less' : 'Show more'}
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
 function AccountDetail({
   account,
   schoolId,
@@ -281,6 +367,17 @@ function AccountDetail({
 
   return (
     <div className="px-4 pb-4 space-y-3">
+      {/* Pilot Onboarding Hardening PD.3.5 — Opening Balance summary card.
+          Rendered only when the operator has set previous-dues on this
+          account. The 3-col grid below covers the always-on state. */}
+      {account.openingBalance !== undefined && account.openingBalance !== null && (
+        <OpeningBalanceCard
+          account={account}
+          format={format}
+          settings={detailSettings}
+        />
+      )}
+
       {/* Summary Header */}
       <div className="grid grid-cols-3 gap-4">
         <div className="bg-[rgb(var(--background-primary))] rounded-lg p-3 border border-[rgb(var(--border-primary))]">
