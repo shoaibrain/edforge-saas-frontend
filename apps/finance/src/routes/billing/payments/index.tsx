@@ -515,11 +515,22 @@ function usePaymentColumns(
       {
         accessorKey: 'studentName',
         header: 'Student',
-        cell: ({ row }) => (
-          <span className="text-[rgb(var(--text-primary))]">
-            {row.original.studentName || '-'}
-          </span>
-        ),
+        cell: ({ row }) => {
+          const name = row.original.studentName
+          if (!name) return <span className="text-[rgb(var(--text-tertiary))]">—</span>
+          return (
+            <div className="flex items-center gap-2">
+              <img
+                src={getStudentAvatarUrl(name)}
+                alt=""
+                className="w-7 h-7 rounded-full border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] flex-shrink-0"
+                loading="lazy"
+                aria-hidden="true"
+              />
+              <span className="text-[rgb(var(--text-primary))] truncate">{name}</span>
+            </div>
+          )
+        },
         enableSorting: true,
       },
       {
@@ -661,7 +672,7 @@ function usePaymentColumns(
 // ============================================================================
 
 const STATUS_OPTIONS = [
-  { label: 'All', value: '' },
+  { label: 'All Statuses', value: '' },
   { label: 'Completed', value: 'completed' },
   { label: 'Failed', value: 'failed' },
   { label: 'Cancelled', value: 'cancelled' },
@@ -670,7 +681,7 @@ const STATUS_OPTIONS = [
 ]
 
 const GATEWAY_OPTIONS = [
-  { label: 'All', value: '' },
+  { label: 'All Gateways', value: '' },
   { label: 'Cash', value: 'cash' },
   { label: 'Bank Transfer', value: 'bank_transfer' },
   { label: 'Cheque', value: 'cheque' },
@@ -678,6 +689,13 @@ const GATEWAY_OPTIONS = [
   { label: 'Khalti', value: 'khalti' },
   { label: 'FonePay', value: 'fonepay' },
 ]
+
+// Sprint Payments UX cleanup — operator-visible avatar in the student
+// column (matches the Billing Accounts page pattern). DiceBear adventurer
+// seeded by studentName; deterministic.
+function getStudentAvatarUrl(seed: string): string {
+  return `https://api.dicebear.com/9.x/adventurer/svg?seed=${encodeURIComponent(seed)}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`
+}
 
 // ============================================================================
 // MAIN PAGE
@@ -833,37 +851,10 @@ export default function PaymentsPage() {
         </div>
       </WidgetErrorBoundaryV2>
 
-      {/* Filter Strip */}
-      <div className="flex items-center justify-between flex-wrap gap-2">
-        <div className="flex items-center gap-3 flex-wrap">
-          <Select
-            size="sm"
-            className="w-40"
-            value={statusFilter}
-            onChange={(v) => setStatusFilter(v ?? '')}
-            options={STATUS_OPTIONS}
-          />
-          <Select
-            size="sm"
-            className="w-44"
-            value={gatewayFilter}
-            onChange={(v) => setGatewayFilter(v ?? '')}
-            options={GATEWAY_OPTIONS}
-          />
-        </div>
-        <ExportCsvButton
-          onClick={() => {
-            if (!schoolId) return
-            exportCsvMutation.mutate(schoolId, {
-              onSuccess: () => toast.success('Payments CSV exported'),
-              onError: () => toast.error('Failed to export payments CSV'),
-            })
-          }}
-          isExporting={exportCsvMutation.isPending}
-        />
-      </div>
-
-      {/* Data Table */}
+      {/* Data Table — filters + export live INSIDE the table toolbar
+          (toolbarStart / toolbarExtra slots) so search/filters/export
+          read as a single coherent toolbar instead of an orphan strip
+          floating above the table. */}
       <TanstackDataTable<Payment>
         className="min-h-96"
         columns={columns}
@@ -873,6 +864,36 @@ export default function PaymentsPage() {
         enableSorting
         pagination={{ pageSize: 20 }}
         searchPlaceholder="Search by receipt #, invoice #, or student..."
+        toolbarStart={
+          <div className="flex items-center gap-2 flex-wrap">
+            <Select
+              size="sm"
+              className="w-44"
+              value={statusFilter}
+              onChange={(v) => setStatusFilter(v ?? '')}
+              options={STATUS_OPTIONS}
+            />
+            <Select
+              size="sm"
+              className="w-48"
+              value={gatewayFilter}
+              onChange={(v) => setGatewayFilter(v ?? '')}
+              options={GATEWAY_OPTIONS}
+            />
+          </div>
+        }
+        toolbarExtra={
+          <ExportCsvButton
+            onClick={() => {
+              if (!schoolId) return
+              exportCsvMutation.mutate(schoolId, {
+                onSuccess: () => toast.success('Payments CSV exported'),
+                onError: () => toast.error('Failed to export payments CSV'),
+              })
+            }}
+            isExporting={exportCsvMutation.isPending}
+          />
+        }
         emptyState={{
           icon: <CreditCard className="w-10 h-10" />,
           title: 'No payments found',
