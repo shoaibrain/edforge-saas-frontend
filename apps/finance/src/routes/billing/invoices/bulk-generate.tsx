@@ -33,8 +33,12 @@ export default function BulkInvoicesPage() {
     )
   }
 
+  // Layout uses full available width (no max-width cap) so the two-pane
+  // wizard + rail consume the operator's screen on standard 1440px+
+  // monitors. Operator review feedback (2026-06-28): the previous
+  // `max-w-5xl mx-auto` left ~30% of the viewport empty on the right.
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
+    <div className="p-6 space-y-6 w-full">
       {/* Header */}
       <div className="flex items-center gap-3">
         <Button

@@ -134,23 +134,29 @@ export function Step1Recipients({
           </div>
         </div>
 
-        {selection.mode === 'grade' ? (
-          <GradeList
-            grouped={grouped}
-            selection={selection}
-            openGrades={openGrades}
-            onToggleOpen={toggleOpen}
-            onToggleStudent={(id) => setSelection(toggleStudent(selection, id))}
-            onToggleGroup={(ss) => setSelection(toggleGradeGroup(selection, ss))}
-            searching={!!q}
-          />
-        ) : (
-          <FlatList
-            students={filtered}
-            selection={selection}
-            onToggle={(id) => setSelection(toggleStudent(selection, id))}
-          />
-        )}
+        {/* Bounded scrollable picker — caps at 60vh so neither the grade
+         * accordion (with 14 groups × N expanded students) nor the flat
+         * student list (254 rows in dev-pabson-primary) can blow the
+         * page height. Internal overflow-y; the rail sticks alongside. */}
+        <div className="border border-[rgb(var(--border-primary))] rounded-md bg-[rgb(var(--background-primary))] max-h-[60vh] overflow-y-auto">
+          {selection.mode === 'grade' ? (
+            <GradeList
+              grouped={grouped}
+              selection={selection}
+              openGrades={openGrades}
+              onToggleOpen={toggleOpen}
+              onToggleStudent={(id) => setSelection(toggleStudent(selection, id))}
+              onToggleGroup={(ss) => setSelection(toggleGradeGroup(selection, ss))}
+              searching={!!q}
+            />
+          ) : (
+            <FlatList
+              students={filtered}
+              selection={selection}
+              onToggle={(id) => setSelection(toggleStudent(selection, id))}
+            />
+          )}
+        </div>
       </div>
 
       {/* Rail */}
@@ -298,8 +304,10 @@ function FlatList({
   if (students.length === 0) {
     return <EmptyHint />
   }
+  // No outer border/rounded — the parent scroll container provides them.
+  // Just the dividers between rows. Container handles overflow.
   return (
-    <div className="border border-[rgb(var(--border-primary))] rounded-md overflow-hidden divide-y divide-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))]">
+    <div className="divide-y divide-[rgb(var(--border-primary))]">
       {students.map(s => (
         <StudentRow
           key={s.studentId}
@@ -336,8 +344,10 @@ function GradeList({
   if (grouped.length === 0) {
     return <EmptyHint />
   }
+  // No outer container border/rounded — the parent scroll wrapper owns
+  // those. Per-row dividers separate grade groups.
   return (
-    <div className="space-y-2">
+    <div className="divide-y divide-[rgb(var(--border-primary))]">
       {grouped.map(({ grade, students }) => {
         const state = gradeGroupState(selection, students)
         const selN = students.filter(s => selection.selectedIds.has(s.studentId)).length
@@ -345,10 +355,7 @@ function GradeList({
         return (
           <div
             key={grade}
-            className={[
-              'border border-[rgb(var(--border-primary))] rounded-md bg-[rgb(var(--background-primary))]',
-              state !== 'off' ? 'ring-1 ring-[rgb(var(--accent-soft))]' : '',
-            ].join(' ')}
+            className={state !== 'off' ? 'bg-[rgb(var(--accent-soft))]/10' : ''}
           >
             <div
               role="button"
@@ -483,23 +490,25 @@ function TriCheckbox({ state }: { state: 'off' | 'mixed' | 'on' }) {
 }
 
 function Avatar({ name }: { name: string }) {
-  const initials = name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map(w => w[0])
-    .join('')
-    .toUpperCase()
-  // Hash to a stable color for the avatar — purely cosmetic.
-  const palette = ['#6366F1', '#0EA5E9', '#10B981', '#F59E0B', '#EC4899', '#8B5CF6']
-  const idx = name.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) % palette.length
+  // DiceBear adventurer avatars, deterministic by name. Same source as
+  // the payments + billing-accounts pages (see
+  // `getStudentAvatarUrl` in apps/finance/src/routes/billing/payments/index.tsx).
+  // `loading="lazy"` + decoding="async" so a 250-student flat list
+  // doesn't block the operator's first paint while DiceBear fans out N
+  // SVG requests. The CSS `aspect-square` keeps the layout stable while
+  // the SVG fetches.
+  const src = `https://api.dicebear.com/9.x/adventurer/svg?seed=${encodeURIComponent(
+    name,
+  )}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`
   return (
-    <span
-      className="inline-flex items-center justify-center w-7 h-7 rounded-full text-[10px] font-semibold text-white"
-      style={{ background: palette[idx] }}
-    >
-      {initials || '?'}
-    </span>
+    <img
+      src={src}
+      alt=""
+      loading="lazy"
+      decoding="async"
+      aria-hidden="true"
+      className="w-7 h-7 rounded-full border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] flex-shrink-0"
+    />
   )
 }
 
