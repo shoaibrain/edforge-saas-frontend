@@ -1,79 +1,82 @@
-import { Fragment, useMemo } from 'react'
-import { useNavigate } from '@tanstack/react-router'
-import { Menu, MenuButton, MenuItems, MenuItem, Transition } from '@headlessui/react'
-import { motion } from 'framer-motion'
+import { Fragment, useMemo } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import {
-  User,
-  Settings,
-  LogOut,
-  Sun,
-  Moon,
-  Languages,
-} from 'lucide-react'
-import { useAuthStore } from '../../stores/auth.store'
-import { useThemeStore } from '../../stores/theme.store'
-import { useHomeStore } from '../../stores/home.store'
-import { useAppStore } from '../../stores/app.store'
-import { Avatar } from '@edforge/ui'
-import { useTranslation } from '@edforge/i18n'
-import { getGreeting } from '../../lib/greeting'
-import { adToBS, formatBSLong } from '@edforge/date-utils'
+  Menu,
+  MenuButton,
+  MenuItems,
+  MenuItem,
+  Transition,
+} from "@headlessui/react";
+import { motion } from "framer-motion";
+import { User, Settings, LogOut, Sun, Moon, Languages } from "lucide-react";
+import { useAuthStore } from "../../stores/auth.store";
+import { useThemeStore } from "../../stores/theme.store";
+import { useHomeStore } from "../../stores/home.store";
+import { useAppStore } from "../../stores/app.store";
+import { Avatar } from "@edforge/ui";
+import { normalizePlatformLanguage, useTranslation } from "@edforge/i18n";
+import { getGreeting } from "../../lib/greeting";
+import { adToBS, formatBSLong } from "@edforge/date-utils";
 
-import { Breadcrumbs } from './Breadcrumbs'
-import { SchoolSwitcher } from './SchoolSwitcher'
+import { Breadcrumbs } from "./Breadcrumbs";
+import { SchoolSwitcher } from "./SchoolSwitcher";
 
 // ============================================================================
 // LANGUAGE SLIDING TOGGLE
 // ============================================================================
 
 const LANG_OPTIONS = [
-  { code: 'en', label: 'EN' },
-  { code: 'ne', label: 'NP' },
-] as const
+  { code: "en", label: "EN", labelKey: "languageEnglish" },
+  { code: "ne", label: "NP", labelKey: "languageNepali" },
+] as const;
 
 function LanguageToggle() {
-  const { i18n } = useTranslation()
-  const currentLang = i18n.language || 'en'
+  const { t: tNav, i18n } = useTranslation("nav");
+  const currentLang = normalizePlatformLanguage(i18n.language);
 
   const handleSwitch = (code: string) => (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    i18n.changeLanguage(code)
-  }
+    e.preventDefault();
+    e.stopPropagation();
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("edforge-language", code);
+    }
+    i18n.changeLanguage(code);
+  };
 
   return (
     <div
       className="flex items-center gap-1 p-1 bg-[rgb(var(--background-tertiary))] rounded-lg border border-[rgb(var(--border-primary))]"
       role="radiogroup"
-      aria-label="Language"
+      aria-label={tNav("language")}
     >
-      {LANG_OPTIONS.map(({ code, label }) => {
-        const isActive = currentLang === code
+      {LANG_OPTIONS.map(({ code, label, labelKey }) => {
+        const isActive = currentLang === code;
         return (
           <button
             key={code}
             role="radio"
             aria-checked={isActive}
+            aria-label={tNav(labelKey)}
             onClick={handleSwitch(code)}
             className={`relative px-3 py-1.5 rounded-md text-xs font-bold tracking-wider transition-colors duration-200 ${
               isActive
-                ? 'text-[rgb(var(--action-primary-fg))]'
-                : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))]'
+                ? "text-[rgb(var(--action-primary-fg))]"
+                : "text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))]"
             }`}
           >
             {isActive && (
               <motion.div
                 layoutId="lang-toggle-pill"
                 className="absolute inset-0 bg-[rgb(var(--action-primary-bg))]  rounded-md shadow-sm"
-                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                transition={{ type: "spring", stiffness: 500, damping: 30 }}
               />
             )}
             <span className="relative z-10">{label}</span>
           </button>
-        )
+        );
       })}
     </div>
-  )
+  );
 }
 
 // ============================================================================
@@ -81,22 +84,32 @@ function LanguageToggle() {
 // ============================================================================
 
 function HamburgerButton() {
-  const toggleSidebar = useAppStore((s) => s.toggleSidebar)
-  const collapsed = useAppStore((s) => s.sidebarCollapsed)
+  const toggleSidebar = useAppStore((s) => s.toggleSidebar);
+  const collapsed = useAppStore((s) => s.sidebarCollapsed);
+  const { t: tNav } = useTranslation("nav");
 
   return (
     <button
       onClick={toggleSidebar}
       className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-150 cursor-pointer hover:bg-[var(--shell-ni-hover)]"
-      aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+      aria-label={collapsed ? tNav("expandSidebar") : tNav("collapseSidebar")}
     >
       <div className="flex flex-col gap-1">
-        <span className="block w-5 h-[1.8px] rounded-sm bg-[var(--shell-hbg-line)]" style={{ transition: 'background 0.3s' }} />
-        <span className="block w-5 h-[1.8px] rounded-sm bg-[var(--shell-hbg-line)]" style={{ transition: 'background 0.3s' }} />
-        <span className="block w-5 h-[1.8px] rounded-sm bg-[var(--shell-hbg-line)]" style={{ transition: 'background 0.3s' }} />
+        <span
+          className="block w-5 h-[1.8px] rounded-sm bg-[var(--shell-hbg-line)]"
+          style={{ transition: "background 0.3s" }}
+        />
+        <span
+          className="block w-5 h-[1.8px] rounded-sm bg-[var(--shell-hbg-line)]"
+          style={{ transition: "background 0.3s" }}
+        />
+        <span
+          className="block w-5 h-[1.8px] rounded-sm bg-[var(--shell-hbg-line)]"
+          style={{ transition: "background 0.3s" }}
+        />
       </div>
     </button>
-  )
+  );
 }
 
 // ============================================================================
@@ -105,52 +118,54 @@ function HamburgerButton() {
 // ============================================================================
 
 const THEME_OPTIONS = [
-  { code: 'light', label: 'Light' },
-  { code: 'dark', label: 'Dark' },
-] as const
+  { code: "light", labelKey: "themeLight" },
+  { code: "dark", labelKey: "themeDark" },
+] as const;
 
 function AppearanceToggle() {
-  const { resolvedTheme, setTheme } = useThemeStore()
+  const { t: tNav } = useTranslation("nav");
+  const { resolvedTheme, setTheme } = useThemeStore();
 
-  const handleSwitch = (code: 'light' | 'dark') => (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setTheme(code)
-  }
+  const handleSwitch = (code: "light" | "dark") => (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setTheme(code);
+  };
 
   return (
     <div
       className="flex items-center gap-1 p-1 bg-[rgb(var(--background-tertiary))] rounded-lg border border-[rgb(var(--border-primary))]"
       role="radiogroup"
-      aria-label="Appearance"
+      aria-label={tNav("appearance")}
     >
-      {THEME_OPTIONS.map(({ code, label }) => {
-        const isActive = resolvedTheme === code
+      {THEME_OPTIONS.map(({ code, labelKey }) => {
+        const isActive = resolvedTheme === code;
         return (
           <button
             key={code}
             role="radio"
             aria-checked={isActive}
+            aria-label={tNav(labelKey)}
             onClick={handleSwitch(code)}
             className={`relative px-3 py-1.5 rounded-md text-xs font-bold tracking-wider transition-colors duration-200 ${
               isActive
-                ? 'text-[rgb(var(--action-primary-fg))]'
-                : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))]'
+                ? "text-[rgb(var(--action-primary-fg))]"
+                : "text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))]"
             }`}
           >
             {isActive && (
               <motion.div
                 layoutId="appearance-toggle-pill"
                 className="absolute inset-0 bg-[rgb(var(--action-primary-bg))]  rounded-md shadow-sm"
-                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                transition={{ type: "spring", stiffness: 500, damping: 30 }}
               />
             )}
-            <span className="relative z-10">{label}</span>
+            <span className="relative z-10">{tNav(labelKey)}</span>
           </button>
-        )
+        );
       })}
     </div>
-  )
+  );
 }
 
 // ============================================================================
@@ -158,52 +173,52 @@ function AppearanceToggle() {
 // ============================================================================
 
 function HomeTopbarCenter() {
-  const user = useAuthStore((s) => s.user)
-  const { t } = useTranslation('dashboard')
+  const user = useAuthStore((s) => s.user);
+  const { t } = useTranslation("dashboard");
 
-  const firstName = user?.displayName || user?.name?.split(' ')[0]
-  const greeting = getGreeting(firstName, t)
+  const firstName = user?.displayName || user?.name?.split(" ")[0];
+  const greeting = getGreeting(firstName, t);
 
   const dateDisplay = useMemo(() => {
-    const now = new Date()
+    const now = new Date();
 
     // BS date
-    let bsPart = ''
+    let bsPart = "";
     try {
-      const bs = adToBS(now)
-      bsPart = `${formatBSLong(bs)} BS`
+      const bs = adToBS(now);
+      bsPart = `${formatBSLong(bs)} BS`;
     } catch {
       // Fallback: skip BS date if conversion fails
     }
 
     // Gregorian date
-    const gregPart = now.toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric',
-    })
+    const gregPart = now.toLocaleDateString("en-US", {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    });
 
-    const parts = [bsPart, gregPart].filter(Boolean)
-    return parts.join(' · ')
-  }, [])
+    const parts = [bsPart, gregPart].filter(Boolean);
+    return parts.join(" · ");
+  }, []);
 
   return (
     <div className="flex items-center gap-0 min-w-0">
       <span
         className="text-[13.5px] font-medium text-[color:var(--shell-text-1)]"
-        style={{ transition: 'color 0.3s' }}
+        style={{ transition: "color 0.3s" }}
       >
         {greeting}
       </span>
       <span
         className="text-xs ml-[10px] pl-[10px] border-l text-[color:var(--shell-text-4)] border-[var(--shell-border-color)]"
-        style={{ transition: 'color 0.3s, border-color 0.3s' }}
+        style={{ transition: "color 0.3s, border-color 0.3s" }}
       >
         {dateDisplay}
       </span>
     </div>
-  )
+  );
 }
 
 // ============================================================================
@@ -211,25 +226,19 @@ function HomeTopbarCenter() {
 // ============================================================================
 
 function UserMenu() {
-  const user = useAuthStore((s) => s.user)
-  const logout = useAuthStore((s) => s.logout)
-  const navigate = useNavigate()
-  const { t: tNav } = useTranslation('nav')
-  const { resolvedTheme } = useThemeStore()
+  const user = useAuthStore((s) => s.user);
+  const logout = useAuthStore((s) => s.logout);
+  const navigate = useNavigate();
+  const { t: tNav } = useTranslation("nav");
+  const { resolvedTheme } = useThemeStore();
 
-  if (!user) return null
+  if (!user) return null;
 
   return (
     <Menu as="div" className="relative">
-      <MenuButton
-        className="flex items-center rounded-full hover:ring-[rgb(var(--border-focus)/0.50)] transition-all duration-200 ml-1 flex-shrink-0"
-      >
+      <MenuButton className="flex items-center rounded-full hover:ring-[rgb(var(--border-focus)/0.50)] transition-all duration-200 ml-1 flex-shrink-0">
         <div className="w-8 h-8 rounded-full overflow-hidden">
-          <Avatar
-            name={user.name}
-            size="sm"
-            shape="circle"
-          />
+          <Avatar name={user.name} size="sm" shape="circle" />
         </div>
       </MenuButton>
 
@@ -251,7 +260,9 @@ function UserMenu() {
                 <p className="font-semibold text-[rgb(var(--text-primary))] truncate">
                   {user.displayName || user.name}
                 </p>
-                <p className="text-xs text-[rgb(var(--text-tertiary))] truncate">{user.email}</p>
+                <p className="text-xs text-[rgb(var(--text-tertiary))] truncate">
+                  {user.email}
+                </p>
                 <span className="inline-block mt-1.5 px-2 py-0.5 text-xs font-semibold rounded-full bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]  ">
                   {user.globalRole}
                 </span>
@@ -262,18 +273,18 @@ function UserMenu() {
           {/* Preferences — appearance + language, one consolidated group */}
           <div className="px-4 py-3 border-b border-[rgb(var(--border-secondary))]">
             <p className="px-1 mb-2 text-2xs font-bold uppercase tracking-wider text-[rgb(var(--text-tertiary))]">
-              {tNav('preferences')}
+              {tNav("preferences")}
             </p>
             <div className="space-y-2.5">
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5 min-w-0">
-                  {resolvedTheme === 'dark' ? (
+                  {resolvedTheme === "dark" ? (
                     <Moon className="w-4 h-4 flex-shrink-0 text-[rgb(var(--text-tertiary))]" />
                   ) : (
                     <Sun className="w-4 h-4 flex-shrink-0 text-[rgb(var(--text-tertiary))]" />
                   )}
                   <span className="text-sm font-medium text-[rgb(var(--text-secondary))]">
-                    {tNav('appearance')}
+                    {tNav("appearance")}
                   </span>
                 </div>
                 <AppearanceToggle />
@@ -282,7 +293,7 @@ function UserMenu() {
                 <div className="flex items-center gap-2.5 min-w-0">
                   <Languages className="w-4 h-4 flex-shrink-0 text-[rgb(var(--text-tertiary))]" />
                   <span className="text-sm font-medium text-[rgb(var(--text-secondary))]">
-                    {tNav('language')}
+                    {tNav("language")}
                   </span>
                 </div>
                 <LanguageToggle />
@@ -294,15 +305,21 @@ function UserMenu() {
             <MenuItem>
               {({ active }) => (
                 <button
-                  onClick={() => navigate({ to: '/settings', search: { tab: 'account' } })}
-                  className={`w-full flex items-center gap-3 px-4 py-3 transition-colors ${active ? 'bg-[rgb(var(--background-tertiary))]' : ''}`}
+                  onClick={() =>
+                    navigate({ to: "/settings", search: { tab: "account" } })
+                  }
+                  className={`w-full flex items-center gap-3 px-4 py-3 transition-colors ${active ? "bg-[rgb(var(--background-tertiary))]" : ""}`}
                 >
                   <div className="w-8 h-8 rounded-lg bg-[rgb(var(--background-tertiary))] flex items-center justify-center">
                     <User className="w-4 h-4 text-[rgb(var(--text-secondary))]" />
                   </div>
                   <div className="text-left">
-                    <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{tNav('myProfile')}</p>
-                    <p className="text-xs text-[rgb(var(--text-tertiary))]">{tNav('viewEditProfile')}</p>
+                    <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
+                      {tNav("myProfile")}
+                    </p>
+                    <p className="text-xs text-[rgb(var(--text-tertiary))]">
+                      {tNav("viewEditProfile")}
+                    </p>
                   </div>
                 </button>
               )}
@@ -310,15 +327,21 @@ function UserMenu() {
             <MenuItem>
               {({ active }) => (
                 <button
-                  onClick={() => navigate({ to: '/settings', search: { tab: 'account' } })}
-                  className={`w-full flex items-center gap-3 px-4 py-3 transition-colors ${active ? 'bg-[rgb(var(--background-tertiary))]' : ''}`}
+                  onClick={() =>
+                    navigate({ to: "/settings", search: { tab: "account" } })
+                  }
+                  className={`w-full flex items-center gap-3 px-4 py-3 transition-colors ${active ? "bg-[rgb(var(--background-tertiary))]" : ""}`}
                 >
                   <div className="w-8 h-8 rounded-lg bg-[rgb(var(--background-tertiary))] flex items-center justify-center">
                     <Settings className="w-4 h-4 text-[rgb(var(--text-secondary))]" />
                   </div>
                   <div className="text-left">
-                    <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{tNav('settings')}</p>
-                    <p className="text-xs text-[rgb(var(--text-tertiary))]">{tNav('managePreferences')}</p>
+                    <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
+                      {tNav("settings")}
+                    </p>
+                    <p className="text-xs text-[rgb(var(--text-tertiary))]">
+                      {tNav("managePreferences")}
+                    </p>
                   </div>
                 </button>
               )}
@@ -330,12 +353,14 @@ function UserMenu() {
               {({ active }) => (
                 <button
                   onClick={logout}
-                  className={`w-full flex items-center gap-3 px-4 py-3 transition-colors ${active ? 'bg-rust-50 dark:bg-rust-900/20' : ''}`}
+                  className={`w-full flex items-center gap-3 px-4 py-3 transition-colors ${active ? "bg-rust-50 dark:bg-rust-900/20" : ""}`}
                 >
                   <div className="w-8 h-8 rounded-lg bg-rust-100 dark:bg-rust-900/30 flex items-center justify-center">
                     <LogOut className="w-4 h-4 text-rust-500" />
                   </div>
-                  <span className="text-sm font-medium text-rust-600 dark:text-rust-400">{tNav('signOut')}</span>
+                  <span className="text-sm font-medium text-rust-600 dark:text-rust-400">
+                    {tNav("signOut")}
+                  </span>
                 </button>
               )}
             </MenuItem>
@@ -343,7 +368,7 @@ function UserMenu() {
         </MenuItems>
       </Transition>
     </Menu>
-  )
+  );
 }
 
 // ============================================================================
@@ -351,19 +376,20 @@ function UserMenu() {
 // ============================================================================
 
 export function Header() {
-  const collapsed = useAppStore((s) => s.sidebarCollapsed)
-  const isHomeV2 = useHomeStore((s) => s.isHomeV2Active)
+  const collapsed = useAppStore((s) => s.sidebarCollapsed);
+  const isHomeV2 = useHomeStore((s) => s.isHomeV2Active);
+  const { t: tNav } = useTranslation("nav");
 
   return (
     <header
       className="fixed top-0 left-0 right-0 z-[45] flex items-center h-[var(--shell-topbar-h)] bg-[var(--shell-page-bg)]"
-      style={{ transition: 'background 0.3s' }}
-      aria-label="Global header"
+      style={{ transition: "background 0.3s" }}
+      aria-label={tNav("globalHeader")}
     >
       {/* LEFT ZONE: width tracks sidebar for visual alignment */}
       <div
-        className={`flex items-center gap-1 flex-shrink-0 overflow-hidden pl-4 ${collapsed ? 'w-[var(--shell-sidebar-w-collapsed)]' : 'w-[var(--shell-sidebar-w)]'}`}
-        style={{ transition: 'width var(--shell-transition)' }}
+        className={`flex items-center gap-1 flex-shrink-0 overflow-hidden pl-4 ${collapsed ? "w-[var(--shell-sidebar-w-collapsed)]" : "w-[var(--shell-sidebar-w)]"}`}
+        style={{ transition: "width var(--shell-transition)" }}
       >
         <HamburgerButton />
         {!collapsed && <SchoolSwitcher />}
@@ -379,5 +405,5 @@ export function Header() {
         <UserMenu />
       </div>
     </header>
-  )
+  );
 }

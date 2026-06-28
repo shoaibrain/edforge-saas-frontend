@@ -2,6 +2,99 @@
   "title": "शुल्क भुक्तानी",
   "description": "बीजक हेर्नुहोस्, भुक्तानी गर्नुहोस्, र रसिद डाउनलोड गर्नुहोस्",
 
+  "overview": {
+    "finance": "वित्त",
+    "selectSchoolTitle": "विद्यालय चयन गर्नुहोस्",
+    "selectSchoolDescription": "वित्तीय डेटा हेर्न माथिल्लो नेभिगेसनबाट विद्यालय छान्नुहोस्।",
+    "actions": {
+      "bulkInvoice": "बल्क बीजक",
+      "bulkInvoiceAria": "बल्क बीजक सिर्जना",
+      "recordPayment": "भुक्तानी रेकर्ड",
+      "recordPaymentAria": "भुक्तानी रेकर्ड गर्नुहोस्"
+    },
+    "insight": {
+      "invoiced": "{{amount}} बीजक गरिएको",
+      "collected": "{{rate}}% संकलित",
+      "invoiceOverdue": "{{count}} बीजक बाँकी",
+      "invoiceOverdue_plural": "{{count}} बीजकहरू बाँकी",
+      "noOverdue": "बाँकी छैन"
+    },
+    "filters": {
+      "today": "आज",
+      "week": "यो हप्ता",
+      "month": "यो महिना",
+      "year": "यो वर्ष",
+      "or": "वा",
+      "fromDate": "सुरु मिति",
+      "toDate": "अन्त्य मिति",
+      "allYears": "सबै वर्ष",
+      "clear": "खाली गर्नुहोस्",
+      "exportCsv": "CSV निर्यात",
+      "exportCsvAria": "बीजकहरू CSV मा निर्यात गर्नुहोस्"
+    },
+    "alert": {
+      "title": "{{count}} बीजकहरू बाँकी — {{amount}} असंकलित",
+      "collectionRate": "संकलन दर {{rate}}% छ",
+      "agingBucket": "{{bucket}} बकेटमा {{count}} बीजकहरू",
+      "drafts": "{{count}} थप ड्राफ्ट जारी गर्न आवश्यक छ",
+      "reviewBilling": "बिलिङ समीक्षा"
+    },
+    "kpi": {
+      "totalInvoiced": "कुल बीजक",
+      "collected": "संकलित",
+      "outstanding": "बाँकी",
+      "overdue": "म्याद नाघेको",
+      "invoiceCount": "{{count}} बीजकहरू",
+      "paymentCount": "{{count}} भुक्तानीहरू",
+      "awaiting": "{{count}} प्रतीक्षामा",
+      "thisMonth": "यो महिना"
+    },
+    "empty": {
+      "noPaymentsTitle": "अहिलेसम्म भुक्तानी छैन",
+      "noPaymentsMessage": "विद्यार्थीहरूले भुक्तानी गरेपछि भुक्तानीहरू यहाँ देखिन्छन्।",
+      "noInvoicesTitle": "अहिलेसम्म बीजक छैन",
+      "noInvoicesMessage": "बिलिङ गतिविधि ट्र्याक गर्न बीजक सिर्जना गर्नुहोस्।"
+    },
+    "collection": {
+      "title": "संकलन प्रदर्शन",
+      "percentCollected": "{{rate}}% संकलित",
+      "collected": "संकलित",
+      "outstanding": "बाँकी",
+      "overdue": "म्याद नाघेको",
+      "byFeeType": "शुल्क प्रकार अनुसार",
+      "typeCount": "{{count}} प्रकार",
+      "typeCount_plural": "{{count}} प्रकारहरू",
+      "showLess": "कम देखाउनुहोस्",
+      "showAll": "सबै देखाउनुहोस् ({{count}})",
+      "totalInvoicedThisYear": "यस वर्ष कुल बीजक"
+    },
+    "billingHealth": {
+      "title": "बिलिङ अवस्था",
+      "allAccountsCurrent": "सबै खाताहरू अद्यावधिक छन्",
+      "noInvoicesTitle": "अहिलेसम्म बीजक छैन",
+      "noInvoicesDescription": "बिलिङ अवस्था हेर्न पहिलो बीजक सिर्जना गर्नुहोस्।",
+      "invoices": "बीजकहरू",
+      "invoiceCount": "{{count}} बीजक",
+      "invoiceCount_plural": "{{count}} बीजकहरू",
+      "agingOverview": "एजिङ सिंहावलोकन",
+      "overdueCount": "{{count}} बाँकी",
+      "noOverdue": "म्याद नाघेका बीजकहरू छैनन् — सबै खाताहरू अद्यावधिक छन्।",
+      "paymentMethods": "भुक्तानी विधिहरू",
+      "noPaymentsRecorded": "अहिलेसम्म कुनै भुक्तानी रेकर्ड गरिएको छैन।"
+    },
+    "recent": {
+      "payments": "हालका भुक्तानीहरू",
+      "invoices": "हालका बीजकहरू",
+      "noPayments": "अहिलेसम्म भुक्तानी छैन।",
+      "noInvoices": "अहिलेसम्म बीजक छैन।",
+      "unknown": "अज्ञात",
+      "due": "बाँकी",
+      "today": "आज",
+      "yesterday": "हिजो",
+      "daysAgo": "{{count}} दिनअघि"
+    }
+  },
+
   "invoices": {
     "title": "बीजकहरू",
     "description": "शुल्क बीजकहरू हेर्नुहोस् र व्यवस्थापन गर्नुहोस्",
@@ -151,6 +244,31 @@
     "created": "शुल्क संरचना सफलतापूर्वक सिर्जना भयो",
     "updated": "शुल्क संरचना सफलतापूर्वक अद्यावधिक भयो",
     "deleted": "शुल्क संरचना सफलतापूर्वक मेटाइयो",
+    "createFailed": "शुल्क संरचना सिर्जना गर्न असफल भयो",
+    "updateFailed": "शुल्क संरचना अद्यावधिक गर्न असफल भयो",
+    "deleteFailed": "शुल्क संरचना मेटाउन असफल भयो",
+    "selectSchool": "शुल्क संरचना व्यवस्थापन गर्न विद्यालय चयन गर्नुहोस्।",
+    "loadFailed": "शुल्क संरचनाहरू लोड गर्न असफल भयो",
+    "connectionRetry": "कृपया आफ्नो जडान जाँच गरेर फेरि प्रयास गर्नुहोस्।",
+    "autoApplyBanner": "भर्ना हुँदा स्वतः लागू हुने शुल्क संरचनाहरूले विद्यार्थी भर्ना भएपछि दायित्वहरू स्वतः सिर्जना गर्छन्।",
+    "stats": {
+      "totalStructures": "कुल संरचनाहरू",
+      "autoApply": "स्वतः लागू",
+      "feeTypes": "शुल्क प्रकारहरू",
+      "maxFee": "अधिकतम शुल्क"
+    },
+    "filters": {
+      "all": "सबै",
+      "active": "सक्रिय",
+      "inactive": "निष्क्रिय"
+    },
+    "autoApplyOnEnrollment": "भर्नामा स्वतः लागू",
+    "editAria": "शुल्क संरचना सम्पादन गर्नुहोस्",
+    "deleteAria": "शुल्क संरचना मेटाउनुहोस्",
+    "deleteTitle": "शुल्क संरचना मेटाउनुहोस्",
+    "deleteMessage": "{{feeName}} मेटाउन निश्चित हुनुहुन्छ? यो कार्य उल्टाउन मिल्दैन र फिर्ता गर्न सकिँदैन।",
+    "deleting": "मेटाउँदै...",
+    "confirmDelete": "मेटाउने पुष्टि",
     "types": {
       "tuition": "शिक्षण शुल्क",
       "admission": "भर्ना शुल्क",

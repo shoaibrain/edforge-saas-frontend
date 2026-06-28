@@ -6,69 +6,64 @@
  * Replaces the separate InvoiceStatusCard + AgingReportCard.
  */
 
-import { useMemo } from 'react'
-import {
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-} from 'recharts'
-import { CheckCircle2 } from 'lucide-react'
-import { AnimatedProgressBar } from '@edforge/ui'
-import { formatInvoiceStatus, formatGatewayLabel } from '@edforge/types'
-import { useCurrency } from '@edforge/types/use-currency'
-import { useFinanceSettings } from '../../layouts/FinanceLayout'
+import { useMemo } from "react";
+import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from "recharts";
+import { CheckCircle2 } from "lucide-react";
+import { AnimatedProgressBar } from "@edforge/ui";
+import { formatInvoiceStatus, formatGatewayLabel } from "@edforge/types";
+import { useCurrency } from "@edforge/types/use-currency";
+import { useTranslation } from "@edforge/i18n";
+import { useFinanceSettings } from "../../layouts/FinanceLayout";
 
 // ─── Colors ──────────────────────────────────────────────────────────────────
 
 const STATUS_COLORS: Record<string, string> = {
-  overdue: '#E24B4A',
-  draft: '#888780',
-  paid: '#1D9E75',
-  partially_paid: '#EF9F27',
-  issued: '#378ADD',
-  cancelled: '#5F5E5A',
-  written_off: '#5F5E5A',
-}
+  overdue: "#E24B4A",
+  draft: "#888780",
+  paid: "#1D9E75",
+  partially_paid: "#EF9F27",
+  issued: "#378ADD",
+  cancelled: "#5F5E5A",
+  written_off: "#5F5E5A",
+};
 
 const GATEWAY_COLORS: Record<string, string> = {
-  cash: '#1D9E75',
-  cheque: '#7F77DD',
-  bank_transfer: '#378ADD',
-  esewa: '#60C06E',
-  khalti: '#5C2D91',
-  fonepay: '#2196F3',
-  connectips: '#00BCD4',
-  stripe: '#6772E5',
-}
+  cash: "#1D9E75",
+  cheque: "#7F77DD",
+  bank_transfer: "#378ADD",
+  esewa: "#60C06E",
+  khalti: "#5C2D91",
+  fonepay: "#2196F3",
+  connectips: "#00BCD4",
+  stripe: "#6772E5",
+};
 
 // Aging heat spectrum — color intensity increases with age
 const AGING_COLORS = [
-  '#1D9E75',  // Current — healthy green
-  '#EF9F27',  // 1-30 days — amber
-  '#E8762B',  // 31-60 days — orange
-  '#E24B4A',  // 61-90 days — red
-  '#9B2C2C',  // 90+ days — dark red
-]
+  "#1D9E75", // Current — healthy green
+  "#EF9F27", // 1-30 days — amber
+  "#E8762B", // 31-60 days — orange
+  "#E24B4A", // 61-90 days — red
+  "#9B2C2C", // 90+ days — dark red
+];
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 interface AgingBucket {
-  label: string
-  minDays: number
-  maxDays: number | null
-  count: number
-  amount: number
+  label: string;
+  minDays: number;
+  maxDays: number | null;
+  count: number;
+  amount: number;
 }
 
 interface BillingHealthCardProps {
-  invoicesByStatus: Record<string, number>
-  totalInvoiceCount: number
-  paymentsByGateway: Record<string, number>
-  totalPaymentCount: number
-  agingReport: AgingBucket[]
-  isLoading: boolean
+  invoicesByStatus: Record<string, number>;
+  totalInvoiceCount: number;
+  paymentsByGateway: Record<string, number>;
+  totalPaymentCount: number;
+  agingReport: AgingBucket[];
+  isLoading: boolean;
 }
 
 // ─── Skeletons ───────────────────────────────────────────────────────────────
@@ -86,7 +81,7 @@ function GatewayRowsSkeleton({ rows = 3 }: { rows?: number }) {
         </div>
       ))}
     </div>
-  )
+  );
 }
 
 /**
@@ -127,7 +122,7 @@ function BillingHealthSkeleton() {
         <GatewayRowsSkeleton />
       </div>
     </>
-  )
+  );
 }
 
 function SpectrumSkeleton() {
@@ -136,56 +131,69 @@ function SpectrumSkeleton() {
       <div className="h-6 rounded-lg v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
       <div className="flex gap-4 justify-between">
         {[1, 2, 3, 4, 5].map((i) => (
-          <div key={i} className="h-3 w-12 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
+          <div
+            key={i}
+            className="h-3 w-12 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]"
+          />
         ))}
       </div>
     </div>
-  )
+  );
 }
 
 // ─── Tooltips ────────────────────────────────────────────────────────────────
 
 function DonutTooltip({ active, payload }: any) {
-  if (!active || !payload?.length) return null
-  const d = payload[0]
+  const { t } = useTranslation("payments");
+  if (!active || !payload?.length) return null;
+  const d = payload[0];
   return (
     <div className="rounded-lg border px-3 py-2 text-xs shadow-lg bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]">
       <div className="font-semibold">{d.name}</div>
       <div className="text-[rgb(var(--text-disabled))]">
-        {d.value} invoice{d.value !== 1 ? 's' : ''} · {d.payload.pct}%
+        {t(
+          d.value === 1
+            ? "overview.billingHealth.invoiceCount"
+            : "overview.billingHealth.invoiceCount_plural",
+          { count: d.value },
+        )}{" "}
+        · {d.payload.pct}%
       </div>
     </div>
-  )
+  );
 }
 
 // ─── Aging Insight Generator ─────────────────────────────────────────────────
 
-function getAgingInsight(buckets: AgingBucket[], fmtShort: (amount: number) => string): string | null {
-  const activeBuckets = buckets.filter((b) => b.count > 0)
-  if (activeBuckets.length === 0) return null
+function getAgingInsight(
+  buckets: AgingBucket[],
+  fmtShort: (amount: number) => string,
+): string | null {
+  const activeBuckets = buckets.filter((b) => b.count > 0);
+  if (activeBuckets.length === 0) return null;
 
-  const total = activeBuckets.reduce((sum, b) => sum + b.count, 0)
-  const totalAmount = activeBuckets.reduce((sum, b) => sum + b.amount, 0)
+  const total = activeBuckets.reduce((sum, b) => sum + b.count, 0);
+  const totalAmount = activeBuckets.reduce((sum, b) => sum + b.amount, 0);
 
   if (activeBuckets.length === 1) {
-    const b = activeBuckets[0]
-    return `${b.count} invoice${b.count !== 1 ? 's' : ''} overdue (${fmtShort(b.amount)}), all within the ${b.label} window.`
+    const b = activeBuckets[0];
+    return `${b.count} invoice${b.count !== 1 ? "s" : ""} overdue (${fmtShort(b.amount)}), all within the ${b.label} window.`;
   }
 
   // Multiple buckets active — find the worst
-  const worst = activeBuckets[activeBuckets.length - 1]
-  return `${total} invoices overdue totaling ${fmtShort(totalAmount)}. ${worst.count} invoice${worst.count !== 1 ? 's' : ''} in the ${worst.label} bucket need${worst.count === 1 ? 's' : ''} immediate attention.`
+  const worst = activeBuckets[activeBuckets.length - 1];
+  return `${total} invoices overdue totaling ${fmtShort(totalAmount)}. ${worst.count} invoice${worst.count !== 1 ? "s" : ""} in the ${worst.label} bucket need${worst.count === 1 ? "s" : ""} immediate attention.`;
 }
 
 // ─── Default Buckets ─────────────────────────────────────────────────────────
 
 const DEFAULT_BUCKETS: AgingBucket[] = [
-  { label: 'Current', minDays: 0, maxDays: 0, count: 0, amount: 0 },
-  { label: '1-30 days', minDays: 1, maxDays: 30, count: 0, amount: 0 },
-  { label: '31-60 days', minDays: 31, maxDays: 60, count: 0, amount: 0 },
-  { label: '61-90 days', minDays: 61, maxDays: 90, count: 0, amount: 0 },
-  { label: '90+ days', minDays: 91, maxDays: null, count: 0, amount: 0 },
-]
+  { label: "Current", minDays: 0, maxDays: 0, count: 0, amount: 0 },
+  { label: "1-30 days", minDays: 1, maxDays: 30, count: 0, amount: 0 },
+  { label: "31-60 days", minDays: 31, maxDays: 60, count: 0, amount: 0 },
+  { label: "61-90 days", minDays: 61, maxDays: 90, count: 0, amount: 0 },
+  { label: "90+ days", minDays: 91, maxDays: null, count: 0, amount: 0 },
+];
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
@@ -197,42 +205,57 @@ export function BillingHealthCard({
   agingReport,
   isLoading,
 }: BillingHealthCardProps) {
-  const settings = useFinanceSettings()
-  const { formatShort } = useCurrency(settings)
+  const settings = useFinanceSettings();
+  const { formatShort } = useCurrency(settings);
+  const { t } = useTranslation("payments");
+
+  const statusLabel = (status: string) =>
+    t(`status.${status}`, { defaultValue: formatInvoiceStatus(status) });
+  const gatewayLabel = (gateway: string) => {
+    const key =
+      gateway === "bank_transfer" ? "bankTransfer" : gateway.toLowerCase();
+    return t(`gateway.${key}`, { defaultValue: formatGatewayLabel(gateway) });
+  };
 
   const sortedStatuses = useMemo(
     () =>
       Object.entries(invoicesByStatus)
         .filter(([, count]) => count > 0)
         .sort(([, a], [, b]) => b - a),
-    [invoicesByStatus]
-  )
+    [invoicesByStatus],
+  );
 
   const donutData = useMemo(
     () =>
       sortedStatuses.map(([status, count]) => ({
-        name: formatInvoiceStatus(status),
+        name: statusLabel(status),
         value: count,
-        color: STATUS_COLORS[status] || '#888780',
-        pct: totalInvoiceCount > 0 ? Math.round((count / totalInvoiceCount) * 100) : 0,
+        color: STATUS_COLORS[status] || "#888780",
+        pct:
+          totalInvoiceCount > 0
+            ? Math.round((count / totalInvoiceCount) * 100)
+            : 0,
       })),
-    [sortedStatuses, totalInvoiceCount]
-  )
+    [sortedStatuses, statusLabel, totalInvoiceCount],
+  );
 
   const sortedGateways = useMemo(
     () =>
       Object.entries(paymentsByGateway)
         .filter(([, count]) => count > 0)
         .sort(([, a], [, b]) => b - a),
-    [paymentsByGateway]
-  )
+    [paymentsByGateway],
+  );
 
-  const buckets = agingReport.length > 0 ? agingReport : DEFAULT_BUCKETS
-  const hasAnyOverdue = buckets.some((b) => b.count > 0)
-  const agingInsight = useMemo(() => getAgingInsight(buckets, formatShort), [buckets, formatShort])
+  const buckets = agingReport.length > 0 ? agingReport : DEFAULT_BUCKETS;
+  const hasAnyOverdue = buckets.some((b) => b.count > 0);
+  const agingInsight = useMemo(
+    () => getAgingInsight(buckets, formatShort),
+    [buckets, formatShort],
+  );
 
   // Spectrum bar segment widths — proportional to count, minimum 6% for visibility
-  const totalCount = buckets.reduce((s, b) => s + b.count, 0)
+  const totalCount = buckets.reduce((s, b) => s + b.count, 0);
 
   return (
     <div
@@ -243,12 +266,12 @@ export function BillingHealthCard({
       {/* ── Header ── */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-medium text-[rgb(var(--text-secondary))]">
-          Billing health
+          {t("overview.billingHealth.title")}
         </h3>
         {!isLoading && !hasAnyOverdue && totalInvoiceCount > 0 && (
           <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-[rgb(var(--state-success-bg))] text-[rgb(var(--accent-enrollment-text))]">
             <CheckCircle2 className="w-3 h-3" />
-            All accounts current
+            {t("overview.billingHealth.allAccountsCurrent")}
           </span>
         )}
       </div>
@@ -260,17 +283,20 @@ export function BillingHealthCard({
         <div className="flex flex-col items-center py-6">
           <CheckCircle2 className="w-8 h-8 mb-2 opacity-40 text-[rgb(var(--text-tertiary))]" />
           <p className="text-xs font-medium text-[rgb(var(--text-tertiary))]">
-            No invoices yet
+            {t("overview.billingHealth.noInvoicesTitle")}
           </p>
           <p className="text-xs mt-0.5 text-[rgb(var(--text-disabled))]">
-            Create your first invoice to see billing health data.
+            {t("overview.billingHealth.noInvoicesDescription")}
           </p>
         </div>
       ) : (
         <>
           <div className="flex items-start gap-4">
             {/* Donut */}
-            <div className="flex-shrink-0 relative" style={{ width: 110, height: 110 }}>
+            <div
+              className="flex-shrink-0 relative"
+              style={{ width: 110, height: 110 }}
+            >
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
@@ -297,7 +323,7 @@ export function BillingHealthCard({
                   {totalInvoiceCount}
                 </span>
                 <span className="text-xs mt-0.5 text-[rgb(var(--text-disabled))]">
-                  invoices
+                  {t("overview.billingHealth.invoices")}
                 </span>
               </div>
             </div>
@@ -305,7 +331,10 @@ export function BillingHealthCard({
             {/* Legend */}
             <div className="flex-1 space-y-1.5 pt-1">
               {donutData.map((item) => (
-                <div key={item.name} className="flex items-center justify-between">
+                <div
+                  key={item.name}
+                  className="flex items-center justify-between"
+                >
                   <div className="flex items-center gap-1.5">
                     <div
                       // allow-presentation-style: per-status legend dot color
@@ -336,11 +365,13 @@ export function BillingHealthCard({
           <div className="mb-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-medium text-[rgb(var(--text-secondary))]">
-                Aging overview
+                {t("overview.billingHealth.agingOverview")}
               </span>
               {hasAnyOverdue && (
                 <span className="text-xs tabular-nums text-[rgb(var(--text-disabled))]">
-                  {totalCount} overdue
+                  {t("overview.billingHealth.overdueCount", {
+                    count: totalCount,
+                  })}
                 </span>
               )}
             </div>
@@ -358,20 +389,28 @@ export function BillingHealthCard({
               <div className="rounded-lg px-4 py-3 flex items-center gap-2 bg-[rgb(var(--state-success-bg))] border border-[rgb(var(--state-success-border))]">
                 <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-[rgb(var(--accent-enrollment-text))]" />
                 <span className="text-xs text-[rgb(var(--accent-enrollment-text))]">
-                  No overdue invoices — all accounts are current.
+                  {t("overview.billingHealth.noOverdue")}
                 </span>
               </div>
             ) : (
               <>
                 {/* Spectrum heatbar */}
-                <div className="flex rounded-lg overflow-hidden" style={{ height: 24 }}>
+                <div
+                  className="flex rounded-lg overflow-hidden"
+                  style={{ height: 24 }}
+                >
                   {buckets.map((bucket, idx) => {
                     // Width proportional to count; minimum 6% for empty segments, proportional for active
-                    const isActive = bucket.count > 0
-                    const minWidth = 6
-                    const proportionalWidth = totalCount > 0 ? (bucket.count / totalCount) * 100 : 0
-                    const width = isActive ? Math.max(proportionalWidth, 12) : minWidth
-                    const color = AGING_COLORS[idx] || AGING_COLORS[AGING_COLORS.length - 1]
+                    const isActive = bucket.count > 0;
+                    const minWidth = 6;
+                    const proportionalWidth =
+                      totalCount > 0 ? (bucket.count / totalCount) * 100 : 0;
+                    const width = isActive
+                      ? Math.max(proportionalWidth, 12)
+                      : minWidth;
+                    const color =
+                      AGING_COLORS[idx] ||
+                      AGING_COLORS[AGING_COLORS.length - 1];
 
                     return (
                       <div
@@ -380,9 +419,14 @@ export function BillingHealthCard({
                         className="relative flex items-center justify-center transition-all duration-500"
                         style={{
                           width: `${width}%`,
-                          background: isActive ? color : 'rgb(var(--background-tertiary))',
+                          background: isActive
+                            ? color
+                            : "rgb(var(--background-tertiary))",
                           opacity: isActive ? 1 : 0.4,
-                          borderRight: idx < buckets.length - 1 ? '1px solid rgb(var(--background-primary))' : undefined,
+                          borderRight:
+                            idx < buckets.length - 1
+                              ? "1px solid rgb(var(--background-primary))"
+                              : undefined,
                         }}
                         title={`${bucket.label}: ${bucket.count} invoices (${formatShort(bucket.amount)})`}
                       >
@@ -392,18 +436,23 @@ export function BillingHealthCard({
                           </span>
                         )}
                       </div>
-                    )
+                    );
                   })}
                 </div>
 
                 {/* Bucket labels */}
                 <div className="flex mt-1.5 gap-0.5">
                   {buckets.map((bucket, idx) => {
-                    const isActive = bucket.count > 0
-                    const minWidth = 6
-                    const proportionalWidth = totalCount > 0 ? (bucket.count / totalCount) * 100 : 0
-                    const width = isActive ? Math.max(proportionalWidth, 12) : minWidth
-                    const color = AGING_COLORS[idx] || AGING_COLORS[AGING_COLORS.length - 1]
+                    const isActive = bucket.count > 0;
+                    const minWidth = 6;
+                    const proportionalWidth =
+                      totalCount > 0 ? (bucket.count / totalCount) * 100 : 0;
+                    const width = isActive
+                      ? Math.max(proportionalWidth, 12)
+                      : minWidth;
+                    const color =
+                      AGING_COLORS[idx] ||
+                      AGING_COLORS[AGING_COLORS.length - 1];
 
                     return (
                       <div
@@ -414,7 +463,11 @@ export function BillingHealthCard({
                         <div
                           // allow-presentation-style: active bucket label uses its heat color
                           className="text-xs font-medium truncate"
-                          style={{ color: isActive ? color : 'rgb(var(--text-disabled))' }}
+                          style={{
+                            color: isActive
+                              ? color
+                              : "rgb(var(--text-disabled))",
+                          }}
                         >
                           {bucket.label}
                         </div>
@@ -424,7 +477,7 @@ export function BillingHealthCard({
                           </div>
                         )}
                       </div>
-                    )
+                    );
                   })}
                 </div>
               </>
@@ -437,16 +490,21 @@ export function BillingHealthCard({
           {/* ── Payment Methods ── */}
           <div>
             <span className="text-xs font-medium text-[rgb(var(--text-secondary))]">
-              Payment methods
+              {t("overview.billingHealth.paymentMethods")}
             </span>
 
             {totalPaymentCount === 0 ? (
-              <p className="text-xs py-3 text-[rgb(var(--text-tertiary))]">No payments recorded yet.</p>
+              <p className="text-xs py-3 text-[rgb(var(--text-tertiary))]">
+                {t("overview.billingHealth.noPaymentsRecorded")}
+              </p>
             ) : (
               <div className="space-y-2 mt-2.5">
                 {sortedGateways.map(([gateway, count]) => {
-                  const pct = totalPaymentCount > 0 ? (count / totalPaymentCount) * 100 : 0
-                  const color = GATEWAY_COLORS[gateway] || '#888780'
+                  const pct =
+                    totalPaymentCount > 0
+                      ? (count / totalPaymentCount) * 100
+                      : 0;
+                  const color = GATEWAY_COLORS[gateway] || "#888780";
                   return (
                     <div key={gateway} className="space-y-1">
                       <div className="flex items-center justify-between">
@@ -457,7 +515,7 @@ export function BillingHealthCard({
                             style={{ background: color }}
                           />
                           <span className="text-xs text-[rgb(var(--text-secondary))]">
-                            {formatGatewayLabel(gateway)}
+                            {gatewayLabel(gateway)}
                           </span>
                         </div>
                         <div className="flex items-center gap-2">
@@ -472,10 +530,10 @@ export function BillingHealthCard({
                       <AnimatedProgressBar
                         percentage={pct}
                         color={color}
-                        label={`${formatGatewayLabel(gateway)}: ${count} (${pct.toFixed(0)}%)`}
+                        label={`${gatewayLabel(gateway)}: ${count} (${pct.toFixed(0)}%)`}
                       />
                     </div>
-                  )
+                  );
                 })}
               </div>
             )}
@@ -483,5 +541,5 @@ export function BillingHealthCard({
         </>
       )}
     </div>
-  )
+  );
 }

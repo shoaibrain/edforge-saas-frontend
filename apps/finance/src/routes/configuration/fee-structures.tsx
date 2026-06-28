@@ -10,55 +10,69 @@
  *  - Improved error handling with specific error messages in toasts
  */
 
-import { useState, useMemo, useEffect, useCallback } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { toast } from 'sonner'
-import type { FeeStructure } from '@edforge/types'
-import { useCurrency } from '@edforge/types/use-currency'
-import { useFinanceSettings } from '../../layouts/FinanceLayout'
-import { apiGet } from '@edforge/api-client'
-import type { AxiosError } from '@edforge/api-client'
+import { useState, useMemo, useEffect, useCallback } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
+import type { FeeStructure } from "@edforge/types";
+import { useCurrency } from "@edforge/types/use-currency";
+import { useTranslation } from "@edforge/i18n";
+import { useFinanceSettings } from "../../layouts/FinanceLayout";
+import { apiGet } from "@edforge/api-client";
+import type { AxiosError } from "@edforge/api-client";
 import {
   GRADE_LEVEL_OPTIONS,
   getGradeLevelsInRange,
   type GradeLevel,
-} from '@aibrains/shared-types'
-import { Button, StatCard, WidgetErrorBoundaryV2 } from '@edforge/ui'
-import { Plus, AlertTriangle, DollarSign, Layers, TrendingUp } from 'lucide-react'
-import { useAppStore } from '../../stores/app.store'
+} from "@aibrains/shared-types";
+import { Button, StatCard, WidgetErrorBoundaryV2 } from "@edforge/ui";
+import {
+  Plus,
+  AlertTriangle,
+  DollarSign,
+  Layers,
+  TrendingUp,
+} from "lucide-react";
+import { useAppStore } from "../../stores/app.store";
 import {
   useFeeStructures,
   useCreateFeeStructure,
   useUpdateFeeStructure,
   useDeleteFeeStructure,
-} from '@edforge/finance-services'
-import { FeeStructureList } from '../../components/configuration/FeeStructureList'
-import { FeeStructureForm } from '../../components/configuration/FeeStructureForm'
-import type { FeeStructureFormData, AcademicYearOption } from '../../components/configuration/FeeStructureForm'
-import { FinancePageHeader, FinanceInfoBanner, FinanceFilterChips } from '../../components/shared'
+} from "@edforge/finance-services";
+import { FeeStructureList } from "../../components/configuration/FeeStructureList";
+import { FeeStructureForm } from "../../components/configuration/FeeStructureForm";
+import type {
+  FeeStructureFormData,
+  AcademicYearOption,
+} from "../../components/configuration/FeeStructureForm";
+import {
+  FinancePageHeader,
+  FinanceInfoBanner,
+  FinanceFilterChips,
+} from "../../components/shared";
 
 /* ------------------------------------------------------------------ */
 /*  API response types                                                 */
 /* ------------------------------------------------------------------ */
 
 interface AcademicYearApiItem {
-  yearId?: string
-  academicYearId?: string
-  id?: string
-  name: string
-  status: string
-  isCurrent?: boolean
+  yearId?: string;
+  academicYearId?: string;
+  id?: string;
+  name: string;
+  status: string;
+  isCurrent?: boolean;
 }
 
 interface SchoolApiResponse {
-  gradeRange?: { start: string; end: string }
+  gradeRange?: { start: string; end: string };
   /**
    * P1: school's chosen subset of the global grade-level catalog. Preferred
    * over `gradeRange` for picking which grade codes a fee structure can be
    * assigned to. Falls back to `gradeRange`-derived options for legacy rows.
    */
-  enabledGradeLevels?: string[]
-  [key: string]: unknown
+  enabledGradeLevels?: string[];
+  [key: string]: unknown;
 }
 
 /* ------------------------------------------------------------------ */
@@ -66,14 +80,20 @@ interface SchoolApiResponse {
 /* ------------------------------------------------------------------ */
 
 function extractApiErrorMessage(error: unknown): string | null {
-  const axiosErr = error as AxiosError<{ message?: string; errors?: Array<{ message?: string }> }>
-  const data = axiosErr?.response?.data
-  if (!data) return null
-  if (data.message) return data.message
+  const axiosErr = error as AxiosError<{
+    message?: string;
+    errors?: Array<{ message?: string }>;
+  }>;
+  const data = axiosErr?.response?.data;
+  if (!data) return null;
+  if (data.message) return data.message;
   if (data.errors?.length) {
-    return data.errors.map((e) => e.message).filter(Boolean).join('; ')
+    return data.errors
+      .map((e) => e.message)
+      .filter(Boolean)
+      .join("; ");
   }
-  return null
+  return null;
 }
 
 /**
@@ -85,23 +105,30 @@ function extractApiErrorMessage(error: unknown): string | null {
  *   2. Else `gradeRange` → derive via shared-types' `getGradeLevelsInRange`
  *   3. Else → full 20-code catalog
  */
-function deriveSchoolGradeCodes(school: SchoolApiResponse | undefined): string[] {
-  const enabled = school?.enabledGradeLevels
+function deriveSchoolGradeCodes(
+  school: SchoolApiResponse | undefined,
+): string[] {
+  const enabled = school?.enabledGradeLevels;
   if (Array.isArray(enabled) && enabled.length > 0) {
-    const enabledSet = new Set<string>(enabled.map(String))
-    const filtered = GRADE_LEVEL_OPTIONS.map((o) => o.value).filter((v) => enabledSet.has(v))
-    if (filtered.length > 0) return filtered
+    const enabledSet = new Set<string>(enabled.map(String));
+    const filtered = GRADE_LEVEL_OPTIONS.map((o) => o.value).filter((v) =>
+      enabledSet.has(v),
+    );
+    if (filtered.length > 0) return filtered;
   }
-  const range = school?.gradeRange
+  const range = school?.gradeRange;
   if (range) {
     try {
-      const codes = getGradeLevelsInRange(range.start as GradeLevel, range.end as GradeLevel)
-      if (codes.length > 0) return [...codes]
+      const codes = getGradeLevelsInRange(
+        range.start as GradeLevel,
+        range.end as GradeLevel,
+      );
+      if (codes.length > 0) return [...codes];
     } catch {
       // fall through
     }
   }
-  return GRADE_LEVEL_OPTIONS.map((o) => o.value)
+  return GRADE_LEVEL_OPTIONS.map((o) => o.value);
 }
 
 /* ------------------------------------------------------------------ */
@@ -109,67 +136,80 @@ function deriveSchoolGradeCodes(school: SchoolApiResponse | undefined): string[]
 /* ------------------------------------------------------------------ */
 
 export default function FeeStructuresPage() {
-  const schoolId = useAppStore((s) => s.activeSchoolId)
-  const settings = useFinanceSettings()
-  const { formatCompact } = useCurrency(settings)
+  const schoolId = useAppStore((s) => s.activeSchoolId);
+  const settings = useFinanceSettings();
+  const { formatCompact } = useCurrency(settings);
+  const { t } = useTranslation("payments");
 
-  const [showForm, setShowForm] = useState(false)
-  const [editingFee, setEditingFee] = useState<FeeStructure | null>(null)
-  const [deletingFee, setDeletingFee] = useState<FeeStructure | null>(null)
-  const [activeFilter, setActiveFilter] = useState<'' | 'active' | 'inactive'>('')
+  const [showForm, setShowForm] = useState(false);
+  const [editingFee, setEditingFee] = useState<FeeStructure | null>(null);
+  const [deletingFee, setDeletingFee] = useState<FeeStructure | null>(null);
+  const [activeFilter, setActiveFilter] = useState<"" | "active" | "inactive">(
+    "",
+  );
 
-  const { data: feeStructures, isLoading, isError } = useFeeStructures(schoolId ?? '')
-  const createMutation = useCreateFeeStructure(schoolId ?? '')
-  const updateMutation = useUpdateFeeStructure(schoolId ?? '')
-  const deleteMutation = useDeleteFeeStructure(schoolId ?? '')
+  const {
+    data: feeStructures,
+    isLoading,
+    isError,
+  } = useFeeStructures(schoolId ?? "");
+  const createMutation = useCreateFeeStructure(schoolId ?? "");
+  const updateMutation = useUpdateFeeStructure(schoolId ?? "");
+  const deleteMutation = useDeleteFeeStructure(schoolId ?? "");
 
   const filteredFeeStructures = useMemo(() => {
-    const list = feeStructures ?? []
-    if (activeFilter === 'active') return list.filter(f => f.isActive !== false)
-    if (activeFilter === 'inactive') return list.filter(f => f.isActive === false)
-    return list
-  }, [feeStructures, activeFilter])
+    const list = feeStructures ?? [];
+    if (activeFilter === "active")
+      return list.filter((f) => f.isActive !== false);
+    if (activeFilter === "inactive")
+      return list.filter((f) => f.isActive === false);
+    return list;
+  }, [feeStructures, activeFilter]);
 
   const kpi = useMemo(() => {
-    const list = feeStructures ?? []
-    const totalStructures = list.length
-    const autoApplyCount = list.filter(f => f.autoApplyOnEnrollment).length
-    const feeTypes = new Set(list.map(f => f.feeType)).size
-    const maxFee = list.reduce((max, f) => Math.max(max, f.amount || 0), 0)
-    return { totalStructures, autoApplyCount, feeTypes, maxFee }
-  }, [feeStructures])
+    const list = feeStructures ?? [];
+    const totalStructures = list.length;
+    const autoApplyCount = list.filter((f) => f.autoApplyOnEnrollment).length;
+    const feeTypes = new Set(list.map((f) => f.feeType)).size;
+    const maxFee = list.reduce((max, f) => Math.max(max, f.amount || 0), 0);
+    return { totalStructures, autoApplyCount, feeTypes, maxFee };
+  }, [feeStructures]);
 
   // Fetch academic years for the school
   const { data: academicYearsRaw } = useQuery({
-    queryKey: ['academicYears', schoolId],
-    queryFn: () => apiGet<{ items: AcademicYearApiItem[] } | AcademicYearApiItem[]>(
-      `/schools/${schoolId}/academic-years`,
-    ),
+    queryKey: ["academicYears", schoolId],
+    queryFn: () =>
+      apiGet<{ items: AcademicYearApiItem[] } | AcademicYearApiItem[]>(
+        `/schools/${schoolId}/academic-years`,
+      ),
     enabled: !!schoolId,
     staleTime: 10 * 60 * 1000,
-  })
+  });
 
   const academicYears: AcademicYearOption[] = useMemo(() => {
     const items = Array.isArray(academicYearsRaw)
       ? academicYearsRaw
-      : academicYearsRaw?.items ?? []
+      : (academicYearsRaw?.items ?? []);
     return items.map((ay) => ({
-      id: ay.yearId || ay.academicYearId || ay.id || '',
+      id: ay.yearId || ay.academicYearId || ay.id || "",
       name: ay.name,
       status: ay.status,
       isCurrent: ay.isCurrent,
-    }))
-  }, [academicYearsRaw])
+    }));
+  }, [academicYearsRaw]);
 
   // Fetch school details for grade range
   const { data: schoolData } = useQuery({
-    queryKey: ['school', schoolId],
+    queryKey: ["school", schoolId],
     queryFn: () => apiGet<SchoolApiResponse>(`/schools/${schoolId}`),
     enabled: !!schoolId,
     staleTime: 10 * 60 * 1000,
-  })
+  });
 
-  const gradeOptions = useMemo(() => deriveSchoolGradeCodes(schoolData), [schoolData])
+  const gradeOptions = useMemo(
+    () => deriveSchoolGradeCodes(schoolData),
+    [schoolData],
+  );
 
   /**
    * When editing, surface any codes the saved fee structure references that
@@ -181,17 +221,17 @@ export default function FeeStructuresPage() {
    * ("permissive on out-of-range data").
    */
   const editGradeOptions = useMemo(() => {
-    if (!editingFee?.gradeLevels?.length) return gradeOptions
-    const inDerived = new Set(gradeOptions)
-    const extras = editingFee.gradeLevels.filter((g) => !inDerived.has(g))
-    return extras.length > 0 ? [...gradeOptions, ...extras] : gradeOptions
-  }, [gradeOptions, editingFee])
+    if (!editingFee?.gradeLevels?.length) return gradeOptions;
+    const inDerived = new Set(gradeOptions);
+    const extras = editingFee.gradeLevels.filter((g) => !inDerived.has(g));
+    return extras.length > 0 ? [...gradeOptions, ...extras] : gradeOptions;
+  }, [gradeOptions, editingFee]);
 
   // Resolve academic year name from ID
   const getAcademicYearName = (yearId: string): string => {
-    const year = academicYears.find((y) => y.id === yearId)
-    return year?.name ?? ''
-  }
+    const year = academicYears.find((y) => y.id === yearId);
+    return year?.name ?? "";
+  };
 
   const handleCreate = async (data: FeeStructureFormData) => {
     try {
@@ -202,7 +242,7 @@ export default function FeeStructuresPage() {
         amount: data.amount,
         currency: settings.currency,
         taxRate: data.taxRate || 0,
-        taxType: data.taxType || 'none',
+        taxType: data.taxType || "none",
         frequency: data.frequency,
         gradeLevels: data.gradeLevels ?? [],
         autoApplyOnEnrollment: data.autoApplyOnEnrollment,
@@ -211,17 +251,17 @@ export default function FeeStructuresPage() {
         effectiveTo: data.effectiveTo || undefined,
         academicYear: getAcademicYearName(data.academicYearId),
         academicYearId: data.academicYearId,
-      })
-      toast.success('Fee structure created')
-      setShowForm(false)
+      });
+      toast.success(t("feeStructure.created"));
+      setShowForm(false);
     } catch (error) {
-      const msg = extractApiErrorMessage(error)
-      toast.error(msg || 'Failed to create fee structure')
+      const msg = extractApiErrorMessage(error);
+      toast.error(msg || t("feeStructure.createFailed"));
     }
-  }
+  };
 
   const handleUpdate = async (data: FeeStructureFormData) => {
-    if (!editingFee) return
+    if (!editingFee) return;
     try {
       await updateMutation.mutateAsync({
         id: editingFee.id,
@@ -230,39 +270,39 @@ export default function FeeStructuresPage() {
           description: data.description,
           amount: data.amount,
           taxRate: data.taxRate || 0,
-          taxType: data.taxType || 'none',
+          taxType: data.taxType || "none",
           frequency: data.frequency,
           gradeLevels: data.gradeLevels ?? [],
           effectiveFrom: data.effectiveFrom,
           effectiveTo: data.effectiveTo || undefined,
         },
-      })
-      toast.success('Fee structure updated')
-      setEditingFee(null)
+      });
+      toast.success(t("feeStructure.updated"));
+      setEditingFee(null);
     } catch (error) {
-      const msg = extractApiErrorMessage(error)
-      toast.error(msg || 'Failed to update fee structure')
+      const msg = extractApiErrorMessage(error);
+      toast.error(msg || t("feeStructure.updateFailed"));
     }
-  }
+  };
 
   const handleDelete = async () => {
-    if (!deletingFee) return
+    if (!deletingFee) return;
     try {
-      await deleteMutation.mutateAsync(deletingFee.id)
-      toast.success('Fee structure deleted')
-      setDeletingFee(null)
+      await deleteMutation.mutateAsync(deletingFee.id);
+      toast.success(t("feeStructure.deleted"));
+      setDeletingFee(null);
     } catch (error) {
-      const msg = extractApiErrorMessage(error)
-      toast.error(msg || 'Failed to delete fee structure')
+      const msg = extractApiErrorMessage(error);
+      toast.error(msg || t("feeStructure.deleteFailed"));
     }
-  }
+  };
 
   if (!schoolId) {
     return (
       <div className="max-w-3xl mx-auto px-6 py-8 text-center text-[rgb(var(--text-tertiary))]">
-        Select a school to manage fee structures.
+        {t("feeStructure.selectSchool")}
       </div>
-    )
+    );
   }
 
   if (isError) {
@@ -270,21 +310,23 @@ export default function FeeStructuresPage() {
       <div className="p-6 space-y-6">
         <div className="text-center py-16">
           <AlertTriangle className="w-10 h-10 mx-auto mb-3 text-[rgb(var(--state-danger-fg))] opacity-60" />
-          <p className="text-sm font-medium text-[rgb(var(--text-primary))]">Failed to load fee structures</p>
+          <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
+            {t("feeStructure.loadFailed")}
+          </p>
           <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
-            Please check your connection and try again.
+            {t("feeStructure.connectionRetry")}
           </p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
     <div className="p-6 space-y-5">
       {/* Header */}
       <FinancePageHeader
-        title="Fee Structures"
-        subtitle="Configure the fee types and amounts for your school."
+        title={t("feeStructure.title")}
+        subtitle={t("feeStructure.description")}
         actions={
           <button
             type="button"
@@ -292,7 +334,7 @@ export default function FeeStructuresPage() {
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
           >
             <Plus className="w-3.5 h-3.5" />
-            Add Fee Structure
+            {t("feeStructure.addFee")}
           </button>
         }
       />
@@ -300,14 +342,14 @@ export default function FeeStructuresPage() {
       {/* Info Banner */}
       <FinanceInfoBanner
         variant="info"
-        message="Fee structures with auto-apply on enrollment will automatically generate obligations when a student is enrolled."
+        message={t("feeStructure.autoApplyBanner")}
       />
 
       {/* KPI Grid */}
       <WidgetErrorBoundaryV2>
         <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
           <StatCard
-            label="Total Structures"
+            label={t("feeStructure.stats.totalStructures")}
             value={String(kpi.totalStructures)}
             icon={Layers}
             accentColor="rgba(127, 119, 221, 0.12)"
@@ -317,7 +359,7 @@ export default function FeeStructuresPage() {
             loading={isLoading}
           />
           <StatCard
-            label="Auto-Apply"
+            label={t("feeStructure.stats.autoApply")}
             value={String(kpi.autoApplyCount)}
             icon={TrendingUp}
             accentColor="rgba(29, 158, 117, 0.12)"
@@ -326,7 +368,7 @@ export default function FeeStructuresPage() {
             loading={isLoading}
           />
           <StatCard
-            label="Fee Types"
+            label={t("feeStructure.stats.feeTypes")}
             value={String(kpi.feeTypes)}
             icon={DollarSign}
             accentColor="rgba(55, 138, 221, 0.12)"
@@ -335,7 +377,7 @@ export default function FeeStructuresPage() {
             loading={isLoading}
           />
           <StatCard
-            label="Max Fee"
+            label={t("feeStructure.stats.maxFee")}
             value={formatCompact(kpi.maxFee)}
             icon={AlertTriangle}
             accentColor="rgba(239, 159, 39, 0.12)"
@@ -349,12 +391,12 @@ export default function FeeStructuresPage() {
       {/* Filter Chips */}
       <FinanceFilterChips
         options={[
-          { label: 'All', value: '' },
-          { label: 'Active', value: 'active' },
-          { label: 'Inactive', value: 'inactive' },
+          { label: t("feeStructure.filters.all"), value: "" },
+          { label: t("feeStructure.filters.active"), value: "active" },
+          { label: t("feeStructure.filters.inactive"), value: "inactive" },
         ]}
         value={activeFilter}
-        onChange={(v) => setActiveFilter(v as '' | 'active' | 'inactive')}
+        onChange={(v) => setActiveFilter(v as "" | "active" | "inactive")}
         accentColor="#7F77DD"
       />
 
@@ -405,7 +447,7 @@ export default function FeeStructuresPage() {
         />
       )}
     </div>
-  )
+  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -418,26 +460,28 @@ function DeleteConfirmDialog({
   onConfirm,
   onCancel,
 }: {
-  feeName: string
-  isPending: boolean
-  onConfirm: () => void
-  onCancel: () => void
+  feeName: string;
+  isPending: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
 }) {
+  const { t } = useTranslation("payments");
+
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && !isPending) onCancel()
+      if (e.key === "Escape" && !isPending) onCancel();
     },
     [onCancel, isPending],
-  )
+  );
 
   useEffect(() => {
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [handleKeyDown])
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]);
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget && !isPending) onCancel()
-  }
+    if (e.target === e.currentTarget && !isPending) onCancel();
+  };
 
   return (
     <div
@@ -455,16 +499,15 @@ function DeleteConfirmDialog({
           <AlertTriangle className="w-6 h-6 text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]" />
         </div>
 
-        <h3 id="delete-fee-title" className="text-lg font-semibold text-[rgb(var(--text-primary))] text-center">
-          Delete Fee Structure
+        <h3
+          id="delete-fee-title"
+          className="text-lg font-semibold text-[rgb(var(--text-primary))] text-center"
+        >
+          {t("feeStructure.deleteTitle")}
         </h3>
 
         <p className="text-sm text-[rgb(var(--text-tertiary))] mt-2 text-center">
-          Are you sure you want to delete{' '}
-          <span className="font-medium text-[rgb(var(--text-primary))]">
-            {feeName}
-          </span>
-          ? This action is irreversible and cannot be undone.
+          {t("feeStructure.deleteMessage", { feeName })}
         </p>
 
         <div className="flex gap-3 mt-6">
@@ -474,7 +517,7 @@ function DeleteConfirmDialog({
             disabled={isPending}
             className="flex-1"
           >
-            Cancel
+            {t("actions.cancel")}
           </Button>
           <button
             type="button"
@@ -482,10 +525,12 @@ function DeleteConfirmDialog({
             disabled={isPending}
             className="flex-1 py-2 rounded-xl bg-[rgb(var(--action-danger-bg))] text-[rgb(var(--action-primary-fg))] text-sm font-semibold hover:brightness-95 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isPending ? 'Deleting...' : 'Confirm Delete'}
+            {isPending
+              ? t("feeStructure.deleting")
+              : t("feeStructure.confirmDelete")}
           </button>
         </div>
       </div>
     </div>
-  )
+  );
 }
