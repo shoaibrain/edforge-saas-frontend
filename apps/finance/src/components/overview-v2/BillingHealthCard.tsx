@@ -206,8 +206,10 @@ export function BillingHealthCard({
   isLoading,
 }: BillingHealthCardProps) {
   const settings = useFinanceSettings();
-  const { formatShort } = useCurrency(settings);
-  const { t } = useTranslation("payments");
+  const { t, i18n } = useTranslation("payments");
+  const { formatShort } = useCurrency(settings, {
+    platformLanguage: i18n.language,
+  });
 
   const statusLabel = (status: string) =>
     t(`status.${status}`, { defaultValue: formatInvoiceStatus(status) });

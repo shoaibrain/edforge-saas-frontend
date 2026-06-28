@@ -57,8 +57,10 @@ export function RecentInvoicesCard({
   isLoading,
 }: RecentInvoicesCardProps) {
   const settings = useFinanceSettings();
-  const { format } = useCurrency(settings);
   const { t, i18n } = useTranslation("payments");
+  const { format } = useCurrency(settings, {
+    platformLanguage: i18n.language,
+  });
   const top5 = invoices.slice(0, 5);
   const statusLabel = (status: string) =>
     t(`status.${status}`, { defaultValue: formatInvoiceStatus(status) });

@@ -179,7 +179,9 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
   const data = useFinanceOverviewV2(schoolId);
   const { stagger, fadeInUp } = useMotionVariants();
   const settings = useFinanceSettings();
-  const { formatCompact, formatShort } = useCurrency(settings);
+  const { formatCompact, formatShort } = useCurrency(settings, {
+    platformLanguage: i18n.language,
+  });
 
   const {
     kpi,

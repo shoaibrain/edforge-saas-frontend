@@ -8,12 +8,30 @@ import { useMemo } from "react";
 import { formatCurrency } from "@aibrains/shared-types/utils/currency";
 import type { ResolvedSettings } from "@edforge/config/resolved-settings";
 
-export function normalizeCurrencyLocale(locale: string): "ne" | undefined {
-  return locale.trim().toLowerCase().startsWith("ne") ? "ne" : undefined;
+export interface UseCurrencyOptions {
+  /**
+   * Active platform UI language, not tenant regional defaultLocale.
+   * Pass i18n.language from translated UI surfaces that should use Nepali
+   * digits/symbols when the operator explicitly selects Nepali.
+   */
+  platformLanguage?: unknown;
 }
 
-export function useCurrency(settings: ResolvedSettings) {
-  const currencyLocale = normalizeCurrencyLocale(settings.locale);
+export function normalizeCurrencyLocale(
+  platformLanguage: unknown,
+): "ne" | undefined {
+  if (typeof platformLanguage !== "string") return undefined;
+  const normalized = platformLanguage.trim().replace("_", "-").toLowerCase();
+  return normalized === "ne" || normalized.startsWith("ne-")
+    ? "ne"
+    : undefined;
+}
+
+export function useCurrency(
+  settings: ResolvedSettings,
+  options: UseCurrencyOptions = {},
+) {
+  const currencyLocale = normalizeCurrencyLocale(options.platformLanguage);
 
   return useMemo(
     () => ({

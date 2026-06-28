@@ -77,8 +77,10 @@ export function RecentPaymentsCard({
   isLoading,
 }: RecentPaymentsCardProps) {
   const settings = useFinanceSettings();
-  const { format } = useCurrency(settings);
   const { t, i18n } = useTranslation("payments");
+  const { format } = useCurrency(settings, {
+    platformLanguage: i18n.language,
+  });
   const top5 = payments.slice(0, 5);
   const gatewayLabel = (gateway: string) => {
     const key =

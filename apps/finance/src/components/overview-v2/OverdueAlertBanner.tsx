@@ -27,8 +27,10 @@ export function OverdueAlertBanner({
   agingReport,
 }: OverdueAlertBannerProps) {
   const settings = useFinanceSettings();
-  const { formatShort } = useCurrency(settings);
-  const { t } = useTranslation("payments");
+  const { t, i18n } = useTranslation("payments");
+  const { formatShort } = useCurrency(settings, {
+    platformLanguage: i18n.language,
+  });
   const navigate = useNavigate();
 
   if (overdue <= 0) return null;

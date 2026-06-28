@@ -138,8 +138,10 @@ function deriveSchoolGradeCodes(
 export default function FeeStructuresPage() {
   const schoolId = useAppStore((s) => s.activeSchoolId);
   const settings = useFinanceSettings();
-  const { formatCompact } = useCurrency(settings);
-  const { t } = useTranslation("payments");
+  const { t, i18n } = useTranslation("payments");
+  const { formatCompact } = useCurrency(settings, {
+    platformLanguage: i18n.language,
+  });
 
   const [showForm, setShowForm] = useState(false);
   const [editingFee, setEditingFee] = useState<FeeStructure | null>(null);

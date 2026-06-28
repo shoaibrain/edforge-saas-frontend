@@ -67,8 +67,10 @@ export function CollectionPerformanceCard({
   isLoading,
 }: CollectionPerformanceCardProps) {
   const settings = useFinanceSettings();
-  const { formatShort } = useCurrency(settings);
-  const { t } = useTranslation("payments");
+  const { t, i18n } = useTranslation("payments");
+  const { formatShort } = useCurrency(settings, {
+    platformLanguage: i18n.language,
+  });
   const [showAll, setShowAll] = useState(false);
 
   // Use totalInvoiced as denominator for accurate percentages

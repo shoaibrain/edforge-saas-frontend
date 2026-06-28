@@ -33,8 +33,10 @@ export function FeeStructureList({
   onDelete,
 }: FeeStructureListProps) {
   const settings = useFinanceSettings();
-  const { formatCompact } = useCurrency(settings);
-  const { t } = useTranslation("payments");
+  const { t, i18n } = useTranslation("payments");
+  const { formatCompact } = useCurrency(settings, {
+    platformLanguage: i18n.language,
+  });
   const safeList = Array.isArray(feeStructures) ? feeStructures : [];
   const frequencyLabel = (frequency: string) =>
     t(`feeStructure.frequencies.${frequency}`, { defaultValue: frequency });

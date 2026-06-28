@@ -109,7 +109,7 @@ export function formatRelativeDate(
   options: RelativeDateFormatOptions = {},
 ): string {
   // Normalize: treat naive ISO strings (no timezone) as UTC
-  const normalized = /[Z+\-]\d{0,2}:?\d{0,2}$/.test(dateString)
+  const normalized = /[Z+-]\d{0,2}:?\d{0,2}$/.test(dateString)
     ? dateString
     : dateString + "Z";
   const date = new Date(normalized);
