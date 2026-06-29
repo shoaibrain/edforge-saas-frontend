@@ -727,6 +727,102 @@
       "saveScores": "अङ्क सुरक्षित गर्नुहोस्"
     }
   },
+  "examModule": {
+    "description": "Midterm, final र term examinations योजना, सञ्चालन र publish गर्नुहोस्",
+    "descriptionWithYear": "{{yearName}} का exam योजना, सञ्चालन र publish गर्नुहोस्",
+    "createExam": "Exam सिर्जना गर्नुहोस्",
+    "createDisabledTitle": "पहिले term सहितको शैक्षिक वर्ष चाहिन्छ",
+    "noActiveYear": {
+      "title": "सक्रिय शैक्षिक वर्ष छैन",
+      "description": "Exam schedule गर्न यस विद्यालयका लागि current academic year सेट गर्नुहोस्।"
+    },
+    "bulk": {
+      "changeStatus": "स्थिति परिवर्तन",
+      "generateResults": "Result बनाउनुहोस्",
+      "changeStatusComingSoon": "{{count}} exam को bulk status change — चाँडै आउँदैछ",
+      "generateComingSoon": "{{count}} exam को result generation queue हुनेछ — चाँडै आउँदैछ",
+      "onlyClosed": "Result card closed exams बाट मात्र बनाउन सकिन्छ।"
+    },
+    "filter": {
+      "filteredBy": "Filter:",
+      "clear": "Clear (1)"
+    },
+    "summary": {
+      "total": "कुल Exam",
+      "live": "Live Now",
+      "upcoming": "आउँदैछ",
+      "awaiting": "Result प्रतीक्षा",
+      "readiness": "Result तयारी",
+      "typeTermCount": "{{types}} प्रकार · {{terms}} term",
+      "inSession": "चलिरहेको",
+      "nothingLive": "Live छैन",
+      "allCaughtUp": "सबै पूरा",
+      "actionNeeded": "Action चाहिन्छ",
+      "noClosed": "Closed exam छैन",
+      "generatedCount": "{{generated}}/{{total}} generated",
+      "readinessAria": "Result तयारी: {{percent}}% ({{generated}} of {{total}} generated)",
+      "nextHint": "अर्को: {{examName}} · {{days}}d मा",
+      "noUpcoming": "आउँदै गरेको छैन"
+    },
+    "status": {
+      "draft": "Draft",
+      "scheduled": "Scheduled",
+      "in_progress": "In Progress",
+      "closed": "Closed",
+      "published": "Published"
+    },
+    "transitions": {
+      "draft": "Draft मा सार्नुहोस्",
+      "scheduled": "Schedule गर्नुहोस्",
+      "in_progress": "Exam सुरु गर्नुहोस्",
+      "closed": "Exam बन्द गर्नुहोस्",
+      "published": "Exam publish गर्नुहोस्"
+    },
+    "transitionConfirm": {
+      "closed": "यो exam बन्द गर्ने हो? अङ्क locked हुन्छन् र enrolled विद्यार्थीहरूका result cards बन्नेछन्। बन्द गरेपछि मात्र publish गर्न सकिन्छ।",
+      "published": "यो exam publish गर्ने हो? यसले exam lifecycle पूरा भएको मान्छ।"
+    },
+    "types": {
+      "midterm": "Midterm",
+      "final": "Final",
+      "unit_test": "Unit Test",
+      "quiz": "Quiz"
+    },
+    "resultGeneration": {
+      "label": "Result generation",
+      "pending": "Result card बनाउँदै...",
+      "generated": "Result card बनेको छ",
+      "failed": "Result generation असफल",
+      "generatedAt": "{{dateTime}} मा generated"
+    },
+    "detail": {
+      "backToExams": "Exam मा फर्कनुहोस्",
+      "notFoundTitle": "Exam भेटिएन",
+      "notFoundDescription": "यो exam हटाइएको हुन सक्छ वा तपाईंलाई access छैन।",
+      "noTerm": "Term छैन",
+      "grades": "ग्रेडहरू",
+      "edit": "सम्पादन",
+      "resultCards": "Result Cards",
+      "lifecycle": "Lifecycle",
+      "lifecycleComplete": "यो exam published छ — lifecycle पूरा भयो।",
+      "tabsAria": "Exam tabs",
+      "tabs": {
+        "overview": "Overview",
+        "subjects": "Subjects",
+        "scores": "Scores"
+      },
+      "fields": {
+        "type": "Type",
+        "term": "Term",
+        "status": "Status",
+        "gradeLevels": "Grade Levels",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "created": "Created",
+        "description": "Description"
+      }
+    }
+  },
   "classrooms": {
     "tabs": {
       "overview": "अवलोकन",

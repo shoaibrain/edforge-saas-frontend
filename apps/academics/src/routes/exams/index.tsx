@@ -17,13 +17,13 @@ import type { ExamResponseDto } from '@aibrains/shared-types'
 import { useActiveSchoolId } from '../../stores/app.store'
 import { useCurrentAcademicYear, useGradingPeriods } from '../../hooks/useSchool'
 import { useExams, useExamPattern } from '../../hooks/useExams'
+import { useAcademicsI18n } from '../../lib/i18n'
 import { ExamTable } from '../../components/exams/ExamTable'
 import { ExamDrawer } from '../../components/exams/ExamDrawer'
 import { BulkExamStatusDrawer } from '../../components/exams/BulkExamStatusDrawer'
 import {
   ExamSummary,
   filterExamsByBucket,
-  labelForBucket,
   type ExamBucket,
 } from '../../components/exams/ExamSummary'
 
@@ -33,6 +33,7 @@ interface TermOption {
 }
 
 export function ExamsModule() {
+  const { t, formatDate } = useAcademicsI18n()
   const schoolId = useActiveSchoolId() || ''
   const navigate = useNavigate()
   const canCreateExam = usePermission('create', 'assessments')
@@ -89,25 +90,25 @@ export function ExamsModule() {
     () => [
       {
         id: 'change-status',
-        label: 'Change status',
+        label: t('examModule.bulk.changeStatus'),
         icon: <Flag className="w-4 h-4" />,
         onRun: (rows) => setBulkStatusTarget(rows),
       },
       {
         id: 'generate-results',
-        label: 'Generate results',
+        label: t('examModule.bulk.generateResults'),
         icon: <RefreshCw className="w-4 h-4" />,
         onRun: (rows) => {
           const closable = rows.filter((r) => r.status === 'closed')
           if (closable.length === 0) {
-            toast.error('Only closed exams can generate result cards.')
+            toast.error(t('examModule.bulk.onlyClosed'))
             return
           }
-          toast.info(`Will queue result generation for ${closable.length} exam${closable.length === 1 ? '' : 's'} — coming soon`)
+          toast.info(t('examModule.bulk.generateComingSoon', { count: closable.length }))
         },
       },
     ],
-    []
+    [t]
   )
 
   const showFilterChip = activeBucket !== 'total'
@@ -122,10 +123,10 @@ export function ExamsModule() {
             ) : null}
             {currentYear?.name ? <ContextBarSep /> : null}
             <span>
-              {new Date().toLocaleDateString('en-US', {
-                weekday: 'long',
-                month: 'short',
-                day: 'numeric',
+                  {formatDate(new Date(), {
+                    weekday: 'long',
+                    month: 'short',
+                    day: 'numeric',
               })}
             </span>
           </>
@@ -133,8 +134,8 @@ export function ExamsModule() {
         description={
           <p className="text-sm text-[rgb(var(--text-tertiary))]">
             {currentYear?.name
-              ? `Plan, run, and publish exams for ${currentYear.name}`
-              : 'Plan, run, and publish midterms, finals, and term examinations'}
+              ? t('examModule.descriptionWithYear', { yearName: currentYear.name })
+              : t('examModule.description')}
           </p>
         }
         actions={
@@ -143,11 +144,11 @@ export function ExamsModule() {
               type="button"
               onClick={() => setDrawerOpen(true)}
               disabled={!canOpenDrawer}
-              title={!canOpenDrawer ? 'An academic year with terms is required first' : undefined}
+              title={!canOpenDrawer ? t('examModule.createDisabledTitle') : undefined}
               className="inline-flex items-center gap-1.5 px-3.5 py-2 text-sm font-semibold rounded-lg bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors disabled:opacity-50"
             >
               <Plus className="w-4 h-4" />
-              Create Exam
+              {t('examModule.createExam')}
             </button>
           ) : undefined
         }
@@ -156,9 +157,11 @@ export function ExamsModule() {
       {!academicYearId ? (
         <div className="bg-surface-secondary rounded-xl border border-border-secondary p-12 text-center">
           <ClipboardList className="w-12 h-12 mx-auto text-text-tertiary mb-4" />
-          <h4 className="text-lg font-medium text-text-primary mb-2">No Active Academic Year</h4>
+          <h4 className="text-lg font-medium text-text-primary mb-2">
+            {t('examModule.noActiveYear.title')}
+          </h4>
           <p className="text-text-secondary max-w-md mx-auto">
-            Set a current academic year for this school to begin scheduling exams.
+            {t('examModule.noActiveYear.description')}
           </p>
         </div>
       ) : (
@@ -173,9 +176,9 @@ export function ExamsModule() {
           {showFilterChip && (
             <div className="flex items-center gap-2 px-1">
               <span className="text-xs text-[rgb(var(--text-tertiary))]">
-                Filtered by{' '}
+                {t('examModule.filter.filteredBy')}{' '}
                 <span className="text-[rgb(var(--text-primary))] font-medium">
-                  {labelForBucket(activeBucket as Exclude<ExamBucket, null | 'total'>)}
+                  {t(`examModule.summary.${activeBucket}`)}
                 </span>
               </span>
               <button
@@ -184,7 +187,7 @@ export function ExamsModule() {
                 className="inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded-md border border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-secondary))] transition-colors"
               >
                 <X className="w-3 h-3" />
-                Clear (1)
+                {t('examModule.filter.clear')}
               </button>
             </div>
           )}

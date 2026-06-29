@@ -727,6 +727,102 @@
       "saveScores": "Save Scores"
     }
   },
+  "examModule": {
+    "description": "Plan, run, and publish midterms, finals, and term examinations",
+    "descriptionWithYear": "Plan, run, and publish exams for {{yearName}}",
+    "createExam": "Create Exam",
+    "createDisabledTitle": "An academic year with terms is required first",
+    "noActiveYear": {
+      "title": "No Active Academic Year",
+      "description": "Set a current academic year for this school to begin scheduling exams."
+    },
+    "bulk": {
+      "changeStatus": "Change status",
+      "generateResults": "Generate results",
+      "changeStatusComingSoon": "Bulk change status for {{count}} exam(s) — coming soon",
+      "generateComingSoon": "Will queue result generation for {{count}} exam(s) — coming soon",
+      "onlyClosed": "Only closed exams can generate result cards."
+    },
+    "filter": {
+      "filteredBy": "Filtered by",
+      "clear": "Clear (1)"
+    },
+    "summary": {
+      "total": "Total Exams",
+      "live": "Live Now",
+      "upcoming": "Upcoming",
+      "awaiting": "Awaiting Results",
+      "readiness": "Result Readiness",
+      "typeTermCount": "{{types}} types · {{terms}} terms",
+      "inSession": "In session",
+      "nothingLive": "Nothing live",
+      "allCaughtUp": "All caught up",
+      "actionNeeded": "Action needed",
+      "noClosed": "No closed exams",
+      "generatedCount": "{{generated}}/{{total}} generated",
+      "readinessAria": "Result Readiness: {{percent}}% ({{generated}} of {{total}} generated)",
+      "nextHint": "Next: {{examName}} · in {{days}}d",
+      "noUpcoming": "No upcoming"
+    },
+    "status": {
+      "draft": "Draft",
+      "scheduled": "Scheduled",
+      "in_progress": "In Progress",
+      "closed": "Closed",
+      "published": "Published"
+    },
+    "transitions": {
+      "draft": "Move to Draft",
+      "scheduled": "Schedule",
+      "in_progress": "Start Exam",
+      "closed": "Close Exam",
+      "published": "Publish Exam"
+    },
+    "transitionConfirm": {
+      "closed": "Close this exam? Scores lock and result cards are generated for every enrolled student. You can only publish after closing.",
+      "published": "Publish this exam? This marks the exam lifecycle complete."
+    },
+    "types": {
+      "midterm": "Midterm",
+      "final": "Final",
+      "unit_test": "Unit Test",
+      "quiz": "Quiz"
+    },
+    "resultGeneration": {
+      "label": "Result generation",
+      "pending": "Generating result cards...",
+      "generated": "Result cards generated",
+      "failed": "Result generation failed",
+      "generatedAt": "Generated {{dateTime}}"
+    },
+    "detail": {
+      "backToExams": "Back to Exams",
+      "notFoundTitle": "Exam Not Found",
+      "notFoundDescription": "This exam may have been removed or you don't have access.",
+      "noTerm": "No term",
+      "grades": "Grades",
+      "edit": "Edit",
+      "resultCards": "Result Cards",
+      "lifecycle": "Lifecycle",
+      "lifecycleComplete": "This exam is published — its lifecycle is complete.",
+      "tabsAria": "Exam tabs",
+      "tabs": {
+        "overview": "Overview",
+        "subjects": "Subjects",
+        "scores": "Scores"
+      },
+      "fields": {
+        "type": "Type",
+        "term": "Term",
+        "status": "Status",
+        "gradeLevels": "Grade Levels",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "created": "Created",
+        "description": "Description"
+      }
+    }
+  },
   "classrooms": {
     "tabs": {
       "overview": "Overview",
