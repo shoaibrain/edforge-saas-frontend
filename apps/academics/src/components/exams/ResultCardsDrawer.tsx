@@ -26,6 +26,7 @@ import {
 import { getAcademicSubjectLabel, getSubjectAreaLabel } from '../../schemas/course.form'
 import { humanizeExamType } from '../../schemas/exam.form'
 import { useSchoolProfile } from '../../hooks/useSchool'
+import { useAcademicsI18n } from '../../lib/i18n'
 import { openReportCardPrint } from './ReportCardPrint'
 
 function gpaClass(gpa: number): string {
@@ -46,14 +47,15 @@ type CourseScore = ResultCardResponseDto['courseScores'][number]
 
 /** Per-subject outcome cell: Absent (AB) is a distinct non-failing state (P1b). */
 function CoursePassCell({ cs, division }: { cs: CourseScore; division: boolean }) {
+  const { t } = useAcademicsI18n()
   if (cs.notGraded) {
-    return <span className="text-[rgb(var(--state-warning-fg))] text-xs font-medium" title="Absent / Not graded">AB</span>
+    return <span className="text-[rgb(var(--state-warning-fg))] text-xs font-medium" title={t('examModule.resultCards.absentTitle')}>AB</span>
   }
   const passed = division ? cs.pass === true : cs.isPassing
   return passed ? (
     <CheckCircle2 className="w-4 h-4 text-[rgb(var(--state-success-fg))] inline" />
   ) : (
-    <span className="text-[rgb(var(--state-danger-fg))] text-xs font-medium">Fail</span>
+    <span className="text-[rgb(var(--state-danger-fg))] text-xs font-medium">{t('examModule.resultCards.fail')}</span>
   )
 }
 
@@ -86,6 +88,7 @@ function cardIdentity(card: ResultCardResponseDto): ResultCardStudentIdentity | 
 
 /** Roster student cell: avatar + name + grade, falling back to the id badge. */
 function StudentCell({ card, size = 'sm' }: { card: ResultCardResponseDto; size?: 'sm' | 'md' }) {
+  const { t } = useAcademicsI18n()
   const id = cardIdentity(card)
   if (!id) return <UuidBadge value={card.studentId} />
   return (
@@ -98,7 +101,7 @@ function StudentCell({ card, size = 'sm' }: { card: ResultCardResponseDto; size?
         </p>
         {(id.gradeLevel || id.emisStudentId) && (
           <p className="text-xs text-text-tertiary truncate">
-            {id.gradeLevel ? `Grade ${id.gradeLevel}` : ''}
+            {id.gradeLevel ? t('examModule.resultCards.gradeLabel', { grade: id.gradeLevel }) : ''}
             {id.gradeLevel && id.emisStudentId ? ' · ' : ''}
             {id.emisStudentId ? `EMIS ${id.emisStudentId}` : ''}
           </p>
@@ -109,6 +112,7 @@ function StudentCell({ card, size = 'sm' }: { card: ResultCardResponseDto; size?
 }
 
 function StatusBadge({ status }: { status: ResultCardResponseDto['status'] }) {
+  const { t } = useAcademicsI18n()
   const published = status === 'published'
   return (
     <span
@@ -119,7 +123,7 @@ function StatusBadge({ status }: { status: ResultCardResponseDto['status'] }) {
       }`}
     >
       {published ? <Lock className="w-3 h-3" /> : null}
-      {published ? 'Published' : 'Draft'}
+      {published ? t('examModule.resultCards.published') : t('examModule.resultCards.draft')}
     </span>
   )
 }
@@ -141,6 +145,7 @@ function ReportCardDetail({
   onBack: () => void
   onCardUpdated: (card: ResultCardResponseDto) => void
 }) {
+  const { t } = useAcademicsI18n()
   const isDraft = card.status === 'draft'
   const division = isDivisionCard(card)
   const [conduct, setConduct] = useState(card.conduct ?? '')
@@ -156,7 +161,7 @@ function ReportCardDetail({
   }, [card.cardId, card.conduct, card.classTeacherRemark])
 
   const handlePublish = async () => {
-    if (!window.confirm('Publish this result card? Publishing is final and cannot be undone.')) return
+    if (!window.confirm(t('examModule.resultCards.publishConfirm'))) return
     const updated = await publishMutation.mutateAsync({ cardId: card.cardId, enrollmentId: card.enrollmentId })
     onCardUpdated(updated)
   }
@@ -184,7 +189,7 @@ function ReportCardDetail({
           className="flex items-center gap-1.5 text-sm text-text-tertiary hover:text-text-primary transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          All result cards
+          {t('examModule.resultCards.allCards')}
         </button>
 
         {/* Summary — Division scheme shows %/Division/Result/Position; letter_gpa shows GPA/Overall */}
@@ -195,16 +200,16 @@ function ReportCardDetail({
               <>
                 {card.percentage != null && (
                   <div className="text-right">
-                    <p className="text-xs text-text-tertiary">Percentage</p>
+                    <p className="text-xs text-text-tertiary">{t('examModule.resultCards.percentage')}</p>
                     <p className="text-lg font-semibold text-text-primary">{card.percentage.toFixed(1)}%</p>
                   </div>
                 )}
                 <div className="text-right">
-                  <p className="text-xs text-text-tertiary">Division</p>
+                  <p className="text-xs text-text-tertiary">{t('examModule.resultCards.division')}</p>
                   <p className="text-lg font-semibold text-text-primary">{card.division ?? '—'}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs text-text-tertiary">Result</p>
+                  <p className="text-xs text-text-tertiary">{t('examModule.resultCards.result')}</p>
                   <p
                     className={`text-lg font-semibold ${
                       card.result === 'pass'
@@ -212,22 +217,22 @@ function ReportCardDetail({
                         : 'text-[rgb(var(--state-danger-fg))]'
                     }`}
                   >
-                    {card.result === 'pass' ? 'PASS' : 'FAIL'}
+                    {card.result === 'pass' ? t('examModule.resultCards.passUpper') : t('examModule.resultCards.failUpper')}
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs text-text-tertiary">Position</p>
+                  <p className="text-xs text-text-tertiary">{t('examModule.resultCards.position')}</p>
                   <p className="text-lg font-semibold text-text-primary">{card.classRank ?? '—'}</p>
                 </div>
               </>
             ) : (
               <>
                 <div className="text-right">
-                  <p className="text-xs text-text-tertiary">Term GPA</p>
+                  <p className="text-xs text-text-tertiary">{t('examModule.resultCards.termGpa')}</p>
                   <p className={`text-lg font-semibold ${gpaClass(card.termGpa)}`}>{card.termGpa.toFixed(2)}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs text-text-tertiary">Overall</p>
+                  <p className="text-xs text-text-tertiary">{t('examModule.resultCards.overall')}</p>
                   <p className="text-lg font-semibold text-text-primary">{card.overallGrade}</p>
                 </div>
               </>
@@ -241,20 +246,20 @@ function ReportCardDetail({
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-surface-secondary text-left text-text-tertiary">
-                <th className="px-3 py-2 font-medium">Subject</th>
+                <th className="px-3 py-2 font-medium">{t('examModule.resultCards.subject')}</th>
                 {division ? (
                   <>
-                    <th className="px-3 py-2 font-medium text-right">Marks</th>
-                    <th className="px-3 py-2 font-medium text-right">Pass M.</th>
+                    <th className="px-3 py-2 font-medium text-right">{t('examModule.resultCards.marks')}</th>
+                    <th className="px-3 py-2 font-medium text-right">{t('examModule.resultCards.passMarksShort')}</th>
                     <th className="px-3 py-2 font-medium text-right">H.M.</th>
-                    <th className="px-3 py-2 font-medium text-center">Result</th>
+                    <th className="px-3 py-2 font-medium text-center">{t('examModule.resultCards.result')}</th>
                   </>
                 ) : (
                   <>
-                    <th className="px-3 py-2 font-medium text-right">Score</th>
-                    <th className="px-3 py-2 font-medium text-center">Grade</th>
+                    <th className="px-3 py-2 font-medium text-right">{t('examModule.resultCards.score')}</th>
+                    <th className="px-3 py-2 font-medium text-center">{t('examModule.resultCards.grade')}</th>
                     <th className="px-3 py-2 font-medium text-right">GPA</th>
-                    <th className="px-3 py-2 font-medium text-center">Pass</th>
+                    <th className="px-3 py-2 font-medium text-center">{t('examModule.resultCards.pass')}</th>
                   </>
                 )}
               </tr>
@@ -292,7 +297,7 @@ function ReportCardDetail({
                 </tr>
               ))}
               <tr className="bg-surface-secondary/60 font-medium">
-                <td className="px-3 py-2 text-text-primary">Total</td>
+                <td className="px-3 py-2 text-text-primary">{t('examModule.resultCards.total')}</td>
                 <td className="px-3 py-2 text-right text-text-primary">
                   {card.totalScore} / {card.totalMaxMarks}
                 </td>
@@ -304,14 +309,14 @@ function ReportCardDetail({
 
         {/* Conduct */}
         <div>
-          <label className="block text-sm font-medium text-text-primary mb-1.5">Conduct</label>
+          <label className="block text-sm font-medium text-text-primary mb-1.5">{t('examModule.resultCards.conduct')}</label>
           {isDraft ? (
             <>
               <textarea
                 value={conduct}
                 onChange={(e) => setConduct(e.target.value)}
                 rows={2}
-                placeholder="Conduct note…"
+                placeholder={t('examModule.resultCards.conductPlaceholder')}
                 className="w-full px-3 py-2 text-sm bg-surface-primary border border-border-primary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
               />
               <button
@@ -320,7 +325,7 @@ function ReportCardDetail({
                 disabled={conductMutation.isPending || conduct === (card.conduct ?? '')}
                 className="mt-1.5 text-xs font-medium text-[rgb(var(--state-info-fg))] hover:text-[rgb(var(--text-primary))] disabled:opacity-50"
               >
-                {conductMutation.isPending ? 'Saving…' : 'Save conduct'}
+                {conductMutation.isPending ? t('examModule.drawer.saving') : t('examModule.resultCards.saveConduct')}
               </button>
             </>
           ) : (
@@ -330,14 +335,14 @@ function ReportCardDetail({
 
         {/* Class-teacher remark */}
         <div>
-          <label className="block text-sm font-medium text-text-primary mb-1.5">Class-Teacher Remark</label>
+          <label className="block text-sm font-medium text-text-primary mb-1.5">{t('examModule.resultCards.classTeacherRemark')}</label>
           {isDraft ? (
             <>
               <textarea
                 value={remark}
                 onChange={(e) => setRemark(e.target.value)}
                 rows={2}
-                placeholder="Class-teacher remark…"
+                placeholder={t('examModule.resultCards.remarkPlaceholder')}
                 className="w-full px-3 py-2 text-sm bg-surface-primary border border-border-primary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
               />
               <button
@@ -346,7 +351,7 @@ function ReportCardDetail({
                 disabled={remarkMutation.isPending || remark === (card.classTeacherRemark ?? '')}
                 className="mt-1.5 text-xs font-medium text-[rgb(var(--state-info-fg))] hover:text-[rgb(var(--text-primary))] disabled:opacity-50"
               >
-                {remarkMutation.isPending ? 'Saving…' : 'Save remark'}
+                {remarkMutation.isPending ? t('examModule.drawer.saving') : t('examModule.resultCards.saveRemark')}
               </button>
             </>
           ) : (
@@ -358,7 +363,9 @@ function ReportCardDetail({
       {/* Footer — print + publish */}
       <div className="shrink-0 flex items-center justify-between gap-3 px-6 py-4 border-t border-border-secondary bg-surface-secondary/50">
         <span className="text-xs text-text-tertiary">
-          {card.status === 'published' ? 'Published — read only' : 'Draft — review then publish'}
+          {card.status === 'published'
+            ? t('examModule.resultCards.publishedReadOnly')
+            : t('examModule.resultCards.draftReview')}
         </span>
         <div className="flex items-center gap-2">
           <button
@@ -367,7 +374,7 @@ function ReportCardDetail({
             className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-text-secondary border border-border-secondary rounded-lg hover:bg-surface-secondary transition-colors"
           >
             <Printer className="w-4 h-4" />
-            Print / PDF
+            {t('examModule.resultCards.printPdf')}
           </button>
           {isDraft && (
             <button
@@ -377,7 +384,7 @@ function ReportCardDetail({
               className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-success-fg))] rounded-lg hover:brightness-95 transition-colors disabled:opacity-50"
             >
               {publishMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
-              Publish
+              {t('examModule.resultCards.publish')}
             </button>
           )}
         </div>
@@ -397,6 +404,7 @@ function ResultCardList({
   exam: ExamResponseDto
   onSelect: (card: ResultCardResponseDto) => void
 }) {
+  const { t } = useAcademicsI18n()
   const { data, isLoading } = useResultCards({ examId: exam.examId })
   const cards = useMemo(() => data?.items ?? [], [data])
   // One exam → one grading scheme; key the columns off the cards.
@@ -421,9 +429,9 @@ function ResultCardList({
       return (
         <div className="px-6 py-12 text-center">
           <Loader2 className="w-10 h-10 mx-auto text-amber-500 mb-3 animate-spin" />
-          <h4 className="text-base font-medium text-text-primary mb-1">Generating result cards…</h4>
+          <h4 className="text-base font-medium text-text-primary mb-1">{t('examModule.resultCards.generatingTitle')}</h4>
           <p className="text-sm text-text-secondary max-w-sm mx-auto">
-            This usually takes a few seconds. The list updates automatically when they&apos;re ready.
+            {t('examModule.resultCards.generatingDescription')}
           </p>
         </div>
       )
@@ -432,11 +440,11 @@ function ResultCardList({
       return (
         <div className="px-6 py-12 text-center">
           <AlertCircle className="w-10 h-10 mx-auto text-[rgb(var(--state-danger-fg))] mb-3" />
-          <h4 className="text-base font-medium text-text-primary mb-1">Result generation failed</h4>
+          <h4 className="text-base font-medium text-text-primary mb-1">{t('examModule.resultCards.generationFailedTitle')}</h4>
           <p className="text-sm text-text-secondary max-w-sm mx-auto">
             {exam.lastGenerationError
               ? exam.lastGenerationError
-              : 'Something went wrong generating the result cards. Re-opening and re-closing the exam will retry.'}
+              : t('examModule.resultCards.generationFailedDescription')}
           </p>
         </div>
       )
@@ -444,9 +452,9 @@ function ResultCardList({
     return (
       <div className="px-6 py-12 text-center">
         <ClipboardList className="w-10 h-10 mx-auto text-text-tertiary mb-3" />
-        <h4 className="text-base font-medium text-text-primary mb-1">No Result Cards Yet</h4>
+        <h4 className="text-base font-medium text-text-primary mb-1">{t('examModule.resultCards.emptyTitle')}</h4>
         <p className="text-sm text-text-secondary max-w-sm mx-auto">
-          Result cards are generated automatically once this exam is closed. Close the exam after all scores are entered.
+          {t('examModule.resultCards.emptyDescription')}
         </p>
       </div>
     )
@@ -458,21 +466,21 @@ function ResultCardList({
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-surface-secondary text-left text-text-tertiary">
-              <th className="px-3 py-2 font-medium">Student</th>
-              <th className="px-3 py-2 font-medium text-right">Total</th>
+              <th className="px-3 py-2 font-medium">{t('examModule.resultCards.student')}</th>
+              <th className="px-3 py-2 font-medium text-right">{t('examModule.resultCards.total')}</th>
               {division ? (
                 <>
                   <th className="px-3 py-2 font-medium text-right">%</th>
-                  <th className="px-3 py-2 font-medium text-center">Division</th>
-                  <th className="px-3 py-2 font-medium text-center">Result</th>
+                  <th className="px-3 py-2 font-medium text-center">{t('examModule.resultCards.division')}</th>
+                  <th className="px-3 py-2 font-medium text-center">{t('examModule.resultCards.result')}</th>
                 </>
               ) : (
                 <>
                   <th className="px-3 py-2 font-medium text-right">GPA</th>
-                  <th className="px-3 py-2 font-medium text-center">Grade</th>
+                  <th className="px-3 py-2 font-medium text-center">{t('examModule.resultCards.grade')}</th>
                 </>
               )}
-              <th className="px-3 py-2 font-medium text-center">Status</th>
+              <th className="px-3 py-2 font-medium text-center">{t('examModule.detail.fields.status')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border-secondary">
@@ -507,7 +515,7 @@ function ResultCardList({
                             : 'text-[rgb(var(--state-danger-fg))]'
                         }`}
                       >
-                        {card.result === 'pass' ? 'PASS' : 'FAIL'}
+                        {card.result === 'pass' ? t('examModule.resultCards.passUpper') : t('examModule.resultCards.failUpper')}
                       </span>
                     </td>
                   </>
@@ -540,6 +548,7 @@ interface ResultCardsDrawerProps {
 }
 
 export function ResultCardsDrawer({ open, onClose, exam }: ResultCardsDrawerProps) {
+  const { t } = useAcademicsI18n()
   const [selectedCard, setSelectedCard] = useState<ResultCardResponseDto | null>(null)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
   const prevFocusedRef = useRef<HTMLElement | null>(null)
@@ -604,10 +613,10 @@ export function ResultCardsDrawer({ open, onClose, exam }: ResultCardsDrawerProp
                     </div>
                     <div className="min-w-0">
                       <h2 id="result-cards-title" className="text-lg font-semibold text-text-primary truncate">
-                        Result Cards
+                        {t('examModule.detail.resultCards')}
                       </h2>
                       <p className="text-xs text-text-tertiary truncate">
-                        {exam.examName} · {humanizeExamType(exam.examType)}
+                        {exam.examName} · {t(`examModule.types.${exam.examType}`, { defaultValue: humanizeExamType(exam.examType) })}
                       </p>
                     </div>
                   </div>
@@ -616,7 +625,7 @@ export function ResultCardsDrawer({ open, onClose, exam }: ResultCardsDrawerProp
                     ref={closeButtonRef}
                     onClick={onClose}
                     className="p-1.5 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-surface-secondary transition-colors flex-shrink-0"
-                    aria-label="Close drawer"
+                    aria-label={t('examModule.detail.closeDrawer')}
                   >
                     <X className="w-5 h-5" />
                   </button>

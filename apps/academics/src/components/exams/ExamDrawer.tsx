@@ -25,6 +25,7 @@ import {
 import type { CreateExamDto, ExamResponseDto, UpdateExamDto } from '@aibrains/shared-types'
 import { useCreateExam, useUpdateExam } from '../../hooks/useExams'
 import { useSchoolEnabledGradeOptions } from '../../hooks/useGradeOptions'
+import { useAcademicsI18n } from '../../lib/i18n'
 import { examFormSchema, type ExamFormData, humanizeExamType } from '../../schemas/exam.form'
 
 interface ExamTermOption {
@@ -83,6 +84,7 @@ export function ExamDrawer({
   examPattern,
   exam,
 }: ExamDrawerProps) {
+  const { t } = useAcademicsI18n()
   const isEdit = !!exam
   const createMutation = useCreateExam()
   const updateMutation = useUpdateExam()
@@ -217,9 +219,9 @@ export function ExamDrawer({
     onClose()
   }
 
-  const title = isEdit ? 'Edit Exam' : 'Create Exam'
-  const submitLabel = isEdit ? 'Save Changes' : 'Create Exam'
-  const submittingLabel = isEdit ? 'Saving…' : 'Creating…'
+  const title = isEdit ? t('examModule.drawer.editTitle') : t('examModule.drawer.createTitle')
+  const submitLabel = isEdit ? t('actions.saveChanges') : t('examModule.createExam')
+  const submittingLabel = isEdit ? t('examModule.drawer.saving') : t('examModule.drawer.creating')
 
   return (
     <AnimatePresence>
@@ -259,7 +261,7 @@ export function ExamDrawer({
                     type="button"
                     onClick={handleClose}
                     className="p-1.5 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-surface-secondary transition-colors flex-shrink-0"
-                    aria-label="Close drawer"
+                    aria-label={t('examModule.detail.closeDrawer')}
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -272,37 +274,40 @@ export function ExamDrawer({
                     className="flex flex-col flex-1 min-h-0 overflow-hidden"
                   >
                     <div className="flex-1 overflow-y-auto px-6 py-4 space-y-8">
-                      <FormSection title="Exam Details" description="Name this exam and choose its type and term.">
+                      <FormSection title={t('examModule.drawer.detailsTitle')} description={t('examModule.drawer.detailsDescription')}>
                         <div className="space-y-4">
-                          <TextField name="examName" label="Exam Name" placeholder="e.g., First Term Exam" />
+                          <TextField name="examName" label={t('examModule.drawer.examName')} placeholder={t('examModule.drawer.examNamePlaceholder')} />
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <SelectField
                               name="examType"
-                              label="Exam Type"
-                              placeholder="Select exam type"
-                              options={examPattern.map((t) => ({ value: t, label: humanizeExamType(t) }))}
+                              label={t('examModule.detail.fields.type')}
+                              placeholder={t('examModule.drawer.selectExamType')}
+                              options={examPattern.map((type) => ({
+                                value: type,
+                                label: t(`examModule.types.${type}`, { defaultValue: humanizeExamType(type) }),
+                              }))}
                               disabled={examTypeLocked}
                               helperText={
                                 examTypeLocked
-                                  ? 'Locked: exam type can only change while the exam is in Draft.'
+                                  ? t('examModule.drawer.examTypeLocked')
                                   : undefined
                               }
                             />
                             <SelectField
                               name="termId"
-                              label="Term"
-                              placeholder="Select term"
+                              label={t('examModule.detail.fields.term')}
+                              placeholder={t('examModule.drawer.selectTerm')}
                               options={terms.map((t) => ({ value: t.periodId, label: t.name }))}
                               disabled={isEdit}
-                              helperText={isEdit ? 'Term cannot be changed after creation.' : undefined}
+                              helperText={isEdit ? t('examModule.drawer.termLocked') : undefined}
                             />
                           </div>
                         </div>
                       </FormSection>
 
                       <FormSection
-                        title="Grade Levels"
-                        description="Scope this exam to the grade(s) sitting it. Drives the Subjects picker, score roster, and Result Card generation."
+                        title={t('examModule.detail.fields.gradeLevels')}
+                        description={t('examModule.drawer.gradeLevelsDescription')}
                       >
                         <GradeLevelsField
                           options={schoolGradeOptions}
@@ -310,21 +315,21 @@ export function ExamDrawer({
                           isLoading={schoolOptionsLoading}
                           helperText={
                             gradeLevelsLocked
-                              ? 'Locked: grade levels can only change while the exam is in Draft.'
-                              : 'Pick one for a per-grade exam, or multiple for a grade-split (e.g., Grade 9 + 10).'
+                              ? t('examModule.drawer.gradeLevelsLocked')
+                              : t('examModule.drawer.gradeLevelsHelper')
                           }
                         />
                       </FormSection>
 
-                      <FormSection title="Schedule" description="When does this exam run?">
+                      <FormSection title={t('examModule.drawer.scheduleTitle')} description={t('examModule.drawer.scheduleDescription')}>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          <DateField name="startDate" label="Start Date" />
-                          <DateField name="endDate" label="End Date" />
+                          <DateField name="startDate" label={t('examModule.detail.fields.startDate')} />
+                          <DateField name="endDate" label={t('examModule.detail.fields.endDate')} />
                         </div>
                       </FormSection>
 
-                      <FormSection title="Description" description="Optional notes about this exam.">
-                        <TextareaField name="description" label="Description" placeholder="Optional description…" />
+                      <FormSection title={t('examModule.detail.fields.description')} description={t('examModule.drawer.descriptionDescription')}>
+                        <TextareaField name="description" label={t('examModule.detail.fields.description')} placeholder={t('examModule.drawer.descriptionPlaceholder')} />
                       </FormSection>
                     </div>
 
@@ -335,7 +340,7 @@ export function ExamDrawer({
                         disabled={isPending}
                         className="px-4 py-2 text-sm font-medium text-[rgb(var(--text-secondary))] bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] rounded-lg hover:bg-[rgb(var(--background-secondary))] transition-colors disabled:opacity-50"
                       >
-                        Cancel
+                        {t('actions.cancel')}
                       </button>
                       <button
                         type="submit"
@@ -386,6 +391,7 @@ function GradeLevelsField({
   isLoading = false,
   helperText,
 }: GradeLevelsFieldProps) {
+  const { t } = useAcademicsI18n()
   const { control } = useFormContext<ExamFormData>()
 
   return (
@@ -411,18 +417,17 @@ function GradeLevelsField({
           return (
             <div className="flex items-center gap-2 text-sm text-text-tertiary py-2">
               <Loader2 className="w-4 h-4 animate-spin" />
-              Loading available grade levels…
+              {t('examModule.drawer.loadingGradeLevels')}
             </div>
           )
         }
 
         return (
           <div>
-            <div className="flex flex-wrap gap-2" role="group" aria-label="Grade levels">
+            <div className="flex flex-wrap gap-2" role="group" aria-label={t('examModule.detail.fields.gradeLevels')}>
               {options.length === 0 ? (
                 <p className="text-sm text-text-tertiary">
-                  This school has no enabled grade levels configured. Set them under
-                  Settings → Grade Levels before creating exams.
+                  {t('examModule.drawer.noGradeLevels')}
                 </p>
               ) : (
                 options.map((option) => {

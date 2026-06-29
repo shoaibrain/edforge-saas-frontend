@@ -19,6 +19,7 @@ import {
 } from '../../hooks/useExamCourses'
 import { acceptsExamCourseMutations } from '../../schemas/exam-state-machine'
 import { getExamStatusMeta } from '../../schemas/exam.form'
+import { useAcademicsI18n } from '../../lib/i18n'
 import { buildComponents, type ComponentDraft } from './exam-scoring'
 
 const DEFAULT_PASSING = 32
@@ -56,6 +57,7 @@ export function ExamSubjectsTab({
    */
   examGradeLevels: string[]
 }) {
+  const { t, formatNumber } = useAcademicsI18n()
   const mutable = canManage && acceptsExamCourseMutations(status)
 
   const { data, isLoading } = useExamCourses(examId)
@@ -180,8 +182,8 @@ export function ExamSubjectsTab({
     setForm((f) => ({
       ...f,
       components: [
-        { label: 'Theory', fullMarks: '', passMarks: '' },
-        { label: 'Practical', fullMarks: '', passMarks: '' },
+        { label: t('examModule.subjects.theory'), fullMarks: '', passMarks: '' },
+        { label: t('examModule.subjects.practical'), fullMarks: '', passMarks: '' },
       ],
     }))
 
@@ -230,7 +232,7 @@ export function ExamSubjectsTab({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <p className="text-sm text-text-secondary">
-          {examCourses.length} subject{examCourses.length !== 1 ? 's' : ''}
+          {t('examModule.subjects.count', { count: formatNumber(examCourses.length) })}
         </p>
         {mutable && !adding && availableCourses.length > 0 && (
           <button
@@ -239,7 +241,7 @@ export function ExamSubjectsTab({
             className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--action-primary-bg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
           >
             <Plus className="w-4 h-4" />
-            Add Subject
+            {t('examModule.subjects.addSubject')}
           </button>
         )}
       </div>
@@ -247,8 +249,11 @@ export function ExamSubjectsTab({
       {!acceptsExamCourseMutations(status) && (
         <div className="flex items-center gap-2 rounded-lg border border-border-secondary bg-surface-secondary/50 px-4 py-3 text-sm text-text-secondary">
           <Lock className="w-4 h-4 text-text-tertiary" />
-          Subjects are locked while the exam is {getExamStatusMeta(status).label}. They can only be changed in
-          Draft or Scheduled.
+          {t('examModule.subjects.locked', {
+            status: t(`examModule.status.${status}`, {
+              defaultValue: getExamStatusMeta(status).label,
+            }),
+          })}
         </div>
       )}
 
@@ -258,9 +263,9 @@ export function ExamSubjectsTab({
         <div className="flex items-start gap-2 rounded-lg border border-border-secondary bg-surface-secondary/50 px-4 py-3 text-sm text-text-secondary">
           <BookOpen className="w-4 h-4 text-text-tertiary mt-0.5 flex-shrink-0" />
           <span>
-            No courses match this exam&apos;s grade level{examGradeLevels.length !== 1 ? 's' : ''} (
-            {examGradeLevels.join(', ')}). Add courses tagged for{' '}
-            {examGradeLevels.length !== 1 ? 'those grades' : 'that grade'} in Curriculum first.
+            {t('examModule.subjects.noGradeMatch', {
+              grades: examGradeLevels.join(', '),
+            })}
           </span>
         </div>
       )}
@@ -270,13 +275,13 @@ export function ExamSubjectsTab({
         <div className="rounded-xl border border-border-secondary p-4 space-y-3">
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
             <label className="sm:col-span-2 text-xs font-medium text-text-tertiary">
-              Course
+              {t('examModule.subjects.course')}
               <select
                 value={form.courseId}
                 onChange={(e) => setForm((f) => ({ ...f, courseId: e.target.value }))}
                 className="mt-1 w-full rounded-lg border border-border-secondary bg-surface-primary px-3 py-2 text-sm text-text-primary"
               >
-                <option value="">Select a course…</option>
+                <option value="">{t('examModule.subjects.selectCourse')}</option>
                 {availableCourses.map((c) => (
                   <option key={c.courseId} value={c.courseId}>
                     {c.courseName}
@@ -286,7 +291,7 @@ export function ExamSubjectsTab({
               </select>
             </label>
             <label className="text-xs font-medium text-text-tertiary">
-              Max Marks
+              {t('examModule.subjects.maxMarks')}
               <input
                 type="number"
                 min={1}
@@ -296,7 +301,7 @@ export function ExamSubjectsTab({
               />
             </label>
             <label className="text-xs font-medium text-text-tertiary">
-              Pass Marks
+              {t('examModule.subjects.passMarks')}
               <input
                 type="number"
                 min={0}
@@ -312,7 +317,10 @@ export function ExamSubjectsTab({
           <div className="rounded-lg border border-border-secondary/70 bg-surface-secondary/30 p-3 space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-medium text-text-tertiary">
-                Components <span className="text-text-tertiary/70">(optional — e.g. Theory + Practical)</span>
+                {t('examModule.subjects.components')}{' '}
+                <span className="text-text-tertiary/70">
+                  {t('examModule.subjects.componentsHint')}
+                </span>
               </span>
               {form.components.length === 0 ? (
                 <button
@@ -320,11 +328,14 @@ export function ExamSubjectsTab({
                   onClick={seedTheoryPractical}
                   className="text-xs font-medium text-[rgb(var(--state-info-fg))] hover:text-[rgb(var(--text-primary))]"
                 >
-                  + Split into components
+                  {t('examModule.subjects.splitComponents')}
                 </button>
               ) : (
                 <span className={`text-xs tabular-nums ${componentsValid ? 'text-text-tertiary' : 'text-[rgb(var(--state-danger-fg))]'}`}>
-                  Σ {componentsSum} / {Number.isFinite(addMax) ? addMax : '—'} full
+                  {t('examModule.subjects.componentsSum', {
+                    sum: formatNumber(componentsSum),
+                    max: Number.isFinite(addMax) ? formatNumber(addMax) : '—',
+                  })}
                 </span>
               )}
             </div>
@@ -334,35 +345,35 @@ export function ExamSubjectsTab({
                 <input
                   type="text"
                   value={c.label}
-                  placeholder="Label (e.g. Theory)"
+                  placeholder={t('examModule.subjects.componentLabelPlaceholder')}
                   onChange={(e) => setComponent(i, { label: e.target.value })}
                   className="flex-1 rounded-lg border border-border-secondary bg-surface-primary px-2 py-1 text-sm text-text-primary"
-                  aria-label={`Component ${i + 1} label`}
+                  aria-label={t('examModule.subjects.componentLabelAria', { index: formatNumber(i + 1) })}
                 />
                 <input
                   type="number"
                   min={1}
                   value={c.fullMarks}
-                  placeholder="Full"
+                  placeholder={t('examModule.subjects.fullPlaceholder')}
                   onChange={(e) => setComponent(i, { fullMarks: e.target.value })}
                   className="w-20 rounded-lg border border-border-secondary bg-surface-primary px-2 py-1 text-sm text-text-primary text-right"
-                  aria-label={`Component ${i + 1} full marks`}
+                  aria-label={t('examModule.subjects.componentFullAria', { index: formatNumber(i + 1) })}
                 />
-                <span className="text-text-tertiary text-xs">/ pass</span>
+                <span className="text-text-tertiary text-xs">/ {t('examModule.subjects.passShort')}</span>
                 <input
                   type="number"
                   min={0}
                   value={c.passMarks}
-                  placeholder="Pass"
+                  placeholder={t('examModule.subjects.passPlaceholder')}
                   onChange={(e) => setComponent(i, { passMarks: e.target.value })}
                   className="w-20 rounded-lg border border-border-secondary bg-surface-primary px-2 py-1 text-sm text-text-primary text-right"
-                  aria-label={`Component ${i + 1} pass marks`}
+                  aria-label={t('examModule.subjects.componentPassAria', { index: formatNumber(i + 1) })}
                 />
                 <button
                   type="button"
                   onClick={() => removeComponentRow(i)}
                   className="p-1 rounded-lg text-text-tertiary hover:text-[rgb(var(--state-danger-fg))] hover:bg-surface-secondary"
-                  aria-label="Remove component"
+                  aria-label={t('examModule.subjects.removeComponent')}
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -376,21 +387,22 @@ export function ExamSubjectsTab({
                   onClick={() => addComponentRow()}
                   className="inline-flex items-center gap-1 text-xs font-medium text-[rgb(var(--state-info-fg))] hover:text-[rgb(var(--text-primary))]"
                 >
-                  <Plus className="w-3.5 h-3.5" /> Add component
+                  <Plus className="w-3.5 h-3.5" /> {t('examModule.subjects.addComponent')}
                 </button>
                 <button
                   type="button"
                   onClick={() => setForm((f) => ({ ...f, components: [] }))}
                   className="text-xs text-text-tertiary hover:text-text-secondary"
                 >
-                  Clear (single subject)
+                  {t('examModule.subjects.clearComponents')}
                 </button>
               </div>
             )}
             {form.components.length > 0 && !componentsValid && (
               <p className="text-xs text-[rgb(var(--state-danger-fg))]">
-                Each component needs a label, full ≥ 1, 0 ≤ pass ≤ full, and the full marks must sum to Max
-                Marks ({Number.isFinite(addMax) ? addMax : '—'}).
+                {t('examModule.subjects.componentsInvalid', {
+                  max: Number.isFinite(addMax) ? formatNumber(addMax) : '—',
+                })}
               </p>
             )}
           </div>
@@ -404,7 +416,7 @@ export function ExamSubjectsTab({
               }}
               className="px-3 py-1.5 text-sm font-medium text-text-secondary border border-border-secondary rounded-lg hover:bg-surface-secondary transition-colors"
             >
-              Cancel
+              {t('actions.cancel')}
             </button>
             <button
               type="button"
@@ -412,7 +424,7 @@ export function ExamSubjectsTab({
               disabled={!form.courseId || createMut.isPending || !componentsValid}
               className="px-3 py-1.5 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--action-primary-bg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors disabled:opacity-50"
             >
-              Add
+              {t('actions.add')}
             </button>
           </div>
         </div>
@@ -423,7 +435,7 @@ export function ExamSubjectsTab({
         <div className="rounded-xl border border-border-secondary p-10 text-center">
           <BookOpen className="w-10 h-10 mx-auto text-text-tertiary mb-3" />
           <p className="text-sm text-text-secondary">
-            No subjects yet.{mutable ? ' Add the courses this exam will cover.' : ''}
+            {mutable ? t('examModule.subjects.emptyMutable') : t('examModule.subjects.emptyReadonly')}
           </p>
         </div>
       ) : (
@@ -434,7 +446,7 @@ export function ExamSubjectsTab({
               <div key={ec.examCourseId} className="flex items-center justify-between gap-3 px-4 py-3">
                 <div className="min-w-0">
                   <p className="text-sm font-medium text-text-primary truncate">
-                    {ec.courseName ?? 'Course'}
+                    {ec.courseName ?? t('examModule.subjects.courseFallback')}
                     {ec.courseCode ? <span className="text-text-tertiary font-normal"> ({ec.courseCode})</span> : null}
                   </p>
                   {ec.academicSubject && (
@@ -457,23 +469,23 @@ export function ExamSubjectsTab({
                       value={editForm.maxMarks}
                       onChange={(e) => setEditForm((f) => ({ ...f, maxMarks: e.target.value }))}
                       className="w-20 rounded-lg border border-border-secondary bg-surface-primary px-2 py-1 text-sm text-text-primary"
-                      aria-label="Max marks"
+                      aria-label={t('examModule.subjects.maxMarks')}
                     />
-                    <span className="text-text-tertiary text-xs">/ pass</span>
+                    <span className="text-text-tertiary text-xs">/ {t('examModule.subjects.passShort')}</span>
                     <input
                       type="number"
                       min={0}
                       value={editForm.passingMarks}
                       onChange={(e) => setEditForm((f) => ({ ...f, passingMarks: e.target.value }))}
                       className="w-20 rounded-lg border border-border-secondary bg-surface-primary px-2 py-1 text-sm text-text-primary"
-                      aria-label="Passing marks"
+                      aria-label={t('examModule.subjects.passMarks')}
                     />
                     <button
                       type="button"
                       onClick={() => handleSaveEdit(ec.examCourseId)}
                       disabled={updateMut.isPending}
                       className="p-1.5 rounded-lg text-[rgb(var(--state-success-fg))] hover:bg-surface-secondary disabled:opacity-50"
-                      aria-label="Save"
+                      aria-label={t('actions.saveChanges')}
                     >
                       <Check className="w-4 h-4" />
                     </button>
@@ -481,7 +493,7 @@ export function ExamSubjectsTab({
                       type="button"
                       onClick={() => setEditingId(null)}
                       className="p-1.5 rounded-lg text-text-tertiary hover:bg-surface-secondary"
-                      aria-label="Cancel"
+                      aria-label={t('actions.cancel')}
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -489,9 +501,9 @@ export function ExamSubjectsTab({
                 ) : (
                   <div className="flex items-center gap-4">
                     <span className="text-sm text-text-secondary tabular-nums">
-                      {ec.maxMarks} <span className="text-text-tertiary">max</span>
+                      {formatNumber(ec.maxMarks)} <span className="text-text-tertiary">{t('examModule.subjects.maxShort')}</span>
                       <span className="text-text-tertiary"> · </span>
-                      {ec.passingMarks} <span className="text-text-tertiary">pass</span>
+                      {formatNumber(ec.passingMarks)} <span className="text-text-tertiary">{t('examModule.subjects.passShort')}</span>
                     </span>
                     {mutable && (
                       <div className="flex items-center gap-1">
@@ -499,19 +511,19 @@ export function ExamSubjectsTab({
                           type="button"
                           onClick={() => startEdit(ec)}
                           className="p-1.5 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-surface-secondary transition-colors"
-                          aria-label="Edit marks"
+                          aria-label={t('examModule.subjects.editMarks')}
                         >
                           <Pencil className="w-4 h-4" />
                         </button>
                         <button
                           type="button"
                           onClick={() => {
-                            if (window.confirm(`Remove ${ec.courseName ?? 'this subject'} from the exam?`)) {
+                            if (window.confirm(t('examModule.subjects.removeConfirm', { subject: ec.courseName ?? t('examModule.subjects.thisSubject') }))) {
                               deleteMut.mutate(ec.examCourseId)
                             }
                           }}
                           className="p-1.5 rounded-lg text-text-tertiary hover:text-[rgb(var(--state-danger-fg))] hover:bg-surface-secondary transition-colors"
-                          aria-label="Remove subject"
+                          aria-label={t('examModule.subjects.removeSubject')}
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
