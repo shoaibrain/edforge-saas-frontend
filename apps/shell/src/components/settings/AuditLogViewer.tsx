@@ -1,14 +1,22 @@
 /**
  * AuditLogViewer
  *
- * Displays the audit trail for a school as a timeline with field diffs.
- * Queries GET /schools/:schoolId/audit-log
+ * Displays the audit trail for a school as a sortable, filterable,
+ * exportable table backed by the shared `TanstackDataTable`. Per-row
+ * expansion reveals the field-by-field diff. Read-only — no row
+ * selection or bulk actions.
+ *
+ * Queries GET /schools/:schoolId/audit-log via tenantService.
  */
 
-import { useState } from 'react'
+import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Clock, Shield, AlertTriangle, ChevronDown, ChevronUp } from 'lucide-react'
-import { Select } from '@edforge/ui'
+import { AlertTriangle, Shield } from 'lucide-react'
+import {
+  TanstackDataTable,
+  type ColumnDef,
+  type FacetedFilterConfig,
+} from '@edforge/ui'
 import { tenantService } from '@/services/tenant.service'
 import type { AuditLogEntry } from '@/services/tenant.service'
 
@@ -24,188 +32,210 @@ const ACTION_LABELS: Record<string, string> = {
   version_change: 'Version Changed',
 }
 
-const ACTION_COLORS: Record<string, string> = {
-  create: 'text-[rgb(var(--state-success-fg))] bg-[rgb(var(--state-success-bg)/0.18)]  ',
-  update: 'text-[rgb(var(--state-info-fg))] bg-[rgb(var(--state-info-bg)/0.18)] dark:text-[rgb(var(--state-info-fg))] ',
-  delete: 'text-[rgb(var(--state-danger-fg))] bg-[rgb(var(--state-danger-bg)/0.18)] dark:text-[rgb(var(--state-danger-fg))] ',
-  status_change: 'text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-900/20',
-  version_change: 'text-[rgb(var(--state-info-fg))] bg-[rgb(var(--state-info-bg)/0.18)]  ',
+const ACTION_TONE: Record<string, string> = {
+  create: 'text-[rgb(var(--state-success-fg))] bg-[rgb(var(--state-success-bg)/0.18)]',
+  update: 'text-[rgb(var(--state-info-fg))] bg-[rgb(var(--state-info-bg)/0.18)]',
+  delete: 'text-[rgb(var(--state-danger-fg))] bg-[rgb(var(--state-danger-bg)/0.18)]',
+  status_change: 'text-[rgb(var(--state-warning-fg))] bg-[rgb(var(--state-warning-bg)/0.18)]',
+  version_change: 'text-[rgb(var(--state-info-fg))] bg-[rgb(var(--state-info-bg)/0.18)]',
 }
 
 export function AuditLogViewer({ schoolId }: AuditLogViewerProps) {
-  const [actionFilter, setActionFilter] = useState<string>('')
-  const [expandedEntries, setExpandedEntries] = useState<Set<string>>(new Set())
-
+  // Server filter on action removed — the table's built-in faceted
+  // filter handles the same job client-side over the loaded window
+  // (limit 50), which matches the prior server-side selectivity and
+  // avoids a round-trip per filter toggle.
   const { data, isLoading } = useQuery({
-    queryKey: ['auditLog', schoolId, actionFilter],
-    queryFn: () => tenantService.getAuditLog(schoolId, {
-      limit: 50,
-      action: actionFilter || undefined,
-    }),
+    queryKey: ['auditLog', schoolId],
+    queryFn: () => tenantService.getAuditLog(schoolId, { limit: 50 }),
     enabled: !!schoolId,
     staleTime: 30 * 1000,
   })
 
-  const toggleEntry = (id: string) => {
-    setExpandedEntries(prev => {
-      const next = new Set(prev)
-      if (next.has(id)) next.delete(id)
-      else next.add(id)
-      return next
-    })
-  }
+  const entries: AuditLogEntry[] = data?.items ?? []
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="w-6 h-6 border-2 border-[rgb(var(--border-focus))] border-t-transparent rounded-full animate-spin" />
-      </div>
-    )
-  }
+  const actionOptions = useMemo(() => {
+    const seen = new Set<string>()
+    for (const e of entries) seen.add(e.action)
+    return Array.from(seen)
+      .sort()
+      .map((a) => ({ value: a, label: ACTION_LABELS[a] ?? a }))
+  }, [entries])
 
-  const entries = data?.items || []
+  const entityOptions = useMemo(() => {
+    const seen = new Set<string>()
+    for (const e of entries) seen.add(e.targetEntity)
+    return Array.from(seen)
+      .sort()
+      .map((t) => ({ value: t, label: t }))
+  }, [entries])
+
+  const facets = useMemo<FacetedFilterConfig[]>(
+    () => [
+      ...(actionOptions.length > 0
+        ? [{ columnId: 'action', title: 'Action', options: actionOptions }]
+        : []),
+      ...(entityOptions.length > 0
+        ? [{ columnId: 'targetEntity', title: 'Entity', options: entityOptions }]
+        : []),
+    ],
+    [actionOptions, entityOptions],
+  )
+
+  const columns: ColumnDef<AuditLogEntry, unknown>[] = useMemo(
+    () => [
+      {
+        id: 'changedAt',
+        accessorKey: 'changedAt',
+        header: 'When',
+        cell: ({ row }) => (
+          <span className="text-xs text-[rgb(var(--text-secondary))] tabular-nums">
+            {new Date(row.original.changedAt).toLocaleString()}
+          </span>
+        ),
+        sortingFn: (a, b) =>
+          new Date(a.original.changedAt).getTime() - new Date(b.original.changedAt).getTime(),
+      },
+      {
+        id: 'action',
+        accessorKey: 'action',
+        header: 'Action',
+        cell: ({ row }) => {
+          const a = row.original.action
+          const tone = ACTION_TONE[a] ?? ACTION_TONE.update
+          return (
+            <span
+              className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${tone}`}
+            >
+              {ACTION_LABELS[a] ?? a}
+            </span>
+          )
+        },
+        filterFn: (row, _id, value) => {
+          if (!Array.isArray(value) || value.length === 0) return true
+          return value.includes(row.original.action)
+        },
+      },
+      {
+        id: 'targetEntity',
+        accessorKey: 'targetEntity',
+        header: 'Entity',
+        cell: ({ row }) => (
+          <span className="text-xs font-medium text-[rgb(var(--text-primary))]">
+            {row.original.targetEntity}
+          </span>
+        ),
+        filterFn: (row, _id, value) => {
+          if (!Array.isArray(value) || value.length === 0) return true
+          return value.includes(row.original.targetEntity)
+        },
+      },
+      {
+        id: 'targetEntityId',
+        accessorKey: 'targetEntityId',
+        header: 'Entity ID',
+        cell: ({ row }) => (
+          <span className="text-xs font-mono text-[rgb(var(--text-tertiary))] truncate inline-block max-w-[14ch]">
+            {row.original.targetEntityId}
+          </span>
+        ),
+      },
+      {
+        id: 'changedByName',
+        accessorFn: (e) => e.changedByName ?? e.changedBy,
+        header: 'By',
+        cell: ({ row }) => (
+          <span className="text-xs text-[rgb(var(--text-secondary))]">
+            {row.original.changedByName ?? row.original.changedBy}
+          </span>
+        ),
+      },
+      {
+        id: 'changeCount',
+        accessorFn: (e) => e.changes?.length ?? 0,
+        header: 'Changes',
+        cell: ({ row }) => {
+          const n = row.original.changes?.length ?? 0
+          return (
+            <span className="text-xs text-[rgb(var(--text-tertiary))] tabular-nums">
+              {n}
+              {row.original.severity === 'high' && (
+                <AlertTriangle className="inline-block w-3.5 h-3.5 text-[rgb(var(--state-warning-fg))] ml-1 align-text-bottom" />
+              )}
+            </span>
+          )
+        },
+      },
+    ],
+    [],
+  )
 
   return (
-    <div className="space-y-4">
-      {/* Filter bar */}
-      <div className="flex items-center gap-3">
-        <Select
-          aria-label="Filter by action"
-          className="w-44"
-          value={actionFilter}
-          onChange={(v) => setActionFilter(v ?? '')}
-          options={[
-            { value: '', label: 'All Actions' },
-            { value: 'create', label: 'Create' },
-            { value: 'update', label: 'Update' },
-            { value: 'delete', label: 'Delete' },
-            { value: 'status_change', label: 'Status Change' },
-            { value: 'version_change', label: 'Version Change' },
-          ]}
-        />
-        <span className="text-xs text-[rgb(var(--text-tertiary))]">
-          {entries.length} entries
-        </span>
-      </div>
+    <TanstackDataTable<AuditLogEntry>
+      columns={columns}
+      data={entries}
+      getRowId={(row) => row.auditId}
+      isLoading={isLoading}
+      tableId="settings.audit-log"
+      enableSorting
+      enableExpanding
+      enableColumnVisibility
+      pagination={{ pageSize: 20 }}
+      pageSizes={[10, 20, 50]}
+      defaultSort={[{ id: 'changedAt', desc: true }]}
+      searchPlaceholder="Search by entity, ID, or actor…"
+      facets={facets}
+      exportOptions={{ filename: 'audit-log', formats: ['csv'] }}
+      renderSubComponent={({ row }) => <AuditDiffPanel entry={row.original} />}
+      emptyState={{
+        icon: <Shield className="w-10 h-10" />,
+        title: 'No audit log entries found',
+        description: 'Audit entries appear here as users make changes to the school.',
+      }}
+      maxHeight="calc(100vh - 22rem)"
+      className="min-h-96"
+    />
+  )
+}
 
-      {/* Timeline */}
-      {entries.length === 0 ? (
-        <div className="text-center py-12">
-          <Shield className="w-10 h-10 text-[rgb(var(--text-tertiary))] mx-auto mb-2" />
-          <p className="text-sm text-[rgb(var(--text-tertiary))]">No audit log entries found</p>
-        </div>
+function AuditDiffPanel({ entry }: { entry: AuditLogEntry }) {
+  const changes = entry.changes ?? []
+  return (
+    <div className="px-4 py-3 bg-[rgb(var(--background-tertiary)/0.4)] border-t border-[rgb(var(--border-primary))]">
+      {entry.reason && (
+        <p className="mb-2 text-xs text-[rgb(var(--text-secondary))] italic">{entry.reason}</p>
+      )}
+      {changes.length === 0 ? (
+        <p className="text-xs text-[rgb(var(--text-tertiary))]">No field-level changes recorded.</p>
       ) : (
-        <div className="relative">
-          {/* Timeline line */}
-          <div className="absolute left-5 top-0 bottom-0 w-px bg-[rgb(var(--border-primary))]" />
-
-          <div className="space-y-3">
-            {entries.map((entry) => (
-              <AuditEntry
-                key={entry.auditId}
-                entry={entry}
-                isExpanded={expandedEntries.has(entry.auditId)}
-                onToggle={() => toggleEntry(entry.auditId)}
-              />
+        <table className="w-full text-xs">
+          <thead>
+            <tr className="text-[rgb(var(--text-tertiary))]">
+              <th className="text-left py-1 pr-4 font-medium">Field</th>
+              <th className="text-left py-1 pr-4 font-medium">Old value</th>
+              <th className="text-left py-1 font-medium">New value</th>
+            </tr>
+          </thead>
+          <tbody>
+            {changes.map((c, i) => (
+              <tr key={`${entry.auditId}-${i}`} className="border-t border-[rgb(var(--border-primary))]">
+                <td className="py-1.5 pr-4 font-medium text-[rgb(var(--text-secondary))]">{c.field}</td>
+                <td className="py-1.5 pr-4 text-[rgb(var(--state-danger-fg))] line-through">
+                  {formatValue(c.oldValue)}
+                </td>
+                <td className="py-1.5 text-[rgb(var(--state-success-fg))]">
+                  {formatValue(c.newValue)}
+                </td>
+              </tr>
             ))}
-          </div>
-        </div>
+          </tbody>
+        </table>
       )}
     </div>
   )
 }
 
-function AuditEntry({
-  entry,
-  isExpanded,
-  onToggle,
-}: {
-  entry: AuditLogEntry
-  isExpanded: boolean
-  onToggle: () => void
-}) {
-  const actionColor = ACTION_COLORS[entry.action] || ACTION_COLORS.update
-  const hasChanges = entry.changes && entry.changes.length > 0
-  const ChevronIcon = isExpanded ? ChevronUp : ChevronDown
-
-  return (
-    <div className="relative pl-12">
-      {/* Timeline dot */}
-      <div className={`absolute left-3.5 top-3 w-3 h-3 rounded-full border-2 border-[rgb(var(--background-primary))] ${
-        entry.severity === 'high' ? 'bg-amber-500' : 'bg-[rgb(var(--action-primary-bg))]'
-      }`} />
-
-      <div
-        className="p-3 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] cursor-pointer hover:bg-[rgb(var(--background-tertiary))] transition-colors"
-        onClick={onToggle}
-      >
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${actionColor}`}>
-                {ACTION_LABELS[entry.action] || entry.action}
-              </span>
-              <span className="text-xs font-medium text-[rgb(var(--text-primary))]">
-                {entry.targetEntity}
-              </span>
-              {entry.severity === 'high' && (
-                <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
-              )}
-            </div>
-            <div className="flex items-center gap-2 mt-1 text-xs text-[rgb(var(--text-tertiary))]">
-              <Clock className="w-3 h-3" />
-              <span>{new Date(entry.changedAt).toLocaleString()}</span>
-              {entry.changedByName && (
-                <>
-                  <span>by</span>
-                  <span className="font-medium text-[rgb(var(--text-secondary))]">{entry.changedByName}</span>
-                </>
-              )}
-            </div>
-            {entry.reason && (
-              <p className="mt-1 text-xs text-[rgb(var(--text-secondary))] italic">{entry.reason}</p>
-            )}
-          </div>
-          {hasChanges && (
-            <ChevronIcon className="w-4 h-4 text-[rgb(var(--text-tertiary))] flex-shrink-0 mt-1" />
-          )}
-        </div>
-
-        {/* Expanded field changes */}
-        {isExpanded && hasChanges && (
-          <div className="mt-3 pt-3 border-t border-[rgb(var(--border-primary))]">
-            <table className="w-full text-xs">
-              <thead>
-                <tr className="text-[rgb(var(--text-tertiary))]">
-                  <th className="text-left py-1 pr-4 font-medium">Field</th>
-                  <th className="text-left py-1 pr-4 font-medium">Old Value</th>
-                  <th className="text-left py-1 font-medium">New Value</th>
-                </tr>
-              </thead>
-              <tbody>
-                {entry.changes.map((change, i) => (
-                  <tr key={i} className="border-t border-[rgb(var(--border-primary))]">
-                    <td className="py-1.5 pr-4 font-medium text-[rgb(var(--text-secondary))]">
-                      {change.field}
-                    </td>
-                    <td className="py-1.5 pr-4 text-[rgb(var(--state-danger-fg))] line-through">
-                      {formatValue(change.oldValue)}
-                    </td>
-                    <td className="py-1.5 text-[rgb(var(--state-success-fg))]">
-                      {formatValue(change.newValue)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-    </div>
-  )
-}
-
-function formatValue(value: any): string {
+function formatValue(value: unknown): string {
   if (value === null || value === undefined) return '-'
   if (typeof value === 'boolean') return value ? 'true' : 'false'
   if (typeof value === 'object') return JSON.stringify(value)

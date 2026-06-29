@@ -14,7 +14,6 @@ import {
   ToggleLeft,
   ToggleRight,
   Users,
-  Send,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import type { OnChangeFn, RowSelectionState } from '@tanstack/react-table'
@@ -345,10 +344,11 @@ export function SectionTable({
     [courseOptions, periodOptions],
   )
 
-  // Default bulk action placeholders — used when the route doesn't pass
-  // its own `bulkActions` prop. Activate / Deactivate are upgraded to a
-  // real BulkSectionStatusModal by `apps/academics/src/routes/classrooms/index.tsx`;
-  // Send notification remains a toast pending a backend slice.
+  // Fallback bulk actions used when the route doesn't pass `bulkActionsProp`.
+  // Activate / Deactivate are upgraded to a real `BulkSectionStatusModal`
+  // by the /classrooms route. The earlier `Send notification` entry was
+  // dropped — its backend slice (#225) isn't built, and shipping a toast
+  // placeholder for an unsupported flow confuses operators.
   const defaultBulkActions = useMemo<BulkAction<SectionResponseDto>[]>(
     () => [
       {
@@ -364,13 +364,6 @@ export function SectionTable({
         icon: <ToggleLeft className="w-4 h-4" />,
         onRun: (rows) =>
           toast.info(`Deactivate ${rows.length} section${rows.length === 1 ? '' : 's'} — coming soon`),
-      },
-      {
-        id: 'notify',
-        label: 'Send notification',
-        icon: <Send className="w-4 h-4" />,
-        onRun: (rows) =>
-          toast.info(`Notify ${rows.length} section${rows.length === 1 ? '' : 's'} — coming soon`),
       },
     ],
     [],
