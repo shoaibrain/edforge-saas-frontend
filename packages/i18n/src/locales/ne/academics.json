@@ -168,6 +168,55 @@
     "pickupAuth": "लिन अधिकृत",
     "atEmployer": "{{employer}} मा"
   },
+  "studentProfile": {
+    "guardian": {
+      "addTitle": "Guardian थप्नुहोस्",
+      "addDescription": "{{student}} को profile मा parent वा guardian थप्नुहोस्",
+      "unsavedChangesConfirm": "तपाईंसँग unsaved changes छन्। बन्द गर्न निश्चित हुनुहुन्छ?",
+      "unsavedChanges": "तपाईंसँग unsaved changes छन्",
+      "firstName": "पहिलो नाम",
+      "firstNamePlaceholder": "Guardian first name",
+      "lastName": "थर",
+      "lastNamePlaceholder": "Guardian last name",
+      "relationship": "Relationship",
+      "phone": "फोन",
+      "email": "Email",
+      "primaryContact": "Primary Contact",
+      "pickupAuthorized": "Pickup Authorized",
+      "noGuardian": "Guardian file मा छैन",
+      "guardians": "Guardians",
+      "guardianCount": "{{value}} Guardian",
+      "guardianCount_plural": "{{value}} Guardians",
+      "cellAria": "{{value}} guardian; primary {{firstName}} {{lastName}}, {{relationship}}",
+      "relationships": {
+        "mother": "आमा",
+        "father": "बुबा",
+        "guardian": "कानुनी संरक्षक",
+        "grandparent": "हजुरबुबा/हजुरआमा",
+        "sibling": "दाजुभाइ/दिदीबहिनी",
+        "aunt": "फुपू/माइजू",
+        "uncle": "काका/मामा",
+        "other": "अन्य"
+      },
+      "badges": {
+        "primary": "Primary",
+        "portal": "Portal",
+        "pickup": "Pickup"
+      }
+    },
+    "section": {
+      "addDescription": "{{student}} लाई class section मा थप्नुहोस्",
+      "activeEnrollmentRequired": "Section मा थप्नुअघि विद्यार्थीको active enrollment हुनुपर्छ। कृपया पहिले विद्यार्थी enroll गर्नुहोस्।",
+      "selectRequired": "कृपया section छान्नुहोस्",
+      "alreadyRostered": "विद्यार्थी यस section मा पहिले नै rostered छ",
+      "addFailed": "विद्यार्थीलाई section मा थप्न असफल",
+      "grade": "Grade {{grade}}",
+      "currentYear": "Current Year",
+      "section": "Section",
+      "selectPlaceholder": "Section छान्नुहोस्...",
+      "noSectionsFound": "Section भेटिएन। पहिले Scheduling मा sections सिर्जना गर्नुहोस्।"
+    }
+  },
   "privacy": {
     "showSensitive": "संवेदनशील विवरण देखाउनुहोस्",
     "hideSensitive": "संवेदनशील विवरण लुकाउनुहोस्"

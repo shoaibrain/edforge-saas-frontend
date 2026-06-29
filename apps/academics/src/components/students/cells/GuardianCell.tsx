@@ -15,22 +15,15 @@
 import { useState } from 'react'
 import type { GuardianDto } from '@aibrains/shared-types'
 import { UserAvatar } from '../../common/UserAvatar'
+import { useAcademicsI18n } from '../../../lib/i18n'
 
 const MAX_VISIBLE = 3
 
-const RELATIONSHIP_LABELS: Record<string, string> = {
-  father: 'Father',
-  mother: 'Mother',
-  guardian: 'Legal Guardian',
-  grandparent: 'Grandparent',
-  sibling: 'Sibling',
-  aunt: 'Aunt',
-  uncle: 'Uncle',
-  other: 'Other',
-}
-
-function relationshipLabel(rel: string): string {
-  return RELATIONSHIP_LABELS[rel] ?? (rel.charAt(0).toUpperCase() + rel.slice(1))
+function relationshipLabel(rel: string, t: (key: string, options?: Record<string, unknown>) => string): string {
+  const fallback = rel.charAt(0).toUpperCase() + rel.slice(1)
+  const key = `studentProfile.guardian.relationships.${rel}`
+  const translated = t(key)
+  return translated === key ? fallback : translated
 }
 
 /** Collision-resistant avatar seed — guardianId is optional and names repeat. */
@@ -43,11 +36,13 @@ function sortPrimaryFirst(guardians: GuardianDto[]): GuardianDto[] {
 }
 
 function GuardianBadges({ guardian }: { guardian: GuardianDto }) {
+  const { t } = useAcademicsI18n()
+
   return (
     <span className="inline-flex items-center gap-2">
-      {guardian.isPrimary && <Badge color="rgb(var(--accent-enrollment))" label="Primary" />}
-      {guardian.hasPortalAccess && <Badge color="rgb(var(--accent-academics))" label="Portal" />}
-      {guardian.canPickup && <Badge color="rgb(var(--text-tertiary))" label="Pickup" />}
+      {guardian.isPrimary && <Badge color="rgb(var(--accent-enrollment))" label={t('studentProfile.guardian.badges.primary')} />}
+      {guardian.hasPortalAccess && <Badge color="rgb(var(--accent-academics))" label={t('studentProfile.guardian.badges.portal')} />}
+      {guardian.canPickup && <Badge color="rgb(var(--text-tertiary))" label={t('studentProfile.guardian.badges.pickup')} />}
     </span>
   )
 }
@@ -70,10 +65,11 @@ function Badge({ color, label }: { color: string; label: string }) {
 }
 
 export function GuardianCell({ guardians }: { guardians?: GuardianDto[] }) {
+  const { t, formatNumber } = useAcademicsI18n()
   const [open, setOpen] = useState(false)
 
   if (!guardians || guardians.length === 0) {
-    return <span className="text-xs italic text-[rgb(var(--text-tertiary))]">No guardian on file</span>
+    return <span className="text-xs italic text-[rgb(var(--text-tertiary))]">{t('studentProfile.guardian.noGuardian')}</span>
   }
 
   const sorted = sortPrimaryFirst(guardians)
@@ -88,7 +84,13 @@ export function GuardianCell({ guardians }: { guardians?: GuardianDto[] }) {
         onClick={() => setOpen((v) => !v)}
         aria-haspopup="dialog"
         aria-expanded={open}
-        aria-label={`${sorted.length} guardian${sorted.length === 1 ? '' : 's'}; primary ${primary.firstName} ${primary.lastName}, ${relationshipLabel(primary.relationship)}`}
+        aria-label={t('studentProfile.guardian.cellAria', {
+          count: sorted.length,
+          value: formatNumber(sorted.length),
+          firstName: primary.firstName,
+          lastName: primary.lastName,
+          relationship: relationshipLabel(primary.relationship, t),
+        })}
         className="flex items-center gap-2.5 min-w-0 text-left rounded-md focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))]"
       >
         {/* Stacked avatars — primary leftmost and on top (descending z-index) */}
@@ -123,9 +125,9 @@ export function GuardianCell({ guardians }: { guardians?: GuardianDto[] }) {
           </span>
           <span className="flex items-center gap-2">
             <span className="text-xs uppercase tracking-wide text-[rgb(var(--text-tertiary))]">
-              {relationshipLabel(primary.relationship)}
+              {relationshipLabel(primary.relationship, t)}
             </span>
-            {primary.hasPortalAccess && <Badge color="rgb(var(--accent-academics))" label="Portal" />}
+            {primary.hasPortalAccess && <Badge color="rgb(var(--accent-academics))" label={t('studentProfile.guardian.badges.portal')} />}
           </span>
         </span>
       </button>
@@ -135,12 +137,15 @@ export function GuardianCell({ guardians }: { guardians?: GuardianDto[] }) {
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
           <div
             role="dialog"
-            aria-label="Guardians"
+            aria-label={t('studentProfile.guardian.guardians')}
             className="absolute left-0 z-20 mt-1 w-64 rounded-lg border overflow-hidden shadow-lg bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.5)]"
             onKeyDown={(e) => { if (e.key === 'Escape') setOpen(false) }}
           >
             <div className="px-3 py-2 text-xs font-bold uppercase tracking-wider border-b text-[rgb(var(--text-tertiary))] border-[rgb(var(--border-primary)/0.3)]">
-              {sorted.length} Guardian{sorted.length === 1 ? '' : 's'}
+              {t('studentProfile.guardian.guardianCount', {
+                count: sorted.length,
+                value: formatNumber(sorted.length),
+              })}
             </div>
             <ul>
               {sorted.map((g) => (
@@ -149,7 +154,7 @@ export function GuardianCell({ guardians }: { guardians?: GuardianDto[] }) {
                   <div className="min-w-0">
                     <div className="text-xs font-medium truncate text-[rgb(var(--text-primary))]">{g.firstName} {g.lastName}</div>
                     <div className="flex items-center gap-2 flex-wrap mt-0.5">
-                      <span className="text-xs font-medium text-[rgb(var(--text-secondary))]">{relationshipLabel(g.relationship)}</span>
+                      <span className="text-xs font-medium text-[rgb(var(--text-secondary))]">{relationshipLabel(g.relationship, t)}</span>
                       <GuardianBadges guardian={g} />
                     </div>
                   </div>

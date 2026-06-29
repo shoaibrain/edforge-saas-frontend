@@ -168,6 +168,55 @@
     "pickupAuth": "Pickup Auth",
     "atEmployer": "at {{employer}}"
   },
+  "studentProfile": {
+    "guardian": {
+      "addTitle": "Add Guardian",
+      "addDescription": "Add a parent or guardian to {{student}}'s profile",
+      "unsavedChangesConfirm": "You have unsaved changes. Are you sure you want to close?",
+      "unsavedChanges": "You have unsaved changes",
+      "firstName": "First Name",
+      "firstNamePlaceholder": "Guardian first name",
+      "lastName": "Last Name",
+      "lastNamePlaceholder": "Guardian last name",
+      "relationship": "Relationship",
+      "phone": "Phone",
+      "email": "Email",
+      "primaryContact": "Primary Contact",
+      "pickupAuthorized": "Pickup Authorized",
+      "noGuardian": "No guardian on file",
+      "guardians": "Guardians",
+      "guardianCount": "{{value}} Guardian",
+      "guardianCount_plural": "{{value}} Guardians",
+      "cellAria": "{{value}} guardian(s); primary {{firstName}} {{lastName}}, {{relationship}}",
+      "relationships": {
+        "mother": "Mother",
+        "father": "Father",
+        "guardian": "Legal Guardian",
+        "grandparent": "Grandparent",
+        "sibling": "Sibling",
+        "aunt": "Aunt",
+        "uncle": "Uncle",
+        "other": "Other"
+      },
+      "badges": {
+        "primary": "Primary",
+        "portal": "Portal",
+        "pickup": "Pickup"
+      }
+    },
+    "section": {
+      "addDescription": "Add {{student}} to a class section",
+      "activeEnrollmentRequired": "Student must have an active enrollment before being added to sections. Please enroll the student first.",
+      "selectRequired": "Please select a section",
+      "alreadyRostered": "Student is already rostered in this section",
+      "addFailed": "Failed to add student to section",
+      "grade": "Grade {{grade}}",
+      "currentYear": "Current Year",
+      "section": "Section",
+      "selectPlaceholder": "Select a section...",
+      "noSectionsFound": "No sections found. Create sections in Scheduling first."
+    }
+  },
   "privacy": {
     "showSensitive": "Show sensitive details",
     "hideSensitive": "Hide sensitive details"
