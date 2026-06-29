@@ -8,12 +8,9 @@
  */
 
 import { useMemo } from 'react'
-import { Mail, Users, ShieldAlert, UserCog } from 'lucide-react'
-import { toast } from 'sonner'
+import { Mail, Users } from 'lucide-react'
 import {
   TanstackDataTable,
-  createSelectColumn,
-  type BulkAction,
   type ColumnDef,
   type FacetedFilterConfig,
 } from '@edforge/ui'
@@ -74,7 +71,6 @@ export function TeacherTable({ staff, isLoading, onSelect }: TeacherTableProps) 
   const { t, dataTableLabels, enumLabel } = useAcademicsI18n()
   const columns: ColumnDef<StaffMember, unknown>[] = useMemo(
     () => [
-      createSelectColumn<StaffMember>(),
       {
         accessorFn: (row) => `${row.firstName} ${row.lastSurname || row.lastName || ''}`,
         id: 'name',
@@ -182,29 +178,10 @@ export function TeacherTable({ staff, isLoading, onSelect }: TeacherTableProps) 
     [roleOptions, statusOptions, t],
   )
 
-  const bulkActions = useMemo<BulkAction<StaffMember>[]>(
-    () => [
-      {
-        id: 'change-role',
-        label: t('tables.teachers.actions.changeRole'),
-        icon: <UserCog className="w-4 h-4" />,
-        onRun: (rows) => toast.info(t('common.comingSoon', {
-          action: t('tables.teachers.actions.changeRole'),
-          countLabel: t('common.staff', { count: rows.length }),
-        })),
-      },
-      {
-        id: 'update-status',
-        label: t('tables.teachers.actions.updateStatus'),
-        icon: <ShieldAlert className="w-4 h-4" />,
-        onRun: (rows) => toast.info(t('common.comingSoon', {
-          action: t('tables.teachers.actions.updateStatus'),
-          countLabel: t('common.staff', { count: rows.length }),
-        })),
-      },
-    ],
-    [t],
-  )
+  // Row selection + bulk actions intentionally omitted — the staff
+  // bulk endpoints (#226 change role, #228 update status) aren't built
+  // yet. Re-add `enableRowSelection` + a real `bulkActions` array once
+  // either backend slice lands; until then the table stays chrome-only.
 
   return (
     <TanstackDataTable<StaffMember>
@@ -214,14 +191,12 @@ export function TeacherTable({ staff, isLoading, onSelect }: TeacherTableProps) 
       isLoading={isLoading}
       tableId="academics.teachers"
       enableSorting
-      enableRowSelection
       enableColumnVisibility
       pagination={{ pageSize: 20 }}
       pageSizes={[10, 20, 50]}
       defaultSort={[{ id: 'name', desc: false }]}
       searchPlaceholder={t('tables.teachers.search')}
       facets={facets}
-      bulkActions={bulkActions}
       exportOptions={{ filename: 'teachers', formats: ['csv'] }}
       onRowClick={onSelect}
       emptyState={{

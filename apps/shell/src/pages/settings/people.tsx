@@ -26,7 +26,6 @@ import {
   Clock,
   ShieldAlert,
 } from 'lucide-react'
-import { toast } from 'sonner'
 import type { RowSelectionState } from '@tanstack/react-table'
 import { Button, Select, TanstackDataTable, createActionsColumn, createSelectColumn, type BulkAction, type ColumnDef } from '@edforge/ui'
 import { BulkChangeUserRoleModal } from '@/components/people/BulkChangeUserRoleModal'
@@ -439,8 +438,10 @@ export default function PeopleSettingsPage() {
   const [bulkSuspendTarget, setBulkSuspendTarget] = useState<UserResponseDto[] | null>(null)
   const currentUserId = user?.id ?? ''
 
-  // Change role + Suspend now open real modals (closes #233 + #234).
-  // Re-invite stays a toast pending the backend slice (#235).
+  // Change role + Suspend open real modals (closes #233 + #234).
+  // The earlier `Re-invite` placeholder was dropped — its backend slice
+  // (#235) isn't built, and a toast for an unsupported flow confuses
+  // operators. Re-add here once the backend lands.
   const userBulkActions = useMemo<BulkAction<UserResponseDto>[]>(
     () => [
       {
@@ -455,13 +456,6 @@ export default function PeopleSettingsPage() {
         icon: <ShieldAlert className="w-4 h-4" />,
         tone: 'critical',
         onRun: (rows) => setBulkSuspendTarget(rows),
-      },
-      {
-        id: 'reinvite',
-        label: 'Re-invite',
-        icon: <UserCheck className="w-4 h-4" />,
-        onRun: (rows) =>
-          toast.info(`Re-invite ${rows.length} user${rows.length === 1 ? '' : 's'} — coming soon`),
       },
     ],
     [],

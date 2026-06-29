@@ -1,14 +1,24 @@
 /**
  * FeeStructureList
  *
- * Admin table of configured fee structures with edit/delete actions.
+ * Admin table of configured fee structures with per-row edit/delete
+ * actions. Backed by the shared `TanstackDataTable` (sort / search /
+ * column visibility / density / CSV export / persistence). The finance
+ * MFE has its own copy under `apps/finance/src/components/configuration`
+ * for the /finance/configuration/fee-structures surface; this one is
+ * for shell's /settings/fee-structures.
  */
 
+import { useMemo } from 'react'
 import type { FeeStructure } from '@edforge/types'
 import { useCurrency } from '@edforge/types/use-currency'
 import { useTranslation } from '@edforge/i18n'
+import {
+  TanstackDataTable,
+  type ColumnDef,
+} from '@edforge/ui'
 import { useSettings } from '../../lib/shell-context'
-import { Pencil, Trash2, GraduationCap, DollarSign } from 'lucide-react'
+import { DollarSign, GraduationCap, Pencil, Trash2 } from 'lucide-react'
 
 interface FeeStructureListProps {
   feeStructures: FeeStructure[]
@@ -27,131 +37,148 @@ export function FeeStructureList({
   const settings = useSettings()
   const { format } = useCurrency(settings)
 
-  const safeList = Array.isArray(feeStructures) ? feeStructures : []
+  const safeList: FeeStructure[] = Array.isArray(feeStructures) ? feeStructures : []
 
-  if (isLoading) {
-    return (
-      <div className="space-y-3">
-        {[...Array(3)].map((_, i) => (
-          <div key={i} className="h-16 rounded-xl bg-[rgb(var(--bg-tertiary))] animate-pulse" />
-        ))}
-      </div>
-    )
-  }
-
-  if (safeList.length === 0) {
-    return (
-      <div className="text-center py-12">
-        <DollarSign className="w-10 h-10 mx-auto mb-3 text-[rgb(var(--text-tertiary))] opacity-40" />
-        <p className="text-sm font-medium text-[rgb(var(--text-secondary))]">
-          {t('feeStructure.noFeeStructures')}
-        </p>
-        <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
-          {t('feeStructure.noFeeStructuresDescription')}
-        </p>
-      </div>
-    )
-  }
+  const columns: ColumnDef<FeeStructure, unknown>[] = useMemo(
+    () => [
+      {
+        id: 'name',
+        accessorKey: 'name',
+        header: t('feeStructure.name'),
+        cell: ({ row }) => {
+          const fee = row.original
+          return (
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="font-medium text-[rgb(var(--text-primary))] truncate">{fee.name}</span>
+                {!fee.isActive && (
+                  <span className="text-xs px-1.5 py-0.5 rounded bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]">
+                    Inactive
+                  </span>
+                )}
+              </div>
+              {fee.description && (
+                <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5 truncate">{fee.description}</p>
+              )}
+            </div>
+          )
+        },
+      },
+      {
+        id: 'feeType',
+        accessorKey: 'feeType',
+        header: t('feeStructure.type'),
+        cell: ({ row }) => (
+          <span className="text-sm text-[rgb(var(--text-secondary))]">
+            {t(`feeStructure.types.${row.original.feeType}`, { defaultValue: row.original.feeType })}
+          </span>
+        ),
+      },
+      {
+        id: 'amount',
+        accessorKey: 'amount',
+        header: () => <span className="block text-right">{t('feeStructure.amount')}</span>,
+        cell: ({ row }) => {
+          const fee = row.original
+          return (
+            <span className="block text-right font-medium text-[rgb(var(--text-primary))] tabular-nums">
+              {format(fee.amount)}
+              {fee.taxRate > 0 && (
+                <span className="text-xs text-[rgb(var(--text-tertiary))] ml-1">
+                  +{fee.taxRate}% {fee.taxType}
+                </span>
+              )}
+            </span>
+          )
+        },
+      },
+      {
+        id: 'frequency',
+        accessorKey: 'frequency',
+        header: t('feeStructure.frequency'),
+        cell: ({ row }) => (
+          <span className="text-sm text-[rgb(var(--text-secondary))]">
+            {t(`feeStructure.frequencies.${row.original.frequency}`, { defaultValue: row.original.frequency })}
+          </span>
+        ),
+      },
+      {
+        id: 'gradeLevels',
+        accessorFn: (fee) => (fee.gradeLevels ?? []).join(', '),
+        header: t('feeStructure.gradeLevels'),
+        enableSorting: false,
+        cell: ({ row }) => {
+          const grades = row.original.gradeLevels ?? []
+          if (grades.length === 0) {
+            return (
+              <span className="text-xs text-[rgb(var(--text-tertiary))]">
+                {t('feeStructure.allGrades')}
+              </span>
+            )
+          }
+          return (
+            <div className="flex flex-wrap gap-1">
+              {grades.map((grade) => (
+                <span
+                  key={grade}
+                  className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]"
+                >
+                  <GraduationCap className="w-2.5 h-2.5 mr-0.5" />
+                  {grade}
+                </span>
+              ))}
+            </div>
+          )
+        },
+      },
+      {
+        id: 'actions',
+        header: () => <span className="sr-only">Actions</span>,
+        enableSorting: false,
+        cell: ({ row }) => (
+          <div className="flex items-center justify-end gap-1">
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); onEdit(row.original) }}
+              className="p-1.5 rounded-md hover:bg-[rgb(var(--background-tertiary))] transition-colors"
+              aria-label={t('feeStructure.editFee')}
+            >
+              <Pencil className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))]" />
+            </button>
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); onDelete(row.original) }}
+              className="p-1.5 rounded-md hover:bg-[rgb(var(--state-danger-bg)/0.18)] transition-colors"
+              aria-label={t('feeStructure.deleteFee')}
+            >
+              <Trash2 className="w-3.5 h-3.5 text-[rgb(var(--state-danger-fg))]" />
+            </button>
+          </div>
+        ),
+      },
+    ],
+    [t, format, onEdit, onDelete],
+  )
 
   return (
-    <div className="border border-[rgb(var(--border-primary))] rounded-xl overflow-hidden">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="bg-[rgb(var(--bg-secondary))]">
-            <th className="text-left px-4 py-2.5 text-xs font-medium text-[rgb(var(--text-tertiary))]">
-              {t('feeStructure.name')}
-            </th>
-            <th className="text-left px-4 py-2.5 text-xs font-medium text-[rgb(var(--text-tertiary))]">
-              {t('feeStructure.type')}
-            </th>
-            <th className="text-right px-4 py-2.5 text-xs font-medium text-[rgb(var(--text-tertiary))]">
-              {t('feeStructure.amount')}
-            </th>
-            <th className="text-left px-4 py-2.5 text-xs font-medium text-[rgb(var(--text-tertiary))]">
-              {t('feeStructure.frequency')}
-            </th>
-            <th className="text-left px-4 py-2.5 text-xs font-medium text-[rgb(var(--text-tertiary))]">
-              {t('feeStructure.gradeLevels')}
-            </th>
-            <th className="w-20" />
-          </tr>
-        </thead>
-        <tbody>
-          {safeList.map((fee) => (
-            <tr
-              key={fee.id}
-              className="border-t border-[rgb(var(--border-primary))] hover:bg-[rgb(var(--bg-tertiary))] transition-colors"
-            >
-              <td className="px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <span className="font-medium text-[rgb(var(--text-primary))]">{fee.name}</span>
-                  {!fee.isActive && (
-                    <span className="text-xs px-1.5 py-0.5 rounded bg-[rgb(var(--background-tertiary))]  text-[rgb(var(--text-tertiary))]">
-                      Inactive
-                    </span>
-                  )}
-                </div>
-                {fee.description && (
-                  <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">{fee.description}</p>
-                )}
-              </td>
-              <td className="px-4 py-3 text-[rgb(var(--text-secondary))]">
-                {t(`feeStructure.types.${fee.feeType}`, { defaultValue: fee.feeType })}
-              </td>
-              <td className="px-4 py-3 text-right font-medium text-[rgb(var(--text-primary))]">
-                {format(fee.amount)}
-                {fee.taxRate > 0 && (
-                  <span className="text-xs text-[rgb(var(--text-tertiary))] ml-1">
-                    +{fee.taxRate}% {fee.taxType}
-                  </span>
-                )}
-              </td>
-              <td className="px-4 py-3 text-[rgb(var(--text-secondary))]">
-                {t(`feeStructure.frequencies.${fee.frequency}`, { defaultValue: fee.frequency })}
-              </td>
-              <td className="px-4 py-3">
-                {(fee.gradeLevels ?? []).length === 0 ? (
-                  <span className="text-xs text-[rgb(var(--text-tertiary))]">
-                    {t('feeStructure.allGrades')}
-                  </span>
-                ) : (
-                  <div className="flex flex-wrap gap-1">
-                    {(fee.gradeLevels ?? []).map((grade) => (
-                      <span
-                        key={grade}
-                        className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] dark:bg-[rgb(var(--state-info-bg)/0.18)]0/10 "
-                      >
-                        <GraduationCap className="w-2.5 h-2.5 mr-0.5" />
-                        {grade}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </td>
-              <td className="px-4 py-3">
-                <div className="flex items-center gap-1">
-                  <button
-                    type="button"
-                    onClick={() => onEdit(fee)}
-                    className="p-1.5 rounded-lg hover:bg-[rgb(var(--bg-tertiary))] transition-colors"
-                    aria-label={t('feeStructure.editFee')}
-                  >
-                    <Pencil className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))]" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onDelete(fee)}
-                    className="p-1.5 rounded-lg hover:bg-[rgb(var(--state-danger-bg)/0.18)] dark:hover:bg-[rgb(var(--state-danger-bg)/0.18)]0/10 transition-colors"
-                    aria-label={t('feeStructure.deleteFee')}
-                  >
-                    <Trash2 className="w-3.5 h-3.5 text-[rgb(var(--state-danger-fg))]" />
-                  </button>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <TanstackDataTable<FeeStructure>
+      columns={columns}
+      data={safeList}
+      getRowId={(row) => row.id}
+      isLoading={isLoading}
+      tableId="settings.fee-structures"
+      enableSorting
+      enableColumnVisibility
+      pagination={{ pageSize: 20 }}
+      pageSizes={[10, 20, 50]}
+      defaultSort={[{ id: 'name', desc: false }]}
+      searchPlaceholder={t('feeStructure.name')}
+      exportOptions={{ filename: 'fee-structures', formats: ['csv'] }}
+      emptyState={{
+        icon: <DollarSign className="w-10 h-10" />,
+        title: t('feeStructure.noFeeStructures'),
+        description: t('feeStructure.noFeeStructuresDescription'),
+      }}
+    />
   )
 }

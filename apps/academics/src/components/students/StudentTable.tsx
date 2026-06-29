@@ -9,7 +9,7 @@
  */
 
 import { useMemo, useState, type ReactNode } from 'react'
-import { User, MoreVertical, UserMinus, ExternalLink, MessageSquare, ArrowRightLeft, Archive } from 'lucide-react'
+import { User, MoreVertical, UserMinus, ExternalLink, Archive } from 'lucide-react'
 import { toast } from 'sonner'
 import type { OnChangeFn, RowSelectionState } from '@tanstack/react-table'
 import {
@@ -275,30 +275,14 @@ export function StudentTable({
     ? { hasMore: Boolean(hasMore), isFetching: Boolean(isFetchingMore), onLoadMore, serverTotalHint }
     : undefined
 
-  // Default bulk action placeholders — used when the route doesn't pass
-  // its own `bulkActions` prop. The Archive action is upgraded to a real
-  // bulk drawer by `apps/academics/src/routes/students/index.tsx`; the
-  // other two (Message, Move) remain toasts pending backend slices.
+  // Fallback bulk actions used when the route doesn't pass `bulkActionsProp`.
+  // Only Archive is included — the per-row mutation already exists, so the
+  // route at /students upgrades this to a real `BulkArchiveStudentsModal`.
+  // Earlier `Message` and `Move section` placeholders were dropped: their
+  // backend slices (#221, #222) aren't built, and shipping toast placeholders
+  // for unsupported flows confuses operators. Re-add here once those land.
   const defaultBulkActions = useMemo<BulkAction<StudentResponseDto>[]>(
     () => [
-      {
-        id: 'message',
-        label: t('tables.students.actions.message'),
-        icon: <MessageSquare className="w-4 h-4" />,
-        onRun: (rows) => toast.info(t('common.comingSoon', {
-          action: t('tables.students.bulk.message'),
-          countLabel: t('common.students', { count: rows.length }),
-        })),
-      },
-      {
-        id: 'move',
-        label: t('tables.students.actions.moveSection'),
-        icon: <ArrowRightLeft className="w-4 h-4" />,
-        onRun: (rows) => toast.info(t('common.comingSoon', {
-          action: t('tables.students.bulk.move'),
-          countLabel: t('common.students', { count: rows.length }),
-        })),
-      },
       {
         id: 'archive',
         label: t('tables.students.actions.archive'),
