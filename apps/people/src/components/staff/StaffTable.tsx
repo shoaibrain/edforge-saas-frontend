@@ -9,7 +9,7 @@
 import { useMemo, type MouseEvent, type ReactNode } from 'react'
 import { UsersRound, Eye, Pencil, MoreVertical } from 'lucide-react'
 import { useTranslation } from '@edforge/i18n'
-import { focusRingInset, StatusBadge, TanstackDataTable, type ColumnDef, type StatusTone } from '@edforge/ui'
+import { focusRingInset, IdentityCell, StatusBadge, TanstackDataTable, type ColumnDef, type StatusTone } from '@edforge/ui'
 import type { StaffResponseDto } from '@aibrains/shared-types'
 import { StaffRoleChip } from './StaffRoleChip'
 import { AccessChip } from './AccessChip'
@@ -76,25 +76,12 @@ export function StaffTable({
           const s = row.original
           const empTone = EMPLOYMENT_TONE[s.employmentStatus] ?? 'neutral'
           return (
-            <div className="flex items-center gap-2.5">
-              <img
-                src={getStaffAvatar(s.staffId)}
-                alt={`${s.firstName} ${s.lastSurname}`}
-                className="h-8 w-8 shrink-0 rounded-full object-cover"
-                loading="lazy"
-              />
-              <div className="flex min-w-0 flex-col gap-0.5">
-                <div className="flex items-center gap-1">
-                  <span className="truncate text-xs font-medium text-[rgb(var(--text-primary))]">
-                    {s.firstName} {s.lastSurname}
-                  </span>
-                  <StatusBadge tone={empTone}>{getEmploymentLabel(s.employmentStatus)}</StatusBadge>
-                </div>
-                <span className="truncate text-xs text-[rgb(var(--text-tertiary))]">
-                  {s.email}
-                </span>
-              </div>
-            </div>
+            <IdentityCell
+              name={`${s.firstName} ${s.lastSurname}`}
+              avatarSrc={getStaffAvatar(s.staffId)}
+              secondary={s.email}
+              trailing={<StatusBadge tone={empTone}>{getEmploymentLabel(s.employmentStatus)}</StatusBadge>}
+            />
           )
         },
       },

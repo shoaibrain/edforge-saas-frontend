@@ -16,15 +16,16 @@ import {
   TanstackDataTable,
   AttendanceTrend,
   createSelectColumn,
+  IdentityCell,
   type AttendanceTrendDirection,
   type BulkAction,
   type ColumnDef,
   type DataTableColumnMeta,
 } from '@edforge/ui'
+import { getStudentAvatar } from '../../lib/avatar'
 import { gradeSort } from '@edforge/types'
 import type { StudentResponseDto } from '@aibrains/shared-types'
 import { StudentStatusBadge } from './StudentStatusBadge'
-import { UserAvatar } from '../common/UserAvatar'
 import { GradeChip } from './cells/GradeChip'
 import { GuardianCell } from './cells/GuardianCell'
 import { StudentLocationCell } from './cells/StudentLocationCell'
@@ -174,19 +175,16 @@ export function StudentTable({
         cell: ({ row }) => {
           const student = row.original
           return (
-            <div className="flex items-center gap-3">
-              <UserAvatar userId={student.studentId} userName={student.fullName} role="student" size="lg" />
-              <div className="min-w-0">
-                <p className="text-sm font-medium truncate text-[rgb(var(--text-primary))]">
-                  {student.fullName}
-                </p>
-                {student.studentNumber && (
-                  <p className="text-xs font-mono truncate text-[rgb(var(--text-tertiary))]">
-                    #{student.studentNumber}
-                  </p>
-                )}
-              </div>
-            </div>
+            <IdentityCell
+              name={student.fullName}
+              avatarSrc={getStudentAvatar(student.studentId, { size: 40 })}
+              size="md"
+              secondary={
+                student.studentNumber ? (
+                  <span className="font-mono">#{student.studentNumber}</span>
+                ) : undefined
+              }
+            />
           )
         },
       },

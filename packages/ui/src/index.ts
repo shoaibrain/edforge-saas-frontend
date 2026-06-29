@@ -28,6 +28,10 @@ export {
   type AvatarGroupProps,
 } from './components/Avatar'
 export {
+  IdentityCell,
+  type IdentityCellProps,
+} from './components/IdentityCell'
+export {
   Skeleton,
   SkeletonText,
   SkeletonAvatar,

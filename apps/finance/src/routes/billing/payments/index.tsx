@@ -14,6 +14,7 @@ import {
   TanstackDataTable,
   createActionsColumn,
   createSelectColumn,
+  IdentityCell,
   StatCard,
   WidgetErrorBoundaryV2,
   Select,
@@ -537,18 +538,7 @@ function usePaymentColumns(
         cell: ({ row }) => {
           const name = row.original.studentName
           if (!name) return <span className="text-[rgb(var(--text-tertiary))]">—</span>
-          return (
-            <div className="flex items-center gap-2">
-              <img
-                src={getStudentAvatarUrl(name)}
-                alt=""
-                className="w-7 h-7 rounded-full border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] flex-shrink-0"
-                loading="lazy"
-                aria-hidden="true"
-              />
-              <span className="text-[rgb(var(--text-primary))] truncate">{name}</span>
-            </div>
-          )
+          return <IdentityCell name={name} avatarSrc={getStudentAvatarUrl(name)} />
         },
         enableSorting: true,
       },

@@ -25,6 +25,7 @@ import {
   createExpandColumn,
   createSelectColumn,
   FilterTabs,
+  IdentityCell,
   type BulkAction,
   type ColumnDef,
   StatCard,
@@ -493,23 +494,11 @@ function buildColumns(
     cell: ({ row }) => {
       const account = row.original
       return (
-        <div className="flex items-center gap-3">
-          <div className="flex-shrink-0 w-8 h-8 rounded-full overflow-hidden bg-[rgb(var(--background-tertiary))]">
-            <img
-              src={getAvatarUrl(account.studentId)}
-              alt={account.studentName || t('studentAccount.columns.student')}
-              className="w-full h-full object-cover"
-              loading="lazy"
-            />
-          </div>
-          <span className="font-medium text-[rgb(var(--text-primary))]">
-            {account.studentName || (
-              <span className="text-[rgb(var(--text-tertiary))] text-xs">
-                <UuidBadge value={account.studentId ?? ''} />
-              </span>
-            )}
-          </span>
-        </div>
+        <IdentityCell
+          name={account.studentName ?? ''}
+          avatarSrc={getAvatarUrl(account.studentId)}
+          fallback={<UuidBadge value={account.studentId ?? ''} />}
+        />
       )
     },
   },
