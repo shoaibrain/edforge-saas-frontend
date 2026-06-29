@@ -29,6 +29,7 @@ import type { StudentProfileResponseDto } from '@aibrains/shared-types'
 import { useStudentAttendanceSummary } from '../../../hooks/useAttendance'
 import { useRemoveStudent } from '../../../hooks'
 import { useActiveSchoolId } from '../../../stores/app.store'
+import { useAcademicsI18n } from '../../../lib/i18n'
 
 // ============================================================================
 // TYPES
@@ -47,10 +48,10 @@ type Classroom = NonNullable<StudentProfileResponseDto['classrooms']>[number]
 // ============================================================================
 
 function getRateColor(rate: number) {
-  if (rate >= 95) return { text: 'text-[rgb(var(--state-success-fg))]', label: 'Excellent' }
-  if (rate >= 90) return { text: 'text-[rgb(var(--state-warning-fg))]', label: 'Good' }
-  if (rate >= 85) return { text: 'text-[rgb(var(--state-warning-fg))]', label: 'At Risk' }
-  return { text: 'text-[rgb(var(--state-danger-fg))]', label: 'Critical' }
+  if (rate >= 95) return { text: 'text-[rgb(var(--state-success-fg))]', labelKey: 'performance.excellent' }
+  if (rate >= 90) return { text: 'text-[rgb(var(--state-warning-fg))]', labelKey: 'performance.good' }
+  if (rate >= 85) return { text: 'text-[rgb(var(--state-warning-fg))]', labelKey: 'performance.atRisk' }
+  return { text: 'text-[rgb(var(--state-danger-fg))]', labelKey: 'performance.critical' }
 }
 
 // ============================================================================
@@ -58,29 +59,30 @@ function getRateColor(rate: number) {
 // ============================================================================
 
 function AttendanceSection({ summary }: { summary: AttendanceSummary }) {
+  const { t, formatNumber } = useAcademicsI18n()
   const rateColor = getRateColor(summary.attendanceRate)
 
   return (
     <section className="mb-8">
       <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-4">
         <Calendar className="w-4 h-4 text-amber-500" />
-        Attendance Summary
+        {t('studentProfile.schedule.attendanceSummary')}
       </h3>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
         {/* Rate */}
         <div className="sm:col-span-1 p-4 rounded-xl bg-surface-secondary border border-border-secondary">
-          <p className="text-xs font-medium text-text-tertiary uppercase tracking-wide mb-1">Rate</p>
+          <p className="text-xs font-medium text-text-tertiary uppercase tracking-wide mb-1">{t('studentProfile.schedule.rate')}</p>
           <p className={`text-2xl font-bold ${rateColor.text}`}>
-            {summary.attendanceRate.toFixed(1)}%
+            {formatNumber(Number(summary.attendanceRate.toFixed(1)))}%
           </p>
-          <p className={`text-xs ${rateColor.text}`}>{rateColor.label}</p>
+          <p className={`text-xs ${rateColor.text}`}>{t(rateColor.labelKey)}</p>
         </div>
         {/* Stats */}
-        <StatCard label="Total Days" value={summary.totalDays} />
-        <StatCard label="Present" value={summary.present} color="text-[rgb(var(--state-success-fg))]" />
-        <StatCard label="Absent" value={summary.absent} color="text-[rgb(var(--state-danger-fg))]" />
-        <StatCard label="Late" value={summary.late} color="text-[rgb(var(--state-warning-fg))]" />
-        <StatCard label="Excused" value={summary.excused} color="text-[rgb(var(--state-info-fg))]" />
+        <StatCard label={t('studentProfile.schedule.totalDays')} value={summary.totalDays} />
+        <StatCard label={t('attendance.status.present.label')} value={summary.present} color="text-[rgb(var(--state-success-fg))]" />
+        <StatCard label={t('attendance.status.absent.label')} value={summary.absent} color="text-[rgb(var(--state-danger-fg))]" />
+        <StatCard label={t('attendance.status.late.label')} value={summary.late} color="text-[rgb(var(--state-warning-fg))]" />
+        <StatCard label={t('attendance.status.excused.label')} value={summary.excused} color="text-[rgb(var(--state-info-fg))]" />
       </div>
 
       {/* Alerts */}
@@ -88,7 +90,7 @@ function AttendanceSection({ summary }: { summary: AttendanceSummary }) {
         <div className="mt-4 p-3 rounded-lg bg-[rgb(var(--state-warning-fg))]/5 border border-amber-500/15">
           <p className="text-sm text-[rgb(var(--state-warning-fg))] flex items-center gap-2">
             <TrendingDown className="w-4 h-4 flex-shrink-0" />
-            Attendance below 90% may affect academic performance. Consider follow-up.
+            {t('alerts.lowAttendance')}
           </p>
         </div>
       )}
@@ -96,7 +98,7 @@ function AttendanceSection({ summary }: { summary: AttendanceSummary }) {
         <div className="mt-4 p-3 rounded-lg bg-[rgb(var(--state-success-fg)/0.05)] border border-[rgb(var(--state-success-border))]/15">
           <p className="text-sm text-[rgb(var(--state-success-fg))] flex items-center gap-2">
             <TrendingUp className="w-4 h-4 flex-shrink-0" />
-            Outstanding attendance record!
+            {t('alerts.highAttendance')}
           </p>
         </div>
       )}
@@ -113,10 +115,12 @@ function StatCard({
   value: number
   color?: string
 }) {
+  const { formatNumber } = useAcademicsI18n()
+
   return (
     <div className="p-4 rounded-xl bg-surface-secondary border border-border-secondary">
       <p className="text-xs font-medium text-text-tertiary uppercase tracking-wide mb-1">{label}</p>
-      <p className={`text-2xl font-bold ${color || 'text-text-primary'}`}>{value}</p>
+      <p className={`text-2xl font-bold ${color || 'text-text-primary'}`}>{formatNumber(value)}</p>
     </div>
   )
 }
@@ -158,13 +162,17 @@ function ScheduleTable({
   student: StudentProfileResponseDto
   studentId: string
 }) {
+  const { t, formatNumber } = useAcademicsI18n()
   const schoolId = useActiveSchoolId() || ''
   const removeStudentMutation = useRemoveStudent()
   const [removingId, setRemovingId] = useState<string | null>(null)
 
   const handleRemove = async (classroom: Classroom) => {
     const confirmed = window.confirm(
-      `Remove ${student.fullName} from ${classroom.name}? This will unlink the student from this section.`
+      t('studentProfile.schedule.removeConfirm', {
+        student: student.fullName,
+        section: classroom.name,
+      })
     )
     if (!confirmed) return
 
@@ -185,9 +193,9 @@ function ScheduleTable({
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2">
           <BookOpen className="w-4 h-4 text-[rgb(var(--state-info-fg))]" />
-          Current Classes
+          {t('sections.currentClasses')}
           <span className="text-xs text-text-tertiary font-normal ml-1">
-            ({classrooms.length})
+            ({formatNumber(classrooms.length)})
           </span>
         </h3>
       </div>
@@ -197,9 +205,9 @@ function ScheduleTable({
           <thead>
             <tr className="border-b border-border-secondary">
               <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide w-8">#</th>
-              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">Class</th>
-              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">Subject</th>
-              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">Teacher</th>
+              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">{t('studentProfile.schedule.class')}</th>
+              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">{t('studentProfile.schedule.subject')}</th>
+              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">{t('common.teacher')}</th>
               <th className="text-right py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide w-16"></th>
             </tr>
           </thead>
@@ -241,7 +249,7 @@ function ScheduleTable({
                       onClick={() => handleRemove(classroom)}
                       disabled={isRemoving}
                       className="p-1.5 text-text-tertiary hover:text-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--state-danger-bg)/0.18)] rounded-lg transition-colors disabled:opacity-50"
-                      title="Remove from section"
+                      title={t('studentProfile.schedule.removeFromSection')}
                     >
                       {isRemoving ? (
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -263,17 +271,17 @@ function ScheduleTable({
           {student.academicSummary.gpa !== undefined && (
             <div className="flex items-center gap-2">
               <GraduationCap className="w-4 h-4 text-text-tertiary" />
-              <span className="text-sm text-text-secondary">GPA:</span>
+              <span className="text-sm text-text-secondary">{t('stats.termGpa')}:</span>
               <span className="text-sm font-semibold text-text-primary">
-                {student.academicSummary.gpa.toFixed(2)}
+                {formatNumber(Number(student.academicSummary.gpa.toFixed(2)))}
               </span>
             </div>
           )}
           {student.academicSummary.completedCredits !== undefined && (
             <div className="flex items-center gap-2">
-              <span className="text-sm text-text-secondary">Credits:</span>
+              <span className="text-sm text-text-secondary">{t('studentProfile.schedule.credits')}:</span>
               <span className="text-sm font-semibold text-text-primary">
-                {student.academicSummary.completedCredits}
+                {formatNumber(student.academicSummary.completedCredits)}
               </span>
             </div>
           )}
@@ -288,6 +296,7 @@ function ScheduleTable({
 // ============================================================================
 
 export function ScheduleTab({ student, onAddToSection }: ScheduleTabProps) {
+  const { t } = useAcademicsI18n()
   const classrooms = student.classrooms || []
   const attendanceSummary = student.attendanceSummary
 
@@ -315,16 +324,16 @@ export function ScheduleTab({ student, onAddToSection }: ScheduleTabProps) {
     return (
       <div className="text-center py-16">
         <BookOpen className="w-12 h-12 text-text-tertiary mx-auto mb-3" />
-        <p className="text-text-secondary font-medium">No schedule data</p>
+        <p className="text-text-secondary font-medium">{t('studentProfile.schedule.noScheduleData')}</p>
         <p className="text-sm text-text-tertiary mt-1">
           {student.currentEnrollment
-            ? 'Add this student to class sections to begin tracking attendance and grades.'
-            : 'Classes and attendance data will appear here once the student is enrolled in sections.'}
+            ? t('studentProfile.schedule.addSectionsHint')
+            : t('studentProfile.schedule.enrollSectionsHint')}
         </p>
         {onAddToSection && student.currentEnrollment && (
           <Button variant="outline" size="sm" onClick={onAddToSection} className="mt-4">
             <Plus className="w-4 h-4 mr-1.5" />
-            Add to Section
+            {t('actions.addToSection')}
           </Button>
         )}
       </div>
@@ -344,7 +353,7 @@ export function ScheduleTab({ student, onAddToSection }: ScheduleTabProps) {
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--text-primary))] bg-[rgb(var(--state-info-bg)/0.18)] hover:bg-[rgb(var(--state-info-bg)/0.26)] dark:bg-[rgb(var(--state-info-bg)/0.18)] dark:hover:bg-[rgb(var(--state-info-fg)/0.2)]  rounded-lg transition-colors"
           >
             <Calendar className="w-3.5 h-3.5" />
-            Attendance History
+            {t('studentProfile.schedule.attendanceHistory')}
             <ExternalLink className="w-3 h-3" />
           </Link>
           <Link
@@ -353,14 +362,14 @@ export function ScheduleTab({ student, onAddToSection }: ScheduleTabProps) {
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-amber-600 hover:text-amber-700 bg-amber-50 hover:bg-[rgb(var(--state-warning-bg)/0.18)] dark:bg-[rgb(var(--state-warning-fg))]/10 dark:hover:bg-[rgb(var(--state-warning-fg))]/20 dark:text-amber-400 rounded-lg transition-colors"
           >
             <GraduationCap className="w-3.5 h-3.5" />
-            View Grades
+            {t('studentProfile.schedule.viewGrades')}
             <ExternalLink className="w-3 h-3" />
           </Link>
         </div>
         {onAddToSection && student.currentEnrollment && (
           <Button variant="outline" size="sm" onClick={onAddToSection}>
             <Plus className="w-3.5 h-3.5 mr-1.5" />
-            Add to Section
+            {t('actions.addToSection')}
           </Button>
         )}
       </div>
@@ -371,18 +380,18 @@ export function ScheduleTab({ student, onAddToSection }: ScheduleTabProps) {
         <section>
           <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-4">
             <BookOpen className="w-4 h-4 text-[rgb(var(--state-info-fg))]" />
-            Current Classes
+            {t('sections.currentClasses')}
           </h3>
           <div className="text-center py-8">
             <BookOpen className="w-8 h-8 text-text-tertiary mx-auto mb-2" />
-            <p className="text-sm text-text-secondary">No classes scheduled</p>
+            <p className="text-sm text-text-secondary">{t('empty.noClasses')}</p>
             <p className="text-xs text-text-tertiary mt-1">
-              Classes will appear here once enrolled in sections.
+              {t('empty.classesWillAppear')}
             </p>
             {onAddToSection && student.currentEnrollment && (
               <Button variant="outline" size="sm" onClick={onAddToSection} className="mt-3">
                 <Plus className="w-3.5 h-3.5 mr-1.5" />
-                Add to Section
+                {t('actions.addToSection')}
               </Button>
             )}
           </div>

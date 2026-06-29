@@ -215,6 +215,39 @@
       "section": "Section",
       "selectPlaceholder": "Section छान्नुहोस्...",
       "noSectionsFound": "Section भेटिएन। पहिले Scheduling मा sections सिर्जना गर्नुहोस्।"
+    },
+    "demographics": {
+      "title": "Ed-Fi Demographics",
+      "description": "Flash I / II reporting का लागि IEMIS-aligned fields। Edits audited हुन्छन्।",
+      "edit": "Edit",
+      "identity": "Identity",
+      "sex": "लिङ्ग",
+      "primaryLanguage": "मुख्य भाषा",
+      "motherTongue": "मातृभाषा",
+      "ethnicity": "Ethnicity",
+      "disabilities": "Disabilities",
+      "flags": "Flags",
+      "transferredIn": "Transferred in?",
+      "belowPovertyLine": "Below poverty line?",
+      "scholarshipCategory": "Scholarship category",
+      "notSpecified": "Not specified",
+      "derivedConfirm": "Derived — Edit क्लिक गरेर confirm गर्नुहोस्",
+      "noDisabilities": "No disabilities recorded"
+    },
+    "schedule": {
+      "attendanceSummary": "Attendance Summary",
+      "rate": "Rate",
+      "totalDays": "कुल दिन",
+      "class": "Class",
+      "subject": "Subject",
+      "removeConfirm": "{{student}} लाई {{section}} बाट हटाउने? यसले विद्यार्थीलाई यो section बाट unlink गर्छ।",
+      "removeFromSection": "Section बाट हटाउनुहोस्",
+      "credits": "Credits",
+      "noScheduleData": "Schedule data छैन",
+      "addSectionsHint": "Attendance र grades track गर्न विद्यार्थीलाई class sections मा थप्नुहोस्।",
+      "enrollSectionsHint": "विद्यार्थी sections मा enrolled भएपछि classes र attendance data यहाँ देखिन्छ।",
+      "attendanceHistory": "Attendance History",
+      "viewGrades": "Grades हेर्नुहोस्"
     }
   },
   "privacy": {

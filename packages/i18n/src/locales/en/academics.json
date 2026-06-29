@@ -215,6 +215,39 @@
       "section": "Section",
       "selectPlaceholder": "Select a section...",
       "noSectionsFound": "No sections found. Create sections in Scheduling first."
+    },
+    "demographics": {
+      "title": "Ed-Fi Demographics",
+      "description": "IEMIS-aligned fields used for Flash I / II reporting. Edits are audited.",
+      "edit": "Edit",
+      "identity": "Identity",
+      "sex": "Sex",
+      "primaryLanguage": "Primary language",
+      "motherTongue": "Mother tongue",
+      "ethnicity": "Ethnicity",
+      "disabilities": "Disabilities",
+      "flags": "Flags",
+      "transferredIn": "Transferred in?",
+      "belowPovertyLine": "Below poverty line?",
+      "scholarshipCategory": "Scholarship category",
+      "notSpecified": "Not specified",
+      "derivedConfirm": "Derived — click Edit to confirm",
+      "noDisabilities": "No disabilities recorded"
+    },
+    "schedule": {
+      "attendanceSummary": "Attendance Summary",
+      "rate": "Rate",
+      "totalDays": "Total Days",
+      "class": "Class",
+      "subject": "Subject",
+      "removeConfirm": "Remove {{student}} from {{section}}? This will unlink the student from this section.",
+      "removeFromSection": "Remove from section",
+      "credits": "Credits",
+      "noScheduleData": "No schedule data",
+      "addSectionsHint": "Add this student to class sections to begin tracking attendance and grades.",
+      "enrollSectionsHint": "Classes and attendance data will appear here once the student is enrolled in sections.",
+      "attendanceHistory": "Attendance History",
+      "viewGrades": "View Grades"
     }
   },
   "privacy": {
