@@ -11,6 +11,7 @@ import {
   useCreateGradingPolicy,
   useUpdateGradingPolicy,
 } from '../../hooks/useGrades'
+import { useAcademicsI18n } from '../../lib/i18n'
 import type {
   GradingPolicyResponse,
   CategoryWeight,
@@ -38,19 +39,22 @@ const defaultLetterGrades: LetterGradeEntryDto[] = [
   { letter: 'F', minPercentage: 0, maxPercentage: 59, gpaPoints: 0.0, isPassing: false },
 ]
 
-const defaultCategories: CategoryWeight[] = [
-  { categoryId: 'tests', categoryName: 'Tests', weight: 30 },
-  { categoryId: 'quizzes', categoryName: 'Quizzes', weight: 20 },
-  { categoryId: 'homework', categoryName: 'Homework', weight: 20 },
-  { categoryId: 'participation', categoryName: 'Participation', weight: 10 },
-  { categoryId: 'projects', categoryName: 'Projects', weight: 20 },
-]
+function createDefaultCategories(t: (key: string) => string): CategoryWeight[] {
+  return [
+    { categoryId: 'tests', categoryName: t('gradesModule.management.categories.tests'), weight: 30 },
+    { categoryId: 'quizzes', categoryName: t('gradesModule.management.categories.quizzes'), weight: 20 },
+    { categoryId: 'homework', categoryName: t('gradesModule.management.categories.homework'), weight: 20 },
+    { categoryId: 'participation', categoryName: t('gradesModule.management.categories.participation'), weight: 10 },
+    { categoryId: 'projects', categoryName: t('gradesModule.management.categories.projects'), weight: 20 },
+  ]
+}
 
 // ============================================================================
 // COMPONENT
 // ============================================================================
 
 export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
+  const { t, formatNumber } = useAcademicsI18n()
   const schoolId = useActiveSchoolId() || ''
   const isEdit = !!policy
   const createMutation = useCreateGradingPolicy()
@@ -70,7 +74,7 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
     policy?.letterGrades ?? defaultLetterGrades
   )
   const [categories, setCategories] = useState<CategoryWeight[]>(
-    policy?.categoryWeights ?? defaultCategories
+    policy?.categoryWeights ?? createDefaultCategories(t)
   )
 
   const totalWeight = useMemo(
@@ -169,7 +173,9 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-secondary">
           <h3 className="text-lg font-semibold text-text-primary">
-            {isEdit ? 'Edit Grading Policy' : 'Create Grading Policy'}
+            {isEdit
+              ? t('gradesModule.policyForm.editTitle')
+              : t('gradesModule.policyForm.createTitle')}
           </h3>
           <button
             type="button"
@@ -184,13 +190,13 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
           {/* Policy Name */}
           <div>
             <label className="block text-sm font-medium text-text-primary mb-1.5">
-              Policy Name *
+              {t('gradesModule.policyForm.policyName')} *
             </label>
             <input
               type="text"
               value={policyName}
               onChange={(e) => setPolicyName(e.target.value)}
-              placeholder="e.g., Standard A-F Scale"
+              placeholder={t('gradesModule.policyForm.policyNamePlaceholder')}
               className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
             />
           </div>
@@ -198,13 +204,13 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
           {/* Description */}
           <div>
             <label className="block text-sm font-medium text-text-primary mb-1.5">
-              Description
+              {t('gradesModule.policyForm.description')}
             </label>
             <input
               type="text"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Brief description of this policy"
+              placeholder={t('gradesModule.policyForm.descriptionPlaceholder')}
               className="w-full px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
             />
           </div>
@@ -213,21 +219,21 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
           <div className="flex items-center gap-6 flex-wrap">
             <div>
               <label className="block text-sm font-medium text-text-primary mb-1.5">
-                Rounding Rule
+                {t('gradesModule.policyForm.roundingRule')}
               </label>
               <select
                 value={roundingRule}
                 onChange={(e) => setRoundingRule(e.target.value as 'up' | 'down' | 'nearest')}
                 className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
               >
-                <option value="nearest">Round to Nearest</option>
-                <option value="up">Round Up</option>
-                <option value="down">Round Down</option>
+                <option value="nearest">{t('gradesModule.policyForm.rounding.nearest')}</option>
+                <option value="up">{t('gradesModule.policyForm.rounding.up')}</option>
+                <option value="down">{t('gradesModule.policyForm.rounding.down')}</option>
               </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-text-primary mb-1.5">
-                Passing Grade
+                {t('gradesModule.policyForm.passingGrade')}
               </label>
               <div className="flex items-center gap-1.5">
                 <input
@@ -248,16 +254,20 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
                 onChange={(e) => setIsDefault(e.target.checked)}
                 className="w-4 h-4 rounded border-border-secondary text-[rgb(var(--action-secondary-fg))] focus:ring-[rgb(var(--border-focus)/0.35)]"
               />
-              <span className="text-sm text-text-primary">Set as default</span>
+              <span className="text-sm text-text-primary">
+                {t('gradesModule.policyForm.setDefault')}
+              </span>
             </label>
           </div>
 
           {/* Grade Scale */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <h4 className="text-sm font-semibold text-text-primary">Letter Grades</h4>
+              <h4 className="text-sm font-semibold text-text-primary">
+                {t('gradesModule.policyForm.letterGrades')}
+              </h4>
               <label className="flex items-center gap-2 text-xs text-text-tertiary">
-                GPA scale
+                {t('gradesModule.policyForm.gpaScale')}
                 <select
                   value={gpaScale}
                   onChange={(e) => setGpaScale(e.target.value as GpaScale)}
@@ -286,7 +296,9 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
                     min={0}
                     max={100}
                   />
-                  <span className="text-text-tertiary text-sm">to</span>
+                  <span className="text-text-tertiary text-sm">
+                    {t('gradesModule.policyForm.to')}
+                  </span>
                   <input
                     type="number"
                     value={entry.maxPercentage}
@@ -304,7 +316,7 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
                     step={0.1}
                     min={0}
                     max={parseFloat(gpaScale)}
-                    placeholder="GPA"
+                    placeholder={t('gradesModule.policyForm.gpaPlaceholder')}
                   />
                 </div>
               ))}
@@ -315,7 +327,7 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
           <div>
             <div className="flex items-center justify-between mb-3">
               <h4 className="text-sm font-semibold text-text-primary">
-                Category Weights
+                {t('gradesModule.policyForm.categoryWeights')}
               </h4>
               <div className="flex items-center gap-2">
                 <span
@@ -325,7 +337,9 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
                       : 'text-[rgb(var(--state-danger-fg))]'
                   }`}
                 >
-                  Total: {totalWeight}%
+                  {t('gradesModule.policyForm.totalWeight', {
+                    total: formatNumber(totalWeight),
+                  })}
                 </span>
                 {!isWeightValid && (
                   <AlertCircle className="w-3.5 h-3.5 text-[rgb(var(--state-danger-fg))]" />
@@ -357,7 +371,7 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
                     value={cat.categoryName}
                     onChange={(e) => handleCategoryChange(i, 'categoryName', e.target.value)}
                     className="flex-1 px-2 py-1.5 bg-surface-secondary border border-border-secondary rounded text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
-                    placeholder="Category name"
+                    placeholder={t('gradesModule.policyForm.categoryNamePlaceholder')}
                   />
                   <input
                     type="number"
@@ -376,9 +390,11 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
                       className="w-14 px-2 py-1.5 bg-surface-secondary border border-border-secondary rounded text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
                       min={0}
                       max={5}
-                      title="Drop lowest N scores"
+                      title={t('gradesModule.policyForm.dropLowestTitle')}
                     />
-                    <span className="text-text-tertiary text-xs whitespace-nowrap">drop</span>
+                    <span className="text-text-tertiary text-xs whitespace-nowrap">
+                      {t('gradesModule.policyForm.drop')}
+                    </span>
                   </div>
                   <button
                     type="button"
@@ -396,7 +412,7 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
                 className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-text-secondary hover:text-text-primary bg-surface-secondary hover:bg-surface-hover rounded-lg transition-colors"
               >
                 <Plus className="w-3.5 h-3.5" />
-                Add Category
+                {t('gradesModule.policyForm.addCategory')}
               </button>
             </div>
           </div>
@@ -409,7 +425,7 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
             onClick={onClose}
             className="px-4 py-2 text-sm font-medium text-text-secondary hover:text-text-primary bg-surface-secondary hover:bg-surface-hover rounded-lg transition-colors"
           >
-            Cancel
+            {t('actions.cancel')}
           </button>
           <button
             type="button"
@@ -418,7 +434,9 @@ export function GradingPolicyForm({ policy, onClose }: GradingPolicyFormProps) {
             className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg-hover))] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
-            {isEdit ? 'Update Policy' : 'Create Policy'}
+            {isEdit
+              ? t('gradesModule.policyForm.updatePolicy')
+              : t('gradesModule.policyForm.createPolicy')}
           </button>
         </div>
       </div>

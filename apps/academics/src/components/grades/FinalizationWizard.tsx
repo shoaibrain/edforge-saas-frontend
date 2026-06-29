@@ -17,6 +17,7 @@ import {
   ChevronLeft,
 } from 'lucide-react'
 import { useSectionGrades, useBulkFinalizeGrades } from '../../hooks/useGrades'
+import { useAcademicsI18n } from '../../lib/i18n'
 import { useEscapeToClose } from '../../hooks/useEscapeToClose'
 
 // ============================================================================
@@ -46,6 +47,7 @@ export function FinalizationWizard({
   termId,
   termName,
 }: FinalizationWizardProps) {
+  const { t, formatNumber } = useAcademicsI18n()
   const [step, setStep] = useState<WizardStep>('review')
   const [finalizedCount, setFinalizedCount] = useState(0)
   const [errorCount, setErrorCount] = useState(0)
@@ -124,7 +126,9 @@ export function FinalizationWizard({
           <div className="flex items-center gap-2">
             <Lock className="w-5 h-5 text-[rgb(var(--action-secondary-fg))]" />
             <h3 id="finalize-grades-title" className="text-lg font-semibold text-text-primary">
-              Finalize Grades{termName ? ` — ${termName}` : ''}
+              {termName
+                ? t('gradesModule.finalization.titleWithTerm', { termName })
+                : t('gradesModule.finalization.title')}
             </h3>
           </div>
           <button type="button" onClick={onClose} className="p-1.5 rounded-md text-text-tertiary hover:text-text-primary hover:bg-surface-hover transition-colors">
@@ -146,29 +150,41 @@ export function FinalizationWizard({
                 {isLoading ? (
                   <div className="py-8 text-center">
                     <Loader2 className="w-6 h-6 mx-auto animate-spin text-text-tertiary" />
-                    <p className="text-sm text-text-secondary mt-2">Loading grades...</p>
+                    <p className="text-sm text-text-secondary mt-2">
+                      {t('gradesModule.finalization.loading')}
+                    </p>
                   </div>
                 ) : (
                   <>
                     <p className="text-sm text-text-secondary">
-                      Review grades before finalizing. Finalized grades are locked and cannot be changed.
+                      {t('gradesModule.finalization.reviewDescription')}
                     </p>
 
                     {/* Summary stats */}
                     <div className="grid grid-cols-3 gap-3">
                       <div className="p-3 bg-surface-secondary rounded-lg text-center">
-                        <p className="text-2xl font-bold text-[rgb(var(--action-secondary-fg))]">{analysis.eligibleGrades.length}</p>
-                        <p className="text-xs text-text-tertiary">To Finalize</p>
+                        <p className="text-2xl font-bold text-[rgb(var(--action-secondary-fg))]">
+                          {formatNumber(analysis.eligibleGrades.length)}
+                        </p>
+                        <p className="text-xs text-text-tertiary">
+                          {t('gradesModule.finalization.toFinalize')}
+                        </p>
                       </div>
                       <div className="p-3 bg-surface-secondary rounded-lg text-center">
-                        <p className="text-2xl font-bold text-[rgb(var(--state-success-fg))]">{analysis.finalizedGrades.length}</p>
-                        <p className="text-xs text-text-tertiary">Already Final</p>
+                        <p className="text-2xl font-bold text-[rgb(var(--state-success-fg))]">
+                          {formatNumber(analysis.finalizedGrades.length)}
+                        </p>
+                        <p className="text-xs text-text-tertiary">
+                          {t('gradesModule.finalization.alreadyFinal')}
+                        </p>
                       </div>
                       <div className="p-3 bg-surface-secondary rounded-lg text-center">
                         <p className={`text-2xl font-bold ${analysis.emptyStubs.length > 0 ? 'text-text-tertiary' : 'text-[rgb(var(--state-success-fg))]'}`}>
-                          {analysis.emptyStubs.length}
+                          {formatNumber(analysis.emptyStubs.length)}
                         </p>
-                        <p className="text-xs text-text-tertiary">No Scores</p>
+                        <p className="text-xs text-text-tertiary">
+                          {t('gradesModule.finalization.noScores')}
+                        </p>
                       </div>
                     </div>
 
@@ -177,7 +193,9 @@ export function FinalizationWizard({
                       <div className="flex items-start gap-2 p-3 bg-surface-secondary rounded-lg">
                         <AlertTriangle className="w-4 h-4 text-text-tertiary mt-0.5" />
                         <p className="text-xs text-text-secondary">
-                          {analysis.emptyStubs.length} student(s) have no scored assignments and will be skipped.
+                          {t('gradesModule.finalization.emptyStubsWarning', {
+                            count: formatNumber(analysis.emptyStubs.length),
+                          })}
                         </p>
                       </div>
                     )}
@@ -187,7 +205,9 @@ export function FinalizationWizard({
                       <div className="flex items-start gap-2 p-3 bg-amber-50 dark:bg-[rgb(var(--state-warning-fg))]/10 rounded-lg">
                         <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5" />
                         <p className="text-xs text-[rgb(var(--state-warning-fg))]">
-                          {analysis.lowGrades.length} student(s) are below passing grade.
+                          {t('gradesModule.finalization.lowGradesWarning', {
+                            count: formatNumber(analysis.lowGrades.length),
+                          })}
                         </p>
                       </div>
                     )}
@@ -198,10 +218,18 @@ export function FinalizationWizard({
                         <table className="w-full text-sm">
                           <thead className="bg-surface-secondary sticky top-0">
                             <tr>
-                              <th className="text-left px-3 py-2 text-xs font-medium text-text-secondary">Student</th>
-                              <th className="text-center px-3 py-2 text-xs font-medium text-text-secondary">Grade</th>
-                              <th className="text-center px-3 py-2 text-xs font-medium text-text-secondary">Letter</th>
-                              <th className="text-center px-3 py-2 text-xs font-medium text-text-secondary">Status</th>
+                              <th className="text-left px-3 py-2 text-xs font-medium text-text-secondary">
+                                {t('gradesModule.finalization.columns.student')}
+                              </th>
+                              <th className="text-center px-3 py-2 text-xs font-medium text-text-secondary">
+                                {t('gradesModule.finalization.columns.grade')}
+                              </th>
+                              <th className="text-center px-3 py-2 text-xs font-medium text-text-secondary">
+                                {t('gradesModule.finalization.columns.letter')}
+                              </th>
+                              <th className="text-center px-3 py-2 text-xs font-medium text-text-secondary">
+                                {t('gradesModule.finalization.columns.status')}
+                              </th>
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-border-secondary">
@@ -210,7 +238,7 @@ export function FinalizationWizard({
                               return (
                                 <tr key={g.gradeId}>
                                   <td className="px-3 py-2 text-text-primary">
-                                    {g.studentName || `Student`}
+                                    {g.studentName || t('gradesModule.management.studentFallback')}
                                   </td>
                                   <td className="px-3 py-2 text-center font-medium text-text-primary">
                                     {g.numericGrade !== undefined ? `${g.numericGrade.toFixed(1)}%` : '—'}
@@ -224,7 +252,9 @@ export function FinalizationWizard({
                                         ? 'bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] '
                                         : 'bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))] '
                                     }`}>
-                                      {isPassing ? 'Pass' : 'Fail'}
+                                      {isPassing
+                                        ? t('gradesModule.finalization.pass')
+                                        : t('gradesModule.finalization.fail')}
                                     </span>
                                   </td>
                                 </tr>
@@ -239,7 +269,7 @@ export function FinalizationWizard({
                       <div className="flex items-center gap-2 p-3 bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-bg)/0.18)] rounded-lg">
                         <CheckCircle className="w-4 h-4 text-[rgb(var(--state-success-fg))]" />
                         <p className="text-sm text-[rgb(var(--state-success-fg))] ">
-                          All grades are already finalized!
+                          {t('gradesModule.finalization.allFinalized')}
                         </p>
                       </div>
                     )}
@@ -248,7 +278,7 @@ export function FinalizationWizard({
                       <div className="flex items-center gap-2 p-3 bg-surface-secondary rounded-lg">
                         <AlertTriangle className="w-4 h-4 text-text-tertiary" />
                         <p className="text-sm text-text-secondary">
-                          No students have scored assignments to finalize.
+                          {t('gradesModule.finalization.noneToFinalize')}
                         </p>
                       </div>
                     )}
@@ -270,11 +300,12 @@ export function FinalizationWizard({
                   <AlertTriangle className="w-5 h-5 text-[rgb(var(--state-danger-fg))] mt-0.5" />
                   <div>
                     <p className="text-sm font-semibold text-[rgb(var(--state-danger-fg))] ">
-                      This action cannot be undone
+                      {t('gradesModule.finalization.irreversibleTitle')}
                     </p>
                     <p className="text-sm text-[rgb(var(--state-danger-fg))] text-[rgb(var(--state-danger-fg))] mt-1">
-                      You are about to finalize <strong>{analysis.eligibleGrades.length}</strong> grade(s).
-                      Finalized grades are locked and cannot be modified.
+                      {t('gradesModule.finalization.irreversibleBefore')}{' '}
+                      <strong>{formatNumber(analysis.eligibleGrades.length)}</strong>{' '}
+                      {t('gradesModule.finalization.irreversibleAfter')}
                     </p>
                   </div>
                 </div>
@@ -283,7 +314,7 @@ export function FinalizationWizard({
                   <div className="py-4 text-center">
                     <Loader2 className="w-6 h-6 mx-auto animate-spin text-[rgb(var(--action-secondary-fg))]" />
                     <p className="text-sm text-text-secondary mt-2">
-                      Finalizing grades...
+                      {t('gradesModule.finalization.finalizing')}
                     </p>
                   </div>
                 )}
@@ -301,13 +332,17 @@ export function FinalizationWizard({
               >
                 <CheckCircle className="w-12 h-12 mx-auto text-[rgb(var(--state-success-fg))]" />
                 <h4 className="text-lg font-semibold text-text-primary">
-                  Grades Finalized
+                  {t('gradesModule.finalization.completeTitle')}
                 </h4>
                 <p className="text-sm text-text-secondary">
-                  Successfully finalized {finalizedCount} grade(s). These grades are now locked.
+                  {t('gradesModule.finalization.completeDescription', {
+                    count: formatNumber(finalizedCount),
+                  })}
                   {errorCount > 0 && (
                     <span className="block mt-1 text-[rgb(var(--state-warning-fg))]">
-                      {errorCount} grade(s) could not be finalized.
+                      {t('gradesModule.finalization.errorCount', {
+                        count: formatNumber(errorCount),
+                      })}
                     </span>
                   )}
                 </p>
@@ -321,7 +356,7 @@ export function FinalizationWizard({
           {step === 'review' && (
             <>
               <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-medium text-text-secondary hover:text-text-primary bg-surface-secondary hover:bg-surface-hover rounded-lg transition-colors">
-                Cancel
+                {t('actions.cancel')}
               </button>
               <button
                 type="button"
@@ -329,7 +364,7 @@ export function FinalizationWizard({
                 disabled={analysis.eligibleGrades.length === 0 || isLoading}
                 className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg-hover))] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Continue
+                {t('gradesModule.finalization.continue')}
                 <ChevronRight className="w-4 h-4" />
               </button>
             </>
@@ -343,7 +378,7 @@ export function FinalizationWizard({
                 className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-text-secondary hover:text-text-primary bg-surface-secondary hover:bg-surface-hover rounded-lg transition-colors disabled:opacity-50"
               >
                 <ChevronLeft className="w-4 h-4" />
-                Back
+                {t('gradesModule.finalization.back')}
               </button>
               <button
                 type="button"
@@ -352,7 +387,9 @@ export function FinalizationWizard({
                 className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--state-danger-fg))] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
-                Finalize {analysis.eligibleGrades.length} Grades
+                {t('gradesModule.finalization.finalizeGrades', {
+                  count: formatNumber(analysis.eligibleGrades.length),
+                })}
               </button>
             </>
           )}
@@ -363,7 +400,7 @@ export function FinalizationWizard({
                 onClick={onClose}
                 className="px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg-hover))] rounded-lg transition-colors"
               >
-                Done
+                {t('gradesModule.finalization.done')}
               </button>
             </div>
           )}
