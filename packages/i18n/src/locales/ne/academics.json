@@ -169,6 +169,11 @@
     "atEmployer": "{{employer}} मा"
   },
   "studentProfile": {
+    "tabsAria": "Student profile sections",
+    "overview": {
+      "attendanceTrendAria": "Student attendance trend",
+      "categoryBreakdown": "Category Breakdown"
+    },
     "guardian": {
       "addTitle": "Guardian थप्नुहोस्",
       "addDescription": "{{student}} को profile मा parent वा guardian थप्नुहोस्",
@@ -326,6 +331,10 @@
       "title": "विद्यार्थी withdraw",
       "description": "{{student}} लाई withdraw गर्ने हो? यो action school administrator ले reverse गर्न सक्छ।",
       "confirm": "Withdraw"
+    },
+    "profiles": {
+      "title": "Student Profiles",
+      "description": "Detailed student profiles and records - monolith बाट migrated content राखिनेछ।"
     }
   },
   "privacy": {

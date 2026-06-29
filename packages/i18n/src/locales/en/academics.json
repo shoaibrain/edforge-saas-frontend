@@ -169,6 +169,11 @@
     "atEmployer": "at {{employer}}"
   },
   "studentProfile": {
+    "tabsAria": "Student profile sections",
+    "overview": {
+      "attendanceTrendAria": "Student attendance trend",
+      "categoryBreakdown": "Category Breakdown"
+    },
     "guardian": {
       "addTitle": "Add Guardian",
       "addDescription": "Add a parent or guardian to {{student}}'s profile",
@@ -326,6 +331,10 @@
       "title": "Withdraw Student",
       "description": "Are you sure you want to withdraw {{student}}? This action can be reversed by a school administrator.",
       "confirm": "Withdraw"
+    },
+    "profiles": {
+      "title": "Student Profiles",
+      "description": "Detailed student profiles and records - to be populated with migrated content from the monolith."
     }
   },
   "privacy": {

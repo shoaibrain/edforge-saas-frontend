@@ -88,7 +88,7 @@ function ActionsDropdown({
         variant="ghost"
         size="icon"
         onClick={() => setIsOpen(!isOpen)}
-        aria-label="Actions"
+        aria-label={t('common.actions')}
         aria-expanded={isOpen}
       >
         <MoreHorizontal className="w-4 h-4" />
