@@ -947,6 +947,39 @@
       "courseDescriptionPlaceholder": "Describe what this course covers, its goals, and student expectations...",
       "materialsTitle": "Course Materials",
       "materialsDescription": "Add textbooks, workbooks, or digital resources for this course."
+    },
+    "courseDetail": {
+      "actions": {
+        "editCourse": "Edit Course",
+        "printDetails": "Print Details",
+        "activate": "Activate",
+        "deactivate": "Deactivate"
+      },
+      "tabs": {
+        "overview": "Overview",
+        "sections": "Sections",
+        "standards": "Standards"
+      },
+      "periodsPerWeekShort": "Periods/Week",
+      "description": "Description",
+      "learningObjectives": "Learning Objectives",
+      "byAuthor": "by {{author}}",
+      "metadata": "Metadata",
+      "created": "Created",
+      "lastUpdated": "Last Updated",
+      "noSectionsTitle": "No Sections Yet",
+      "noSectionsDescription": "No class sections have been created for this course.",
+      "goToScheduling": "Go to Scheduling",
+      "sectionTitle": "Section {{section}}",
+      "loadMoreSections": "Load More Sections",
+      "standardsTitle": "Learning Standards",
+      "standardsDescription": "Standards alignment for this course will be available in a future release. Link Common Core, NGSS, or state-specific standards to track competency-based outcomes.",
+      "notFoundTitle": "Course Not Found",
+      "notFoundDescription": "This course may have been removed or you don't have access.",
+      "backToCurriculum": "Back to Curriculum",
+      "credits": "{{value}} credit",
+      "credits_plural": "{{value}} credits",
+      "courseTabs": "Course tabs"
     }
   },
   "rosteringModule": {

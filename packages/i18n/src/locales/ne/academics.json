@@ -947,6 +947,39 @@
       "courseDescriptionPlaceholder": "यस course ले समेट्ने विषय, लक्ष्य र विद्यार्थी अपेक्षा लेख्नुहोस्...",
       "materialsTitle": "Course Materials",
       "materialsDescription": "यस course का textbooks, workbooks वा digital resources थप्नुहोस्।"
+    },
+    "courseDetail": {
+      "actions": {
+        "editCourse": "Course Edit",
+        "printDetails": "Details Print",
+        "activate": "Activate",
+        "deactivate": "Deactivate"
+      },
+      "tabs": {
+        "overview": "Overview",
+        "sections": "Sections",
+        "standards": "Standards"
+      },
+      "periodsPerWeekShort": "Periods/Week",
+      "description": "Description",
+      "learningObjectives": "Learning Objectives",
+      "byAuthor": "{{author}} द्वारा",
+      "metadata": "Metadata",
+      "created": "Created",
+      "lastUpdated": "Last Updated",
+      "noSectionsTitle": "Section छैन",
+      "noSectionsDescription": "यस course का लागि class sections सिर्जना गरिएको छैन।",
+      "goToScheduling": "Scheduling मा जानुहोस्",
+      "sectionTitle": "Section {{section}}",
+      "loadMoreSections": "थप Sections लोड",
+      "standardsTitle": "Learning Standards",
+      "standardsDescription": "यस course को standards alignment future release मा उपलब्ध हुनेछ। Competency-based outcomes track गर्न Common Core, NGSS, वा state-specific standards link गर्न सकिनेछ।",
+      "notFoundTitle": "Course भेटिएन",
+      "notFoundDescription": "यो course हटाइएको हुन सक्छ वा तपाईंसँग access छैन।",
+      "backToCurriculum": "Curriculum मा फर्कनुहोस्",
+      "credits": "{{value}} credit",
+      "credits_plural": "{{value}} credits",
+      "courseTabs": "Course tabs"
     }
   },
   "rosteringModule": {

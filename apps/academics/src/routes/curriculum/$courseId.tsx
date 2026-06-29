@@ -56,6 +56,7 @@ import {
   getCapacityTextColor,
 } from '../../schemas/section.form'
 import { CourseDrawer, type DrawerMode } from '../../components/curriculum/CourseDrawer'
+import { useAcademicsI18n } from '../../lib/i18n'
 import type { CourseResponseDto, SectionResponseDto } from '@aibrains/shared-types'
 
 // ============================================================================
@@ -107,6 +108,7 @@ function ActionsDropdown({
   onToggleActive: () => void
   isActive: boolean
 }) {
+  const { t } = useAcademicsI18n()
   const [isOpen, setIsOpen] = useState(false)
 
   return (
@@ -115,7 +117,7 @@ function ActionsDropdown({
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="p-2 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-surface-secondary transition-colors"
-        aria-label="Actions"
+        aria-label={t('common.actions')}
         aria-expanded={isOpen}
       >
         <MoreHorizontal className="w-5 h-5" />
@@ -134,7 +136,7 @@ function ActionsDropdown({
               className="flex items-center gap-2 w-full px-3 py-2 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-secondary transition-colors"
             >
               <Pencil className="w-4 h-4" />
-              Edit Course
+              {t('curriculumModule.courseDetail.actions.editCourse')}
             </button>
             <button
               type="button"
@@ -145,7 +147,7 @@ function ActionsDropdown({
               className="flex items-center gap-2 w-full px-3 py-2 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-secondary transition-colors"
             >
               <Printer className="w-4 h-4" />
-              Print Details
+              {t('curriculumModule.courseDetail.actions.printDetails')}
             </button>
             <div className="border-t border-border-secondary my-1" />
             <button
@@ -159,12 +161,12 @@ function ActionsDropdown({
               {isActive ? (
                 <>
                   <ToggleLeft className="w-4 h-4" />
-                  Deactivate
+                  {t('curriculumModule.courseDetail.actions.deactivate')}
                 </>
               ) : (
                 <>
                   <ToggleRight className="w-4 h-4" />
-                  Activate
+                  {t('curriculumModule.courseDetail.actions.activate')}
                 </>
               )}
             </button>
@@ -242,6 +244,7 @@ function CapacityBar({ current, max }: { current: number; max: number }) {
 // ============================================================================
 
 function OverviewTab({ course }: { course: CourseResponseDto }) {
+  const { t, formatDate, formatNumber } = useAcademicsI18n()
   const subjectColors = SUBJECT_AREA_COLORS[course.subjectArea] ?? SUBJECT_AREA_COLORS.other
   const typeColors = COURSE_TYPE_COLORS[course.courseType] ?? COURSE_TYPE_COLORS.required
 
@@ -275,25 +278,25 @@ function OverviewTab({ course }: { course: CourseResponseDto }) {
 
       {/* Classification */}
       <div className="rounded-xl border border-border-secondary p-5">
-        <SectionHeader icon={GraduationCap} title="Classification" />
+        <SectionHeader icon={GraduationCap} title={t('curriculumModule.form.classificationTitle')} />
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-          <DetailField label="Subject Area" value={getSubjectAreaLabel(course.subjectArea)} />
-          <DetailField label="Course Type" value={getCourseTypeLabel(course.courseType)} />
+          <DetailField label={t('curriculumModule.filters.subjectArea')} value={getSubjectAreaLabel(course.subjectArea)} />
+          <DetailField label={t('curriculumModule.filters.courseType')} value={getCourseTypeLabel(course.courseType)} />
           <DetailField
-            label="Credits"
-            value={`${course.credits}${course.creditType ? ` (${getCreditTypeLabel(course.creditType)})` : ''}`}
+            label={t('tables.courses.columns.credits')}
+            value={`${formatNumber(course.credits)}${course.creditType ? ` (${getCreditTypeLabel(course.creditType)})` : ''}`}
           />
-          <DetailField label="Duration" value={getDurationLabel(course.typicalDuration)} />
-          <DetailField label="Course Code" value={course.courseCode} mono />
+          <DetailField label={t('tables.courses.columns.duration')} value={getDurationLabel(course.typicalDuration)} />
+          <DetailField label={t('curriculumModule.form.courseCode')} value={course.courseCode} mono />
           {course.periodsPerWeek && (
-            <DetailField label="Periods/Week" value={course.periodsPerWeek} />
+            <DetailField label={t('curriculumModule.courseDetail.periodsPerWeekShort')} value={formatNumber(course.periodsPerWeek)} />
           )}
         </div>
       </div>
 
       {/* Grade Levels */}
       <div className="rounded-xl border border-border-secondary p-5">
-        <SectionHeader icon={Layers} title="Grade Levels" />
+        <SectionHeader icon={Layers} title={t('tables.courses.columns.grades')} />
         <div className="flex flex-wrap gap-2">
           {course.gradeLevels.map((g) => (
             <span
@@ -309,7 +312,7 @@ function OverviewTab({ course }: { course: CourseResponseDto }) {
       {/* Description */}
       {course.description && (
         <div className="rounded-xl border border-border-secondary p-5">
-          <SectionHeader icon={FileText} title="Description" />
+          <SectionHeader icon={FileText} title={t('curriculumModule.courseDetail.description')} />
           <p className="text-sm text-text-secondary leading-relaxed">
             {course.description}
           </p>
@@ -319,7 +322,7 @@ function OverviewTab({ course }: { course: CourseResponseDto }) {
       {/* Objectives */}
       {course.objectives && course.objectives.length > 0 && (
         <div className="rounded-xl border border-border-secondary p-5">
-          <SectionHeader icon={Award} title="Learning Objectives" />
+          <SectionHeader icon={Award} title={t('curriculumModule.courseDetail.learningObjectives')} />
           <ul className="space-y-1.5">
             {course.objectives.map((obj, i) => (
               <li key={i} className="flex items-start gap-2 text-sm text-text-secondary">
@@ -334,7 +337,7 @@ function OverviewTab({ course }: { course: CourseResponseDto }) {
       {/* Materials */}
       {course.textbooks && course.textbooks.length > 0 && (
         <div className="rounded-xl border border-border-secondary p-5">
-          <SectionHeader icon={BookOpen} title="Course Materials" />
+          <SectionHeader icon={BookOpen} title={t('curriculumModule.form.materialsTitle')} />
           <div className="space-y-2">
             {course.textbooks.map((mat, i) => (
               <div
@@ -345,7 +348,7 @@ function OverviewTab({ course }: { course: CourseResponseDto }) {
                 <div>
                   <p className="text-sm font-medium text-text-primary">{mat.title}</p>
                   {mat.author && (
-                    <p className="text-xs text-text-secondary">by {mat.author}</p>
+                    <p className="text-xs text-text-secondary">{t('curriculumModule.courseDetail.byAuthor', { author: mat.author })}</p>
                   )}
                   {mat.isbn && (
                     <p className="text-xs text-text-tertiary font-mono">ISBN: {mat.isbn}</p>
@@ -359,29 +362,21 @@ function OverviewTab({ course }: { course: CourseResponseDto }) {
 
       {/* Metadata */}
       <div className="rounded-xl border border-border-secondary p-5">
-        <SectionHeader icon={Clock} title="Metadata" />
+        <SectionHeader icon={Clock} title={t('curriculumModule.courseDetail.metadata')} />
         <div className="grid grid-cols-2 gap-4">
           <DetailField
-            label="Created"
+            label={t('curriculumModule.courseDetail.created')}
             value={
               course.createdAt
-                ? new Date(course.createdAt).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                  })
+                ? formatDate(course.createdAt)
                 : undefined
             }
           />
           <DetailField
-            label="Last Updated"
+            label={t('curriculumModule.courseDetail.lastUpdated')}
             value={
               course.updatedAt
-                ? new Date(course.updatedAt).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                  })
+                ? formatDate(course.updatedAt)
                 : undefined
             }
           />
@@ -404,6 +399,7 @@ function SectionsTab({
   schoolId: string
   onViewSection: (section: SectionResponseDto) => void
 }) {
+  const { t, formatNumber } = useAcademicsI18n()
   const navigate = useNavigate()
 
   const {
@@ -436,10 +432,10 @@ function SectionsTab({
       <div className="text-center py-12">
         <CalendarDays className="w-12 h-12 mx-auto text-text-tertiary mb-4" />
         <h3 className="text-lg font-semibold text-text-primary mb-2">
-          No Sections Yet
+          {t('curriculumModule.courseDetail.noSectionsTitle')}
         </h3>
         <p className="text-sm text-text-secondary mb-4">
-          No class sections have been created for this course.
+          {t('curriculumModule.courseDetail.noSectionsDescription')}
         </p>
         <button
           type="button"
@@ -447,7 +443,7 @@ function SectionsTab({
           className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--action-primary-bg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
         >
           <Plus className="w-4 h-4" />
-          Go to Scheduling
+          {t('curriculumModule.courseDetail.goToScheduling')}
         </button>
       </div>
     )
@@ -458,7 +454,9 @@ function SectionsTab({
       {/* Header */}
       <div className="flex items-center justify-between">
         <p className="text-sm text-text-secondary">
-          {totalCount ?? sections.length} section{(totalCount ?? sections.length) !== 1 ? 's' : ''}
+          {t('common.sections', {
+            count: totalCount ?? sections.length,
+          }).replace(String(totalCount ?? sections.length), formatNumber(totalCount ?? sections.length))}
         </p>
       </div>
 
@@ -479,7 +477,7 @@ function SectionsTab({
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
                     <p className="font-medium text-text-primary truncate">
-                      {section.sectionName || `Section ${section.sectionNumber}`}
+                      {section.sectionName || t('curriculumModule.courseDetail.sectionTitle', { section: section.sectionNumber })}
                     </p>
                     <span className="text-xs text-text-tertiary font-mono">
                       #{section.sectionNumber}
@@ -517,7 +515,7 @@ function SectionsTab({
                     }`}
                   />
                   <span className="text-xs text-text-secondary">
-                    {section.isActive ? 'Active' : 'Inactive'}
+                    {section.isActive ? t('common.active') : t('common.inactive')}
                   </span>
                 </div>
               </div>
@@ -535,7 +533,7 @@ function SectionsTab({
             disabled={isFetchingNextPage}
             className="px-4 py-2 text-sm font-medium text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--state-info-bg)/0.18)] rounded-lg transition-colors disabled:opacity-50"
           >
-            {isFetchingNextPage ? 'Loading...' : 'Load More Sections'}
+            {isFetchingNextPage ? t('dataTable.loadingPage') : t('curriculumModule.courseDetail.loadMoreSections')}
           </button>
         </div>
       )}
@@ -548,17 +546,18 @@ function SectionsTab({
 // ============================================================================
 
 function StandardsTab() {
+  const { t } = useAcademicsI18n()
+
   return (
     <div className="text-center py-12">
       <div className="p-3 rounded-lg bg-[rgb(var(--state-info-bg)/0.18)] inline-block mb-4">
         <Target className="w-8 h-8 text-[rgb(var(--state-info-fg))]" />
       </div>
       <h3 className="text-lg font-semibold text-text-primary mb-2">
-        Learning Standards
+        {t('curriculumModule.courseDetail.standardsTitle')}
       </h3>
       <p className="text-sm text-text-secondary max-w-md mx-auto">
-        Standards alignment for this course will be available in a future release.
-        Link Common Core, NGSS, or state-specific standards to track competency-based outcomes.
+        {t('curriculumModule.courseDetail.standardsDescription')}
       </p>
     </div>
   )
@@ -569,6 +568,7 @@ function StandardsTab() {
 // ============================================================================
 
 export function CourseDetailPage() {
+  const { t, formatNumber } = useAcademicsI18n()
   const { courseId } = useParams({ from: '/curriculum/$courseId' })
   const navigate = useNavigate()
   // URL-synced active tab (deep-linkable / shareable).
@@ -637,10 +637,10 @@ export function CourseDetailPage() {
         <div className="text-center">
           <AlertCircle className="w-12 h-12 mx-auto text-text-tertiary mb-4" />
           <h2 className="text-lg font-semibold text-text-primary mb-2">
-            Course Not Found
+            {t('curriculumModule.courseDetail.notFoundTitle')}
           </h2>
           <p className="text-sm text-text-secondary mb-4">
-            This course may have been removed or you don't have access.
+            {t('curriculumModule.courseDetail.notFoundDescription')}
           </p>
           <button
             type="button"
@@ -648,7 +648,7 @@ export function CourseDetailPage() {
             className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--action-primary-bg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to Curriculum
+            {t('curriculumModule.courseDetail.backToCurriculum')}
           </button>
         </div>
       </div>
@@ -688,7 +688,10 @@ export function CourseDetailPage() {
                   </span>
                   <span className="text-text-tertiary">·</span>
                   <span className="text-sm text-text-secondary">
-                    {course.credits} credit{course.credits !== 1 ? 's' : ''}
+                    {t('curriculumModule.courseDetail.credits', {
+                      count: course.credits,
+                      value: formatNumber(course.credits),
+                    })}
                   </span>
                 </div>
               </div>
@@ -707,7 +710,7 @@ export function CourseDetailPage() {
                     course.isActive ? 'bg-[rgb(var(--state-success-fg))]' : 'bg-[rgb(var(--text-tertiary))]'
                   }`}
                 />
-                {course.isActive ? 'Active' : 'Inactive'}
+                {course.isActive ? t('common.active') : t('common.inactive')}
               </div>
               {coursePerms.edit && (
                 <ActionsDropdown
@@ -723,7 +726,7 @@ export function CourseDetailPage() {
         {/* Tabs — shared @edforge/ui primitive (house standard, accessible) */}
         <div className="px-6">
           <Tabs
-            aria-label="Course tabs"
+            aria-label={t('curriculumModule.courseDetail.courseTabs')}
             value={activeTab}
             onChange={(value) => setActiveTab(value as CourseTab)}
             tabs={TABS.map((tab): TabItem => ({
@@ -731,7 +734,7 @@ export function CourseDetailPage() {
               label: (
                 <span className="flex items-center gap-2">
                   <tab.icon className="w-4 h-4" />
-                  {tab.label}
+                  {t(`curriculumModule.courseDetail.tabs.${tab.id}`)}
                 </span>
               ),
             }))}
