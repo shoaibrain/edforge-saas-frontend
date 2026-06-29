@@ -18,6 +18,7 @@ import {
   RELATIONSHIP_OPTIONS,
   PHONE_TYPE_OPTIONS,
 } from '../../../schemas/student.form'
+import { useAcademicsI18n } from '../../../lib/i18n'
 
 interface GuardianFormProps {
   /** Index in the guardians array (for field name prefixing) */
@@ -29,6 +30,7 @@ interface GuardianFormProps {
 }
 
 export function GuardianForm({ index, onRemove, canRemove }: GuardianFormProps) {
+  const { t, formatNumber } = useAcademicsI18n()
   const [isExpanded, setIsExpanded] = useState(true)
   const prefix = `guardians.${index}`
 
@@ -52,7 +54,7 @@ export function GuardianForm({ index, onRemove, canRemove }: GuardianFormProps) 
             <User className="w-4 h-4 text-[rgb(var(--action-secondary-fg))]" />
           </div>
           <span className="text-sm font-medium text-[rgb(var(--text-primary))]">
-            Guardian {index + 1}
+            {t('enrollmentModule.step.guardians.guardianNumber', { number: formatNumber(index + 1) })}
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -64,7 +66,7 @@ export function GuardianForm({ index, onRemove, canRemove }: GuardianFormProps) 
                 onRemove()
               }}
               className="p-1.5 rounded-lg text-[rgb(var(--state-danger-fg))] hover:text-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--state-danger-bg)/0.18)] transition-colors"
-              aria-label="Remove guardian"
+              aria-label={t('enrollmentModule.step.guardians.remove')}
             >
               <Trash2 className="w-4 h-4" />
             </button>
@@ -93,21 +95,21 @@ export function GuardianForm({ index, onRemove, canRemove }: GuardianFormProps) 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-x-5 gap-y-4">
                 <TextField
                   name={`${prefix}.firstName`}
-                  label="First Name"
-                  placeholder="First name"
+                  label={t('fields.firstName')}
+                  placeholder={t('fields.firstName')}
                   required
                 />
                 <TextField
                   name={`${prefix}.lastName`}
-                  label="Last Name"
-                  placeholder="Last name"
+                  label={t('fields.lastName')}
+                  placeholder={t('fields.lastName')}
                   required
                 />
                 <SelectField
                   name={`${prefix}.relationship`}
-                  label="Relationship"
+                  label={t('enrollmentModule.step.guardians.relationship')}
                   options={RELATIONSHIP_OPTIONS}
-                  placeholder="Select"
+                  placeholder={t('enrollmentModule.step.guardians.select')}
                   required
                 />
               </div>
@@ -116,7 +118,7 @@ export function GuardianForm({ index, onRemove, canRemove }: GuardianFormProps) 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-x-5 gap-y-4">
                 <TextField
                   name={`${prefix}.email`}
-                  label="Email"
+                  label={t('fields.email')}
                   type="email"
                   placeholder="email@example.com"
                   required={hasPortalAccess}
@@ -125,13 +127,13 @@ export function GuardianForm({ index, onRemove, canRemove }: GuardianFormProps) 
                   name={`${prefix}.phone`}
                   archetype={archetype}
                   country={country}
-                  label="Phone"
+                  label={t('fields.phone')}
                 />
                 <SelectField
                   name={`${prefix}.phoneType`}
-                  label="Phone Type"
+                  label={t('enrollmentModule.step.contact.phoneType')}
                   options={PHONE_TYPE_OPTIONS}
-                  placeholder="Select"
+                  placeholder={t('enrollmentModule.step.guardians.select')}
                 />
               </div>
 
@@ -139,36 +141,36 @@ export function GuardianForm({ index, onRemove, canRemove }: GuardianFormProps) 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4">
                 <TextField
                   name={`${prefix}.employer`}
-                  label="Employer"
-                  placeholder="Employer name"
+                  label={t('enrollmentModule.step.guardians.employer')}
+                  placeholder={t('enrollmentModule.step.guardians.employerPlaceholder')}
                 />
                 <TextField
                   name={`${prefix}.occupation`}
-                  label="Occupation"
-                  placeholder="Occupation"
+                  label={t('fields.occupation')}
+                  placeholder={t('enrollmentModule.step.guardians.occupationPlaceholder')}
                 />
               </div>
 
               {/* Permissions */}
               <div className="border-t border-[rgb(var(--border-secondary))] pt-4">
                 <h4 className="text-xs font-semibold text-[rgb(var(--text-secondary))] uppercase tracking-wider mb-3">
-                  Permissions
+                  {t('enrollmentModule.step.guardians.permissions')}
                 </h4>
                 <div className="flex flex-wrap gap-x-6 gap-y-3">
                   <CheckboxField
                     name={`${prefix}.isPrimary`}
-                    label="Primary Guardian"
-                    description="Main point of contact"
+                    label={t('enrollmentModule.step.guardians.primaryGuardian')}
+                    description={t('enrollmentModule.step.guardians.primaryGuardianDescription')}
                   />
                   <CheckboxField
                     name={`${prefix}.hasPortalAccess`}
-                    label="Portal Access"
-                    description="Can view student records"
+                    label={t('enrollmentModule.step.guardians.portalAccess')}
+                    description={t('enrollmentModule.step.guardians.portalAccessDescription')}
                   />
                   <CheckboxField
                     name={`${prefix}.canPickup`}
-                    label="Authorized for Pickup"
-                    description="Can pick up the student"
+                    label={t('enrollmentModule.step.guardians.pickup')}
+                    description={t('enrollmentModule.step.guardians.pickupDescription')}
                   />
                 </div>
               </div>

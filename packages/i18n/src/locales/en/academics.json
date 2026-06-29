@@ -922,6 +922,288 @@
       "notifyComingSoon_plural": "Notify {{count}} sections - coming soon"
     }
   },
+  "enrollmentModule": {
+    "tabs": {
+      "registration": "Registration",
+      "records": "Enrollment records"
+    },
+    "actions": {
+      "cancelEnrollment": "Cancel enrollment",
+      "export": "Export",
+      "exportCsv": "Export enrollments as CSV",
+      "closeYear": "Close Year",
+      "closing": "Closing...",
+      "back": "Back",
+      "skip": "Skip",
+      "continue": "Continue",
+      "createStudent": "Create Student"
+    },
+    "header": {
+      "title": "Enroll student",
+      "registering": "Registering a new student",
+      "academicYear": "Academic year {{year}}",
+      "studentsCurrentlyEnrolled": "{{count}} students currently enrolled",
+      "tabsAria": "Enrollment tabs"
+    },
+    "summary": {
+      "enrolled": "enrolled",
+      "active": "active",
+      "gradeLevels": "grade levels",
+      "progressPercent": "{{percent}}%"
+    },
+    "confirm": {
+      "markNoShow": "Mark {{studentName}} as no-show? This will withdraw the enrollment.",
+      "thisStudent": "this student",
+      "closeYear": "Close all open enrollments for {{yearName}}? This will mark all enrolled students as graduated for this year. This action cannot be undone.",
+      "discardTitle": "Discard changes?",
+      "discardDescription": "You have unsaved student information. Are you sure you want to leave? All entered data will be lost."
+    },
+    "export": {
+      "failedTitle": "Export Failed",
+      "failedDescription": "Could not download the file."
+    },
+    "wizard": {
+      "progressAria": "Registration progress",
+      "stepAnnouncement": "Step {{current}} of {{total}}: {{title}}",
+      "steps": {
+        "personal": {
+          "title": "Personal Info",
+          "description": "Enter the student's basic personal details."
+        },
+        "contact": {
+          "title": "Contact",
+          "description": "Provide contact details and address information."
+        },
+        "guardians": {
+          "title": "Guardians",
+          "description": "Add the student's parents or legal guardians."
+        },
+        "medical": {
+          "title": "Medical",
+          "description": "Provide health information and demographic details."
+        },
+        "enrollment": {
+          "title": "Enrollment",
+          "description": "Set the enrollment type, academic year, and Ed-Fi details."
+        },
+        "review": {
+          "title": "Review",
+          "description": "Review all information before creating the student record."
+        }
+      },
+      "sidebar": {
+        "context": "Enrollment Context",
+        "academicYear": "Academic Year",
+        "enrolled": "Enrolled",
+        "gradeLevels": "Grade Levels",
+        "requiredForEdFi": "Required for EdFi",
+        "progress": "Progress",
+        "filled": "Filled",
+        "required": "Required",
+        "step": "Step {{step}}",
+        "done": "Done",
+        "current": "Current",
+        "fields": {
+          "firstName": "First name",
+          "lastName": "Last name",
+          "dateOfBirth": "Date of birth",
+          "gender": "Gender",
+          "gradeLevel": "Grade level",
+          "entryDate": "Entry date"
+        }
+      },
+      "toast": {
+        "registeredAndEnrolled": "{{studentName}} has been registered and enrolled!",
+        "enrollmentConflict": "Student created. Enrollment conflict: {{message}}. The student may already be enrolled.",
+        "enrollmentFailed": "Student created, but enrollment failed: {{message}}. You can add enrollment from the student profile.",
+        "registered": "{{studentName}} has been registered!"
+      }
+    },
+    "duplicate": {
+      "checking": "Checking for existing student records...",
+      "possibleDuplicate": "Possible Duplicate Found",
+      "similarRecords": "Similar Records Found",
+      "singleMatch": "A student with similar information already exists.",
+      "multipleMatches": "{{count}} students with similar information were found.",
+      "continueNew": "You can continue if this is a new student.",
+      "dismiss": "Dismiss warning",
+      "dob": "DOB: {{date}}",
+      "grade": "Grade {{grade}}",
+      "match": "Match: {{reasons}}",
+      "viewStudent": "View {{name}}",
+      "confidence": {
+        "high": "High",
+        "medium": "Medium",
+        "low": "Low"
+      }
+    },
+    "step": {
+      "type": {
+        "title": "Enrollment Type",
+        "description": "How the student is enrolling",
+        "newDescription": "First-time enrollment in this school",
+        "transferDescription": "Transferring from another school",
+        "returningDescription": "Previously enrolled and returning",
+        "reenrollmentDescription": "Re-enrolling after a break in enrollment"
+      },
+      "details": {
+        "title": "Enrollment Details",
+        "description": "Academic year and enrollment date",
+        "academicYear": "Academic Year",
+        "loadingYears": "Loading academic years...",
+        "failedYears": "Failed to load academic years. Please refresh.",
+        "selectAcademicYear": "Select academic year",
+        "currentSuffix": "Current",
+        "enrollmentDate": "Enrollment Date",
+        "dateRange": "Must be within {{start}} - {{end}}",
+        "activeYear": "Active academic year - enrollment will be immediately active",
+        "noActiveYearTitle": "No active academic year available",
+        "noActiveYearDescription": "Please configure and activate an academic year in School Settings before enrolling students."
+      },
+      "entry": {
+        "title": "Entry Details",
+        "description": "Ed-Fi descriptor fields for state reporting",
+        "entryType": "Entry Type",
+        "selectEntryType": "Select entry type",
+        "entryTypeHelp": "How the student is entering this school",
+        "residencyStatus": "Residency Status",
+        "selectResidencyStatus": "Select residency status",
+        "residencyHelp": "Student's residency relative to the school"
+      },
+      "settings": {
+        "title": "Enrollment Settings",
+        "description": "Defaults are pre-configured - adjust only if needed",
+        "primarySchool": "Primary School",
+        "primarySchoolHelp": "Is this the student's primary school of enrollment?",
+        "fte": "Full-Time Equivalency (FTE)",
+        "fteHelp": "1.0 = full-time, 0.5 = half-time",
+        "repeatGrade": "Repeat Grade",
+        "repeatGradeHelp": "Check if the student is repeating the current grade level"
+      },
+      "transfer": {
+        "title": "Transfer Information",
+        "description": "Details about the previous school",
+        "previousSchool": "Previous School",
+        "previousSchoolPlaceholder": "Name of previous school",
+        "previousAddress": "Previous School Address",
+        "previousAddressPlaceholder": "City, State",
+        "reason": "Reason for Transfer",
+        "reasonPlaceholder": "Briefly describe the reason for transfer"
+      },
+      "notes": {
+        "title": "Additional Notes",
+        "description": "Optional notes about this enrollment",
+        "label": "Notes",
+        "placeholder": "Any additional notes about this enrollment..."
+      },
+      "auto": {
+        "label": "Auto-populated:",
+        "description": "School, grade level, and entry grade level descriptor are automatically set based on your school context and Step 1 selections."
+      },
+      "personal": {
+        "studentName": "Student Name",
+        "studentNameDescription": "Legal name as it appears on official documents",
+        "firstNamePlaceholder": "Enter first name",
+        "lastNamePlaceholder": "Enter last name",
+        "middleNamePlaceholder": "Enter middle name",
+        "preferredName": "Preferred Name",
+        "preferredNamePlaceholder": "Nickname or preferred name",
+        "suffix": "Suffix",
+        "suffixPlaceholder": "Jr., III, etc.",
+        "basicDetails": "Basic Details",
+        "basicDetailsDescription": "Date of birth, gender, and grade level",
+        "ageHelp": "Student must be between 3 and 22 years old",
+        "selectGender": "Select gender",
+        "selectGradeLevel": "Select grade level"
+      },
+      "contact": {
+        "details": "Contact Details",
+        "detailsDescription": "Email and phone information",
+        "emailAddress": "Email Address",
+        "emailHelp": "Optional for students",
+        "phoneNumber": "Phone Number",
+        "phoneType": "Phone Type",
+        "selectType": "Select type",
+        "physicalAddress": "Physical Address",
+        "physicalAddressDescription": "Student's primary residential address",
+        "mailingAddress": "Mailing Address",
+        "mailingAddressDescription": "Only if different from physical address",
+        "differentMailingAddress": "Use a different mailing address",
+        "differentMailingAddressDescription": "Enable this if the mailing address is different from the physical address above"
+      },
+      "guardians": {
+        "guardianNumber": "Guardian {{number}}",
+        "remove": "Remove guardian",
+        "relationship": "Relationship",
+        "select": "Select",
+        "employer": "Employer",
+        "employerPlaceholder": "Employer name",
+        "occupationPlaceholder": "Occupation",
+        "permissions": "Permissions",
+        "primaryGuardian": "Primary Guardian",
+        "primaryGuardianDescription": "Main point of contact",
+        "portalAccess": "Portal Access",
+        "portalAccessDescription": "Can view student records",
+        "pickup": "Authorized for Pickup",
+        "pickupDescription": "Can pick up the student",
+        "emptyTitle": "No guardians added yet",
+        "emptyDescription": "Guardian information is optional but recommended.",
+        "addGuardian": "Add Guardian",
+        "maxReached": "Maximum of 10 guardians reached."
+      },
+      "medical": {
+        "optionalInfo": "All fields on this page are optional. You can skip this step and add information later.",
+        "health": "Health Information",
+        "healthDescription": "Allergies, medications, conditions, dietary restrictions",
+        "allergyPlaceholder": "Type an allergy and press Enter",
+        "allergyHelp": "e.g. Peanuts, Latex, Penicillin",
+        "currentMedications": "Current Medications",
+        "medicationPlaceholder": "Type a medication and press Enter",
+        "medicalConditions": "Medical Conditions",
+        "conditionPlaceholder": "Type a condition and press Enter",
+        "conditionHelp": "e.g. Asthma, Diabetes, Epilepsy",
+        "dietaryPlaceholder": "Type a dietary restriction and press Enter",
+        "physicianInsurance": "Physician & Insurance",
+        "physicianInsuranceDescription": "Primary care physician and insurance details",
+        "physicianName": "Physician Name",
+        "physicianPlaceholder": "Dr. Jane Smith",
+        "insuranceProvider": "Insurance Provider",
+        "insurancePlaceholder": "Insurance company name",
+        "policyNumber": "Policy Number",
+        "policyPlaceholder": "Policy or ID number",
+        "demographics": "Demographics",
+        "demographicsDescription": "Ethnicity, language, and country of birth",
+        "selectEthnicity": "Select ethnicity",
+        "selectLanguage": "Select language",
+        "countryOfBirthPlaceholder": "Country of birth"
+      },
+      "review": {
+        "edit": "Edit",
+        "creating": "Creating student record and enrollment...",
+        "whatWillHappen": "What will happen when you click \"Create Student\"",
+        "studentRecordCreated": "A student record will be created for {{studentName}}",
+        "enrolledIn": "Enrolled in {{academicYear}} as {{gradeLevel}}",
+        "enrollmentTypeDate": "Enrollment type: {{type}} - Date: {{date}}",
+        "noEnrollment": "No enrollment data - student will be created without enrollment",
+        "noGuardiansWarning": "No guardians added - consider adding at least one guardian",
+        "personalInfo": "Personal Information",
+        "contactInfo": "Contact Information",
+        "medicalDemographics": "Medical & Demographics",
+        "noGuardians": "No guardians added",
+        "primary": "Primary",
+        "emailValue": "Email: {{email}}",
+        "phoneValue": "Phone: {{phone}}",
+        "authorizedPickup": "Authorized for pickup",
+        "portalAccess": "Portal access",
+        "allergies": "Allergies",
+        "medications": "Medications",
+        "conditions": "Conditions",
+        "physician": "Physician",
+        "fullTimeEquivalency": "Full-Time Equivalency",
+        "transferReason": "Transfer Reason"
+      }
+    }
+  },
   "iemisExport": {
     "title": "IEMiS Monthly Export",
     "description": "Generate the IEMiS Flash II monthly attendance roll-up for a calendar month. The export recomputes per-student present / absent / excused day counts and lets you download a CSV. Grade is the school-local grade level.",

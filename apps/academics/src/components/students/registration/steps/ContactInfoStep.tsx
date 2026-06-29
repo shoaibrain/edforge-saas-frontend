@@ -30,6 +30,7 @@ import type { WizardStepProps } from '@edforge/wizard'
 import { useWizardForm } from '../../../../hooks/useWizardForm'
 import { PHONE_TYPE_OPTIONS } from '../../../../schemas/student.form'
 import { CollapsibleSection } from '../CollapsibleSection'
+import { useAcademicsI18n } from '../../../../lib/i18n'
 
 export function ContactInfoStep({
   data,
@@ -37,6 +38,7 @@ export function ContactInfoStep({
   errors,
   clearError,
 }: WizardStepProps) {
+  const { t } = useAcademicsI18n()
   const form = useWizardForm({ data, updateData, errors, clearError })
   const useMailingAddress = form.watch('contactInfo.useMailingAddress')
   const { archetype, country } = useTenantContext()
@@ -48,30 +50,30 @@ export function ContactInfoStep({
         <CollapsibleSection
           id="contact-details"
           icon={Phone}
-          title="Contact Details"
-          description="Email and phone information"
+          title={t('enrollmentModule.step.contact.details')}
+          description={t('enrollmentModule.step.contact.detailsDescription')}
           fields={['contactInfo.email', 'contactInfo.phone', 'contactInfo.phoneType']}
           defaultExpanded
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
             <TextField
               name="contactInfo.email"
-              label="Email Address"
+              label={t('enrollmentModule.step.contact.emailAddress')}
               type="email"
               placeholder="student@example.com"
-              helperText="Optional for students"
+              helperText={t('enrollmentModule.step.contact.emailHelp')}
             />
             <PhoneInput
               name="contactInfo.phone"
               archetype={archetype}
               country={country}
-              label="Phone Number"
+              label={t('enrollmentModule.step.contact.phoneNumber')}
             />
             <SelectField
               name="contactInfo.phoneType"
-              label="Phone Type"
+              label={t('enrollmentModule.step.contact.phoneType')}
               options={PHONE_TYPE_OPTIONS}
-              placeholder="Select type"
+              placeholder={t('enrollmentModule.step.contact.selectType')}
             />
           </div>
         </CollapsibleSection>
@@ -80,8 +82,8 @@ export function ContactInfoStep({
         <CollapsibleSection
           id="contact-address"
           icon={MapPin}
-          title="Physical Address"
-          description="Student's primary residential address"
+          title={t('enrollmentModule.step.contact.physicalAddress')}
+          description={t('enrollmentModule.step.contact.physicalAddressDescription')}
           fields={[
             'contactInfo.address.street1',
             'contactInfo.address.city',
@@ -109,16 +111,16 @@ export function ContactInfoStep({
         <CollapsibleSection
           id="contact-mailing"
           icon={Mail}
-          title="Mailing Address"
-          description="Only if different from physical address"
+          title={t('enrollmentModule.step.contact.mailingAddress')}
+          description={t('enrollmentModule.step.contact.mailingAddressDescription')}
           fields={['contactInfo.useMailingAddress']}
           defaultExpanded={false}
         >
           <div className="space-y-4">
             <ToggleField
               name="contactInfo.useMailingAddress"
-              label="Use a different mailing address"
-              description="Enable this if the mailing address is different from the physical address above"
+              label={t('enrollmentModule.step.contact.differentMailingAddress')}
+              description={t('enrollmentModule.step.contact.differentMailingAddressDescription')}
             />
 
             {useMailingAddress && (
@@ -126,7 +128,7 @@ export function ContactInfoStep({
                 archetype={archetype}
                 country={country}
                 namePrefix="contactInfo.mailingAddress"
-                title="Mailing Address"
+                title={t('enrollmentModule.step.contact.mailingAddress')}
                 showAddressLine2
                 showCountry
               />

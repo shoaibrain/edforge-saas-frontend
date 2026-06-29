@@ -922,6 +922,288 @@
       "notifyComingSoon_plural": "{{count}} सेक्सनहरूलाई सूचना - चाँडै आउँदैछ"
     }
   },
+  "enrollmentModule": {
+    "tabs": {
+      "registration": "दर्ता",
+      "records": "भर्ना रेकर्डहरू"
+    },
+    "actions": {
+      "cancelEnrollment": "भर्ना रद्द गर्नुहोस्",
+      "export": "निर्यात",
+      "exportCsv": "भर्नाहरू CSV रूपमा निर्यात गर्नुहोस्",
+      "closeYear": "वर्ष बन्द गर्नुहोस्",
+      "closing": "बन्द गर्दै...",
+      "back": "पछाडि",
+      "skip": "छोड्नुहोस्",
+      "continue": "जारी राख्नुहोस्",
+      "createStudent": "विद्यार्थी सिर्जना गर्नुहोस्"
+    },
+    "header": {
+      "title": "विद्यार्थी भर्ना गर्नुहोस्",
+      "registering": "नयाँ विद्यार्थी दर्ता गर्दै",
+      "academicYear": "शैक्षिक वर्ष {{year}}",
+      "studentsCurrentlyEnrolled": "{{count}} विद्यार्थी हाल भर्ना",
+      "tabsAria": "भर्ना ट्याबहरू"
+    },
+    "summary": {
+      "enrolled": "भर्ना",
+      "active": "सक्रिय",
+      "gradeLevels": "ग्रेड स्तरहरू",
+      "progressPercent": "{{percent}}%"
+    },
+    "confirm": {
+      "markNoShow": "{{studentName}} लाई नआएको रूपमा चिन्ह लगाउने? यसले भर्ना फिर्ता गर्नेछ।",
+      "thisStudent": "यो विद्यार्थी",
+      "closeYear": "{{yearName}} का सबै खुला भर्नाहरू बन्द गर्ने? यसले यस वर्षका सबै भर्ना विद्यार्थीहरूलाई स्नातकको रूपमा चिन्ह लगाउनेछ। यो कार्य उल्ट्याउन सकिँदैन।",
+      "discardTitle": "परिवर्तनहरू त्याग्ने?",
+      "discardDescription": "तपाईंसँग सुरक्षित नगरिएको विद्यार्थी जानकारी छ। छोड्न निश्चित हुनुहुन्छ? सबै प्रविष्ट डाटा हराउनेछ।"
+    },
+    "export": {
+      "failedTitle": "निर्यात असफल",
+      "failedDescription": "फाइल डाउनलोड गर्न सकिएन।"
+    },
+    "wizard": {
+      "progressAria": "दर्ता प्रगति",
+      "stepAnnouncement": "चरण {{current}} / {{total}}: {{title}}",
+      "steps": {
+        "personal": {
+          "title": "व्यक्तिगत जानकारी",
+          "description": "विद्यार्थीको आधारभूत व्यक्तिगत विवरण प्रविष्ट गर्नुहोस्।"
+        },
+        "contact": {
+          "title": "सम्पर्क",
+          "description": "सम्पर्क विवरण र ठेगाना जानकारी दिनुहोस्।"
+        },
+        "guardians": {
+          "title": "अभिभावकहरू",
+          "description": "विद्यार्थीका अभिभावक वा कानुनी संरक्षक थप्नुहोस्।"
+        },
+        "medical": {
+          "title": "स्वास्थ्य",
+          "description": "स्वास्थ्य जानकारी र जनसांख्यिक विवरण दिनुहोस्।"
+        },
+        "enrollment": {
+          "title": "भर्ना",
+          "description": "भर्ना प्रकार, शैक्षिक वर्ष र Ed-Fi विवरण सेट गर्नुहोस्।"
+        },
+        "review": {
+          "title": "समीक्षा",
+          "description": "विद्यार्थी रेकर्ड सिर्जना गर्नु अघि सबै जानकारी समीक्षा गर्नुहोस्।"
+        }
+      },
+      "sidebar": {
+        "context": "भर्ना सन्दर्भ",
+        "academicYear": "शैक्षिक वर्ष",
+        "enrolled": "भर्ना",
+        "gradeLevels": "ग्रेड स्तरहरू",
+        "requiredForEdFi": "EdFi का लागि आवश्यक",
+        "progress": "प्रगति",
+        "filled": "भरिएको",
+        "required": "आवश्यक",
+        "step": "चरण {{step}}",
+        "done": "पूरा",
+        "current": "हाल",
+        "fields": {
+          "firstName": "पहिलो नाम",
+          "lastName": "थर",
+          "dateOfBirth": "जन्म मिति",
+          "gender": "लिङ्ग",
+          "gradeLevel": "ग्रेड स्तर",
+          "entryDate": "प्रवेश मिति"
+        }
+      },
+      "toast": {
+        "registeredAndEnrolled": "{{studentName}} दर्ता र भर्ना भयो!",
+        "enrollmentConflict": "विद्यार्थी सिर्जना भयो। भर्ना द्वन्द्व: {{message}}। विद्यार्थी पहिले नै भर्ना भएको हुन सक्छ।",
+        "enrollmentFailed": "विद्यार्थी सिर्जना भयो, तर भर्ना असफल: {{message}}। विद्यार्थी प्रोफाइलबाट भर्ना थप्न सक्नुहुन्छ।",
+        "registered": "{{studentName}} दर्ता भयो!"
+      }
+    },
+    "duplicate": {
+      "checking": "अवस्थित विद्यार्थी रेकर्डहरू जाँच गर्दै...",
+      "possibleDuplicate": "सम्भावित डुप्लिकेट भेटियो",
+      "similarRecords": "मिल्दोजुल्दो रेकर्डहरू भेटिए",
+      "singleMatch": "मिल्दोजुल्दो जानकारी भएको विद्यार्थी पहिले नै छ।",
+      "multipleMatches": "{{count}} मिल्दोजुल्दो विद्यार्थी भेटिए।",
+      "continueNew": "यो नयाँ विद्यार्थी हो भने जारी राख्न सक्नुहुन्छ।",
+      "dismiss": "चेतावनी हटाउनुहोस्",
+      "dob": "जन्म मिति: {{date}}",
+      "grade": "ग्रेड {{grade}}",
+      "match": "मिल्दो: {{reasons}}",
+      "viewStudent": "{{name}} हेर्नुहोस्",
+      "confidence": {
+        "high": "उच्च",
+        "medium": "मध्यम",
+        "low": "कम"
+      }
+    },
+    "step": {
+      "type": {
+        "title": "भर्ना प्रकार",
+        "description": "विद्यार्थी कसरी भर्ना हुँदैछ",
+        "newDescription": "यस विद्यालयमा पहिलो पटक भर्ना",
+        "transferDescription": "अर्को विद्यालयबाट स्थानान्तरण",
+        "returningDescription": "पहिले भर्ना भएको र फर्किएको",
+        "reenrollmentDescription": "भर्नामा विरामपछि पुन: भर्ना"
+      },
+      "details": {
+        "title": "भर्ना विवरण",
+        "description": "शैक्षिक वर्ष र भर्ना मिति",
+        "academicYear": "शैक्षिक वर्ष",
+        "loadingYears": "शैक्षिक वर्षहरू लोड हुँदै...",
+        "failedYears": "शैक्षिक वर्षहरू लोड गर्न असफल। कृपया रिफ्रेस गर्नुहोस्।",
+        "selectAcademicYear": "शैक्षिक वर्ष छान्नुहोस्",
+        "currentSuffix": "हालको",
+        "enrollmentDate": "भर्ना मिति",
+        "dateRange": "{{start}} - {{end}} भित्र हुनुपर्छ",
+        "activeYear": "सक्रिय शैक्षिक वर्ष - भर्ना तुरुन्तै सक्रिय हुनेछ",
+        "noActiveYearTitle": "कुनै सक्रिय शैक्षिक वर्ष उपलब्ध छैन",
+        "noActiveYearDescription": "विद्यार्थी भर्ना गर्नु अघि विद्यालय सेटिङमा शैक्षिक वर्ष कन्फिगर र सक्रिय गर्नुहोस्।"
+      },
+      "entry": {
+        "title": "प्रवेश विवरण",
+        "description": "राज्य रिपोर्टिङका लागि Ed-Fi descriptor फिल्डहरू",
+        "entryType": "प्रवेश प्रकार",
+        "selectEntryType": "प्रवेश प्रकार छान्नुहोस्",
+        "entryTypeHelp": "विद्यार्थी यस विद्यालयमा कसरी प्रवेश गर्दैछ",
+        "residencyStatus": "बसोबास स्थिति",
+        "selectResidencyStatus": "बसोबास स्थिति छान्नुहोस्",
+        "residencyHelp": "विद्यालयसँग सम्बन्धित विद्यार्थीको बसोबास स्थिति"
+      },
+      "settings": {
+        "title": "भर्ना सेटिङहरू",
+        "description": "पूर्वनिर्धारित सेट छ - आवश्यक भए मात्र समायोजन गर्नुहोस्",
+        "primarySchool": "प्राथमिक विद्यालय",
+        "primarySchoolHelp": "के यो विद्यार्थीको प्राथमिक भर्ना विद्यालय हो?",
+        "fte": "पूर्ण-समय समतुल्यता (FTE)",
+        "fteHelp": "1.0 = पूर्ण-समय, 0.5 = आधा-समय",
+        "repeatGrade": "ग्रेड दोहोर्याउने",
+        "repeatGradeHelp": "विद्यार्थीले हालको ग्रेड स्तर दोहोर्याइरहेको छ भने टिक गर्नुहोस्"
+      },
+      "transfer": {
+        "title": "स्थानान्तरण जानकारी",
+        "description": "अघिल्लो विद्यालयबारे विवरण",
+        "previousSchool": "अघिल्लो विद्यालय",
+        "previousSchoolPlaceholder": "अघिल्लो विद्यालयको नाम",
+        "previousAddress": "अघिल्लो विद्यालय ठेगाना",
+        "previousAddressPlaceholder": "शहर, प्रदेश",
+        "reason": "स्थानान्तरणको कारण",
+        "reasonPlaceholder": "स्थानान्तरणको कारण छोटकरीमा लेख्नुहोस्"
+      },
+      "notes": {
+        "title": "थप टिप्पणीहरू",
+        "description": "यस भर्नाबारे वैकल्पिक टिप्पणीहरू",
+        "label": "टिप्पणीहरू",
+        "placeholder": "यस भर्नाबारे थप टिप्पणीहरू..."
+      },
+      "auto": {
+        "label": "स्वतः भरिएको:",
+        "description": "विद्यालय, ग्रेड स्तर र प्रवेश ग्रेड स्तर descriptor तपाईंको विद्यालय सन्दर्भ र चरण 1 छनोटहरूका आधारमा स्वतः सेट हुन्छन्।"
+      },
+      "personal": {
+        "studentName": "विद्यार्थी नाम",
+        "studentNameDescription": "आधिकारिक कागजातमा देखिने कानुनी नाम",
+        "firstNamePlaceholder": "पहिलो नाम प्रविष्ट गर्नुहोस्",
+        "lastNamePlaceholder": "थर प्रविष्ट गर्नुहोस्",
+        "middleNamePlaceholder": "बीचको नाम प्रविष्ट गर्नुहोस्",
+        "preferredName": "रुचाइएको नाम",
+        "preferredNamePlaceholder": "बोलाउने वा रुचाइएको नाम",
+        "suffix": "नाम पछाडिको उपाधि",
+        "suffixPlaceholder": "Jr., III, आदि",
+        "basicDetails": "आधारभूत विवरण",
+        "basicDetailsDescription": "जन्म मिति, लिङ्ग र ग्रेड स्तर",
+        "ageHelp": "विद्यार्थी 3 देखि 22 वर्षको बीचमा हुनुपर्छ",
+        "selectGender": "लिङ्ग छान्नुहोस्",
+        "selectGradeLevel": "ग्रेड स्तर छान्नुहोस्"
+      },
+      "contact": {
+        "details": "सम्पर्क विवरण",
+        "detailsDescription": "इमेल र फोन जानकारी",
+        "emailAddress": "इमेल ठेगाना",
+        "emailHelp": "विद्यार्थीका लागि वैकल्पिक",
+        "phoneNumber": "फोन नम्बर",
+        "phoneType": "फोन प्रकार",
+        "selectType": "प्रकार छान्नुहोस्",
+        "physicalAddress": "भौतिक ठेगाना",
+        "physicalAddressDescription": "विद्यार्थीको प्राथमिक बसोबास ठेगाना",
+        "mailingAddress": "पत्राचार ठेगाना",
+        "mailingAddressDescription": "भौतिक ठेगानाभन्दा फरक भए मात्र",
+        "differentMailingAddress": "फरक पत्राचार ठेगाना प्रयोग गर्नुहोस्",
+        "differentMailingAddressDescription": "पत्राचार ठेगाना माथिको भौतिक ठेगानाभन्दा फरक छ भने सक्षम गर्नुहोस्"
+      },
+      "guardians": {
+        "guardianNumber": "अभिभावक {{number}}",
+        "remove": "अभिभावक हटाउनुहोस्",
+        "relationship": "सम्बन्ध",
+        "select": "छान्नुहोस्",
+        "employer": "रोजगारदाता",
+        "employerPlaceholder": "रोजगारदाता नाम",
+        "occupationPlaceholder": "पेशा",
+        "permissions": "अनुमतिहरू",
+        "primaryGuardian": "प्राथमिक अभिभावक",
+        "primaryGuardianDescription": "मुख्य सम्पर्क व्यक्ति",
+        "portalAccess": "पोर्टल पहुँच",
+        "portalAccessDescription": "विद्यार्थी रेकर्ड हेर्न सक्छ",
+        "pickup": "लिन अधिकृत",
+        "pickupDescription": "विद्यार्थी लिन सक्छ",
+        "emptyTitle": "अहिलेसम्म कुनै अभिभावक थपिएको छैन",
+        "emptyDescription": "अभिभावक जानकारी वैकल्पिक हो तर सिफारिस गरिएको छ।",
+        "addGuardian": "अभिभावक थप्नुहोस्",
+        "maxReached": "अधिकतम 10 अभिभावक पुगेको छ।"
+      },
+      "medical": {
+        "optionalInfo": "यस पृष्ठका सबै फिल्डहरू वैकल्पिक छन्। यो चरण छोडेर पछि जानकारी थप्न सक्नुहुन्छ।",
+        "health": "स्वास्थ्य जानकारी",
+        "healthDescription": "एलर्जी, औषधि, अवस्था, आहार प्रतिबन्धहरू",
+        "allergyPlaceholder": "एलर्जी टाइप गरेर Enter थिच्नुहोस्",
+        "allergyHelp": "जस्तै बदाम, लेटेक्स, पेनिसिलिन",
+        "currentMedications": "हालका औषधिहरू",
+        "medicationPlaceholder": "औषधि टाइप गरेर Enter थिच्नुहोस्",
+        "medicalConditions": "चिकित्सा अवस्थाहरू",
+        "conditionPlaceholder": "अवस्था टाइप गरेर Enter थिच्नुहोस्",
+        "conditionHelp": "जस्तै दम, मधुमेह, मिर्गी",
+        "dietaryPlaceholder": "आहार प्रतिबन्ध टाइप गरेर Enter थिच्नुहोस्",
+        "physicianInsurance": "चिकित्सक र बीमा",
+        "physicianInsuranceDescription": "प्राथमिक चिकित्सक र बीमा विवरण",
+        "physicianName": "चिकित्सक नाम",
+        "physicianPlaceholder": "Dr. Jane Smith",
+        "insuranceProvider": "बीमा प्रदायक",
+        "insurancePlaceholder": "बीमा कम्पनी नाम",
+        "policyNumber": "नीति नम्बर",
+        "policyPlaceholder": "नीति वा ID नम्बर",
+        "demographics": "जनसांख्यिकी",
+        "demographicsDescription": "जातीयता, भाषा र जन्म देश",
+        "selectEthnicity": "जातीयता छान्नुहोस्",
+        "selectLanguage": "भाषा छान्नुहोस्",
+        "countryOfBirthPlaceholder": "जन्म देश"
+      },
+      "review": {
+        "edit": "सम्पादन गर्नुहोस्",
+        "creating": "विद्यार्थी रेकर्ड र भर्ना सिर्जना गर्दै...",
+        "whatWillHappen": "\"विद्यार्थी सिर्जना गर्नुहोस्\" क्लिक गर्दा के हुनेछ",
+        "studentRecordCreated": "{{studentName}} का लागि विद्यार्थी रेकर्ड सिर्जना हुनेछ",
+        "enrolledIn": "{{academicYear}} मा {{gradeLevel}} रूपमा भर्ना",
+        "enrollmentTypeDate": "भर्ना प्रकार: {{type}} - मिति: {{date}}",
+        "noEnrollment": "भर्ना डाटा छैन - विद्यार्थी भर्ना बिना सिर्जना हुनेछ",
+        "noGuardiansWarning": "अभिभावक थपिएको छैन - कम्तीमा एक अभिभावक थप्न विचार गर्नुहोस्",
+        "personalInfo": "व्यक्तिगत जानकारी",
+        "contactInfo": "सम्पर्क जानकारी",
+        "medicalDemographics": "स्वास्थ्य र जनसांख्यिकी",
+        "noGuardians": "अभिभावक थपिएको छैन",
+        "primary": "प्राथमिक",
+        "emailValue": "इमेल: {{email}}",
+        "phoneValue": "फोन: {{phone}}",
+        "authorizedPickup": "लिन अधिकृत",
+        "portalAccess": "पोर्टल पहुँच",
+        "allergies": "एलर्जीहरू",
+        "medications": "औषधिहरू",
+        "conditions": "अवस्थाहरू",
+        "physician": "चिकित्सक",
+        "fullTimeEquivalency": "पूर्ण-समय समतुल्यता",
+        "transferReason": "स्थानान्तरण कारण"
+      }
+    }
+  },
   "iemisExport": {
     "title": "IEMiS मासिक निर्यात",
     "description": "क्यालेन्डर महिनाका लागि IEMiS Flash II मासिक उपस्थिति सारांश बनाउनुहोस्। निर्यातले प्रति-विद्यार्थी उपस्थित / अनुपस्थित / अनुमति सहित अनुपस्थित दिनहरू पुन: गणना गर्छ र CSV डाउनलोड गर्न दिन्छ। ग्रेड विद्यालयको स्थानीय ग्रेड स्तर हो।",

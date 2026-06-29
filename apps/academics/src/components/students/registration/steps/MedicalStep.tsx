@@ -16,6 +16,7 @@ import type { WizardStepProps } from '@edforge/wizard'
 import { useWizardForm } from '../../../../hooks/useWizardForm'
 import { TagInput } from '../../../common/TagInput'
 import { CollapsibleSection } from '../CollapsibleSection'
+import { useAcademicsI18n } from '../../../../lib/i18n'
 
 const ETHNICITY_OPTIONS = [
   { value: 'american_indian', label: 'American Indian / Alaska Native' },
@@ -48,6 +49,7 @@ export function MedicalStep({
   errors,
   clearError,
 }: WizardStepProps) {
+  const { t } = useAcademicsI18n()
   const form = useWizardForm({ data, updateData, errors, clearError })
 
   const getTagArray = useCallback(
@@ -90,7 +92,7 @@ export function MedicalStep({
         <div className="flex items-start gap-3 rounded-lg p-3 bg-[rgb(var(--state-info-bg))] border border-[rgb(var(--state-info-border))]">
           <Info className="w-4 h-4 shrink-0 mt-0.5 text-[rgb(var(--state-info-fg))]" />
           <p className="text-xs text-[rgb(var(--text-secondary))]">
-            All fields on this page are optional. You can skip this step and add information later.
+            {t('enrollmentModule.step.medical.optionalInfo')}
           </p>
         </div>
 
@@ -98,8 +100,8 @@ export function MedicalStep({
         <CollapsibleSection
           id="medical-health"
           icon={Heart}
-          title="Health Information"
-          description="Allergies, medications, conditions, dietary restrictions"
+          title={t('enrollmentModule.step.medical.health')}
+          description={t('enrollmentModule.step.medical.healthDescription')}
           fields={[
             'medicalInfo.allergies',
             'medicalInfo.medications',
@@ -110,30 +112,30 @@ export function MedicalStep({
         >
           <div className="space-y-4">
             <TagInput
-              label="Allergies"
+              label={t('medical.allergies')}
               value={getTagArray('medicalInfo.allergies')}
               onChange={(tags) => updateTags('medicalInfo.allergies', tags)}
-              placeholder="Type an allergy and press Enter"
-              helperText="e.g. Peanuts, Latex, Penicillin"
+              placeholder={t('enrollmentModule.step.medical.allergyPlaceholder')}
+              helperText={t('enrollmentModule.step.medical.allergyHelp')}
             />
             <TagInput
-              label="Current Medications"
+              label={t('enrollmentModule.step.medical.currentMedications')}
               value={getTagArray('medicalInfo.medications')}
               onChange={(tags) => updateTags('medicalInfo.medications', tags)}
-              placeholder="Type a medication and press Enter"
+              placeholder={t('enrollmentModule.step.medical.medicationPlaceholder')}
             />
             <TagInput
-              label="Medical Conditions"
+              label={t('enrollmentModule.step.medical.medicalConditions')}
               value={getTagArray('medicalInfo.conditions')}
               onChange={(tags) => updateTags('medicalInfo.conditions', tags)}
-              placeholder="Type a condition and press Enter"
-              helperText="e.g. Asthma, Diabetes, Epilepsy"
+              placeholder={t('enrollmentModule.step.medical.conditionPlaceholder')}
+              helperText={t('enrollmentModule.step.medical.conditionHelp')}
             />
             <TagInput
-              label="Dietary Restrictions"
+              label={t('medical.dietaryRestrictions')}
               value={getTagArray('medicalInfo.dietaryRestrictions')}
               onChange={(tags) => updateTags('medicalInfo.dietaryRestrictions', tags)}
-              placeholder="Type a dietary restriction and press Enter"
+              placeholder={t('enrollmentModule.step.medical.dietaryPlaceholder')}
             />
           </div>
         </CollapsibleSection>
@@ -142,8 +144,8 @@ export function MedicalStep({
         <CollapsibleSection
           id="medical-physician"
           icon={Stethoscope}
-          title="Physician & Insurance"
-          description="Primary care physician and insurance details"
+          title={t('enrollmentModule.step.medical.physicianInsurance')}
+          description={t('enrollmentModule.step.medical.physicianInsuranceDescription')}
           fields={[
             'medicalInfo.physicianName',
             'medicalInfo.physicianPhone',
@@ -155,23 +157,23 @@ export function MedicalStep({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
             <TextField
               name="medicalInfo.physicianName"
-              label="Physician Name"
-              placeholder="Dr. Jane Smith"
+              label={t('enrollmentModule.step.medical.physicianName')}
+              placeholder={t('enrollmentModule.step.medical.physicianPlaceholder')}
             />
             <TextField
               name="medicalInfo.physicianPhone"
-              label="Physician Phone"
+              label={t('medical.physicianPhone')}
               placeholder="(555) 123-4567"
             />
             <TextField
               name="medicalInfo.insuranceProvider"
-              label="Insurance Provider"
-              placeholder="Insurance company name"
+              label={t('enrollmentModule.step.medical.insuranceProvider')}
+              placeholder={t('enrollmentModule.step.medical.insurancePlaceholder')}
             />
             <TextField
               name="medicalInfo.insurancePolicyNumber"
-              label="Policy Number"
-              placeholder="Policy or ID number"
+              label={t('enrollmentModule.step.medical.policyNumber')}
+              placeholder={t('enrollmentModule.step.medical.policyPlaceholder')}
             />
           </div>
         </CollapsibleSection>
@@ -180,34 +182,34 @@ export function MedicalStep({
         <CollapsibleSection
           id="medical-demographics"
           icon={Globe}
-          title="Demographics"
-          description="Ethnicity, language, and country of birth"
+          title={t('enrollmentModule.step.medical.demographics')}
+          description={t('enrollmentModule.step.medical.demographicsDescription')}
           fields={['ethnicity', 'primaryLanguage', 'homeLanguage', 'countryOfBirth']}
           defaultExpanded={false}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
             <SelectField
               name="ethnicity"
-              label="Ethnicity"
+              label={t('fields.ethnicity')}
               options={ETHNICITY_OPTIONS}
-              placeholder="Select ethnicity"
+              placeholder={t('enrollmentModule.step.medical.selectEthnicity')}
             />
             <SelectField
               name="primaryLanguage"
-              label="Primary Language"
+              label={t('fields.primaryLanguage')}
               options={LANGUAGE_OPTIONS}
-              placeholder="Select language"
+              placeholder={t('enrollmentModule.step.medical.selectLanguage')}
             />
             <SelectField
               name="homeLanguage"
-              label="Home Language"
+              label={t('fields.homeLanguage')}
               options={LANGUAGE_OPTIONS}
-              placeholder="Select language"
+              placeholder={t('enrollmentModule.step.medical.selectLanguage')}
             />
             <TextField
               name="countryOfBirth"
-              label="Country of Birth"
-              placeholder="Country of birth"
+              label={t('fields.countryOfBirth')}
+              placeholder={t('enrollmentModule.step.medical.countryOfBirthPlaceholder')}
             />
           </div>
         </CollapsibleSection>

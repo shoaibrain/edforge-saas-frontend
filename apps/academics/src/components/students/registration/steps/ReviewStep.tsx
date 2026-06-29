@@ -28,6 +28,7 @@ import {
 import { useAcademicYears } from '../../../../hooks/useSchool'
 import { useActiveSchoolId } from '../../../../stores/app.store'
 import type { GuardianFormData } from '../../../../schemas/student.form'
+import { useAcademicsI18n } from '../../../../lib/i18n'
 
 // ============================================================================
 // HELPERS
@@ -48,20 +49,6 @@ function labelFor(
   return options.find((o) => o.value === value)?.label ?? value
 }
 
-/** Format a date string (YYYY-MM-DD) to readable format */
-function formatDate(dateStr: string | undefined): string {
-  if (!dateStr) return '—'
-  try {
-    return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
-  } catch {
-    return dateStr
-  }
-}
-
 // ============================================================================
 // SUB-COMPONENTS
 // ============================================================================
@@ -79,10 +66,12 @@ function DataField({ label, value }: { label: string; value: string }) {
 
 function SectionHeader({
   title,
+  editLabel,
   stepIndex,
   goToStep,
 }: {
   title: string
+  editLabel: string
   stepIndex: number
   goToStep: (index: number) => void
 }) {
@@ -97,7 +86,7 @@ function SectionHeader({
         className="flex items-center gap-1.5 text-xs font-medium text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--text-primary))] transition-colors"
       >
         <Edit2 className="w-3 h-3" />
-        Edit
+        {editLabel}
       </button>
     </div>
   )
@@ -124,6 +113,7 @@ function TagList({ tags }: { tags: string[] }) {
 // ============================================================================
 
 export function ReviewStep({ data }: WizardStepProps) {
+  const { t, formatDate } = useAcademicsI18n()
   const { goToStep, isSubmitting } = useWizard()
 
   const contactInfo = (data.contactInfo as Record<string, unknown> | undefined) ?? {}
@@ -162,20 +152,20 @@ export function ReviewStep({ data }: WizardStepProps) {
       {isSubmitting && (
         <div className="rounded-lg bg-[rgb(var(--state-info-bg)/0.18)] border border-[rgb(var(--state-info-border)/0.35)] p-4 text-sm text-[rgb(var(--state-info-fg))] flex items-center gap-3">
           <div className="w-4 h-4 border-2 border-[rgb(var(--state-info-border))] border-t-transparent rounded-full animate-spin" />
-          Creating student record and enrollment...
+          {t('enrollmentModule.step.review.creating')}
         </div>
       )}
 
       {/* Enrollment Summary Confirmation Card */}
       <div className="rounded-xl border-2 border-[rgb(var(--state-info-border)/0.35)] bg-[rgb(var(--state-info-bg)/0.18)]/50 p-5">
         <h3 className="text-sm font-semibold text-[rgb(var(--state-info-fg))] mb-3">
-          What will happen when you click "Create Student"
+          {t('enrollmentModule.step.review.whatWillHappen')}
         </h3>
         <div className="space-y-2">
           <div className="flex items-start gap-2">
             <CheckCircle2 className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] shrink-0 mt-0.5" />
             <span className="text-sm text-[rgb(var(--text-secondary))]">
-              A student record will be created for <strong>{display(data.firstName)} {display(data.lastName)}</strong>
+              {t('enrollmentModule.step.review.studentRecordCreated', { studentName: `${display(data.firstName)} ${display(data.lastName)}` })}
             </span>
           </div>
           {hasEnrollment ? (
@@ -183,14 +173,19 @@ export function ReviewStep({ data }: WizardStepProps) {
               <div className="flex items-start gap-2">
                 <CheckCircle2 className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] shrink-0 mt-0.5" />
                 <span className="text-sm text-[rgb(var(--text-secondary))]">
-                  Enrolled in <strong>{academicYearName}</strong> as{' '}
-                  <strong>{labelFor(data.currentGradeLevel as string, GRADE_LEVEL_OPTIONS)}</strong>
+                  {t('enrollmentModule.step.review.enrolledIn', {
+                    academicYear: academicYearName,
+                    gradeLevel: labelFor(data.currentGradeLevel as string, GRADE_LEVEL_OPTIONS),
+                  })}
                 </span>
               </div>
               <div className="flex items-start gap-2">
                 <CheckCircle2 className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] shrink-0 mt-0.5" />
                 <span className="text-sm text-[rgb(var(--text-secondary))]">
-                  Enrollment type: <strong>{labelFor(enrollment.enrollmentType as string, ENROLLMENT_TYPE_OPTIONS)}</strong> — Date: <strong>{formatDate(enrollment.enrollmentDate as string)}</strong>
+                  {t('enrollmentModule.step.review.enrollmentTypeDate', {
+                    type: labelFor(enrollment.enrollmentType as string, ENROLLMENT_TYPE_OPTIONS),
+                    date: formatDate(enrollment.enrollmentDate as string, { year: 'numeric', month: 'long', day: 'numeric' }),
+                  })}
                 </span>
               </div>
             </>
@@ -198,7 +193,7 @@ export function ReviewStep({ data }: WizardStepProps) {
             <div className="flex items-start gap-2">
               <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
               <span className="text-sm text-amber-700">
-                No enrollment data — student will be created without enrollment
+                {t('enrollmentModule.step.review.noEnrollment')}
               </span>
             </div>
           )}
@@ -206,7 +201,7 @@ export function ReviewStep({ data }: WizardStepProps) {
             <div className="flex items-start gap-2">
               <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
               <span className="text-sm text-amber-700">
-                No guardians added — consider adding at least one guardian
+                {t('enrollmentModule.step.review.noGuardiansWarning')}
               </span>
             </div>
           )}
@@ -215,17 +210,17 @@ export function ReviewStep({ data }: WizardStepProps) {
 
       {/* Personal Information */}
       <div className="space-y-3">
-        <SectionHeader title="Personal Information" stepIndex={0} goToStep={goToStep} />
+        <SectionHeader title={t('enrollmentModule.step.review.personalInfo')} editLabel={t('enrollmentModule.step.review.edit')} stepIndex={0} goToStep={goToStep} />
         <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-1">
-          <DataField label="First Name" value={display(data.firstName)} />
-          <DataField label="Last Name" value={display(data.lastName)} />
-          <DataField label="Middle Name" value={display(data.middleName)} />
-          <DataField label="Preferred Name" value={display(data.preferredName)} />
-          <DataField label="Suffix" value={display(data.suffix)} />
-          <DataField label="Date of Birth" value={formatDate(data.dateOfBirth as string)} />
-          <DataField label="Gender" value={labelFor(data.gender as string, GENDER_OPTIONS)} />
+          <DataField label={t('fields.firstName')} value={display(data.firstName)} />
+          <DataField label={t('fields.lastName')} value={display(data.lastName)} />
+          <DataField label={t('fields.middleName')} value={display(data.middleName)} />
+          <DataField label={t('enrollmentModule.step.personal.preferredName')} value={display(data.preferredName)} />
+          <DataField label={t('enrollmentModule.step.personal.suffix')} value={display(data.suffix)} />
+          <DataField label={t('fields.dateOfBirth')} value={formatDate(data.dateOfBirth as string, { year: 'numeric', month: 'long', day: 'numeric' })} />
+          <DataField label={t('fields.gender')} value={labelFor(data.gender as string, GENDER_OPTIONS)} />
           <DataField
-            label="Grade Level"
+            label={t('fields.gradeLevel')}
             value={labelFor(data.currentGradeLevel as string, GRADE_LEVEL_OPTIONS)}
           />
         </div>
@@ -233,23 +228,23 @@ export function ReviewStep({ data }: WizardStepProps) {
 
       {/* Contact Information */}
       <div className="space-y-3">
-        <SectionHeader title="Contact Information" stepIndex={1} goToStep={goToStep} />
+        <SectionHeader title={t('enrollmentModule.step.review.contactInfo')} editLabel={t('enrollmentModule.step.review.edit')} stepIndex={1} goToStep={goToStep} />
         <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-1">
-          <DataField label="Email" value={display(contactInfo.email)} />
-          <DataField label="Phone" value={display(contactInfo.phone)} />
-          <DataField label="Phone Type" value={display(contactInfo.phoneType)} />
+          <DataField label={t('fields.email')} value={display(contactInfo.email)} />
+          <DataField label={t('fields.phone')} value={display(contactInfo.phone)} />
+          <DataField label={t('enrollmentModule.step.contact.phoneType')} value={display(contactInfo.phoneType)} />
         </div>
-        <DataField label="Physical Address" value={formatAddress(address)} />
+        <DataField label={t('enrollmentModule.step.contact.physicalAddress')} value={formatAddress(address)} />
         {Boolean(contactInfo.useMailingAddress) && (
-          <DataField label="Mailing Address" value={formatAddress(mailingAddress)} />
+          <DataField label={t('enrollmentModule.step.contact.mailingAddress')} value={formatAddress(mailingAddress)} />
         )}
       </div>
 
       {/* Guardians */}
       <div className="space-y-3">
-        <SectionHeader title="Guardians" stepIndex={2} goToStep={goToStep} />
+        <SectionHeader title={t('enrollmentModule.wizard.steps.guardians.title')} editLabel={t('enrollmentModule.step.review.edit')} stepIndex={2} goToStep={goToStep} />
         {guardians.length === 0 ? (
-          <p className="text-sm text-[rgb(var(--text-tertiary))]">No guardians added</p>
+          <p className="text-sm text-[rgb(var(--text-tertiary))]">{t('enrollmentModule.step.review.noGuardians')}</p>
         ) : (
           <div className="space-y-3">
             {guardians.map((g, i) => (
@@ -266,15 +261,15 @@ export function ReviewStep({ data }: WizardStepProps) {
                   </span>
                   {g.isPrimary && (
                     <span className="text-xs px-1.5 py-0.5 rounded bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--text-secondary))] font-medium">
-                      Primary
+                      {t('enrollmentModule.step.review.primary')}
                     </span>
                   )}
                 </div>
                 <div className="grid grid-cols-2 gap-x-4 gap-y-0.5 text-xs text-[rgb(var(--text-secondary))]">
-                  {g.email && <span>Email: {g.email}</span>}
-                  {g.phone && <span>Phone: {g.phone}</span>}
-                  {g.canPickup && <span>Authorized for pickup</span>}
-                  {g.hasPortalAccess && <span>Portal access</span>}
+                  {g.email && <span>{t('enrollmentModule.step.review.emailValue', { email: g.email })}</span>}
+                  {g.phone && <span>{t('enrollmentModule.step.review.phoneValue', { phone: g.phone })}</span>}
+                  {g.canPickup && <span>{t('enrollmentModule.step.review.authorizedPickup')}</span>}
+                  {g.hasPortalAccess && <span>{t('enrollmentModule.step.review.portalAccess')}</span>}
                 </div>
               </div>
             ))}
@@ -284,85 +279,85 @@ export function ReviewStep({ data }: WizardStepProps) {
 
       {/* Medical / Demographics */}
       <div className="space-y-3">
-        <SectionHeader title="Medical & Demographics" stepIndex={3} goToStep={goToStep} />
+        <SectionHeader title={t('enrollmentModule.step.review.medicalDemographics')} editLabel={t('enrollmentModule.step.review.edit')} stepIndex={3} goToStep={goToStep} />
         <div className="space-y-2">
           <div className="py-1">
-            <span className="text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Allergies</span>
+            <span className="text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase tracking-wider">{t('enrollmentModule.step.review.allergies')}</span>
             <TagList tags={(medicalInfo.allergies as string[]) ?? []} />
           </div>
           <div className="py-1">
-            <span className="text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Medications</span>
+            <span className="text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase tracking-wider">{t('enrollmentModule.step.review.medications')}</span>
             <TagList tags={(medicalInfo.medications as string[]) ?? []} />
           </div>
           <div className="py-1">
-            <span className="text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Conditions</span>
+            <span className="text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase tracking-wider">{t('enrollmentModule.step.review.conditions')}</span>
             <TagList tags={(medicalInfo.conditions as string[]) ?? []} />
           </div>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-1">
-          <DataField label="Physician" value={display(medicalInfo.physicianName)} />
-          <DataField label="Ethnicity" value={display(data.ethnicity)} />
-          <DataField label="Primary Language" value={display(data.primaryLanguage)} />
-          <DataField label="Home Language" value={display(data.homeLanguage)} />
-          <DataField label="Country of Birth" value={display(data.countryOfBirth)} />
+          <DataField label={t('enrollmentModule.step.review.physician')} value={display(medicalInfo.physicianName)} />
+          <DataField label={t('fields.ethnicity')} value={display(data.ethnicity)} />
+          <DataField label={t('fields.primaryLanguage')} value={display(data.primaryLanguage)} />
+          <DataField label={t('fields.homeLanguage')} value={display(data.homeLanguage)} />
+          <DataField label={t('fields.countryOfBirth')} value={display(data.countryOfBirth)} />
         </div>
       </div>
 
       {/* Enrollment */}
       <div className="space-y-3">
-        <SectionHeader title="Enrollment" stepIndex={4} goToStep={goToStep} />
+        <SectionHeader title={t('enrollmentModule.wizard.steps.enrollment.title')} editLabel={t('enrollmentModule.step.review.edit')} stepIndex={4} goToStep={goToStep} />
         <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-1">
           <DataField
-            label="Enrollment Type"
+            label={t('enrollmentModule.step.type.title')}
             value={labelFor(enrollment.enrollmentType as string, ENROLLMENT_TYPE_OPTIONS)}
           />
           <DataField
-            label="Enrollment Date"
-            value={formatDate(enrollment.enrollmentDate as string)}
+            label={t('enrollmentModule.step.details.enrollmentDate')}
+            value={formatDate(enrollment.enrollmentDate as string, { year: 'numeric', month: 'long', day: 'numeric' })}
           />
-          <DataField label="Academic Year" value={academicYearName} />
+          <DataField label={t('enrollmentModule.step.details.academicYear')} value={academicYearName} />
 
           {/* Ed-Fi Descriptor Fields */}
           <DataField
-            label="Entry Type"
+            label={t('enrollmentModule.step.entry.entryType')}
             value={labelFor(enrollment.entryTypeDescriptor as string, ENTRY_TYPE_OPTIONS)}
           />
           <DataField
-            label="Residency Status"
+            label={t('enrollmentModule.step.entry.residencyStatus')}
             value={labelFor(enrollment.residencyStatusDescriptor as string, RESIDENCY_STATUS_OPTIONS)}
           />
           <DataField
-            label="Primary School"
-            value={enrollment.primarySchool === false ? 'No' : 'Yes'}
+            label={t('enrollmentModule.step.settings.primarySchool')}
+            value={enrollment.primarySchool === false ? t('yesNo.no') : t('yesNo.yes')}
           />
           <DataField
-            label="Full-Time Equivalency"
+            label={t('enrollmentModule.step.review.fullTimeEquivalency')}
             value={enrollment.fullTimeEquivalency != null ? String(enrollment.fullTimeEquivalency) : '1.0'}
           />
           <DataField
-            label="Repeat Grade"
-            value={enrollment.repeatGradeIndicator ? 'Yes' : 'No'}
+            label={t('enrollmentModule.step.settings.repeatGrade')}
+            value={enrollment.repeatGradeIndicator ? t('yesNo.yes') : t('yesNo.no')}
           />
 
           {enrollment.enrollmentType === 'transfer' && (
             <>
               <DataField
-                label="Previous School"
+                label={t('enrollmentModule.step.transfer.previousSchool')}
                 value={display(enrollment.previousSchoolName)}
               />
               <DataField
-                label="Previous School Address"
+                label={t('enrollmentModule.step.transfer.previousAddress')}
                 value={display(enrollment.previousSchoolAddress)}
               />
               <DataField
-                label="Transfer Reason"
+                label={t('enrollmentModule.step.review.transferReason')}
                 value={display(enrollment.transferReason)}
               />
             </>
           )}
           {Boolean(enrollment.notes) && (
             <div className="col-span-full">
-              <DataField label="Notes" value={display(enrollment.notes)} />
+              <DataField label={t('enrollmentModule.step.notes.label')} value={display(enrollment.notes)} />
             </div>
           )}
         </div>

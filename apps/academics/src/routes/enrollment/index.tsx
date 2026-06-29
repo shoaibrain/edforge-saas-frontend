@@ -48,6 +48,7 @@ import { EnrollmentTable } from '../../components/enrollment/EnrollmentTable'
 import { WithdrawalModal } from '../../components/enrollment/WithdrawalModal'
 import { TransferModal } from '../../components/enrollment/TransferModal'
 import type { EnrollmentResponseDto } from '../../services/academics.service'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 // ============================================================================
 // TYPES
@@ -60,6 +61,7 @@ type EnrollmentTab = 'registration' | 'dashboard'
 // ============================================================================
 
 function YearProgressBar({ startDate, endDate }: { startDate: string; endDate: string }) {
+  const { t, formatNumber } = useAcademicsI18n()
   const progress = useMemo(() => {
     const start = new Date(startDate).getTime()
     const end = new Date(endDate).getTime()
@@ -79,7 +81,7 @@ function YearProgressBar({ startDate, endDate }: { startDate: string; endDate: s
         />
       </div>
       <span className="text-xs text-[rgb(var(--text-tertiary))]">
-        {progress}%
+        {t('enrollmentModule.summary.progressPercent', { percent: formatNumber(progress) })}
       </span>
     </div>
   )
@@ -91,6 +93,7 @@ function YearProgressBar({ startDate, endDate }: { startDate: string; endDate: s
 
 export function EnrollmentModule() {
   const navigate = useNavigate()
+  const { t, formatNumber } = useAcademicsI18n()
   // URL-synced active tab (deep-linkable; legacy ?tab=new|records mapped in route)
   const { tab } = useSearch({ from: '/students/enrollment' })
   const activeTab: EnrollmentTab = tab ?? 'registration'
@@ -162,14 +165,14 @@ export function EnrollmentModule() {
 
   // Handlers
   const handleMarkNoShow = useCallback((enrollment: EnrollmentResponseDto) => {
-    const studentName = (enrollment as Record<string, unknown>).studentName || 'this student'
-    if (!window.confirm(`Mark ${studentName} as no-show? This will withdraw the enrollment.`)) return
+    const studentName = (enrollment as Record<string, unknown>).studentName || t('enrollmentModule.confirm.thisStudent', { defaultValue: 'this student' })
+    if (!window.confirm(t('enrollmentModule.confirm.markNoShow', { studentName }))) return
     markNoShowMutation.mutate({
       schoolId,
       yearId: activeYearId,
       studentId: enrollment.studentId,
     })
-  }, [schoolId, activeYearId, markNoShowMutation])
+  }, [schoolId, activeYearId, markNoShowMutation, t])
 
   const handleExportCSV = useCallback(async () => {
     if (!schoolId || !activeYearId) return
@@ -178,24 +181,22 @@ export function EnrollmentModule() {
       await downloadAuthenticatedFile(url, `enrollments-${activeYearId}.csv`)
     } catch (error) {
       console.error('[Export] CSV export failed:', error)
-      toast.error('Export Failed', {
-        description: error instanceof Error ? error.message : 'Could not download the file.',
+      toast.error(t('enrollmentModule.export.failedTitle'), {
+        description: error instanceof Error ? error.message : t('enrollmentModule.export.failedDescription'),
       })
     }
-  }, [schoolId, activeYearId])
+  }, [schoolId, activeYearId, t])
 
   const handleCloseYear = useCallback(() => {
     if (!activeYearObj) return
     const yearName = activeYearObj.name
-    if (!window.confirm(
-      `Close all open enrollments for ${yearName}? This will mark all enrolled students as graduated for this year. This action cannot be undone.`
-    )) return
+    if (!window.confirm(t('enrollmentModule.confirm.closeYear', { yearName }))) return
     closeYearMutation.mutate({
       schoolId,
       yearId: activeYearId,
       lastDayOfSchool: activeYearObj.endDate,
     })
-  }, [schoolId, activeYearId, activeYearObj, closeYearMutation])
+  }, [schoolId, activeYearId, activeYearObj, closeYearMutation, t])
 
   const handleCancelEnrollment = useCallback(() => {
     navigate({ to: '/students' })
@@ -204,15 +205,15 @@ export function EnrollmentModule() {
   // Tab definitions (registration first)
   const tabItems = useMemo(() => {
     const items: { id: EnrollmentTab; label: string; count?: number }[] = [
-      { id: 'registration', label: 'Registration' },
+      { id: 'registration', label: t('enrollmentModule.tabs.registration') },
     ]
     items.push({
       id: 'dashboard',
-      label: 'Enrollment records',
+      label: t('enrollmentModule.tabs.records'),
       count: summary?.totalEnrolled ?? undefined,
     })
     return items
-  }, [summary?.totalEnrolled])
+  }, [summary?.totalEnrolled, t])
 
   return (
     <div className="min-h-full">
@@ -225,7 +226,7 @@ export function EnrollmentModule() {
               <UserPlus className="w-4 h-4 text-[rgb(var(--accent-enrollment-text))]" />
             </div>
             <h1 className="font-semibold text-lg tracking-[-0.3px] text-[rgb(var(--text-primary))]">
-              Enroll student
+              {t('enrollmentModule.header.title')}
             </h1>
           </div>
 
@@ -237,7 +238,7 @@ export function EnrollmentModule() {
               className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[8px] transition-colors hover:opacity-80 bg-transparent border border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-tertiary))]"
             >
               <X className="w-3 h-3" />
-              Cancel enrollment
+              {t('enrollmentModule.actions.cancelEnrollment')}
             </button>
 
             {activeTab === 'dashboard' && academicYears && academicYears.length > 0 && (
@@ -249,7 +250,7 @@ export function EnrollmentModule() {
                 >
                   {academicYears.map((year: { yearId: string; name: string; status: string }) => (
                     <option key={year.yearId} value={year.yearId}>
-                      {year.name}{year.status === 'planning' ? ' (Planning)' : year.status === 'completed' ? ' (Completed)' : ''}
+                      {year.name}{year.status === 'planning' ? ` (${t('status.planning', { defaultValue: 'Planning' })})` : year.status === 'completed' ? ` (${t('status.completed')})` : ''}
                     </option>
                   ))}
                 </select>
@@ -258,10 +259,10 @@ export function EnrollmentModule() {
                     type="button"
                     onClick={handleExportCSV}
                     className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-[8px] transition-colors hover:opacity-80 bg-transparent border border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-tertiary))]"
-                    title="Export enrollments as CSV"
+                    title={t('enrollmentModule.actions.exportCsv')}
                   >
                     <Download className="w-3 h-3" />
-                    Export
+                    {t('enrollmentModule.actions.export')}
                   </button>
                 )}
                 {enrollPerms.edit && activeYearObj?.status === 'completed' && (
@@ -270,10 +271,10 @@ export function EnrollmentModule() {
                     onClick={handleCloseYear}
                     disabled={closeYearMutation.isPending}
                     className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-[8px] transition-colors disabled:opacity-50 bg-[rgb(var(--accent-attendance)/0.08)] border border-[rgb(var(--accent-attendance)/0.2)] text-[rgb(var(--accent-attendance-text))]"
-                    title="Close all open enrollments for this year"
+                    title={t('enrollmentModule.actions.closeYear')}
                   >
                     <Lock className="w-3 h-3" />
-                    {closeYearMutation.isPending ? 'Closing...' : 'Close Year'}
+                    {closeYearMutation.isPending ? t('enrollmentModule.actions.closing') : t('enrollmentModule.actions.closeYear')}
                   </button>
                 )}
               </>
@@ -284,9 +285,9 @@ export function EnrollmentModule() {
         {/* Context Banner */}
         {!summaryLoading && (
           <p className="mt-2 text-2xs text-[rgb(var(--text-tertiary))]">
-            Registering a new student
-            {activeYearObj ? ` · Academic year ${activeYearObj.name}` : ''}
-            {summary ? ` · ${summary.totalEnrolled ?? 0} students currently enrolled` : ''}
+            {t('enrollmentModule.header.registering')}
+            {activeYearObj ? ` · ${t('enrollmentModule.header.academicYear', { year: activeYearObj.name })}` : ''}
+            {summary ? ` · ${t('enrollmentModule.header.studentsCurrentlyEnrolled', { count: formatNumber(summary.totalEnrolled ?? 0) })}` : ''}
           </p>
         )}
       </div>
@@ -294,7 +295,7 @@ export function EnrollmentModule() {
       {/* Tabs — shared @edforge/ui primitive (house standard, accessible) */}
       <div className="px-6 bg-[rgb(var(--background-secondary))]">
         <Tabs
-          aria-label="Enrollment tabs"
+          aria-label={t('enrollmentModule.header.tabsAria')}
           value={activeTab}
           onChange={(value) => setActiveTab(value as EnrollmentTab)}
           tabs={tabItems.filter((tab) => tab.id !== 'registration' || enrollPerms.create)}
@@ -326,13 +327,13 @@ export function EnrollmentModule() {
                     />
                     <div className="ml-auto flex items-center gap-3 text-xs text-[rgb(var(--text-tertiary))]">
                       <span>
-                        <strong className="text-[rgb(var(--text-primary))]">{summary?.totalEnrolled ?? '--'}</strong> enrolled
+                        <strong className="text-[rgb(var(--text-primary))]">{summary?.totalEnrolled != null ? formatNumber(summary.totalEnrolled) : '--'}</strong> {t('enrollmentModule.summary.enrolled')}
                       </span>
                       <span>
-                        <strong className="text-[rgb(var(--text-primary))]">{activeCount}</strong> active
+                        <strong className="text-[rgb(var(--text-primary))]">{formatNumber(activeCount)}</strong> {t('enrollmentModule.summary.active')}
                       </span>
                       <span>
-                        <strong className="text-[rgb(var(--text-primary))]">{gradeLevelCount}</strong> grade levels
+                        <strong className="text-[rgb(var(--text-primary))]">{formatNumber(gradeLevelCount)}</strong> {t('enrollmentModule.summary.gradeLevels')}
                       </span>
                     </div>
                   </div>
