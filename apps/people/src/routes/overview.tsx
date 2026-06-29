@@ -122,7 +122,7 @@ export function Overview() {
   return (
     <Container size="full" padding="lg" className="overflow-auto py-6">
       {/* Context Bar (operating context, not a page title — the shell breadcrumb
-          carries "People & HR") */}
+          carries "People") */}
       <h1 className="sr-only">People</h1>
       <ContextBar
         className="mb-2"
