@@ -36,6 +36,7 @@ import {
   Loader2,
 } from 'lucide-react'
 import { Button, Modal, ModalFooter } from '@edforge/ui'
+import { useTranslation } from '@edforge/i18n'
 import {
   useEnrolledStudents,
   useBulkGenerateInvoices,
@@ -58,7 +59,6 @@ import { AsyncJobProgress } from '../AsyncJobProgress'
 import {
   emptySelection,
   defaultDetails,
-  WIZARD_STEP_LABELS,
   type SelectedFeesMap,
   type CustomLine,
   type WizardDetails,
@@ -71,6 +71,15 @@ import {
   resolveCustomLineItems,
   computeBatch,
 } from './compute'
+
+type Translate = (key: string, options?: Record<string, unknown>) => string
+
+const WIZARD_STEP_LABEL_KEYS = [
+  'bulkGenerate.steps.selectRecipients',
+  'bulkGenerate.steps.feeStructures',
+  'bulkGenerate.steps.invoiceDetails',
+  'bulkGenerate.steps.reviewConfirm',
+] as const
 
 /**
  * Operator-protection threshold from the plan §3 C.5: any bulk-generate
@@ -94,6 +103,7 @@ export function BulkGenerateWizard({
   onComplete,
   onCancel,
 }: BulkGenerateWizardProps) {
+  const { t } = useTranslation('payments')
   // ---- Data sources --------------------------------------------------------
   const studentsQuery = useEnrolledStudents(schoolId)
   const feesQuery = useFeeStructures(schoolId)
@@ -134,14 +144,18 @@ export function BulkGenerateWizard({
   ) {
     if (asyncJob.status === 'succeeded') {
       const parts = [
-        `${asyncJob.succeeded} invoice${asyncJob.succeeded === 1 ? '' : 's'} created as draft${asyncJob.succeeded === 1 ? '' : 's'}`,
+        t('bulkGenerate.async.toastSucceeded', { count: asyncJob.succeeded }),
       ]
-      if (asyncJob.skipped > 0) parts.push(`${asyncJob.skipped} skipped`)
-      if (asyncJob.failed > 0) parts.push(`${asyncJob.failed} failed`)
+      if (asyncJob.skipped > 0) {
+        parts.push(t('bulkGenerate.async.toastSkipped', { count: asyncJob.skipped }))
+      }
+      if (asyncJob.failed > 0) {
+        parts.push(t('bulkGenerate.async.toastFailed', { count: asyncJob.failed }))
+      }
       if (asyncJob.failed > 0) toast.error(parts.join(' · '))
       else toast.success(parts.join(' · '))
     } else {
-      toast.error(asyncJob.error ?? 'Bulk invoice generation failed.')
+      toast.error(asyncJob.error ?? t('bulkGenerate.toast.failed'))
     }
     setToastedJobId(asyncJobId)
   }
@@ -274,8 +288,12 @@ export function BulkGenerateWizard({
       invoices,
     })
     toast.success(
-      `${response.generated} invoice${response.generated === 1 ? '' : 's'} generated` +
-        (response.skipped > 0 ? ` · ${response.skipped} skipped` : ''),
+      response.skipped > 0
+        ? t('bulkGenerate.toast.generatedWithSkipped', {
+            count: response.generated,
+            skipped: response.skipped,
+          })
+        : t('bulkGenerate.toast.generated', { count: response.generated }),
     )
   }
 
@@ -285,13 +303,10 @@ export function BulkGenerateWizard({
     // post-deploy — kept as defense for staggered rollouts.
     const code = err?.response?.data?.code
     if (code === 'BULK_GENERATE_SYNC_LIMIT_EXCEEDED') {
-      toast.error(
-        'Too many students for synchronous generation. Try again — the ' +
-          'system will switch to the async worker automatically.',
-      )
+      toast.error(t('bulkGenerate.toast.syncLimitExceeded'))
       return
     }
-    const msg = err?.response?.data?.message || err?.message || 'Bulk generation failed.'
+    const msg = err?.response?.data?.message || err?.message || t('bulkGenerate.toast.failed')
     toast.error(msg)
   }
 
@@ -327,7 +342,8 @@ export function BulkGenerateWizard({
   if (studentsQuery.isLoading || feesQuery.isLoading || academicYearsQuery.isLoading) {
     return (
       <div className="flex items-center justify-center py-12 text-sm text-[rgb(var(--text-tertiary))]">
-        <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Loading school roster…
+        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+        {t('bulkGenerate.loadingRoster')}
       </div>
     )
   }
@@ -389,7 +405,7 @@ export function BulkGenerateWizard({
     <div className="space-y-6">
       <Stepper step={step} maxReached={maxReached} onGoto={gotoStep} />
 
-      <div className="min-h-[420px]">
+      <div className="min-h-96">
         {step === 0 && (
           <Step1Recipients
             students={students}
@@ -435,11 +451,11 @@ export function BulkGenerateWizard({
       <div className="flex items-center justify-between pt-4 border-t border-[rgb(var(--border-primary))]">
         {step === 0 ? (
           <Button variant="ghost" onClick={onCancel}>
-            <X className="w-4 h-4 mr-1" /> Cancel
+            <X className="w-4 h-4 mr-1" /> {t('actions.cancel')}
           </Button>
         ) : (
           <Button variant="outline" onClick={goBack}>
-            <ChevronLeft className="w-4 h-4 mr-1" /> Back
+            <ChevronLeft className="w-4 h-4 mr-1" /> {t('actions.back')}
           </Button>
         )}
 
@@ -450,11 +466,12 @@ export function BulkGenerateWizard({
               selection.selectedIds.size,
               totalLineCount,
               previewQuery,
+              t,
             )}
           </span>
           {step < 3 ? (
             <Button onClick={goNext} disabled={!canAdvanceFromStep[step]}>
-              Next <ChevronRight className="w-4 h-4 ml-1" />
+              {t('actions.next')} <ChevronRight className="w-4 h-4 ml-1" />
             </Button>
           ) : (
             <Button
@@ -469,11 +486,13 @@ export function BulkGenerateWizard({
             >
               {generateMutation.isPending ? (
                 <>
-                  <Loader2 className="w-4 h-4 mr-1 animate-spin" /> Generating…
+                  <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                  {t('bulkGenerate.actions.generating')}
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-4 h-4 mr-1" /> Generate invoices
+                  <Sparkles className="w-4 h-4 mr-1" />
+                  {t('bulkGenerate.actions.generateInvoices')}
                 </>
               )}
             </Button>
@@ -485,18 +504,21 @@ export function BulkGenerateWizard({
       <Modal
         open={confirmOpen}
         onClose={() => setConfirmOpen(false)}
-        title="Generate invoices?"
-        description={`Generate ${selection.selectedIds.size} invoices? This cannot be undone.`}
+        title={t('bulkGenerate.confirm.title')}
+        description={t('bulkGenerate.confirm.description', {
+          count: selection.selectedIds.size,
+        })}
       >
         <div className="text-sm text-[rgb(var(--text-secondary))] space-y-2">
           <p>
-            Invoices for {selection.selectedIds.size} students will be created
-            as drafts. You can review and issue them from the invoices list.
+            {t('bulkGenerate.confirm.body', {
+              count: selection.selectedIds.size,
+            })}
           </p>
         </div>
         <ModalFooter>
           <Button variant="outline" onClick={() => setConfirmOpen(false)}>
-            Cancel
+            {t('actions.cancel')}
           </Button>
           <Button
             onClick={() => {
@@ -504,7 +526,9 @@ export function BulkGenerateWizard({
               dispatchSubmit()
             }}
           >
-            Generate {selection.selectedIds.size}
+            {t('bulkGenerate.confirm.generateCount', {
+              count: selection.selectedIds.size,
+            })}
           </Button>
         </ModalFooter>
       </Modal>
@@ -527,30 +551,33 @@ function AsyncJobInProgress({
   onRunInBackground: () => void
   onReset: () => void
 }) {
+  const { t } = useTranslation('payments')
   const isFailed = job?.status === 'failed'
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
       <div className="text-center space-y-2 py-4">
         <h2 className="text-xl font-semibold text-[rgb(var(--text-primary))]">
-          {isFailed ? 'Bulk generation failed' : 'Generating invoices…'}
+          {isFailed
+            ? t('bulkGenerate.async.failedTitle')
+            : t('bulkGenerate.async.inProgressTitle')}
         </h2>
         <p className="text-sm text-[rgb(var(--text-secondary))]">
           {isFailed
-            ? 'The worker reported a job-level failure before any (or all) invoices were created.'
-            : `Creating draft invoices for ${studentCount} students. This typically completes in under 90 seconds.`}
+            ? t('bulkGenerate.async.failedDescription')
+            : t('bulkGenerate.async.runningDescription', { count: studentCount })}
         </p>
       </div>
 
-      <AsyncJobProgress job={job} verbingNoun="Generating invoices" />
+      <AsyncJobProgress job={job} verbingNoun={t('bulkGenerate.async.progressVerb')} />
 
       <div className="flex items-center justify-center gap-3">
         {isFailed ? (
           <Button variant="outline" onClick={onReset}>
-            Start over
+            {t('bulkGenerate.async.startOver')}
           </Button>
         ) : (
           <Button variant="outline" onClick={onRunInBackground}>
-            Run in background
+            {t('bulkGenerate.async.runInBackground')}
           </Button>
         )}
       </div>
@@ -571,10 +598,12 @@ function Stepper({
   maxReached: WizardStep
   onGoto: (n: WizardStep) => void
 }) {
+  const { t } = useTranslation('payments')
   return (
     <div className="flex items-center gap-2 text-xs">
-      {WIZARD_STEP_LABELS.map((label, i) => {
+      {WIZARD_STEP_LABEL_KEYS.map((labelKey, i) => {
         const idx = i as WizardStep
+        const label = t(labelKey)
         const isDone = i < step || (maxReached > i && step !== i)
         const isCurrent = step === i
         const reachable = i <= maxReached
@@ -598,9 +627,9 @@ function Stepper({
                 className={[
                   'inline-flex items-center justify-center w-6 h-6 rounded-full text-xs',
                   isDone
-                    ? 'bg-[rgb(var(--accent-strong))] text-white'
+                    ? 'bg-[rgb(var(--accent-strong))] text-[rgb(var(--action-primary-fg))]'
                     : isCurrent
-                    ? 'bg-[rgb(var(--accent-strong))] text-white'
+                    ? 'bg-[rgb(var(--accent-strong))] text-[rgb(var(--action-primary-fg))]'
                     : 'bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-tertiary))]',
                 ].join(' ')}
               >
@@ -608,7 +637,7 @@ function Stepper({
               </span>
               <span className="truncate">{label}</span>
             </button>
-            {i < WIZARD_STEP_LABELS.length - 1 && (
+            {i < WIZARD_STEP_LABEL_KEYS.length - 1 && (
               <span
                 className={[
                   'h-px flex-1',
@@ -630,19 +659,35 @@ function footerInfo(
   selN: number,
   lineN: number,
   previewQuery: ReturnType<typeof useBulkPreview>,
+  t: Translate,
 ): string {
   if (step === 0) {
-    if (selN === 0) return 'Select at least one student to continue'
-    return `${selN} student${selN === 1 ? '' : 's'} selected`
+    if (selN === 0) return t('bulkGenerate.footer.selectStudent')
+    return t('bulkGenerate.footer.studentsSelected', { count: selN })
   }
   if (step === 1) {
-    if (lineN === 0) return 'Add at least one fee or custom line'
-    return `${lineN} line item${lineN === 1 ? '' : 's'} · ${selN} students`
+    if (lineN === 0) return t('bulkGenerate.footer.addFeeOrLine')
+    return t('bulkGenerate.footer.lineItemsAndStudents', {
+      lineCount: lineN,
+      lineLabel: t(
+        lineN === 1
+          ? 'bulkGenerate.common.lineItem'
+          : 'bulkGenerate.common.lineItem_plural',
+      ),
+      studentCount: selN,
+      studentLabel: t(
+        selN === 1
+          ? 'bulkGenerate.common.student'
+          : 'bulkGenerate.common.student_plural',
+      ),
+    })
   }
   if (step === 2) {
-    return `${selN} invoice${selN === 1 ? '' : 's'} will be configured`
+    return t('bulkGenerate.footer.invoicesConfigured', { count: selN })
   }
-  if (previewQuery.isLoading || previewQuery.isFetching) return 'Resolving preview…'
+  if (previewQuery.isLoading || previewQuery.isFetching) {
+    return t('bulkGenerate.footer.resolvingPreview')
+  }
   const eligible = previewQuery.data?.eligibleCount ?? selN
-  return `Ready to generate ${eligible} invoice${eligible === 1 ? '' : 's'}`
+  return t('bulkGenerate.footer.readyToGenerate', { count: eligible })
 }

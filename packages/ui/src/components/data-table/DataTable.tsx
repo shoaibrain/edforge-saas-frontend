@@ -8,9 +8,11 @@ import { DataTableSkeleton } from './DataTableSkeleton'
 import { DataTableEmpty } from './DataTableEmpty'
 import { DataTablePagination } from './DataTablePagination'
 import { DataTableToolbar } from './DataTableToolbar'
+import { resolveDataTableLabels } from './labels'
 import type {
   BulkAction,
   DataTableColumnMeta,
+  DataTableLabels,
   DataTableProps,
   FacetedFilterConfig,
 } from './types'
@@ -52,9 +54,11 @@ export function DataTable<TData>({
   enableDensityToggle,
   bulkActions,
   exportOptions,
+  labels,
   className,
   maxHeight,
 }: DataTableProps<TData>) {
+  const resolvedLabels = resolveDataTableLabels(labels)
   // Resolve prototype-shaped aliases onto the canonical props.
   const resolvedFacets: FacetedFilterConfig[] | undefined =
     facets ?? facetedFilters
@@ -117,10 +121,10 @@ export function DataTable<TData>({
       >
         <AlertCircle className="w-10 h-10 text-[rgb(var(--state-danger-fg))] mb-3" />
         <h3 className="text-lg font-medium text-[rgb(var(--text-primary))] mb-2">
-          Failed to load data
+          {resolvedLabels.errorTitle}
         </h3>
         <p className="text-sm text-[rgb(var(--text-secondary))] mb-4 max-w-sm">
-          {error.message || 'An unexpected error occurred.'}
+          {error.message || resolvedLabels.errorDescription}
         </p>
         {onRetry && (
           <button
@@ -129,7 +133,7 @@ export function DataTable<TData>({
             className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
-            Retry
+            {resolvedLabels.retry}
           </button>
         )}
       </div>
@@ -168,6 +172,7 @@ export function DataTable<TData>({
         config={emptyState}
         className={className}
         onClearFilters={isFiltered ? handleClearFilters : undefined}
+        labels={resolvedLabels}
       />
     )
   }
@@ -195,6 +200,7 @@ export function DataTable<TData>({
             onDensityChange={setDensity}
             enableDensityToggle={showDensityToggle}
             exportOptions={exportOptions}
+            labels={resolvedLabels}
           />
         </div>
       )}
@@ -215,6 +221,7 @@ export function DataTable<TData>({
             config={emptyState}
             bare
             onClearFilters={isFiltered ? handleClearFilters : undefined}
+            labels={resolvedLabels}
           />
         ) : (
           <table className="w-full" role="grid" style={{ tableLayout: 'fixed' }}>
@@ -303,6 +310,7 @@ export function DataTable<TData>({
             totalCount={totalCount}
             pageSizeOptions={resolvedPagination.pageSizeOptions}
             serverPagination={serverPagination}
+            labels={resolvedLabels}
           />
         </div>
       )}
@@ -313,6 +321,7 @@ export function DataTable<TData>({
         actions={bulkActions ?? []}
         table={table}
         hasFooter={!!resolvedPagination && !isEmpty}
+        labels={resolvedLabels}
       />
     </div>
   )
@@ -327,11 +336,13 @@ function FloatingBulkBar<TData>({
   actions,
   table,
   hasFooter,
+  labels,
 }: {
   visible: boolean
   actions: BulkAction<TData>[]
   table: Table<TData>
   hasFooter: boolean
+  labels: DataTableLabels
 }) {
   const selectedRows = table.getFilteredSelectedRowModel().rows.map((r) => r.original)
   const count = selectedRows.length
@@ -340,7 +351,7 @@ function FloatingBulkBar<TData>({
     <div
       aria-live="polite"
       role={visible ? 'region' : undefined}
-      aria-label={visible ? `${count} selected` : undefined}
+      aria-label={visible ? labels.selectedRows(count) : undefined}
       // bottom offset matches the prototype's "58px above footer" spec;
       // inline style avoids the design-system arbitrary-spacing lint rule
       // since this magic gap is specific to this component's layout.
@@ -365,7 +376,7 @@ function FloatingBulkBar<TData>({
         )}
       >
         <span className="font-medium tabular-nums">
-          {count} selected
+          {labels.selectedRows(count)}
         </span>
         <span className="h-5 w-px bg-[rgb(var(--border-primary)/0.4)]" aria-hidden />
         <div className="flex items-center gap-1.5">
@@ -398,8 +409,8 @@ function FloatingBulkBar<TData>({
           <button
             type="button"
             onClick={() => table.toggleAllRowsSelected(false)}
-            aria-label="Clear selection"
-            title="Clear selection"
+            aria-label={labels.clearSelection}
+            title={labels.clearSelection}
             className={cn(
               'inline-flex items-center justify-center w-9 h-9 rounded-full',
               'text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-secondary))]',

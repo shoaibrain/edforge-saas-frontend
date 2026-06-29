@@ -31,6 +31,7 @@ import {
   Home as HomeIcon,
   Award,
 } from 'lucide-react'
+import { useTranslation } from '@edforge/i18n'
 import {
   toggleStudent,
   toggleGradeGroup,
@@ -47,6 +48,8 @@ import type {
   SegmentId,
   StudentSearchResult,
 } from './types'
+
+type Translate = (key: string, options?: Record<string, unknown>) => string
 
 export interface Step1RecipientsProps {
   students: StudentSearchResult[]
@@ -68,6 +71,7 @@ export function Step1Recipients({
   setSelection,
   previewCounters,
 }: Step1RecipientsProps) {
+  const { t } = useTranslation('payments')
   const [q, setQ] = useState('')
   const [openGrades, setOpenGrades] = useState<Set<string>>(() => new Set())
 
@@ -111,8 +115,12 @@ export function Step1Recipients({
 
         <div className="flex items-center justify-between text-xs text-[rgb(var(--text-tertiary))]">
           <span>
-            {filtered.length} student{filtered.length === 1 ? '' : 's'}
-            {q ? ' match' : ' total'}
+            {t(
+              q
+                ? 'bulkGenerate.step1.studentMatchCount'
+                : 'bulkGenerate.step1.studentTotalCount',
+              { count: filtered.length },
+            )}
           </span>
           <div className="flex items-center gap-3">
             <button
@@ -120,7 +128,8 @@ export function Step1Recipients({
               onClick={selectAllFiltered}
               className="text-[rgb(var(--accent-strong))] hover:underline inline-flex items-center gap-1"
             >
-              <Check className="w-3 h-3" /> Select all {q ? 'matching' : ''}
+              <Check className="w-3 h-3" />
+              {t(q ? 'bulkGenerate.step1.selectAllMatching' : 'bulkGenerate.step1.selectAll')}
             </button>
             {selection.selectedIds.size > 0 && (
               <button
@@ -128,7 +137,7 @@ export function Step1Recipients({
                 onClick={() => setSelection(clearSelection(selection))}
                 className="text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] inline-flex items-center gap-1"
               >
-                <X className="w-3 h-3" /> Clear
+                <X className="w-3 h-3" /> {t('bulkGenerate.step1.clear')}
               </button>
             )}
           </div>
@@ -176,6 +185,7 @@ function ModeToggle({
   mode: SelectionMode
   onChange: (m: SelectionMode) => void
 }) {
+  const { t } = useTranslation('payments')
   return (
     <div className="inline-flex rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] p-0.5 text-xs">
       <button
@@ -188,7 +198,7 @@ function ModeToggle({
             : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))]',
         ].join(' ')}
       >
-        <Layers className="w-3.5 h-3.5" /> By grade
+        <Layers className="w-3.5 h-3.5" /> {t('bulkGenerate.step1.byGrade')}
       </button>
       <button
         type="button"
@@ -200,7 +210,7 @@ function ModeToggle({
             : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))]',
         ].join(' ')}
       >
-        <Users className="w-3.5 h-3.5" /> By student
+        <Users className="w-3.5 h-3.5" /> {t('bulkGenerate.step1.byStudent')}
       </button>
     </div>
   )
@@ -211,6 +221,7 @@ function ModeToggle({
 // ---------------------------------------------------------------------------
 
 function SearchBar({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const { t } = useTranslation('payments')
   return (
     <div className="relative">
       <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[rgb(var(--text-tertiary))]" />
@@ -218,7 +229,7 @@ function SearchBar({ value, onChange }: { value: string; onChange: (v: string) =
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="Search name, student ID, or student number…"
+        placeholder={t('bulkGenerate.step1.searchPlaceholder')}
         className="w-full pl-9 pr-3 py-2 text-sm rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-strong))] focus:border-transparent"
       />
     </div>
@@ -229,13 +240,13 @@ function SearchBar({ value, onChange }: { value: string; onChange: (v: string) =
 // Segment chips (Phase 1 — all visible, all greyed pending counter wiring)
 // ---------------------------------------------------------------------------
 
-const SEGMENTS: ReadonlyArray<{ id: SegmentId; label: string; icon: React.ComponentType<{ className?: string }>; phase: 1 | 2 }> = [
-  { id: 'outstanding', label: 'Outstanding balance', icon: AlertTriangle, phase: 1 },
-  { id: 'new', label: 'New admissions', icon: UserPlus, phase: 1 },
-  { id: 'not-billed-this-period', label: 'Not yet billed this period', icon: Info, phase: 1 },
-  { id: 'transport', label: 'Transport users', icon: Bus, phase: 2 },
-  { id: 'boarders', label: 'Boarders', icon: HomeIcon, phase: 2 },
-  { id: 'scholarship', label: 'Scholarship / BPL', icon: Award, phase: 2 },
+const SEGMENTS: ReadonlyArray<{ id: SegmentId; icon: React.ComponentType<{ className?: string }>; phase: 1 | 2 }> = [
+  { id: 'outstanding', icon: AlertTriangle, phase: 1 },
+  { id: 'new', icon: UserPlus, phase: 1 },
+  { id: 'not-billed-this-period', icon: Info, phase: 1 },
+  { id: 'transport', icon: Bus, phase: 2 },
+  { id: 'boarders', icon: HomeIcon, phase: 2 },
+  { id: 'scholarship', icon: Award, phase: 2 },
 ]
 
 function SegmentChips({
@@ -243,10 +254,11 @@ function SegmentChips({
 }: {
   counters?: Step1RecipientsProps['previewCounters']
 }) {
+  const { t } = useTranslation('payments')
   return (
     <div className="flex flex-wrap items-center gap-2">
       <span className="text-[11px] font-medium uppercase tracking-wider text-[rgb(var(--text-tertiary))] mr-1">
-        Quick segments
+        {t('bulkGenerate.step1.quickSegments')}
       </span>
       {SEGMENTS.map(seg => {
         const Icon = seg.icon
@@ -260,8 +272,8 @@ function SegmentChips({
             : undefined
         const phase2 = seg.phase === 2
         const tooltip = phase2
-          ? 'Coming in Phase 2 — requires student demographic data'
-          : 'Counter wiring lands with the bulk-preview integration; chip filtering follows in a follow-up PR'
+          ? t('bulkGenerate.step1.phase2Tooltip')
+          : t('bulkGenerate.step1.phase1Tooltip')
         return (
           <button
             key={seg.id}
@@ -275,7 +287,7 @@ function SegmentChips({
             ].join(' ')}
           >
             <Icon className="w-3 h-3" />
-            <span>{seg.label}</span>
+            <span>{t(`bulkGenerate.step1.segments.${seg.id}`)}</span>
             {count !== undefined && (
               <span className="px-1.5 py-0 text-[10px] rounded bg-[rgb(var(--background-primary))] tabular-nums">
                 {count}
@@ -341,6 +353,7 @@ function GradeList({
   onToggleGroup: (students: StudentSearchResult[]) => void
   searching: boolean
 }) {
+  const { t } = useTranslation('payments')
   if (grouped.length === 0) {
     return <EmptyHint />
   }
@@ -378,21 +391,25 @@ function GradeList({
                 <TriCheckbox state={state} />
               </div>
               <div className="inline-flex items-center justify-center min-w-[44px] px-2 py-0.5 rounded-md text-xs font-semibold bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-secondary))]">
-                {gradeLabel(grade)}
+                {gradeLabel(grade, t)}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-sm text-[rgb(var(--text-primary))]">
-                  {students.length} student{students.length === 1 ? '' : 's'}
+                  {t('bulkGenerate.common.studentCount', { count: students.length })}
                 </div>
                 <div className="text-xs text-[rgb(var(--text-tertiary))]">
                   {selN > 0 ? (
                     <>
-                      <b className="text-[rgb(var(--accent-strong))]">{selN} selected</b>
+                      <b className="text-[rgb(var(--accent-strong))]">
+                        {t('bulkGenerate.common.selectedCount', { count: selN })}
+                      </b>
                       {' · '}
-                      {students.length - selN} not selected
+                      {t('bulkGenerate.common.notSelectedCount', {
+                        count: students.length - selN,
+                      })}
                     </>
                   ) : (
-                    'none selected'
+                    t('bulkGenerate.common.noneSelected')
                   )}
                 </div>
               </div>
@@ -438,6 +455,7 @@ function StudentRow({
   onToggle: () => void
   compact?: boolean
 }) {
+  const { t } = useTranslation('payments')
   return (
     <div
       role="button"
@@ -462,7 +480,7 @@ function StudentRow({
           {s.fullName}
         </div>
         <div className="text-xs text-[rgb(var(--text-tertiary))] truncate">
-          {s.studentNumber ?? s.studentId} · {gradeLabel(s.currentGradeLevel)}
+          {s.studentNumber ?? s.studentId} · {gradeLabel(s.currentGradeLevel, t)}
         </div>
       </div>
     </div>
@@ -513,16 +531,17 @@ function Avatar({ name }: { name: string }) {
 }
 
 function EmptyHint() {
+  const { t } = useTranslation('payments')
   return (
     <div className="text-center py-10 text-sm text-[rgb(var(--text-tertiary))] border border-dashed border-[rgb(var(--border-primary))] rounded-md">
-      No students match the current search.
+      {t('bulkGenerate.step1.noStudentsMatch')}
     </div>
   )
 }
 
-function gradeLabel(g: string): string {
-  if (!g) return 'Unknown'
-  return /^\d+$/.test(g) ? `Grade ${g}` : g
+function gradeLabel(g: string, t: Translate): string {
+  if (!g) return t('bulkGenerate.common.unknown')
+  return /^\d+$/.test(g) ? t('bulkGenerate.common.gradeLabel', { grade: g }) : g
 }
 
 // ---------------------------------------------------------------------------
@@ -536,11 +555,12 @@ function RecipientRail({
   summary: ReturnType<typeof summarize>
   totalStudents: number
 }) {
+  const { t } = useTranslation('payments')
   return (
     <aside className="space-y-3 p-4 border border-[rgb(var(--border-primary))] rounded-md bg-[rgb(var(--background-secondary))] h-fit sticky top-2">
       <div>
         <div className="text-[11px] uppercase tracking-wider text-[rgb(var(--text-tertiary))]">
-          Recipients selected
+          {t('bulkGenerate.step1.recipientsSelected')}
         </div>
         <div className="text-2xl font-semibold text-[rgb(var(--text-primary))] mt-0.5">
           {summary.total}
@@ -552,7 +572,7 @@ function RecipientRail({
         <>
           <div className="flex items-center justify-between text-xs text-[rgb(var(--text-secondary))]">
             <span className="inline-flex items-center gap-1.5">
-              <Layers className="w-3.5 h-3.5" /> Grades covered
+              <Layers className="w-3.5 h-3.5" /> {t('bulkGenerate.step1.gradesCovered')}
             </span>
             <span className="font-semibold">{summary.perGrade.length}</span>
           </div>
@@ -562,7 +582,7 @@ function RecipientRail({
                 key={grade}
                 className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))]"
               >
-                {gradeLabel(grade)}
+                {gradeLabel(grade, t)}
                 <span className="px-1 py-0 rounded bg-[rgb(var(--background-secondary))] tabular-nums">
                   {count}
                 </span>
@@ -572,10 +592,11 @@ function RecipientRail({
         </>
       ) : (
         <p className="text-xs text-[rgb(var(--text-tertiary))] leading-relaxed">
-          Nobody selected yet. Tick a grade to add everyone in it, then untick
-          individual students you want to skip — or switch to{' '}
-          <b className="text-[rgb(var(--text-primary))]">By student</b> to
-          cherry-pick.
+          {t('bulkGenerate.step1.emptyRailPrefix')}{' '}
+          <b className="text-[rgb(var(--text-primary))]">
+            {t('bulkGenerate.step1.byStudent')}
+          </b>{' '}
+          {t('bulkGenerate.step1.emptyRailSuffix')}
         </p>
       )}
     </aside>

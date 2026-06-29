@@ -12,6 +12,7 @@ import {
   useExportInvoicesCsv,
 } from '@edforge/finance-services'
 import { toast } from 'sonner'
+import { useTranslation } from '@edforge/i18n'
 import type { DashboardSummary } from '@edforge/types'
 
 // ============================================================================
@@ -109,6 +110,7 @@ export interface FinanceV2Data {
 // ============================================================================
 
 export function useFinanceOverviewV2(schoolId: string): FinanceV2Data {
+  const { t } = useTranslation('payments')
   // Filter state
   const [fromDate, setFromDate] = useState('')
   const [toDate, setToDate] = useState('')
@@ -161,8 +163,8 @@ export function useFinanceOverviewV2(schoolId: string): FinanceV2Data {
   // Export handler
   const handleExportCSV = () => {
     exportCsvMutation.mutate(schoolId, {
-      onSuccess: () => toast.success('CSV export downloaded'),
-      onError: () => toast.error('Failed to export CSV'),
+      onSuccess: () => toast.success(t('overview.export.success')),
+      onError: () => toast.error(t('overview.export.failed')),
     })
   }
 

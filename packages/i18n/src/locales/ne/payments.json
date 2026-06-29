@@ -32,6 +32,10 @@
       "exportCsv": "CSV निर्यात",
       "exportCsvAria": "बीजकहरू CSV मा निर्यात गर्नुहोस्"
     },
+    "export": {
+      "success": "CSV निर्यात डाउनलोड भयो",
+      "failed": "CSV निर्यात गर्न असफल भयो"
+    },
     "alert": {
       "title": "{{count}} बीजकहरू बाँकी — {{amount}} असंकलित",
       "collectionRate": "संकलन दर {{rate}}% छ",
@@ -78,6 +82,18 @@
       "invoiceCount_plural": "{{count}} बीजकहरू",
       "agingOverview": "एजिङ सिंहावलोकन",
       "overdueCount": "{{count}} बाँकी",
+      "agingBucketTitle": "{{bucket}}: {{count}} बीजकहरू ({{amount}})",
+      "agingBuckets": {
+        "current": "हालको",
+        "days1To30": "१-३० दिन",
+        "days31To60": "३१-६० दिन",
+        "days61To90": "६१-९० दिन",
+        "days90Plus": "९०+ दिन"
+      },
+      "agingInsight": {
+        "singleBucket": "{{count}} बाँकी · {{amount}}, सबै {{bucket}} अवधिभित्र।",
+        "multipleBuckets": "{{count}} बाँकी जम्मा {{amount}}। {{bucket}} मा {{worstCount}} लाई तुरुन्त ध्यान चाहिन्छ।"
+      },
       "noOverdue": "म्याद नाघेका बीजकहरू छैनन् — सबै खाताहरू अद्यावधिक छन्।",
       "paymentMethods": "भुक्तानी विधिहरू",
       "noPaymentsRecorded": "अहिलेसम्म कुनै भुक्तानी रेकर्ड गरिएको छैन।"
@@ -98,24 +114,97 @@
   "invoices": {
     "title": "बीजकहरू",
     "description": "शुल्क बीजकहरू हेर्नुहोस् र व्यवस्थापन गर्नुहोस्",
+    "manageDescription": "विद्यार्थी बीजकहरू सिर्जना, जारी र व्यवस्थापन गर्नुहोस्।",
     "outstanding": "बाँकी",
     "paid": "भुक्तानी भएको",
     "overdue": "म्याद सकिएको",
     "all": "सबै बीजकहरू",
     "invoiceNumber": "बीजक नं.",
+    "status": "स्थिति",
     "dueDate": "भुक्तानी मिति",
+    "dueDateRequired": "भुक्तानी मिति *",
     "issuedDate": "जारी मिति",
     "billingPeriod": "बिलिङ अवधि",
+    "billingPeriodPlaceholder": "जस्तै पहिलो टर्म, भर्ना",
+    "notes": "नोटहरू",
     "amountDue": "बाँकी रकम",
     "grandTotal": "जम्मा",
     "noInvoices": "कुनै बीजक फेला परेन",
     "noInvoicesDescription": "चयन गरिएको अवधिको लागि कुनै बीजक छैन।",
+    "generateFirstInvoice": "सुरु गर्न पहिलो बीजक सिर्जना गर्नुहोस्।",
     "noOutstanding": "सबै मिलाइएको छ!",
     "noOutstandingDescription": "यस समय कुनै बाँकी बीजक छैन।",
     "generateInvoice": "बीजक सिर्जना गर्नुहोस्",
     "selectFees": "समावेश गर्ने शुल्कहरू छान्नुहोस्",
     "selectStudent": "विद्यार्थी छान्नुहोस्",
-    "generated": "बीजक सफलतापूर्वक सिर्जना भयो"
+    "selectSchool": "बीजकहरू व्यवस्थापन गर्न विद्यालय चयन गर्नुहोस्।",
+    "selectAcademicYear": "शैक्षिक वर्ष छान्नुहोस्",
+    "studentRequired": "विद्यार्थी *",
+    "feeStructuresRequired": "शुल्क संरचनाहरू *",
+    "generated": "बीजक सफलतापूर्वक सिर्जना भयो",
+    "generateFailed": "बीजक सिर्जना गर्न असफल भयो",
+    "requiredFields": "कृपया सबै आवश्यक फिल्डहरू भर्नुहोस्",
+    "issue": "जारी गर्नुहोस्",
+    "issueSuccess": "बीजक सफलतापूर्वक जारी भयो",
+    "issueFailed": "बीजक जारी गर्न असफल भयो",
+    "cancelSuccess": "बीजक रद्द भयो",
+    "cancelFailed": "बीजक रद्द गर्न असफल भयो",
+    "bulkIssueSuccess": "{{count}} बीजक जारी भयो।",
+    "bulkIssueSuccess_plural": "{{count}} बीजकहरू जारी भए।",
+    "bulkIssueSuccessWithSkipped": "{{count}} बीजक जारी भयो। {{skipped}} छोडियो।",
+    "bulkIssueSuccessWithSkipped_plural": "{{count}} बीजकहरू जारी भए। {{skipped}} छोडियो।",
+    "bulkIssueFailed": "बीजकहरू जारी गर्न असफल भयो",
+    "overdueByDays": "{{count}} दिन म्याद नाघेको",
+    "overdueBanner": "{{count}} बीजक म्याद नाघेको - {{amount}} उठ्न बाँकी",
+    "overdueBanner_plural": "{{count}} बीजकहरू म्याद नाघेका - {{amount}} उठ्न बाँकी",
+    "overdueBannerRate": "सङ्कलन दर {{rate}}% छ।",
+    "overdueBannerWithDrafts": "सङ्कलन दर {{rate}}% छ। {{drafts}} मस्यौदा जारी गर्न बाँकी छन्।",
+    "loadedInvoices": "{{count}} बीजकहरू",
+    "loadedCount": "{{count}} लोड भएको",
+    "paidCount": "{{count}} भुक्तानी भएको",
+    "loadedSelectionOnly": "चयन लोड भएका रेकर्डहरूमा मात्र लागू हुन्छ ({{count}} देखाइएको)। थप बीजक समावेश गर्न थप पृष्ठहरू लोड गर्नुहोस्।",
+    "searchPlaceholder": "बीजक नं. वा विद्यार्थीबाट खोज्नुहोस्...",
+    "issueSelected": "चयनित जारी गर्नुहोस् ({{count}})",
+    "sendReminder": "रिमाइन्डर पठाउनुहोस्",
+    "cancelTitle": "बीजक {{invoiceNumber}} रद्द गर्ने?",
+    "cancelDescriptionPrefix": "यो कार्य",
+    "irreversible": "फिर्ता गर्न नसकिने",
+    "cancelDescriptionSuffix": "बीजक स्थायी रूपमा रद्द हुनेछ र फेरि जारी गर्न सकिँदैन।",
+    "cancelReason": "रद्द गर्ने कारण *",
+    "cancelReasonPlaceholder": "यो बीजक रद्द गर्ने कारण प्रविष्ट गर्नुहोस्...",
+    "keepInvoice": "बीजक राख्नुहोस्",
+    "cancelInvoice": "बीजक रद्द गर्नुहोस्",
+    "bulkIssueTitle": "{{count}} बीजक जारी गर्ने?",
+    "bulkIssueTitle_plural": "{{count}} बीजकहरू जारी गर्ने?",
+    "bulkIssueDescription": "जारी भएपछि विद्यार्थीहरूले यी बीजकहरू हेर्न र भुक्तानी गर्न सक्छन्। यो कार्य उल्टाउन सकिँदैन।",
+    "issueCountInvoices": "{{count}} बीजक जारी गर्नुहोस्",
+    "issueCountInvoices_plural": "{{count}} बीजकहरू जारी गर्नुहोस्"
+  },
+
+  "invoiceDetail": {
+    "backToInvoices": "बीजकहरूमा फर्कनुहोस्",
+    "invoice": "बीजक",
+    "student": "विद्यार्थी: {{name}}",
+    "due": "तिर्नुपर्ने: {{date}}",
+    "actions": {
+      "issueInvoice": "बीजक जारी गर्नुहोस्"
+    },
+    "sections": {
+      "lineItems": "लाइन आइटमहरू",
+      "paymentHistory": "भुक्तानी इतिहास"
+    },
+    "empty": {
+      "noLineItems": "कुनै लाइन आइटम छैन"
+    },
+    "paymentHistory": {
+      "payment": "भुक्तानी",
+      "via": "{{gateway}} मार्फत"
+    },
+    "metadata": {
+      "created": "सिर्जना: {{date}}",
+      "issued": "जारी: {{date}}",
+      "notes": "नोट: {{notes}}"
+    }
   },
 
   "lineItems": {
@@ -218,7 +307,9 @@
     "completed": "सम्पन्न",
     "failed": "असफल",
     "refunded": "फिर्ता भएको",
-    "partially_refunded": "आंशिक फिर्ता"
+    "partially_refunded": "आंशिक फिर्ता",
+    "debit": "डेबिट",
+    "credit": "क्रेडिट"
   },
 
   "feeStructure": {
@@ -263,6 +354,68 @@
       "inactive": "निष्क्रिय"
     },
     "autoApplyOnEnrollment": "भर्नामा स्वतः लागू",
+    "closeForm": "शुल्क संरचना फारम बन्द गर्नुहोस्",
+    "sections": {
+      "basicInfo": "आधारभूत जानकारी",
+      "pricing": "मूल्य",
+      "scope": "दायरा",
+      "enrollmentRules": "भर्ना नियमहरू",
+      "effectivePeriod": "लागू अवधि"
+    },
+    "fields": {
+      "name": "नाम",
+      "description": "विवरण",
+      "type": "प्रकार",
+      "academicYear": "शैक्षिक वर्ष",
+      "amount": "रकम",
+      "frequency": "आवृत्ति",
+      "taxType": "कर प्रकार",
+      "taxRate": "कर दर (%)",
+      "gradeLevels": "कक्षा तहहरू",
+      "effectiveFrom": "लागू मिति",
+      "effectiveTo": "समाप्त मिति"
+    },
+    "placeholders": {
+      "name": "जस्तै वार्षिक शिक्षण शुल्क",
+      "description": "वैकल्पिक विवरण",
+      "selectYear": "वर्ष छान्नुहोस्..."
+    },
+    "academicYearStatus": {
+      "current": "हालको",
+      "planning": "योजना",
+      "noneConfigured": "कुनै शैक्षिक वर्ष कन्फिगर गरिएको छैन।"
+    },
+    "taxTypes": {
+      "none": "छैन"
+    },
+    "enrollment": {
+      "proRateOnMidTermEntry": "मध्य-अवधि भर्नामा अनुपातिक शुल्क",
+      "proRateHelp": "सक्रिय भएमा, मध्य-अवधिमा भर्ना भएका विद्यार्थीहरूको शुल्क अनुपातिक रूपमा स्वतः गणना गरिन्छ।"
+    },
+    "dateHelp": {
+      "gregorianStorage": "मितिहरू ग्रेगोरियन (AD) मा देखाइन्छन्। प्रणालीले सबै मितिहरू AD ढाँचामा भण्डारण गर्छ।",
+      "dualBs": "जहाँ लागू हुन्छ, विक्रम संवत् बराबर मितिहरू देखाइन्छन्।"
+    },
+    "gradeSelect": {
+      "placeholder": "कक्षा तहहरू छान्नुहोस्...",
+      "selectedCount": "{{count}} कक्षा चयन भयो",
+      "selectedCount_plural": "{{count}} कक्षा चयन भए",
+      "gradeLabel": "कक्षा {{grade}}",
+      "removeGradeAria": "कक्षा {{grade}} हटाउनुहोस्"
+    },
+    "validation": {
+      "nameRequired": "नाम आवश्यक छ",
+      "nameMax": "नाम १०० अक्षर वा कम हुनुपर्छ",
+      "descriptionMax": "विवरण २५५ अक्षर वा कम हुनुपर्छ",
+      "amountRequired": "रकम आवश्यक छ",
+      "amountMin": "रकम ऋणात्मक हुन सक्दैन",
+      "amountMax": "रकम १०,०००,००० भन्दा बढी हुन सक्दैन",
+      "taxRateMin": "कर दर ऋणात्मक हुन सक्दैन",
+      "taxRateMax": "कर दर १००% भन्दा बढी हुन सक्दैन",
+      "effectiveFromRequired": "लागू सुरु मिति आवश्यक छ",
+      "academicYearRequired": "शैक्षिक वर्ष आवश्यक छ",
+      "effectiveToAfterFrom": "समाप्त मिति सुरु मितिपछि हुनुपर्छ"
+    },
     "editAria": "शुल्क संरचना सम्पादन गर्नुहोस्",
     "deleteAria": "शुल्क संरचना मेटाउनुहोस्",
     "deleteTitle": "शुल्क संरचना मेटाउनुहोस्",
@@ -289,6 +442,217 @@
     }
   },
 
+  "bulkGenerate": {
+    "title": "बीजकहरू थोक सिर्जना गर्नुहोस्",
+    "description": "एकैपटक धेरै विद्यार्थीहरूको बीजक सिर्जना गर्नुहोस् - कक्षा, विद्यार्थी वा स्मार्ट खण्डअनुसार।",
+    "selectSchool": "थोक बीजक सिर्जना गर्न विद्यालय चयन गर्नुहोस्।",
+    "loadingRoster": "विद्यालय रोस्टर लोड हुँदै...",
+    "steps": {
+      "selectRecipients": "प्रापकहरू छान्नुहोस्",
+      "feeStructures": "शुल्क संरचनाहरू",
+      "invoiceDetails": "बीजक विवरण",
+      "reviewConfirm": "समीक्षा र पुष्टि"
+    },
+    "actions": {
+      "generating": "सिर्जना गर्दै...",
+      "generateInvoices": "बीजकहरू सिर्जना गर्नुहोस्"
+    },
+    "toast": {
+      "generated": "{{count}} बीजक सिर्जना भयो",
+      "generated_plural": "{{count}} बीजकहरू सिर्जना भए",
+      "generatedWithSkipped": "{{count}} बीजक सिर्जना भयो · {{skipped}} छोडियो",
+      "generatedWithSkipped_plural": "{{count}} बीजकहरू सिर्जना भए · {{skipped}} छोडियो",
+      "syncLimitExceeded": "सिंक्रोनस सिर्जनाका लागि धेरै विद्यार्थी (>25) छन्। अहिलेका लागि चयन घटाउनुहोस् वा एउटै कक्षा छानेर फेरि प्रयास गर्नुहोस्।",
+      "failed": "थोक बीजक सिर्जना असफल भयो।"
+    },
+    "confirm": {
+      "title": "बीजकहरू सिर्जना गर्ने?",
+      "description": "{{count}} बीजक सिर्जना गर्ने? यसलाई फिर्ता गर्न सकिँदैन।",
+      "description_plural": "{{count}} बीजकहरू सिर्जना गर्ने? यसलाई फिर्ता गर्न सकिँदैन।",
+      "body": "{{count}} विद्यार्थीका लागि बीजक ड्राफ्टको रूपमा सिर्जना हुनेछ। तपाईंले बीजक सूचीबाट समीक्षा गरेर जारी गर्न सक्नुहुन्छ।",
+      "body_plural": "{{count}} विद्यार्थीहरूका लागि बीजकहरू ड्राफ्टको रूपमा सिर्जना हुनेछन्। तपाईंले बीजक सूचीबाट समीक्षा गरेर जारी गर्न सक्नुहुन्छ।",
+      "generateCount": "{{count}} सिर्जना गर्नुहोस्",
+      "generateCount_plural": "{{count}} सिर्जना गर्नुहोस्"
+    },
+    "async": {
+      "inProgressTitle": "बीजकहरू सिर्जना हुँदै...",
+      "failedTitle": "थोक सिर्जना असफल भयो",
+      "failedDescription": "कुनै वा सबै बीजक सिर्जना हुनु अघि worker ले job-level असफलता रिपोर्ट गर्‍यो।",
+      "runningDescription": "{{count}} विद्यार्थीका लागि ड्राफ्ट बीजक सिर्जना हुँदैछ। यो सामान्यतया ९० सेकेन्डभित्र सकिन्छ।",
+      "runningDescription_plural": "{{count}} विद्यार्थीहरूका लागि ड्राफ्ट बीजकहरू सिर्जना हुँदैछन्। यो सामान्यतया ९० सेकेन्डभित्र सकिन्छ।",
+      "progressVerb": "बीजकहरू सिर्जना गर्दै",
+      "startOver": "फेरि सुरु गर्नुहोस्",
+      "runInBackground": "पृष्ठभूमिमा चलाउनुहोस्",
+      "toastSucceeded": "{{count}} ड्राफ्ट बीजक सिर्जना भयो",
+      "toastSucceeded_plural": "{{count}} ड्राफ्ट बीजकहरू सिर्जना भए",
+      "toastSkipped": "{{count}} छोडियो",
+      "toastFailed": "{{count}} असफल"
+    },
+    "asyncSuccess": {
+      "title": "{{count}} बीजक ड्राफ्टको रूपमा सिर्जना भयो",
+      "title_plural": "{{count}} बीजकहरू ड्राफ्टको रूपमा सिर्जना भए",
+      "notice": "परिवारहरूलाई पठाउन प्रत्येक बीजकमा Issue क्लिक गर्नुहोस्, वा bulk-issue प्रयोग गर्नुहोस्।",
+      "periodNotice": "{{billingPeriod}} का लागि। परिवारहरूलाई पठाउन प्रत्येक बीजकमा Issue क्लिक गर्नुहोस्, वा bulk-issue प्रयोग गर्नुहोस्।",
+      "created": "सिर्जना भयो",
+      "skipped": "छोडियो",
+      "failed": "असफल",
+      "retryFailed": "असफल पुनः प्रयास ({{count}})",
+      "failureCount": "{{count}} असफलता",
+      "failureCount_plural": "{{count}} असफलताहरू",
+      "showingFirst": "(पहिलो {{count}} देखाइँदै)",
+      "noReasons": "worker बाट प्रति-record कारणहरू फर्किएनन्।"
+    },
+    "footer": {
+      "selectStudent": "अगाडि बढ्न कम्तीमा एक विद्यार्थी छान्नुहोस्",
+      "studentsSelected": "{{count}} विद्यार्थी चयन भयो",
+      "studentsSelected_plural": "{{count}} विद्यार्थी चयन भए",
+      "addFeeOrLine": "कम्तीमा एक शुल्क वा अनुकूल लाइन थप्नुहोस्",
+      "lineItemsAndStudents": "{{lineCount}} {{lineLabel}} · {{studentCount}} {{studentLabel}}",
+      "invoicesConfigured": "{{count}} बीजक कन्फिगर हुनेछ",
+      "invoicesConfigured_plural": "{{count}} बीजकहरू कन्फिगर हुनेछन्",
+      "resolvingPreview": "पूर्वावलोकन समाधान हुँदै...",
+      "readyToGenerate": "{{count}} बीजक सिर्जना गर्न तयार",
+      "readyToGenerate_plural": "{{count}} बीजकहरू सिर्जना गर्न तयार"
+    },
+    "common": {
+      "unknown": "अज्ञात",
+      "grade": "कक्षा",
+      "grade_plural": "कक्षाहरू",
+      "gradeLabel": "कक्षा {{grade}}",
+      "gradesList": "कक्षाहरू {{grades}}",
+      "student": "विद्यार्थी",
+      "student_plural": "विद्यार्थीहरू",
+      "studentCount": "{{count}} विद्यार्थी",
+      "studentCount_plural": "{{count}} विद्यार्थीहरू",
+      "selectedCount": "{{count}} चयन भयो",
+      "notSelectedCount": "{{count}} चयन नभएको",
+      "noneSelected": "कुनै चयन छैन",
+      "lineItem": "लाइन आइटम",
+      "lineItem_plural": "लाइन आइटमहरू",
+      "optional": "(वैकल्पिक)"
+    },
+    "step1": {
+      "byGrade": "कक्षाअनुसार",
+      "byStudent": "विद्यार्थीअनुसार",
+      "searchPlaceholder": "नाम, विद्यार्थी ID वा विद्यार्थी नम्बर खोज्नुहोस्...",
+      "quickSegments": "छिटो खण्डहरू",
+      "studentTotalCount": "{{count}} विद्यार्थी जम्मा",
+      "studentTotalCount_plural": "{{count}} विद्यार्थीहरू जम्मा",
+      "studentMatchCount": "{{count}} विद्यार्थी मिल्यो",
+      "studentMatchCount_plural": "{{count}} विद्यार्थीहरू मिले",
+      "selectAll": "सबै छान्नुहोस्",
+      "selectAllMatching": "मिल्ने सबै छान्नुहोस्",
+      "clear": "हटाउनुहोस्",
+      "phase1Tooltip": "काउन्टर वायरिङ थोक-पूर्वावलोकन एकीकरणसँग आउँछ; चिप फिल्टरिङ अर्को PR मा थपिनेछ",
+      "phase2Tooltip": "Phase 2 मा आउँदैछ - विद्यार्थी जनसांख्यिकीय डाटा आवश्यक छ",
+      "segments": {
+        "outstanding": "बाँकी शेष",
+        "new": "नयाँ भर्ना",
+        "not-billed-this-period": "यो अवधिमा अझै बीजक नभएको",
+        "transport": "यातायात प्रयोगकर्ता",
+        "boarders": "छात्रावासी",
+        "scholarship": "छात्रवृत्ति / BPL"
+      },
+      "noStudentsMatch": "हालको खोजसँग कुनै विद्यार्थी मिलेन।",
+      "recipientsSelected": "चयन गरिएका प्रापकहरू",
+      "gradesCovered": "समेटिएका कक्षाहरू",
+      "emptyRailPrefix": "अहिलेसम्म कोही चयन छैन। सबैलाई थप्न कक्षा टिक गर्नुहोस्, त्यसपछि छोड्न चाहेका विद्यार्थी अनटिक गर्नुहोस् - वा",
+      "emptyRailSuffix": "मा स्विच गरेर छुट्टाछुट्टै छान्नुहोस्।"
+    },
+    "step2": {
+      "coverageIntro": "प्रत्येक शुल्क तपाईंका {{count}} चयन गरिएका विद्यार्थीसँग जाँचिन्छ। विद्यार्थीलाई लागू नहुने शुल्क त्यस बीजकमा स्वतः छोडिन्छ।",
+      "coverageIntro_plural": "प्रत्येक शुल्क तपाईंका {{count}} चयन गरिएका विद्यार्थीहरूसँग जाँचिन्छ। विद्यार्थीलाई लागू नहुने शुल्क त्यस बीजकमा स्वतः छोडिन्छ।",
+      "estimatedGrandTotal": "अनुमानित कुल जम्मा",
+      "avgPerStudent": "{{amount}} औसत / विद्यार्थी",
+      "students": "विद्यार्थीहरू",
+      "feeStructures": "शुल्क संरचनाहरू",
+      "customLines": "अनुकूल लाइनहरू",
+      "grossSubtotal": "कुल उपजम्मा",
+      "feeDiscounts": "शुल्क छुटहरू",
+      "zeroTotalWarning": "{{count}} विद्यार्थीको अनुमानित जम्मा 0 छ। उनीहरूलाई हटाउन Step 3 मा Skip zero-total सक्रिय गर्नुहोस्।",
+      "zeroTotalWarning_plural": "{{count}} विद्यार्थीहरूको अनुमानित जम्मा 0 छ। उनीहरूलाई हटाउन Step 3 मा Skip zero-total सक्रिय गर्नुहोस्।",
+      "perFeeDiscount": "प्रति-शुल्क छुट %",
+      "appliesToAll": "सबै {{count}} मा लागू",
+      "appliesToZero": "0 मा लागू - चयन गर्न मिल्दैन",
+      "partialCoverage": "{{covered}} मध्ये {{total}} · {{skipped}} छोडियो",
+      "customLineItems": "अनुकूल लाइन आइटमहरू",
+      "addLine": "लाइन थप्नुहोस्",
+      "customLineHelp": "हरेक चयन गरिएको विद्यार्थीको बीजकमा थपिने वैकल्पिक एक-पटकको शुल्क (जस्तै, वार्षिक पिकनिक - स्वैच्छिक)।",
+      "customLinePlaceholder": "जस्तै वार्षिक पिकनिक - स्वैच्छिक",
+      "customLineFallback": "अनुकूल लाइन आइटम",
+      "removeLine": "लाइन हटाउनुहोस्"
+    },
+    "step3": {
+      "academicYear": "शैक्षिक वर्ष",
+      "academicYearHelp": "सक्रिय वर्ष - बीजक र लेजर एन्करिङ चलाउँछ।",
+      "noAcademicYears": "कुनै शैक्षिक वर्ष कन्फिगर गरिएको छैन",
+      "billingPeriod": "बिलिङ अवधि / टर्म",
+      "billingPeriodHelp": "ग्रेडिङ-अवधिसँग मिलेको बिलिङ विन्डो।",
+      "selectPeriod": "- छान्नुहोस् -",
+      "terms": {
+        "first": "पहिलो टर्म",
+        "second": "दोस्रो टर्म",
+        "third": "तेस्रो टर्म",
+        "fourth": "चौथो टर्म"
+      },
+      "issueDate": "जारी मिति",
+      "dueDate": "भुक्तानी अन्तिम मिति",
+      "numberPreview": "बीजक नम्बर पूर्वावलोकन",
+      "sequentialNumbers": "{{count}} क्रमिक नम्बर",
+      "sequentialNumbers_plural": "{{count}} क्रमिक नम्बरहरू",
+      "numberPreviewHelp": "ढाँचा मात्र - वास्तविक नम्बरहरू सिर्जना समयमा आरक्षित हुन्छन्। ढाँचा:",
+      "note": "हरेक बीजकमा नोट",
+      "notePlaceholder": "जस्तै कृपया अन्तिम मितिअघि लेखा काउन्टरमा वा eSewa मार्फत भुक्तानी गर्नुहोस्।",
+      "reviewEveryInvoice": "सिर्जना गर्नुअघि हरेक बीजक समीक्षा गर्नुहोस्",
+      "reviewEveryInvoiceHelp": "अर्को चरणमा प्रति-विद्यार्थी लाइन-आइटम पूर्वावलोकन देखाउनुहोस्।",
+      "skipZeroTotal": "जम्मा शून्य हुने विद्यार्थीहरू छोड्नुहोस्",
+      "skipZeroTotalHelp": "शून्य-रकम बीजक जारी नगर्नुहोस् (जस्तै पूर्ण छुट पाएका विद्यार्थीहरू)।"
+    },
+    "step4": {
+      "verifyIntro": "तलका सबै कुरा प्रमाणित गर्नुहोस्। {{count}} बीजक सिर्जना हुनेछ",
+      "verifyIntro_plural": "तलका सबै कुरा प्रमाणित गर्नुहोस्। {{count}} बीजकहरू सिर्जना हुनेछन्",
+      "skippedZeroParenthetical": "({{count}} छोडियो - जम्मा शून्य)",
+      "recipients": "प्रापकहरू",
+      "recipientSummary": "{{studentCount}} {{studentLabel}} · {{gradeCount}} {{gradeLabel}}",
+      "feeStructures": "शुल्क संरचनाहरू",
+      "noFeesSelected": "कुनै शुल्क चयन गरिएको छैन।",
+      "period": "अवधि",
+      "issueDue": "जारी {{issueDate}} · अन्तिम {{dueDate}}",
+      "perStudentPreview": "प्रति-विद्यार्थी पूर्वावलोकन",
+      "tapToExpand": "विस्तार गर्न पंक्ति ट्याप गर्नुहोस्",
+      "noBillableStudents": "बीजकयोग्य विद्यार्थी छैनन्।",
+      "allProjectedZero": "सबै अनुमानित जम्मा 0 छन्।",
+      "invoices": "बीजकहरू",
+      "avgPerStudent": "औसत / विद्यार्थी",
+      "grandTotal": "कुल जम्मा",
+      "postingNotice": "जारी हुँदा General Ledger मा पोस्ट हुन्छ। सूचनाहरू अभिभावकको च्यानल प्राथमिकताअनुसार पठाइन्छन्।",
+      "resolvingServerPreview": "सर्भर पूर्वावलोकन समाधान हुँदै...",
+      "serverPreviewUnavailable": "सर्भर पूर्वावलोकन उपलब्ध छैन - सिर्जना अझै काम गर्छ, तर duplicate / segment काउन्ट देखाइने छैन।",
+      "serverPreview": "सर्भर पूर्वावलोकन",
+      "duplicateSkip": "दोहोरो छोड्ने",
+      "hasBalanceDue": "बाँकी रकम छ",
+      "newAdmissions": "नयाँ भर्ना",
+      "notBilledThisPeriod": "यो अवधिमा बीजक नभएको",
+      "estimatedDuration": "अनुमानित अवधि ≈ {{seconds}}s",
+      "lineItemCount": "{{count}} लाइन आइटम",
+      "lineItemCount_plural": "{{count}} लाइन आइटमहरू",
+      "customBadge": "अनुकूल",
+      "invoiceTotal": "बीजक जम्मा"
+    },
+    "success": {
+      "generatedTitle": "{{count}} बीजक सिर्जना भयो",
+      "generatedTitle_plural": "{{count}} बीजकहरू सिर्जना भए",
+      "notice": "अभिभावकहरूलाई उनीहरूको च्यानल प्राथमिकताअनुसार सूचना पठाइनेछ।",
+      "periodNotice": "{{billingPeriod}} का लागि। अभिभावकहरूलाई उनीहरूको च्यानल प्राथमिकताअनुसार सूचना पठाइनेछ।",
+      "invoices": "बीजकहरू",
+      "totalBilled": "कुल बिल",
+      "skipped": "छोडिएको",
+      "downloadAll": "सबै डाउनलोड (PDF)",
+      "downloadAllTooltip": "थोक PDF डाउनलोड पछिल्लो sprint मा आउँछ",
+      "newBatch": "नयाँ ब्याच"
+    }
+  },
+
   "gatewayConfig": {
     "title": "भुक्तानी गेटवेहरू",
     "description": "तपाईंको विद्यालयको भुक्तानी गेटवे कन्फिगर गर्नुहोस्",
@@ -305,13 +669,333 @@
     "credentialsMasked": "सुरक्षाको लागि प्रमाणहरू लुकाइएको छ"
   },
 
+  "paymentsList": {
+    "title": "भुक्तानीहरू",
+    "description": "सबै भुक्तानी कारोबारहरू हेर्नुहोस् र व्यवस्थापन गर्नुहोस्।",
+    "selectSchool": "भुक्तानीहरू हेर्न विद्यालय चयन गर्नुहोस्।",
+    "gateway": "गेटवे",
+    "date": "मिति",
+    "allGateways": "सबै गेटवेहरू",
+    "viewReceipt": "रसिद हेर्नुहोस्",
+    "voidPayment": "भुक्तानी void गर्नुहोस्",
+    "voidDescription": "यसले लेजर प्रविष्टि उल्ट्याउँछ र बीजकमा बाँकी रकम पुनर्स्थापित गर्छ। यो कार्य उल्टाउन सकिँदैन।",
+    "voidReason": "Void गर्ने कारण *",
+    "voidReasonPlaceholder": "जस्तै दोहोरो भुक्तानी, डाटा इन्ट्री त्रुटि",
+    "refundPayment": "भुक्तानी फिर्ता गर्नुहोस्",
+    "refundPartial": "आंशिक फिर्ता",
+    "originalAmount": "मूल रकम",
+    "alreadyRefunded": "पहिले नै फिर्ता गरिएको",
+    "maxRefundable": "अधिकतम फिर्तायोग्य",
+    "refundAmount": "फिर्ता रकम ({{currency}}) *",
+    "reasonRequired": "कारण *",
+    "refundReasonPlaceholder": "फिर्ताको कारण...",
+    "amountGreaterThanZero": "रकम 0 भन्दा बढी हुनुपर्छ",
+    "exceedsRefundable": "फिर्तायोग्य रकमभन्दा बढी ({{amount}})",
+    "voidSuccess": "भुक्तानी सफलतापूर्वक void भयो",
+    "voidFailed": "भुक्तानी void गर्न असफल भयो",
+    "refundSuccess": "फिर्ता प्रक्रिया सफलतापूर्वक सुरु भयो",
+    "refundFailed": "फिर्ता सिर्जना गर्न असफल भयो",
+    "voidSelected": "चयनित void गर्नुहोस्",
+    "sendReceipt": "रसिद पठाउनुहोस्",
+    "paymentCount": "{{count}} भुक्तानी",
+    "paymentCount_plural": "{{count}} भुक्तानीहरू",
+    "processed": "प्रक्रिया भएको",
+    "partialRefunds": "आंशिक फिर्ताहरू",
+    "searchPlaceholder": "रसिद नं., बीजक नं. वा विद्यार्थीबाट खोज्नुहोस्...",
+    "exportSuccess": "भुक्तानी CSV निर्यात भयो",
+    "exportFailed": "भुक्तानी CSV निर्यात गर्न असफल भयो",
+    "recordManualPayment": "म्यानुअल भुक्तानी रेकर्ड गर्नुहोस्"
+  },
+
+  "recordPayment": {
+    "title": "भुक्तानी रेकर्ड गर्नुहोस्",
+    "description": "नगद, बैंक ट्रान्सफर वा चेक भुक्तानी म्यानुअल रूपमा रेकर्ड गर्नुहोस्।",
+    "selectSchool": "भुक्तानी रेकर्ड गर्न विद्यालय चयन गर्नुहोस्।",
+    "loadingInvoices": "बीजकहरू लोड हुँदै...",
+    "noUnpaidInvoices": "यो विद्यार्थीका लागि कुनै भुक्तानी बाँकी बीजक छैन।",
+    "dueDate": "अन्तिम मिति {{date}}",
+    "selectInvoiceError": "कृपया बीजक चयन गर्नुहोस्",
+    "validAmountError": "कृपया मान्य रकम प्रविष्ट गर्नुहोस्",
+    "referenceRequired": "बैंक ट्रान्सफर / चेकका लागि सन्दर्भ नम्बर आवश्यक छ",
+    "recordSuccess": "भुक्तानी सफलतापूर्वक रेकर्ड भयो",
+    "recordFailed": "भुक्तानी रेकर्ड गर्न असफल भयो",
+    "successTitle": "भुक्तानी रेकर्ड भयो",
+    "successDescription": "म्यानुअल भुक्तानी रेकर्ड गरिएको छ र विद्यार्थी खाता अद्यावधिक भएको छ।",
+    "recordAnother": "अर्को भुक्तानी रेकर्ड गर्नुहोस्",
+    "studentRequired": "विद्यार्थी *",
+    "studentSearchPlaceholder": "विद्यार्थी नामबाट खोज्नुहोस्...",
+    "invoiceRequired": "बीजक *",
+    "paymentMethodRequired": "भुक्तानी विधि *",
+    "amountRequired": "रकम ({{currency}}) *",
+    "referenceRequiredLabel": "सन्दर्भ नं. *",
+    "bankReferencePlaceholder": "बैंक सन्दर्भ नम्बर",
+    "chequeReferencePlaceholder": "चेक नम्बर",
+    "datePaid": "भुक्तानी मिति",
+    "notesPlaceholder": "यो भुक्तानीबारे वैकल्पिक नोट...",
+    "preview": "पूर्वावलोकन",
+    "method": "विधि",
+    "reference": "सन्दर्भ नं."
+  },
+
+  "asyncJobs": {
+    "common": {
+      "closeDrawer": "ड्रअर बन्द गर्नुहोस्",
+      "starting": "सुरु हुँदै...",
+      "channel": "च्यानल",
+      "optional": "(वैकल्पिक)",
+      "unknownStudent": "अज्ञात विद्यार्थी",
+      "recipients": "प्रापकहरू ({{count}})",
+      "willSkip": "छोडिने ({{count}})",
+      "balance": "शेष {{amount}}",
+      "selected": {
+        "accounts": "{{count}} खाता चयन भयो",
+        "accounts_plural": "{{count}} खाताहरू चयन भए",
+        "payments": "{{count}} भुक्तानी चयन भयो",
+        "payments_plural": "{{count}} भुक्तानीहरू चयन भए",
+        "invoices": "{{count}} बीजक चयन भयो",
+        "invoices_plural": "{{count}} बीजकहरू चयन भए"
+      },
+      "channels": {
+        "email": "इमेल",
+        "sms": "SMS",
+        "both": "दुवै"
+      }
+    },
+    "progress": {
+      "queued": "पङ्क्तिमा छ - कामदारले उठाउने प्रतीक्षा गर्दै।",
+      "processed": "{{done}} / {{total}} प्रशोधन भयो",
+      "done": "सम्पन्न",
+      "summary": "{{succeeded}} सफल · {{skipped}} छोडियो · {{failed}} असफल",
+      "failed": "काम असफल भयो",
+      "failureFallback": "काम अपरिवर्तनीय त्रुटिसहित समाप्त भयो।"
+    },
+    "toast": {
+      "skipped": "{{count}} छोडियो",
+      "failed": "{{count}} असफल",
+      "statements": {
+        "success": "{{count}} स्टेटमेन्ट पठाइयो",
+        "success_plural": "{{count}} स्टेटमेन्टहरू पठाइए",
+        "none": "कुनै स्टेटमेन्ट पठाइएन - {{failed}} असफल; {{skipped}} छोडियो"
+      },
+      "receipts": {
+        "success": "{{count}} रसिद पठाइयो",
+        "success_plural": "{{count}} रसिदहरू पठाइए",
+        "none": "कुनै रसिद पठाइएन - {{failed}} असफल; {{skipped}} छोडियो"
+      },
+      "reminders": {
+        "success": "{{count}} रिमाइन्डर पठाइयो",
+        "success_plural": "{{count}} रिमाइन्डरहरू पठाइए",
+        "none": "कुनै रिमाइन्डर पठाइएन - {{failed}} असफल; {{skipped}} छोडियो"
+      },
+      "adjustments": {
+        "success": "{{count}} खाता समायोजन भयो",
+        "success_plural": "{{count}} खाताहरू समायोजन भए",
+        "none": "कुनै समायोजन लागू भएन - {{failed}} असफल; {{skipped}} छोडियो"
+      },
+      "voidPayments": {
+        "success": "{{count}} भुक्तानी void भयो",
+        "success_plural": "{{count}} भुक्तानीहरू void भए",
+        "none": "कुनै भुक्तानी void भएन - {{failed}} असफल; {{skipped}} छोडियो"
+      }
+    },
+    "skip": {
+      "noReceiptNumber": "रसिद नम्बर छैन",
+      "notCompleted": "सम्पन्न छैन ({{status}})",
+      "notOutstanding": "बाँकी छैन ({{status}})"
+    },
+    "statements": {
+      "title": "स्टेटमेन्टहरू पठाउनुहोस्",
+      "progress": "स्टेटमेन्टहरू पठाउँदै",
+      "description": "फाइलमा रहेका प्रत्येक अभिभावकले हालको शेष र पछिल्लो लेजर गतिविधि PDF संलग्नकका रूपमा पाउँछन्। इमेलबाट मात्र पठाइन्छ।",
+      "send": "{{count}} पठाउनुहोस्",
+      "jobFailed": "स्टेटमेन्ट पठाउने काम असफल भयो।",
+      "failedToStart": "स्टेटमेन्ट पठाउने काम सुरु गर्न असफल भयो।"
+    },
+    "receipts": {
+      "title": "रसिदहरू पठाउनुहोस्",
+      "progress": "रसिदहरू पठाउँदै",
+      "willSend": "पठाइने ({{count}})",
+      "noneEligible": "चयन गरिएका कुनै भुक्तानी योग्य छैनन् - रसिदका लागि सम्पन्न भुक्तानी र रसिद नम्बर आवश्यक छ।",
+      "send": "{{count}} पठाउनुहोस्",
+      "jobFailed": "रसिद पठाउने काम असफल भयो।",
+      "failedToStart": "रसिद पठाउने काम सुरु गर्न असफल भयो।"
+    },
+    "reminders": {
+      "title": "रिमाइन्डरहरू पठाउनुहोस्",
+      "progress": "रिमाइन्डरहरू पठाउँदै",
+      "customNote": "अनुकूल नोट",
+      "customNotePlaceholder": "जस्तै मैत्रीपूर्ण रिमाइन्डर - कृपया टर्म अन्त्यअघि भुक्तानी गर्नुहोस्।",
+      "willRemind": "रिमाइन्ड गरिने ({{count}})",
+      "noneEligible": "चयन गरिएका कुनै बीजकमा बाँकी शेष छैन।",
+      "send": "{{count}} पठाउनुहोस्",
+      "jobFailed": "रिमाइन्डर पठाउने काम असफल भयो।",
+      "failedToStart": "रिमाइन्डर पठाउने काम सुरु गर्न असफल भयो।"
+    },
+    "adjustments": {
+      "title": "शेष समायोजन गर्नुहोस्",
+      "progress": "लेजर प्रविष्टिहरू पोस्ट गर्दै",
+      "warning": "उही समायोजन प्रत्येक चयन गरिएको खाताको लेजरमा लेखिन्छ। sign-threshold guard छोड्न override toggle प्रयोग गर्नुहोस्, जस्तै पहिले नै surplus भएको खातामा credit गर्नु।",
+      "type": "प्रकार",
+      "types": {
+        "debit": "डेबिट (तिर्नुपर्ने बढ्छ)",
+        "credit": "क्रेडिट (तिर्नुपर्ने घट्छ)"
+      },
+      "amount": "रकम",
+      "effectiveDate": "लागू मिति",
+      "reason": "कारण",
+      "reasonPlaceholder": "जस्तै टर्म सुरुमा छात्रवृत्ति क्रेडिट लागू भयो",
+      "override": "sign-threshold guard override गर्नुहोस् - समायोजनले शेषको चिन्ह सीमा पार गरे पनि लागू गर्नुहोस्।",
+      "apply": "{{count}} मा लागू गर्नुहोस्",
+      "jobFailed": "शेष समायोजन काम असफल भयो।",
+      "failedToStart": "शेष समायोजन काम सुरु गर्न असफल भयो।"
+    },
+    "voidPayments": {
+      "title": "भुक्तानी void गर्नुहोस्",
+      "warning": "Void गर्दा प्रत्येक भुक्तानीको लेजर प्रविष्टि उल्टिन्छ र जोडिएको बीजकमा बाँकी रकम पुनर्स्थापना हुन्छ। प्रत्येक पङ्क्ति छुट्टै अनुरोध हो र आंशिक असफलताले अरूलाई rollback गर्दैन।",
+      "reason": "Void गर्ने कारण",
+      "reasonPlaceholder": "जस्तै दोहोरिएको भुक्तानी, डाटा प्रविष्टि त्रुटि",
+      "reasonHelp": "उही कारण प्रत्येक void गरिएको भुक्तानीमा रेकर्ड हुन्छ।",
+      "willVoid": "Void गरिने ({{count}})",
+      "noneEligible": "चयन गरिएका कुनै भुक्तानी void गर्न योग्य छैनन्।",
+      "voiding": "Void गर्दै...",
+      "apply": "{{count}} void गर्नुहोस्"
+    }
+  },
+
+  "financeLayout": {
+    "error": {
+      "title": "केही गलत भयो",
+      "description": "Finance मोड्युलमा अनपेक्षित त्रुटि भयो। पृष्ठ पुन: लोड गर्नुहोस् वा overview मा फर्कनुहोस्।",
+      "reload": "पुन: लोड गर्नुहोस्",
+      "overview": "Overview मा जानुहोस्"
+    },
+    "noSchools": {
+      "title": "कुनै विद्यालय कन्फिगर गरिएको छैन",
+      "description": "Finance प्रयोग गर्नु अघि Settings > Organization मा आफ्नो संस्था सेटअप गर्नुहोस्।",
+      "goToSettings": "Settings मा जानुहोस्"
+    }
+  },
+
+  "paymentGateways": {
+    "title": "भुक्तानी गेटवेहरू",
+    "description": "तपाईंको विद्यालयका लागि उपलब्ध भुक्तानी गेटवेहरू कन्फिगर गर्नुहोस्।",
+    "selectSchool": "भुक्तानी गेटवे व्यवस्थापन गर्न विद्यालय चयन गर्नुहोस्।",
+    "saved": "गेटवे कन्फिगरेसन सुरक्षित भयो",
+    "saveFailed": "गेटवे कन्फिगरेसन सुरक्षित गर्न असफल भयो",
+    "loadFailed": "गेटवे कन्फिगरेसन लोड गर्न असफल भयो",
+    "enable": "सक्षम गर्नुहोस्",
+    "saveConfiguration": "कन्फिगरेसन सुरक्षित गर्नुहोस्",
+    "securityNote": "Credential हरू encrypted र सुरक्षित रूपमा भण्डारण गरिन्छ। सुरक्षित गरेपछि मानहरू masked हुनेछन्।",
+    "showSecret": "गोप्य मान देखाउनुहोस्",
+    "hideSecret": "गोप्य मान लुकाउनुहोस्",
+    "gatewayLabels": {
+      "esewa": "eSewa",
+      "khalti": "Khalti",
+      "fonepay": "Fonepay",
+      "connectips": "ConnectIPS",
+      "stripe": "Stripe",
+      "cash": "नगद",
+      "bank_transfer": "बैंक ट्रान्सफर",
+      "cheque": "चेक"
+    },
+    "descriptions": {
+      "esewa": "अनलाइन भुक्तानीका लागि नेपालको प्रमुख डिजिटल वालेट",
+      "khalti": "नेपालका लागि डिजिटल वालेट र भुक्तानी गेटवे",
+      "fonepay": "QR आधारित अन्तरबैंक भुक्तानी नेटवर्क",
+      "connectips": "NCHL को इन्टरनेट बैंकिङ भुक्तानी प्रणाली",
+      "stripe": "कार्ड र वालेटका लागि विश्वव्यापी भुक्तानी प्रक्रिया",
+      "cash": "म्यानुअल नगद भुक्तानी",
+      "bank_transfer": "सीधा बैंक ट्रान्सफर भुक्तानी",
+      "cheque": "चेकबाट भुक्तानी"
+    },
+    "credentials": {
+      "merchantCode": "Merchant Code",
+      "secretKey": "Secret Key",
+      "publicKey": "Public Key",
+      "apiKey": "API Key"
+    }
+  },
+
+  "studentSearch": {
+    "placeholder": "नाम वा विद्यार्थी नम्बरबाट खोज्नुहोस्...",
+    "searching": "खोज्दै...",
+    "noStudents": "कुनै विद्यार्थी फेला परेन।",
+    "grade": "कक्षा {{grade}}"
+  },
+
   "studentAccount": {
     "title": "विद्यार्थी खाता",
+    "pageTitle": "विद्यार्थी खाताहरू",
+    "description": "विद्यार्थी बिलिङ खाता, बीजक, भुक्तानी र लेजर इतिहास हेर्नुहोस्।",
+    "selectSchool": "विद्यार्थी खाताहरू हेर्न विद्यालय चयन गर्नुहोस्।",
     "balance": "बाँकी शेष",
     "totalPaid": "कुल भुक्तानी",
     "lastPayment": "अन्तिम भुक्तानी",
     "ledger": "खाता लेजर",
-    "noTransactions": "अहिलेसम्म कुनै कारोबार छैन"
+    "noTransactions": "अहिलेसम्म कुनै कारोबार छैन",
+    "never": "कहिल्यै छैन",
+    "searchPlaceholder": "विद्यार्थीको नामबाट खोज्नुहोस्...",
+    "tabs": {
+      "ledger": "लेजर",
+      "invoices": "बीजकहरू",
+      "payments": "भुक्तानीहरू"
+    },
+    "summary": {
+      "totalStudents": "कुल विद्यार्थी",
+      "outstanding": "बाँकी",
+      "fullyPaid": "पूरा भुक्तानी",
+      "withBalance": "बाँकी भएका",
+      "accounts": "{{count}} खाता",
+      "accounts_plural": "{{count}} खाताहरू",
+      "withBalanceCount": "{{count}} बाँकी भएका",
+      "noBalance": "बाँकी छैन"
+    },
+    "actions": {
+      "sendStatement": "स्टेटमेन्ट पठाउनुहोस्",
+      "adjustBalance": "शेष समायोजन गर्नुहोस्"
+    },
+    "columns": {
+      "student": "विद्यार्थी",
+      "studentName": "विद्यार्थीको नाम",
+      "date": "मिति",
+      "type": "प्रकार",
+      "description": "विवरण",
+      "debit": "डेबिट",
+      "credit": "क्रेडिट",
+      "balance": "शेष",
+      "balanceBucket": "शेष समूह",
+      "invoiceNumber": "बीजक #",
+      "status": "स्थिति",
+      "total": "कुल",
+      "due": "बाँकी",
+      "dueDate": "तिर्नुपर्ने मिति",
+      "amountPaid": "भुक्तानी रकम",
+      "grandTotal": "कुल जम्मा"
+    },
+    "balanceBuckets": {
+      "noBalance": "बाँकी छैन"
+    },
+    "openingBalance": {
+      "title": "सुरुवाती शेष (अघिल्ला बाँकी)",
+      "amount": "रकम",
+      "asOf": "मिति",
+      "remaining": "बाँकी",
+      "settled": "{{amount}} मिलान भयो",
+      "note": "नोट",
+      "showMore": "थप देखाउनुहोस्",
+      "showLess": "कम देखाउनुहोस्"
+    },
+    "empty": {
+      "noAccounts": "कुनै विद्यार्थी खाता फेला परेन",
+      "noAccountsDescription": "बीजक सिर्जना भएपछि विद्यार्थी खाताहरू स्वतः यहाँ देखिन्छन्।",
+      "noLedger": "अहिलेसम्म कुनै लेजर प्रविष्टि छैन।",
+      "noInvoices": "यो विद्यार्थीका लागि कुनै बीजक छैन।",
+      "noPayments": "यो विद्यार्थीका लागि कुनै भुक्तानी रेकर्ड छैन।"
+    },
+    "error": {
+      "ledgerLoadFailed": "लेजर प्रविष्टि लोड गर्न असफल भयो।",
+      "unknown": "अज्ञात त्रुटि"
+    }
   },
 
   "currency": {

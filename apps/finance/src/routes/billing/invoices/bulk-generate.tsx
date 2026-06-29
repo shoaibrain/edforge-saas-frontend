@@ -14,10 +14,12 @@
 import { useNavigate } from '@tanstack/react-router'
 import { ArrowLeft } from 'lucide-react'
 import { Button } from '@edforge/ui'
+import { useTranslation } from '@edforge/i18n'
 import { useAppStore } from '../../../stores/app.store'
 import { BulkGenerateWizard } from '../../../components/billing/bulk/BulkGenerateWizard'
 
 export default function BulkInvoicesPage() {
+  const { t } = useTranslation('payments')
   const navigate = useNavigate()
   const schoolId = useAppStore((s) => s.activeSchoolId)
   // Display-only school code for the invoice-number prefix preview. We
@@ -28,7 +30,7 @@ export default function BulkInvoicesPage() {
   if (!schoolId) {
     return (
       <div className="p-6 text-center text-sm text-[rgb(var(--text-tertiary))]">
-        Select a school to generate bulk invoices.
+        {t('bulkGenerate.selectSchool')}
       </div>
     )
   }
@@ -50,11 +52,10 @@ export default function BulkInvoicesPage() {
         </Button>
         <div>
           <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">
-            Bulk Generate Invoices
+            {t('bulkGenerate.title')}
           </h1>
           <p className="text-sm text-[rgb(var(--text-secondary))] mt-0.5">
-            Generate invoices for multiple students at once — by grade, by
-            student, or by smart segment.
+            {t('bulkGenerate.description')}
           </p>
         </div>
       </div>

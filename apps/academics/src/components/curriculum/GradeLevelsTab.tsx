@@ -19,6 +19,7 @@ import { TanstackDataTable, type ColumnDef } from '@edforge/ui'
 import type { CourseResponseDto } from '@aibrains/shared-types'
 import { GradeLevelDrawer, type GradeLevelData } from './GradeLevelDrawer'
 import { useSchoolEnabledGradeOptions } from '../../hooks/useGradeOptions'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 // ============================================================================
 // TYPES
@@ -95,6 +96,7 @@ function GradeBadge({ value, label }: { value: string; label: string }) {
 }
 
 function CourseChips({ courses }: { courses: CourseResponseDto[] }) {
+  const { t } = useAcademicsI18n()
   if (courses.length === 0) {
     return <span className="text-text-tertiary text-sm">—</span>
   }
@@ -117,7 +119,7 @@ function CourseChips({ courses }: { courses: CourseResponseDto[] }) {
       ))}
       {remaining > 0 && (
         <span className="inline-flex items-center px-1.5 py-0.5 rounded-md text-xs font-medium bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--action-secondary-fg))]">
-          +{remaining} more
+          {t('common.more', { count: remaining })}
         </span>
       )}
     </div>
@@ -137,6 +139,7 @@ export function GradeLevelsTab({
   enrollmentLoading = false,
   hasCurrentAY = true,
 }: GradeLevelsTabProps) {
+  const { t, dataTableLabels } = useAcademicsI18n()
   // Drawer state
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [selectedGrade, setSelectedGrade] = useState<GradeLevelData | null>(null)
@@ -216,7 +219,7 @@ export function GradeLevelsTab({
     () => [
       {
         accessorKey: 'value',
-        header: 'Grade Level',
+        header: t('tables.gradeLevels.columns.gradeLevel'),
         size: 200,
         cell: ({ row }) => (
           <GradeBadge value={row.original.value} label={row.original.label} />
@@ -224,7 +227,7 @@ export function GradeLevelsTab({
       },
       {
         accessorKey: 'courseCount',
-        header: 'Course Count',
+        header: t('tables.gradeLevels.columns.courseCount'),
         size: 130,
         cell: ({ row }) => (
           <div className="flex items-center gap-2">
@@ -233,7 +236,9 @@ export function GradeLevelsTab({
             </span>
             {row.original.courseCount > 0 && (
               <span className="text-xs text-text-tertiary">
-                course{row.original.courseCount !== 1 ? 's' : ''}
+                {row.original.courseCount === 1
+                  ? t('common.course')
+                  : t('tables.gradeLevels.columns.courses')}
               </span>
             )}
           </div>
@@ -241,20 +246,20 @@ export function GradeLevelsTab({
       },
       {
         accessorKey: 'courses',
-        header: 'Courses',
+        header: t('tables.gradeLevels.columns.courses'),
         size: 320,
         cell: ({ row }) => <CourseChips courses={row.original.courses} />,
       },
       {
         accessorKey: 'studentCount',
-        header: 'Students',
+        header: t('tables.gradeLevels.columns.students'),
         size: 120,
         cell: ({ row }) => {
           if (!hasCurrentAY) {
             return (
               <span
                 className="text-sm text-text-tertiary"
-                title="No active academic year — enrollment counts will appear once an academic year is set as current."
+                title={t('tables.gradeLevels.noCurrentYearTitle')}
               >
                 &mdash;
               </span>
@@ -270,7 +275,9 @@ export function GradeLevelsTab({
               </span>
               {row.original.studentCount > 0 && (
                 <span className="text-xs text-text-tertiary">
-                  student{row.original.studentCount !== 1 ? 's' : ''}
+                  {row.original.studentCount === 1
+                    ? t('common.student')
+                    : t('tables.gradeLevels.columns.students')}
                 </span>
               )}
             </div>
@@ -278,7 +285,7 @@ export function GradeLevelsTab({
         },
       },
     ],
-    [hasCurrentAY, studentsPending]
+    [hasCurrentAY, studentsPending, t]
   )
 
   return (
@@ -287,28 +294,28 @@ export function GradeLevelsTab({
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <StatCard
           icon={Layers}
-          label="Total Grade Levels"
+          label={t('tables.gradeLevels.stats.totalGradeLevels')}
           value={stats.totalGrades}
           accent="text-[rgb(var(--state-info-fg))]"
           bg="bg-[rgb(var(--state-info-fg))]/10"
         />
         <StatCard
           icon={BookOpen}
-          label="Course Assignments"
+          label={t('tables.gradeLevels.stats.courseAssignments')}
           value={stats.totalAssignments}
           accent="text-[rgb(var(--state-danger-fg))] "
           bg="bg-[rgb(var(--state-danger-fg))]/10"
         />
         <StatCard
           icon={BarChart3}
-          label="Avg. Courses / Grade"
+          label={t('tables.gradeLevels.stats.avgCoursesPerGrade')}
           value={stats.avgPerGrade}
           accent="text-[rgb(var(--action-secondary-fg))]"
           bg="bg-[rgb(var(--state-info-bg)/0.18)]"
         />
         <StatCard
           icon={GraduationCap}
-          label="Grades with Courses"
+          label={t('tables.gradeLevels.stats.gradesWithCourses')}
           value={stats.withCourses}
           accent="text-[rgb(var(--state-warning-fg))]"
           bg="bg-[rgb(var(--state-warning-fg))]/10"
@@ -325,9 +332,10 @@ export function GradeLevelsTab({
         pagination={{ pageSize: 20 }}
         emptyState={{
           icon: <Layers className="w-12 h-12" />,
-          title: 'No grade levels found',
-          description: 'Grade levels will appear once courses are configured.',
+          title: t('tables.gradeLevels.empty.title'),
+          description: t('tables.gradeLevels.empty.description'),
         }}
+        labels={dataTableLabels}
         onRowClick={handleRowClick}
         maxHeight="calc(100vh - 28rem)"
       />

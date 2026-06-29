@@ -25,6 +25,8 @@
 
 import { AlertTriangle, CheckCircle, RotateCcw, X } from 'lucide-react'
 import { Button } from '@edforge/ui'
+import { UuidBadge } from '@edforge/archetype'
+import { useTranslation } from '@edforge/i18n'
 import type { AsyncBulkJobResult } from '@edforge/finance-services'
 
 export interface AsyncGenerateSuccessProps {
@@ -45,6 +47,7 @@ export function AsyncGenerateSuccess({
   onRetryFailed,
   retryPending,
 }: AsyncGenerateSuccessProps) {
+  const { t } = useTranslation('payments')
   const failedIds = (job.failures ?? []).map((f) => f.recordId)
   const hasFailures = job.failed > 0
   const canRetryFailed = hasFailures && failedIds.length > 0 && !!onRetryFailed
@@ -57,20 +60,21 @@ export function AsyncGenerateSuccess({
         </div>
         <div>
           <h2 className="text-2xl font-semibold text-[rgb(var(--text-primary))]">
-            {job.succeeded} invoice{job.succeeded === 1 ? '' : 's'} created as drafts
+            {t('bulkGenerate.asyncSuccess.title', { count: job.succeeded })}
           </h2>
           <p className="text-sm text-[rgb(var(--text-secondary))] mt-1">
-            For{billingPeriod ? ` ${billingPeriod}` : ''}. Click Issue on each
-            invoice (or use bulk-issue) to send them to families.
+            {billingPeriod
+              ? t('bulkGenerate.asyncSuccess.periodNotice', { billingPeriod })
+              : t('bulkGenerate.asyncSuccess.notice')}
           </p>
         </div>
         <div className="flex items-center justify-center gap-8 text-sm">
-          <Stat label="Created" value={job.succeeded} />
+          <Stat label={t('bulkGenerate.asyncSuccess.created')} value={job.succeeded} />
           {job.skipped > 0 && (
-            <Stat label="Skipped" value={job.skipped} tone="muted" />
+            <Stat label={t('bulkGenerate.asyncSuccess.skipped')} value={job.skipped} tone="muted" />
           )}
           {hasFailures && (
-            <Stat label="Failed" value={job.failed} tone="danger" />
+            <Stat label={t('bulkGenerate.asyncSuccess.failed')} value={job.failed} tone="danger" />
           )}
         </div>
       </div>
@@ -83,15 +87,15 @@ export function AsyncGenerateSuccess({
             disabled={retryPending}
           >
             <RotateCcw className="w-4 h-4 mr-1.5" />
-            Retry failed ({failedIds.length})
+            {t('bulkGenerate.asyncSuccess.retryFailed', { count: failedIds.length })}
           </Button>
         )}
         <Button variant="outline" onClick={onReset} disabled={retryPending}>
-          <RotateCcw className="w-4 h-4 mr-1.5" /> New batch
+          <RotateCcw className="w-4 h-4 mr-1.5" /> {t('bulkGenerate.success.newBatch')}
         </Button>
         {onClose && (
           <Button onClick={onClose} disabled={retryPending}>
-            <X className="w-4 h-4 mr-1.5" /> Close
+            <X className="w-4 h-4 mr-1.5" /> {t('actions.close')}
           </Button>
         )}
       </div>
@@ -100,22 +104,24 @@ export function AsyncGenerateSuccess({
         <div className="border border-[rgb(var(--state-danger-border)/0.4)] rounded-md bg-[rgb(var(--state-danger-bg)/0.10)] p-3">
           <div className="flex items-center gap-2 text-sm font-medium text-[rgb(var(--state-danger-fg))] mb-2">
             <AlertTriangle className="w-4 h-4" />
-            {job.failed} failure{job.failed === 1 ? '' : 's'}
+            {t('bulkGenerate.asyncSuccess.failureCount', { count: job.failed })}
             {job.failures && job.failures.length < job.failed && (
               <span className="text-xs font-normal text-[rgb(var(--text-tertiary))]">
-                (showing first {job.failures.length})
+                {t('bulkGenerate.asyncSuccess.showingFirst', {
+                  count: job.failures.length,
+                })}
               </span>
             )}
           </div>
           {(job.failures ?? []).length > 0 ? (
-            <ul className="divide-y divide-[rgb(var(--border-primary))] max-h-[240px] overflow-y-auto">
+            <ul className="divide-y divide-[rgb(var(--border-primary))] max-h-60 overflow-y-auto">
               {(job.failures ?? []).map((f) => (
                 <li
                   key={f.recordId}
                   className="flex items-center gap-3 px-2 py-1.5 text-sm"
                 >
-                  <span className="text-xs font-mono text-[rgb(var(--text-tertiary))] whitespace-nowrap">
-                    {f.recordId.slice(0, 8)}
+                  <span className="text-xs text-[rgb(var(--text-tertiary))] whitespace-nowrap">
+                    <UuidBadge value={f.recordId} />
                   </span>
                   <span className="flex-1 min-w-0 truncate text-[rgb(var(--text-secondary))]">
                     {f.reason}
@@ -125,7 +131,7 @@ export function AsyncGenerateSuccess({
             </ul>
           ) : (
             <p className="text-xs text-[rgb(var(--text-tertiary))]">
-              No per-record reasons were returned by the worker.
+              {t('bulkGenerate.asyncSuccess.noReasons')}
             </p>
           )}
         </div>
@@ -157,7 +163,7 @@ function Stat({
       >
         {value}
       </div>
-      <div className="text-[11px] uppercase tracking-wider text-[rgb(var(--text-tertiary))] mt-0.5">
+      <div className="text-xs uppercase tracking-wider text-[rgb(var(--text-tertiary))] mt-0.5">
         {label}
       </div>
     </div>

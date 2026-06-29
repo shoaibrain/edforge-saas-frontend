@@ -182,5 +182,352 @@
     "no": "No"
   },
   "gradeLabel": "Grade {{level}}",
-  "ageLabel": "{{age}} yrs"
+  "ageLabel": "{{age}} yrs",
+  "dataTable": {
+    "errorTitle": "Failed to load data",
+    "errorDescription": "An unexpected error occurred.",
+    "retry": "Retry",
+    "clearSearch": "Clear search",
+    "clearFilters": "Clear filters",
+    "clearActiveFilters": "Clear ({{count}})",
+    "clearSelection": "Clear selection",
+    "selectedRows": "{{count}} selected",
+    "selectedRows_plural": "{{count}} selected",
+    "paginationShowing": "Showing {{start}}-{{end}} of {{total}} results",
+    "rowsPerPage": "{{size}} / page",
+    "previousPage": "Prev",
+    "nextPage": "Next",
+    "loadingPage": "Loading...",
+    "rowDensity": "Row density",
+    "comfortableDensity": "Comfortable",
+    "comfortableDensityTitle": "Comfortable rows",
+    "compactDensity": "Compact",
+    "compactDensityTitle": "Compact rows",
+    "viewOptions": "View",
+    "toggleColumns": "Toggle columns",
+    "export": "Export",
+    "exportFormats": {
+      "csv": "Export as CSV",
+      "xlsx": "Export as XLSX"
+    },
+    "xlsxUnavailable": "XLSX export ships in a follow-up",
+    "filterAriaLabel": "{{title}} filter",
+    "clearFilter": "Clear filter"
+  },
+  "common": {
+    "actions": "Actions",
+    "active": "Active",
+    "inactive": "Inactive",
+    "teacher": "Teacher",
+    "primaryInstructor": "Primary Instructor",
+    "student": "Student",
+    "students": "{{count}} student",
+    "students_plural": "{{count}} students",
+    "course": "Course",
+    "courses": "{{count}} course",
+    "courses_plural": "{{count}} courses",
+    "section": "Section",
+    "sections": "{{count}} section",
+    "sections_plural": "{{count}} sections",
+    "staff": "{{count}} staff",
+    "staff_plural": "{{count}} staff",
+    "more": "+{{count}} more",
+    "comingSoon": "{{action}} for {{countLabel}} — coming soon"
+  },
+  "enums": {
+    "employmentStatus": {
+      "active": "Active",
+      "on_leave": "On leave",
+      "suspended": "Suspended",
+      "terminated": "Terminated"
+    },
+    "staffRole": {
+      "teacher": "Teacher",
+      "principal": "Principal",
+      "vice_principal": "Vice Principal",
+      "counselor": "Counselor",
+      "admin_staff": "Admin Staff"
+    },
+    "examResult": {
+      "generated": "Generated",
+      "pending": "Pending",
+      "none": "—"
+    }
+  },
+  "tables": {
+    "students": {
+      "columns": {
+        "student": "Student",
+        "grade": "Grade",
+        "attendance": "Attendance",
+        "guardian": "Guardian",
+        "location": "Location",
+        "status": "Status",
+        "enrolled": "Enrolled"
+      },
+      "actions": {
+        "studentActions": "Student actions",
+        "viewProfile": "View Profile",
+        "withdraw": "Withdraw",
+        "message": "Message",
+        "moveSection": "Move section",
+        "archive": "Archive"
+      },
+      "bulk": {
+        "message": "Message",
+        "move": "Move",
+        "archive": "Archive"
+      },
+      "empty": {
+        "title": "No students found",
+        "description": "Get started by adding your first student to the directory.",
+        "action": "Add Student"
+      }
+    },
+    "enrollment": {
+      "columns": {
+        "student": "Student",
+        "gradeLevel": "Grade Level",
+        "status": "Status",
+        "entryDate": "Entry Date",
+        "exitDate": "Exit Date",
+        "type": "Type"
+      },
+      "actions": {
+        "withdraw": "Withdraw",
+        "transfer": "Transfer",
+        "markNoShow": "Mark No-Show"
+      },
+      "filters": {
+        "loadingGrades": "Loading grades...",
+        "allGrades": "All Grades",
+        "allStatus": "All Status",
+        "clear": "Clear"
+      },
+      "types": {
+        "new": "New",
+        "re_enrollment": "Re-enrollment",
+        "transfer": "Transfer"
+      },
+      "empty": {
+        "title": "No enrollments found",
+        "description": "Try adjusting your filters or search term."
+      },
+      "search": "Search students..."
+    },
+    "courses": {
+      "columns": {
+        "code": "Code",
+        "courseName": "Course Name",
+        "subject": "Subject",
+        "grades": "Grades",
+        "credits": "Credits",
+        "type": "Type",
+        "duration": "Duration",
+        "status": "Status"
+      },
+      "actions": {
+        "actions": "Actions",
+        "quickView": "Quick View",
+        "viewFullDetails": "View Full Details",
+        "editCourse": "Edit Course",
+        "activate": "Activate",
+        "deactivate": "Deactivate"
+      },
+      "warnings": {
+        "missingAcademicSubjectTitle": "No granular academic subject set. Report cards fall back to this subject area — add a granular subject for finer labels.",
+        "missingAcademicSubject": "No granular academic subject set"
+      },
+      "empty": {
+        "title": "No courses found",
+        "description": "Get started by adding your first course to the catalog.",
+        "action": "Add Course"
+      }
+    },
+    "gradeLevels": {
+      "stats": {
+        "totalGradeLevels": "Total Grade Levels",
+        "courseAssignments": "Course Assignments",
+        "avgCoursesPerGrade": "Avg. Courses / Grade",
+        "gradesWithCourses": "Grades with Courses"
+      },
+      "columns": {
+        "gradeLevel": "Grade Level",
+        "courseCount": "Course Count",
+        "courses": "Courses",
+        "students": "Students"
+      },
+      "empty": {
+        "title": "No grade levels found",
+        "description": "Grade levels will appear once courses are configured."
+      },
+      "noCurrentYearTitle": "No active academic year — enrollment counts will appear once an academic year is set as current."
+    },
+    "sections": {
+      "columns": {
+        "section": "Section",
+        "course": "Course",
+        "teacher": "Teacher",
+        "period": "Period",
+        "room": "Room",
+        "enrollment": "Enrollment",
+        "status": "Status"
+      },
+      "actions": {
+        "sectionActions": "Section actions",
+        "viewDetails": "View Details",
+        "viewRoster": "View Roster",
+        "editSection": "Edit Section",
+        "activate": "Activate",
+        "deactivate": "Deactivate",
+        "sendNotification": "Send notification",
+        "notify": "Notify"
+      },
+      "search": "Search sections...",
+      "empty": {
+        "title": "No sections found",
+        "description": "Create your first class section to start building your schedule."
+      }
+    },
+    "sectionRoster": {
+      "columns": {
+        "name": "Name",
+        "studentId": "Student ID",
+        "grade": "Grade",
+        "enrolled": "Enrolled"
+      },
+      "actions": {
+        "forStudent": "Actions for {{studentName}}",
+        "removeFromSection": "Remove from Section",
+        "addStudents": "Add Students"
+      },
+      "capacity": "{{current}}/{{max}} enrolled",
+      "search": "Search by name or student ID...",
+      "empty": {
+        "title": "No students enrolled yet",
+        "description": "Add students to this section to build your class roster."
+      },
+      "confirmRemove": {
+        "title": "Remove Student",
+        "description": "Are you sure you want to remove {{studentName}} from this section?",
+        "fallbackStudent": "this student",
+        "confirm": "Remove"
+      }
+    },
+    "teachers": {
+      "columns": {
+        "name": "Name",
+        "email": "Email",
+        "role": "Role",
+        "status": "Status"
+      },
+      "actions": {
+        "changeRole": "Change role",
+        "updateStatus": "Update status"
+      },
+      "search": "Search by name or email...",
+      "empty": {
+        "title": "No staff found",
+        "description": "Try adjusting your search or filters."
+      }
+    },
+    "exams": {
+      "columns": {
+        "exam": "Exam",
+        "type": "Type",
+        "term": "Term",
+        "grades": "Grades",
+        "schedule": "Schedule",
+        "status": "Status",
+        "results": "Results"
+      },
+      "results": {
+        "generated": "Generated",
+        "pending": "Pending"
+      },
+      "search": "Search exams...",
+      "schedule": {
+        "daysAgo": "{{count}}d ago",
+        "today": "today",
+        "inDays": "in {{count}}d",
+        "duration": "{{count}}d"
+      },
+      "empty": {
+        "title": "No exams match",
+        "description": "Adjust filters or create the first exam for this academic year to begin scheduling."
+      }
+    },
+    "examScores": {
+      "search": "Search students by name...",
+      "subject": "Subject",
+      "student": "Student",
+      "grade": "Grade",
+      "score": "Score",
+      "subjectFallback": "Subject",
+      "maxMarks": "{{marks}} max",
+      "summary": "{{students}} · max {{max}}",
+      "pass": "pass {{marks}}",
+      "emptyNoStudents": "No students to score",
+      "emptyNoActiveForGrades": "No active students enrolled for this exam's grade band ({{grades}}).",
+      "emptyNoActiveEnrollments": "No active enrollments for this academic year.",
+      "noSubjectsTitle": "No subjects yet",
+      "noSubjectsDescription": "Add subjects in the Subjects tab before entering scores.",
+      "lockedStatus": "Score entry is locked while the exam is {{status}}. Scores can only be entered or edited in Scheduled or In Progress.",
+      "lockedPermission": "You do not have permission to edit scores.",
+      "invalidRows": "{{count}} row invalid (0–{{max}})",
+      "invalidRows_plural": "{{count}} rows invalid (0–{{max}})",
+      "noChanges": "No changes",
+      "pendingChanges": "{{count}} change pending",
+      "pendingChanges_plural": "{{count}} changes pending",
+      "blankCount": "{{count}} blank",
+      "blankCount_plural": "{{count}} blanks",
+      "saving": "Saving...",
+      "saveScores": "Save Scores"
+    }
+  },
+  "iemisExport": {
+    "title": "IEMiS Monthly Export",
+    "description": "Generate the IEMiS Flash II monthly attendance roll-up for a calendar month. The export recomputes per-student present / absent / excused day counts and lets you download a CSV. Grade is the school-local grade level.",
+    "month": "Month",
+    "monthAria": "Export month (YYYY-MM)",
+    "generating": "Generating...",
+    "generate": "Generate Export",
+    "downloadCsv": "Download CSV",
+    "invalidMonth": "Enter a valid month (YYYY-MM).",
+    "failed": "Failed to generate the export. Please try again.",
+    "summary": "{{students}} · {{yearMonth}}",
+    "generated": "Generated {{dateTime}}",
+    "empty": "No attendance recorded for this month.",
+    "search": "Search students...",
+    "bs": "BS {{label}}",
+    "bsRange": "BS {{start}} – {{end}}",
+    "bsMonths": {
+      "1": "Baisakh",
+      "2": "Jestha",
+      "3": "Ashadh",
+      "4": "Shrawan",
+      "5": "Bhadra",
+      "6": "Ashwin",
+      "7": "Kartik",
+      "8": "Mangsir",
+      "9": "Poush",
+      "10": "Magh",
+      "11": "Falgun",
+      "12": "Chaitra"
+    },
+    "columns": {
+      "studentId": "Student ID",
+      "studentName": "Student Name",
+      "grade": "Grade",
+      "presentDays": "Present Days",
+      "absentDays": "Absent Days",
+      "excusedDays": "Excused Days",
+      "totalSchoolDays": "Total School Days",
+      "student": "Student",
+      "present": "Present",
+      "absent": "Absent",
+      "excused": "Excused",
+      "schoolDays": "School Days"
+    }
+  }
 }

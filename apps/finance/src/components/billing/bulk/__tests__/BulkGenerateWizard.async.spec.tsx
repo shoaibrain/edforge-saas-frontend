@@ -105,6 +105,65 @@ vi.mock('../Step4Review', () => ({
   Step4Review: () => <div data-testid="step-4">Review</div>,
 }))
 
+vi.mock('@edforge/i18n', () => {
+  const messages: Record<string, string> = {
+    'actions.cancel': 'Cancel',
+    'actions.back': 'Back',
+    'actions.next': 'Next',
+    'actions.close': 'Close',
+    'bulkGenerate.steps.selectRecipients': 'Select recipients',
+    'bulkGenerate.steps.feeStructures': 'Fee structures',
+    'bulkGenerate.steps.invoiceDetails': 'Invoice details',
+    'bulkGenerate.steps.reviewConfirm': 'Review & confirm',
+    'bulkGenerate.actions.generating': 'Generating...',
+    'bulkGenerate.actions.generateInvoices': 'Generate invoices',
+    'bulkGenerate.footer.studentsSelected': '{{count}} students selected',
+    'bulkGenerate.footer.lineItemsAndStudents': '{{lineCount}} {{lineLabel}} · {{studentCount}} {{studentLabel}}',
+    'bulkGenerate.footer.invoicesConfigured': '{{count}} invoices will be configured',
+    'bulkGenerate.footer.readyToGenerate': 'Ready to generate {{count}} invoices',
+    'bulkGenerate.common.lineItem': 'line item',
+    'bulkGenerate.common.lineItem_plural': 'line items',
+    'bulkGenerate.common.student': 'student',
+    'bulkGenerate.common.student_plural': 'students',
+    'bulkGenerate.confirm.title': 'Generate invoices?',
+    'bulkGenerate.confirm.description': 'Generate {{count}} invoices? This cannot be undone.',
+    'bulkGenerate.confirm.body': 'Invoices for {{count}} students will be created as drafts. You can review and issue them from the invoices list.',
+    'bulkGenerate.confirm.generateCount': 'Generate {{count}}',
+    'bulkGenerate.async.inProgressTitle': 'Generating invoices...',
+    'bulkGenerate.async.runningDescription': 'Creating draft invoices for {{count}} students. This typically completes in under 90 seconds.',
+    'bulkGenerate.async.progressVerb': 'Generating invoices',
+    'bulkGenerate.async.runInBackground': 'Run in background',
+    'bulkGenerate.async.toastSucceeded': '{{count}} draft invoices created',
+    'bulkGenerate.async.toastSkipped': '{{count}} skipped',
+    'bulkGenerate.async.toastFailed': '{{count}} failed',
+    'bulkGenerate.asyncSuccess.title': '{{count}} invoices created as drafts',
+    'bulkGenerate.asyncSuccess.periodNotice': 'For {{billingPeriod}}. Click Issue on each invoice, or use bulk-issue, to send them to families.',
+    'bulkGenerate.asyncSuccess.created': 'Created',
+    'bulkGenerate.asyncSuccess.skipped': 'Skipped',
+    'bulkGenerate.asyncSuccess.failed': 'Failed',
+    'bulkGenerate.asyncSuccess.retryFailed': 'Retry failed ({{count}})',
+    'bulkGenerate.asyncSuccess.failureCount': '{{count}} failures',
+    'bulkGenerate.asyncSuccess.showingFirst': '(showing first {{count}})',
+    'bulkGenerate.success.newBatch': 'New batch',
+    'bulkGenerate.toast.generated': '{{count}} invoices generated',
+    'bulkGenerate.toast.generatedWithSkipped': '{{count}} invoices generated · {{skipped}} skipped',
+    'bulkGenerate.toast.syncLimitExceeded': 'Too many students (>25) for synchronous generation. For now, narrow the selection or pick a single grade and try again.',
+    'bulkGenerate.toast.failed': 'Bulk generation failed.',
+  }
+
+  return {
+    useTranslation: () => ({
+      t: (key: string, options?: Record<string, unknown>) => {
+        let value = messages[key] ?? key
+        for (const [token, replacement] of Object.entries(options ?? {})) {
+          value = value.replaceAll(`{{${token}}}`, String(replacement))
+        }
+        return value
+      },
+    }),
+  }
+})
+
 // ---- Mock the data hooks ------------------------------------------------
 //
 // vi.hoisted() lets the mock factory reach state defined in the spec file

@@ -143,6 +143,40 @@ export interface DataTableExportOptions {
 }
 
 // ============================================================================
+// LOCALIZED LABELS
+// ============================================================================
+
+export interface DataTableLabels {
+  errorTitle: string
+  errorDescription: string
+  retry: string
+  clearSearch: string
+  clearFilters: string
+  clearActiveFilters: (count: number) => string
+  clearSelection: string
+  selectedRows: (count: number) => string
+  paginationShowing: (start: number, end: number, total: string) => string
+  rowsPerPage: (size: number) => string
+  previousPage: string
+  nextPage: string
+  loadingPage: string
+  rowDensity: string
+  comfortableDensity: string
+  comfortableDensityTitle: string
+  compactDensity: string
+  compactDensityTitle: string
+  viewOptions: string
+  toggleColumns: string
+  export: string
+  exportFormat: (format: DataTableExportFormat) => string
+  xlsxUnavailable: string
+  filterAriaLabel: (title: string) => string
+  clearFilter: string
+}
+
+export type DataTableLabelsInput = Partial<DataTableLabels>
+
+// ============================================================================
 // MAIN DATA TABLE PROPS
 // ============================================================================
 
@@ -235,6 +269,10 @@ export interface DataTableProps<TData> {
   // -- Export --
   /** Surfaces a built-in Export button in the toolbar right cluster. */
   exportOptions?: DataTableExportOptions
+
+  // -- Labels --
+  /** Localized labels for the built-in table chrome. English defaults apply. */
+  labels?: DataTableLabelsInput
 
   // -- Styling --
   className?: string

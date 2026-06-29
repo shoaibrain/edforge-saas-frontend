@@ -1,10 +1,12 @@
 import { Rows3, AlignJustify } from 'lucide-react'
 import { cn, focusRingInset } from '../../utils'
-import type { DataTableDensity } from './types'
+import { DEFAULT_DATA_TABLE_LABELS } from './labels'
+import type { DataTableDensity, DataTableLabels } from './types'
 
 interface DataTableDensityToggleProps {
   density: DataTableDensity
   onChange: (next: DataTableDensity) => void
+  labels?: DataTableLabels
 }
 
 /**
@@ -16,26 +18,28 @@ interface DataTableDensityToggleProps {
 export function DataTableDensityToggle({
   density,
   onChange,
+  labels,
 }: DataTableDensityToggleProps) {
+  const resolvedLabels = labels ?? DEFAULT_DATA_TABLE_LABELS
   return (
     <div
       role="group"
-      aria-label="Row density"
+      aria-label={resolvedLabels.rowDensity}
       className="inline-flex items-center rounded-lg border border-[rgb(var(--border-primary))] overflow-hidden"
     >
       <DensityButton
         active={density === 'comfortable'}
         onClick={() => onChange('comfortable')}
-        label="Comfortable"
-        title="Comfortable rows"
+        label={resolvedLabels.comfortableDensity}
+        title={resolvedLabels.comfortableDensityTitle}
       >
         <Rows3 className="w-3.5 h-3.5" />
       </DensityButton>
       <DensityButton
         active={density === 'compact'}
         onClick={() => onChange('compact')}
-        label="Compact"
-        title="Compact rows"
+        label={resolvedLabels.compactDensity}
+        title={resolvedLabels.compactDensityTitle}
       >
         <AlignJustify className="w-3.5 h-3.5" />
       </DensityButton>

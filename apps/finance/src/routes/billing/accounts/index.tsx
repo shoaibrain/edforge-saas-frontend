@@ -19,6 +19,7 @@ import {
   Pencil,
 } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
+import { useTranslation } from '@edforge/i18n'
 import {
   TanstackDataTable,
   createExpandColumn,
@@ -46,18 +47,20 @@ import { BulkAdjustBalanceDrawer } from '../../../components/billing/BulkAdjustB
 import type { RowSelectionState } from '@tanstack/react-table'
 
 type AccountTab = 'ledger' | 'invoices' | 'payments'
+type Translate = (key: string, options?: Record<string, unknown>) => string
 
 const ACCOUNT_TABS = [
-  { key: 'ledger', label: 'Ledger' },
-  { key: 'invoices', label: 'Invoices' },
-  { key: 'payments', label: 'Payments' },
-] satisfies { key: AccountTab; label: string }[]
+  { key: 'ledger', labelKey: 'studentAccount.tabs.ledger' },
+  { key: 'invoices', labelKey: 'studentAccount.tabs.invoices' },
+  { key: 'payments', labelKey: 'studentAccount.tabs.payments' },
+] satisfies { key: AccountTab; labelKey: string }[]
 
 // ============================================================================
 // LEDGER TAB
 // ============================================================================
 
 function LedgerTab({ schoolId, accountId }: { schoolId: string; accountId: string }) {
+  const { t } = useTranslation('payments')
   const ledgerSettings = useFinanceSettings()
   const { format } = useCurrency(ledgerSettings)
   const { data: ledger, isLoading, isError, error, refetch } = useStudentLedger(schoolId, accountId)
@@ -77,17 +80,17 @@ function LedgerTab({ schoolId, accountId }: { schoolId: string; accountId: strin
     return (
       <div className="text-center py-6">
         <p className="text-xs text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]">
-          Failed to load ledger entries.
+          {t('studentAccount.error.ledgerLoadFailed')}
         </p>
         <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
-          {(error as Error)?.message ?? 'Unknown error'}
+          {(error as Error)?.message ?? t('studentAccount.error.unknown')}
         </p>
         <button
           type="button"
           onClick={() => { void refetch() }}
           className="mt-2 text-xs px-2 py-1 rounded border border-[rgb(var(--border-primary))] hover:bg-[rgb(var(--background-secondary))]"
         >
-          Retry
+          {t('actions.retry')}
         </button>
       </div>
     )
@@ -96,7 +99,7 @@ function LedgerTab({ schoolId, accountId }: { schoolId: string; accountId: strin
   if (entries.length === 0) {
     return (
       <div className="text-center py-6">
-        <p className="text-xs text-[rgb(var(--text-tertiary))]">No ledger entries yet.</p>
+        <p className="text-xs text-[rgb(var(--text-tertiary))]">{t('studentAccount.empty.noLedger')}</p>
       </div>
     )
   }
@@ -105,12 +108,12 @@ function LedgerTab({ schoolId, accountId }: { schoolId: string; accountId: strin
     <table className="w-full">
       <thead>
         <tr className="border-b border-[rgb(var(--border-primary))]">
-          <th className="text-left px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">Date</th>
-          <th className="text-left px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">Type</th>
-          <th className="text-left px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">Description</th>
-          <th className="text-right px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">Debit</th>
-          <th className="text-right px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">Credit</th>
-          <th className="text-right px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">Balance</th>
+          <th className="text-left px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.date')}</th>
+          <th className="text-left px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.type')}</th>
+          <th className="text-left px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.description')}</th>
+          <th className="text-right px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.debit')}</th>
+          <th className="text-right px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.credit')}</th>
+          <th className="text-right px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.balance')}</th>
         </tr>
       </thead>
       <tbody className="divide-y divide-[rgb(var(--border-primary))]">
@@ -146,6 +149,7 @@ function LedgerTab({ schoolId, accountId }: { schoolId: string; accountId: strin
 // ============================================================================
 
 function InvoicesTab({ schoolId, studentId }: { schoolId: string; studentId: string }) {
+  const { t } = useTranslation('payments')
   const navigate = useNavigate()
   const invSettings = useFinanceSettings()
   const { format } = useCurrency(invSettings)
@@ -163,7 +167,7 @@ function InvoicesTab({ schoolId, studentId }: { schoolId: string; studentId: str
   if (invoices.length === 0) {
     return (
       <div className="text-center py-6">
-        <p className="text-xs text-[rgb(var(--text-tertiary))]">No invoices for this student.</p>
+        <p className="text-xs text-[rgb(var(--text-tertiary))]">{t('studentAccount.empty.noInvoices')}</p>
       </div>
     )
   }
@@ -172,11 +176,11 @@ function InvoicesTab({ schoolId, studentId }: { schoolId: string; studentId: str
     <table className="w-full">
       <thead>
         <tr className="border-b border-[rgb(var(--border-primary))]">
-          <th className="text-left px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">Invoice #</th>
-          <th className="text-left px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">Status</th>
-          <th className="text-right px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">Total</th>
-          <th className="text-right px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">Due</th>
-          <th className="text-left px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">Due Date</th>
+          <th className="text-left px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.invoiceNumber')}</th>
+          <th className="text-left px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.status')}</th>
+          <th className="text-right px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.total')}</th>
+          <th className="text-right px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.due')}</th>
+          <th className="text-left px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.dueDate')}</th>
         </tr>
       </thead>
       <tbody className="divide-y divide-[rgb(var(--border-primary))]">
@@ -219,6 +223,7 @@ function PaymentsTab({ schoolId, studentId }: { schoolId: string; studentId: str
 }
 
 function PaymentsFromLedger({ schoolId, studentId }: { schoolId: string; studentId: string }) {
+  const { t } = useTranslation('payments')
   const paySettings = useFinanceSettings()
   const { format } = useCurrency(paySettings)
   const { data, isLoading } = useInvoices(schoolId, { studentId })
@@ -237,7 +242,7 @@ function PaymentsFromLedger({ schoolId, studentId }: { schoolId: string; student
   if (paidInvoices.length === 0) {
     return (
       <div className="text-center py-6">
-        <p className="text-xs text-[rgb(var(--text-tertiary))]">No payments recorded for this student.</p>
+        <p className="text-xs text-[rgb(var(--text-tertiary))]">{t('studentAccount.empty.noPayments')}</p>
       </div>
     )
   }
@@ -246,10 +251,10 @@ function PaymentsFromLedger({ schoolId, studentId }: { schoolId: string; student
     <table className="w-full">
       <thead>
         <tr className="border-b border-[rgb(var(--border-primary))]">
-          <th className="text-left px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">Invoice #</th>
-          <th className="text-right px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">Amount Paid</th>
-          <th className="text-right px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">Grand Total</th>
-          <th className="text-left px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">Status</th>
+          <th className="text-left px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.invoiceNumber')}</th>
+          <th className="text-right px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.amountPaid')}</th>
+          <th className="text-right px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.grandTotal')}</th>
+          <th className="text-left px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.status')}</th>
         </tr>
       </thead>
       <tbody className="divide-y divide-[rgb(var(--border-primary))]">
@@ -289,6 +294,7 @@ function OpeningBalanceCard({
   format: (amount: number) => string
   settings: ReturnType<typeof useFinanceSettings>
 }) {
+  const { t } = useTranslation('payments')
   const [expanded, setExpanded] = useState(false)
   const amount = account.openingBalance ?? 0
   const remaining = account.openingBalanceRemaining ?? amount
@@ -301,18 +307,18 @@ function OpeningBalanceCard({
       <div className="flex items-center gap-2 mb-2">
         <Wallet className="w-4 h-4 text-[rgb(var(--text-secondary))]" />
         <p className="text-xs uppercase tracking-wider text-[rgb(var(--text-tertiary))]">
-          Opening Balance (Previous Dues)
+          {t('studentAccount.openingBalance.title')}
         </p>
       </div>
       <div className="grid grid-cols-3 gap-4">
         <div>
-          <p className="text-xs text-[rgb(var(--text-tertiary))]">Amount</p>
+          <p className="text-xs text-[rgb(var(--text-tertiary))]">{t('studentAccount.openingBalance.amount')}</p>
           <p className="text-sm font-semibold text-[rgb(var(--text-primary))]">
             {format(amount)}
           </p>
         </div>
         <div>
-          <p className="text-xs text-[rgb(var(--text-tertiary))]">As of</p>
+          <p className="text-xs text-[rgb(var(--text-tertiary))]">{t('studentAccount.openingBalance.asOf')}</p>
           <p className="text-sm font-semibold text-[rgb(var(--text-primary))]">
             {account.openingBalanceAsOf
               ? formatDate(account.openingBalanceAsOf, settings)
@@ -320,7 +326,7 @@ function OpeningBalanceCard({
           </p>
         </div>
         <div>
-          <p className="text-xs text-[rgb(var(--text-tertiary))]">Remaining</p>
+          <p className="text-xs text-[rgb(var(--text-tertiary))]">{t('studentAccount.openingBalance.remaining')}</p>
           <p className={`text-sm font-semibold ${
             remaining > 0
               ? 'text-[rgb(var(--state-warning-fg))]'
@@ -329,7 +335,7 @@ function OpeningBalanceCard({
             {format(remaining)}
             {settled > 0 && (
               <span className="ml-2 text-xs font-normal text-[rgb(var(--text-tertiary))]">
-                ({format(settled)} settled)
+                ({t('studentAccount.openingBalance.settled', { amount: format(settled) })})
               </span>
             )}
           </p>
@@ -337,7 +343,7 @@ function OpeningBalanceCard({
       </div>
       {note && (
         <div className="mt-2 pt-2 border-t border-[rgb(var(--border-primary))]">
-          <p className="text-xs text-[rgb(var(--text-tertiary))]">Note</p>
+          <p className="text-xs text-[rgb(var(--text-tertiary))]">{t('studentAccount.openingBalance.note')}</p>
           <p
             className={`text-sm text-[rgb(var(--text-secondary))] ${
               expanded ? '' : 'line-clamp-1'
@@ -352,7 +358,7 @@ function OpeningBalanceCard({
               className="text-xs text-[rgb(var(--text-link))] hover:underline mt-0.5"
               onClick={() => setExpanded(prev => !prev)}
             >
-              {expanded ? 'Show less' : 'Show more'}
+              {expanded ? t('studentAccount.openingBalance.showLess') : t('studentAccount.openingBalance.showMore')}
             </button>
           )}
         </div>
@@ -368,9 +374,11 @@ function AccountDetail({
   account: StudentAccount
   schoolId: string
 }) {
+  const { t } = useTranslation('payments')
   const detailSettings = useFinanceSettings()
   const { format } = useCurrency(detailSettings)
   const [activeTab, setActiveTab] = useState<AccountTab>('ledger')
+  const tabs = ACCOUNT_TABS.map((tab) => ({ key: tab.key, label: t(tab.labelKey) }))
 
   return (
     <div className="px-4 pb-4 space-y-3">
@@ -388,7 +396,7 @@ function AccountDetail({
       {/* Summary Header */}
       <div className="grid grid-cols-3 gap-4">
         <div className="bg-[rgb(var(--background-primary))] rounded-lg p-3 border border-[rgb(var(--border-primary))]">
-          <p className="text-xs uppercase tracking-wider text-[rgb(var(--text-tertiary))]">Outstanding</p>
+          <p className="text-xs uppercase tracking-wider text-[rgb(var(--text-tertiary))]">{t('studentAccount.balance')}</p>
           <p className={`text-sm font-semibold mt-0.5 ${
             account.balance > 0 ? 'text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]' : 'text-[rgb(var(--state-success-fg))] '
           }`}>
@@ -396,22 +404,22 @@ function AccountDetail({
           </p>
         </div>
         <div className="bg-[rgb(var(--background-primary))] rounded-lg p-3 border border-[rgb(var(--border-primary))]">
-          <p className="text-xs uppercase tracking-wider text-[rgb(var(--text-tertiary))]">Total Paid</p>
+          <p className="text-xs uppercase tracking-wider text-[rgb(var(--text-tertiary))]">{t('studentAccount.totalPaid')}</p>
           <p className="text-sm font-semibold mt-0.5 text-[rgb(var(--text-primary))]">
             {format(account.totalPaid)}
           </p>
         </div>
         <div className="bg-[rgb(var(--background-primary))] rounded-lg p-3 border border-[rgb(var(--border-primary))]">
-          <p className="text-xs uppercase tracking-wider text-[rgb(var(--text-tertiary))]">Last Payment</p>
+          <p className="text-xs uppercase tracking-wider text-[rgb(var(--text-tertiary))]">{t('studentAccount.lastPayment')}</p>
           <p className="text-sm font-semibold mt-0.5 text-[rgb(var(--text-primary))]">
-            {account.lastPaymentDate ? formatDate(account.lastPaymentDate, detailSettings) : 'Never'}
+            {account.lastPaymentDate ? formatDate(account.lastPaymentDate, detailSettings) : t('studentAccount.never')}
           </p>
         </div>
       </div>
 
       {/* Tabs */}
       <FilterTabs
-        tabs={ACCOUNT_TABS}
+        tabs={tabs}
         activeTab={activeTab}
         onTabChange={(key) => setActiveTab(key as AccountTab)}
         className="rounded-lg bg-[rgb(var(--background-tertiary))] p-1"
@@ -463,20 +471,24 @@ function balanceBucket(balance: number): 'zero' | 'low' | 'mid' | 'high' {
   return 'high'
 }
 
-const BALANCE_OPTIONS = [
-  { value: 'zero', label: 'No balance' },
+const BALANCE_OPTIONS: Array<{ value: string; label?: string; labelKey?: string }> = [
+  { value: 'zero', labelKey: 'studentAccount.balanceBuckets.noBalance' },
   { value: 'low', label: '< 500' },
-  { value: 'mid', label: '500 – 2,000' },
+  { value: 'mid', label: '500-2,000' },
   { value: 'high', label: '2,000+' },
 ]
 
-function buildColumns(format: (amount: number) => string, settings: ReturnType<typeof useFinanceSettings>): ColumnDef<StudentAccount, unknown>[] {
+function buildColumns(
+  format: (amount: number) => string,
+  settings: ReturnType<typeof useFinanceSettings>,
+  t: Translate,
+): ColumnDef<StudentAccount, unknown>[] {
   return [
   createSelectColumn<StudentAccount>(),
   createExpandColumn<StudentAccount>(),
   {
     accessorKey: 'studentName',
-    header: 'Student Name',
+    header: t('studentAccount.columns.studentName'),
     size: 280,
     cell: ({ row }) => {
       const account = row.original
@@ -485,7 +497,7 @@ function buildColumns(format: (amount: number) => string, settings: ReturnType<t
           <div className="flex-shrink-0 w-8 h-8 rounded-full overflow-hidden bg-[rgb(var(--background-tertiary))]">
             <img
               src={getAvatarUrl(account.studentId)}
-              alt={account.studentName || 'Student'}
+              alt={account.studentName || t('studentAccount.columns.student')}
               className="w-full h-full object-cover"
               loading="lazy"
             />
@@ -503,7 +515,7 @@ function buildColumns(format: (amount: number) => string, settings: ReturnType<t
   },
   {
     accessorKey: 'balance',
-    header: 'Balance',
+    header: t('studentAccount.columns.balance'),
     meta: { align: 'right' as const },
     cell: ({ row }) => {
       const account = row.original
@@ -519,7 +531,7 @@ function buildColumns(format: (amount: number) => string, settings: ReturnType<t
   {
     id: 'balanceBucket',
     accessorFn: (row) => balanceBucket(row.balance),
-    header: 'Balance bucket',
+    header: t('studentAccount.columns.balanceBucket'),
     enableHiding: true,
     enableSorting: false,
     filterFn: 'arrIncludesSome',
@@ -530,7 +542,7 @@ function buildColumns(format: (amount: number) => string, settings: ReturnType<t
   },
   {
     accessorKey: 'totalPaid',
-    header: 'Total Paid',
+    header: t('studentAccount.totalPaid'),
     meta: { align: 'right' as const },
     cell: ({ row }) => (
       <span className="text-[rgb(var(--text-secondary))]">
@@ -540,10 +552,10 @@ function buildColumns(format: (amount: number) => string, settings: ReturnType<t
   },
   {
     accessorKey: 'lastPaymentDate',
-    header: 'Last Payment',
+    header: t('studentAccount.lastPayment'),
     cell: ({ row }) => (
       <span className="text-[rgb(var(--text-secondary))]">
-        {row.original.lastPaymentDate ? formatDate(row.original.lastPaymentDate, settings) : 'Never'}
+        {row.original.lastPaymentDate ? formatDate(row.original.lastPaymentDate, settings) : t('studentAccount.never')}
       </span>
     ),
   },
@@ -555,10 +567,11 @@ function buildColumns(format: (amount: number) => string, settings: ReturnType<t
 // ============================================================================
 
 export default function StudentAccountsPage() {
+  const { t } = useTranslation('payments')
   const schoolId = useAppStore((s) => s.activeSchoolId)
   const settings = useFinanceSettings()
   const { format, formatCompact } = useCurrency(settings)
-  const columns = useMemo(() => buildColumns(format, settings), [format, settings])
+  const columns = useMemo(() => buildColumns(format, settings, t), [format, settings, t])
 
   const { data: accounts, isLoading } = useStudentAccounts(schoolId ?? '')
 
@@ -588,24 +601,24 @@ export default function StudentAccountsPage() {
     () => [
       {
         id: 'send-statement',
-        label: 'Send statement',
+        label: t('studentAccount.actions.sendStatement'),
         icon: <Mail className="w-4 h-4" />,
         onRun: (rows) => setBulkStatementsTarget(rows),
       },
       {
         id: 'adjust-balance',
-        label: 'Adjust balance',
+        label: t('studentAccount.actions.adjustBalance'),
         icon: <Pencil className="w-4 h-4" />,
         onRun: (rows) => setBulkAdjustTarget(rows),
       },
     ],
-    [],
+    [t],
   )
 
   if (!schoolId) {
     return (
       <div className="p-6 text-center text-sm text-[rgb(var(--text-tertiary))]">
-        Select a school to view student accounts.
+        {t('studentAccount.selectSchool')}
       </div>
     )
   }
@@ -614,52 +627,52 @@ export default function StudentAccountsPage() {
     <div className="p-6 space-y-5">
       {/* Header */}
       <FinancePageHeader
-        title="Student Accounts"
-        subtitle="View student billing accounts, invoices, payments, and ledger history."
+        title={t('studentAccount.pageTitle')}
+        subtitle={t('studentAccount.description')}
       />
 
       {/* KPI Tiles */}
       <WidgetErrorBoundaryV2>
         <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
           <StatCard
-            label="Total Students"
+            label={t('studentAccount.summary.totalStudents')}
             value={String(kpi.totalStudents)}
             icon={Users}
             accentColor="rgba(29, 158, 117, 0.12)"
             iconColor="#1D9E75"
             barColor="#1D9E75"
-            tag={{ text: `${kpi.totalStudents} accounts`, color: '#1D9E75', bg: 'rgba(29,158,117,0.10)' }}
+            tag={{ text: t('studentAccount.summary.accounts', { count: kpi.totalStudents }), color: '#1D9E75', bg: 'rgba(29,158,117,0.10)' }}
             loading={isLoading}
           />
           <StatCard
-            label="Outstanding"
+            label={t('studentAccount.summary.outstanding')}
             value={formatCompact(kpi.totalOutstanding)}
             icon={Receipt}
             accentColor="rgba(239, 159, 39, 0.12)"
             iconColor="#EF9F27"
             barColor="#EF9F27"
-            tag={{ text: `${kpi.overdueCount} with balance`, color: '#EF9F27', bg: 'rgba(239,159,39,0.10)' }}
+            tag={{ text: t('studentAccount.summary.withBalanceCount', { count: kpi.overdueCount }), color: '#EF9F27', bg: 'rgba(239,159,39,0.10)' }}
             valueColor="#EF9F27"
             loading={isLoading}
           />
           <StatCard
-            label="Fully Paid"
+            label={t('studentAccount.summary.fullyPaid')}
             value={String(kpi.fullyPaidCount)}
             icon={TrendingUp}
             accentColor="rgba(29, 158, 117, 0.12)"
             iconColor="#1D9E75"
             barColor="#1D9E75"
-            tag={{ text: 'no balance', color: '#1D9E75', bg: 'rgba(29,158,117,0.10)' }}
+            tag={{ text: t('studentAccount.summary.noBalance'), color: '#1D9E75', bg: 'rgba(29,158,117,0.10)' }}
             loading={isLoading}
           />
           <StatCard
-            label="With Balance"
+            label={t('studentAccount.summary.withBalance')}
             value={String(kpi.overdueCount)}
             icon={AlertTriangle}
             accentColor="rgba(226, 75, 74, 0.12)"
             iconColor="#E24B4A"
             barColor="#E24B4A"
-            tag={{ text: `${kpi.overdueCount} with balance`, color: '#E24B4A', bg: 'rgba(226,75,74,0.10)' }}
+            tag={{ text: t('studentAccount.summary.withBalanceCount', { count: kpi.overdueCount }), color: '#E24B4A', bg: 'rgba(226,75,74,0.10)' }}
             loading={isLoading}
           />
         </div>
@@ -672,7 +685,7 @@ export default function StudentAccountsPage() {
         getRowId={(row) => row.id}
         isLoading={isLoading}
         tableId="finance.accounts"
-        searchPlaceholder="Search by student name..."
+        searchPlaceholder={t('studentAccount.searchPlaceholder')}
         enableSorting={true}
         enableRowSelection
         rowSelection={rowSelection}
@@ -683,7 +696,14 @@ export default function StudentAccountsPage() {
         pageSizes={[10, 20, 50]}
         defaultSort={[{ id: 'balance', desc: true }]}
         facets={[
-          { columnId: 'balanceBucket', title: 'Balance', options: BALANCE_OPTIONS },
+          {
+            columnId: 'balanceBucket',
+            title: t('studentAccount.columns.balance'),
+            options: BALANCE_OPTIONS.map((option) => ({
+              value: option.value,
+              label: option.labelKey ? t(option.labelKey) : option.label ?? option.value,
+            })),
+          },
         ]}
         initialColumnVisibility={{ balanceBucket: false }}
         bulkActions={accountBulkActions}
@@ -693,8 +713,8 @@ export default function StudentAccountsPage() {
         )}
         emptyState={{
           icon: <Users className="w-10 h-10" />,
-          title: 'No student accounts found',
-          description: 'Student accounts are created automatically when invoices are generated.',
+          title: t('studentAccount.empty.noAccounts'),
+          description: t('studentAccount.empty.noAccountsDescription'),
         }}
         maxHeight="calc(100vh - 22rem)"
         className="min-h-96"

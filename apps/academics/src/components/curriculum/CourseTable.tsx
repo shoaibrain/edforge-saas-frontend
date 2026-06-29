@@ -22,6 +22,7 @@ import { getDurationLabel, sortGradeCodes } from '../../schemas/course.form'
 import { formatCourseType } from '../../utils/course-type'
 import { CourseTypeChip } from './CourseTypeChip'
 import { SubjectChip } from './SubjectChip'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 // ============================================================================
 // TYPES
@@ -51,6 +52,7 @@ interface RowActionsProps {
 
 function RowActions({ course, onView, onEdit, onToggleActive, onNavigate }: RowActionsProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const { t } = useAcademicsI18n()
 
   return (
     <div className="relative">
@@ -61,7 +63,7 @@ function RowActions({ course, onView, onEdit, onToggleActive, onNavigate }: RowA
           setIsOpen(!isOpen)
         }}
         className="p-1.5 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-secondary transition-colors"
-        aria-label="Actions"
+        aria-label={t('tables.courses.actions.actions')}
       >
         <MoreVertical className="w-4 h-4" />
       </button>
@@ -86,7 +88,7 @@ function RowActions({ course, onView, onEdit, onToggleActive, onNavigate }: RowA
               className="flex items-center gap-2 w-full px-3 py-2 text-sm text-text-primary hover:bg-surface-secondary transition-colors"
             >
               <Eye className="w-4 h-4" />
-              Quick View
+              {t('tables.courses.actions.quickView')}
             </button>
             {onNavigate && (
               <button
@@ -99,7 +101,7 @@ function RowActions({ course, onView, onEdit, onToggleActive, onNavigate }: RowA
                 className="flex items-center gap-2 w-full px-3 py-2 text-sm text-text-primary hover:bg-surface-secondary transition-colors"
               >
                 <ExternalLink className="w-4 h-4" />
-                View Full Details
+                {t('tables.courses.actions.viewFullDetails')}
               </button>
             )}
             {onEdit && (
@@ -113,7 +115,7 @@ function RowActions({ course, onView, onEdit, onToggleActive, onNavigate }: RowA
                 className="flex items-center gap-2 w-full px-3 py-2 text-sm text-text-primary hover:bg-surface-secondary transition-colors"
               >
                 <Pencil className="w-4 h-4" />
-                Edit Course
+                {t('tables.courses.actions.editCourse')}
               </button>
             )}
             {onToggleActive && (
@@ -133,12 +135,12 @@ function RowActions({ course, onView, onEdit, onToggleActive, onNavigate }: RowA
                 {course.isActive ? (
                   <>
                     <ToggleLeft className="w-4 h-4" />
-                    Deactivate
+                    {t('tables.courses.actions.deactivate')}
                   </>
                 ) : (
                   <>
                     <ToggleRight className="w-4 h-4" />
-                    Activate
+                    {t('tables.courses.actions.activate')}
                   </>
                 )}
               </button>
@@ -155,6 +157,7 @@ function RowActions({ course, onView, onEdit, onToggleActive, onNavigate }: RowA
 // ============================================================================
 
 function GradeLevelChips({ grades }: { grades: string[] }) {
+  const { t } = useAcademicsI18n()
   if (!grades || grades.length === 0) return <span className="text-text-tertiary">—</span>
 
   const sorted = sortGradeCodes(grades)
@@ -174,7 +177,7 @@ function GradeLevelChips({ grades }: { grades: string[] }) {
       ))}
       {!showAll && remaining > 0 && (
         <span className="text-3xs font-medium py-px px-1.5 rounded-[5px] text-[rgb(var(--text-tertiary))] bg-[rgb(var(--background-tertiary)/0.5)]">
-          +{remaining} more
+          {t('common.more', { count: remaining })}
         </span>
       )}
     </div>
@@ -182,9 +185,10 @@ function GradeLevelChips({ grades }: { grades: string[] }) {
 }
 
 function StatusDot({ isActive }: { isActive: boolean }) {
+  const { t } = useAcademicsI18n()
   return (
     <StatusBadge tone={isActive ? 'success' : 'neutral'} size="sm" dot>
-      {isActive ? 'Active' : 'Inactive'}
+      {isActive ? t('common.active') : t('common.inactive')}
     </StatusBadge>
   )
 }
@@ -202,12 +206,13 @@ export function CourseTable({
   onToggleActive,
   onNavigateToCourse,
 }: CourseTableProps) {
+  const { t, dataTableLabels } = useAcademicsI18n()
   const columns: ColumnDef<CourseResponseDto, unknown>[] = useMemo(
     () => [
       {
 
         accessorKey: 'courseCode',
-        header: 'Code',
+        header: t('tables.courses.columns.code'),
         size: 120,
         cell: ({ row }) => (
           <span className="font-mono text-3xs font-medium py-0.5 px-1.5 rounded-[5px] tracking-[0.3px] whitespace-nowrap bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]">
@@ -217,7 +222,7 @@ export function CourseTable({
       },
       {
         accessorKey: 'courseName',
-        header: 'Course Name',
+        header: t('tables.courses.columns.courseName'),
         size: 240,
         cell: ({ row }) => (
           <div className="min-w-0">
@@ -234,15 +239,15 @@ export function CourseTable({
       },
       {
         accessorKey: 'subjectArea',
-        header: 'Subject',
+        header: t('tables.courses.columns.subject'),
         size: 160,
         cell: ({ row }) => (
           <div className="flex items-center gap-1.5">
             <SubjectChip subject={row.original.subjectArea} />
             {!row.original.academicSubject && (
               <span
-                title="No granular academic subject set. Report cards fall back to this subject area — add a granular subject for finer labels."
-                aria-label="No granular academic subject set"
+                title={t('tables.courses.warnings.missingAcademicSubjectTitle')}
+                aria-label={t('tables.courses.warnings.missingAcademicSubject')}
                 className="cursor-help text-xs text-amber-500"
               >
                 ⚠
@@ -253,14 +258,14 @@ export function CourseTable({
       },
       {
         accessorKey: 'gradeLevels',
-        header: 'Grades',
+        header: t('tables.courses.columns.grades'),
         size: 140,
         enableSorting: false,
         cell: ({ row }) => <GradeLevelChips grades={row.original.gradeLevels} />,
       },
       {
         accessorKey: 'credits',
-        header: 'Credits',
+        header: t('tables.courses.columns.credits'),
         size: 100,
         cell: ({ row }) => {
           const { style } = formatCourseType(row.original.courseType)
@@ -284,13 +289,13 @@ export function CourseTable({
       },
       {
         accessorKey: 'courseType',
-        header: 'Type',
+        header: t('tables.courses.columns.type'),
         size: 110,
         cell: ({ row }) => <CourseTypeChip type={row.original.courseType} />,
       },
       {
         accessorKey: 'typicalDuration',
-        header: 'Duration',
+        header: t('tables.courses.columns.duration'),
         size: 100,
         enableSorting: false,
         cell: ({ row }) => (
@@ -301,7 +306,7 @@ export function CourseTable({
       },
       {
         accessorKey: 'isActive',
-        header: 'Status',
+        header: t('tables.courses.columns.status'),
         size: 90,
         cell: ({ row }) => <StatusDot isActive={row.original.isActive} />,
       },
@@ -317,7 +322,7 @@ export function CourseTable({
         ),
       }),
     ],
-    [onViewCourse, onEditCourse, onToggleActive, onNavigateToCourse]
+    [onViewCourse, onEditCourse, onToggleActive, onNavigateToCourse, t]
   )
 
   return (
@@ -328,13 +333,13 @@ export function CourseTable({
       isLoading={isLoading}
       emptyState={{
         icon: <BookOpen className="w-12 h-12" />,
-        title: 'No courses found',
-        description:
-          'Get started by adding your first course to the catalog.',
+        title: t('tables.courses.empty.title'),
+        description: t('tables.courses.empty.description'),
         action: onAddCourse
-          ? { label: 'Add Course', onClick: onAddCourse }
+          ? { label: t('tables.courses.empty.action'), onClick: onAddCourse }
           : undefined,
       }}
+      labels={dataTableLabels}
       pagination={{ pageSize: 20 }}
       enableSorting={true}
       onRowClick={onViewCourse}

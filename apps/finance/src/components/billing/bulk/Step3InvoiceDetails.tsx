@@ -7,6 +7,7 @@
  */
 
 import { Eye, Ban, Calendar as CalIcon } from 'lucide-react'
+import { useTranslation } from '@edforge/i18n'
 import type { WizardDetails } from './types'
 
 export interface Step3InvoiceDetailsProps {
@@ -24,70 +25,79 @@ export function Step3InvoiceDetails({
   academicYears,
   numberPreview,
 }: Step3InvoiceDetailsProps) {
+  const { t } = useTranslation('payments')
   const set = <K extends keyof WizardDetails>(k: K, v: WizardDetails[K]) =>
     setDetails({ ...details, [k]: v })
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-6 gap-y-4 max-w-3xl">
-      <Field label="Academic year" help="Active year — drives invoice + ledger anchoring.">
+      <Field
+        label={t('bulkGenerate.step3.academicYear')}
+        help={t('bulkGenerate.step3.academicYearHelp')}
+      >
         <select
           value={details.academicYear}
           onChange={(e) => set('academicYear', e.target.value)}
           className="w-full px-3 py-2 text-sm rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-strong))] focus:border-transparent"
         >
-          {academicYears.length === 0 && <option value="">No academic years configured</option>}
+          {academicYears.length === 0 && (
+            <option value="">{t('bulkGenerate.step3.noAcademicYears')}</option>
+          )}
           {academicYears.map(ay => (
             <option key={ay} value={ay}>{ay}</option>
           ))}
         </select>
       </Field>
 
-      <Field label="Billing period / term" help="Grading-period aligned billing window.">
+      <Field
+        label={t('bulkGenerate.step3.billingPeriod')}
+        help={t('bulkGenerate.step3.billingPeriodHelp')}
+      >
         <select
           value={details.billingPeriod}
           onChange={(e) => set('billingPeriod', e.target.value)}
           className="w-full px-3 py-2 text-sm rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-strong))] focus:border-transparent"
         >
-          <option value="">— Select —</option>
-          <option value="First Term">First Term</option>
-          <option value="Second Term">Second Term</option>
-          <option value="Third Term">Third Term</option>
-          <option value="Fourth Term">Fourth Term</option>
+          <option value="">{t('bulkGenerate.step3.selectPeriod')}</option>
+          <option value="First Term">{t('bulkGenerate.step3.terms.first')}</option>
+          <option value="Second Term">{t('bulkGenerate.step3.terms.second')}</option>
+          <option value="Third Term">{t('bulkGenerate.step3.terms.third')}</option>
+          <option value="Fourth Term">{t('bulkGenerate.step3.terms.fourth')}</option>
         </select>
       </Field>
 
-      <Field label="Issue date">
+      <Field label={t('bulkGenerate.step3.issueDate')}>
         <DateInput value={details.issueDate} onChange={(v) => set('issueDate', v)} />
       </Field>
 
-      <Field label="Due date">
+      <Field label={t('bulkGenerate.step3.dueDate')}>
         <DateInput value={details.dueDate} onChange={(v) => set('dueDate', v)} />
       </Field>
 
       <div className="lg:col-span-2">
-        <Field label="Invoice number preview">
+        <Field label={t('bulkGenerate.step3.numberPreview')}>
           <div className="flex items-center gap-3 px-3 py-2 rounded-md bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))]">
             <span className="text-sm font-mono text-[rgb(var(--text-primary))] truncate">
               {numberPreview.first} … {numberPreview.last}
             </span>
             <span className="text-xs text-[rgb(var(--text-tertiary))] whitespace-nowrap">
-              {studentCount} sequential number{studentCount === 1 ? '' : 's'}
+              {t('bulkGenerate.step3.sequentialNumbers', { count: studentCount })}
             </span>
           </div>
           <span className="text-[11px] text-[rgb(var(--text-tertiary))] mt-1 block">
-            Format only — actual numbers are reserved at generate time. Format:
+            {t('bulkGenerate.step3.numberPreviewHelp')}{' '}
             INV-<i>{`{school}`}</i>-<i>{`{year}`}</i>-<i>{`{term}`}</i>-<i>{`{seq}`}</i>.
           </span>
         </Field>
       </div>
 
       <div className="lg:col-span-2">
-        <Field label="Note on every invoice" optional>
+        <Field label={t('bulkGenerate.step3.note')} optional>
           <input
             type="text"
             value={details.notes}
             onChange={(e) => set('notes', e.target.value)}
-            placeholder="e.g. Please pay at the accounts counter or via eSewa before the due date."
+            placeholder={t('bulkGenerate.step3.notePlaceholder')}
             className="w-full px-3 py-2 text-sm rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-strong))] focus:border-transparent"
           />
         </Field>
@@ -96,15 +106,15 @@ export function Step3InvoiceDetails({
       <div className="lg:col-span-2 space-y-2">
         <OptionToggle
           icon={Eye}
-          title="Review every invoice before generating"
-          subtitle="Show a per-student line-item preview on the next step."
+          title={t('bulkGenerate.step3.reviewEveryInvoice')}
+          subtitle={t('bulkGenerate.step3.reviewEveryInvoiceHelp')}
           value={details.showPreview}
           onChange={(v) => set('showPreview', v)}
         />
         <OptionToggle
           icon={Ban}
-          title="Skip students whose total comes to zero"
-          subtitle="Don't issue zero-amount invoices (e.g. fully-discounted students)."
+          title={t('bulkGenerate.step3.skipZeroTotal')}
+          subtitle={t('bulkGenerate.step3.skipZeroTotalHelp')}
           value={details.skipZeroTotal}
           onChange={(v) => set('skipZeroTotal', v)}
         />
@@ -124,12 +134,15 @@ function Field({
   optional?: boolean
   children: React.ReactNode
 }) {
+  const { t } = useTranslation('payments')
   return (
     <div>
       <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1">
         {label}
         {optional && (
-          <span className="ml-1 text-[rgb(var(--text-tertiary))]">(optional)</span>
+          <span className="ml-1 text-[rgb(var(--text-tertiary))]">
+            {t('bulkGenerate.common.optional')}
+          </span>
         )}
       </label>
       {children}

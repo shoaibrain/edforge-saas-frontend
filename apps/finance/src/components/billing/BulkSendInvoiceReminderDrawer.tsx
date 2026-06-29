@@ -16,6 +16,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Bell, Loader2, X } from 'lucide-react'
 import { toast } from 'sonner'
+import { useTranslation } from '@edforge/i18n'
 import {
   useAsyncBulkJob,
   useBulkSendInvoiceReminders,
@@ -23,6 +24,11 @@ import {
 } from '@edforge/finance-services'
 import type { Invoice, InvoiceStatus } from '@edforge/types'
 import { AsyncJobProgress } from './AsyncJobProgress'
+import {
+  formatAsyncJobToast,
+  formatChannelLabel,
+  formatKnownSkipReason,
+} from './async-job-i18n'
 
 export interface BulkSendInvoiceReminderDrawerProps {
   open: boolean
@@ -63,6 +69,7 @@ export function BulkSendInvoiceReminderDrawer({
   schoolId,
   onComplete,
 }: BulkSendInvoiceReminderDrawerProps) {
+  const { t } = useTranslation('payments')
   const [channel, setChannel] = useState<BulkSendReminderDto['channel']>('email')
   const [note, setNote] = useState('')
   const [jobId, setJobId] = useState<string | null>(null)
@@ -77,18 +84,19 @@ export function BulkSendInvoiceReminderDrawer({
   useEffect(() => {
     if (!job.data) return
     if (job.data.status === 'succeeded') {
-      const parts: string[] = [`Sent ${job.data.succeeded} reminder${job.data.succeeded === 1 ? '' : 's'}`]
-      if (job.data.skipped > 0) parts.push(`${job.data.skipped} skipped`)
-      if (job.data.failed > 0) parts.push(`${job.data.failed} failed`)
-      if (job.data.failed === 0 && job.data.skipped === 0) toast.success(parts[0])
-      else if (job.data.succeeded === 0)
-        toast.error(`No reminders sent — ${job.data.failed} failed; ${job.data.skipped} skipped`)
-      else toast.error(parts.join(' · '))
+      const result = formatAsyncJobToast(
+        t,
+        'reminders',
+        job.data.succeeded,
+        job.data.skipped,
+        job.data.failed,
+      )
+      toast[result.tone](result.message)
       onComplete()
     } else if (job.data.status === 'failed') {
-      toast.error(job.data.error ?? 'Send-reminders job failed.')
+      toast.error(job.data.error ?? t('asyncJobs.reminders.jobFailed'))
     }
-  }, [job.data, onComplete])
+  }, [job.data, onComplete, t])
 
   const handleClose = () => {
     if (isWorking) return
@@ -110,7 +118,7 @@ export function BulkSendInvoiceReminderDrawer({
       })
       setJobId(ack.jobId)
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to start send-reminders job.')
+      toast.error(err instanceof Error ? err.message : t('asyncJobs.reminders.failedToStart'))
     }
   }
 
@@ -156,10 +164,10 @@ export function BulkSendInvoiceReminderDrawer({
                         id="bulk-send-reminder-title"
                         className="text-lg font-semibold text-[rgb(var(--text-primary))] truncate"
                       >
-                        Send reminders
+                        {t('asyncJobs.reminders.title')}
                       </h2>
                       <p className="text-xs text-[rgb(var(--text-tertiary))] tabular-nums">
-                        {invoices.length} invoice{invoices.length === 1 ? '' : 's'} selected
+                        {t('asyncJobs.common.selected.invoices', { count: invoices.length })}
                       </p>
                     </div>
                   </div>
@@ -168,7 +176,7 @@ export function BulkSendInvoiceReminderDrawer({
                     onClick={handleClose}
                     disabled={isWorking}
                     className="p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-secondary))] transition-colors flex-shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
-                    aria-label="Close drawer"
+                    aria-label={t('asyncJobs.common.closeDrawer')}
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -176,12 +184,12 @@ export function BulkSendInvoiceReminderDrawer({
 
                 <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
                   {showProgress ? (
-                    <AsyncJobProgress job={job.data} verbingNoun="Sending reminders" />
+                    <AsyncJobProgress job={job.data} verbingNoun={t('asyncJobs.reminders.progress')} />
                   ) : (
                     <>
                       <section>
                         <label className="block text-sm font-medium text-[rgb(var(--text-primary))] mb-2">
-                          Channel
+                          {t('asyncJobs.common.channel')}
                         </label>
                         <div className="grid grid-cols-3 gap-2">
                           {(['email', 'sms', 'both'] as const).map((c) => (
@@ -195,7 +203,7 @@ export function BulkSendInvoiceReminderDrawer({
                                   : 'bg-[rgb(var(--background-primary))] border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-secondary))]'
                               }`}
                             >
-                              {c === 'email' ? 'Email' : c === 'sms' ? 'SMS' : 'Both'}
+                              {formatChannelLabel(t, c)}
                             </button>
                           ))}
                         </div>
@@ -206,14 +214,17 @@ export function BulkSendInvoiceReminderDrawer({
                           htmlFor="bulk-reminder-note"
                           className="block text-sm font-medium text-[rgb(var(--text-primary))] mb-2"
                         >
-                          Custom note <span className="text-[rgb(var(--text-tertiary))] font-normal">(optional)</span>
+                          {t('asyncJobs.reminders.customNote')}{' '}
+                          <span className="text-[rgb(var(--text-tertiary))] font-normal">
+                            {t('asyncJobs.common.optional')}
+                          </span>
                         </label>
                         <textarea
                           id="bulk-reminder-note"
                           value={note}
                           onChange={(e) => setNote(e.target.value.slice(0, MAX_NOTE_LEN))}
                           rows={3}
-                          placeholder="e.g. Friendly reminder — please settle before term-end."
+                          placeholder={t('asyncJobs.reminders.customNotePlaceholder')}
                           className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] resize-none focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
                         />
                         <p className="mt-1 text-xs text-[rgb(var(--text-tertiary))] tabular-nums">
@@ -225,11 +236,11 @@ export function BulkSendInvoiceReminderDrawer({
 
                   <section>
                     <h3 className="text-sm font-medium text-[rgb(var(--text-primary))] mb-2">
-                      Will remind ({eligible.length})
+                      {t('asyncJobs.reminders.willRemind', { count: eligible.length })}
                     </h3>
                     {eligible.length === 0 ? (
                       <p className="text-sm text-[rgb(var(--text-tertiary))]">
-                        None of the selected invoices have an outstanding balance.
+                        {t('asyncJobs.reminders.noneEligible')}
                       </p>
                     ) : (
                       <ul className="space-y-1 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary)/0.4)] p-2 max-h-40 overflow-y-auto">
@@ -242,7 +253,7 @@ export function BulkSendInvoiceReminderDrawer({
                               {inv.invoiceNumber ?? inv.id.slice(0, 8)}
                             </span>
                             <span className="text-xs text-[rgb(var(--text-tertiary))] flex-shrink-0">
-                              {inv.status}
+                              {t(`status.${inv.status}`, { defaultValue: inv.status })}
                             </span>
                           </li>
                         ))}
@@ -253,7 +264,7 @@ export function BulkSendInvoiceReminderDrawer({
                   {skipped.length > 0 && (
                     <section>
                       <h3 className="text-sm font-medium text-[rgb(var(--text-tertiary))] mb-2">
-                        Will skip ({skipped.length})
+                        {t('asyncJobs.common.willSkip', { count: skipped.length })}
                       </h3>
                       <ul className="space-y-1 rounded-lg border border-dashed border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary)/0.2)] p-2 max-h-40 overflow-y-auto">
                         {skipped.map(({ invoice, reason }) => (
@@ -265,7 +276,7 @@ export function BulkSendInvoiceReminderDrawer({
                               {invoice.invoiceNumber ?? invoice.id.slice(0, 8)}
                             </span>
                             <span className="text-xs text-[rgb(var(--text-tertiary))] flex-shrink-0">
-                              {reason}
+                              {formatKnownSkipReason(t, reason)}
                             </span>
                           </li>
                         ))}
@@ -281,7 +292,7 @@ export function BulkSendInvoiceReminderDrawer({
                     disabled={isWorking}
                     className="px-4 py-2 text-sm font-medium text-[rgb(var(--text-secondary))] bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] rounded-lg hover:bg-[rgb(var(--background-secondary))] transition-colors disabled:opacity-50"
                   >
-                    {jobId && (job.data?.status === 'succeeded' || job.data?.status === 'failed') ? 'Close' : 'Cancel'}
+                    {jobId && (job.data?.status === 'succeeded' || job.data?.status === 'failed') ? t('actions.close') : t('actions.cancel')}
                   </button>
                   {!jobId && (
                     <button
@@ -293,12 +304,12 @@ export function BulkSendInvoiceReminderDrawer({
                       {start.isPending ? (
                         <>
                           <Loader2 className="w-4 h-4 animate-spin" />
-                          Starting…
+                          {t('asyncJobs.common.starting')}
                         </>
                       ) : (
                         <>
                           <Bell className="w-4 h-4" />
-                          Send {eligible.length}
+                          {t('asyncJobs.reminders.send', { count: eligible.length })}
                         </>
                       )}
                     </button>

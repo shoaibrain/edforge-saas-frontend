@@ -12,9 +12,12 @@ import { toast } from 'sonner'
 import type { PaymentGateway } from '@edforge/types'
 import { Loader2, AlertTriangle } from 'lucide-react'
 import { ContextBar } from '@edforge/ui'
+import { useTranslation } from '@edforge/i18n'
 import { useAppStore } from '../../stores/app.store'
 import { useGatewayConfigs, useSaveGatewayConfig } from '@edforge/finance-services'
 import { GatewayConfigCard } from '../../components/configuration/GatewayConfigCard'
+import { useFinanceSettings } from '../../layouts/FinanceLayout'
+import { formatDate } from '../../utils/format-date'
 
 // Gateways to show in the admin UI (in display order)
 const GATEWAYS: PaymentGateway[] = [
@@ -26,6 +29,8 @@ const GATEWAYS: PaymentGateway[] = [
 ]
 
 export default function PaymentGatewaysPage() {
+  const { t } = useTranslation('payments')
+  const settings = useFinanceSettings()
   const schoolId = useAppStore((s) => s.activeSchoolId)
 
   const { data: configs, isLoading, isError } = useGatewayConfigs(schoolId ?? '')
@@ -44,16 +49,16 @@ export default function PaymentGatewaysPage() {
           credentials: data.credentials,
         },
       })
-      toast.success('Gateway configuration saved')
+      toast.success(t('paymentGateways.saved'))
     } catch {
-      toast.error('Failed to save gateway configuration')
+      toast.error(t('paymentGateways.saveFailed'))
     }
   }
 
   if (!schoolId) {
     return (
       <div className="max-w-3xl mx-auto px-6 py-8 text-center text-[rgb(var(--text-tertiary))]">
-        Select a school to manage payment gateways.
+        {t('paymentGateways.selectSchool')}
       </div>
     )
   }
@@ -61,20 +66,15 @@ export default function PaymentGatewaysPage() {
   return (
     <div className="max-w-3xl mx-auto px-6 py-8">
       <div className="space-y-6">
-        <h1 className="sr-only">Payment Gateways</h1>
+        <h1 className="sr-only">{t('paymentGateways.title')}</h1>
         <ContextBar
           meta={
             <span>
-              {new Date().toLocaleDateString('en-US', {
-                weekday: 'long',
-                month: 'short',
-                day: 'numeric',
-                year: 'numeric',
-              })}
+              {formatDate(new Date().toISOString(), settings)}
             </span>
           }
           description={
-            <span>Configure which payment gateways are available for your school.</span>
+            <span>{t('paymentGateways.description')}</span>
           }
         />
 
@@ -85,9 +85,9 @@ export default function PaymentGatewaysPage() {
         ) : isError ? (
           <div className="text-center py-12">
             <AlertTriangle className="w-10 h-10 mx-auto mb-3 text-[rgb(var(--state-danger-fg))] opacity-60" />
-            <p className="text-sm font-medium text-[rgb(var(--text-primary))]">Failed to load gateway configurations</p>
+            <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{t('paymentGateways.loadFailed')}</p>
             <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
-              Please check your connection and try again.
+              {t('error.tryAgain')}
             </p>
           </div>
         ) : (

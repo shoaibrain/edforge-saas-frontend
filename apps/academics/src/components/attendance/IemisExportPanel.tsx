@@ -8,22 +8,18 @@
  * backend track.
  */
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Button, Input, TanstackDataTable, type ColumnDef } from '@edforge/ui'
 import { Download, FileSpreadsheet, Loader2, AlertTriangle } from 'lucide-react'
 import { gregorianToBs } from '@edforge/date-utils'
 import { useExportIemisAttendance } from '../../hooks/useAttendance'
 import type { IemisAttendanceExportResponseDto } from '@aibrains/shared-types'
 import { IdentityCell } from './roster/IdentityCell'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 type IemisExportRow = IemisAttendanceExportResponseDto['rows'][number]
 
 const YEAR_MONTH_RE = /^\d{4}-(0[1-9]|1[0-2])$/
-
-const BS_MONTH_NAMES = [
-  'Baisakh', 'Jestha', 'Ashadh', 'Shrawan', 'Bhadra', 'Ashwin',
-  'Kartik', 'Mangsir', 'Poush', 'Magh', 'Falgun', 'Chaitra',
-]
 
 function currentYearMonth(): string {
   const now = new Date()
@@ -36,36 +32,32 @@ function currentYearMonth(): string {
  * operators who think in BS. Best-effort: if the converter is out of its
  * supported BS range we just omit the hint.
  */
-function bsSpanLabel(yearMonth: string): string | null {
+function bsSpanLabel(
+  yearMonth: string,
+  t: ReturnType<typeof useAcademicsI18n>['t'],
+): string | null {
   if (!YEAR_MONTH_RE.test(yearMonth)) return null
   try {
     const [y, m] = yearMonth.split('-').map(Number)
     const lastDay = new Date(y, m, 0).getDate()
     const start = gregorianToBs(`${yearMonth}-01T12:00:00`)
     const end = gregorianToBs(`${yearMonth}-${String(lastDay).padStart(2, '0')}T12:00:00`)
-    const fmt = (d: { year: number; month: number }) => `${BS_MONTH_NAMES[d.month - 1]} ${d.year}`
+    const fmt = (d: { year: number; month: number }) =>
+      `${t(`iemisExport.bsMonths.${d.month}`)} ${d.year}`
     const a = fmt(start)
     const b = fmt(end)
-    return a === b ? `BS ${a}` : `BS ${a} – ${b}`
+    return a === b
+      ? t('iemisExport.bs', { label: a })
+      : t('iemisExport.bsRange', { start: a, end: b })
   } catch {
     return null
   }
 }
 
-const CSV_HEADER = [
-  'Student ID',
-  'Student Name',
-  'Grade',
-  'Present Days',
-  'Absent Days',
-  'Excused Days',
-  'Total School Days',
-]
-
-function buildCsv(res: IemisAttendanceExportResponseDto): string {
+function buildCsv(res: IemisAttendanceExportResponseDto, header: string[]): string {
   const escape = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`
   const lines = [
-    CSV_HEADER.map(escape).join(','),
+    header.map(escape).join(','),
     ...res.rows.map((r) =>
       [r.studentId, r.studentName ?? '', r.gradeLevel ?? '', r.presentDays, r.absentDays, r.excusedDays, r.totalSchoolDays]
         .map(escape)
@@ -87,50 +79,66 @@ function downloadCsv(filename: string, csv: string) {
   URL.revokeObjectURL(url)
 }
 
-const numericCell = (value: number) => (
-  <div className="text-right tabular-nums text-text-secondary">{value}</div>
-)
-
-// Bounded, sortable, paginated report table (whole-school month, ~255–779 rows).
-// Student column reuses the roster IdentityCell so the export matches the roll-call
-// roster (avatar + name; the export row carries no studentNumber).
-const COLUMNS: ColumnDef<IemisExportRow, unknown>[] = [
-  {
-    accessorKey: 'studentName',
-    header: 'Student',
-    size: 260,
-    cell: ({ row }) => (
-      <IdentityCell
-        studentId={row.original.studentId}
-        studentName={row.original.studentName ?? row.original.studentId}
-      />
-    ),
-  },
-  {
-    accessorKey: 'gradeLevel',
-    header: 'Grade',
-    size: 100,
-    cell: ({ row }) => <span className="text-sm text-text-secondary">{row.original.gradeLevel ?? '—'}</span>,
-  },
-  { accessorKey: 'presentDays', header: 'Present', size: 90, cell: ({ row }) => numericCell(row.original.presentDays) },
-  { accessorKey: 'absentDays', header: 'Absent', size: 90, cell: ({ row }) => numericCell(row.original.absentDays) },
-  { accessorKey: 'excusedDays', header: 'Excused', size: 90, cell: ({ row }) => numericCell(row.original.excusedDays) },
-  { accessorKey: 'totalSchoolDays', header: 'School Days', size: 110, cell: ({ row }) => numericCell(row.original.totalSchoolDays) },
-]
-
 interface IemisExportPanelProps {
   schoolId: string
   academicYearId: string
 }
 
 export function IemisExportPanel({ schoolId, academicYearId }: IemisExportPanelProps) {
+  const { t, dataTableLabels, formatDateTime, formatNumber } = useAcademicsI18n()
   const [yearMonth, setYearMonth] = useState<string>(currentYearMonth())
   const exportMutation = useExportIemisAttendance()
   const result = exportMutation.data
 
   const isValid = YEAR_MONTH_RE.test(yearMonth)
   const canGenerate = isValid && !!schoolId && !!academicYearId && !exportMutation.isPending
-  const bsSpan = bsSpanLabel(yearMonth)
+  const bsSpan = bsSpanLabel(yearMonth, t)
+
+  const csvHeader = useMemo(
+    () => [
+      t('iemisExport.columns.studentId'),
+      t('iemisExport.columns.studentName'),
+      t('iemisExport.columns.grade'),
+      t('iemisExport.columns.presentDays'),
+      t('iemisExport.columns.absentDays'),
+      t('iemisExport.columns.excusedDays'),
+      t('iemisExport.columns.totalSchoolDays'),
+    ],
+    [t],
+  )
+
+  const columns: ColumnDef<IemisExportRow, unknown>[] = useMemo(
+    () => {
+      const numericCell = (value: number) => (
+        <div className="text-right tabular-nums text-text-secondary">{formatNumber(value)}</div>
+      )
+
+      return [
+        {
+          accessorKey: 'studentName',
+          header: t('iemisExport.columns.student'),
+          size: 260,
+          cell: ({ row }) => (
+            <IdentityCell
+              studentId={row.original.studentId}
+              studentName={row.original.studentName ?? row.original.studentId}
+            />
+          ),
+        },
+        {
+          accessorKey: 'gradeLevel',
+          header: t('iemisExport.columns.grade'),
+          size: 100,
+          cell: ({ row }) => <span className="text-sm text-text-secondary">{row.original.gradeLevel ?? '—'}</span>,
+        },
+        { accessorKey: 'presentDays', header: t('iemisExport.columns.present'), size: 90, cell: ({ row }) => numericCell(row.original.presentDays) },
+        { accessorKey: 'absentDays', header: t('iemisExport.columns.absent'), size: 90, cell: ({ row }) => numericCell(row.original.absentDays) },
+        { accessorKey: 'excusedDays', header: t('iemisExport.columns.excused'), size: 90, cell: ({ row }) => numericCell(row.original.excusedDays) },
+        { accessorKey: 'totalSchoolDays', header: t('iemisExport.columns.schoolDays'), size: 110, cell: ({ row }) => numericCell(row.original.totalSchoolDays) },
+      ]
+    },
+    [formatNumber, t],
+  )
 
   const handleGenerate = () => {
     if (!canGenerate) return
@@ -139,7 +147,7 @@ export function IemisExportPanel({ schoolId, academicYearId }: IemisExportPanelP
 
   const handleDownload = () => {
     if (!result) return
-    downloadCsv(`iemis-attendance-${result.yearMonth}.csv`, buildCsv(result))
+    downloadCsv(`iemis-attendance-${result.yearMonth}.csv`, buildCsv(result, csvHeader))
   }
 
   return (
@@ -148,17 +156,15 @@ export function IemisExportPanel({ schoolId, academicYearId }: IemisExportPanelP
       <div className="bg-surface-secondary border border-border-secondary rounded-xl p-4">
         <div className="flex items-center gap-2 mb-3">
           <FileSpreadsheet className="w-4 h-4 text-[rgb(var(--accent-attendance-text))]" />
-          <h4 className="text-sm font-semibold text-text-primary">IEMiS Monthly Export</h4>
+          <h4 className="text-sm font-semibold text-text-primary">{t('iemisExport.title')}</h4>
         </div>
         <p className="text-xs text-text-tertiary mb-4 max-w-2xl">
-          Generate the IEMiS Flash II monthly attendance roll-up for a calendar month. The
-          export recomputes per-student present / absent / excused day counts and lets you
-          download a CSV. Grade is the school-local grade level.
+          {t('iemisExport.description')}
         </p>
         <div className="flex flex-wrap items-end gap-3">
           <div>
             <label htmlFor="iemis-year-month" className="block text-xs font-medium text-text-secondary mb-1">
-              Month
+              {t('iemisExport.month')}
             </label>
             <Input
               id="iemis-year-month"
@@ -166,7 +172,7 @@ export function IemisExportPanel({ schoolId, academicYearId }: IemisExportPanelP
               value={yearMonth}
               onChange={(e) => setYearMonth(e.target.value)}
               className="w-44"
-              aria-label="Export month (YYYY-MM)"
+              aria-label={t('iemisExport.monthAria')}
             />
             {bsSpan && (
               <p className="mt-1 text-3xs text-text-tertiary" data-testid="iemis-bs-span">{bsSpan}</p>
@@ -175,22 +181,22 @@ export function IemisExportPanel({ schoolId, academicYearId }: IemisExportPanelP
           <Button onClick={handleGenerate} disabled={!canGenerate}>
             {exportMutation.isPending ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" /> Generating…
+                <Loader2 className="w-4 h-4 animate-spin" /> {t('iemisExport.generating')}
               </>
             ) : (
               <>
-                <FileSpreadsheet className="w-4 h-4" /> Generate Export
+                <FileSpreadsheet className="w-4 h-4" /> {t('iemisExport.generate')}
               </>
             )}
           </Button>
           {result && (
             <Button variant="secondary" onClick={handleDownload} disabled={result.rowCount === 0}>
-              <Download className="w-4 h-4" /> Download CSV
+              <Download className="w-4 h-4" /> {t('iemisExport.downloadCsv')}
             </Button>
           )}
         </div>
         {!isValid && (
-          <p className="mt-2 text-xs text-[rgb(var(--state-danger-fg))]">Enter a valid month (YYYY-MM).</p>
+          <p className="mt-2 text-xs text-[rgb(var(--state-danger-fg))]">{t('iemisExport.invalidMonth')}</p>
         )}
       </div>
 
@@ -198,7 +204,7 @@ export function IemisExportPanel({ schoolId, academicYearId }: IemisExportPanelP
       {exportMutation.isError && (
         <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[rgb(var(--state-danger-bg)/0.12)] border border-[rgb(var(--state-danger-fg)/0.25)] text-xs text-[rgb(var(--state-danger-fg))]">
           <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-          Failed to generate the export. Please try again.
+          {t('iemisExport.failed')}
         </div>
       )}
 
@@ -207,25 +213,28 @@ export function IemisExportPanel({ schoolId, academicYearId }: IemisExportPanelP
         <div className="space-y-3">
           <div className="flex items-center justify-between px-1">
             <div className="text-xs text-text-secondary">
-              <strong className="text-text-primary">{result.rowCount}</strong> student
-              {result.rowCount !== 1 ? 's' : ''} · {result.yearMonth}
+              {t('iemisExport.summary', {
+                students: t('common.students', { count: result.rowCount }),
+                yearMonth: result.yearMonth,
+              })}
             </div>
             <div className="text-3xs text-text-tertiary">
-              Generated {new Date(result.generatedAt).toLocaleString()}
+              {t('iemisExport.generated', { dateTime: formatDateTime(result.generatedAt) })}
             </div>
           </div>
           {result.rowCount === 0 ? (
             <div className="rounded-xl border border-border-secondary bg-surface-secondary py-10 text-center text-sm text-text-tertiary">
-              No attendance recorded for this month.
+              {t('iemisExport.empty')}
             </div>
           ) : (
             <TanstackDataTable
-              columns={COLUMNS}
+              columns={columns}
               data={result.rows}
               getRowId={(r) => r.studentId}
               enableSorting
-              searchPlaceholder="Search students…"
+              searchPlaceholder={t('iemisExport.search')}
               pagination={{ pageSize: 25 }}
+              labels={dataTableLabels}
               maxHeight="60vh"
             />
           )}

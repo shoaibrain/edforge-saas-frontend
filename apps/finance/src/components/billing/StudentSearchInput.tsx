@@ -8,6 +8,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { Search, Loader2, X } from 'lucide-react'
+import { useTranslation } from '@edforge/i18n'
 import { useSearchStudents } from '@edforge/finance-services'
 import type { StudentSearchResult } from '@edforge/finance-services'
 import { UuidBadge } from '@edforge/archetype'
@@ -23,8 +24,9 @@ export function StudentSearchInput({
   schoolId,
   value,
   onChange,
-  placeholder = 'Search by name or student number...',
+  placeholder,
 }: StudentSearchInputProps) {
+  const { t } = useTranslation('payments')
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
   const [isOpen, setIsOpen] = useState(false)
@@ -97,7 +99,7 @@ export function StudentSearchInput({
             setIsOpen(true)
           }}
           onFocus={() => search.length >= 2 && setIsOpen(true)}
-          placeholder={placeholder}
+          placeholder={placeholder ?? t('studentSearch.placeholder')}
           className="w-full pl-9 pr-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
         />
       </div>
@@ -107,11 +109,11 @@ export function StudentSearchInput({
           {isLoading ? (
             <div className="flex items-center justify-center py-4">
               <Loader2 className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] animate-spin" />
-              <span className="ml-2 text-xs text-[rgb(var(--text-tertiary))]">Searching...</span>
+              <span className="ml-2 text-xs text-[rgb(var(--text-tertiary))]">{t('studentSearch.searching')}</span>
             </div>
           ) : students.length === 0 ? (
             <div className="py-4 text-center text-xs text-[rgb(var(--text-tertiary))]">
-              No students found.
+              {t('studentSearch.noStudents')}
             </div>
           ) : (
             <div className="divide-y divide-[rgb(var(--border-primary))]">
@@ -128,7 +130,7 @@ export function StudentSearchInput({
                     </div>
                     <div className="text-xs text-[rgb(var(--text-tertiary))]">
                       {student.studentNumber && `#${student.studentNumber}`}
-                      {student.currentGradeLevel && ` · Grade ${student.currentGradeLevel}`}
+                      {student.currentGradeLevel && ` · ${t('studentSearch.grade', { grade: student.currentGradeLevel })}`}
                     </div>
                   </div>
                 </button>
