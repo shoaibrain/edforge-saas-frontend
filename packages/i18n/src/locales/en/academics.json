@@ -1308,6 +1308,54 @@
       "findings_plural": "{{count}} findings from import"
     }
   },
+  "calendarModule": {
+    "description": "Manage academic years, terms, and grading periods",
+    "current": "Current",
+    "noneSet": "None set",
+    "archiveCurrentHint": "Set another year as current before archiving",
+    "status": {
+      "planning": "Planning",
+      "active": "Active",
+      "completed": "Completed",
+      "archived": "Archived"
+    },
+    "actions": {
+      "planning": "Activate",
+      "active": "Complete",
+      "completed": "Archive",
+      "archived": "Archived",
+      "setCurrent": "Set as Current",
+      "cancel": "Cancel",
+      "confirm": "Confirm"
+    },
+    "stats": {
+      "currentYear": "Current Year",
+      "totalYears": "Total Years",
+      "active": "Active",
+      "planning": "Planning"
+    },
+    "noSchool": {
+      "title": "No School Selected",
+      "description": "Please select a school from the sidebar to manage academic years."
+    },
+    "error": {
+      "title": "Failed to Load Academic Years",
+      "description": "Something went wrong. Please try again.",
+      "retry": "Retry"
+    },
+    "empty": {
+      "title": "No Academic Years",
+      "description": "No academic years have been created yet. Create your first academic year to get started with term and grading period management."
+    },
+    "confirm": {
+      "setCurrentTitle": "Set as Current Academic Year",
+      "replaceCurrentDescription": "This will replace \"{{currentName}}\" as the current academic year with \"{{nextName}}\". All modules that depend on the current year (attendance, grades, scheduling) will switch to the new selection.",
+      "setCurrentDescription": "Set \"{{yearName}}\" as the current academic year? This determines which year is active across all modules.",
+      "advanceTitle": "{{action}} Academic Year",
+      "updateStatusTitle": "Update Status",
+      "advanceDescription": "Are you sure you want to change \"{{yearName}}\" from {{fromStatus}} to {{toStatus}}? This action cannot be reversed."
+    }
+  },
   "gradesModule": {
     "reportCard": {
       "noStudentTitle": "No Student Selected",
