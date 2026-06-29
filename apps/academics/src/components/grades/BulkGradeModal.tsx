@@ -70,7 +70,7 @@ export function BulkGradeModal({
   teacherId,
   categories,
 }: BulkGradeModalProps) {
-  const { t, formatNumber } = useAcademicsI18n()
+  const { t, formatNumber, formatCount } = useAcademicsI18n()
   const displayCategories = categories?.length
     ? categories
     : DEFAULT_CATEGORIES.map((category) => ({
@@ -270,9 +270,7 @@ export function BulkGradeModal({
           ) : (
             <Save className="w-4 h-4 mr-2" />
           )}
-          {t('gradesModule.management.saveGrades', {
-            count: formatNumber(validEntries.length),
-          })}
+          {formatCount('gradesModule.management.saveGrades', validEntries.length)}
         </Button>
       </ModalFooter>
     </Modal>

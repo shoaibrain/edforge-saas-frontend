@@ -93,7 +93,7 @@ function YearProgressBar({ startDate, endDate }: { startDate: string; endDate: s
 
 export function EnrollmentModule() {
   const navigate = useNavigate()
-  const { t, formatNumber } = useAcademicsI18n()
+  const { t, formatNumber, formatCount } = useAcademicsI18n()
   // URL-synced active tab (deep-linkable; legacy ?tab=new|records mapped in route)
   const { tab } = useSearch({ from: '/students/enrollment' })
   const activeTab: EnrollmentTab = tab ?? 'registration'
@@ -287,7 +287,7 @@ export function EnrollmentModule() {
           <p className="mt-2 text-2xs text-[rgb(var(--text-tertiary))]">
             {t('enrollmentModule.header.registering')}
             {activeYearObj ? ` · ${t('enrollmentModule.header.academicYear', { year: activeYearObj.name })}` : ''}
-            {summary ? ` · ${t('enrollmentModule.header.studentsCurrentlyEnrolled', { count: formatNumber(summary.totalEnrolled ?? 0) })}` : ''}
+            {summary ? ` · ${formatCount('enrollmentModule.header.studentsCurrentlyEnrolled', summary.totalEnrolled ?? 0)}` : ''}
           </p>
         )}
       </div>

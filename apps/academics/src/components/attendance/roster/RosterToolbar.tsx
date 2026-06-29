@@ -48,14 +48,14 @@ export function RosterToolbar({
   bulkScopeCount,
   markedCount,
 }: RosterToolbarProps) {
-  const { t, formatNumber } = useAcademicsI18n()
+  const { t, formatNumber, formatCount } = useAcademicsI18n()
   const chips = CHIP_KEYS.filter((key) => key !== 'locked' || showLockedChip)
   const presentLabel = bulkScopeCount == null
     ? t('attendance.toolbar.allPresent')
-    : t('attendance.toolbar.markPresent', { count: formatNumber(bulkScopeCount) })
+    : formatCount('attendance.toolbar.markPresent', bulkScopeCount)
   const absentLabel = bulkScopeCount == null
     ? t('attendance.toolbar.allAbsent')
-    : t('attendance.toolbar.markAbsent', { count: formatNumber(bulkScopeCount) })
+    : formatCount('attendance.toolbar.markAbsent', bulkScopeCount)
 
   return (
     <div className="flex flex-shrink-0 flex-wrap items-center gap-x-3 gap-y-2 border-b border-border-secondary bg-surface-primary px-3 py-2.5">

@@ -39,7 +39,7 @@ interface CourseFiltersProps {
 // ============================================================================
 
 export function CourseFilters({ totalCount: _totalCount, schoolId, onExport }: CourseFiltersProps) {
-  const { t, formatNumber } = useAcademicsI18n()
+  const { t, formatCount } = useAcademicsI18n()
   const filters = useCourseFilters()
   const actions = useCourseFilterActions()
   const { options: gradeOptions } = useSchoolEnabledGradeOptions(schoolId)
@@ -160,7 +160,7 @@ export function CourseFilters({ totalCount: _totalCount, schoolId, onExport }: C
           className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-[rgb(var(--accent-enrollment-text))] hover:opacity-80 transition-opacity"
         >
           <X className="w-3 h-3" />
-          {t('curriculumModule.filters.clear', { count: formatNumber(filterCount) })}
+          {formatCount('curriculumModule.filters.clear', filterCount)}
         </button>
       )}
 

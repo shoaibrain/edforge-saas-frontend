@@ -51,6 +51,48 @@ feature explicitly owns that workflow:
 | English         | English         | अंग्रेजी        | Language option                |
 | Nepali          | Nepali          | नेपाली          | Language option                |
 
+## Nepal Pilot Terminology Rules
+
+Use a mixed Nepali-English product vocabulary where it improves operator
+comprehension. The Nepal pilot UI should be understandable to school operators
+who work in Nepali, but it should not translate institutional acronyms, imported
+standards, or platform concepts into unfamiliar wording.
+
+- Keep official acronyms and external standards unchanged: `Ed-Fi`, `IEMIS`,
+  `EMIS`, `GPA`, `PAN`, `CSV`, `PDF`, `BS`, and `AD`.
+- Keep platform nouns in English when they are already the operational term in
+  school workflows or map to data concepts: `Course`, `Section`, `Grade`,
+  `Academic Year`, `Term`, `Report Card`, `Attendance`, and `Enrollment`.
+- Translate user actions, state messages, warnings, confirmations, empty states,
+  helper text, and validation copy when Nepali wording makes the task clearer.
+- Preserve tenant, user, and imported data exactly as stored. Localization owns
+  platform copy and formatting, not content translation.
+- Review compact controls, badges, table cells, and action buttons in both
+  English and Nepali before merge. Nepali strings can be longer, so truncation
+  and wrap behavior are part of localization QA.
+
+## Formatting And Pluralization Rules
+
+Never pass a locale-formatted string as the `count` option for an i18next
+translation. `count` must stay numeric so plural rules remain valid. When a
+localized number needs to appear in the rendered copy, pass it separately as
+`value`.
+
+```ts
+formatCount('academics.someKey', total)
+```
+
+The `formatCount` helper passes `{ count: total, value: formatNumber(total) }`
+and should be preferred for count-bearing Academics copy. Locale entries should
+use `{{value}}` for the displayed number and reserve `{{count}}` for plural
+selection only.
+
+Avoid localization workarounds such as `t(...).replace(...)`. If translated
+copy needs a formatted number, date, time, percent, or currency, add the correct
+interpolation variable and use the shared helpers (`formatNumber`,
+`formatCount`, `formatDate`, `formatDateTime`, currency formatters) at the call
+site.
+
 ## Terms Requiring Product Or Native Copy Review
 
 - Whether to use `इनभ्वाइस`, `बिल`, or another finance term consistently.

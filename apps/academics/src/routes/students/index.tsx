@@ -284,7 +284,7 @@ export function StudentsModule() {
 }
 
 function StudentsContent({ schoolId }: { schoolId: string }) {
-  const { t, formatNumber, formatDate } = useAcademicsI18n()
+  const { t, formatNumber, formatCount, formatDate } = useAcademicsI18n()
   const navigate = useNavigate()
   const { staggerContainer, fadeInUp } = useMotionVariants()
 
@@ -590,10 +590,10 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
                   barColor="rgb(var(--accent-enrollment))"
                   tag={
                     overviewData.overview.recentEnrollments && overviewData.overview.recentEnrollments > 0
-                      ? { text: t('studentsModule.stats.recentEnrollments', { count: overviewData.overview.recentEnrollments, value: formatNumber(overviewData.overview.recentEnrollments) }), color: 'rgb(var(--accent-enrollment))', bg: 'rgb(var(--accent-enrollment)/0.1)' }
+                      ? { text: formatCount('studentsModule.stats.recentEnrollments', overviewData.overview.recentEnrollments), color: 'rgb(var(--accent-enrollment))', bg: 'rgb(var(--accent-enrollment)/0.1)' }
                       : undefined
                   }
-                  hint={overviewData.enrollment.data.length > 0 ? t('studentsModule.stats.acrossGrades', { count: overviewData.enrollment.data.length, value: formatNumber(overviewData.enrollment.data.length) }) : t('studentsModule.stats.thisAcademicYear')}
+                  hint={overviewData.enrollment.data.length > 0 ? formatCount('studentsModule.stats.acrossGrades', overviewData.enrollment.data.length) : t('studentsModule.stats.thisAcademicYear')}
                   loading={overviewData.overview.isLoading}
                   error={overviewData.overview.errors.length > 0}
                   onRetry={() => refetch()}
@@ -610,7 +610,7 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
                   barColor="rgb(var(--accent-finance))"
                   tag={
                     overviewData.alerts.criticalCount > 0
-                      ? { text: t('studentsModule.stats.criticalCount', { count: overviewData.alerts.criticalCount, value: formatNumber(overviewData.alerts.criticalCount) }), color: 'rgb(var(--accent-finance))', bg: 'rgb(var(--accent-finance)/0.1)' }
+                      ? { text: formatCount('studentsModule.stats.criticalCount', overviewData.alerts.criticalCount), color: 'rgb(var(--accent-finance))', bg: 'rgb(var(--accent-finance)/0.1)' }
                       : undefined
                   }
                   hint={

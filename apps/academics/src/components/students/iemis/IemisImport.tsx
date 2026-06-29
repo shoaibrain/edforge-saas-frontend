@@ -83,7 +83,7 @@ import { useAcademicsI18n } from '../../../lib/i18n'
 
 export function IemisImport() {
   const navigate = useNavigate()
-  const { t, formatNumber } = useAcademicsI18n()
+  const { t, formatCount } = useAcademicsI18n()
   const schoolId = useActiveSchoolId()
 
   // Fetch the active school so we can (a) display its name/IEMIS code in
@@ -366,7 +366,11 @@ export function IemisImport() {
         <InlineStatus
           icon={<Loader2 className="w-5 h-5 animate-spin" />}
           title={t('iemisImport.states.dryRunTitle')}
-          description={t('iemisImport.states.dryRunDescription', { count: parseResult?.rowCount != null ? formatNumber(parseResult.rowCount) : '...' })}
+          description={
+            parseResult?.rowCount != null
+              ? formatCount('iemisImport.states.dryRunDescription', parseResult.rowCount)
+              : t('iemisImport.states.dryRunDescriptionPending')
+          }
         />
       )}
 
@@ -600,7 +604,7 @@ function PreviewView({
   onCancel: () => void
   onDownloadFindings: () => void
 }) {
-  const { t, formatNumber } = useAcademicsI18n()
+  const { t, formatNumber, formatCount } = useAcademicsI18n()
   const errors = dryRun.findings.filter((f) => f.level === 'error')
   const warnings = dryRun.findings.filter((f) => f.level === 'warn')
   const willImport = parse.rowCount - dryRun.skipped - dryRun.failed
@@ -744,7 +748,7 @@ function PreviewView({
               </li>
             ))}
             {dryRun.duplicates.length > 20 && (
-              <li className="italic">{t('iemisImport.duplicates.andMore', { count: formatNumber(dryRun.duplicates.length - 20) })}</li>
+              <li className="italic">{formatCount('iemisImport.duplicates.andMore', dryRun.duplicates.length - 20)}</li>
             )}
           </ul>
         </div>
@@ -807,7 +811,7 @@ function ConfirmModal({
   onConfirm: () => void
   onCancel: () => void
 }) {
-  const { t, formatNumber } = useAcademicsI18n()
+  const { t, formatCount } = useAcademicsI18n()
   const [ack, setAck] = useState(false)
   const willImport = parse.rowCount - dryRun.skipped - dryRun.failed
   return (
@@ -875,7 +879,7 @@ function ConfirmModal({
             disabled={!ack || willImport <= 0}
             className="px-4 py-1.5 text-sm rounded-lg bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg-hover))] disabled:bg-text-tertiary disabled:cursor-not-allowed text-[rgb(var(--action-primary-fg))] font-medium"
           >
-            {t('iemisImport.actions.importNow', { count: formatNumber(willImport) })}
+            {formatCount('iemisImport.actions.importNow', willImport)}
           </button>
         </div>
       </div>
@@ -902,14 +906,14 @@ function ProgressView({
   totalRows: number
   enrollInAcademicYearName: string | undefined
 }) {
-  const { t, formatNumber } = useAcademicsI18n()
+  const { t, formatCount } = useAcademicsI18n()
   const status = job?.status ?? 'queued'
   const isQueued = status === 'queued'
   const description = isQueued
-    ? t('iemisImport.progress.queuedDescription', { count: formatNumber(totalRows) })
+    ? formatCount('iemisImport.progress.queuedDescription', totalRows)
     : enrollInAcademicYearName
-      ? t('iemisImport.progress.runningDescriptionWithYear', { count: formatNumber(totalRows), yearName: enrollInAcademicYearName })
-      : t('iemisImport.progress.runningDescription', { count: formatNumber(totalRows) })
+      ? formatCount('iemisImport.progress.runningDescriptionWithYear', totalRows, { yearName: enrollInAcademicYearName })
+      : formatCount('iemisImport.progress.runningDescription', totalRows)
 
   return (
     <div className="rounded-xl border border-[rgb(var(--state-info-border)/0.45)] bg-[rgb(var(--state-info-bg)/0.18)]   p-5">

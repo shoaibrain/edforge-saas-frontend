@@ -69,7 +69,7 @@ const cardStyle = {
 const IEMIS_PORTAL_URL = 'https://emis.cehrd.gov.np'
 
 export function GovernmentReportsExport() {
-  const { t, formatDateTime, formatNumber } = useAcademicsI18n()
+  const { t, formatDateTime, formatCount } = useAcademicsI18n()
   const navigate = useNavigate()
   const schoolId = useActiveSchoolId()
 
@@ -453,9 +453,7 @@ export function GovernmentReportsExport() {
                       </div>
                       <div className="text-xs mt-0.5 text-[rgb(var(--text-tertiary))]">
                         {typeof snap.rowCount === 'number'
-                          ? t('governmentReports.history.rowsPrefix', {
-                              count: formatNumber(snap.rowCount),
-                            })
+                          ? formatCount('governmentReports.history.rowsPrefix', snap.rowCount)
                           : ''}
                         {snap.generatedAt
                           ? t('governmentReports.history.generated', {

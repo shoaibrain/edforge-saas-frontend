@@ -475,8 +475,8 @@
       },
       "allPresent": "सबै उपस्थित",
       "allAbsent": "सबै अनुपस्थित",
-      "markPresent": "{{count}} उपस्थित चिन्ह लगाउनुहोस्",
-      "markAbsent": "{{count}} अनुपस्थित चिन्ह लगाउनुहोस्",
+      "markPresent": "{{value}} उपस्थित चिन्ह लगाउनुहोस्",
+      "markAbsent": "{{value}} अनुपस्थित चिन्ह लगाउनुहोस्",
       "clear": "हटाउनुहोस्"
     },
     "actions": {
@@ -602,7 +602,7 @@
         "declining": "↓ घट्दै",
         "stable": "— स्थिर"
       },
-      "scopeSections": "तपाईंका सेक्सनहरूको डाटा देखाइँदै ({{count}} विद्यार्थी)",
+      "scopeSections": "तपाईंका सेक्सनहरूको डाटा देखाइँदै ({{value}} विद्यार्थी)",
       "loadFailed": "उपस्थिति अवलोकन लोड गर्न असफल",
       "loadFailedDescription": "कृपया पृष्ठ पुन: ताजा गर्नुहोस्। समस्या रहिरहेमा सहायता टोलीलाई सम्पर्क गर्नुहोस्।"
     },
@@ -903,13 +903,13 @@
     "summary": {
       "coursesAcross": "course",
       "subjectAreasSuffix": "subject area मा",
-      "elective": "{{count}} elective",
+      "elective": "{{value}} elective",
       "specializedTypesSuffix": "specialized course type (Honors, AP, Dual Enrollment)",
       "basedOnLoaded": "लोड भएका course को आधारमा"
     },
     "stats": {
       "totalCourses": "कुल Course",
-      "activeTag": "{{count}} active",
+      "activeTag": "{{value}} active",
       "subjectAreas": "Subject Areas",
       "subjectHint": "Math · Science · ELA · SS · Arts · Voc.",
       "electives": "Electives",
@@ -927,7 +927,7 @@
       "allCreditTypes": "सबै Credit Type",
       "gradeLevel": "Grade level",
       "allGrades": "सबै Grade",
-      "clear": "Clear ({{count}})",
+      "clear": "Clear ({{value}})",
       "exportAria": "Course CSV export गर्नुहोस्",
       "exportCsv": "CSV Export"
     },
@@ -979,6 +979,8 @@
       "noSectionsTitle": "Section छैन",
       "noSectionsDescription": "यस course का लागि class sections सिर्जना गरिएको छैन।",
       "goToScheduling": "Scheduling मा जानुहोस्",
+      "sectionCount": "{{value}} section",
+      "sectionCount_plural": "{{value}} sections",
       "sectionTitle": "Section {{section}}",
       "loadMoreSections": "थप Sections लोड",
       "standardsTitle": "Learning Standards",
@@ -1003,7 +1005,7 @@
     },
     "conflict": {
       "title": "Schedule Conflict",
-      "samePeriod": "{{count}} अन्य section सँग एउटै class period"
+      "samePeriod": "{{value}} अन्य section सँग एउटै class period"
     },
     "student": {
       "gradeShort": "Gr {{grade}}"
@@ -1224,7 +1226,7 @@
       "noGradeLevels": "यस विद्यालयमा enabled grade levels configured छैन। Exam सिर्जना गर्नु अघि Settings -> Grade Levels मा सेट गर्नुहोस्।"
     },
     "subjects": {
-      "count": "{{count}} subject(s)",
+      "count": "{{value}} subject(s)",
       "addSubject": "Subject थप्नुहोस्",
       "locked": "Exam {{status}} हुँदा subjects locked हुन्छन्। Draft वा Scheduled मा मात्र परिवर्तन गर्न सकिन्छ।",
       "noGradeMatch": "यस exam को grade levels ({{grades}}) सँग मिल्ने course छैन। पहिले Curriculum मा ती grade का course थप्नुहोस्।",
@@ -1515,7 +1517,7 @@
       "title": "विद्यार्थी भर्ना गर्नुहोस्",
       "registering": "नयाँ विद्यार्थी दर्ता गर्दै",
       "academicYear": "शैक्षिक वर्ष {{year}}",
-      "studentsCurrentlyEnrolled": "{{count}} विद्यार्थी हाल भर्ना",
+      "studentsCurrentlyEnrolled": "{{value}} विद्यार्थी हाल भर्ना",
       "tabsAria": "भर्ना ट्याबहरू"
     },
     "summary": {
@@ -1597,7 +1599,7 @@
       "possibleDuplicate": "सम्भावित डुप्लिकेट भेटियो",
       "similarRecords": "मिल्दोजुल्दो रेकर्डहरू भेटिए",
       "singleMatch": "मिल्दोजुल्दो जानकारी भएको विद्यार्थी पहिले नै छ।",
-      "multipleMatches": "{{count}} मिल्दोजुल्दो विद्यार्थी भेटिए।",
+      "multipleMatches": "{{value}} मिल्दोजुल्दो विद्यार्थी भेटिए।",
       "continueNew": "यो नयाँ विद्यार्थी हो भने जारी राख्न सक्नुहुन्छ।",
       "dismiss": "चेतावनी हटाउनुहोस्",
       "dob": "जन्म मिति: {{date}}",
@@ -1786,7 +1788,8 @@
       "parsingTitle": "xlsx फाइल पार्स गर्दै",
       "parsingDescription": "स्तम्भहरू पढ्दै र पङ्क्ति डिक्सनरी बनाउँदै। सामान्यतया 2 सेकेन्डभन्दा कम लाग्छ।",
       "dryRunTitle": "IEMIS नियमहरूसँग जाँच गर्दै",
-      "dryRunDescription": "{{count}} पङ्क्तिमा त्रुटि, चेतावनी र डुप्लिकेट जाँच गर्दै। डाटा अझै सुरक्षित गरिएको छैन।",
+      "dryRunDescription": "{{value}} पङ्क्तिमा त्रुटि, चेतावनी र डुप्लिकेट जाँच गर्दै। डाटा अझै सुरक्षित गरिएको छैन।",
+      "dryRunDescriptionPending": "पङ्क्तिमा त्रुटि, चेतावनी र डुप्लिकेट जाँच गर्दै। डाटा अझै सुरक्षित गरिएको छैन।",
       "parseErrorTitle": "फाइल पार्स गर्न सकिएन",
       "unknownParseError": "अज्ञात पार्स त्रुटि।",
       "submittingTitle": "आयात पेश गर्दै",
@@ -1840,14 +1843,14 @@
       "importAnother": "अर्को फाइल आयात गर्नुहोस्",
       "viewStudents": "विद्यार्थीहरू हेर्नुहोस्",
       "backToPreview": "preview मा फर्कनुहोस्",
-      "importNow": "{{count}} अहिले आयात गर्नुहोस्"
+      "importNow": "{{value}} अहिले आयात गर्नुहोस्"
     },
     "duplicates": {
       "title": "{{count}} डुप्लिकेट छोडिनेछ",
       "title_plural": "{{count}} डुप्लिकेटहरू छोडिनेछन्",
       "description": "यी पङ्क्तिहरूमा यस tenant मा पहिले नै भएको emisStudentId छ। तिनीहरू फेरि सिर्जना हुने छैनन्; विद्यमान रेकर्डहरू परिवर्तन हुँदैनन्।",
       "row": "पङ्क्ति {{row}} - emisStudentId {{emisStudentId}} पहिले नै student id {{studentId}} मा छ",
-      "andMore": "...र थप {{count}}"
+      "andMore": "...र थप {{value}}"
     },
     "confirm": {
       "title": "IEMIS आयात पुष्टि गर्नुहोस्",
@@ -1864,9 +1867,9 @@
     "progress": {
       "queuedTitle": "आयात queued",
       "runningTitle": "विद्यार्थी आयात गर्दै...",
-      "queuedDescription": "Job queued छ। {{count}} पङ्क्ति प्रक्रिया गर्दै।",
-      "runningDescription": "{{count}} पङ्क्ति आयात गर्दै।",
-      "runningDescriptionWithYear": "{{count}} पङ्क्ति आयात गर्दै र {{yearName}} मा भर्ना गर्दै।",
+      "queuedDescription": "Job queued छ। {{value}} पङ्क्ति प्रक्रिया गर्दै।",
+      "runningDescription": "{{value}} पङ्क्ति आयात गर्दै।",
+      "runningDescriptionWithYear": "{{value}} पङ्क्ति आयात गर्दै र {{yearName}} मा भर्ना गर्दै।",
       "keepOpen": "यो tab खुला राख्न सक्नुहुन्छ। आयात server-side चल्छ; tab बन्द गर्दा job रद्द हुँदैन, तर live status view हराउनेछ।"
     },
     "results": {
@@ -1983,10 +1986,10 @@
       "searchStudents": "नामबाट विद्यार्थी खोज्नुहोस्...",
       "noStudents": "यस सेक्सनमा विद्यार्थी भर्ना छैन।",
       "noStudentMatches": "\"{{search}}\" सँग मिल्ने विद्यार्थी छैन।",
-      "saveGrades": "ग्रेड सेभ गर्नुहोस् ({{count}})",
-      "saveWithScores": "अङ्क सहित सेभ गर्नुहोस् ({{count}})",
+      "saveGrades": "ग्रेड सेभ गर्नुहोस् ({{value}})",
+      "saveWithScores": "अङ्क सहित सेभ गर्नुहोस् ({{value}})",
       "createAssignment": "असाइनमेन्ट सिर्जना गर्नुहोस्",
-      "scoreStatistics": "अङ्क तथ्याङ्क ({{count}} प्रविष्ट)",
+      "scoreStatistics": "अङ्क तथ्याङ्क ({{value}} प्रविष्ट)",
       "pasteScores": "अङ्क टाँस्नुहोस् (Name\\tScore प्रति line)",
       "pasteScoresPlaceholder": "राम शर्मा\\t95\nसीता थापा\\t88",
       "pasteFromSpreadsheet": "Spreadsheet बाट अङ्क टाँस्नुहोस्",
@@ -2023,8 +2026,8 @@
       "toFinalize": "अन्तिम गर्नुपर्ने",
       "alreadyFinal": "पहिले नै अन्तिम",
       "noScores": "अङ्क छैन",
-      "emptyStubsWarning": "{{count}} विद्यार्थीमा scored assignments छैनन् र छोडिनेछन्।",
-      "lowGradesWarning": "{{count}} विद्यार्थी passing grade भन्दा तल छन्।",
+      "emptyStubsWarning": "{{value}} विद्यार्थीमा scored assignments छैनन् र छोडिनेछन्।",
+      "lowGradesWarning": "{{value}} विद्यार्थी passing grade भन्दा तल छन्।",
       "columns": {
         "student": "विद्यार्थी",
         "grade": "ग्रेड",
@@ -2040,11 +2043,11 @@
       "irreversibleAfter": "ग्रेड अन्तिम गर्न लाग्दै हुनुहुन्छ। अन्तिम ग्रेडहरू locked हुन्छन् र परिमार्जन गर्न सकिँदैन।",
       "finalizing": "ग्रेड अन्तिम गर्दै...",
       "completeTitle": "ग्रेड अन्तिम भयो",
-      "completeDescription": "{{count}} ग्रेड सफलतापूर्वक अन्तिम भयो। यी ग्रेडहरू अब locked छन्।",
-      "errorCount": "{{count}} ग्रेड अन्तिम गर्न सकिएन।",
+      "completeDescription": "{{value}} ग्रेड सफलतापूर्वक अन्तिम भयो। यी ग्रेडहरू अब locked छन्।",
+      "errorCount": "{{value}} ग्रेड अन्तिम गर्न सकिएन।",
       "continue": "जारी राख्नुहोस्",
       "back": "पछाडि",
-      "finalizeGrades": "{{count}} ग्रेड अन्तिम गर्नुहोस्",
+      "finalizeGrades": "{{value}} ग्रेड अन्तिम गर्नुहोस्",
       "done": "सकियो"
     },
     "policyForm": {
@@ -2125,7 +2128,7 @@
         "summativeHigher": "Summative {{diff}}% बढी",
         "summativeHigherSuffix": "formative भन्दा।",
         "equal": "Formative र summative अङ्क बराबर छन् — राम्रो सन्तुलन।",
-        "unclassified": "+{{count}} unclassified (avg {{avg}}%)"
+        "unclassified": "+{{value}} unclassified (avg {{avg}}%)"
       },
       "distribution": {
         "title": "ग्रेड वितरण",
@@ -2161,7 +2164,7 @@
       "atRisk": {
         "title": "जोखिममा रहेका विद्यार्थी",
         "subtitle": "कुनै course मा 60% भन्दा तल रहेका विद्यार्थी",
-        "studentCount": "{{count}} विद्यार्थी",
+        "studentCount": "{{value}} विद्यार्थी",
         "empty": "ग्रेड threshold भन्दा तल विद्यार्थी छैनन्",
         "headers": {
           "student": "विद्यार्थी",
@@ -2281,7 +2284,7 @@
       },
       "empty": "यस विद्यालयका लागि अहिलेसम्म रिपोर्ट बनाइएको छैन।",
       "emptyFilter": "यो filter सँग मिल्ने रिपोर्ट छैन।",
-      "rowsPrefix": "{{count}} rows · ",
+      "rowsPrefix": "{{value}} rows · ",
       "generated": "{{dateTime}} मा बनाइएको",
       "created": "{{dateTime}} मा सिर्जना",
       "dryRunSuffix": " · dry-run"

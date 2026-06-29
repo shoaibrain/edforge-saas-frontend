@@ -475,8 +475,8 @@
       },
       "allPresent": "All Present",
       "allAbsent": "All Absent",
-      "markPresent": "Mark {{count}} Present",
-      "markAbsent": "Mark {{count}} Absent",
+      "markPresent": "Mark {{value}} Present",
+      "markAbsent": "Mark {{value}} Absent",
       "clear": "Clear"
     },
     "actions": {
@@ -602,7 +602,7 @@
         "declining": "↓ Declining",
         "stable": "— Stable"
       },
-      "scopeSections": "Showing data for your sections ({{count}} students)",
+      "scopeSections": "Showing data for your sections ({{value}} students)",
       "loadFailed": "Failed to load attendance overview",
       "loadFailedDescription": "Please try refreshing the page. If the issue persists, contact support."
     },
@@ -903,13 +903,13 @@
     "summary": {
       "coursesAcross": "courses across",
       "subjectAreasSuffix": "subject areas",
-      "elective": "{{count}} elective",
+      "elective": "{{value}} elective",
       "specializedTypesSuffix": "specialized course types (Honors, AP, Dual Enrollment)",
       "basedOnLoaded": "based on loaded courses"
     },
     "stats": {
       "totalCourses": "Total Courses",
-      "activeTag": "{{count}} active",
+      "activeTag": "{{value}} active",
       "subjectAreas": "Subject Areas",
       "subjectHint": "Math · Science · ELA · SS · Arts · Voc.",
       "electives": "Electives",
@@ -927,7 +927,7 @@
       "allCreditTypes": "All Credit Types",
       "gradeLevel": "Grade level",
       "allGrades": "All Grades",
-      "clear": "Clear ({{count}})",
+      "clear": "Clear ({{value}})",
       "exportAria": "Export courses as CSV",
       "exportCsv": "Export CSV"
     },
@@ -979,6 +979,8 @@
       "noSectionsTitle": "No Sections Yet",
       "noSectionsDescription": "No class sections have been created for this course.",
       "goToScheduling": "Go to Scheduling",
+      "sectionCount": "{{value}} section",
+      "sectionCount_plural": "{{value}} sections",
       "sectionTitle": "Section {{section}}",
       "loadMoreSections": "Load More Sections",
       "standardsTitle": "Learning Standards",
@@ -1003,7 +1005,7 @@
     },
     "conflict": {
       "title": "Schedule Conflict",
-      "samePeriod": "Same class period as {{count}} other section(s)"
+      "samePeriod": "Same class period as {{value}} other section(s)"
     },
     "student": {
       "gradeShort": "Gr {{grade}}"
@@ -1224,7 +1226,7 @@
       "noGradeLevels": "This school has no enabled grade levels configured. Set them under Settings -> Grade Levels before creating exams."
     },
     "subjects": {
-      "count": "{{count}} subject(s)",
+      "count": "{{value}} subject(s)",
       "addSubject": "Add Subject",
       "locked": "Subjects are locked while the exam is {{status}}. They can only be changed in Draft or Scheduled.",
       "noGradeMatch": "No courses match this exam's grade levels ({{grades}}). Add courses tagged for those grades in Curriculum first.",
@@ -1515,7 +1517,7 @@
       "title": "Enroll student",
       "registering": "Registering a new student",
       "academicYear": "Academic year {{year}}",
-      "studentsCurrentlyEnrolled": "{{count}} students currently enrolled",
+      "studentsCurrentlyEnrolled": "{{value}} students currently enrolled",
       "tabsAria": "Enrollment tabs"
     },
     "summary": {
@@ -1597,7 +1599,7 @@
       "possibleDuplicate": "Possible Duplicate Found",
       "similarRecords": "Similar Records Found",
       "singleMatch": "A student with similar information already exists.",
-      "multipleMatches": "{{count}} students with similar information were found.",
+      "multipleMatches": "{{value}} students with similar information were found.",
       "continueNew": "You can continue if this is a new student.",
       "dismiss": "Dismiss warning",
       "dob": "DOB: {{date}}",
@@ -1786,7 +1788,8 @@
       "parsingTitle": "Parsing the xlsx file",
       "parsingDescription": "Reading columns and building row dictionaries. This usually takes under 2 seconds.",
       "dryRunTitle": "Validating against IEMIS rules",
-      "dryRunDescription": "Checking {{count}} rows for errors, warnings, and duplicates. No data is saved yet.",
+      "dryRunDescription": "Checking {{value}} rows for errors, warnings, and duplicates. No data is saved yet.",
+      "dryRunDescriptionPending": "Checking rows for errors, warnings, and duplicates. No data is saved yet.",
       "parseErrorTitle": "Unable to parse the file",
       "unknownParseError": "Unknown parse error.",
       "submittingTitle": "Submitting import",
@@ -1840,14 +1843,14 @@
       "importAnother": "Import another file",
       "viewStudents": "View students",
       "backToPreview": "Back to preview",
-      "importNow": "Import {{count}} now"
+      "importNow": "Import {{value}} now"
     },
     "duplicates": {
       "title": "{{count}} duplicate will be skipped",
       "title_plural": "{{count}} duplicates will be skipped",
       "description": "These rows have an emisStudentId that already exists in this tenant. They will not be re-created; existing records are untouched.",
       "row": "Row {{row}} - emisStudentId {{emisStudentId}} already at student id {{studentId}}",
-      "andMore": "...and {{count}} more"
+      "andMore": "...and {{value}} more"
     },
     "confirm": {
       "title": "Confirm IEMIS import",
@@ -1864,9 +1867,9 @@
     "progress": {
       "queuedTitle": "Import queued",
       "runningTitle": "Importing students...",
-      "queuedDescription": "Job is queued. Processing {{count}} rows.",
-      "runningDescription": "Importing {{count}} rows.",
-      "runningDescriptionWithYear": "Importing {{count}} rows and enrolling into {{yearName}}.",
+      "queuedDescription": "Job is queued. Processing {{value}} rows.",
+      "runningDescription": "Importing {{value}} rows.",
+      "runningDescriptionWithYear": "Importing {{value}} rows and enrolling into {{yearName}}.",
       "keepOpen": "You can keep this tab open. The import runs server-side; closing the tab won't cancel the job, but you'll lose the live status view."
     },
     "results": {
@@ -1983,10 +1986,10 @@
       "searchStudents": "Search students by name...",
       "noStudents": "No students enrolled in this section.",
       "noStudentMatches": "No students match \"{{search}}\".",
-      "saveGrades": "Save Grades ({{count}})",
-      "saveWithScores": "Save with Scores ({{count}})",
+      "saveGrades": "Save Grades ({{value}})",
+      "saveWithScores": "Save with Scores ({{value}})",
       "createAssignment": "Create Assignment",
-      "scoreStatistics": "Score Statistics ({{count}} entered)",
+      "scoreStatistics": "Score Statistics ({{value}} entered)",
       "pasteScores": "Paste Scores (Name\\tScore per line)",
       "pasteScoresPlaceholder": "John Smith\\t95\nJane Doe\\t88",
       "pasteFromSpreadsheet": "Paste scores from spreadsheet",
@@ -2023,8 +2026,8 @@
       "toFinalize": "To Finalize",
       "alreadyFinal": "Already Final",
       "noScores": "No Scores",
-      "emptyStubsWarning": "{{count}} student(s) have no scored assignments and will be skipped.",
-      "lowGradesWarning": "{{count}} student(s) are below passing grade.",
+      "emptyStubsWarning": "{{value}} student(s) have no scored assignments and will be skipped.",
+      "lowGradesWarning": "{{value}} student(s) are below passing grade.",
       "columns": {
         "student": "Student",
         "grade": "Grade",
@@ -2040,11 +2043,11 @@
       "irreversibleAfter": "grade(s). Finalized grades are locked and cannot be modified.",
       "finalizing": "Finalizing grades...",
       "completeTitle": "Grades Finalized",
-      "completeDescription": "Successfully finalized {{count}} grade(s). These grades are now locked.",
-      "errorCount": "{{count}} grade(s) could not be finalized.",
+      "completeDescription": "Successfully finalized {{value}} grade(s). These grades are now locked.",
+      "errorCount": "{{value}} grade(s) could not be finalized.",
       "continue": "Continue",
       "back": "Back",
-      "finalizeGrades": "Finalize {{count}} Grades",
+      "finalizeGrades": "Finalize {{value}} Grades",
       "done": "Done"
     },
     "policyForm": {
@@ -2125,7 +2128,7 @@
         "summativeHigher": "Summative {{diff}}% higher",
         "summativeHigherSuffix": "than formative.",
         "equal": "Formative and summative scores are equal — well balanced.",
-        "unclassified": "+{{count}} unclassified (avg {{avg}}%)"
+        "unclassified": "+{{value}} unclassified (avg {{avg}}%)"
       },
       "distribution": {
         "title": "Grade Distribution",
@@ -2161,7 +2164,7 @@
       "atRisk": {
         "title": "At-Risk Students",
         "subtitle": "Students scoring below 60% in any course",
-        "studentCount": "{{count}} students",
+        "studentCount": "{{value}} students",
         "empty": "No students below the grade threshold",
         "headers": {
           "student": "Student",
@@ -2281,7 +2284,7 @@
       },
       "empty": "No reports generated yet for this school.",
       "emptyFilter": "No reports match this filter.",
-      "rowsPrefix": "{{count}} rows · ",
+      "rowsPrefix": "{{value}} rows · ",
       "generated": "generated {{dateTime}}",
       "created": "created {{dateTime}}",
       "dryRunSuffix": " · dry-run"

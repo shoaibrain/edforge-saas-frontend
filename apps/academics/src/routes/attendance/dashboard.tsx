@@ -933,7 +933,7 @@ export function AttendanceDashboard({
   academicYearId,
   currentDate,
 }: AttendanceDashboardProps) {
-  const { t, formatNumber } = useAcademicsI18n()
+  const { t, formatCount } = useAcademicsI18n()
   // Student drill-down modal state
   const [selectedStudent, setSelectedStudent] = useState<{
     studentId: string
@@ -992,7 +992,7 @@ export function AttendanceDashboard({
       {/* SCOPE INDICATOR */}
       {!isSchoolWide && summary && (
         <div className="inline-flex items-center gap-1.5 px-2.5 py-1 text-3xs font-medium rounded-[20px] bg-[rgb(var(--state-info-bg))] text-[rgb(var(--state-info-fg))]">
-          {t('attendance.dashboard.scopeSections', { count: formatNumber(summary.totalStudents) })}
+          {formatCount('attendance.dashboard.scopeSections', summary.totalStudents)}
         </div>
       )}
 
