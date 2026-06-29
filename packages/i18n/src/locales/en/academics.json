@@ -1440,5 +1440,94 @@
       "excused": "Excused",
       "schoolDays": "School Days"
     }
+  },
+  "governmentReports": {
+    "title": "Government Reports",
+    "descriptionPrefix": "Generate, download, and track CEHRD IEMIS Flash I / Flash II submissions for",
+    "iemisCode": "IEMIS {{code}}",
+    "noSchool": "Select a school to generate government reports.",
+    "noIemisCode": {
+      "title": "This school has no IEMIS code yet",
+      "beforeCode": "CEHRD Flash I/II exports require the school's government-issued IEMIS code (the",
+      "afterCode": "column). Add it under School Settings, then return here to generate reports."
+    },
+    "fields": {
+      "report": "Report",
+      "academicYearBs": "Academic year (BS)",
+      "academicYearAria": "Academic year in Bikram Sambat"
+    },
+    "year": {
+      "currentOption": "{{yearName}} · current",
+      "bs": "BS {{year}}"
+    },
+    "templates": {
+      "IEMIS_NPL_CEHRD_FLASH_I": "Flash I — Enrollment census",
+      "IEMIS_NPL_CEHRD_FLASH_II": "Flash II — Outcomes & attendance"
+    },
+    "status": {
+      "generating": "Generating",
+      "generated": "Ready",
+      "submitted": "Submitted",
+      "verified": "Verified",
+      "failed": "Failed"
+    },
+    "actions": {
+      "back": "Back",
+      "validate": "Validate",
+      "generate": "Generate report",
+      "downloadCsv": "Download CSV",
+      "csv": "CSV",
+      "retry": "Retry",
+      "retryGeneration": "Retry generation",
+      "markSubmitted": "Mark submitted",
+      "markVerified": "Mark verified",
+      "refresh": "Refresh",
+      "dismiss": "Dismiss"
+    },
+    "validation": {
+      "invalidBsYear": "Enter a 4-digit BS year, e.g. 2083."
+    },
+    "flashIi": {
+      "beforeExam": "Flash II's",
+      "examMarks": "exam marks",
+      "and": "and",
+      "gpa": "GPA",
+      "afterGpa": "columns are entered manually in this version; all other columns (enrollment, attendance, demographics) are generated automatically."
+    },
+    "existingReport": "A {{template}} for BS {{year}} already exists ({{status}}). Generating creates a new version.",
+    "history": {
+      "title": "Report history",
+      "filterAria": "Filter by report",
+      "filters": {
+        "all": "All",
+        "flashI": "Flash I",
+        "flashII": "Flash II"
+      },
+      "empty": "No reports generated yet for this school.",
+      "emptyFilter": "No reports match this filter.",
+      "rowsPrefix": "{{count}} rows · ",
+      "generated": "generated {{dateTime}}",
+      "created": "created {{dateTime}}",
+      "dryRunSuffix": " · dry-run"
+    },
+    "guidance": {
+      "beforeLink": "After downloading, upload the CSV to the IEMIS portal (",
+      "afterLink": "), then mark the report",
+      "and": "and",
+      "afterVerified": "once CEHRD confirms acceptance."
+    },
+    "preflight": {
+      "passed": "Validation passed",
+      "blocked": "Validation blocked",
+      "description": "Validation confirms the school and academic year exist. Per-student field issues are reported on the report row during generation."
+    },
+    "active": {
+      "generating": "Generating report...",
+      "stalled": "Taking longer than expected",
+      "ready": "Report ready",
+      "failed": "Generation failed",
+      "stalledDescription": "This is unusual for a single school; it may have failed. Refresh to check the latest status.",
+      "emptyReport": "This report has 0 students. Double-check the academic year before submitting."
+    }
   }
 }

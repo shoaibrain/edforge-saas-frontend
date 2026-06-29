@@ -1440,5 +1440,94 @@
       "excused": "अनुमति सहित",
       "schoolDays": "विद्यालय दिन"
     }
+  },
+  "governmentReports": {
+    "title": "सरकारी रिपोर्टहरू",
+    "descriptionPrefix": "CEHRD IEMIS Flash I / Flash II submissions बनाउन, डाउनलोड गर्न र track गर्न",
+    "iemisCode": "IEMIS {{code}}",
+    "noSchool": "सरकारी रिपोर्ट बनाउन विद्यालय चयन गर्नुहोस्।",
+    "noIemisCode": {
+      "title": "यस विद्यालयमा IEMIS code अझै छैन",
+      "beforeCode": "CEHRD Flash I/II निर्यातका लागि विद्यालयको सरकारी IEMIS code आवश्यक हुन्छ (",
+      "afterCode": "स्तम्भ)। School Settings मा थपेर फेरि यहाँ रिपोर्ट बनाउन आउनुहोस्।"
+    },
+    "fields": {
+      "report": "रिपोर्ट",
+      "academicYearBs": "शैक्षिक वर्ष (वि.सं.)",
+      "academicYearAria": "बिक्रम सम्बतमा शैक्षिक वर्ष"
+    },
+    "year": {
+      "currentOption": "{{yearName}} · हालको",
+      "bs": "वि.सं. {{year}}"
+    },
+    "templates": {
+      "IEMIS_NPL_CEHRD_FLASH_I": "Flash I — भर्ना census",
+      "IEMIS_NPL_CEHRD_FLASH_II": "Flash II — नतिजा र उपस्थिति"
+    },
+    "status": {
+      "generating": "बनाउँदै",
+      "generated": "तयार",
+      "submitted": "पेश गरिएको",
+      "verified": "प्रमाणित",
+      "failed": "असफल"
+    },
+    "actions": {
+      "back": "पछाडि",
+      "validate": "Validate गर्नुहोस्",
+      "generate": "रिपोर्ट बनाउनुहोस्",
+      "downloadCsv": "CSV डाउनलोड गर्नुहोस्",
+      "csv": "CSV",
+      "retry": "पुन: प्रयास",
+      "retryGeneration": "फेरि बनाउन प्रयास गर्नुहोस्",
+      "markSubmitted": "पेश गरिएको चिन्ह लगाउनुहोस्",
+      "markVerified": "प्रमाणित चिन्ह लगाउनुहोस्",
+      "refresh": "Refresh गर्नुहोस्",
+      "dismiss": "हटाउनुहोस्"
+    },
+    "validation": {
+      "invalidBsYear": "४ अंकको वि.सं. वर्ष प्रविष्ट गर्नुहोस्, जस्तै 2083।"
+    },
+    "flashIi": {
+      "beforeExam": "Flash II का",
+      "examMarks": "exam marks",
+      "and": "र",
+      "gpa": "GPA",
+      "afterGpa": "स्तम्भहरू यो संस्करणमा manual रूपमा भरिन्छन्; बाँकी स्तम्भहरू (भर्ना, उपस्थिति, demographics) स्वचालित रूपमा तयार हुन्छन्।"
+    },
+    "existingReport": "वि.सं. {{year}} का लागि {{template}} पहिले नै छ ({{status}})। फेरि बनाउँदा नयाँ version सिर्जना हुन्छ।",
+    "history": {
+      "title": "रिपोर्ट इतिहास",
+      "filterAria": "रिपोर्ट अनुसार filter गर्नुहोस्",
+      "filters": {
+        "all": "सबै",
+        "flashI": "Flash I",
+        "flashII": "Flash II"
+      },
+      "empty": "यस विद्यालयका लागि अहिलेसम्म रिपोर्ट बनाइएको छैन।",
+      "emptyFilter": "यो filter सँग मिल्ने रिपोर्ट छैन।",
+      "rowsPrefix": "{{count}} rows · ",
+      "generated": "{{dateTime}} मा बनाइएको",
+      "created": "{{dateTime}} मा सिर्जना",
+      "dryRunSuffix": " · dry-run"
+    },
+    "guidance": {
+      "beforeLink": "डाउनलोड गरेपछि CSV लाई IEMIS portal मा upload गर्नुहोस् (",
+      "afterLink": "), त्यसपछि रिपोर्टलाई",
+      "and": "र",
+      "afterVerified": "CEHRD ले स्वीकार गरेपछि चिन्ह लगाउनुहोस्।"
+    },
+    "preflight": {
+      "passed": "Validation पास भयो",
+      "blocked": "Validation रोकियो",
+      "description": "Validation ले विद्यालय र शैक्षिक वर्ष उपलब्ध छन् भनेर पुष्टि गर्छ। प्रति-विद्यार्थी field समस्याहरू generation को समयमा report row मा देखाइन्छ।"
+    },
+    "active": {
+      "generating": "रिपोर्ट बनाउँदै...",
+      "stalled": "अपेक्षाभन्दा लामो समय लाग्दैछ",
+      "ready": "रिपोर्ट तयार छ",
+      "failed": "रिपोर्ट बनाउन असफल",
+      "stalledDescription": "एउटा विद्यालयका लागि यो असामान्य हो; असफल भएको हुन सक्छ। पछिल्लो स्थिति जाँच गर्न refresh गर्नुहोस्।",
+      "emptyReport": "यस रिपोर्टमा 0 विद्यार्थी छन्। पेश गर्नुअघि शैक्षिक वर्ष फेरि जाँच गर्नुहोस्।"
+    }
   }
 }

@@ -50,12 +50,11 @@ import {
   isEmptyReport,
   isStalledGenerating,
   isValidBsYear,
-  statusLabel,
   statusVariant,
-  TEMPLATE_LABELS,
   TEMPLATE_OPTIONS,
   triggerBrowserDownload,
 } from './government-reports.helpers'
+import { useAcademicsI18n } from '../../lib/i18n'
 import type {
   PreflightReportingSnapshotResponse,
   ReportingSnapshot,
@@ -70,6 +69,7 @@ const cardStyle = {
 const IEMIS_PORTAL_URL = 'https://emis.cehrd.gov.np'
 
 export function GovernmentReportsExport() {
+  const { t, formatDateTime, formatNumber } = useAcademicsI18n()
   const navigate = useNavigate()
   const schoolId = useActiveSchoolId()
 
@@ -101,10 +101,15 @@ export function GovernmentReportsExport() {
       const bs = extractBsYear(ay.name)
       if (!bs || seen.has(bs)) continue
       seen.add(bs)
-      opts.push({ value: bs, label: ay.isCurrent ? `${ay.name} · current` : ay.name })
+      opts.push({
+        value: bs,
+        label: ay.isCurrent
+          ? t('governmentReports.year.currentOption', { yearName: ay.name })
+          : ay.name,
+      })
     }
     return opts
-  }, [academicYearsQuery.data])
+  }, [academicYearsQuery.data, t])
 
   const useYearDropdown = yearOptions.length > 0
 
@@ -197,7 +202,7 @@ export function GovernmentReportsExport() {
   if (!schoolId) {
     return (
       <PageShell onBack={() => navigate({ to: '/' })}>
-        <EmptyCard>Select a school to generate government reports.</EmptyCard>
+        <EmptyCard>{t('governmentReports.noSchool')}</EmptyCard>
       </PageShell>
     )
   }
@@ -220,12 +225,12 @@ export function GovernmentReportsExport() {
         <div className="rounded-xl border p-8" style={cardStyle}>
           <AlertTriangle className="w-7 h-7 mb-3 text-[rgb(var(--state-warning-fg))]" />
           <h2 className="text-base font-semibold mb-1 text-[rgb(var(--text-primary))]">
-            This school has no IEMIS code yet
+            {t('governmentReports.noIemisCode.title')}
           </h2>
           <p className="text-sm text-[rgb(var(--text-secondary))]">
-            CEHRD Flash I/II exports require the school’s government-issued IEMIS
-            code (the <code>school_iemis_code</code> column). Add it under School
-            Settings, then return here to generate reports.
+            {t('governmentReports.noIemisCode.beforeCode')}{' '}
+            <code>school_iemis_code</code>{' '}
+            {t('governmentReports.noIemisCode.afterCode')}
           </p>
         </div>
       </PageShell>
@@ -240,13 +245,14 @@ export function GovernmentReportsExport() {
       <header className="mb-6">
         <h1 className="text-xl font-semibold flex items-center gap-2 text-[rgb(var(--text-primary))]">
           <FileSpreadsheet className="w-5 h-5 text-[rgb(var(--accent-enrollment-text))]" />
-          Government Reports
+          {t('governmentReports.title')}
         </h1>
         <p className="text-sm mt-1 text-[rgb(var(--text-secondary))]">
-          Generate, download, and track CEHRD IEMIS Flash I / Flash II
-          submissions for{' '}
+          {t('governmentReports.descriptionPrefix')}{' '}
           <span className="text-[rgb(var(--text-primary))]">{school.name}</span>{' '}
-          <span className="text-[rgb(var(--text-tertiary))]">· IEMIS {school.emisSchoolCode}</span>.
+          <span className="text-[rgb(var(--text-tertiary))]">
+            · {t('governmentReports.iemisCode', { code: school.emisSchoolCode })}
+          </span>.
         </p>
       </header>
 
@@ -255,7 +261,7 @@ export function GovernmentReportsExport() {
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="flex flex-col gap-1.5">
             <span className="text-xs font-medium text-[rgb(var(--text-secondary))]">
-              Report
+              {t('governmentReports.fields.report')}
             </span>
             <select
               value={templateId}
@@ -267,7 +273,7 @@ export function GovernmentReportsExport() {
             >
               {TEMPLATE_OPTIONS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
-                  {opt.label}
+                  {t(`governmentReports.templates.${opt.value}`)}
                 </option>
               ))}
             </select>
@@ -275,7 +281,7 @@ export function GovernmentReportsExport() {
 
           <label className="flex flex-col gap-1.5">
             <span className="text-xs font-medium text-[rgb(var(--text-secondary))]">
-              Academic year (BS)
+              {t('governmentReports.fields.academicYearBs')}
             </span>
             {useYearDropdown ? (
               <select
@@ -302,12 +308,12 @@ export function GovernmentReportsExport() {
                   }}
                   inputMode="numeric"
                   placeholder="2083"
-                  aria-label="Academic year in Bikram Sambat"
+                  aria-label={t('governmentReports.fields.academicYearAria')}
                   className="px-3 py-2 text-sm rounded-lg border bg-transparent border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-primary))]"
                 />
                 {academicYearBs.length > 0 && !yearValid && (
                   <span className="text-xs text-[rgb(var(--state-danger-fg))]">
-                    Enter a 4-digit BS year, e.g. 2083.
+                    {t('governmentReports.validation.invalidBsYear')}
                   </span>
                 )}
               </>
@@ -319,9 +325,11 @@ export function GovernmentReportsExport() {
           <div className="mt-4 rounded-lg border p-3 text-xs flex items-start gap-2 border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]">
             <Info className="w-4 h-4 mt-0.5 shrink-0 text-[rgb(var(--state-warning-fg))]" />
             <span>
-              Flash II’s <strong>exam marks</strong> and <strong>GPA</strong> columns are
-              entered manually in this version; all other columns (enrollment,
-              attendance, demographics) are generated automatically.
+              {t('governmentReports.flashIi.beforeExam')}{' '}
+              <strong>{t('governmentReports.flashIi.examMarks')}</strong>{' '}
+              {t('governmentReports.flashIi.and')}{' '}
+              <strong>{t('governmentReports.flashIi.gpa')}</strong>{' '}
+              {t('governmentReports.flashIi.afterGpa')}
             </span>
           </div>
         )}
@@ -332,8 +340,11 @@ export function GovernmentReportsExport() {
           <div className="mt-3 text-xs flex items-start gap-2 text-[rgb(var(--text-tertiary))]">
             <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" />
             <span>
-              A {TEMPLATE_LABELS[templateId]} for BS {academicYearBs} already exists
-              ({statusLabel(existingReport.status)}). Generating creates a new version.
+              {t('governmentReports.existingReport', {
+                template: t(`governmentReports.templates.${templateId}`),
+                year: academicYearBs,
+                status: t(`governmentReports.status.${existingReport.status}`),
+              })}
             </span>
           </div>
         )}
@@ -349,7 +360,7 @@ export function GovernmentReportsExport() {
             ) : (
               <Info className="w-4 h-4" />
             )}
-            Validate
+            {t('governmentReports.actions.validate')}
           </button>
           <button
             onClick={handleGenerate}
@@ -361,7 +372,7 @@ export function GovernmentReportsExport() {
             ) : (
               <FileSpreadsheet className="w-4 h-4" />
             )}
-            Generate report
+            {t('governmentReports.actions.generate')}
           </button>
         </div>
       </section>
@@ -383,13 +394,17 @@ export function GovernmentReportsExport() {
       <section className="rounded-xl border" style={cardStyle}>
         <div className="px-5 py-3 border-b flex items-center justify-between gap-3 flex-wrap border-[rgb(var(--border-primary)/0.35)]">
           <span className="text-sm font-medium text-[rgb(var(--text-primary))]">
-            Report history
+            {t('governmentReports.history.title')}
           </span>
-          <div className="flex items-center gap-1" role="group" aria-label="Filter by report">
+          <div
+            className="flex items-center gap-1"
+            role="group"
+            aria-label={t('governmentReports.history.filterAria')}
+          >
             {([
-              { value: 'ALL', label: 'All' },
-              { value: 'IEMIS_NPL_CEHRD_FLASH_I', label: 'Flash I' },
-              { value: 'IEMIS_NPL_CEHRD_FLASH_II', label: 'Flash II' },
+              { value: 'ALL', label: t('governmentReports.history.filters.all') },
+              { value: 'IEMIS_NPL_CEHRD_FLASH_I', label: t('governmentReports.history.filters.flashI') },
+              { value: 'IEMIS_NPL_CEHRD_FLASH_II', label: t('governmentReports.history.filters.flashII') },
             ] as const).map((opt) => {
               const active = templateFilter === opt.value
               return (
@@ -417,14 +432,14 @@ export function GovernmentReportsExport() {
         ) : groupedHistory.length === 0 ? (
           <div className="px-5 py-8 text-center text-sm text-[rgb(var(--text-tertiary))]">
             {snapshots.length === 0
-              ? 'No reports generated yet for this school.'
-              : 'No reports match this filter.'}
+              ? t('governmentReports.history.empty')
+              : t('governmentReports.history.emptyFilter')}
           </div>
         ) : (
           groupedHistory.map((group) => (
             <div key={group.year}>
               <div className="px-5 py-1.5 text-xs font-semibold uppercase tracking-wide border-b bg-transparent border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-tertiary))]">
-                BS {group.year}
+                {t('governmentReports.year.bs', { year: group.year })}
               </div>
               <ul>
                 {group.items.map((snap) => (
@@ -434,14 +449,22 @@ export function GovernmentReportsExport() {
                   >
                     <div className="min-w-0 flex-1">
                       <div className="text-sm font-medium truncate text-[rgb(var(--text-primary))]">
-                        {TEMPLATE_LABELS[snap.templateId]}
+                        {t(`governmentReports.templates.${snap.templateId}`)}
                       </div>
                       <div className="text-xs mt-0.5 text-[rgb(var(--text-tertiary))]">
-                        {typeof snap.rowCount === 'number' ? `${snap.rowCount} rows · ` : ''}
+                        {typeof snap.rowCount === 'number'
+                          ? t('governmentReports.history.rowsPrefix', {
+                              count: formatNumber(snap.rowCount),
+                            })
+                          : ''}
                         {snap.generatedAt
-                          ? `generated ${new Date(snap.generatedAt).toLocaleString()}`
-                          : `created ${new Date(snap.createdAt).toLocaleString()}`}
-                        {snap.dryRun ? ' · dry-run' : ''}
+                          ? t('governmentReports.history.generated', {
+                              dateTime: formatDateTime(snap.generatedAt),
+                            })
+                          : t('governmentReports.history.created', {
+                              dateTime: formatDateTime(snap.createdAt),
+                            })}
+                        {snap.dryRun ? t('governmentReports.history.dryRunSuffix') : ''}
                       </div>
                       {snap.status === 'failed' && snap.errorSummary && (
                         <div className="text-xs mt-0.5 text-[rgb(var(--state-danger-fg))]">
@@ -450,43 +473,46 @@ export function GovernmentReportsExport() {
                       )}
                     </div>
 
-                    <StatusPill variant={statusVariant(snap.status)} label={statusLabel(snap.status)} />
+                    <StatusPill
+                      variant={statusVariant(snap.status)}
+                      label={t(`governmentReports.status.${snap.status}`)}
+                    />
 
                     <div className="flex items-center gap-1.5">
                       {canDownload(snap.status, snap.dryRun) && (
                         <RowButton
                           onClick={() => handleDownload(snap)}
                           disabled={downloadMut.isPending}
-                          ariaLabel="Download CSV"
+                          ariaLabel={t('governmentReports.actions.downloadCsv')}
                           icon={<Download className="w-3.5 h-3.5" />}
-                          label="CSV"
+                          label={t('governmentReports.actions.csv')}
                         />
                       )}
                       {canRetry(snap.status) && (
                         <RowButton
                           onClick={() => handleRetry(snap)}
                           disabled={createMut.isPending}
-                          ariaLabel="Retry generation"
+                          ariaLabel={t('governmentReports.actions.retryGeneration')}
                           icon={<RefreshCw className="w-3.5 h-3.5" />}
-                          label="Retry"
+                          label={t('governmentReports.actions.retry')}
                         />
                       )}
                       {canMarkSubmitted(snap.status, snap.dryRun) && (
                         <RowButton
                           onClick={() => handleTransition(snap, 'submitted')}
                           disabled={transitionMut.isPending}
-                          ariaLabel="Mark submitted"
+                          ariaLabel={t('governmentReports.actions.markSubmitted')}
                           icon={<Send className="w-3.5 h-3.5" />}
-                          label="Mark submitted"
+                          label={t('governmentReports.actions.markSubmitted')}
                         />
                       )}
                       {canMarkVerified(snap.status, snap.dryRun) && (
                         <RowButton
                           onClick={() => handleTransition(snap, 'verified')}
                           disabled={transitionMut.isPending}
-                          ariaLabel="Mark verified"
+                          ariaLabel={t('governmentReports.actions.markVerified')}
                           icon={<ShieldCheck className="w-3.5 h-3.5" />}
-                          label="Mark verified"
+                          label={t('governmentReports.actions.markVerified')}
                         />
                       )}
                     </div>
@@ -501,7 +527,7 @@ export function GovernmentReportsExport() {
         <div className="px-5 py-3 border-t text-xs flex items-start gap-2 border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-tertiary))]">
           <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" />
           <span>
-            After downloading, upload the CSV to the IEMIS portal (
+            {t('governmentReports.guidance.beforeLink')}{' '}
             <a
               href={IEMIS_PORTAL_URL}
               target="_blank"
@@ -510,8 +536,11 @@ export function GovernmentReportsExport() {
             >
               emis.cehrd.gov.np
             </a>
-            ), then mark the report <strong>Submitted</strong> — and{' '}
-            <strong>Verified</strong> once CEHRD confirms acceptance.
+            {t('governmentReports.guidance.afterLink')}{' '}
+            <strong>{t('governmentReports.status.submitted')}</strong>{' '}
+            {t('governmentReports.guidance.and')}{' '}
+            <strong>{t('governmentReports.status.verified')}</strong>{' '}
+            {t('governmentReports.guidance.afterVerified')}
           </span>
         </div>
       </section>
@@ -524,6 +553,7 @@ export function GovernmentReportsExport() {
 // ============================================================================
 
 function PageShell({ children, onBack }: { children: React.ReactNode; onBack: () => void }) {
+  const { t } = useAcademicsI18n()
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       <button
@@ -531,7 +561,7 @@ function PageShell({ children, onBack }: { children: React.ReactNode; onBack: ()
         className="inline-flex items-center gap-1.5 text-sm transition-colors hover:opacity-80 mb-3 text-[rgb(var(--text-secondary))]"
       >
         <ArrowLeft className="w-4 h-4" />
-        Back
+        {t('governmentReports.actions.back')}
       </button>
       {children}
     </div>
@@ -574,6 +604,7 @@ function RowButton({
 }
 
 function PreflightSummary({ preflight }: { preflight: PreflightReportingSnapshotResponse }) {
+  const { t } = useAcademicsI18n()
   const { errors, warnings, canProceed } = preflight
   return (
     <div className="mt-4 rounded-lg border p-3 text-sm border-[rgb(var(--border-primary)/0.35)]">
@@ -583,7 +614,9 @@ function PreflightSummary({ preflight }: { preflight: PreflightReportingSnapshot
         ) : (
           <AlertTriangle className="w-4 h-4 text-[rgb(var(--state-danger-fg))]" />
         )}
-        {canProceed ? 'Validation passed' : 'Validation blocked'}
+        {canProceed
+          ? t('governmentReports.preflight.passed')
+          : t('governmentReports.preflight.blocked')}
       </div>
       {errors.length > 0 && (
         <ul className="mt-2 space-y-1 text-[rgb(var(--state-danger-fg))]">
@@ -600,8 +633,7 @@ function PreflightSummary({ preflight }: { preflight: PreflightReportingSnapshot
         </ul>
       )}
       <div className="mt-2 text-xs text-[rgb(var(--text-tertiary))]">
-        Validation confirms the school and academic year exist. Per-student field
-        issues are reported on the report row during generation.
+        {t('governmentReports.preflight.description')}
       </div>
     </div>
   )
@@ -624,6 +656,7 @@ function ActiveGenerationBanner({
   onRefresh: () => void
   onDismiss: () => void
 }) {
+  const { t } = useAcademicsI18n()
   const failed = snapshot.status === 'failed'
   const ready = canDownload(snapshot.status, snapshot.dryRun)
   const empty = isEmptyReport(snapshot)
@@ -644,20 +677,19 @@ function ActiveGenerationBanner({
       {failed && <AlertTriangle className="w-5 h-5 text-[rgb(var(--state-danger-fg))]" />}
       <div className="flex-1 min-w-0">
         <div className="text-sm font-medium text-[rgb(var(--text-primary))]">
-          {spinning && 'Generating report…'}
-          {stalledGenerating && 'Taking longer than expected'}
-          {ready && 'Report ready'}
-          {failed && 'Generation failed'}
+          {spinning && t('governmentReports.active.generating')}
+          {stalledGenerating && t('governmentReports.active.stalled')}
+          {ready && t('governmentReports.active.ready')}
+          {failed && t('governmentReports.active.failed')}
         </div>
         {stalledGenerating && (
           <div className="text-xs mt-0.5 text-[rgb(var(--text-tertiary))]">
-            This is unusual for a single school — it may have failed. Refresh to
-            check the latest status.
+            {t('governmentReports.active.stalledDescription')}
           </div>
         )}
         {ready && empty && (
           <div className="text-xs mt-0.5 text-[rgb(var(--state-warning-fg))]">
-            This report has 0 students — double-check the academic year before submitting.
+            {t('governmentReports.active.emptyReport')}
           </div>
         )}
         {failed && snapshot.errorSummary && (
@@ -673,7 +705,7 @@ function ActiveGenerationBanner({
           className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border transition-colors hover:opacity-80 disabled:opacity-50 border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
         >
           {refreshing ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-          Refresh
+          {t('governmentReports.actions.refresh')}
         </button>
       )}
       {ready && (
@@ -683,14 +715,14 @@ function ActiveGenerationBanner({
           className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors hover:opacity-90 disabled:opacity-50 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
         >
           {downloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-          Download CSV
+          {t('governmentReports.actions.downloadCsv')}
         </button>
       )}
       <button
         onClick={onDismiss}
         className="text-xs transition-colors hover:opacity-80 text-[rgb(var(--text-tertiary))]"
       >
-        Dismiss
+        {t('governmentReports.actions.dismiss')}
       </button>
     </section>
   )
