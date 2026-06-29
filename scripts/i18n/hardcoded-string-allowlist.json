@@ -1,0 +1,39 @@
+{
+  "ignoreFiles": [
+    ".d.ts",
+    ".test.ts",
+    ".test.tsx",
+    ".spec.ts",
+    ".spec.tsx",
+    ".stories.tsx",
+    "/__tests__/",
+    "/dist/",
+    "/build/",
+    "/node_modules/",
+    "/.turbo/"
+  ],
+  "ignoreLiterals": [
+    "AD",
+    "BS",
+    "CSV",
+    "EN",
+    "NP",
+    "PDF",
+    "PAN",
+    "NPR",
+    "EMIS",
+    "eSewa",
+    "Khalti",
+    "FonePay",
+    "ConnectIPS"
+  ],
+  "ignoreLiteralPatterns": [
+    "^[A-Z0-9_./:-]+$",
+    "^#[0-9A-Fa-f]{3,8}$",
+    "^rgb",
+    "^var\\(",
+    "^data:",
+    "^https?://",
+    "^/"
+  ]
+}

@@ -2,6 +2,99 @@
   "title": "Fee Payments",
   "description": "View invoices, make payments, and download receipts",
 
+  "overview": {
+    "finance": "Finance",
+    "selectSchoolTitle": "Select a School",
+    "selectSchoolDescription": "Choose a school from the top navigation to view financial data.",
+    "actions": {
+      "bulkInvoice": "Bulk invoice",
+      "bulkInvoiceAria": "Bulk invoice generation",
+      "recordPayment": "Record payment",
+      "recordPaymentAria": "Record a payment"
+    },
+    "insight": {
+      "invoiced": "{{amount}} invoiced",
+      "collected": "{{rate}}% collected",
+      "invoiceOverdue": "{{count}} invoice overdue",
+      "invoiceOverdue_plural": "{{count}} invoices overdue",
+      "noOverdue": "no overdue"
+    },
+    "filters": {
+      "today": "Today",
+      "week": "This week",
+      "month": "This month",
+      "year": "This year",
+      "or": "or",
+      "fromDate": "From date",
+      "toDate": "To date",
+      "allYears": "All Years",
+      "clear": "Clear",
+      "exportCsv": "Export CSV",
+      "exportCsvAria": "Export invoices as CSV"
+    },
+    "alert": {
+      "title": "{{count}} invoices overdue — {{amount}} uncollected",
+      "collectionRate": "Collection rate is {{rate}}%",
+      "agingBucket": "{{count}} invoices in {{bucket}} bucket",
+      "drafts": "{{count}} additional drafts need to be issued",
+      "reviewBilling": "Review billing"
+    },
+    "kpi": {
+      "totalInvoiced": "Total Invoiced",
+      "collected": "Collected",
+      "outstanding": "Outstanding",
+      "overdue": "Overdue",
+      "invoiceCount": "{{count}} invoices",
+      "paymentCount": "{{count}} payments",
+      "awaiting": "{{count}} awaiting",
+      "thisMonth": "this month"
+    },
+    "empty": {
+      "noPaymentsTitle": "No payments yet",
+      "noPaymentsMessage": "Payments will appear here once students start paying.",
+      "noInvoicesTitle": "No invoices yet",
+      "noInvoicesMessage": "Create invoices to start tracking billing activity."
+    },
+    "collection": {
+      "title": "Collection performance",
+      "percentCollected": "{{rate}}% collected",
+      "collected": "Collected",
+      "outstanding": "Outstanding",
+      "overdue": "Overdue",
+      "byFeeType": "By fee type",
+      "typeCount": "{{count}} type",
+      "typeCount_plural": "{{count}} types",
+      "showLess": "Show less",
+      "showAll": "Show all ({{count}})",
+      "totalInvoicedThisYear": "Total invoiced this year"
+    },
+    "billingHealth": {
+      "title": "Billing health",
+      "allAccountsCurrent": "All accounts current",
+      "noInvoicesTitle": "No invoices yet",
+      "noInvoicesDescription": "Create your first invoice to see billing health data.",
+      "invoices": "invoices",
+      "invoiceCount": "{{count}} invoice",
+      "invoiceCount_plural": "{{count}} invoices",
+      "agingOverview": "Aging overview",
+      "overdueCount": "{{count}} overdue",
+      "noOverdue": "No overdue invoices — all accounts are current.",
+      "paymentMethods": "Payment methods",
+      "noPaymentsRecorded": "No payments recorded yet."
+    },
+    "recent": {
+      "payments": "Recent payments",
+      "invoices": "Recent invoices",
+      "noPayments": "No payments yet.",
+      "noInvoices": "No invoices yet.",
+      "unknown": "Unknown",
+      "due": "due",
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "daysAgo": "{{count}} days ago"
+    }
+  },
+
   "invoices": {
     "title": "Invoices",
     "description": "View and manage fee invoices",
@@ -137,7 +230,7 @@
     "deleteConfirmation": "Are you sure you want to delete this fee structure? This cannot be undone.",
     "name": "Fee Name",
     "type": "Fee Type",
-    "amount": "Amount (NPR)",
+    "amount": "Amount",
     "frequency": "Frequency",
     "taxRate": "Tax Rate (%)",
     "taxType": "Tax Type",
@@ -151,6 +244,31 @@
     "created": "Fee structure created successfully",
     "updated": "Fee structure updated successfully",
     "deleted": "Fee structure deleted successfully",
+    "createFailed": "Failed to create fee structure",
+    "updateFailed": "Failed to update fee structure",
+    "deleteFailed": "Failed to delete fee structure",
+    "selectSchool": "Select a school to manage fee structures.",
+    "loadFailed": "Failed to load fee structures",
+    "connectionRetry": "Please check your connection and try again.",
+    "autoApplyBanner": "Fee structures with auto-apply on enrollment will automatically generate obligations when a student is enrolled.",
+    "stats": {
+      "totalStructures": "Total Structures",
+      "autoApply": "Auto-Apply",
+      "feeTypes": "Fee Types",
+      "maxFee": "Max Fee"
+    },
+    "filters": {
+      "all": "All",
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "autoApplyOnEnrollment": "Auto-apply on enrollment",
+    "editAria": "Edit fee structure",
+    "deleteAria": "Delete fee structure",
+    "deleteTitle": "Delete Fee Structure",
+    "deleteMessage": "Are you sure you want to delete {{feeName}}? This action is irreversible and cannot be undone.",
+    "deleting": "Deleting...",
+    "confirmDelete": "Confirm Delete",
     "types": {
       "tuition": "Tuition",
       "admission": "Admission",

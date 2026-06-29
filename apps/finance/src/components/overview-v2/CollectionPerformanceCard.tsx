@@ -5,29 +5,30 @@
  * compact fee type breakdown rows below.
  */
 
-import { useState } from 'react'
-import { ChevronDown, ChevronUp } from 'lucide-react'
-import { AnimatedProgressBar } from '@edforge/ui'
-import { formatFeeType } from '@edforge/types'
-import { useCurrency } from '@edforge/types/use-currency'
-import { useFinanceSettings } from '../../layouts/FinanceLayout'
+import { useState } from "react";
+import { ChevronDown, ChevronUp } from "lucide-react";
+import { AnimatedProgressBar } from "@edforge/ui";
+import { formatFeeType } from "@edforge/types";
+import { useCurrency } from "@edforge/types/use-currency";
+import { useTranslation } from "@edforge/i18n";
+import { useFinanceSettings } from "../../layouts/FinanceLayout";
 
-const FEE_COLORS = ['#1D9E75', '#378ADD', '#7F77DD', '#EF9F27', '#D85A30']
-const MAX_VISIBLE_FEE_TYPES = 5
+const FEE_COLORS = ["#1D9E75", "#378ADD", "#7F77DD", "#EF9F27", "#D85A30"];
+const MAX_VISIBLE_FEE_TYPES = 5;
 
 interface CollectionPerformanceCardProps {
-  totalInvoiced: number
-  totalCollected: number
-  outstanding: number
-  overdue: number
-  collectionRate: number
+  totalInvoiced: number;
+  totalCollected: number;
+  outstanding: number;
+  overdue: number;
+  collectionRate: number;
   byFeeType: Array<{
-    feeType: string
-    invoiceCount: number
-    totalAmount: number
-    collectedAmount: number
-  }>
-  isLoading: boolean
+    feeType: string;
+    invoiceCount: number;
+    totalAmount: number;
+    collectedAmount: number;
+  }>;
+  isLoading: boolean;
 }
 
 function CardSkeleton() {
@@ -53,7 +54,7 @@ function CardSkeleton() {
         </div>
       ))}
     </div>
-  )
+  );
 }
 
 export function CollectionPerformanceCard({
@@ -65,20 +66,29 @@ export function CollectionPerformanceCard({
   byFeeType,
   isLoading,
 }: CollectionPerformanceCardProps) {
-  const settings = useFinanceSettings()
-  const { formatShort } = useCurrency(settings)
-  const [showAll, setShowAll] = useState(false)
+  const settings = useFinanceSettings();
+  const { t, i18n } = useTranslation("payments");
+  const { formatShort } = useCurrency(settings, {
+    platformLanguage: i18n.language,
+  });
+  const [showAll, setShowAll] = useState(false);
 
   // Use totalInvoiced as denominator for accurate percentages
-  const denom = totalInvoiced > 0 ? totalInvoiced : 1
-  const collectedPct = Math.min((totalCollected / denom) * 100, 100)
-  const nonOverdueOutstanding = outstanding - overdue
-  const outstandingPct = Math.min((nonOverdueOutstanding / denom) * 100, 100)
-  const overduePct = Math.min((overdue / denom) * 100, 100)
+  const denom = totalInvoiced > 0 ? totalInvoiced : 1;
+  const collectedPct = Math.min((totalCollected / denom) * 100, 100);
+  const nonOverdueOutstanding = outstanding - overdue;
+  const outstandingPct = Math.min((nonOverdueOutstanding / denom) * 100, 100);
+  const overduePct = Math.min((overdue / denom) * 100, 100);
 
   // Fee type display — cap at MAX_VISIBLE_FEE_TYPES unless expanded
-  const hasOverflow = byFeeType.length > MAX_VISIBLE_FEE_TYPES
-  const visibleFeeTypes = showAll ? byFeeType : byFeeType.slice(0, MAX_VISIBLE_FEE_TYPES)
+  const hasOverflow = byFeeType.length > MAX_VISIBLE_FEE_TYPES;
+  const visibleFeeTypes = showAll
+    ? byFeeType
+    : byFeeType.slice(0, MAX_VISIBLE_FEE_TYPES);
+  const feeTypeLabel = (feeType: string) =>
+    t(`feeStructure.types.${feeType.toLowerCase()}`, {
+      defaultValue: formatFeeType(feeType),
+    });
 
   return (
     <div
@@ -89,10 +99,12 @@ export function CollectionPerformanceCard({
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-medium text-[rgb(var(--text-secondary))]">
-          Collection performance
+          {t("overview.collection.title")}
         </h3>
         <span className="text-xs text-[rgb(var(--text-disabled))]">
-          {collectionRate.toFixed(1)}% collected
+          {t("overview.collection.percentCollected", {
+            rate: collectionRate.toFixed(1),
+          })}
         </span>
       </div>
 
@@ -104,24 +116,36 @@ export function CollectionPerformanceCard({
           {/* Collected */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-[rgb(var(--text-tertiary))]">Collected</span>
+              <span className="text-xs text-[rgb(var(--text-tertiary))]">
+                {t("overview.collection.collected")}
+              </span>
               <span className="text-xs font-medium text-[rgb(var(--accent-enrollment-text))]">
                 {formatShort(totalCollected)}
               </span>
             </div>
-            <AnimatedProgressBar percentage={collectedPct} color="#1D9E75" label={`Collected: ${formatShort(totalCollected)}`} />
+            <AnimatedProgressBar
+              percentage={collectedPct}
+              color="#1D9E75"
+              label={`${t("overview.collection.collected")}: ${formatShort(totalCollected)}`}
+            />
           </div>
 
           {/* Outstanding (non-overdue) — hide when negligible */}
           {nonOverdueOutstanding >= 1000 && (
             <div>
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs text-[rgb(var(--text-tertiary))]">Outstanding</span>
+                <span className="text-xs text-[rgb(var(--text-tertiary))]">
+                  {t("overview.collection.outstanding")}
+                </span>
                 <span className="text-xs font-medium text-[rgb(var(--state-warning-fg))]">
                   {formatShort(nonOverdueOutstanding)}
                 </span>
               </div>
-              <AnimatedProgressBar percentage={outstandingPct} color="rgb(var(--state-warning-fg))" label={`Outstanding: ${formatShort(nonOverdueOutstanding)}`} />
+              <AnimatedProgressBar
+                percentage={outstandingPct}
+                color="rgb(var(--state-warning-fg))"
+                label={`${t("overview.collection.outstanding")}: ${formatShort(nonOverdueOutstanding)}`}
+              />
             </div>
           )}
 
@@ -129,12 +153,18 @@ export function CollectionPerformanceCard({
           {overdue > 0 && (
             <div>
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs text-[rgb(var(--text-tertiary))]">Overdue</span>
+                <span className="text-xs text-[rgb(var(--text-tertiary))]">
+                  {t("overview.collection.overdue")}
+                </span>
                 <span className="text-xs font-medium text-[rgb(var(--state-danger-fg))]">
                   {formatShort(overdue)}
                 </span>
               </div>
-              <AnimatedProgressBar percentage={overduePct} color="rgb(var(--state-danger-fg))" label={`Overdue: ${formatShort(overdue)}`} />
+              <AnimatedProgressBar
+                percentage={overduePct}
+                color="rgb(var(--state-danger-fg))"
+                label={`${t("overview.collection.overdue")}: ${formatShort(overdue)}`}
+              />
             </div>
           )}
 
@@ -146,18 +176,29 @@ export function CollectionPerformanceCard({
               {/* Section header */}
               <div className="flex items-center justify-between">
                 <span className="text-xs font-medium text-[rgb(var(--text-secondary))]">
-                  By fee type
+                  {t("overview.collection.byFeeType")}
                 </span>
                 <span className="text-xs tabular-nums text-[rgb(var(--text-disabled))]">
-                  {byFeeType.length} type{byFeeType.length !== 1 ? 's' : ''}
+                  {t(
+                    byFeeType.length === 1
+                      ? "overview.collection.typeCount"
+                      : "overview.collection.typeCount_plural",
+                    { count: byFeeType.length },
+                  )}
                 </span>
               </div>
 
               {/* Compact fee type rows */}
               <div className="space-y-2.5">
                 {visibleFeeTypes.map((fee, idx) => {
-                  const pct = fee.totalAmount > 0 ? Math.min((fee.collectedAmount / fee.totalAmount) * 100, 100) : 0
-                  const color = FEE_COLORS[idx % FEE_COLORS.length]
+                  const pct =
+                    fee.totalAmount > 0
+                      ? Math.min(
+                          (fee.collectedAmount / fee.totalAmount) * 100,
+                          100,
+                        )
+                      : 0;
+                  const color = FEE_COLORS[idx % FEE_COLORS.length];
                   return (
                     <div key={fee.feeType}>
                       <div className="flex items-center justify-between mb-1">
@@ -167,8 +208,11 @@ export function CollectionPerformanceCard({
                             className="w-2 h-2 rounded-full flex-shrink-0"
                             style={{ background: color }}
                           />
-                          <span className="text-xs font-medium truncate text-[rgb(var(--text-secondary))]" style={{ maxWidth: 120 }}>
-                            {formatFeeType(fee.feeType)}
+                          <span
+                            className="text-xs font-medium truncate text-[rgb(var(--text-secondary))]"
+                            style={{ maxWidth: 120 }}
+                          >
+                            {feeTypeLabel(fee.feeType)}
                           </span>
                         </div>
                         <div className="flex items-center gap-2 flex-shrink-0">
@@ -179,7 +223,9 @@ export function CollectionPerformanceCard({
                           >
                             {formatShort(fee.collectedAmount)}
                           </span>
-                          <span className="text-xs text-[rgb(var(--text-disabled))]">/</span>
+                          <span className="text-xs text-[rgb(var(--text-disabled))]">
+                            /
+                          </span>
                           <span className="text-xs tabular-nums text-[rgb(var(--text-disabled))]">
                             {formatShort(fee.totalAmount)}
                           </span>
@@ -188,9 +234,14 @@ export function CollectionPerformanceCard({
                           </span>
                         </div>
                       </div>
-                      <AnimatedProgressBar percentage={pct} color={color} label={`${formatFeeType(fee.feeType)}: ${pct.toFixed(0)}% collected`} height={4} />
+                      <AnimatedProgressBar
+                        percentage={pct}
+                        color={color}
+                        label={`${feeTypeLabel(fee.feeType)}: ${t("overview.collection.percentCollected", { rate: pct.toFixed(0) })}`}
+                        height={4}
+                      />
                     </div>
-                  )
+                  );
                 })}
               </div>
 
@@ -203,12 +254,14 @@ export function CollectionPerformanceCard({
                   {showAll ? (
                     <>
                       <ChevronUp className="w-3 h-3" />
-                      Show less
+                      {t("overview.collection.showLess")}
                     </>
                   ) : (
                     <>
                       <ChevronDown className="w-3 h-3" />
-                      Show all ({byFeeType.length})
+                      {t("overview.collection.showAll", {
+                        count: byFeeType.length,
+                      })}
                     </>
                   )}
                 </button>
@@ -219,7 +272,7 @@ export function CollectionPerformanceCard({
           {/* Total invoiced */}
           <div className="flex items-baseline justify-between pt-1">
             <span className="text-xs text-[rgb(var(--text-disabled))]">
-              Total invoiced this year
+              {t("overview.collection.totalInvoicedThisYear")}
             </span>
             <span className="text-sm font-semibold text-[rgb(var(--text-primary))]">
               {formatShort(totalInvoiced)}
@@ -228,5 +281,5 @@ export function CollectionPerformanceCard({
         </div>
       )}
     </div>
-  )
+  );
 }
