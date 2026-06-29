@@ -14,7 +14,6 @@ import {
   ToggleLeft,
   ToggleRight,
   Users,
-  Send,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import type { OnChangeFn, RowSelectionState } from '@tanstack/react-table'
@@ -34,6 +33,7 @@ import {
   getCapacityLabel,
   getCapacityTextColor,
 } from '../../schemas/section.form'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 // ============================================================================
 // TYPES
@@ -69,6 +69,7 @@ interface RowActionsProps {
 
 function RowActions({ section, onView, onEdit, onToggleActive, onViewRoster }: RowActionsProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const { t } = useAcademicsI18n()
 
   return (
     <div className="relative">
@@ -79,7 +80,7 @@ function RowActions({ section, onView, onEdit, onToggleActive, onViewRoster }: R
           setIsOpen(!isOpen)
         }}
         className="p-1.5 rounded-md text-text-tertiary hover:text-text-primary hover:bg-surface-secondary transition-colors"
-        aria-label="Section actions"
+        aria-label={t('tables.sections.actions.sectionActions')}
       >
         <MoreVertical className="w-4 h-4" />
       </button>
@@ -104,7 +105,7 @@ function RowActions({ section, onView, onEdit, onToggleActive, onViewRoster }: R
               className="flex items-center gap-2 w-full px-3 py-2 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-secondary transition-colors"
             >
               <Eye className="w-4 h-4" />
-              View Details
+              {t('tables.sections.actions.viewDetails')}
             </button>
             <button
               type="button"
@@ -116,7 +117,7 @@ function RowActions({ section, onView, onEdit, onToggleActive, onViewRoster }: R
               className="flex items-center gap-2 w-full px-3 py-2 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-secondary transition-colors"
             >
               <Users className="w-4 h-4" />
-              View Roster
+              {t('tables.sections.actions.viewRoster')}
             </button>
             <button
               type="button"
@@ -128,7 +129,7 @@ function RowActions({ section, onView, onEdit, onToggleActive, onViewRoster }: R
               className="flex items-center gap-2 w-full px-3 py-2 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-secondary transition-colors"
             >
               <Pencil className="w-4 h-4" />
-              Edit Section
+              {t('tables.sections.actions.editSection')}
             </button>
             <div className="border-t border-border-secondary my-1" />
             <button
@@ -143,12 +144,12 @@ function RowActions({ section, onView, onEdit, onToggleActive, onViewRoster }: R
               {section.isActive ? (
                 <>
                   <ToggleLeft className="w-4 h-4" />
-                  Deactivate
+                  {t('tables.sections.actions.deactivate')}
                 </>
               ) : (
                 <>
                   <ToggleRight className="w-4 h-4" />
-                  Activate
+                  {t('tables.sections.actions.activate')}
                 </>
               )}
             </button>
@@ -199,17 +200,18 @@ export function SectionTable({
   rowSelection,
   onRowSelectionChange,
 }: SectionTableProps) {
+  const { t, dataTableLabels } = useAcademicsI18n()
   const columns: ColumnDef<SectionResponseDto, unknown>[] = useMemo(
     () => [
       createSelectColumn<SectionResponseDto>(),
       {
         accessorKey: 'sectionNumber',
-        header: 'Section',
+        header: t('tables.sections.columns.section'),
         size: 180,
         cell: ({ row }) => (
           <div>
             <div className="font-medium text-text-primary">
-              {row.original.sectionName || `Section ${row.original.sectionNumber}`}
+              {row.original.sectionName || `${t('common.section')} ${row.original.sectionNumber}`}
             </div>
             <div className="text-xs text-text-tertiary mt-0.5">
               #{row.original.sectionNumber}
@@ -220,7 +222,7 @@ export function SectionTable({
       {
         id: 'course',
         accessorFn: (row) => row.courseName,
-        header: 'Course',
+        header: t('tables.sections.columns.course'),
         size: 200,
         cell: ({ row }) => (
           <div>
@@ -238,7 +240,7 @@ export function SectionTable({
       {
         id: 'teacher',
         accessorFn: (row) => row.primaryTeacherName,
-        header: 'Teacher',
+        header: t('tables.sections.columns.teacher'),
         size: 180,
         cell: ({ row }) => (
           <span className="text-sm text-text-primary">
@@ -249,7 +251,7 @@ export function SectionTable({
       {
         id: 'period',
         accessorFn: (row) => row.periodName,
-        header: 'Period',
+        header: t('tables.sections.columns.period'),
         size: 120,
         enableSorting: false,
         cell: ({ row }) => (
@@ -261,7 +263,7 @@ export function SectionTable({
       {
         id: 'room',
         accessorFn: (row) => row.locationRoomNumber ?? row.roomNumber,
-        header: 'Room',
+        header: t('tables.sections.columns.room'),
         size: 100,
         enableSorting: false,
         cell: ({ row }) => (
@@ -273,7 +275,7 @@ export function SectionTable({
       {
         id: 'enrollment',
         accessorFn: (row) => row.currentEnrollment,
-        header: 'Enrollment',
+        header: t('tables.sections.columns.enrollment'),
         size: 180,
         enableSorting: false,
         cell: ({ row }) => (
@@ -285,7 +287,7 @@ export function SectionTable({
       },
       {
         accessorKey: 'isActive',
-        header: 'Status',
+        header: t('tables.sections.columns.status'),
         size: 80,
         enableSorting: false,
         // String-keyed facet values so the facet dropdown shows "active" /
@@ -294,7 +296,7 @@ export function SectionTable({
         filterFn: 'arrIncludesSome',
         cell: ({ row }) => (
           <StatusBadge tone={row.original.isActive ? 'success' : 'neutral'} dot>
-            {row.original.isActive ? 'Active' : 'Inactive'}
+            {row.original.isActive ? t('common.active') : t('common.inactive')}
           </StatusBadge>
         ),
       },
@@ -310,7 +312,7 @@ export function SectionTable({
         ),
       }),
     ],
-    [onViewSection, onEditSection, onToggleActive, onViewRoster]
+    [onViewSection, onEditSection, onToggleActive, onViewRoster, t]
   )
 
   const courseOptions = useMemo(() => {
@@ -329,51 +331,49 @@ export function SectionTable({
     () => [
       {
         columnId: 'isActive',
-        title: 'Status',
+        title: t('tables.sections.columns.status'),
         options: [
-          { value: 'active', label: 'Active' },
-          { value: 'inactive', label: 'Inactive' },
+          { value: 'active', label: t('common.active') },
+          { value: 'inactive', label: t('common.inactive') },
         ],
       },
       ...(courseOptions.length > 0
-        ? [{ columnId: 'course', title: 'Course', options: courseOptions }]
+        ? [{ columnId: 'course', title: t('tables.sections.columns.course'), options: courseOptions }]
         : []),
       ...(periodOptions.length > 0
-        ? [{ columnId: 'period', title: 'Period', options: periodOptions }]
+        ? [{ columnId: 'period', title: t('tables.sections.columns.period'), options: periodOptions }]
         : []),
     ],
-    [courseOptions, periodOptions],
+    [courseOptions, periodOptions, t],
   )
 
-  // Default bulk action placeholders — used when the route doesn't pass
-  // its own `bulkActions` prop. Activate / Deactivate are upgraded to a
-  // real BulkSectionStatusModal by `apps/academics/src/routes/classrooms/index.tsx`;
-  // Send notification remains a toast pending a backend slice.
+  // Fallback bulk actions used when the route doesn't pass `bulkActionsProp`.
+  // Activate / Deactivate are upgraded to a real `BulkSectionStatusModal`
+  // by the /classrooms route. The earlier `Send notification` entry was
+  // dropped — its backend slice (#225) isn't built, and shipping a toast
+  // placeholder for an unsupported flow confuses operators.
   const defaultBulkActions = useMemo<BulkAction<SectionResponseDto>[]>(
     () => [
       {
         id: 'activate',
-        label: 'Activate',
+        label: t('tables.sections.actions.activate'),
         icon: <ToggleRight className="w-4 h-4" />,
-        onRun: (rows) =>
-          toast.info(`Activate ${rows.length} section${rows.length === 1 ? '' : 's'} — coming soon`),
+        onRun: (rows) => toast.info(t('common.comingSoon', {
+          action: t('tables.sections.actions.activate'),
+          countLabel: t('common.sections', { count: rows.length }),
+        })),
       },
       {
         id: 'deactivate',
-        label: 'Deactivate',
+        label: t('tables.sections.actions.deactivate'),
         icon: <ToggleLeft className="w-4 h-4" />,
-        onRun: (rows) =>
-          toast.info(`Deactivate ${rows.length} section${rows.length === 1 ? '' : 's'} — coming soon`),
-      },
-      {
-        id: 'notify',
-        label: 'Send notification',
-        icon: <Send className="w-4 h-4" />,
-        onRun: (rows) =>
-          toast.info(`Notify ${rows.length} section${rows.length === 1 ? '' : 's'} — coming soon`),
+        onRun: (rows) => toast.info(t('common.comingSoon', {
+          action: t('tables.sections.actions.deactivate'),
+          countLabel: t('common.sections', { count: rows.length }),
+        })),
       },
     ],
-    [],
+    [t],
   )
 
   const bulkActions = bulkActionsProp ?? defaultBulkActions
@@ -388,7 +388,7 @@ export function SectionTable({
       enableSorting
       enableRowSelection
       enableColumnVisibility
-      searchPlaceholder="Search sections…"
+      searchPlaceholder={t('tables.sections.search')}
       facets={facets}
       bulkActions={bulkActions}
       rowSelection={rowSelection}
@@ -399,10 +399,10 @@ export function SectionTable({
       pageSizes={[10, 20, 50]}
       emptyState={{
         icon: <CalendarDays className="w-12 h-12 text-text-tertiary" />,
-        title: 'No sections found',
-        description:
-          'Create your first class section to start building your schedule.',
+        title: t('tables.sections.empty.title'),
+        description: t('tables.sections.empty.description'),
       }}
+      labels={dataTableLabels}
       onRowClick={onViewSection}
       maxHeight="calc(100vh - 26rem)"
     />

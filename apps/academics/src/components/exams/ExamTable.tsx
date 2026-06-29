@@ -18,6 +18,7 @@ import {
   type FacetedFilterConfig,
 } from '@edforge/ui'
 import { getExamStatusMeta, humanizeExamType } from '../../schemas/exam.form'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 interface ExamTableProps {
   exams: ExamResponseDto[]
@@ -40,12 +41,6 @@ const STATUS_ORDER: ExamStatus[] = [
   'published',
 ]
 
-const RESULT_OPTIONS = [
-  { value: 'generated', label: 'Generated' },
-  { value: 'pending', label: 'Pending' },
-  { value: 'none', label: '—' },
-] as const
-
 export function ExamTable({
   exams,
   termNameById,
@@ -53,6 +48,7 @@ export function ExamTable({
   onSelectExam,
   bulkActions,
 }: ExamTableProps) {
+  const { t, dataTableLabels, formatDate } = useAcademicsI18n()
   // Augment every row with a stable "results bucket" so the facet filter and
   // sort don't need to recompute the bucket on every cell render.
   const rows: ExamWithResults[] = useMemo(
@@ -90,9 +86,9 @@ export function ExamTable({
     () =>
       STATUS_ORDER.map((s) => ({
         value: s,
-        label: getExamStatusMeta(s).label,
+        label: t(`status.${s}`, { defaultValue: getExamStatusMeta(s).label }),
       })),
-    []
+    [t]
   )
 
   const columns = useMemo<ColumnDef<ExamWithResults, unknown>[]>(
@@ -102,7 +98,7 @@ export function ExamTable({
       {
         id: 'examName',
         accessorKey: 'examName',
-        header: 'Exam',
+        header: t('tables.exams.columns.exam'),
         size: 280,
         enableSorting: true,
         cell: ({ row }) => (
@@ -122,7 +118,7 @@ export function ExamTable({
       {
         id: 'examType',
         accessorKey: 'examType',
-        header: 'Type',
+        header: t('tables.exams.columns.type'),
         size: 160,
         enableSorting: true,
         filterFn: 'arrIncludesSome',
@@ -147,7 +143,7 @@ export function ExamTable({
       {
         id: 'termId',
         accessorKey: 'termId',
-        header: 'Term',
+        header: t('tables.exams.columns.term'),
         size: 120,
         enableSorting: true,
         filterFn: 'arrIncludesSome',
@@ -165,7 +161,7 @@ export function ExamTable({
       {
         id: 'gradeLevels',
         accessorKey: 'gradeLevels',
-        header: 'Grades',
+        header: t('tables.exams.columns.grades'),
         size: 140,
         enableSorting: false,
         cell: ({ getValue }) => {
@@ -196,7 +192,7 @@ export function ExamTable({
       {
         id: 'schedule',
         accessorFn: (row) => row.startDate,
-        header: 'Schedule',
+        header: t('tables.exams.columns.schedule'),
         size: 180,
         enableSorting: true,
         sortingFn: (a, b) =>
@@ -204,12 +200,12 @@ export function ExamTable({
         cell: ({ row }) => (
           <div>
             <div className="text-[rgb(var(--text-primary))] tabular-nums">
-              {formatShortDate(row.original.startDate)}
+              {formatShortDate(row.original.startDate, formatDate)}
               <span className="text-[rgb(var(--text-tertiary))]"> → </span>
-              {formatShortDate(row.original.endDate)}
+              {formatShortDate(row.original.endDate, formatDate)}
             </div>
             <div className="text-xs text-[rgb(var(--text-tertiary))] tabular-nums">
-              {scheduleSubline(row.original.startDate, row.original.endDate)}
+              {scheduleSubline(row.original.startDate, row.original.endDate, t)}
             </div>
           </div>
         ),
@@ -218,7 +214,7 @@ export function ExamTable({
       {
         id: 'status',
         accessorKey: 'status',
-        header: 'Status',
+        header: t('tables.exams.columns.status'),
         size: 140,
         enableSorting: true,
         filterFn: 'arrIncludesSome',
@@ -232,7 +228,7 @@ export function ExamTable({
                 aria-hidden
                 className="inline-block w-1.5 h-1.5 rounded-full bg-current"
               />
-              {meta.label}
+              {t(`status.${getValue() as ExamStatus}`, { defaultValue: meta.label })}
             </span>
           )
         },
@@ -241,7 +237,7 @@ export function ExamTable({
       {
         id: 'results',
         accessorKey: 'resultsBucket',
-        header: 'Results',
+        header: t('tables.exams.columns.results'),
         size: 130,
         enableSorting: true,
         filterFn: 'arrIncludesSome',
@@ -251,7 +247,7 @@ export function ExamTable({
             return (
               <span className="inline-flex items-center gap-1 text-[rgb(var(--state-success-fg))]">
                 <CheckCircle2 className="w-3.5 h-3.5" />
-                Generated
+                {t('tables.exams.results.generated')}
               </span>
             )
           }
@@ -259,7 +255,7 @@ export function ExamTable({
             return (
               <span className="inline-flex items-center gap-1 text-[rgb(var(--state-warning-fg))]">
                 <Clock className="w-3.5 h-3.5" />
-                Pending
+                {t('tables.exams.results.pending')}
               </span>
             )
           }
@@ -267,21 +263,25 @@ export function ExamTable({
         },
       },
     ],
-    [termNameById]
+    [formatDate, termNameById, t]
   )
 
   const facets: FacetedFilterConfig[] = useMemo(
     () => [
-      { columnId: 'examType', title: 'Type', options: typeOptions },
-      { columnId: 'termId', title: 'Term', options: termOptions },
-      { columnId: 'status', title: 'Status', options: statusOptions },
+      { columnId: 'examType', title: t('tables.exams.columns.type'), options: typeOptions },
+      { columnId: 'termId', title: t('tables.exams.columns.term'), options: termOptions },
+      { columnId: 'status', title: t('tables.exams.columns.status'), options: statusOptions },
       {
         columnId: 'results',
-        title: 'Results',
-        options: RESULT_OPTIONS.map((o) => ({ ...o })),
+        title: t('tables.exams.columns.results'),
+        options: [
+          { value: 'generated', label: t('enums.examResult.generated') },
+          { value: 'pending', label: t('enums.examResult.pending') },
+          { value: 'none', label: t('enums.examResult.none') },
+        ],
       },
     ],
-    [typeOptions, termOptions, statusOptions]
+    [typeOptions, termOptions, statusOptions, t]
   )
 
   return (
@@ -295,7 +295,7 @@ export function ExamTable({
       enableRowSelection={!!bulkActions?.length}
       enableColumnVisibility
       facets={facets}
-      searchPlaceholder="Search exams…"
+      searchPlaceholder={t('tables.exams.search')}
       defaultSort={[{ id: 'schedule', desc: true }]}
       pagination={{ pageSize: 8 }}
       pageSizes={[8, 12, 20]}
@@ -303,11 +303,11 @@ export function ExamTable({
       onRowClick={onSelectExam}
       bulkActions={bulkActions}
       exportOptions={{ filename: 'exams', formats: ['csv'] }}
+      labels={dataTableLabels}
       emptyState={{
         icon: <ClipboardList className="w-12 h-12" />,
-        title: 'No exams match',
-        description:
-          'Adjust filters or create the first exam for this academic year to begin scheduling.',
+        title: t('tables.exams.empty.title'),
+        description: t('tables.exams.empty.description'),
       }}
     />
   )
@@ -327,20 +327,27 @@ function typeAbbrev(examType: string): string {
     .toUpperCase()
 }
 
-function formatShortDate(iso?: string): string {
+function formatShortDate(
+  iso: string | undefined,
+  formatDate: ReturnType<typeof useAcademicsI18n>['formatDate'],
+): string {
   if (!iso) return '—'
   // The exam DTO stores YYYY-MM-DD. Render as "MMM D" matching the prototype.
   const [y, m, d] = iso.split('-').map((part) => Number(part))
   if (!y || !m || !d) return iso
   const dt = new Date(Date.UTC(y, m - 1, d))
-  return dt.toLocaleDateString(undefined, {
+  return formatDate(dt, {
     month: 'short',
     day: 'numeric',
     timeZone: 'UTC',
   })
 }
 
-function scheduleSubline(start?: string, end?: string): string {
+function scheduleSubline(
+  start: string | undefined,
+  end: string | undefined,
+  t: ReturnType<typeof useAcademicsI18n>['t'],
+): string {
   if (!start || !end) return ''
   const startMs = Date.parse(start + 'T00:00:00Z')
   const endMs = Date.parse(end + 'T00:00:00Z')
@@ -350,9 +357,9 @@ function scheduleSubline(start?: string, end?: string): string {
   const dayLen = Math.max(0, Math.round((endMs - startMs) / 86_400_000)) + 1
   const sincePart =
     daySince > 0
-      ? `${daySince}d ago`
+      ? t('tables.exams.schedule.daysAgo', { count: daySince })
       : daySince === 0
-        ? 'today'
-        : `in ${Math.abs(daySince)}d`
-  return `${sincePart} · ${dayLen}d`
+        ? t('tables.exams.schedule.today')
+        : t('tables.exams.schedule.inDays', { count: Math.abs(daySince) })
+  return `${sincePart} · ${t('tables.exams.schedule.duration', { count: dayLen })}`
 }

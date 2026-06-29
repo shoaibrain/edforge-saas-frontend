@@ -30,6 +30,7 @@ import { acceptsScoreWrites } from '../../schemas/exam-state-machine'
 import { getExamStatusMeta } from '../../schemas/exam.form'
 import { UserAvatar } from '../common/UserAvatar'
 import { evalComponents, sameComponentScores } from './exam-scoring'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 const MAX_BULK = 250 // backend EXAM_SCORE_BULK_MAX_TOTAL
 
@@ -181,6 +182,7 @@ export function ExamScoresTab({
   exam: ExamResponseDto
   canManage: boolean
 }) {
+  const { t, dataTableLabels } = useAcademicsI18n()
   const writable = canManage && acceptsScoreWrites(exam.status)
 
   const { data: examCoursesData, isLoading: subjectsLoading } = useExamCourses(exam.examId)
@@ -365,8 +367,8 @@ export function ExamScoresTab({
   const bulkMutation = useBulkExamScores(exam.examId, exam.schoolId)
 
   // Roster table wiring. `setRow` is stable; the context value carries the
-  // live edit state to the ScoreCells. `columns` is referentially stable
-  // (empty deps) so typing never resets the table's pagination/search.
+  // live edit state to the ScoreCells. `columns` only depends on label copy,
+  // so typing never resets the table's pagination/search.
   const setRow = useCallback((enrollmentId: string, text: string) => {
     setEdits((prev) => ({ ...prev, [enrollmentId]: { text, value: parseRow(text).value } }))
   }, [])
@@ -387,11 +389,11 @@ export function ExamScoresTab({
     () => [
       {
         accessorKey: 'studentName',
-        header: 'Student',
+        header: t('tables.examScores.student'),
         size: 300,
         cell: ({ row }) => {
           const e = row.original
-          const displayName = e.studentName || 'Student'
+          const displayName = e.studentName || t('common.student')
           return (
             <div className="flex items-center gap-3 min-w-0">
               <UserAvatar userId={e.studentId} userName={displayName} role="student" size="md" />
@@ -402,7 +404,7 @@ export function ExamScoresTab({
       },
       {
         accessorKey: 'gradeLevel',
-        header: 'Grade',
+        header: t('tables.examScores.grade'),
         size: 110,
         cell: ({ row }) => (
           <span className="inline-block px-2 py-0.5 text-xs font-medium rounded-full bg-surface-secondary text-text-secondary">
@@ -412,18 +414,18 @@ export function ExamScoresTab({
       },
       {
         id: 'score',
-        header: () => <span className="block text-right">Score</span>,
+        header: () => <span className="block text-right">{t('tables.examScores.score')}</span>,
         size: 340,
         enableSorting: false,
         cell: ({ row }) => (
           <ScoreCell
             enrollmentId={row.original.enrollmentId}
-            studentName={row.original.studentName ?? 'student'}
+            studentName={row.original.studentName ?? t('common.student')}
           />
         ),
       },
     ],
-    [],
+    [t],
   )
 
   const handleSave = async () => {
@@ -481,18 +483,22 @@ export function ExamScoresTab({
     return (
       <div className="rounded-xl border border-border-secondary p-10 text-center">
         <BookOpen className="w-10 h-10 mx-auto text-text-tertiary mb-3" />
-        <h4 className="text-base font-medium text-text-primary mb-1">No subjects yet</h4>
+        <h4 className="text-base font-medium text-text-primary mb-1">{t('tables.examScores.noSubjectsTitle')}</h4>
         <p className="text-sm text-text-secondary">
-          Add subjects in the Subjects tab before entering scores.
+          {t('tables.examScores.noSubjectsDescription')}
         </p>
       </div>
     )
   }
 
   const lockReason = !acceptsScoreWrites(exam.status)
-    ? `Score entry is locked while the exam is ${getExamStatusMeta(exam.status).label}. Scores can only be entered or edited in Scheduled or In Progress.`
+    ? t('tables.examScores.lockedStatus', {
+        status: t(`status.${exam.status}`, {
+          defaultValue: getExamStatusMeta(exam.status).label,
+        }),
+      })
     : !canManage
-      ? 'You do not have permission to edit scores.'
+      ? t('tables.examScores.lockedPermission')
       : null
 
   return (
@@ -500,7 +506,7 @@ export function ExamScoresTab({
       {/* Subject picker + counts */}
       <div className="flex flex-wrap items-center gap-3">
         <label className="text-xs font-medium text-text-tertiary">
-          Subject
+          {t('tables.examScores.subject')}
           <select
             value={selectedExamCourseId}
             onChange={(e) => setSelectedExamCourseId(e.target.value)}
@@ -508,15 +514,18 @@ export function ExamScoresTab({
           >
             {examCourses.map((c) => (
               <option key={c.examCourseId} value={c.examCourseId}>
-                {c.courseName ?? c.courseCode ?? 'Subject'} ({c.maxMarks} max)
+                {c.courseName ?? c.courseCode ?? t('tables.examScores.subjectFallback')} ({t('tables.examScores.maxMarks', { marks: c.maxMarks })})
               </option>
             ))}
           </select>
         </label>
         <div className="text-xs text-text-tertiary">
-          {enrollments.length} student{enrollments.length === 1 ? '' : 's'} · max {maxMarks}
+          {t('tables.examScores.summary', {
+            students: t('common.students', { count: enrollments.length }),
+            max: maxMarks,
+          })}
           {selectedCourse?.passingMarks != null && (
-            <> · pass {selectedCourse.passingMarks}</>
+            <> · {t('tables.examScores.pass', { marks: selectedCourse.passingMarks })}</>
           )}
           {components.length > 0 && (
             <> · {components.map((c) => c.label ?? c.code).join(' + ')}</>
@@ -542,19 +551,20 @@ export function ExamScoresTab({
           getRowId={(e) => e.enrollmentId}
           isLoading={rosterLoading || scoresLoading}
           enableSorting
-          searchPlaceholder="Search students by name…"
+          searchPlaceholder={t('tables.examScores.search')}
           pagination={{ pageSize: 20 }}
           maxHeight="calc(100vh - 22rem)"
           emptyState={{
             icon: <Users className="w-10 h-10" />,
-            title: 'No students to score',
+            title: t('tables.examScores.emptyNoStudents'),
             description:
               examGradeSet.size > 0 && activeEnrollments.length > 0
-                ? `No active students enrolled at this exam's grade level${
-                    (exam.gradeLevels?.length ?? 0) === 1 ? '' : 's'
-                  } (${(exam.gradeLevels ?? []).join(', ')}).`
-                : 'No active enrollments for this academic year.',
+                ? t('tables.examScores.emptyNoActiveForGrades', {
+                    grades: (exam.gradeLevels ?? []).join(', '),
+                  })
+                : t('tables.examScores.emptyNoActiveEnrollments'),
           }}
+          labels={dataTableLabels}
         />
       </ScoreEntryContext.Provider>
 
@@ -565,15 +575,15 @@ export function ExamScoresTab({
             {diffs.invalidCount > 0 ? (
               <span className="inline-flex items-center gap-1.5 text-[rgb(var(--state-danger-fg))]">
                 <AlertCircle className="w-4 h-4" />
-                {diffs.invalidCount} row{diffs.invalidCount === 1 ? '' : 's'} invalid (0–{maxMarks})
+                {t('tables.examScores.invalidRows', { count: diffs.invalidCount, max: maxMarks })}
               </span>
             ) : diffs.changes.length === 0 ? (
-              <span className="text-text-tertiary">No changes</span>
+              <span className="text-text-tertiary">{t('tables.examScores.noChanges')}</span>
             ) : (
               <span>
-                {diffs.changes.length} change{diffs.changes.length === 1 ? '' : 's'} pending
+                {t('tables.examScores.pendingChanges', { count: diffs.changes.length })}
                 {diffs.blanksCount > 0 && (
-                  <span className="text-text-tertiary"> · {diffs.blanksCount} blank</span>
+                  <span className="text-text-tertiary"> · {t('tables.examScores.blankCount', { count: diffs.blanksCount })}</span>
                 )}
               </span>
             )}
@@ -591,12 +601,12 @@ export function ExamScoresTab({
             {bulkMutation.isPending ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                Saving…
+                {t('tables.examScores.saving')}
               </>
             ) : (
               <>
                 <Save className="w-4 h-4" />
-                Save Scores
+                {t('tables.examScores.saveScores')}
               </>
             )}
           </button>

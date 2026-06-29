@@ -8,15 +8,13 @@
  */
 
 import { useMemo } from 'react'
-import { Mail, Users, ShieldAlert, UserCog } from 'lucide-react'
-import { toast } from 'sonner'
+import { Mail, Users } from 'lucide-react'
 import {
   TanstackDataTable,
-  createSelectColumn,
-  type BulkAction,
   type ColumnDef,
   type FacetedFilterConfig,
 } from '@edforge/ui'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 // ============================================================================
 // TYPES
@@ -65,98 +63,96 @@ function getRoleBadge(role: string) {
   return styles[role] || 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))] dark:bg-[rgb(var(--background-tertiary)/0.2)] '
 }
 
-function humanizeEnum(value: string): string {
-  return value.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
-}
-
 // ============================================================================
 // COLUMN DEFINITIONS
 // ============================================================================
 
-const columns: ColumnDef<StaffMember, unknown>[] = [
-  createSelectColumn<StaffMember>(),
-  {
-    accessorFn: (row) => `${row.firstName} ${row.lastSurname || row.lastName || ''}`,
-    id: 'name',
-    header: 'Name',
-    cell: ({ getValue }) => (
-      <span className="font-medium text-text-primary">
-        {getValue<string>()}
-      </span>
-    ),
-    enableSorting: true,
-  },
-  {
-    accessorKey: 'email',
-    header: 'Email',
-    cell: ({ row }) => {
-      const email = row.original.email
-      return email ? (
-        <span className="flex items-center gap-1.5 text-text-secondary">
-          <Mail className="w-3.5 h-3.5 text-text-tertiary" />
-          {email}
-        </span>
-      ) : (
-        <span className="text-text-tertiary">&mdash;</span>
-      )
-    },
-    enableSorting: true,
-  },
-  {
-    accessorKey: 'role',
-    header: 'Role',
-    filterFn: 'arrIncludesSome',
-    cell: ({ row }) => {
-      const role = row.original.role
-      return role ? (
-        <span
-          className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium capitalize ${getRoleBadge(role)}`}
-        >
-          {role.replace(/_/g, ' ')}
-        </span>
-      ) : (
-        <span className="text-text-tertiary">&mdash;</span>
-      )
-    },
-    enableSorting: true,
-    meta: {
-      facetLabelMap: (value: unknown) => humanizeEnum(String(value)),
-    },
-  },
-  {
-    accessorFn: (row) => row.employmentStatus || row.status || 'active',
-    id: 'status',
-    header: 'Status',
-    filterFn: 'arrIncludesSome',
-    cell: ({ getValue }) => {
-      const status = getValue<string>()
-      return (
-        <span
-          className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium capitalize ${getStatusBadge(status)}`}
-        >
-          {status.replace(/_/g, ' ')}
-        </span>
-      )
-    },
-    enableSorting: true,
-    meta: {
-      facetLabelMap: (value: unknown) => humanizeEnum(String(value)),
-    },
-  },
-]
-
-// ============================================================================
-// COMPONENT
-// ============================================================================
-
 export function TeacherTable({ staff, isLoading, onSelect }: TeacherTableProps) {
+  const { t, dataTableLabels, enumLabel } = useAcademicsI18n()
+  const columns: ColumnDef<StaffMember, unknown>[] = useMemo(
+    () => [
+      {
+        accessorFn: (row) => `${row.firstName} ${row.lastSurname || row.lastName || ''}`,
+        id: 'name',
+        header: t('tables.teachers.columns.name'),
+        cell: ({ getValue }) => (
+          <span className="font-medium text-text-primary">
+            {getValue<string>()}
+          </span>
+        ),
+        enableSorting: true,
+      },
+      {
+        accessorKey: 'email',
+        header: t('tables.teachers.columns.email'),
+        cell: ({ row }) => {
+          const email = row.original.email
+          return email ? (
+            <span className="flex items-center gap-1.5 text-text-secondary">
+              <Mail className="w-3.5 h-3.5 text-text-tertiary" />
+              {email}
+            </span>
+          ) : (
+            <span className="text-text-tertiary">&mdash;</span>
+          )
+        },
+        enableSorting: true,
+      },
+      {
+        accessorKey: 'role',
+        header: t('tables.teachers.columns.role'),
+        filterFn: 'arrIncludesSome',
+        cell: ({ row }) => {
+          const role = row.original.role
+          return role ? (
+            <span
+              className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium capitalize ${getRoleBadge(role)}`}
+            >
+              {enumLabel('enums.staffRole', role)}
+            </span>
+          ) : (
+            <span className="text-text-tertiary">&mdash;</span>
+          )
+        },
+        enableSorting: true,
+        meta: {
+          facetLabelMap: (value: unknown) => enumLabel('enums.staffRole', String(value)),
+        },
+      },
+      {
+        accessorFn: (row) => row.employmentStatus || row.status || 'active',
+        id: 'status',
+        header: t('tables.teachers.columns.status'),
+        filterFn: 'arrIncludesSome',
+        cell: ({ getValue }) => {
+          const status = getValue<string>()
+          return (
+            <span
+              className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium capitalize ${getStatusBadge(status)}`}
+            >
+              {enumLabel('enums.employmentStatus', status)}
+            </span>
+          )
+        },
+        enableSorting: true,
+        meta: {
+          facetLabelMap: (value: unknown) => enumLabel('enums.employmentStatus', String(value)),
+        },
+      },
+    ],
+    [enumLabel, t],
+  )
+
   // Derive facet options from the loaded staff list — counts are computed
   // live inside the shared DataTable via getFacetedUniqueValues.
   const roleOptions = useMemo(() => {
     const set = new Set<string>()
     staff.forEach((m) => m.role && set.add(m.role))
-    return Array.from(set).sort().map((value) => ({ value, label: humanizeEnum(value) }))
-  }, [staff])
+    return Array.from(set).sort().map((value) => ({
+      value,
+      label: enumLabel('enums.staffRole', value),
+    }))
+  }, [staff, enumLabel])
 
   const statusOptions = useMemo(() => {
     const set = new Set<string>()
@@ -164,40 +160,28 @@ export function TeacherTable({ staff, isLoading, onSelect }: TeacherTableProps) 
       const s = m.employmentStatus || m.status
       if (s) set.add(s)
     })
-    return Array.from(set).sort().map((value) => ({ value, label: humanizeEnum(value) }))
-  }, [staff])
+    return Array.from(set).sort().map((value) => ({
+      value,
+      label: enumLabel('enums.employmentStatus', value),
+    }))
+  }, [staff, enumLabel])
 
   const facets = useMemo<FacetedFilterConfig[]>(
     () => [
       ...(roleOptions.length > 0
-        ? [{ columnId: 'role', title: 'Role', options: roleOptions }]
+        ? [{ columnId: 'role', title: t('tables.teachers.columns.role'), options: roleOptions }]
         : []),
       ...(statusOptions.length > 0
-        ? [{ columnId: 'status', title: 'Status', options: statusOptions }]
+        ? [{ columnId: 'status', title: t('tables.teachers.columns.status'), options: statusOptions }]
         : []),
     ],
-    [roleOptions, statusOptions],
+    [roleOptions, statusOptions, t],
   )
 
-  const bulkActions = useMemo<BulkAction<StaffMember>[]>(
-    () => [
-      {
-        id: 'change-role',
-        label: 'Change role',
-        icon: <UserCog className="w-4 h-4" />,
-        onRun: (rows) =>
-          toast.info(`Change role for ${rows.length} staff — coming soon`),
-      },
-      {
-        id: 'update-status',
-        label: 'Update status',
-        icon: <ShieldAlert className="w-4 h-4" />,
-        onRun: (rows) =>
-          toast.info(`Update status for ${rows.length} staff — coming soon`),
-      },
-    ],
-    [],
-  )
+  // Row selection + bulk actions intentionally omitted — the staff
+  // bulk endpoints (#226 change role, #228 update status) aren't built
+  // yet. Re-add `enableRowSelection` + a real `bulkActions` array once
+  // either backend slice lands; until then the table stays chrome-only.
 
   return (
     <TanstackDataTable<StaffMember>
@@ -207,21 +191,20 @@ export function TeacherTable({ staff, isLoading, onSelect }: TeacherTableProps) 
       isLoading={isLoading}
       tableId="academics.teachers"
       enableSorting
-      enableRowSelection
       enableColumnVisibility
       pagination={{ pageSize: 20 }}
       pageSizes={[10, 20, 50]}
       defaultSort={[{ id: 'name', desc: false }]}
-      searchPlaceholder="Search by name or email…"
+      searchPlaceholder={t('tables.teachers.search')}
       facets={facets}
-      bulkActions={bulkActions}
       exportOptions={{ filename: 'teachers', formats: ['csv'] }}
       onRowClick={onSelect}
       emptyState={{
         icon: <Users className="w-10 h-10 text-text-tertiary opacity-40" />,
-        title: 'No staff found',
-        description: 'Try adjusting your search or filters.',
+        title: t('tables.teachers.empty.title'),
+        description: t('tables.teachers.empty.description'),
       }}
+      labels={dataTableLabels}
       maxHeight="calc(100vh - 13rem)"
     />
   )

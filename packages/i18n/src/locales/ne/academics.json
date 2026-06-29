@@ -182,5 +182,352 @@
     "no": "छैन"
   },
   "gradeLabel": "ग्रेड {{level}}",
-  "ageLabel": "{{age}} वर्ष"
+  "ageLabel": "{{age}} वर्ष",
+  "dataTable": {
+    "errorTitle": "डाटा लोड गर्न असफल",
+    "errorDescription": "अनपेक्षित त्रुटि भयो।",
+    "retry": "पुन: प्रयास गर्नुहोस्",
+    "clearSearch": "खोज खाली गर्नुहोस्",
+    "clearFilters": "फिल्टरहरू हटाउनुहोस्",
+    "clearActiveFilters": "हटाउनुहोस् ({{count}})",
+    "clearSelection": "छनोट हटाउनुहोस्",
+    "selectedRows": "{{count}} चयन गरिएको",
+    "selectedRows_plural": "{{count}} चयन गरिएको",
+    "paginationShowing": "{{start}}-{{end}} / {{total}} नतिजा",
+    "rowsPerPage": "{{size}} / पृष्ठ",
+    "previousPage": "अघिल्लो",
+    "nextPage": "अर्को",
+    "loadingPage": "लोड हुँदै...",
+    "rowDensity": "पङ्क्ति घनत्व",
+    "comfortableDensity": "आरामदायी",
+    "comfortableDensityTitle": "आरामदायी पङ्क्तिहरू",
+    "compactDensity": "सघन",
+    "compactDensityTitle": "सघन पङ्क्तिहरू",
+    "viewOptions": "दृश्य",
+    "toggleColumns": "स्तम्भहरू देखाउने/लुकाउने",
+    "export": "निर्यात",
+    "exportFormats": {
+      "csv": "CSV निर्यात गर्नुहोस्",
+      "xlsx": "XLSX निर्यात गर्नुहोस्"
+    },
+    "xlsxUnavailable": "XLSX निर्यात अर्को चरणमा आउनेछ",
+    "filterAriaLabel": "{{title}} फिल्टर",
+    "clearFilter": "फिल्टर हटाउनुहोस्"
+  },
+  "common": {
+    "actions": "कार्यहरू",
+    "active": "सक्रिय",
+    "inactive": "निष्क्रिय",
+    "teacher": "शिक्षक",
+    "primaryInstructor": "मुख्य प्रशिक्षक",
+    "student": "विद्यार्थी",
+    "students": "{{count}} विद्यार्थी",
+    "students_plural": "{{count}} विद्यार्थी",
+    "course": "पाठ्यक्रम",
+    "courses": "{{count}} पाठ्यक्रम",
+    "courses_plural": "{{count}} पाठ्यक्रम",
+    "section": "सेक्सन",
+    "sections": "{{count}} सेक्सन",
+    "sections_plural": "{{count}} सेक्सन",
+    "staff": "{{count}} कर्मचारी",
+    "staff_plural": "{{count}} कर्मचारी",
+    "more": "+{{count}} थप",
+    "comingSoon": "{{countLabel}} का लागि {{action}} — चाँडै आउँदैछ"
+  },
+  "enums": {
+    "employmentStatus": {
+      "active": "सक्रिय",
+      "on_leave": "बिदामा",
+      "suspended": "निलम्बित",
+      "terminated": "सेवा समाप्त"
+    },
+    "staffRole": {
+      "teacher": "शिक्षक",
+      "principal": "प्रधानाध्यापक",
+      "vice_principal": "सहायक प्रधानाध्यापक",
+      "counselor": "परामर्शदाता",
+      "admin_staff": "प्रशासनिक कर्मचारी"
+    },
+    "examResult": {
+      "generated": "बनाइएको",
+      "pending": "विचाराधीन",
+      "none": "—"
+    }
+  },
+  "tables": {
+    "students": {
+      "columns": {
+        "student": "विद्यार्थी",
+        "grade": "ग्रेड",
+        "attendance": "उपस्थिति",
+        "guardian": "अभिभावक",
+        "location": "स्थान",
+        "status": "स्थिति",
+        "enrolled": "भर्ना मिति"
+      },
+      "actions": {
+        "studentActions": "विद्यार्थी कार्यहरू",
+        "viewProfile": "प्रोफाइल हेर्नुहोस्",
+        "withdraw": "निकाल्नुहोस्",
+        "message": "सन्देश",
+        "moveSection": "सेक्सन सार्नुहोस्",
+        "archive": "अभिलेख गर्नुहोस्"
+      },
+      "bulk": {
+        "message": "सन्देश",
+        "move": "सार्नुहोस्",
+        "archive": "अभिलेख"
+      },
+      "empty": {
+        "title": "कुनै विद्यार्थी भेटिएन",
+        "description": "डाइरेक्टरीमा पहिलो विद्यार्थी थपेर सुरु गर्नुहोस्।",
+        "action": "विद्यार्थी थप्नुहोस्"
+      }
+    },
+    "enrollment": {
+      "columns": {
+        "student": "विद्यार्थी",
+        "gradeLevel": "ग्रेड स्तर",
+        "status": "स्थिति",
+        "entryDate": "प्रवेश मिति",
+        "exitDate": "निकास मिति",
+        "type": "प्रकार"
+      },
+      "actions": {
+        "withdraw": "निकाल्नुहोस्",
+        "transfer": "स्थानान्तरण",
+        "markNoShow": "उपस्थित नभएको चिन्ह लगाउनुहोस्"
+      },
+      "filters": {
+        "loadingGrades": "ग्रेडहरू लोड हुँदै...",
+        "allGrades": "सबै ग्रेड",
+        "allStatus": "सबै स्थिति",
+        "clear": "हटाउनुहोस्"
+      },
+      "types": {
+        "new": "नयाँ",
+        "re_enrollment": "पुन: भर्ना",
+        "transfer": "स्थानान्तरण"
+      },
+      "empty": {
+        "title": "कुनै भर्ना भेटिएन",
+        "description": "फिल्टर वा खोज शब्द समायोजन गर्नुहोस्।"
+      },
+      "search": "विद्यार्थी खोज्नुहोस्..."
+    },
+    "courses": {
+      "columns": {
+        "code": "कोड",
+        "courseName": "पाठ्यक्रम नाम",
+        "subject": "विषय",
+        "grades": "ग्रेडहरू",
+        "credits": "क्रेडिट",
+        "type": "प्रकार",
+        "duration": "अवधि",
+        "status": "स्थिति"
+      },
+      "actions": {
+        "actions": "कार्यहरू",
+        "quickView": "छिटो हेर्नुहोस्",
+        "viewFullDetails": "पूरा विवरण हेर्नुहोस्",
+        "editCourse": "पाठ्यक्रम सम्पादन गर्नुहोस्",
+        "activate": "सक्रिय गर्नुहोस्",
+        "deactivate": "निष्क्रिय गर्नुहोस्"
+      },
+      "warnings": {
+        "missingAcademicSubjectTitle": "सूक्ष्म शैक्षिक विषय सेट गरिएको छैन। रिपोर्ट कार्डले यो विषय क्षेत्र प्रयोग गर्छ — अझ सूक्ष्म लेबलका लागि विषय थप्नुहोस्।",
+        "missingAcademicSubject": "सूक्ष्म शैक्षिक विषय सेट गरिएको छैन"
+      },
+      "empty": {
+        "title": "कुनै पाठ्यक्रम भेटिएन",
+        "description": "सूचीमा पहिलो पाठ्यक्रम थपेर सुरु गर्नुहोस्।",
+        "action": "पाठ्यक्रम थप्नुहोस्"
+      }
+    },
+    "gradeLevels": {
+      "stats": {
+        "totalGradeLevels": "कुल ग्रेड स्तर",
+        "courseAssignments": "पाठ्यक्रम असाइनमेन्ट",
+        "avgCoursesPerGrade": "प्रति ग्रेड औसत पाठ्यक्रम",
+        "gradesWithCourses": "पाठ्यक्रम भएका ग्रेडहरू"
+      },
+      "columns": {
+        "gradeLevel": "ग्रेड स्तर",
+        "courseCount": "पाठ्यक्रम संख्या",
+        "courses": "पाठ्यक्रमहरू",
+        "students": "विद्यार्थीहरू"
+      },
+      "empty": {
+        "title": "कुनै ग्रेड स्तर भेटिएन",
+        "description": "पाठ्यक्रम कन्फिगर भएपछि ग्रेड स्तरहरू यहाँ देखिनेछन्।"
+      },
+      "noCurrentYearTitle": "हाल सक्रिय शैक्षिक वर्ष छैन — शैक्षिक वर्ष हालको बनाइएपछि भर्ना संख्या देखिनेछ।"
+    },
+    "sections": {
+      "columns": {
+        "section": "सेक्सन",
+        "course": "पाठ्यक्रम",
+        "teacher": "शिक्षक",
+        "period": "अवधि",
+        "room": "कोठा",
+        "enrollment": "भर्ना",
+        "status": "स्थिति"
+      },
+      "actions": {
+        "sectionActions": "सेक्सन कार्यहरू",
+        "viewDetails": "विवरण हेर्नुहोस्",
+        "viewRoster": "रोस्टर हेर्नुहोस्",
+        "editSection": "सेक्सन सम्पादन गर्नुहोस्",
+        "activate": "सक्रिय गर्नुहोस्",
+        "deactivate": "निष्क्रिय गर्नुहोस्",
+        "sendNotification": "सूचना पठाउनुहोस्",
+        "notify": "सूचना पठाउनुहोस्"
+      },
+      "search": "सेक्सन खोज्नुहोस्...",
+      "empty": {
+        "title": "कुनै सेक्सन भेटिएन",
+        "description": "तालिका बनाउन पहिलो कक्षा सेक्सन सिर्जना गर्नुहोस्।"
+      }
+    },
+    "sectionRoster": {
+      "columns": {
+        "name": "नाम",
+        "studentId": "विद्यार्थी ID",
+        "grade": "ग्रेड",
+        "enrolled": "भर्ना मिति"
+      },
+      "actions": {
+        "forStudent": "{{studentName}} का लागि कार्यहरू",
+        "removeFromSection": "सेक्सनबाट हटाउनुहोस्",
+        "addStudents": "विद्यार्थी थप्नुहोस्"
+      },
+      "capacity": "{{current}}/{{max}} भर्ना",
+      "search": "नाम वा विद्यार्थी ID खोज्नुहोस्...",
+      "empty": {
+        "title": "अहिलेसम्म कुनै विद्यार्थी भर्ना छैन",
+        "description": "कक्षा रोस्टर बनाउन यस सेक्सनमा विद्यार्थी थप्नुहोस्।"
+      },
+      "confirmRemove": {
+        "title": "विद्यार्थी हटाउनुहोस्",
+        "description": "के तपाईं {{studentName}} लाई यस सेक्सनबाट हटाउन निश्चित हुनुहुन्छ?",
+        "fallbackStudent": "यो विद्यार्थी",
+        "confirm": "हटाउनुहोस्"
+      }
+    },
+    "teachers": {
+      "columns": {
+        "name": "नाम",
+        "email": "इमेल",
+        "role": "भूमिका",
+        "status": "स्थिति"
+      },
+      "actions": {
+        "changeRole": "भूमिका परिवर्तन गर्नुहोस्",
+        "updateStatus": "स्थिति अद्यावधिक गर्नुहोस्"
+      },
+      "search": "नाम वा इमेल खोज्नुहोस्...",
+      "empty": {
+        "title": "कुनै कर्मचारी भेटिएन",
+        "description": "खोज वा फिल्टर समायोजन गर्नुहोस्।"
+      }
+    },
+    "exams": {
+      "columns": {
+        "exam": "परीक्षा",
+        "type": "प्रकार",
+        "term": "सत्र",
+        "grades": "ग्रेडहरू",
+        "schedule": "तालिका",
+        "status": "स्थिति",
+        "results": "नतिजा"
+      },
+      "results": {
+        "generated": "बनाइएको",
+        "pending": "विचाराधीन"
+      },
+      "search": "परीक्षा खोज्नुहोस्...",
+      "schedule": {
+        "daysAgo": "{{count}} दिन अघि",
+        "today": "आज",
+        "inDays": "{{count}} दिनमा",
+        "duration": "{{count}} दिन"
+      },
+      "empty": {
+        "title": "मिल्ने परीक्षा छैन",
+        "description": "फिल्टर समायोजन गर्नुहोस् वा तालिका सुरु गर्न यस शैक्षिक वर्षको पहिलो परीक्षा सिर्जना गर्नुहोस्।"
+      }
+    },
+    "examScores": {
+      "search": "नामबाट विद्यार्थी खोज्नुहोस्...",
+      "subject": "विषय",
+      "student": "विद्यार्थी",
+      "grade": "ग्रेड",
+      "score": "अङ्क",
+      "subjectFallback": "विषय",
+      "maxMarks": "{{marks}} अधिकतम",
+      "summary": "{{students}} · अधिकतम {{max}}",
+      "pass": "उत्तीर्ण {{marks}}",
+      "emptyNoStudents": "अङ्क दिनुपर्ने विद्यार्थी छैन",
+      "emptyNoActiveForGrades": "यस परीक्षाको ग्रेड समूहमा कुनै सक्रिय विद्यार्थी भर्ना छैन ({{grades}})।",
+      "emptyNoActiveEnrollments": "यस शैक्षिक वर्षका लागि कुनै सक्रिय भर्ना छैन।",
+      "noSubjectsTitle": "अहिलेसम्म कुनै विषय छैन",
+      "noSubjectsDescription": "अङ्क प्रविष्ट गर्नुअघि विषयहरू ट्याबमा विषय थप्नुहोस्।",
+      "lockedStatus": "परीक्षा {{status}} अवस्थामा हुँदा अङ्क प्रविष्टि लक हुन्छ। अङ्क Scheduled वा In Progress अवस्थामा मात्र प्रविष्ट वा सम्पादन गर्न सकिन्छ।",
+      "lockedPermission": "तपाईंसँग अङ्क सम्पादन गर्ने अनुमति छैन।",
+      "invalidRows": "{{count}} पङ्क्ति अमान्य (0–{{max}})",
+      "invalidRows_plural": "{{count}} पङ्क्ति अमान्य (0–{{max}})",
+      "noChanges": "कुनै परिवर्तन छैन",
+      "pendingChanges": "{{count}} परिवर्तन बाँकी",
+      "pendingChanges_plural": "{{count}} परिवर्तन बाँकी",
+      "blankCount": "{{count}} खाली",
+      "blankCount_plural": "{{count}} खाली",
+      "saving": "सुरक्षित गर्दै...",
+      "saveScores": "अङ्क सुरक्षित गर्नुहोस्"
+    }
+  },
+  "iemisExport": {
+    "title": "IEMiS मासिक निर्यात",
+    "description": "क्यालेन्डर महिनाका लागि IEMiS Flash II मासिक उपस्थिति सारांश बनाउनुहोस्। निर्यातले प्रति-विद्यार्थी उपस्थित / अनुपस्थित / अनुमति सहित अनुपस्थित दिनहरू पुन: गणना गर्छ र CSV डाउनलोड गर्न दिन्छ। ग्रेड विद्यालयको स्थानीय ग्रेड स्तर हो।",
+    "month": "महिना",
+    "monthAria": "निर्यात महिना (YYYY-MM)",
+    "generating": "बनाउँदै...",
+    "generate": "निर्यात बनाउनुहोस्",
+    "downloadCsv": "CSV डाउनलोड गर्नुहोस्",
+    "invalidMonth": "वैध महिना प्रविष्ट गर्नुहोस् (YYYY-MM)।",
+    "failed": "निर्यात बनाउन असफल। कृपया पुन: प्रयास गर्नुहोस्।",
+    "summary": "{{students}} · {{yearMonth}}",
+    "generated": "{{dateTime}} मा बनाइएको",
+    "empty": "यस महिनाका लागि कुनै उपस्थिति रेकर्ड छैन।",
+    "search": "विद्यार्थी खोज्नुहोस्...",
+    "bs": "वि.सं. {{label}}",
+    "bsRange": "वि.सं. {{start}} – {{end}}",
+    "bsMonths": {
+      "1": "बैशाख",
+      "2": "जेठ",
+      "3": "असार",
+      "4": "साउन",
+      "5": "भदौ",
+      "6": "असोज",
+      "7": "कार्तिक",
+      "8": "मंसिर",
+      "9": "पुष",
+      "10": "माघ",
+      "11": "फागुन",
+      "12": "चैत"
+    },
+    "columns": {
+      "studentId": "विद्यार्थी ID",
+      "studentName": "विद्यार्थी नाम",
+      "grade": "ग्रेड",
+      "presentDays": "उपस्थित दिन",
+      "absentDays": "अनुपस्थित दिन",
+      "excusedDays": "अनुमति सहित अनुपस्थित दिन",
+      "totalSchoolDays": "कुल विद्यालय दिन",
+      "student": "विद्यार्थी",
+      "present": "उपस्थित",
+      "absent": "अनुपस्थित",
+      "excused": "अनुमति सहित",
+      "schoolDays": "विद्यालय दिन"
+    }
+  }
 }

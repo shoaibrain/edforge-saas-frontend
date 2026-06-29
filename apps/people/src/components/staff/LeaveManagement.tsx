@@ -2,7 +2,9 @@
  * LeaveManagement Component
  *
  * Leave requests table with create/approve/reject/cancel actions.
- * Consumes existing backend endpoints (no new backend work).
+ * Consumes existing backend endpoints (no new backend work). Per-row
+ * actions only — no bulk affordances yet (a bulk approve/reject
+ * backend doesn't exist).
  */
 
 import { useState, useMemo } from 'react'
@@ -15,13 +17,16 @@ import {
   X,
   Ban,
   Loader2,
-  Clock,
-  Calendar,
   CalendarCheck2,
   CalendarX2,
   Hourglass,
 } from 'lucide-react'
 import type { LeaveRequestResponseDto } from '@aibrains/shared-types'
+import {
+  TanstackDataTable,
+  type ColumnDef,
+  type FacetedFilterConfig,
+} from '@edforge/ui'
 import { useStaffLeaveRequests, useApproveLeave, useRejectLeave, useCancelLeave } from '../../hooks'
 import { CreateLeaveModal } from './CreateLeaveModal'
 import { formatDate } from '../../lib/utils'
@@ -31,12 +36,12 @@ import { formatDate } from '../../lib/utils'
 // ============================================================================
 
 const LEAVE_STATUS_COLORS: Record<string, string> = {
-  pending: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-  approved: 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] ',
-  rejected: 'bg-[rgb(var(--state-danger-bg))]0/10 text-[rgb(var(--state-danger-fg))] ',
-  cancelled: 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))] ',
-  in_progress: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ',
-  completed: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--action-secondary-fg))] ',
+  pending: 'bg-[rgb(var(--state-warning-bg)/0.18)] text-[rgb(var(--state-warning-fg))]',
+  approved: 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))]',
+  rejected: 'bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))]',
+  cancelled: 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]',
+  in_progress: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]',
+  completed: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--action-secondary-fg))]',
 }
 
 const LEAVE_TYPE_LABELS: Record<string, string> = {
@@ -56,14 +61,14 @@ const LEAVE_TYPE_LABELS: Record<string, string> = {
 }
 
 const LEAVE_TYPE_COLORS: Record<string, string> = {
-  annual: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ',
-  sick: 'bg-[rgb(var(--state-danger-bg))]0/10 text-[rgb(var(--state-danger-fg))] ',
-  personal: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ',
-  bereavement: 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))] ',
-  maternity: 'bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))] ',
-  paternity: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ',
-  family_medical: 'bg-[rgb(var(--state-warning-bg)/0.18)] text-[rgb(var(--state-warning-fg))] ',
-  professional_development: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ',
+  annual: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]',
+  sick: 'bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))]',
+  personal: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]',
+  bereavement: 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))]',
+  maternity: 'bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))]',
+  paternity: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]',
+  family_medical: 'bg-[rgb(var(--state-warning-bg)/0.18)] text-[rgb(var(--state-warning-fg))]',
+  professional_development: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]',
 }
 
 const fadeInUp = {
@@ -116,15 +121,17 @@ export function LeaveManagement({
   const [modalOpen, setModalOpen] = useState(false)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
 
+  const rows: LeaveRequestResponseDto[] = requests ?? []
+
   // Leave balance summary
   const leaveSummary = useMemo(() => {
-    if (!requests || requests.length === 0) return null
-    const approved = requests.filter((r) => r.status === 'approved' || r.status === 'completed' || r.status === 'in_progress')
-    const pending = requests.filter((r) => r.status === 'pending')
+    if (rows.length === 0) return null
+    const approved = rows.filter((r) => r.status === 'approved' || r.status === 'completed' || r.status === 'in_progress')
+    const pending = rows.filter((r) => r.status === 'pending')
     const totalUsed = approved.reduce((sum, r) => sum + (r.totalDays || 0), 0)
     const totalPending = pending.reduce((sum, r) => sum + (r.totalDays || 0), 0)
-    return { totalUsed, totalPending, pendingCount: pending.length, totalRequests: requests.length }
-  }, [requests])
+    return { totalUsed, totalPending, pendingCount: pending.length, totalRequests: rows.length }
+  }, [rows])
 
   const handleApprove = async (leaveId: string) => {
     setActionLoading(leaveId)
@@ -168,6 +175,164 @@ export function LeaveManagement({
     }
   }
 
+  const statusOptions = useMemo(() => {
+    const seen = new Set<string>()
+    for (const r of rows) seen.add(r.status)
+    return Array.from(seen)
+      .sort()
+      .map((s) => ({ value: s, label: formatStatusLabel(s) }))
+  }, [rows])
+
+  const typeOptions = useMemo(() => {
+    const seen = new Set<string>()
+    for (const r of rows) seen.add(r.leaveType)
+    return Array.from(seen)
+      .sort()
+      .map((t) => ({ value: t, label: LEAVE_TYPE_LABELS[t] ?? t }))
+  }, [rows])
+
+  const facets = useMemo<FacetedFilterConfig[]>(
+    () => [
+      ...(statusOptions.length > 0
+        ? [{ columnId: 'status', title: 'Status', options: statusOptions }]
+        : []),
+      ...(typeOptions.length > 0
+        ? [{ columnId: 'leaveType', title: 'Type', options: typeOptions }]
+        : []),
+    ],
+    [statusOptions, typeOptions],
+  )
+
+  const columns: ColumnDef<LeaveRequestResponseDto, unknown>[] = useMemo(
+    () => [
+      {
+        id: 'leaveType',
+        accessorKey: 'leaveType',
+        header: 'Type',
+        cell: ({ row }) => {
+          const t = row.original.leaveType
+          const tone = LEAVE_TYPE_COLORS[t] ?? 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))]'
+          return (
+            <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${tone}`}>
+              {LEAVE_TYPE_LABELS[t] ?? t}
+            </span>
+          )
+        },
+        filterFn: (row, _id, value) => {
+          if (!Array.isArray(value) || value.length === 0) return true
+          return value.includes(row.original.leaveType)
+        },
+      },
+      {
+        id: 'dates',
+        accessorFn: (r) => r.startDate,
+        header: 'Dates',
+        cell: ({ row }) => {
+          const r = row.original
+          return (
+            <span className="text-xs text-[rgb(var(--text-secondary))] tabular-nums">
+              {formatDate(r.startDate)}
+              {r.startDate !== r.endDate && <> — {formatDate(r.endDate)}</>}
+            </span>
+          )
+        },
+        sortingFn: (a, b) => new Date(a.original.startDate).getTime() - new Date(b.original.startDate).getTime(),
+      },
+      {
+        id: 'duration',
+        accessorFn: (r) => r.totalDays ?? r.totalHours ?? 0,
+        header: 'Duration',
+        cell: ({ row }) => (
+          <span className="text-xs text-[rgb(var(--text-secondary))] tabular-nums">
+            {formatDuration(row.original)}
+          </span>
+        ),
+      },
+      {
+        id: 'status',
+        accessorKey: 'status',
+        header: 'Status',
+        cell: ({ row }) => {
+          const s = row.original.status
+          const tone = LEAVE_STATUS_COLORS[s] ?? LEAVE_STATUS_COLORS.pending
+          return (
+            <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${tone}`}>
+              {formatStatusLabel(s)}
+            </span>
+          )
+        },
+        filterFn: (row, _id, value) => {
+          if (!Array.isArray(value) || value.length === 0) return true
+          return value.includes(row.original.status)
+        },
+      },
+      {
+        id: 'reason',
+        accessorKey: 'reason',
+        header: 'Reason',
+        enableSorting: false,
+        cell: ({ row }) => (
+          <span className="text-xs text-[rgb(var(--text-tertiary))] truncate inline-block max-w-[28ch]">
+            {row.original.reason || '—'}
+          </span>
+        ),
+      },
+      {
+        id: 'actions',
+        header: () => <span className="sr-only">Actions</span>,
+        enableSorting: false,
+        cell: ({ row }) => {
+          const r = row.original
+          if (actionLoading === r.leaveId) {
+            return (
+              <span className="inline-flex justify-end w-full">
+                <Loader2 className="w-4 h-4 animate-spin text-[rgb(var(--text-tertiary))]" />
+              </span>
+            )
+          }
+          return (
+            <div className="flex items-center justify-end gap-1">
+              {r.status === 'pending' && (
+                <>
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); void handleApprove(r.leaveId) }}
+                    className="p-1.5 rounded-md hover:bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--state-success-fg))] transition-colors"
+                    title="Approve"
+                    aria-label="Approve"
+                  >
+                    <Check className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); void handleReject(r.leaveId) }}
+                    className="p-1.5 rounded-md hover:bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--state-danger-fg))] transition-colors"
+                    title="Reject"
+                    aria-label="Reject"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </>
+              )}
+              {(r.status === 'pending' || r.status === 'approved') && (
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); void handleCancel(r.leaveId) }}
+                  className="p-1.5 rounded-md hover:bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] transition-colors"
+                  title="Cancel"
+                  aria-label="Cancel"
+                >
+                  <Ban className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+          )
+        },
+      },
+    ],
+    [actionLoading],
+  )
+
   return (
     <motion.div
       variants={staggerChildren}
@@ -198,7 +363,7 @@ export function LeaveManagement({
           <div className="bg-[rgb(var(--background-secondary))] rounded-xl border border-[rgb(var(--border-secondary))] p-4">
             <div className="flex items-center gap-2.5">
               <div className="p-2 rounded-lg bg-[rgb(var(--state-info-bg)/0.18)]">
-                <CalendarDays className="w-4 h-4 text-[rgb(var(--state-info-fg))] " />
+                <CalendarDays className="w-4 h-4 text-[rgb(var(--state-info-fg))]" />
               </div>
               <div>
                 <p className="text-xs text-[rgb(var(--text-tertiary))]">Total Requests</p>
@@ -209,7 +374,7 @@ export function LeaveManagement({
           <div className="bg-[rgb(var(--background-secondary))] rounded-xl border border-[rgb(var(--border-secondary))] p-4">
             <div className="flex items-center gap-2.5">
               <div className="p-2 rounded-lg bg-[rgb(var(--state-success-bg)/0.18)]">
-                <CalendarCheck2 className="w-4 h-4 text-[rgb(var(--state-success-fg))] " />
+                <CalendarCheck2 className="w-4 h-4 text-[rgb(var(--state-success-fg))]" />
               </div>
               <div>
                 <p className="text-xs text-[rgb(var(--text-tertiary))]">Days Used</p>
@@ -219,8 +384,8 @@ export function LeaveManagement({
           </div>
           <div className="bg-[rgb(var(--background-secondary))] rounded-xl border border-[rgb(var(--border-secondary))] p-4">
             <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-lg bg-amber-500/10">
-                <Hourglass className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+              <div className="p-2 rounded-lg bg-[rgb(var(--state-warning-bg)/0.18)]">
+                <Hourglass className="w-4 h-4 text-[rgb(var(--state-warning-fg))]" />
               </div>
               <div>
                 <p className="text-xs text-[rgb(var(--text-tertiary))]">Pending Requests</p>
@@ -230,8 +395,8 @@ export function LeaveManagement({
           </div>
           <div className="bg-[rgb(var(--background-secondary))] rounded-xl border border-[rgb(var(--border-secondary))] p-4">
             <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-lg bg-[rgb(var(--state-danger-bg))]0/10">
-                <CalendarX2 className="w-4 h-4 text-[rgb(var(--state-danger-fg))] " />
+              <div className="p-2 rounded-lg bg-[rgb(var(--state-danger-bg)/0.18)]">
+                <CalendarX2 className="w-4 h-4 text-[rgb(var(--state-danger-fg))]" />
               </div>
               <div>
                 <p className="text-xs text-[rgb(var(--text-tertiary))]">Days Pending</p>
@@ -242,130 +407,28 @@ export function LeaveManagement({
         </motion.div>
       )}
 
-      {/* Leave Requests */}
+      {/* Leave Requests Table */}
       <motion.div variants={fadeInUp}>
-        {isLoading ? (
-          <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="animate-pulse h-20 bg-[rgb(var(--background-secondary))] rounded-xl" />
-            ))}
-          </div>
-        ) : !requests || requests.length === 0 ? (
-          <div className="text-center py-16 bg-[rgb(var(--background-secondary))] rounded-xl border-2 border-dashed border-[rgb(var(--border-secondary))]">
-            <CalendarDays className="w-12 h-12 mx-auto mb-4 text-[rgb(var(--text-tertiary))] opacity-40" />
-            <h4 className="font-medium text-[rgb(var(--text-secondary))] mb-2">No Leave Requests</h4>
-            <p className="text-sm text-[rgb(var(--text-tertiary))] max-w-sm mx-auto">
-              No leave requests have been submitted yet. Click &quot;Request Leave&quot; to create one.
-            </p>
-          </div>
-        ) : (
-          <div className="overflow-hidden rounded-xl border border-[rgb(var(--border-secondary))]">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-[rgb(var(--background-tertiary))]">
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Type</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Dates</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Duration</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Status</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Reason</th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[rgb(var(--border-secondary))]">
-                {requests.map((request) => {
-                  const isActionLoading = actionLoading === request.leaveId
-
-                  return (
-                    <tr
-                      key={request.leaveId}
-                      className="bg-[rgb(var(--background-secondary))] hover:bg-[rgb(var(--background-tertiary))] transition-colors"
-                    >
-                      {/* Type */}
-                      <td className="px-4 py-3">
-                        <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium ${LEAVE_TYPE_COLORS[request.leaveType] || 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))]'}`}>
-                          {LEAVE_TYPE_LABELS[request.leaveType] || request.leaveType}
-                        </span>
-                      </td>
-
-                      {/* Dates */}
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-1.5 text-sm text-[rgb(var(--text-secondary))]">
-                          <Calendar className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))]" />
-                          {formatDate(request.startDate)}
-                          {request.startDate !== request.endDate && (
-                            <>
-                              <span className="text-[rgb(var(--text-tertiary))]">—</span>
-                              {formatDate(request.endDate)}
-                            </>
-                          )}
-                        </div>
-                      </td>
-
-                      {/* Duration */}
-                      <td className="px-4 py-3">
-                        <span className="flex items-center gap-1 text-sm text-[rgb(var(--text-secondary))]">
-                          <Clock className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))]" />
-                          {formatDuration(request)}
-                        </span>
-                      </td>
-
-                      {/* Status */}
-                      <td className="px-4 py-3">
-                        <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium ${LEAVE_STATUS_COLORS[request.status] || LEAVE_STATUS_COLORS.pending}`}>
-                          {formatStatusLabel(request.status)}
-                        </span>
-                      </td>
-
-                      {/* Reason */}
-                      <td className="px-4 py-3">
-                        <p className="text-sm text-[rgb(var(--text-tertiary))] max-w-52 truncate">
-                          {request.reason || '—'}
-                        </p>
-                      </td>
-
-                      {/* Actions */}
-                      <td className="px-4 py-3 text-right">
-                        {isActionLoading ? (
-                          <Loader2 className="w-4 h-4 animate-spin text-[rgb(var(--text-tertiary))] inline-block" />
-                        ) : (
-                          <div className="flex items-center justify-end gap-1">
-                            {request.status === 'pending' && (
-                              <>
-                                <button
-                                  onClick={() => handleApprove(request.leaveId)}
-                                  className="p-1.5 rounded-lg hover:bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--state-success-fg))] transition-colors"
-                                  title="Approve"
-                                >
-                                  <Check className="w-4 h-4" />
-                                </button>
-                                <button
-                                  onClick={() => handleReject(request.leaveId)}
-                                  className="p-1.5 rounded-lg hover:bg-[rgb(var(--state-danger-bg))]0/10 text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--state-danger-fg))] transition-colors"
-                                  title="Reject"
-                                >
-                                  <X className="w-4 h-4" />
-                                </button>
-                              </>
-                            )}
-                            {(request.status === 'pending' || request.status === 'approved') && (
-                              <button
-                                onClick={() => handleCancel(request.leaveId)}
-                                className="p-1.5 rounded-lg hover:bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] transition-colors"
-                                title="Cancel"
-                              >
-                                <Ban className="w-4 h-4" />
-                              </button>
-                            )}
-                          </div>
-                        )}
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
+        <TanstackDataTable<LeaveRequestResponseDto>
+          columns={columns}
+          data={rows}
+          getRowId={(row) => row.leaveId}
+          isLoading={isLoading}
+          tableId="people.staff.leave"
+          enableSorting
+          enableColumnVisibility
+          pagination={{ pageSize: 10 }}
+          pageSizes={[10, 20, 50]}
+          defaultSort={[{ id: 'dates', desc: true }]}
+          searchPlaceholder="Search reason…"
+          facets={facets}
+          exportOptions={{ filename: `leave-${staffId}`, formats: ['csv'] }}
+          emptyState={{
+            icon: <CalendarDays className="w-10 h-10" />,
+            title: 'No leave requests',
+            description: 'No leave requests have been submitted yet. Click "Request Leave" to create one.',
+          }}
+        />
       </motion.div>
 
       {/* Create Leave Modal */}
