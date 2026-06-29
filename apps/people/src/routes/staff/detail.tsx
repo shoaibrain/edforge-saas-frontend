@@ -14,6 +14,7 @@ import { useQuery, useQueries } from '@tanstack/react-query'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
 import { Tabs } from '@edforge/ui'
+import { AnimatedIcon, type IconName } from '@edforge/ui/motion'
 import {
     User,
     Mail,
@@ -145,6 +146,15 @@ const TABS: { id: StaffTab; label: string; icon: typeof User }[] = [
     { id: 'leave', label: 'Leave', icon: CalendarDays },
     { id: 'security', label: 'Security', icon: Shield },
 ]
+
+// Signature glyph per tab (clean counterparts only); unmapped tabs stay static.
+const TAB_SIGNATURE: Partial<Record<StaffTab, IconName>> = {
+    overview: 'overview',
+    profile: 'account',
+    trainings: 'academics',
+    'employment-history': 'auditlog',
+    security: 'security',
+}
 
 // ============================================================================
 // HELPER COMPONENTS
@@ -1600,11 +1610,16 @@ export default function StaffDetailPage() {
                     <Tabs
                         tabs={TABS.filter((tab) => !(tab.id === 'security' && !staff.userId)).map((tab) => {
                             const Icon = tab.icon
+                            const sig = TAB_SIGNATURE[tab.id]
                             return {
                                 id: tab.id,
                                 label: (
                                     <span className="flex items-center gap-2">
-                                        <Icon className="w-4 h-4" />
+                                        {sig ? (
+                                            <AnimatedIcon name={sig} icon={Icon} size={16} />
+                                        ) : (
+                                            <Icon className="w-4 h-4" />
+                                        )}
                                         {tab.label}
                                     </span>
                                 ),

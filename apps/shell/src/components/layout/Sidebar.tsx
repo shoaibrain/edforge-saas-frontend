@@ -1,11 +1,14 @@
 /**
  * Dynamic Sidebar Component — Shell V2
  *
- * Gmail-inspired seamless sidebar with pill nav items and module-specific accent colors.
- * Features ABAC permission filtering and smooth CSS transitions.
+ * Gmail-inspired seamless sidebar with pill nav items and SIGNATURE animated icons.
+ * Icon motion + the per-item accent come from @edforge/ui/motion and @edforge/theme
+ * (icon-motion.css). This file only wires the trigger contract (`.ef-motion` +
+ * `.is-active` on the focusable <a>) and sets the per-item `--accent`; CSS owns the
+ * motion. Features ABAC permission filtering.
  */
 
-import { useState, useEffect, useSyncExternalStore } from 'react'
+import { useState, useEffect, useSyncExternalStore, type CSSProperties } from 'react'
 import { Link, useRouter } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -13,99 +16,92 @@ import {
   ArrowLeft,
   type LucideIcon,
 } from 'lucide-react'
+import { AnimatedIcon, nameForLucide, resolveAccent, type IconName } from '@edforge/ui/motion'
 import { useAppStore } from '../../stores/app.store'
 import { useSidebarStore } from '../../stores/sidebar.store'
 import { SIDEBAR_NAV_ICON_SIZE, SIDEBAR_NAV_ICON_SIZE_COLLAPSED } from '../../config/ui-constants'
 import { useSidebarModule, useActiveNavItem } from '../../hooks/useSidebarModule'
 import { useSecureNavGroups } from '../../hooks/useSecureNavItems'
-import type { NavItem, NavItemGroup, SidebarModule } from '../../config/sidebar-modules'
+import type { NavItem, NavItemGroup } from '../../config/sidebar-modules'
 import { Tooltip } from '@edforge/ui'
 import { useTranslation } from '@edforge/i18n'
 import { cn } from '../../lib/utils'
 
 // ============================================================================
-// MODULE ACCENT COLOR MAPPING
+// SIGNATURE MAPPING — nav-item id → animated-glyph name
+// High-confidence pairings only; anything not listed resolves via the icon's
+// lucide displayName in @edforge/ui/motion, else renders the static lucide glyph.
+// The accent hue per glyph lives in the motion registry (ICON_ACCENT).
 // ============================================================================
 
-type AccentKey = 'teal' | 'amber' | 'coral' | 'blue'
-
-const MODULE_ACCENT_MAP: Record<string, AccentKey> = {
-  home: 'teal',
-  'home-student': 'teal',
-  'home-parent': 'teal',
-  academics: 'teal',
-  'student-portal': 'teal',
-  'parent-portal': 'teal',
-  finance: 'amber',
-  people: 'coral',
-  settings: 'blue',
+const NAV_SIGNATURE: Record<string, IconName> = {
+  // primary modules
+  academics: 'academics',
+  people: 'people',
+  finance: 'finance',
+  settings: 'settings',
+  // module overviews
+  'academics-home': 'overview',
+  'finance-home': 'overview',
+  'people-home': 'overview',
+  'analytics-overview': 'overview',
+  'analytics-dashboard': 'overview',
+  'settings-home': 'overview',
+  // settings sub-nav
+  'my-account': 'account',
+  preferences: 'preferences',
+  security: 'security',
+  'workspace-settings': 'workspace',
+  organization: 'organization',
+  'rbac-security': 'rbac',
+  'auth-debug': 'authdebug',
 }
 
-function getAccentKey(moduleId: SidebarModule): AccentKey {
-  return MODULE_ACCENT_MAP[moduleId] || 'teal'
+/** Resolve the inline `--accent` value for a nav item (danger items go red). */
+function navAccent(item: { id: string; icon: LucideIcon; variant?: 'default' | 'danger' }): string {
+  if (item.variant === 'danger') return 'var(--color-danger)'
+  const name = NAV_SIGNATURE[item.id] ?? nameForLucide(item.icon.displayName)
+  return resolveAccent(name, {})
 }
 
 // ============================================================================
-// ANIMATED NAV ICON
+// NAV ICON — signature glyph in the holder (+ collapsed container tint)
 // ============================================================================
 
-function AnimatedNavIcon({
-  icon: IconEl,
+function NavIcon({
+  icon,
+  sigName,
   isActive,
   isHovered,
-  isDanger,
-  accentKey,
   collapsed,
 }: {
   icon: LucideIcon
+  sigName?: IconName
   isActive: boolean
   isHovered: boolean
-  isDanger?: boolean
-  accentKey: AccentKey
   collapsed: boolean
 }) {
   const iconSize = collapsed ? SIDEBAR_NAV_ICON_SIZE_COLLAPSED : SIDEBAR_NAV_ICON_SIZE
 
-  const iconColor = isActive && !isDanger
-    ? `var(--shell-pill-${accentKey}-icon)`
-    : isActive && isDanger
-      ? undefined
-      : 'var(--shell-icon-color)'
-
-  // In collapsed state, the icon container handles active/hover backgrounds
-  const containerBg = collapsed && isActive && !isDanger
-    ? `var(--shell-pill-${accentKey}-bg)`
-    : collapsed && isActive && isDanger
-      ? 'rgba(226,75,74,0.10)'
-      : collapsed && isHovered && !isActive
-        ? 'var(--shell-ni-hover)'
-        : 'transparent'
+  // In collapsed state the icon container carries the active/hover tint.
+  const containerBg = collapsed && isActive
+    ? 'color-mix(in oklch, var(--accent) 16%, transparent)'
+    : collapsed && isHovered && !isActive
+      ? 'var(--shell-ni-hover)'
+      : 'transparent'
 
   return (
-    <motion.div
-      animate={{
-        scale: isHovered && !isActive ? 1.08 : 1,
-        rotate: isHovered && !isActive ? 3 : 0,
-      }}
-      transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+    <div
       className={cn(
-        'relative flex items-center justify-center flex-shrink-0 transition-colors duration-150',
+        'relative flex items-center justify-center flex-shrink-0',
         collapsed ? 'w-12 h-12 rounded-xl' : 'w-9 h-9 rounded-[10px]',
       )}
-      // allow-presentation-style: active nav-icon container tint is accent-driven
+      // allow-presentation-style: collapsed active/hover icon container tint is accent-driven
       style={{ background: containerBg }}
     >
-      <IconEl
-        size={iconSize}
-        className={cn(
-          'transition-colors duration-200 relative z-10',
-          isActive && isDanger && 'text-rust-500',
-        )}
-        // allow-presentation-style: active nav-icon color is accent-driven
-        style={iconColor ? { color: iconColor } : undefined}
-        strokeWidth={1.75}
-      />
-    </motion.div>
+      {/* Accent is owned by the .ef-motion ancestor (<a>), so applyAccent={false}. */}
+      <AnimatedIcon name={sigName} icon={icon} size={iconSize} applyAccent={false} />
+    </div>
   )
 }
 
@@ -118,21 +114,20 @@ function NavItemLink({
   collapsed,
   isActive,
   index,
-  accentKey,
 }: {
   item: NavItem
   collapsed: boolean
   isActive: boolean
   index: number
-  accentKey: AccentKey
 }) {
   const { t: tNav } = useTranslation('nav')
   const [isHovered, setIsHovered] = useState(false)
   const isDanger = item.variant === 'danger'
   const translatedLabel = tNav(`sidebar.${item.id}`, { defaultValue: item.label })
 
-  const pillBgVar = `var(--shell-pill-${accentKey}-bg)`
-  const pillTextVar = `var(--shell-pill-${accentKey}-text)`
+  const accentValue = navAccent(item)
+  const sigName = NAV_SIGNATURE[item.id]
+  const activeTextColor = 'color-mix(in oklch, var(--accent) 92%, var(--shell-text-1))'
 
   const linkContent = (
     <Link
@@ -140,7 +135,9 @@ function NavItemLink({
       aria-label={translatedLabel}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="block relative"
+      // ef-motion = the CSS trigger contract; --accent drives icon, glow, pill, label.
+      className={cn('block relative ef-motion', isActive && 'is-active')}
+      style={{ '--accent': accentValue } as CSSProperties}
     >
       <div
         className={cn(
@@ -153,9 +150,9 @@ function NavItemLink({
         {isActive && !isDanger && !collapsed && (
           <motion.div
             layoutId="sidebar-nav-pill"
-            // allow-presentation-style: active nav pill bg is the accent-keyed shell var
+            // allow-presentation-style: active nav pill bg is accent-driven (color-mix)
             className="absolute inset-0 rounded-3xl"
-            style={{ background: pillBgVar }}
+            style={{ background: 'color-mix(in oklch, var(--accent) 14%, transparent)' }}
             transition={{ type: 'spring', stiffness: 400, damping: 30 }}
           />
         )}
@@ -169,12 +166,11 @@ function NavItemLink({
         )}
 
         {/* Icon with container */}
-        <AnimatedNavIcon
+        <NavIcon
           icon={item.icon}
+          sigName={sigName}
           isActive={isActive}
           isHovered={isHovered}
-          isDanger={isDanger}
-          accentKey={accentKey}
           collapsed={collapsed}
         />
 
@@ -192,10 +188,10 @@ function NavItemLink({
                 !isActive && !isDanger && 'font-normal',
                 !isActive && isDanger && 'text-rust-500/80 font-normal',
               )}
-              // allow-presentation-style: active nav label color is the accent-keyed shell var
+              // allow-presentation-style: active nav label color is accent-driven
               style={{
                 color: isActive && !isDanger
-                  ? pillTextVar
+                  ? activeTextColor
                   : !isActive && !isDanger
                     ? 'var(--shell-text-2)'
                     : undefined,
@@ -258,13 +254,11 @@ function NavGroup({
   collapsed,
   activeItemId,
   startIndex,
-  accentKey,
 }: {
   group: NavItemGroup
   collapsed: boolean
   activeItemId: string | null
   startIndex: number
-  accentKey: AccentKey
 }) {
   const { t: tNav } = useTranslation('nav')
 
@@ -289,7 +283,6 @@ function NavGroup({
           collapsed={collapsed}
           isActive={activeItemId === item.id}
           index={startIndex + idx}
-          accentKey={accentKey}
         />
       ))}
     </div>
@@ -312,11 +305,9 @@ function useSidebarPathname(): string {
 function HomeNavButton({
   collapsed,
   isSubModule,
-  accentKey,
 }: {
   collapsed: boolean
   isSubModule: boolean
-  accentKey: AccentKey
 }) {
   const { t: tNav } = useTranslation('nav')
   const pathname = useSidebarPathname()
@@ -327,10 +318,12 @@ function HomeNavButton({
   const showBackMode = isSubModule
 
   const CurrentIcon = showBackMode ? ArrowLeft : Home
+  const sigName: IconName | undefined = showBackMode ? undefined : 'home'
   const label = tNav('home')
 
-  const pillBgVar = `var(--shell-pill-${accentKey}-bg)`
-  const pillTextVar = `var(--shell-pill-${accentKey}-text)`
+  // Home is emerald; the back-arrow has no signature (static) but keeps the hue.
+  const accentValue = resolveAccent('home', {})
+  const activeTextColor = 'color-mix(in oklch, var(--accent) 92%, var(--shell-text-1))'
 
   const linkContent = (
     <Link
@@ -338,7 +331,8 @@ function HomeNavButton({
       aria-label={label}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="block relative"
+      className={cn('block relative ef-motion', isActive && 'is-active')}
+      style={{ '--accent': accentValue } as CSSProperties}
     >
       <div
         className={cn(
@@ -351,9 +345,9 @@ function HomeNavButton({
         {isActive && !collapsed && (
           <motion.div
             layoutId="sidebar-nav-pill"
-            // allow-presentation-style: active nav pill bg is the accent-keyed shell var
+            // allow-presentation-style: active nav pill bg is accent-driven (color-mix)
             className="absolute inset-0 rounded-3xl"
-            style={{ background: pillBgVar }}
+            style={{ background: 'color-mix(in oklch, var(--accent) 14%, transparent)' }}
             transition={{ type: 'spring', stiffness: 400, damping: 30 }}
           />
         )}
@@ -363,11 +357,11 @@ function HomeNavButton({
         )}
 
         {/* Icon with container */}
-        <AnimatedNavIcon
+        <NavIcon
           icon={CurrentIcon}
+          sigName={sigName}
           isActive={isActive}
           isHovered={isHovered}
-          accentKey={accentKey}
           collapsed={collapsed}
         />
 
@@ -379,11 +373,11 @@ function HomeNavButton({
               animate={{ opacity: 1, width: 'auto' }}
               exit={{ opacity: 0, width: 0 }}
               transition={{ duration: 0.15 }}
-              // allow-presentation-style: active nav label color is the accent-keyed shell var
+              // allow-presentation-style: active nav label color is accent-driven
               className="text-sm whitespace-nowrap overflow-hidden relative z-10"
               style={{
                 color: isActive
-                  ? pillTextVar
+                  ? activeTextColor
                   : showBackMode
                     ? 'var(--shell-text-3)'
                     : 'var(--shell-text-2)',
@@ -424,9 +418,6 @@ export function Sidebar() {
   // Filter groups based on permissions
   const filteredGroups = useSecureNavGroups(config.groups)
 
-  // Resolve module accent color
-  const accentKey = getAccentKey(moduleId)
-
   // Update sidebar store when module changes
   useEffect(() => {
     setModule(moduleId)
@@ -464,7 +455,7 @@ export function Sidebar() {
         >
           {/* Home / Back button */}
           <div className="mb-1">
-            <HomeNavButton collapsed={collapsed} isSubModule={isSubModule} accentKey={accentKey} />
+            <HomeNavButton collapsed={collapsed} isSubModule={isSubModule} />
             <div className="mt-1 mx-3 border-b border-[var(--shell-divider)]" />
           </div>
 
@@ -480,7 +471,6 @@ export function Sidebar() {
                 collapsed={collapsed}
                 activeItemId={activeItemId}
                 startIndex={groupStartIndex}
-                accentKey={accentKey}
               />
             )
           })}

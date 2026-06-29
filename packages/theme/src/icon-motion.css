@@ -1,0 +1,292 @@
+/* ============================================================================
+ * EdForge — Signature animated-icon engine
+ * Ported verbatim from the locked Claude Design prototype
+ * (edforge/final: animations.css + icons.jsx + app.jsx). CSS owns the motion;
+ * JS owns replay (key-remount). Single source for --icon-dur / --icon-k.
+ *
+ * Trigger contract: an interactive ancestor carries `.ef-motion` (+ `.is-active`
+ * when selected). Tabs are covered automatically via the ARIA the @edforge/ui
+ * Tabs primitive already emits ([role="tab"] / [aria-selected="true"]).
+ * ========================================================================== */
+
+:root {
+  /* one knob re-tunes the whole platform */
+  --icon-dur: .52s;   /* signature duration  */
+  --icon-k: 1;        /* intensity multiplier */
+  --ease-spring: cubic-bezier(.34, 1.56, .64, 1);
+  --ease-out:    cubic-bezier(.22, .61, .36, 1);
+  --ease-soft:   cubic-bezier(.4, 0, .2, 1);
+
+  /* module accents — one chroma family, hue varies (theme-agnostic oklch) */
+  --a-emerald: oklch(0.72 0.15 160);
+  --a-violet:  oklch(0.67 0.17 295);
+  --a-amber:   oklch(0.77 0.14 70);
+  --a-sky:     oklch(0.70 0.14 232);
+  --a-blue:    oklch(0.66 0.18 260);
+  --a-teal:    oklch(0.73 0.12 195);
+  --a-rose:    oklch(0.68 0.18 18);
+  --a-indigo:  oklch(0.64 0.18 280);
+}
+
+/* ---- icon holder + glyph -------------------------------------------------- */
+.nav-ico {
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  perspective: 340px;            /* depth for the finance coin flip */
+  color: currentColor;           /* rest = inherit host text color */
+  transition: color .2s;
+}
+.ico { display: block; overflow: visible; }
+.ico * { transform-box: view-box; }
+
+/* icon adopts the item accent on hover / focus-visible / active */
+:where(.ef-motion, [role="tab"]):is(:hover, :focus-visible) .nav-ico,
+:where(.ef-motion.is-active, [role="tab"][aria-selected="true"]) .nav-ico {
+  color: var(--accent);
+}
+
+/* faint accent glow that blooms behind the icon */
+.nav-ico::after {
+  content: ""; position: absolute; width: 30px; height: 30px; border-radius: 50%;
+  background: radial-gradient(circle, var(--accent) 0%, transparent 68%);
+  opacity: 0; scale: .5; transition: opacity .3s, scale .3s var(--ease-spring);
+  pointer-events: none; z-index: -1;
+}
+:where(.ef-motion, [role="tab"]):is(:hover, :focus-visible) .nav-ico::after { opacity: .16; scale: 1; }
+:where(.ef-motion.is-active, [role="tab"][aria-selected="true"]) .nav-ico::after { opacity: .12; scale: 1; }
+
+/* keyboard focus ring on nav items — accent-tinted, follows the pill's radius.
+   (Tabs keep the @edforge/ui Tabs focus ring; this is scoped to .ef-motion.) */
+:where(.ef-motion):focus-visible { outline: none; }
+:where(.ef-motion):focus-visible > * {
+  box-shadow: 0 0 0 2px color-mix(in oklch, var(--accent) 45%, transparent);
+}
+
+
+/* transform pivots (viewBox units) ------------------------- */
+.h-door      { transform-box: fill-box; transform-origin: center bottom; }
+.a-tassel,
+.a-bead      { transform-origin: 21.5px 10px; }
+.g-cog,.ws-cog,.cf-cog { transform-origin: 12px 12px; }
+.pp-back     { transform-box: fill-box; transform-origin: center; }
+.ov-1,.ov-2,.ov-3,.ov-4,
+.or-w1,.or-w2,.or-w3,.or-w4,
+.st-c1,.st-c2,.ac-ring { transform-box: fill-box; transform-origin: center; }
+.gl-b1,.gl-b2,.gl-b3 { transform-box: fill-box; transform-origin: center bottom; }
+.bk-left     { transform-box: fill-box; transform-origin: right center; }
+.bk-right    { transform-box: fill-box; transform-origin: left center; }
+.rb-key      { transform-origin: 8px 8px; }
+.al-min,.al-hour { transform-origin: 12px 12px; }
+.sc-check,.at-check,.st-l1,.st-l2 { stroke-dasharray: 1; }
+
+/* =========================================================
+   Trigger = item/tab/lab hovered or focused, or item/tab active
+   ========================================================= */
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .ico-home,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .ico-home { animation: sigHop var(--icon-dur) var(--ease-spring); }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .h-door,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .h-door { animation: sigSquash var(--icon-dur) var(--ease-spring); }
+
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .a-tassel,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .a-tassel,
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .a-bead,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .a-bead { animation: sigSwing calc(var(--icon-dur) * 1.25) var(--ease-spring); }
+
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .pp-back,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .pp-back { animation: sigPopBack var(--icon-dur) var(--ease-spring); }
+
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .ico-finance,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .ico-finance { animation: sigFlip calc(var(--icon-dur) * 1.4) var(--ease-soft); }
+
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) :is(.g-cog,.ws-cog,.cf-cog),
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) :is(.g-cog,.ws-cog,.cf-cog) { animation: sigSpin calc(var(--icon-dur) * 1.5) var(--ease-soft); }
+
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .ov-1,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .ov-1 { animation: sigPanel var(--icon-dur) var(--ease-spring); }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .ov-2,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .ov-2 { animation: sigPanel var(--icon-dur) var(--ease-spring) .06s both; }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .ov-3,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .ov-3 { animation: sigPanel var(--icon-dur) var(--ease-spring) .12s both; }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .ov-4,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .ov-4 { animation: sigPanel var(--icon-dur) var(--ease-spring) .18s both; }
+
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .ac-ring,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .ac-ring { animation: sigPulse calc(var(--icon-dur) * 1.3) var(--ease-out); }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .ac-head,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .ac-head { animation: sigNod var(--icon-dur) var(--ease-spring); }
+
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .pf-k1,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .pf-k1 { animation: sigSlideR var(--icon-dur) var(--ease-spring); }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .pf-k2,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .pf-k2 { animation: sigSlideL var(--icon-dur) var(--ease-spring) .05s both; }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .pf-k3,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .pf-k3 { animation: sigSlideR var(--icon-dur) var(--ease-spring) .1s both; }
+
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .sc-shield,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .sc-shield { animation: sigBob var(--icon-dur) var(--ease-spring); }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .sc-check,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .sc-check { animation: sigDraw var(--icon-dur) var(--ease-out) both; }
+
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .or-w1,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .or-w1 { animation: sigLight var(--icon-dur) var(--ease-spring); }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .or-w2,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .or-w2 { animation: sigLight var(--icon-dur) var(--ease-spring) .07s both; }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .or-w3,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .or-w3 { animation: sigLight var(--icon-dur) var(--ease-spring) .14s both; }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .or-w4,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .or-w4 { animation: sigLight var(--icon-dur) var(--ease-spring) .21s both; }
+
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .rb-key,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .rb-key { animation: sigTurn calc(var(--icon-dur) * 1.2) var(--ease-spring); }
+
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .ico-authdebug,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .ico-authdebug { animation: sigShimmy calc(var(--icon-dur) * 1.2) var(--ease-soft); }
+
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .bk-left,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .bk-left { animation: sigPageL var(--icon-dur) var(--ease-spring); }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .bk-right,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .bk-right { animation: sigPageR var(--icon-dur) var(--ease-spring); }
+
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .at-cal,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .at-cal { animation: sigBob var(--icon-dur) var(--ease-spring); }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .at-check,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .at-check { animation: sigDraw var(--icon-dur) var(--ease-out) both; }
+
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .st-l1,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .st-l1 { animation: sigDraw var(--icon-dur) var(--ease-out) both; }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .st-l2,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .st-l2 { animation: sigDraw var(--icon-dur) var(--ease-out) .08s both; }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .st-c1,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .st-c1 { animation: sigPanel var(--icon-dur) var(--ease-spring) .12s both; }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .st-c2,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .st-c2 { animation: sigPanel var(--icon-dur) var(--ease-spring) .18s both; }
+
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .gl-b1,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .gl-b1 { animation: sigGrow var(--icon-dur) var(--ease-spring); }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .gl-b2,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .gl-b2 { animation: sigGrow var(--icon-dur) var(--ease-spring) .07s both; }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .gl-b3,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .gl-b3 { animation: sigGrow var(--icon-dur) var(--ease-spring) .14s both; }
+
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .al-min,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .al-min { animation: sigSweep calc(var(--icon-dur) * 1.5) var(--ease-soft); }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .al-hour,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .al-hour { animation: sigSweepHour calc(var(--icon-dur) * 1.5) var(--ease-soft); }
+
+/* Optional resting idle loop on the active item (tweak gated) */
+.idle-on :where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) :is(.g-cog,.ws-cog,.cf-cog) { animation: sigSpin 10s linear infinite !important; }
+.idle-on :where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .al-min { animation: sigSweep 6s linear infinite !important; }
+
+/* =========================================================
+   KEYFRAMES
+   ========================================================= */
+@keyframes sigHop {
+  0% { transform: translateY(0); }
+  30% { transform: translateY(calc(-3px * var(--icon-k))); }
+  55% { transform: translateY(0); }
+  72% { transform: translateY(calc(-1px * var(--icon-k))); }
+  100% { transform: translateY(0); }
+}
+@keyframes sigSquash {
+  0%,40% { transform: scaleY(1); }
+  62% { transform: scaleY(.62); }
+  100% { transform: scaleY(1); }
+}
+@keyframes sigSwing {
+  0% { rotate: 0deg; }
+  25% { rotate: calc(-22deg * var(--icon-k)); }
+  55% { rotate: calc(13deg * var(--icon-k)); }
+  80% { rotate: calc(-5deg * var(--icon-k)); }
+  100% { rotate: 0deg; }
+}
+@keyframes sigPopBack {
+  0% { opacity: 0; scale: .2; translate: 0 calc(2px * var(--icon-k)); }
+  55% { opacity: 1; scale: 1.12; }
+  100% { opacity: 1; scale: 1; translate: 0 0; }
+}
+@keyframes sigFlip {
+  from { transform: rotateY(0); }
+  to   { transform: rotateY(360deg); }
+}
+@keyframes sigSpin {
+  from { rotate: 0deg; }
+  to   { rotate: 360deg; }
+}
+@keyframes sigPanel {
+  0% { scale: .15; opacity: 0; }
+  60% { scale: 1.15; opacity: 1; }
+  100% { scale: 1; opacity: 1; }
+}
+@keyframes sigPulse {
+  0% { scale: .55; opacity: .65; }
+  100% { scale: 1.7; opacity: 0; }
+}
+@keyframes sigNod {
+  0%,100% { transform: translateY(0); }
+  45% { transform: translateY(calc(-1.2px * var(--icon-k))); }
+}
+@keyframes sigSlideR {
+  0% { translate: 0 0; }
+  50% { translate: calc(5px * var(--icon-k)) 0; }
+  100% { translate: 0 0; }
+}
+@keyframes sigSlideL {
+  0% { translate: 0 0; }
+  50% { translate: calc(-5px * var(--icon-k)) 0; }
+  100% { translate: 0 0; }
+}
+@keyframes sigBob {
+  0%,100% { translate: 0 0; }
+  40% { translate: 0 calc(-1.8px * var(--icon-k)); }
+}
+@keyframes sigDraw {
+  from { stroke-dashoffset: 1; }
+  to   { stroke-dashoffset: 0; }
+}
+@keyframes sigLight {
+  0% { scale: 0; opacity: 0; }
+  60% { scale: 1.18; opacity: 1; }
+  100% { scale: 1; opacity: 1; }
+}
+@keyframes sigTurn {
+  0% { rotate: 0deg; }
+  30% { rotate: calc(-26deg * var(--icon-k)); }
+  68% { rotate: calc(12deg * var(--icon-k)); }
+  100% { rotate: 0deg; }
+}
+@keyframes sigShimmy {
+  0%,100% { rotate: 0deg; }
+  18% { rotate: calc(5deg * var(--icon-k)); }
+  40% { rotate: calc(-5deg * var(--icon-k)); }
+  62% { rotate: calc(3deg * var(--icon-k)); }
+  82% { rotate: calc(-2deg * var(--icon-k)); }
+}
+@keyframes sigPageL {
+  0% { transform: scaleX(1); }
+  45% { transform: scaleX(.74); }
+  100% { transform: scaleX(1); }
+}
+@keyframes sigPageR {
+  0% { transform: scaleX(1); }
+  45% { transform: scaleX(.74); }
+  100% { transform: scaleX(1); }
+}
+@keyframes sigGrow {
+  0% { transform: scaleY(.12); }
+  62% { transform: scaleY(1.14); }
+  100% { transform: scaleY(1); }
+}
+@keyframes sigSweep {
+  from { rotate: 0deg; }
+  to   { rotate: 360deg; }
+}
+@keyframes sigSweepHour {
+  from { rotate: 0deg; }
+  to   { rotate: 30deg; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ico, .ico * { animation: none !important; }
+}

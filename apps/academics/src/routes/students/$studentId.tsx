@@ -26,6 +26,7 @@ import {
   IdCard,
 } from 'lucide-react'
 import { Button, Tabs, type TabItem } from '@edforge/ui'
+import { AnimatedIcon, type IconName } from '@edforge/ui/motion'
 import { useStudentProfile, useStudentProfileActions, useGrantPortalAccess } from '../../hooks'
 import { useActiveSchoolId } from '../../stores/app.store'
 import { NotFound, PermissionDenied } from '../../components/common'
@@ -57,6 +58,14 @@ const TAB_IDS: { id: TabId; icon: typeof User }[] = [
   { id: 'family', icon: Users },
   { id: 'demographics', icon: IdCard },
 ]
+
+// Signature glyph per tab (clean counterparts only); unmapped tabs stay static.
+const TAB_SIGNATURE: Partial<Record<TabId, IconName>> = {
+  overview: 'overview',
+  profile: 'account',
+  enrollment: 'academics',
+  family: 'people',
+}
 
 // ============================================================================
 // ROUTE PARAMS VALIDATION
@@ -229,11 +238,16 @@ export function StudentProfilePage() {
           className="overflow-x-auto no-scrollbar"
           tabs={TAB_IDS.map((tab): TabItem => {
             const Icon = tab.icon
+            const sig = TAB_SIGNATURE[tab.id]
             return {
               id: tab.id,
               label: (
                 <span className="flex items-center gap-2">
-                  <Icon className="w-4 h-4" />
+                  {sig ? (
+                    <AnimatedIcon name={sig} icon={Icon} size={16} />
+                  ) : (
+                    <Icon className="w-4 h-4" />
+                  )}
                   {t(`tabs.${tab.id}`)}
                 </span>
               ),

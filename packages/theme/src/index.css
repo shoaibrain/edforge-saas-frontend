@@ -15,6 +15,9 @@
 /* V2 animation classes (skeleton pulse, bar fill) */
 @import './v2-animations.css';
 
+/* Signature animated-icon engine (tokens + keyframes + triggers) */
+@import './icon-motion.css';
+
 /* Landing V2 tokens — scoped to html[data-surface="landing"], safe to load globally */
 @import './landing-tokens.css';
 
