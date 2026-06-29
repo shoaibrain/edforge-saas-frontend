@@ -25,6 +25,7 @@ import { IdentityCell } from './roster/IdentityCell'
 import { StatusControl } from './roster/StatusControl'
 import { EXCUSE_TYPES } from './roster/excuseTypes'
 import type { AttendanceStatus } from '../../services/academics.service'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 export interface AttendanceRowProps {
   studentId: string
@@ -92,6 +93,7 @@ export const AttendanceRow = forwardRef<AttendanceRowRef, AttendanceRowProps>(fu
   },
   ref,
 ) {
+  const { t } = useAcademicsI18n()
   const rowRef = useRef<HTMLDivElement>(null)
   useImperativeHandle(ref, () => ({ focus: () => rowRef.current?.focus() }))
 
@@ -138,7 +140,7 @@ export const AttendanceRow = forwardRef<AttendanceRowRef, AttendanceRowProps>(fu
       onKeyDown={handleKeyDown}
       tabIndex={tabIndex}
       role="row"
-      aria-label={`Attendance for ${studentName}`}
+      aria-label={t('attendance.grid.rowAria', { studentName })}
     >
       {/* Header band (fixed height — the base row) */}
       <div className="flex h-14 items-center gap-3 px-4">
@@ -156,7 +158,7 @@ export const AttendanceRow = forwardRef<AttendanceRowRef, AttendanceRowProps>(fu
             <>
               <span className="flex items-center gap-1 text-xs text-text-tertiary" title={lockedHint}>
                 <Lock className="h-3 w-3 flex-shrink-0" />
-                {lockedHint || 'Day-presence already recorded'}
+                {lockedHint || t('attendance.row.lockedFallback')}
               </span>
               <StatusControl
                 value={currentStatus}
@@ -172,10 +174,10 @@ export const AttendanceRow = forwardRef<AttendanceRowRef, AttendanceRowProps>(fu
                 type="button"
                 onClick={onStartEdit}
                 className="flex items-center gap-1 rounded-lg bg-surface-secondary px-2.5 py-1.5 text-xs font-medium text-text-secondary transition-colors hover:bg-surface-hover hover:text-text-primary"
-                aria-label={`Edit attendance for ${studentName}`}
+                aria-label={t('attendance.actions.editFor', { studentName })}
               >
                 <Edit2 className="h-3.5 w-3.5" />
-                Edit
+                {t('attendance.actions.edit')}
               </button>
             </>
           ) : (
@@ -186,9 +188,9 @@ export const AttendanceRow = forwardRef<AttendanceRowRef, AttendanceRowProps>(fu
             <button
               type="button"
               onClick={onToggleDetails}
-              aria-label={hasDetails ? 'Edit note or reason' : 'Add note or reason'}
+              aria-label={hasDetails ? t('attendance.actions.editNoteReason') : t('attendance.actions.addNoteReason')}
               aria-expanded={detailsOpen}
-              title={hasDetails ? 'Edit note / reason' : 'Add note / reason'}
+              title={hasDetails ? t('attendance.actions.editNoteReasonTitle') : t('attendance.actions.addNoteReasonTitle')}
               className={`relative rounded-lg p-2 transition-colors ${focusRingInset} ${
                 detailsOpen || hasDetails
                   ? 'bg-[rgb(var(--accent-attendance)/0.12)] text-[rgb(var(--accent-attendance-text))]'
@@ -213,13 +215,13 @@ export const AttendanceRow = forwardRef<AttendanceRowRef, AttendanceRowProps>(fu
                 onClick={onCorrectionSave}
                 className="rounded-lg bg-[rgb(var(--action-primary-bg))] px-3 py-1.5 text-xs font-medium text-[rgb(var(--action-primary-fg))] transition-colors hover:bg-[rgb(var(--action-primary-bg-hover))]"
               >
-                Save
+                {t('attendance.actions.save')}
               </button>
               <button
                 type="button"
                 onClick={onCorrectionCancel}
                 className="rounded-lg p-1.5 text-text-tertiary transition-colors hover:bg-surface-hover hover:text-text-primary"
-                aria-label="Cancel edit"
+                aria-label={t('attendance.actions.cancelEdit')}
               >
                 <X className="h-4 w-4" />
               </button>
@@ -238,26 +240,26 @@ export const AttendanceRow = forwardRef<AttendanceRowRef, AttendanceRowProps>(fu
           <div className={`grid gap-3 ${showReason ? 'sm:grid-cols-2' : ''}`}>
             {showReason && (
               <div>
-                <span className="mb-1 block text-xs font-medium text-text-secondary">Reason</span>
+                <span className="mb-1 block text-xs font-medium text-text-secondary">{t('attendance.row.reason')}</span>
                 <Select
                   size="sm"
-                  aria-label="Absence reason"
+                  aria-label={t('attendance.row.reasonAria')}
                   value={excuseType || ''}
                   onChange={(v) => onExcuseTypeChange?.(v ?? '')}
                   clearable
-                  placeholder="Select reason…"
+                  placeholder={t('attendance.row.selectReason')}
                   options={EXCUSE_TYPES}
                 />
               </div>
             )}
             <div>
-              <span className="mb-1 block text-xs font-medium text-text-secondary">Note</span>
+              <span className="mb-1 block text-xs font-medium text-text-secondary">{t('attendance.row.note')}</span>
               <Input
                 type="text"
                 value={notes}
                 onChange={(e) => onNotesChange(e.target.value)}
-                placeholder="Add a note…"
-                aria-label="Attendance note"
+                placeholder={t('attendance.row.notePlaceholder')}
+                aria-label={t('attendance.row.noteAria')}
               />
             </div>
           </div>

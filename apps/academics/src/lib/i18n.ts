@@ -4,17 +4,67 @@ import {
   useTranslation,
   type LocaleCode,
 } from '@edforge/i18n'
+import enAcademics from '@edforge/i18n/locales/en/academics.json'
 import type { DataTableExportFormat, DataTableLabels } from '@edforge/ui'
+import type { AttendanceStatus } from '../services/academics.service'
 
 const DATE_FALLBACK = '—'
+type TranslateOptions = Record<string, unknown> & { defaultValue?: string; count?: number | string }
+
+const ATTENDANCE_STATUS_LABEL_FALLBACKS: Record<AttendanceStatus, string> = {
+  present: 'Present',
+  absent: 'Absent',
+  late: 'Tardy',
+  excused: 'Excused',
+  remote: 'Remote',
+  half_day: 'Half Day',
+  early_departure: 'Early Dep.',
+}
 
 function humanizeEnum(value: string): string {
   return value.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase())
 }
 
+function lookupFallback(key: string, options?: TranslateOptions): string | undefined {
+  const pluralKey =
+    typeof options?.count === 'number' &&
+    options.count !== 1 &&
+    getStringByPath(enAcademics, `${key}_plural`)
+      ? `${key}_plural`
+      : key
+  return getStringByPath(enAcademics, pluralKey)
+}
+
+function getStringByPath(source: unknown, key: string): string | undefined {
+  let cursor: unknown = source
+  for (const segment of key.split('.')) {
+    if (cursor == null || typeof cursor !== 'object') return undefined
+    cursor = (cursor as Record<string, unknown>)[segment]
+  }
+  return typeof cursor === 'string' ? cursor : undefined
+}
+
+function interpolate(template: string, options?: TranslateOptions): string {
+  if (!options) return template
+  return template.replace(/\{\{\s*(\w+)\s*\}\}/g, (match, token) => {
+    const value = options[token]
+    return value == null ? match : String(value)
+  })
+}
+
 export function useAcademicsI18n() {
-  const { t, i18n } = useTranslation('academics')
+  const { t: rawT, i18n } = useTranslation('academics')
   const locale = normalizeLocaleCode(i18n.language) as LocaleCode
+
+  const t = useCallback(
+    (key: string, options?: TranslateOptions): string => {
+      const translated = rawT(key, options as never) as unknown
+      if (typeof translated === 'string' && translated !== key) return translated
+      const fallback = options?.defaultValue ?? lookupFallback(key, options) ?? key
+      return interpolate(fallback, options)
+    },
+    [rawT],
+  )
 
   const formatNumber = useCallback(
     (value: number) => new Intl.NumberFormat(locale).format(value),
@@ -54,6 +104,24 @@ export function useAcademicsI18n() {
     (keyPrefix: string, value: string | null | undefined) => {
       if (!value) return DATE_FALLBACK
       return t(`${keyPrefix}.${value}`, { defaultValue: humanizeEnum(value) })
+    },
+    [t],
+  )
+
+  const attendanceStatusLabel = useCallback(
+    (value: AttendanceStatus | null | undefined) => {
+      if (!value) return DATE_FALLBACK
+      return t(`attendance.status.${value}.label`, {
+        defaultValue: ATTENDANCE_STATUS_LABEL_FALLBACKS[value] ?? humanizeEnum(value),
+      })
+    },
+    [t],
+  )
+
+  const attendanceStatusShortLabel = useCallback(
+    (value: AttendanceStatus | null | undefined, fallback = '') => {
+      if (!value) return fallback
+      return t(`attendance.status.${value}.short`, { defaultValue: fallback || humanizeEnum(value) })
     },
     [t],
   )
@@ -100,5 +168,7 @@ export function useAcademicsI18n() {
     formatDate,
     formatDateTime,
     enumLabel,
+    attendanceStatusLabel,
+    attendanceStatusShortLabel,
   }
 }

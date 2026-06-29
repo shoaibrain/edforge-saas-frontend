@@ -11,6 +11,7 @@
 
 import { Search, X, CheckCircle, XCircle } from 'lucide-react'
 import { Input, focusRingInset } from '@edforge/ui'
+import { useAcademicsI18n } from '../../../lib/i18n'
 
 export type RosterFilter = 'all' | 'unmarked' | 'absent' | 'flagged' | 'locked'
 
@@ -31,13 +32,7 @@ export interface RosterToolbarProps {
   markedCount: number
 }
 
-const CHIPS: { key: RosterFilter; label: string }[] = [
-  { key: 'all', label: 'All' },
-  { key: 'unmarked', label: 'Unmarked' },
-  { key: 'absent', label: 'Absent' },
-  { key: 'flagged', label: 'Flagged' },
-  { key: 'locked', label: 'Locked' },
-]
+const CHIP_KEYS: RosterFilter[] = ['all', 'unmarked', 'absent', 'flagged', 'locked']
 
 export function RosterToolbar({
   search,
@@ -53,9 +48,14 @@ export function RosterToolbar({
   bulkScopeCount,
   markedCount,
 }: RosterToolbarProps) {
-  const chips = CHIPS.filter((c) => c.key !== 'locked' || showLockedChip)
-  const presentLabel = bulkScopeCount == null ? 'All Present' : `Mark ${bulkScopeCount} Present`
-  const absentLabel = bulkScopeCount == null ? 'All Absent' : `Mark ${bulkScopeCount} Absent`
+  const { t, formatNumber } = useAcademicsI18n()
+  const chips = CHIP_KEYS.filter((key) => key !== 'locked' || showLockedChip)
+  const presentLabel = bulkScopeCount == null
+    ? t('attendance.toolbar.allPresent')
+    : t('attendance.toolbar.markPresent', { count: formatNumber(bulkScopeCount) })
+  const absentLabel = bulkScopeCount == null
+    ? t('attendance.toolbar.allAbsent')
+    : t('attendance.toolbar.markAbsent', { count: formatNumber(bulkScopeCount) })
 
   return (
     <div className="flex flex-shrink-0 flex-wrap items-center gap-x-3 gap-y-2 border-b border-border-secondary bg-surface-primary px-3 py-2.5">
@@ -65,8 +65,8 @@ export function RosterToolbar({
           type="text"
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
-          placeholder="Search students..."
-          aria-label="Search students by name or number"
+          placeholder={t('attendance.toolbar.search')}
+          aria-label={t('attendance.toolbar.searchAria')}
           prefix={<Search className="h-4 w-4" />}
           suffix={
             search ? (
@@ -74,7 +74,7 @@ export function RosterToolbar({
                 type="button"
                 onClick={() => onSearchChange('')}
                 className={`rounded p-0.5 text-text-tertiary transition-colors hover:text-text-primary ${focusRingInset}`}
-                aria-label="Clear search"
+                aria-label={t('attendance.toolbar.clearSearch')}
               >
                 <X className="h-3.5 w-3.5" />
               </button>
@@ -84,14 +84,14 @@ export function RosterToolbar({
       </div>
 
       {/* Filter chips */}
-      <div className="flex items-center gap-1.5 overflow-x-auto" role="group" aria-label="Filter students">
-        {chips.map((c) => {
-          const active = activeFilter === c.key
+      <div className="flex items-center gap-1.5 overflow-x-auto" role="group" aria-label={t('attendance.toolbar.filterAria')}>
+        {chips.map((key) => {
+          const active = activeFilter === key
           return (
             <button
-              key={c.key}
+              key={key}
               type="button"
-              onClick={() => onFilterChange(c.key)}
+              onClick={() => onFilterChange(key)}
               aria-pressed={active}
               className={`flex flex-shrink-0 items-center gap-1 rounded-md border px-2 py-1 text-2xs font-medium transition-colors ${focusRingInset} ${
                 active
@@ -99,8 +99,8 @@ export function RosterToolbar({
                   : 'border-transparent bg-surface-secondary text-text-tertiary hover:text-text-secondary'
               }`}
             >
-              {c.label}
-              <span className="tabular-nums opacity-70">{counts[c.key]}</span>
+              {t(`attendance.toolbar.filters.${key}`)}
+              <span className="tabular-nums opacity-70">{formatNumber(counts[key])}</span>
             </button>
           )
         })}
@@ -131,7 +131,7 @@ export function RosterToolbar({
               onClick={onClearAll}
               className={`rounded-lg bg-surface-secondary px-3 py-1.5 text-xs font-medium text-text-secondary transition-colors hover:bg-surface-hover hover:text-text-primary ${focusRingInset}`}
             >
-              Clear
+              {t('attendance.toolbar.clear')}
             </button>
           )}
         </div>

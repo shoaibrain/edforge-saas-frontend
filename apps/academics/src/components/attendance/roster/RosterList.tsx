@@ -17,6 +17,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { AttendanceRow, type AttendanceRowRef } from '../AttendanceRow'
 import type { AttendanceStatus } from '../../../services/academics.service'
+import { useAcademicsI18n } from '../../../lib/i18n'
 
 export interface RosterEntry {
   studentId: string
@@ -60,6 +61,7 @@ export function RosterList({
   detailsOpenIds,
   onToggleDetails,
 }: RosterListProps) {
+  const { t } = useAcademicsI18n()
   const scrollRef = useRef<HTMLDivElement>(null)
   const rowRefs = useRef<Map<string, AttendanceRowRef>>(new Map())
   const pendingFocus = useRef<number | null>(null)
@@ -104,7 +106,7 @@ export function RosterList({
   }, [items, entries])
 
   if (entries.length === 0) {
-    return <div className="flex-1 py-8 text-center text-sm text-text-tertiary">No students match your search.</div>
+    return <div className="flex-1 py-8 text-center text-sm text-text-tertiary">{t('attendance.empty.noSearchMatches')}</div>
   }
 
   return (

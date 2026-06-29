@@ -31,6 +31,7 @@ import { useAttendanceOverview } from '../../hooks/useAttendance'
 import { StudentAttendanceModal } from '../../components/attendance/StudentAttendanceModal'
 import { UserAvatar } from '../../components/common/UserAvatar'
 import { usePermission } from '@edforge/abac'
+import { useAcademicsI18n } from '../../lib/i18n'
 import type {
   AttendanceAlert,
   AttendanceOverviewResponse,
@@ -209,14 +210,28 @@ function TodaySummaryStrip({
   summary: AttendanceOverviewResponse['todaySummary']
   periodAverages: AttendanceOverviewResponse['periodAverages']
 }) {
+  const { t, formatNumber, attendanceStatusLabel } = useAcademicsI18n()
   const pct = (count: number) =>
-    summary.totalStudents > 0 ? `${((count / summary.totalStudents) * 100).toFixed(1)}% of ${summary.totalStudents}` : '—'
+    summary.totalStudents > 0
+      ? t('attendance.dashboard.ofTotal', {
+        count: `${((count / summary.totalStudents) * 100).toFixed(1)}%`,
+        total: formatNumber(summary.totalStudents),
+      })
+      : '—'
 
   const stats = [
-    { label: 'Present', value: summary.present, color: V2.success, sub: `${summary.totalRecorded ?? summary.present} of ${summary.totalStudents} recorded` },
-    { label: 'Absent', value: summary.absent, color: V2.danger, sub: pct(summary.absent) },
-    { label: 'Late / Tardy', value: summary.late, color: V2.warning, sub: pct(summary.late) },
-    { label: 'Excused', value: summary.excused, color: V2.info, sub: pct(summary.excused) },
+    {
+      label: attendanceStatusLabel('present'),
+      value: summary.present,
+      color: V2.success,
+      sub: t('attendance.dashboard.ofTotalRecorded', {
+        recorded: formatNumber(summary.totalRecorded ?? summary.present),
+        total: formatNumber(summary.totalStudents),
+      }),
+    },
+    { label: attendanceStatusLabel('absent'), value: summary.absent, color: V2.danger, sub: pct(summary.absent) },
+    { label: attendanceStatusLabel('late'), value: summary.late, color: V2.warning, sub: pct(summary.late) },
+    { label: attendanceStatusLabel('excused'), value: summary.excused, color: V2.info, sub: pct(summary.excused) },
   ]
 
   const sevenDayUp = periodAverages.last7Days > periodAverages.last30Days
@@ -247,7 +262,7 @@ function TodaySummaryStrip({
             // allow-presentation-style: per-stat accent color
             className="text-xl font-bold leading-none"
             style={{ color: s.color }}
-          >{s.value}</span>
+          >{formatNumber(s.value)}</span>
           <span className="text-4xs font-bold uppercase tracking-[0.5px] text-[rgb(var(--text-disabled))]">{s.label}</span>
           <span className="text-4xs text-[rgb(var(--text-disabled))]">{s.sub}</span>
         </div>
@@ -262,7 +277,7 @@ function TodaySummaryStrip({
           {periodAverages.academicYear.toFixed(1)}%
         </span>
         <span className="text-4xs font-bold uppercase tracking-[0.5px] text-[rgb(var(--text-disabled))]">
-          School Average
+          {t('attendance.dashboard.schoolAverage')}
         </span>
         <div className="flex items-center gap-1.5 mt-0.5">
           <span
@@ -273,7 +288,7 @@ function TodaySummaryStrip({
               color: sevenDayUp ? V2.success : V2.danger,
             }}
           >
-            7-day: {periodAverages.last7Days.toFixed(1)}%
+            {t('attendance.dashboard.sevenDayAvg')} {periodAverages.last7Days.toFixed(1)}%
           </span>
           <span
             // allow-presentation-style: up/down trend accent (success/danger)
@@ -283,7 +298,7 @@ function TodaySummaryStrip({
               color: !sevenDayUp ? V2.success : V2.danger,
             }}
           >
-            30-day: {periodAverages.last30Days.toFixed(1)}%
+            {t('attendance.dashboard.thirtyDayAvg')} {periodAverages.last30Days.toFixed(1)}%
           </span>
         </div>
       </div>
@@ -296,7 +311,7 @@ function TodaySummaryStrip({
           KPIs in this strip aren't read as the same number. */}
       <div
         className="flex flex-col items-center gap-0.5 flex-1"
-        title="Coverage = students recorded ÷ enrolled (how much of today's roll-call is done). This is different from the attendance rate, which is how many of the recorded students were present."
+        title={t('attendance.dashboard.coverageTitle')}
       >
         <span
           // allow-presentation-style: coverage severity color
@@ -306,10 +321,15 @@ function TodaySummaryStrip({
           {notTakenYet ? '—' : `${coveragePct.toFixed(0)}%`}
         </span>
         <span className="text-4xs font-bold uppercase tracking-[0.5px] text-[rgb(var(--text-disabled))]">
-          Coverage
+          {t('attendance.dashboard.coverage')}
         </span>
         <span className="text-4xs text-[rgb(var(--text-disabled))]">
-          {notTakenYet ? 'Not taken yet' : `${totalRecorded} of ${summary.totalStudents} recorded`}
+          {notTakenYet
+            ? t('attendance.summary.notTakenYet')
+            : t('attendance.dashboard.ofTotalRecorded', {
+              recorded: formatNumber(totalRecorded),
+              total: formatNumber(summary.totalStudents),
+            })}
         </span>
       </div>
     </div>
@@ -327,24 +347,25 @@ function AbsenceBreakdownCard({
   breakdown: AttendanceOverviewResponse['absenceBreakdown']
   date: string
 }) {
+  const { t, formatDate, formatNumber } = useAcademicsI18n()
   const categories = [
-    { label: 'Unexcused', count: breakdown.unexcused, color: V2.danger },
-    { label: 'Excused', count: breakdown.excused, color: V2.info },
-    { label: 'Late / Tardy', count: breakdown.late, color: V2.warning },
-    { label: 'Half Day', count: breakdown.halfDay, color: V2.purple },
-    { label: 'Remote', count: breakdown.remote, color: V2.success },
+    { label: t('attendance.dashboard.absenceCategories.unexcused'), count: breakdown.unexcused, color: V2.danger },
+    { label: t('attendance.dashboard.absenceCategories.excused'), count: breakdown.excused, color: V2.info },
+    { label: t('attendance.dashboard.absenceCategories.late'), count: breakdown.late, color: V2.warning },
+    { label: t('attendance.dashboard.absenceCategories.halfDay'), count: breakdown.halfDay, color: V2.purple },
+    { label: t('attendance.dashboard.absenceCategories.remote'), count: breakdown.remote, color: V2.success },
   ]
 
   const total = categories.reduce((sum, c) => sum + c.count, 0)
-  const dateLabel = new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  const dateLabel = formatDate(date, { month: 'short', day: 'numeric', year: 'numeric' })
 
   return (
     <div className={CARD}>
       <CardHeader
         icon={<AlertCircleIcon />}
         iconBg="rgba(226,75,74,0.08)"
-        title="Today's Absence Breakdown"
-        subtitle={`${dateLabel} — ${total === 0 ? 'no absences recorded yet' : `${total} absences`}`}
+        title={t('attendance.dashboard.absenceBreakdownTitle')}
+        subtitle={`${dateLabel} — ${total === 0 ? t('attendance.dashboard.noAbsencesYet') : t('attendance.dashboard.absences', { count: total })}`}
       />
       <div className={CARD_BODY}>
         {categories.map((cat, i) => (
@@ -359,7 +380,7 @@ function AbsenceBreakdownCard({
               style={{ background: cat.color }}
             />
             <span className="text-2xs text-[rgb(var(--text-secondary))] flex-1">{cat.label}</span>
-            <span className="text-2xs font-medium text-[rgb(var(--text-tertiary))]">{cat.count}</span>
+            <span className="text-2xs font-medium text-[rgb(var(--text-tertiary))]">{formatNumber(cat.count)}</span>
           </div>
         ))}
       </div>
@@ -372,15 +393,12 @@ function AbsenceBreakdownCard({
 // ============================================================================
 
 const DAYS_ORDER = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
-const DAY_SHORT: Record<string, string> = {
-  Sunday: 'Sun', Monday: 'Mon', Tuesday: 'Tue', Wednesday: 'Wed', Thursday: 'Thu', Friday: 'Fri', Saturday: 'Sat',
-}
-
 function DOWPatternCard({
   pattern,
 }: {
   pattern: Record<string, { avgRate: number; avgAbsent: number }>
 }) {
+  const { t } = useAcademicsI18n()
   const days = DAYS_ORDER.filter((d) => pattern[d] != null)
   if (days.length === 0) return null
 
@@ -404,8 +422,8 @@ function DOWPatternCard({
       <CardHeader
         icon={<ActivityIcon />}
         iconBg="rgba(239,159,39,0.10)"
-        title="Day-of-Week Pattern"
-        subtitle="Average attendance rate by weekday"
+        title={t('attendance.dashboard.dowTitle')}
+        subtitle={t('attendance.dashboard.dowSubtitle')}
       />
       <div className={CARD_BODY}>
         <div className="flex gap-1.5">
@@ -426,7 +444,7 @@ function DOWPatternCard({
                   // allow-presentation-style: lowest-day emphasis color
                   className="text-4xs"
                   style={{ color: lowest ? V2.danger : V2.textGhost }}
-                >{DAY_SHORT[day]}</div>
+                >{t(`attendance.dashboard.daysShort.${day}`)}</div>
                 <div
                   // allow-presentation-style: lowest-day emphasis color
                   className="text-4xs font-semibold"
@@ -437,7 +455,11 @@ function DOWPatternCard({
           })}
         </div>
         <div className="text-4xs text-[rgb(var(--text-disabled))] mt-2.5 pt-2" style={{ borderTop: `1px solid ${V2.borderSeparator}` }}>
-          {DAY_SHORT[minDay]} has the lowest avg attendance ({minRate.toFixed(0)}%). {DAY_SHORT[maxDay]} is highest.
+          {t('attendance.dashboard.dowInsight', {
+            minDay: t(`attendance.dashboard.daysShort.${minDay}`),
+            minRate: minRate.toFixed(0),
+            maxDay: t(`attendance.dashboard.daysShort.${maxDay}`),
+          })}
         </div>
       </div>
     </div>
@@ -455,6 +477,7 @@ function TrendChart({
   trend: AttendanceOverviewResponse['trend']
   periodAverages: AttendanceOverviewResponse['periodAverages']
 }) {
+  const { t, formatDate } = useAcademicsI18n()
   const sorted = useMemo(() =>
     [...trend].sort((a, b) => a.date.localeCompare(b.date)),
     [trend]
@@ -466,11 +489,11 @@ function TrendChart({
         <CardHeader
           icon={<TrendLineIcon />}
           iconBg="rgba(29,158,117,0.10)"
-          title="30-Day Attendance Rate"
-          subtitle="No trend data available"
+          title={t('attendance.dashboard.trendTitle')}
+          subtitle={t('attendance.dashboard.trendEmptySubtitle')}
         />
         <div className={`${CARD_BODY} h-20 flex items-center justify-center`}>
-          <span className="text-2xs text-[rgb(var(--text-disabled))]">No trend data available for the selected period.</span>
+          <span className="text-2xs text-[rgb(var(--text-disabled))]">{t('attendance.dashboard.trendEmpty')}</span>
         </div>
       </div>
     )
@@ -496,28 +519,27 @@ function TrendChart({
   const labelCount = Math.min(5, n)
   for (let i = 0; i < labelCount; i++) {
     const idx = Math.round((i / (labelCount - 1)) * (n - 1))
-    const d = new Date(sorted[idx].date)
     dateLabels.push({
-      label: d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+      label: formatDate(sorted[idx].date, { month: 'short', day: 'numeric' }),
       x: idx * step,
     })
   }
 
   // First and last dates for subtitle
-  const firstDate = new Date(sorted[0].date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-  const lastDate = new Date(sorted[n - 1].date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  const firstDate = formatDate(sorted[0].date, { month: 'short', day: 'numeric', year: 'numeric' })
+  const lastDate = formatDate(sorted[n - 1].date, { month: 'short', day: 'numeric', year: 'numeric' })
 
   return (
     <div className={CARD}>
       <CardHeader
         icon={<TrendLineIcon />}
         iconBg="rgba(29,158,117,0.10)"
-        title="30-Day Attendance Rate"
-        subtitle={`Daily recorded attendance rate trend — ${firstDate} to ${lastDate}`}
+        title={t('attendance.dashboard.trendTitle')}
+        subtitle={t('attendance.dashboard.trendSubtitle', { start: firstDate, end: lastDate })}
         right={
           <div className="flex gap-3 text-3xs">
-            <span className="text-[rgb(var(--text-disabled))]">7-day avg: <strong className="text-[#1D9E75]">{periodAverages.last7Days.toFixed(1)}%</strong></span>
-            <span className="text-[rgb(var(--text-disabled))]">30-day avg: <strong className="text-[rgb(var(--text-tertiary))]">{periodAverages.last30Days.toFixed(1)}%</strong></span>
+            <span className="text-[rgb(var(--text-disabled))]">{t('attendance.dashboard.sevenDayAvg')} <strong className="text-[#1D9E75]">{periodAverages.last7Days.toFixed(1)}%</strong></span>
+            <span className="text-[rgb(var(--text-disabled))]">{t('attendance.dashboard.thirtyDayAvg')} <strong className="text-[rgb(var(--text-tertiary))]">{periodAverages.last30Days.toFixed(1)}%</strong></span>
           </div>
         }
       />
@@ -568,6 +590,7 @@ function SectionCompletionCard({
 }: {
   sectionCompletion: AttendanceOverviewResponse['sectionCompletion']
 }) {
+  const { t, formatNumber } = useAcademicsI18n()
   const { totalSections, sectionsWithAttendance, sections } = sectionCompletion
   const pct = totalSections > 0 ? Math.round((sectionsWithAttendance / totalSections) * 100) : 0
 
@@ -581,8 +604,8 @@ function SectionCompletionCard({
       <CardHeader
         icon={<CheckSquareIcon />}
         iconBg="rgba(127,119,221,0.10)"
-        title="Section Completion"
-        subtitle="Today's recording status per section"
+        title={t('attendance.dashboard.sectionCompletionTitle')}
+        subtitle={t('attendance.dashboard.sectionCompletionSubtitle')}
       />
       <div className={CARD_BODY}>
         <div className="flex gap-5 items-start">
@@ -609,21 +632,25 @@ function SectionCompletionCard({
                 >{pct}%</span>
               </div>
             </div>
-            <div className="text-4xs text-[rgb(var(--text-disabled))]">{sectionsWithAttendance} / {totalSections}</div>
+            <div className="text-4xs text-[rgb(var(--text-disabled))]">{formatNumber(sectionsWithAttendance)} / {formatNumber(totalSections)}</div>
           </div>
 
           {/* Section list */}
           <div className="flex-1 min-w-0 overflow-hidden">
             {/* Header row */}
             <div className="flex items-center gap-2.5 mb-1.5 pb-1.5" style={{ borderBottom: `1px solid ${V2.borderSeparator}` }}>
-              <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px] flex-1">Section</span>
-              <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px] text-center" style={{ width: 28 }}>Enr.</span>
-              <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px] text-center" style={{ width: 36 }}>Rec.</span>
-              <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px] text-right" style={{ width: 70 }}>Status</span>
+              <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px] flex-1">{t('attendance.dashboard.section')}</span>
+              <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px] text-center" style={{ width: 28 }}>{t('attendance.dashboard.enrolledAbbr')}</span>
+              <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px] text-center" style={{ width: 36 }}>{t('attendance.dashboard.recordedAbbr')}</span>
+              <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px] text-right" style={{ width: 70 }}>{t('attendance.dashboard.completionStatus')}</span>
             </div>
             {/* Rows */}
             {sections.map((s, i) => {
-              const statusLabel = s.isComplete ? 'Complete' : s.recordedCount > 0 ? 'Partial' : 'Not Started'
+              const statusLabel = s.isComplete
+                ? t('attendance.dashboard.completion.complete')
+                : s.recordedCount > 0
+                  ? t('attendance.dashboard.completion.partial')
+                  : t('attendance.dashboard.completion.notStarted')
               const statusStyle: React.CSSProperties = s.isComplete
                 ? { background: 'rgba(29,158,117,0.10)', color: V2.success }
                 : s.recordedCount > 0
@@ -640,8 +667,8 @@ function SectionCompletionCard({
                     <div className="text-2xs font-medium text-[rgb(var(--text-secondary))]">{s.courseName}</div>
                     <span className="text-4xs text-[rgb(var(--text-disabled))]" style={{ fontFamily: 'var(--font-mono, monospace)' }}>#{s.sectionNumber}</span>
                   </div>
-                  <span className="text-3xs text-[rgb(var(--text-disabled))] text-center" style={{ width: 28 }}>{s.studentCount}</span>
-                  <span className="text-3xs text-[rgb(var(--text-disabled))] text-center" style={{ width: 36 }}>{s.recordedCount}</span>
+                  <span className="text-3xs text-[rgb(var(--text-disabled))] text-center" style={{ width: 28 }}>{formatNumber(s.studentCount)}</span>
+                  <span className="text-3xs text-[rgb(var(--text-disabled))] text-center" style={{ width: 36 }}>{formatNumber(s.recordedCount)}</span>
                   <span
                     // allow-presentation-style: per-section status chip tint (complete/partial/not-started)
                     className="text-4xs font-medium px-2 py-0.5 rounded-[5px] whitespace-nowrap text-right"
@@ -666,21 +693,24 @@ function PeriodAveragesCard({
 }: {
   periodAverages: AttendanceOverviewResponse['periodAverages']
 }) {
+  const { t } = useAcademicsI18n()
   const tiles = [
-    { label: '7-Day', value: periodAverages.last7Days, color: V2.success },
-    { label: '30-Day', value: periodAverages.last30Days, color: V2.textMuted },
-    { label: 'Yearly', value: periodAverages.academicYear, color: V2.textMuted },
+    { label: t('attendance.dashboard.periods.sevenDay'), value: periodAverages.last7Days, color: V2.success },
+    { label: t('attendance.dashboard.periods.thirtyDay'), value: periodAverages.last30Days, color: V2.textMuted },
+    { label: t('attendance.dashboard.periods.yearly'), value: periodAverages.academicYear, color: V2.textMuted },
   ]
 
-  const trending = periodAverages.last7Days > periodAverages.last30Days ? 'upward' : 'downward'
+  const trending = periodAverages.last7Days > periodAverages.last30Days
+    ? t('attendance.dashboard.directions.upward')
+    : t('attendance.dashboard.directions.downward')
 
   return (
     <div className={CARD}>
       <CardHeader
         icon={<BarChartSmallIcon />}
         iconBg="rgba(29,158,117,0.10)"
-        title="Period Averages"
-        subtitle="Attendance rates across different time windows"
+        title={t('attendance.dashboard.periodAveragesTitle')}
+        subtitle={t('attendance.dashboard.periodAveragesSubtitle')}
       />
       <div className={CARD_BODY}>
         <div className="grid grid-cols-3 gap-2.5 mb-4">
@@ -696,7 +726,7 @@ function PeriodAveragesCard({
           ))}
         </div>
         <div className="text-3xs text-[rgb(var(--text-disabled))] italic text-center mt-1">
-          Attendance is trending {trending} over the last 7 days vs. 30-day baseline.
+          {t('attendance.dashboard.trendDirection', { direction: trending })}
         </div>
       </div>
     </div>
@@ -730,6 +760,7 @@ function AlertsTableV2({
   onThresholdChange?: (n: number) => void
   onStudentClick?: (studentId: string) => void
 }) {
+  const { t, formatNumber } = useAcademicsI18n()
   const [sortKey, setSortKey] = useState<AlertSortKey>('attendanceRate')
   const [sortDir, setSortDir] = useState<SortDir>('asc')
 
@@ -777,9 +808,9 @@ function AlertsTableV2({
 
   const trendText = (trend: string) => {
     switch (trend) {
-      case 'improving': return { text: '↑ Improving', color: V2.success }
-      case 'declining': return { text: '↓ Declining', color: V2.danger }
-      default: return { text: '— Stable', color: V2.textHint }
+      case 'improving': return { text: t('attendance.dashboard.trends.improving'), color: V2.success }
+      case 'declining': return { text: t('attendance.dashboard.trends.declining'), color: V2.danger }
+      default: return { text: t('attendance.dashboard.trends.stable'), color: V2.textHint }
     }
   }
 
@@ -788,17 +819,17 @@ function AlertsTableV2({
       <CardHeader
         icon={<WarningTriangleIcon />}
         iconBg="rgba(239,159,39,0.10)"
-        title="Attendance Alerts"
-        subtitle={`Students below ${threshold}% attendance rate · sorted by severity`}
+        title={t('attendance.dashboard.alertsTitle')}
+        subtitle={t('attendance.dashboard.alertsSubtitle', { threshold: formatNumber(threshold) })}
         right={
           <div className="flex items-center gap-3">
             {onThresholdChange && (
               <label className="flex items-center gap-1.5 text-3xs text-[rgb(var(--text-disabled))]">
-                Below
+                {t('attendance.dashboard.below')}
                 <select
                   value={threshold}
                   onChange={(e) => onThresholdChange(Number(e.target.value))}
-                  aria-label="Low-attendance alert threshold"
+                  aria-label={t('attendance.dashboard.thresholdAria')}
                   className="rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-1.5 py-0.5 text-3xs text-[rgb(var(--text-secondary))] focus:outline-none focus:ring-1 focus:ring-[rgb(var(--border-focus))]"
                 >
                   {ALERT_THRESHOLD_OPTIONS.map((t) => (
@@ -808,7 +839,13 @@ function AlertsTableV2({
               </label>
             )}
             {alerts.length > 0 && (
-              <span className="text-3xs text-[rgb(var(--text-disabled))]">Showing {alerts.length} of {totalAtRiskCount} at-risk student{totalAtRiskCount !== 1 ? 's' : ''}</span>
+              <span className="text-3xs text-[rgb(var(--text-disabled))]">
+                {t('attendance.dashboard.showingAtRisk', {
+                  shown: formatNumber(alerts.length),
+                  total: formatNumber(totalAtRiskCount),
+                  count: totalAtRiskCount,
+                })}
+              </span>
             )}
           </div>
         }
@@ -817,26 +854,26 @@ function AlertsTableV2({
         {alerts.length === 0 ? (
           <div className="py-8 text-center">
             <CheckCircle className="text-[#1D9E75] mx-auto mb-3" style={{ width: 40, height: 40 }} />
-            <p className="text-xs text-[rgb(var(--text-secondary))]">No students below the attendance threshold</p>
+            <p className="text-xs text-[rgb(var(--text-secondary))]">{t('attendance.dashboard.noBelowThreshold')}</p>
           </div>
         ) : (
           <>
             {/* Header */}
             <div className="flex items-center gap-3 mb-1.5 pb-1.5" style={{ borderBottom: `1px solid ${V2.borderSeparator}` }}>
               <span style={headerColStyle('studentName', 'flex', 'left')} onClick={() => toggleSort('studentName')}>
-                Student {sortKey === 'studentName' && (sortDir === 'asc' ? '▲' : '▼')}
+                {t('attendance.dashboard.columns.student')} {sortKey === 'studentName' && (sortDir === 'asc' ? '▲' : '▼')}
               </span>
               <span style={headerColStyle('attendanceRate', 70)} onClick={() => toggleSort('attendanceRate')}>
-                Rate {sortKey === 'attendanceRate' && (sortDir === 'asc' ? '▲' : '▼')}
+                {t('attendance.dashboard.columns.rate')} {sortKey === 'attendanceRate' && (sortDir === 'asc' ? '▲' : '▼')}
               </span>
               <span style={headerColStyle('absentDays', 60, 'center')} onClick={() => toggleSort('absentDays')}>
-                Absent {sortKey === 'absentDays' && (sortDir === 'asc' ? '▲' : '▼')}
+                {t('attendance.dashboard.columns.absent')} {sortKey === 'absentDays' && (sortDir === 'asc' ? '▲' : '▼')}
               </span>
               <span style={headerColStyle('totalDays', 50, 'center')} onClick={() => toggleSort('totalDays')}>
-                Total {sortKey === 'totalDays' && (sortDir === 'asc' ? '▲' : '▼')}
+                {t('attendance.dashboard.columns.total')} {sortKey === 'totalDays' && (sortDir === 'asc' ? '▲' : '▼')}
               </span>
               <span style={headerColStyle('trend', 60)} onClick={() => toggleSort('trend')}>
-                Trend {sortKey === 'trend' && (sortDir === 'asc' ? '▲' : '▼')}
+                {t('attendance.dashboard.columns.trend')} {sortKey === 'trend' && (sortDir === 'asc' ? '▲' : '▼')}
               </span>
             </div>
             {/* Rows */}
@@ -870,8 +907,8 @@ function AlertsTableV2({
                   >
                     {alert.attendanceRate.toFixed(1)}%
                   </span>
-                  <span className="text-2xs text-[rgb(var(--text-tertiary))] text-center" style={{ width: 50 }}>{alert.absentDays}</span>
-                  <span className="text-2xs text-[rgb(var(--text-disabled))] text-center" style={{ width: 50 }}>{alert.totalDays}</span>
+                  <span className="text-2xs text-[rgb(var(--text-tertiary))] text-center" style={{ width: 50 }}>{formatNumber(alert.absentDays)}</span>
+                  <span className="text-2xs text-[rgb(var(--text-disabled))] text-center" style={{ width: 50 }}>{formatNumber(alert.totalDays)}</span>
                   <span
                     // allow-presentation-style: trend direction color
                     className="text-3xs text-right"
@@ -896,6 +933,7 @@ export function AttendanceDashboard({
   academicYearId,
   currentDate,
 }: AttendanceDashboardProps) {
+  const { t, formatNumber } = useAcademicsI18n()
   // Student drill-down modal state
   const [selectedStudent, setSelectedStudent] = useState<{
     studentId: string
@@ -943,8 +981,8 @@ export function AttendanceDashboard({
     return (
       <div className={`${CARD} p-6 text-center`}>
         <AlertTriangle className="text-[rgb(var(--state-danger-fg))] mx-auto mb-2" style={{ width: 20, height: 20 }} />
-        <p className="text-sm font-medium text-[rgb(var(--state-danger-fg))] mb-1">Failed to load attendance overview</p>
-        <p className="text-2xs text-[rgb(var(--text-tertiary))]">Please try refreshing the page. If the issue persists, contact support.</p>
+        <p className="text-sm font-medium text-[rgb(var(--state-danger-fg))] mb-1">{t('attendance.dashboard.loadFailed')}</p>
+        <p className="text-2xs text-[rgb(var(--text-tertiary))]">{t('attendance.dashboard.loadFailedDescription')}</p>
       </div>
     )
   }
@@ -954,7 +992,7 @@ export function AttendanceDashboard({
       {/* SCOPE INDICATOR */}
       {!isSchoolWide && summary && (
         <div className="inline-flex items-center gap-1.5 px-2.5 py-1 text-3xs font-medium rounded-[20px] bg-[rgb(var(--state-info-bg))] text-[rgb(var(--state-info-fg))]">
-          Showing data for your sections ({summary.totalStudents} students)
+          {t('attendance.dashboard.scopeSections', { count: formatNumber(summary.totalStudents) })}
         </div>
       )}
 

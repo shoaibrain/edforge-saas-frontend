@@ -8,6 +8,7 @@
 
 import type { AttendanceStatus } from '../../services/academics.service'
 import { ATTENDANCE_STATUS_META, TONE_CLASSES } from './attendanceStatus'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 interface StatusBadgeProps {
   status: AttendanceStatus
@@ -15,17 +16,20 @@ interface StatusBadgeProps {
 }
 
 export function StatusBadge({ status, variant = 'full' }: StatusBadgeProps) {
+  const { attendanceStatusLabel, attendanceStatusShortLabel } = useAcademicsI18n()
   const meta = ATTENDANCE_STATUS_META[status]
   if (!meta) return null
   const tone = TONE_CLASSES[meta.tone]
+  const label = attendanceStatusLabel(status)
+  const shortLabel = attendanceStatusShortLabel(status, meta.shortLabel)
 
   if (variant === 'compact') {
     return (
       <span
         className={`inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold ${tone.badgeBg} ${tone.fg}`}
-        title={meta.label}
+        title={label}
       >
-        {meta.shortLabel}
+        {shortLabel}
       </span>
     )
   }
@@ -35,7 +39,7 @@ export function StatusBadge({ status, variant = 'full' }: StatusBadgeProps) {
       className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${tone.badgeBg} ${tone.fg}`}
     >
       <span className={`w-1.5 h-1.5 rounded-full ${tone.dot}`} />
-      {meta.label}
+      {label}
     </span>
   )
 }

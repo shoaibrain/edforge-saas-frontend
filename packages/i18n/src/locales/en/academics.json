@@ -214,6 +214,248 @@
     "filterAriaLabel": "{{title}} filter",
     "clearFilter": "Clear filter"
   },
+  "attendance": {
+    "title": "Attendance",
+    "subtitle": "Record and review attendance by class section · {{year}}",
+    "academicYearFallback": "Academic Year",
+    "lastUpdated": "Last updated: {{time}}",
+    "tabs": {
+      "overview": "Overview",
+      "dailyEntry": "Daily Entry",
+      "iemisExport": "IEMiS Export",
+      "aria": "Attendance tabs"
+    },
+    "status": {
+      "present": { "label": "Present", "short": "P" },
+      "absent": { "label": "Absent", "short": "A" },
+      "late": { "label": "Tardy", "short": "T" },
+      "excused": { "label": "Excused", "short": "E" },
+      "remote": { "label": "Remote", "short": "R" },
+      "half_day": { "label": "Half Day", "short": "H" },
+      "early_departure": { "label": "Early Dep.", "short": "ED" }
+    },
+    "dateSelector": {
+      "previousDay": "Previous day",
+      "nextDay": "Next day",
+      "selectDate": "Select date",
+      "today": "Today",
+      "bsSuffix": "BS"
+    },
+    "sectionSelector": {
+      "empty": "No sections assigned. Contact your administrator.",
+      "placeholder": "Select a section...",
+      "fallback": "Section",
+      "completedPrefix": "Recorded"
+    },
+    "calendar": {
+      "nonInstructionalTitle": "Non-Instructional Day",
+      "nonInstructionalFallback": "This is a {{eventType}} day.",
+      "cannotSubmit": "{{description}} Attendance cannot be submitted for this date."
+    },
+    "policy": {
+      "modeLabel": "Attendance mode:",
+      "dailyPresence": "Daily presence",
+      "perSection": "Per-section",
+      "dailyPresenceDescription": "A student present in any section counts present for the day; later sections show them locked.",
+      "perSectionDescription": "Each section is recorded independently.",
+      "dismiss": "Got it",
+      "dismissAria": "Got it, dismiss attendance mode notice"
+    },
+    "notRecorded": {
+      "past": "Attendance was not recorded for this day. Use Edit on a student to backfill a record.",
+      "current": "Attendance has not been recorded for this day yet. Use All Present, then mark exceptions, or mark students individually and save."
+    },
+    "empty": {
+      "selectSectionTitle": "Select a Class Section",
+      "selectSectionDescription": "Choose a section from the dropdown above to record attendance. Use quick actions to mark all present, then adjust individual students.",
+      "noStudentsTitle": "No students in this section",
+      "noStudentsDescription": "Enroll students in this section to start taking attendance.",
+      "noStudentsEnrolledTitle": "No Students Enrolled",
+      "noStudentsEnrolledDescription": "This section has no students enrolled yet. Add students from the People tab.",
+      "noSearchMatches": "No students match your search.",
+      "noDataForDate": "No attendance data for this date",
+      "notRecordedForDate": "Attendance not recorded for this date"
+    },
+    "grid": {
+      "ariaLabel": "Attendance entry grid",
+      "rowAria": "Attendance for {{studentName}}",
+      "statusAria": "Attendance status",
+      "keyboardShortcuts": "Keyboard shortcuts:",
+      "navigate": "Navigate",
+      "name": "Name",
+      "status": "Status",
+      "allMarked": "All {{total}} marked — nicely done",
+      "markedCount": "{{marked}} / {{total}} marked",
+      "coverageTitle": "Coverage = students recorded ÷ enrolled (how much of the roll-call is done). This is different from the attendance rate.",
+      "rateTitle": "Attendance rate = attending students ÷ enrolled.",
+      "coverage": "coverage",
+      "rate": "rate",
+      "ofTotal": "{{recorded}} of {{total}}"
+    },
+    "toolbar": {
+      "search": "Search students...",
+      "searchAria": "Search students by name or number",
+      "clearSearch": "Clear search",
+      "filterAria": "Filter students",
+      "filters": {
+        "all": "All",
+        "unmarked": "Unmarked",
+        "absent": "Absent",
+        "flagged": "Flagged",
+        "locked": "Locked"
+      },
+      "allPresent": "All Present",
+      "allAbsent": "All Absent",
+      "markPresent": "Mark {{count}} Present",
+      "markAbsent": "Mark {{count}} Absent",
+      "clear": "Clear"
+    },
+    "actions": {
+      "saveAttendance": "Save Attendance",
+      "save": "Save",
+      "edit": "Edit",
+      "editFor": "Edit attendance for {{studentName}}",
+      "cancelEdit": "Cancel edit",
+      "markStatus": "Mark {{status}}",
+      "mark": "Mark",
+      "addNoteReason": "Add note or reason",
+      "editNoteReason": "Edit note or reason",
+      "addNoteReasonTitle": "Add note / reason",
+      "editNoteReasonTitle": "Edit note / reason"
+    },
+    "announcements": {
+      "allPresent": "All students marked present",
+      "allAbsent": "All students marked absent",
+      "allCleared": "All entries cleared",
+      "saved": "Attendance saved for {{count}} student",
+      "saved_plural": "Attendance saved for {{count}} students"
+    },
+    "saveStatus": {
+      "saved": "Saved",
+      "saving": "Saving...",
+      "savingEllipsis": "Saving…",
+      "offline": "Offline",
+      "offlineLocal": "Offline — changes saved locally",
+      "error": "Save failed",
+      "errorRetry": "Save failed — will retry"
+    },
+    "row": {
+      "lockedFallback": "Day-presence already recorded",
+      "reason": "Reason",
+      "reasonAria": "Absence reason",
+      "selectReason": "Select reason…",
+      "note": "Note",
+      "noteAria": "Attendance note",
+      "notePlaceholder": "Add a note…"
+    },
+    "summary": {
+      "recorded": "{{recorded}} of {{total}} recorded",
+      "notTakenYet": "Not taken yet",
+      "schoolAverage": "School Average",
+      "sevenDay": "7-day: {{value}}%",
+      "thirtyDay": "30-day: {{value}}%",
+      "coverage": "Coverage"
+    },
+    "dashboard": {
+      "ofTotalRecorded": "{{recorded}} of {{total}} recorded",
+      "ofTotal": "{{count}} of {{total}}",
+      "schoolAverage": "School Average",
+      "sevenDayAvg": "7-day avg:",
+      "thirtyDayAvg": "30-day avg:",
+      "coverage": "Coverage",
+      "coverageTitle": "Coverage = students recorded ÷ enrolled (how much of today's roll-call is done). This is different from the attendance rate, which is how many of the recorded students were present.",
+      "absenceBreakdownTitle": "Today's Absence Breakdown",
+      "noAbsencesYet": "no absences recorded yet",
+      "absences": "{{count}} absence",
+      "absences_plural": "{{count}} absences",
+      "absenceCategories": {
+        "unexcused": "Unexcused",
+        "excused": "Excused",
+        "late": "Late / Tardy",
+        "halfDay": "Half Day",
+        "remote": "Remote"
+      },
+      "dowTitle": "Day-of-Week Pattern",
+      "dowSubtitle": "Average attendance rate by weekday",
+      "dowInsight": "{{minDay}} has the lowest avg attendance ({{minRate}}%). {{maxDay}} is highest.",
+      "daysShort": {
+        "Sunday": "Sun",
+        "Monday": "Mon",
+        "Tuesday": "Tue",
+        "Wednesday": "Wed",
+        "Thursday": "Thu",
+        "Friday": "Fri",
+        "Saturday": "Sat"
+      },
+      "trendTitle": "30-Day Attendance Rate",
+      "trendEmptySubtitle": "No trend data available",
+      "trendEmpty": "No trend data available for the selected period.",
+      "trendSubtitle": "Daily recorded attendance rate trend — {{start}} to {{end}}",
+      "sectionCompletionTitle": "Section Completion",
+      "sectionCompletionSubtitle": "Today's recording status per section",
+      "section": "Section",
+      "enrolledAbbr": "Enr.",
+      "recordedAbbr": "Rec.",
+      "completionStatus": "Status",
+      "completion": {
+        "complete": "Complete",
+        "partial": "Partial",
+        "notStarted": "Not Started"
+      },
+      "periodAveragesTitle": "Period Averages",
+      "periodAveragesSubtitle": "Attendance rates across different time windows",
+      "periods": {
+        "sevenDay": "7-Day",
+        "thirtyDay": "30-Day",
+        "yearly": "Yearly"
+      },
+      "trendDirection": "Attendance is trending {{direction}} over the last 7 days vs. 30-day baseline.",
+      "directions": {
+        "upward": "upward",
+        "downward": "downward"
+      },
+      "alertsTitle": "Attendance Alerts",
+      "alertsSubtitle": "Students below {{threshold}}% attendance rate · sorted by severity",
+      "below": "Below",
+      "thresholdAria": "Low-attendance alert threshold",
+      "showingAtRisk": "Showing {{shown}} of {{total}} at-risk student",
+      "showingAtRisk_plural": "Showing {{shown}} of {{total}} at-risk students",
+      "noBelowThreshold": "No students below the attendance threshold",
+      "columns": {
+        "student": "Student",
+        "rate": "Rate",
+        "absent": "Absent",
+        "total": "Total",
+        "trend": "Trend"
+      },
+      "trends": {
+        "improving": "↑ Improving",
+        "declining": "↓ Declining",
+        "stable": "— Stable"
+      },
+      "scopeSections": "Showing data for your sections ({{count}} students)",
+      "loadFailed": "Failed to load attendance overview",
+      "loadFailedDescription": "Please try refreshing the page. If the issue persists, contact support."
+    },
+    "modal": {
+      "trendTitle": "Trend over the window (recent vs earlier)",
+      "trends": {
+        "improving": "Improving",
+        "declining": "Declining",
+        "stable": "Stable"
+      },
+      "last30Days": "Last 30 Days",
+      "noRecord": "No record",
+      "total": "Total",
+      "rate": "Rate",
+      "recentRecords": "Recent Records",
+      "noRecords": "No attendance records found.",
+      "date": "Date",
+      "status": "Status",
+      "notes": "Notes",
+      "close": "Close"
+    }
+  },
   "common": {
     "actions": "Actions",
     "active": "Active",
