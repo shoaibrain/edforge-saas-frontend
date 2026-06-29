@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import { UuidBadge } from '@edforge/archetype'
 import { useStudentGrades } from '../../hooks/useGrades'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 // ============================================================================
 // TYPES
@@ -54,6 +55,7 @@ export function StudentGradesView({
   academicYearId,
   termId,
 }: StudentGradesViewProps) {
+  const { t, formatNumber } = useAcademicsI18n()
   const { data, isLoading } = useStudentGrades(
     studentId,
     { academicYearId, termId },
@@ -83,10 +85,10 @@ export function StudentGradesView({
       <div className="py-12 text-center">
         <GraduationCap className="w-10 h-10 mx-auto text-text-tertiary mb-3" />
         <h4 className="text-sm font-medium text-text-primary mb-1">
-          No grades recorded
+          {t('gradesModule.reportCard.noGradesTitle')}
         </h4>
         <p className="text-xs text-text-tertiary max-w-xs mx-auto">
-          Grades will appear here once they are recorded by teachers.
+          {t('gradesModule.reportCard.noGradesDescription')}
         </p>
       </div>
     )
@@ -98,21 +100,21 @@ export function StudentGradesView({
       {gpa && (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="bg-surface-secondary rounded-xl border border-border-secondary p-4 text-center">
-            <p className="text-xs text-text-tertiary mb-1">Term GPA</p>
+            <p className="text-xs text-text-tertiary mb-1">{t('gradesModule.reportCard.termGpa')}</p>
             <p className={`text-2xl font-bold ${gpa.termGpa != null ? getGpaBadge(gpa.termGpa).text : 'text-text-tertiary'}`}>
-              {gpa.termGpa != null ? gpa.termGpa.toFixed(2) : '—'}
+              {gpa.termGpa != null ? formatNumber(Number(gpa.termGpa.toFixed(2))) : '—'}
             </p>
           </div>
           <div className="bg-surface-secondary rounded-xl border border-border-secondary p-4 text-center">
-            <p className="text-xs text-text-tertiary mb-1">Cumulative GPA</p>
+            <p className="text-xs text-text-tertiary mb-1">{t('gradesModule.reportCard.cumulativeGpa')}</p>
             <p className={`text-2xl font-bold ${gpa.cumulativeGpa != null ? getGpaBadge(gpa.cumulativeGpa).text : 'text-text-tertiary'}`}>
-              {gpa.cumulativeGpa != null ? gpa.cumulativeGpa.toFixed(2) : '—'}
+              {gpa.cumulativeGpa != null ? formatNumber(Number(gpa.cumulativeGpa.toFixed(2))) : '—'}
             </p>
           </div>
           <div className="bg-surface-secondary rounded-xl border border-border-secondary p-4 text-center">
-            <p className="text-xs text-text-tertiary mb-1">Weighted GPA</p>
+            <p className="text-xs text-text-tertiary mb-1">{t('gradesModule.reportCard.weightedGpa')}</p>
             <p className={`text-2xl font-bold ${gpa.weightedGpa != null ? getGpaBadge(gpa.weightedGpa).text : 'text-text-tertiary'}`}>
-              {gpa.weightedGpa != null ? gpa.weightedGpa.toFixed(2) : '—'}
+              {gpa.weightedGpa != null ? formatNumber(Number(gpa.weightedGpa.toFixed(2))) : '—'}
             </p>
           </div>
         </div>
@@ -123,11 +125,11 @@ export function StudentGradesView({
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-surface-secondary">
-              <th className="px-4 py-3 text-left font-semibold text-text-primary">Course</th>
-              <th className="px-4 py-3 text-center font-medium text-text-secondary">Numeric</th>
-              <th className="px-4 py-3 text-center font-medium text-text-secondary">Letter</th>
-              <th className="px-4 py-3 text-center font-medium text-text-secondary">GPA Points</th>
-              <th className="px-4 py-3 text-center font-medium text-text-secondary">Status</th>
+              <th className="px-4 py-3 text-left font-semibold text-text-primary">{t('gradesModule.reportCard.course')}</th>
+              <th className="px-4 py-3 text-center font-medium text-text-secondary">{t('gradesModule.reportCard.numeric')}</th>
+              <th className="px-4 py-3 text-center font-medium text-text-secondary">{t('gradesModule.reportCard.letter')}</th>
+              <th className="px-4 py-3 text-center font-medium text-text-secondary">{t('gradesModule.reportCard.gpaPoints')}</th>
+              <th className="px-4 py-3 text-center font-medium text-text-secondary">{t('gradesModule.reportCard.status')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border-secondary">
@@ -143,7 +145,7 @@ export function StudentGradesView({
                 </td>
                 <td className="px-4 py-3 text-center">
                   <span className="font-semibold text-text-primary">
-                    {grade.numericGrade != null ? `${grade.numericGrade.toFixed(1)}%` : '—'}
+                    {grade.numericGrade != null ? `${formatNumber(Number(grade.numericGrade.toFixed(1)))}%` : '—'}
                   </span>
                 </td>
                 <td className="px-4 py-3 text-center">
@@ -156,17 +158,17 @@ export function StudentGradesView({
                   )}
                 </td>
                 <td className="px-4 py-3 text-center text-text-secondary">
-                  {grade.gpaPoints != null ? grade.gpaPoints.toFixed(1) : '—'}
+                  {grade.gpaPoints != null ? formatNumber(Number(grade.gpaPoints.toFixed(1))) : '—'}
                 </td>
                 <td className="px-4 py-3 text-center">
                   {grade.isFinal ? (
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium text-[rgb(var(--state-success-fg))] bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-fg)/0.2)]  rounded-full">
                       <Lock className="w-3 h-3" />
-                      Final
+                      {t('gradesModule.reportCard.final')}
                     </span>
                   ) : (
                     <span className="px-2 py-0.5 text-xs font-medium text-amber-700 bg-[rgb(var(--state-warning-bg)/0.18)] dark:bg-[rgb(var(--state-warning-fg))]/20 dark:text-amber-400 rounded-full">
-                      In Progress
+                      {t('gradesModule.reportCard.inProgress')}
                     </span>
                   )}
                 </td>

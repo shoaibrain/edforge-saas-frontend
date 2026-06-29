@@ -1308,6 +1308,46 @@
       "findings_plural": "आयातबाट {{count}} findings"
     }
   },
+  "gradesModule": {
+    "reportCard": {
+      "noStudentTitle": "विद्यार्थी चयन गरिएको छैन",
+      "noStudentDescription": "ग्रेड हेर्न विद्यार्थी प्रोफाइलमा गएर \"रिपोर्ट कार्ड हेर्नुहोस्\" क्लिक गर्नुहोस्।",
+      "goToStudents": "विद्यार्थीहरूमा जानुहोस्",
+      "setAcademicYear": "रिपोर्ट कार्ड बनाउनुअघि शैक्षिक वर्ष सेटअप गर्नुहोस्।",
+      "title": "रिपोर्ट कार्ड",
+      "printTitle": "विद्यार्थी रिपोर्ट कार्ड",
+      "student": "विद्यार्थी:",
+      "date": "मिति:",
+      "academicYearFallback": "शैक्षिक वर्ष",
+      "termFallback": "सत्र",
+      "allTerms": "सबै सत्रहरू",
+      "print": "प्रिन्ट",
+      "noGradesTitle": "ग्रेड रेकर्ड गरिएको छैन",
+      "noGradesDescription": "शिक्षकहरूले रेकर्ड गरेपछि ग्रेडहरू यहाँ देखिनेछन्।",
+      "termGpa": "सत्र GPA",
+      "cumulativeGpa": "संचित GPA",
+      "weightedGpa": "भारित GPA",
+      "course": "पाठ्यक्रम",
+      "assignments": "असाइनमेन्टहरू",
+      "numeric": "संख्यात्मक",
+      "letter": "अक्षर",
+      "gpaPoints": "GPA अङ्क",
+      "status": "स्थिति",
+      "final": "अन्तिम",
+      "inProgress": "प्रगतिमा",
+      "generated": "{{dateTime}} मा सिर्जना गरिएको - EdForge Student Information System"
+    },
+    "gradebook": {
+      "noStudentsTitle": "विद्यार्थी भर्ना छैन",
+      "noStudentsDescription": "ग्रेड रेकर्ड गर्न यो सेक्सनमा विद्यार्थी भर्ना गर्नुहोस्।",
+      "student": "विद्यार्थी",
+      "addAssignment": "असाइनमेन्ट थप्नुहोस्",
+      "overall": "समग्र",
+      "pointsShort": "{{points}} अङ्क",
+      "gradeFinalized": "ग्रेड अन्तिम भयो",
+      "viewReportCard": "रिपोर्ट कार्ड हेर्नुहोस्"
+    }
+  },
   "iemisExport": {
     "title": "IEMiS मासिक निर्यात",
     "description": "क्यालेन्डर महिनाका लागि IEMiS Flash II मासिक उपस्थिति सारांश बनाउनुहोस्। निर्यातले प्रति-विद्यार्थी उपस्थित / अनुपस्थित / अनुमति सहित अनुपस्थित दिनहरू पुन: गणना गर्छ र CSV डाउनलोड गर्न दिन्छ। ग्रेड विद्यालयको स्थानीय ग्रेड स्तर हो।",

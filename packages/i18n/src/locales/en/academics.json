@@ -1308,6 +1308,46 @@
       "findings_plural": "{{count}} findings from import"
     }
   },
+  "gradesModule": {
+    "reportCard": {
+      "noStudentTitle": "No Student Selected",
+      "noStudentDescription": "Navigate to a student profile and click \"View Report Card\" to see their grades.",
+      "goToStudents": "Go to Students",
+      "setAcademicYear": "Set up an academic year before generating report cards.",
+      "title": "Report Card",
+      "printTitle": "Student Report Card",
+      "student": "Student:",
+      "date": "Date:",
+      "academicYearFallback": "Academic Year",
+      "termFallback": "Term",
+      "allTerms": "All Terms",
+      "print": "Print",
+      "noGradesTitle": "No grades recorded",
+      "noGradesDescription": "Grades will appear here once they are recorded by teachers.",
+      "termGpa": "Term GPA",
+      "cumulativeGpa": "Cumulative GPA",
+      "weightedGpa": "Weighted GPA",
+      "course": "Course",
+      "assignments": "Assignments",
+      "numeric": "Numeric",
+      "letter": "Letter",
+      "gpaPoints": "GPA Points",
+      "status": "Status",
+      "final": "Final",
+      "inProgress": "In Progress",
+      "generated": "Generated on {{dateTime}} - EdForge Student Information System"
+    },
+    "gradebook": {
+      "noStudentsTitle": "No students enrolled",
+      "noStudentsDescription": "Enroll students in this section to begin recording grades.",
+      "student": "Student",
+      "addAssignment": "Add assignment",
+      "overall": "Overall",
+      "pointsShort": "{{points}} pts",
+      "gradeFinalized": "Grade finalized",
+      "viewReportCard": "View Report Card"
+    }
+  },
   "iemisExport": {
     "title": "IEMiS Monthly Export",
     "description": "Generate the IEMiS Flash II monthly attendance roll-up for a calendar month. The export recomputes per-student present / absent / excused day counts and lets you download a CSV. Grade is the school-local grade level.",
