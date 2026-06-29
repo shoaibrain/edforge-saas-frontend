@@ -10,6 +10,7 @@ import { V2AlertItem } from "@edforge/ui";
 import { useCurrency } from "@edforge/types/use-currency";
 import { useTranslation } from "@edforge/i18n";
 import { useFinanceSettings } from "../../layouts/FinanceLayout";
+import { localizeAgingBucketLabel } from "./aging-i18n";
 
 interface OverdueAlertBannerProps {
   overdue: number;
@@ -42,7 +43,7 @@ export function OverdueAlertBanner({
   const agingLabel = largestBucket
     ? t("overview.alert.agingBucket", {
         count: largestBucket.count,
-        bucket: largestBucket.label,
+        bucket: localizeAgingBucketLabel(largestBucket, t),
       })
     : "";
 

@@ -9,6 +9,7 @@
 import { useMemo, useState } from 'react'
 import { ChevronDown, Users, FileText, Calendar, Shield, AlertTriangle, Loader2, Info, UserPlus, AlertCircle } from 'lucide-react'
 import type { UseQueryResult } from '@tanstack/react-query'
+import { useTranslation } from '@edforge/i18n'
 import { useCurrency } from '@edforge/types/use-currency'
 import { useFinanceSettings } from '../../../layouts/FinanceLayout'
 import { computeBatch } from './compute'
@@ -21,6 +22,8 @@ import type {
   WizardDetails,
 } from './types'
 import type { BulkPreviewResponse } from '@edforge/finance-services'
+
+type Translate = (key: string, options?: Record<string, unknown>) => string
 
 export interface Step4ReviewProps {
   students: StudentSearchResult[]
@@ -40,6 +43,7 @@ export function Step4Review({
   details,
   previewQuery,
 }: Step4ReviewProps) {
+  const { t } = useTranslation('payments')
   const settings = useFinanceSettings()
   const { format: formatCurrency } = useCurrency(settings)
   const batch = useMemo(
@@ -62,11 +66,13 @@ export function Step4Review({
     <div className="grid grid-cols-1 lg:grid-cols-[1fr,300px] gap-6">
       <div className="space-y-4">
         <p className="text-sm text-[rgb(var(--text-secondary))]">
-          Verify everything below. {billableRows.length} invoice
-          {billableRows.length === 1 ? '' : 's'} will be generated
+          {t('bulkGenerate.step4.verifyIntro', { count: billableRows.length })}
           {skippedZero > 0 && details.skipZeroTotal && (
             <span className="text-[rgb(var(--text-tertiary))]">
-              {' '}({skippedZero} skipped — zero total)
+              {' '}
+              {t('bulkGenerate.step4.skippedZeroParenthetical', {
+                count: skippedZero,
+              })}
             </span>
           )}
           .
@@ -74,10 +80,23 @@ export function Step4Review({
 
         {/* Summary card */}
         <div className="border border-[rgb(var(--border-primary))] rounded-md bg-[rgb(var(--background-primary))]">
-          <SummaryRow icon={Users} label="Recipients">
-            {students.length} students · {grades.length} grade{grades.length === 1 ? '' : 's'}
+          <SummaryRow icon={Users} label={t('bulkGenerate.step4.recipients')}>
+            {t('bulkGenerate.step4.recipientSummary', {
+              studentCount: students.length,
+              studentLabel: t(
+                students.length === 1
+                  ? 'bulkGenerate.common.student'
+                  : 'bulkGenerate.common.student_plural',
+              ),
+              gradeCount: grades.length,
+              gradeLabel: t(
+                grades.length === 1
+                  ? 'bulkGenerate.common.grade'
+                  : 'bulkGenerate.common.grade_plural',
+              ),
+            })}
           </SummaryRow>
-          <SummaryRow icon={FileText} label="Fee structures">
+          <SummaryRow icon={FileText} label={t('bulkGenerate.step4.feeStructures')}>
             <div className="space-y-1">
               {selectedFeeObjs.map(f => (
                 <div key={f.id} className="flex justify-between gap-3 text-xs">
@@ -90,7 +109,7 @@ export function Step4Review({
               {customLines.filter(l => l.name || l.amount).map(cl => (
                 <div key={cl.id} className="flex justify-between gap-3 text-xs">
                   <span className="text-[rgb(var(--text-primary))]">
-                    {cl.name || 'Custom line item'}
+                    {cl.name || t('bulkGenerate.step2.customLineFallback')}
                   </span>
                   <span className="text-[rgb(var(--text-tertiary))] font-mono whitespace-nowrap">
                     {formatCurrency(Number(cl.amount) || 0)}
@@ -98,15 +117,20 @@ export function Step4Review({
                 </div>
               ))}
               {selectedFeeObjs.length === 0 && customCount === 0 && (
-                <span className="text-xs text-[rgb(var(--text-tertiary))]">No fees selected.</span>
+                <span className="text-xs text-[rgb(var(--text-tertiary))]">
+                  {t('bulkGenerate.step4.noFeesSelected')}
+                </span>
               )}
             </div>
           </SummaryRow>
-          <SummaryRow icon={Calendar} label="Period">
+          <SummaryRow icon={Calendar} label={t('bulkGenerate.step4.period')}>
             <div>
               {details.billingPeriod || '—'} · {details.academicYear}
               <div className="text-[11px] text-[rgb(var(--text-tertiary))] font-mono whitespace-nowrap mt-0.5">
-                Issue {details.issueDate || '—'} · Due {details.dueDate || '—'}
+                {t('bulkGenerate.step4.issueDue', {
+                  issueDate: details.issueDate || '—',
+                  dueDate: details.dueDate || '—',
+                })}
               </div>
             </div>
           </SummaryRow>
@@ -117,10 +141,10 @@ export function Step4Review({
           <div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-[11px] font-semibold uppercase tracking-wider text-[rgb(var(--text-secondary))]">
-                Per-student preview
+                {t('bulkGenerate.step4.perStudentPreview')}
               </span>
               <span className="text-[11px] text-[rgb(var(--text-tertiary))]">
-                tap a row to expand
+                {t('bulkGenerate.step4.tapToExpand')}
               </span>
             </div>
             <div className="space-y-1.5">
@@ -129,7 +153,8 @@ export function Step4Review({
               ))}
               {billableRows.length === 0 && (
                 <div className="text-center py-6 text-sm text-[rgb(var(--text-tertiary))] border border-dashed border-[rgb(var(--border-primary))] rounded-md">
-                  No billable students. {skippedZero > 0 && 'All projected totals are 0.'}
+                  {t('bulkGenerate.step4.noBillableStudents')}
+                  {skippedZero > 0 && ` ${t('bulkGenerate.step4.allProjectedZero')}`}
                 </div>
               )}
             </div>
@@ -140,15 +165,15 @@ export function Step4Review({
       {/* Grand total + preview banner */}
       <aside className="space-y-3">
         <div className="p-4 rounded-md border border-[rgb(var(--accent-strong))] bg-[rgb(var(--accent-soft))]/30 space-y-3">
-          <Row label="Invoices" value={billableRows.length} bold />
+          <Row label={t('bulkGenerate.step4.invoices')} value={billableRows.length} bold />
           <Row
-            label="Avg / student"
+            label={t('bulkGenerate.step4.avgPerStudent')}
             value={formatCurrency(billableRows.length ? batch.billableTotal / billableRows.length : 0)}
             mono
           />
           <hr className="border-[rgb(var(--accent-strong))]/30" />
           <Row
-            label="Grand total"
+            label={t('bulkGenerate.step4.grandTotal')}
             value={formatCurrency(batch.billableTotal)}
             mono
             big
@@ -159,10 +184,7 @@ export function Step4Review({
 
         <div className="flex items-start gap-2 p-3 rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-[11px] text-[rgb(var(--text-secondary))] leading-relaxed">
           <Shield className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))] flex-shrink-0 mt-0.5" />
-          <span>
-            Posts to the General Ledger on issue. Notifications send per
-            guardian channel preferences.
-          </span>
+          <span>{t('bulkGenerate.step4.postingNotice')}</span>
         </div>
       </aside>
     </div>
@@ -178,10 +200,12 @@ function BulkPreviewBanner({
 }: {
   previewQuery: UseQueryResult<BulkPreviewResponse>
 }) {
+  const { t } = useTranslation('payments')
   if (previewQuery.isLoading || previewQuery.isFetching) {
     return (
       <div className="flex items-center gap-2 p-3 rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-xs text-[rgb(var(--text-tertiary))]">
-        <Loader2 className="w-3.5 h-3.5 animate-spin" /> Resolving server preview…
+        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+        {t('bulkGenerate.step4.resolvingServerPreview')}
       </div>
     )
   }
@@ -189,10 +213,7 @@ function BulkPreviewBanner({
     return (
       <div className="flex items-start gap-2 p-3 rounded-md border border-amber-200 bg-amber-50 dark:bg-amber-950/30 text-xs text-amber-800 dark:text-amber-200">
         <AlertCircle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
-        <span>
-          Server preview unavailable — generate will still work, but duplicate /
-          segment counts won&apos;t be shown.
-        </span>
+        <span>{t('bulkGenerate.step4.serverPreviewUnavailable')}</span>
       </div>
     )
   }
@@ -200,25 +221,29 @@ function BulkPreviewBanner({
   if (!data) return null
   return (
     <div className="p-3 rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] space-y-2 text-xs">
-      <div className="font-semibold text-[rgb(var(--text-secondary))]">Server preview</div>
-      <PreviewRow icon={Info} label="Duplicate skip">
+      <div className="font-semibold text-[rgb(var(--text-secondary))]">
+        {t('bulkGenerate.step4.serverPreview')}
+      </div>
+      <PreviewRow icon={Info} label={t('bulkGenerate.step4.duplicateSkip')}>
         {data.duplicateCount > 0 ? (
           <span className="text-amber-700 dark:text-amber-200">{data.duplicateCount}</span>
         ) : (
           <span className="text-[rgb(var(--text-tertiary))]">0</span>
         )}
       </PreviewRow>
-      <PreviewRow icon={AlertTriangle} label="Has balance due">
+      <PreviewRow icon={AlertTriangle} label={t('bulkGenerate.step4.hasBalanceDue')}>
         {fmtCounter(data.studentsWithBalance)}
       </PreviewRow>
-      <PreviewRow icon={UserPlus} label="New admissions">
+      <PreviewRow icon={UserPlus} label={t('bulkGenerate.step4.newAdmissions')}>
         {fmtCounter(data.studentsNewAdmission)}
       </PreviewRow>
-      <PreviewRow icon={Info} label="Not billed this period">
+      <PreviewRow icon={Info} label={t('bulkGenerate.step4.notBilledThisPeriod')}>
         {fmtCounter(data.studentsNotBilledThisPeriod)}
       </PreviewRow>
       <div className="text-[10px] text-[rgb(var(--text-tertiary))] pt-1 border-t border-[rgb(var(--border-primary))]">
-        Estimated duration ≈ {data.estimatedDurationSec}s
+        {t('bulkGenerate.step4.estimatedDuration', {
+          seconds: data.estimatedDurationSec,
+        })}
       </div>
     </div>
   )
@@ -234,6 +259,7 @@ function fmtCounter(n: number | undefined): React.ReactNode {
 // ---------------------------------------------------------------------------
 
 function PerStudentRow({ inv }: { inv: ComputedInvoice }) {
+  const { t } = useTranslation('payments')
   const settings = useFinanceSettings()
   const { format: formatCurrency } = useCurrency(settings)
   const [open, setOpen] = useState(false)
@@ -256,7 +282,9 @@ function PerStudentRow({ inv }: { inv: ComputedInvoice }) {
             {inv.studentName}
           </div>
           <div className="text-[11px] text-[rgb(var(--text-tertiary))]">
-            {gradeLabel(inv.gradeLevel)} · {inv.lines.length} line item{inv.lines.length === 1 ? '' : 's'}
+            {gradeLabel(inv.gradeLevel, t)} · {t('bulkGenerate.step4.lineItemCount', {
+              count: inv.lines.length,
+            })}
           </div>
         </div>
         <span className="text-sm font-mono font-semibold text-[rgb(var(--text-primary))] whitespace-nowrap">
@@ -275,7 +303,7 @@ function PerStudentRow({ inv }: { inv: ComputedInvoice }) {
                   {line.name}
                   {line.isCustom && (
                     <span className="ml-1.5 text-[10px] px-1 py-0 rounded bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-tertiary))]">
-                      custom
+                      {t('bulkGenerate.step4.customBadge')}
                     </span>
                   )}
                 </td>
@@ -291,7 +319,7 @@ function PerStudentRow({ inv }: { inv: ComputedInvoice }) {
             ))}
             <tr className="border-t border-[rgb(var(--border-primary))]">
               <td className="px-3 py-1.5 font-semibold text-[rgb(var(--text-primary))]">
-                Invoice total
+                {t('bulkGenerate.step4.invoiceTotal')}
               </td>
               <td className="px-3 py-1.5 text-right font-mono font-semibold text-[rgb(var(--text-primary))]">
                 {formatCurrency(inv.total)}
@@ -382,7 +410,7 @@ function PreviewRow({
   )
 }
 
-function gradeLabel(g: string): string {
-  if (!g) return 'Unknown'
-  return /^\d+$/.test(g) ? `Grade ${g}` : g
+function gradeLabel(g: string, t: Translate): string {
+  if (!g) return t('bulkGenerate.common.unknown')
+  return /^\d+$/.test(g) ? t('bulkGenerate.common.gradeLabel', { grade: g }) : g
 }

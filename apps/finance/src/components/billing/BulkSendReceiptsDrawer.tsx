@@ -15,6 +15,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Loader2, Mail, Receipt, X } from 'lucide-react'
 import { toast } from 'sonner'
+import { useTranslation } from '@edforge/i18n'
 import {
   useAsyncBulkJob,
   useBulkSendReceipts,
@@ -22,6 +23,11 @@ import {
 } from '@edforge/finance-services'
 import type { Payment } from '@edforge/types'
 import { AsyncJobProgress } from './AsyncJobProgress'
+import {
+  formatAsyncJobToast,
+  formatChannelLabel,
+  formatKnownSkipReason,
+} from './async-job-i18n'
 
 export interface BulkSendReceiptsDrawerProps {
   open: boolean
@@ -60,6 +66,7 @@ export function BulkSendReceiptsDrawer({
   schoolId,
   onComplete,
 }: BulkSendReceiptsDrawerProps) {
+  const { t } = useTranslation('payments')
   const [channel, setChannel] = useState<BulkSendReceiptDto['channel']>('email')
   const [jobId, setJobId] = useState<string | null>(null)
 
@@ -73,18 +80,19 @@ export function BulkSendReceiptsDrawer({
   useEffect(() => {
     if (!job.data) return
     if (job.data.status === 'succeeded') {
-      const parts: string[] = [`Sent ${job.data.succeeded} receipt${job.data.succeeded === 1 ? '' : 's'}`]
-      if (job.data.skipped > 0) parts.push(`${job.data.skipped} skipped`)
-      if (job.data.failed > 0) parts.push(`${job.data.failed} failed`)
-      if (job.data.failed === 0 && job.data.skipped === 0) toast.success(parts[0])
-      else if (job.data.succeeded === 0)
-        toast.error(`No receipts sent — ${job.data.failed} failed; ${job.data.skipped} skipped`)
-      else toast.error(parts.join(' · '))
+      const result = formatAsyncJobToast(
+        t,
+        'receipts',
+        job.data.succeeded,
+        job.data.skipped,
+        job.data.failed,
+      )
+      toast[result.tone](result.message)
       onComplete()
     } else if (job.data.status === 'failed') {
-      toast.error(job.data.error ?? 'Send-receipts job failed.')
+      toast.error(job.data.error ?? t('asyncJobs.receipts.jobFailed'))
     }
-  }, [job.data, onComplete])
+  }, [job.data, onComplete, t])
 
   const handleClose = () => {
     if (isWorking) return
@@ -103,7 +111,7 @@ export function BulkSendReceiptsDrawer({
       })
       setJobId(ack.jobId)
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to start send-receipts job.')
+      toast.error(err instanceof Error ? err.message : t('asyncJobs.receipts.failedToStart'))
     }
   }
 
@@ -149,10 +157,10 @@ export function BulkSendReceiptsDrawer({
                         id="bulk-send-receipts-title"
                         className="text-lg font-semibold text-[rgb(var(--text-primary))] truncate"
                       >
-                        Send receipts
+                        {t('asyncJobs.receipts.title')}
                       </h2>
                       <p className="text-xs text-[rgb(var(--text-tertiary))] tabular-nums">
-                        {payments.length} payment{payments.length === 1 ? '' : 's'} selected
+                        {t('asyncJobs.common.selected.payments', { count: payments.length })}
                       </p>
                     </div>
                   </div>
@@ -161,7 +169,7 @@ export function BulkSendReceiptsDrawer({
                     onClick={handleClose}
                     disabled={isWorking}
                     className="p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-secondary))] transition-colors flex-shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
-                    aria-label="Close drawer"
+                    aria-label={t('asyncJobs.common.closeDrawer')}
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -169,11 +177,11 @@ export function BulkSendReceiptsDrawer({
 
                 <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
                   {showProgress ? (
-                    <AsyncJobProgress job={job.data} verbingNoun="Sending receipts" />
+                    <AsyncJobProgress job={job.data} verbingNoun={t('asyncJobs.receipts.progress')} />
                   ) : (
                     <section>
                       <label className="block text-sm font-medium text-[rgb(var(--text-primary))] mb-2">
-                        Channel
+                        {t('asyncJobs.common.channel')}
                       </label>
                       <div className="grid grid-cols-3 gap-2">
                         {(['email', 'sms', 'both'] as const).map((c) => (
@@ -187,7 +195,7 @@ export function BulkSendReceiptsDrawer({
                                 : 'bg-[rgb(var(--background-primary))] border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-secondary))]'
                             }`}
                           >
-                            {c === 'email' ? 'Email' : c === 'sms' ? 'SMS' : 'Both'}
+                            {formatChannelLabel(t, c)}
                           </button>
                         ))}
                       </div>
@@ -196,12 +204,11 @@ export function BulkSendReceiptsDrawer({
 
                   <section>
                     <h3 className="text-sm font-medium text-[rgb(var(--text-primary))] mb-2">
-                      Will send ({eligible.length})
+                      {t('asyncJobs.receipts.willSend', { count: eligible.length })}
                     </h3>
                     {eligible.length === 0 ? (
                       <p className="text-sm text-[rgb(var(--text-tertiary))]">
-                        None of the selected payments are eligible — receipts require a completed
-                        payment with a receipt number.
+                        {t('asyncJobs.receipts.noneEligible')}
                       </p>
                     ) : (
                       <ul className="space-y-1 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary)/0.4)] p-2 max-h-40 overflow-y-auto">
@@ -211,7 +218,7 @@ export function BulkSendReceiptsDrawer({
                             className="flex items-center justify-between gap-2 px-2 py-1 text-sm"
                           >
                             <span className="text-[rgb(var(--text-primary))] truncate">
-                              {p.studentName ?? 'Unknown student'}
+                              {p.studentName ?? t('asyncJobs.common.unknownStudent')}
                             </span>
                             <span className="text-xs text-[rgb(var(--text-tertiary))] font-mono flex-shrink-0">
                               {p.receiptNumber}
@@ -225,7 +232,7 @@ export function BulkSendReceiptsDrawer({
                   {skipped.length > 0 && (
                     <section>
                       <h3 className="text-sm font-medium text-[rgb(var(--text-tertiary))] mb-2">
-                        Will skip ({skipped.length})
+                        {t('asyncJobs.common.willSkip', { count: skipped.length })}
                       </h3>
                       <ul className="space-y-1 rounded-lg border border-dashed border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary)/0.2)] p-2 max-h-40 overflow-y-auto">
                         {skipped.map(({ payment, reason }) => (
@@ -234,10 +241,10 @@ export function BulkSendReceiptsDrawer({
                             className="flex items-center justify-between gap-2 px-2 py-1 text-sm"
                           >
                             <span className="text-[rgb(var(--text-secondary))] truncate">
-                              {payment.studentName ?? 'Unknown student'}
+                              {payment.studentName ?? t('asyncJobs.common.unknownStudent')}
                             </span>
                             <span className="text-xs text-[rgb(var(--text-tertiary))] flex-shrink-0">
-                              {reason}
+                              {formatKnownSkipReason(t, reason)}
                             </span>
                           </li>
                         ))}
@@ -253,7 +260,7 @@ export function BulkSendReceiptsDrawer({
                     disabled={isWorking}
                     className="px-4 py-2 text-sm font-medium text-[rgb(var(--text-secondary))] bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] rounded-lg hover:bg-[rgb(var(--background-secondary))] transition-colors disabled:opacity-50"
                   >
-                    {jobId && (job.data?.status === 'succeeded' || job.data?.status === 'failed') ? 'Close' : 'Cancel'}
+                    {jobId && (job.data?.status === 'succeeded' || job.data?.status === 'failed') ? t('actions.close') : t('actions.cancel')}
                   </button>
                   {!jobId && (
                     <button
@@ -265,12 +272,12 @@ export function BulkSendReceiptsDrawer({
                       {start.isPending ? (
                         <>
                           <Loader2 className="w-4 h-4 animate-spin" />
-                          Starting…
+                          {t('asyncJobs.common.starting')}
                         </>
                       ) : (
                         <>
                           <Mail className="w-4 h-4" />
-                          Send {eligible.length}
+                          {t('asyncJobs.receipts.send', { count: eligible.length })}
                         </>
                       )}
                     </button>

@@ -57,6 +57,8 @@ import {
 import { BulkVoidPaymentsDrawer } from '../../../components/billing/BulkVoidPaymentsDrawer'
 import { BulkSendReceiptsDrawer } from '../../../components/billing/BulkSendReceiptsDrawer'
 
+type Translate = (key: string, options?: Record<string, unknown>) => string
+
 // ============================================================================
 // STYLED DIALOG COMPONENTS
 // ============================================================================
@@ -78,6 +80,7 @@ function VoidPaymentDialog({
   onConfirm: (reason: string) => void
   onCancel: () => void
 }) {
+  const { t } = useTranslation('payments')
   const voidSettings = useFinanceSettings()
   const { format: formatAmount } = useCurrency(voidSettings)
   const [reason, setReason] = useState('')
@@ -121,13 +124,14 @@ function VoidPaymentDialog({
               <AlertTriangle className="w-5 h-5 text-[rgb(var(--state-danger-fg))]" />
             </div>
             <h3 id="void-payment-title" className="text-lg font-semibold text-[rgb(var(--text-primary))]">
-              Void Payment
+              {t('paymentsList.voidPayment')}
             </h3>
           </div>
           <button
             onClick={onCancel}
             disabled={isPending}
             className="p-1 rounded-md hover:bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-tertiary))] disabled:opacity-50"
+            aria-label={t('actions.close')}
           >
             <X className="w-4 h-4" />
           </button>
@@ -136,19 +140,19 @@ function VoidPaymentDialog({
         {/* Payment details */}
         <div className="bg-[rgb(var(--background-secondary))] rounded-lg p-3 mb-4 space-y-1.5">
           <div className="flex justify-between text-sm">
-            <span className="text-[rgb(var(--text-secondary))]">Amount</span>
+            <span className="text-[rgb(var(--text-secondary))]">{t('lineItems.amount')}</span>
             <span className="font-medium text-[rgb(var(--text-primary))]">
               {formatAmount(payment.amount)}
             </span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-[rgb(var(--text-secondary))]">Gateway</span>
+            <span className="text-[rgb(var(--text-secondary))]">{t('paymentsList.gateway')}</span>
             <span className="font-medium text-[rgb(var(--text-primary))] capitalize">
-              {payment.gateway.replace('_', ' ')}
+              {formatGatewayForLocale(payment.gateway, t)}
             </span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-[rgb(var(--text-secondary))]">Date</span>
+            <span className="text-[rgb(var(--text-secondary))]">{t('paymentsList.date')}</span>
             <span className="font-medium text-[rgb(var(--text-primary))]">
               {payment.paidAt
                 ? formatDate(payment.paidAt, voidSettings)
@@ -159,7 +163,7 @@ function VoidPaymentDialog({
           </div>
           {payment.receiptNumber && (
             <div className="flex justify-between text-sm">
-              <span className="text-[rgb(var(--text-secondary))]">Receipt #</span>
+              <span className="text-[rgb(var(--text-secondary))]">{t('receipt.receiptNumber')}</span>
               <span className="font-medium text-[rgb(var(--text-primary))]">
                 {payment.receiptNumber}
               </span>
@@ -168,20 +172,19 @@ function VoidPaymentDialog({
         </div>
 
         <p className="text-sm text-[rgb(var(--text-secondary))] mb-4">
-          This will reverse the ledger entry and restore the amount due on the invoice.
-          This action cannot be undone.
+          {t('paymentsList.voidDescription')}
         </p>
 
         {/* Reason input */}
         <div className="mb-6">
           <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
-            Reason for voiding *
+            {t('paymentsList.voidReason')}
           </label>
           <input
             type="text"
             value={reason}
             onChange={(e) => setReason(e.target.value)}
-            placeholder="e.g. Duplicate payment, data entry error"
+            placeholder={t('paymentsList.voidReasonPlaceholder')}
             className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
             autoFocus
           />
@@ -195,7 +198,7 @@ function VoidPaymentDialog({
             disabled={isPending}
             className="flex-1"
           >
-            Cancel
+            {t('actions.cancel')}
           </Button>
           <button
             type="button"
@@ -208,7 +211,7 @@ function VoidPaymentDialog({
             ) : (
               <Ban className="w-4 h-4 inline mr-1.5" />
             )}
-            Void Payment
+            {t('paymentsList.voidPayment')}
           </button>
         </div>
       </motion.div>
@@ -233,6 +236,7 @@ function RefundPaymentDialog({
   onConfirm: (amount: number, reason: string) => void
   onCancel: () => void
 }) {
+  const { t } = useTranslation('payments')
   const refundSettings = useFinanceSettings()
   const { format: formatAmount } = useCurrency(refundSettings)
   const [amount, setAmount] = useState(String(payment.amount))
@@ -271,10 +275,12 @@ function RefundPaymentDialog({
       return
     }
     if (parsed <= 0) {
-      setAmountError('Amount must be greater than 0')
+      setAmountError(t('paymentsList.amountGreaterThanZero'))
     } else if (parsed > maxRefundable) {
       setAmountError(
-        `Exceeds refundable amount (${formatAmount(maxRefundable)})`,
+        t('paymentsList.exceedsRefundable', {
+          amount: formatAmount(maxRefundable),
+        }),
       )
     } else {
       setAmountError('')
@@ -305,12 +311,13 @@ function RefundPaymentDialog({
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <h3 id="refund-payment-title" className="text-lg font-semibold text-[rgb(var(--text-primary))]">
-            Refund Payment
+            {t('paymentsList.refundPayment')}
           </h3>
           <button
             onClick={onCancel}
             disabled={isPending}
             className="p-1 rounded-md hover:bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-tertiary))] disabled:opacity-50"
+            aria-label={t('actions.close')}
           >
             <X className="w-4 h-4" />
           </button>
@@ -319,19 +326,19 @@ function RefundPaymentDialog({
         {/* Payment details */}
         <div className="bg-[rgb(var(--background-secondary))] rounded-lg p-3 mb-4 space-y-1.5">
           <div className="flex justify-between text-sm">
-            <span className="text-[rgb(var(--text-secondary))]">Original amount</span>
+            <span className="text-[rgb(var(--text-secondary))]">{t('paymentsList.originalAmount')}</span>
             <span className="font-medium text-[rgb(var(--text-primary))]">
               {formatAmount(payment.amount)}
             </span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-[rgb(var(--text-secondary))]">Gateway</span>
+            <span className="text-[rgb(var(--text-secondary))]">{t('paymentsList.gateway')}</span>
             <span className="font-medium text-[rgb(var(--text-primary))] capitalize">
-              {payment.gateway.replace('_', ' ')}
+              {formatGatewayForLocale(payment.gateway, t)}
             </span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-[rgb(var(--text-secondary))]">Date</span>
+            <span className="text-[rgb(var(--text-secondary))]">{t('paymentsList.date')}</span>
             <span className="font-medium text-[rgb(var(--text-primary))]">
               {payment.paidAt
                 ? formatDate(payment.paidAt, refundSettings)
@@ -342,14 +349,14 @@ function RefundPaymentDialog({
           </div>
           {totalRefunded > 0 && (
             <div className="flex justify-between text-sm">
-              <span className="text-[rgb(var(--text-secondary))]">Already refunded</span>
+              <span className="text-[rgb(var(--text-secondary))]">{t('paymentsList.alreadyRefunded')}</span>
               <span className="font-medium text-[rgb(var(--state-warning-fg))] ">
                 {formatAmount(totalRefunded)}
               </span>
             </div>
           )}
           <div className="flex justify-between text-sm border-t border-[rgb(var(--border-primary))] pt-1.5 mt-1.5">
-            <span className="text-[rgb(var(--text-secondary))]">Max refundable</span>
+            <span className="text-[rgb(var(--text-secondary))]">{t('paymentsList.maxRefundable')}</span>
             <span className="font-semibold text-[rgb(var(--text-primary))]">
               {formatAmount(maxRefundable)}
             </span>
@@ -360,7 +367,7 @@ function RefundPaymentDialog({
           {/* Amount input */}
           <div>
             <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
-              Refund Amount ({refundSettings.currency}) *
+              {t('paymentsList.refundAmount', { currency: refundSettings.currency })}
             </label>
             <input
               type="number"
@@ -384,13 +391,13 @@ function RefundPaymentDialog({
           {/* Reason input */}
           <div>
             <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
-              Reason *
+              {t('paymentsList.reasonRequired')}
             </label>
             <textarea
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               rows={3}
-              placeholder="Reason for refund..."
+              placeholder={t('paymentsList.refundReasonPlaceholder')}
               className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] resize-none focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
             />
           </div>
@@ -404,7 +411,7 @@ function RefundPaymentDialog({
             disabled={isPending}
             className="flex-1"
           >
-            Cancel
+            {t('actions.cancel')}
           </Button>
           <button
             type="button"
@@ -415,7 +422,9 @@ function RefundPaymentDialog({
             {isPending ? (
               <Loader2 className="w-4 h-4 animate-spin inline mr-1.5" />
             ) : null}
-            Refund{parsedAmount > 0 && parsedAmount < payment.amount ? ' (Partial)' : ''}
+            {parsedAmount > 0 && parsedAmount < payment.amount
+              ? t('paymentsList.refundPartial')
+              : t('paymentsList.refundPayment')}
           </button>
         </div>
       </motion.div>
@@ -494,6 +503,7 @@ function usePaymentColumns(
   voidIsPending: boolean,
   formatAmount: (amount: number, opts?: { decimals?: number }) => string,
 ): ColumnDef<Payment, unknown>[] {
+  const { t } = useTranslation('payments')
   const colSettings = useFinanceSettings()
   // M1.5-FU.3 — used by the View Receipt eye-icon cell below to
   // navigate in-MFE to /finance/payments/$paymentId/receipt instead
@@ -513,7 +523,7 @@ function usePaymentColumns(
       createSelectColumn<Payment>(),
       {
         accessorKey: 'receiptNumber',
-        header: 'Receipt #',
+        header: t('receipt.receiptNumber'),
         cell: ({ row }) => (
           <span className="font-medium text-[rgb(var(--text-primary))]">
             <EntityIdDisplay entity="payment" data={row.original} variant="inline" />
@@ -523,7 +533,7 @@ function usePaymentColumns(
       },
       {
         accessorKey: 'studentName',
-        header: 'Student',
+        header: t('receipt.studentName'),
         cell: ({ row }) => {
           const name = row.original.studentName
           if (!name) return <span className="text-[rgb(var(--text-tertiary))]">—</span>
@@ -544,7 +554,7 @@ function usePaymentColumns(
       },
       {
         accessorKey: 'invoiceNumber',
-        header: 'Invoice #',
+        header: t('invoices.invoiceNumber'),
         cell: ({ row }) => (
           <span className="text-[rgb(var(--text-secondary))]">
             <EntityIdDisplay
@@ -558,7 +568,7 @@ function usePaymentColumns(
       },
       {
         accessorKey: 'amount',
-        header: 'Amount',
+        header: t('lineItems.amount'),
         cell: ({ row }) => (
           <span className="font-medium text-[rgb(var(--text-primary))]">
             {formatAmount(row.original.amount)}
@@ -569,24 +579,24 @@ function usePaymentColumns(
       },
       {
         accessorKey: 'gateway',
-        header: 'Gateway',
+        header: t('paymentsList.gateway'),
         cell: ({ row }) => (
           <span className="text-[rgb(var(--text-secondary))]">
-            {formatGatewayLabel(row.original.gateway)}
+            {formatGatewayForLocale(row.original.gateway, t)}
           </span>
         ),
         enableSorting: false,
       },
       {
         accessorKey: 'status',
-        header: 'Status',
+        header: t('invoices.status'),
         cell: ({ row }) => <FinanceStatusChip status={row.original.status} />,
         meta: { align: 'center' as const },
         enableSorting: false,
       },
       {
         id: 'date',
-        header: 'Date',
+        header: t('paymentsList.date'),
         accessorFn: (row) => row.paidAt ?? row.createdAt,
         cell: ({ row }) => (
           <span className="text-[rgb(var(--text-secondary))]">
@@ -631,7 +641,7 @@ function usePaymentColumns(
                   // Sprint M1.5-FU.7.5 — `title=` removed for the same
                   // reason as ReceiptDownloadIconButton; aria-label
                   // preserves the accessible name.
-                  aria-label="View receipt"
+                  aria-label={t('paymentsList.viewReceipt')}
                 >
                   <Eye className="w-4 h-4" />
                 </button>
@@ -651,7 +661,8 @@ function usePaymentColumns(
                   onClick={() => handleVoidClick(payment)}
                   disabled={voidIsPending}
                   className="p-1.5 rounded-md hover:bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))] dark:hover:bg-[rgb(var(--state-danger-bg)/0.18)] dark:text-[rgb(var(--state-danger-fg))]"
-                  title="Void Payment"
+                  title={t('paymentsList.voidPayment')}
+                  aria-label={t('paymentsList.voidPayment')}
                 >
                   <Ban className="w-4 h-4" />
                 </button>
@@ -662,7 +673,8 @@ function usePaymentColumns(
                 <button
                   onClick={() => handleRefundClick(payment)}
                   className="p-1.5 rounded-md hover:bg-[rgb(var(--state-warning-bg)/0.18)] text-[rgb(var(--state-warning-fg))] dark:hover:bg-[rgb(var(--state-warning-bg)/0.18)] "
-                  title="Refund"
+                  title={t('paymentsList.refundPayment')}
+                  aria-label={t('paymentsList.refundPayment')}
                 >
                   <RotateCcw className="w-4 h-4" />
                 </button>
@@ -672,32 +684,9 @@ function usePaymentColumns(
         },
       }),
     ],
-    [handleVoidClick, handleRefundClick, voidIsPending, formatAmount, colSettings, navigate, activeSchoolId],
+    [handleVoidClick, handleRefundClick, voidIsPending, formatAmount, colSettings, navigate, activeSchoolId, t],
   )
 }
-
-// ============================================================================
-// FILTER OPTIONS
-// ============================================================================
-
-const STATUS_OPTIONS = [
-  { label: 'All Statuses', value: '' },
-  { label: 'Completed', value: 'completed' },
-  { label: 'Failed', value: 'failed' },
-  { label: 'Cancelled', value: 'cancelled' },
-  { label: 'Refunded', value: 'refunded' },
-  { label: 'Pending', value: 'pending' },
-]
-
-const GATEWAY_OPTIONS = [
-  { label: 'All Gateways', value: '' },
-  { label: 'Cash', value: 'cash' },
-  { label: 'Bank Transfer', value: 'bank_transfer' },
-  { label: 'Cheque', value: 'cheque' },
-  { label: 'eSewa', value: 'esewa' },
-  { label: 'Khalti', value: 'khalti' },
-  { label: 'FonePay', value: 'fonepay' },
-]
 
 // Sprint Payments UX cleanup — operator-visible avatar in the student
 // column (matches the Billing Accounts page pattern). DiceBear adventurer
@@ -706,11 +695,23 @@ function getStudentAvatarUrl(seed: string): string {
   return `https://api.dicebear.com/9.x/adventurer/svg?seed=${encodeURIComponent(seed)}&backgroundColor=b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf`
 }
 
+function formatGatewayForLocale(gateway: string, t: Translate): string {
+  const gatewayKey = gateway === 'bank_transfer'
+    ? 'bankTransfer'
+    : gateway === 'connect_ips'
+      ? 'connectips'
+      : gateway
+  return t(`gateway.${gatewayKey}`, {
+    defaultValue: formatGatewayLabel(gateway),
+  })
+}
+
 // ============================================================================
 // MAIN PAGE
 // ============================================================================
 
 export default function PaymentsPage() {
+  const { t } = useTranslation('payments')
   const navigate = useNavigate()
   const schoolId = useAppStore((s) => s.activeSchoolId)
   const settings = useFinanceSettings()
@@ -767,10 +768,10 @@ export default function PaymentsPage() {
         paymentId: voidTarget.id,
         data: { reason },
       })
-      toast.success('Payment voided successfully')
+      toast.success(t('paymentsList.voidSuccess'))
       setVoidTarget(null)
     } catch {
-      toast.error('Failed to void payment')
+      toast.error(t('paymentsList.voidFailed'))
     }
   }
 
@@ -786,10 +787,10 @@ export default function PaymentsPage() {
         paymentId: refundTarget.id,
         data: { amount, reason },
       })
-      toast.success('Refund initiated successfully')
+      toast.success(t('paymentsList.refundSuccess'))
       setRefundTarget(null)
     } catch {
-      toast.error('Failed to create refund')
+      toast.error(t('paymentsList.refundFailed'))
     }
   }
 
@@ -810,25 +811,25 @@ export default function PaymentsPage() {
     () => [
       {
         id: 'void',
-        label: 'Void selected',
+        label: t('paymentsList.voidSelected'),
         icon: <Ban className="w-4 h-4" />,
         tone: 'critical',
         onRun: (rows) => setBulkVoidTarget(rows),
       },
       {
         id: 'send-receipt',
-        label: 'Send receipt',
+        label: t('paymentsList.sendReceipt'),
         icon: <Receipt className="w-4 h-4" />,
         onRun: (rows) => setBulkReceiptTarget(rows),
       },
     ],
-    [],
+    [t],
   )
 
   if (!schoolId) {
     return (
       <div className="p-6 text-center text-sm text-[rgb(var(--text-tertiary))]">
-        Select a school to view payments.
+        {t('paymentsList.selectSchool')}
       </div>
     )
   }
@@ -837,15 +838,15 @@ export default function PaymentsPage() {
     <div className="p-6 space-y-5">
       {/* Header */}
       <FinancePageHeader
-        title="Payments"
-        subtitle="View and manage all payment transactions."
+        title={t('paymentsList.title')}
+        subtitle={t('paymentsList.description')}
         actions={
           <button
             type="button"
             onClick={() => navigate({ to: '/payments/record' })}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
           >
-            Record Payment
+            {t('overview.header.recordPayment')}
           </button>
         }
       />
@@ -854,38 +855,38 @@ export default function PaymentsPage() {
       <WidgetErrorBoundaryV2>
         <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
           <StatCard
-            label="Total Collected"
+            label={t('overview.kpi.collected')}
             value={formatCompact(kpi.totalCollected)}
             icon={DollarSign}
             accentColor="rgba(29, 158, 117, 0.12)"
             iconColor="#1D9E75"
             barColor="#1D9E75"
-            tag={{ text: `${paymentList.length} payments`, color: '#1D9E75', bg: 'rgba(29,158,117,0.10)' }}
+            tag={{ text: t('paymentsList.paymentCount', { count: paymentList.length }), color: '#1D9E75', bg: 'rgba(29,158,117,0.10)' }}
             loading={isLoading}
             valueColor="#1D9E75"
           />
           <StatCard
-            label="Completed"
+            label={t('status.completed')}
             value={String(kpi.completedCount)}
             icon={TrendingUp}
             accentColor="rgba(55, 138, 221, 0.12)"
             iconColor="#378ADD"
             barColor="#378ADD"
-            tag={{ text: 'processed', color: '#378ADD', bg: 'rgba(55,138,221,0.10)' }}
+            tag={{ text: t('paymentsList.processed'), color: '#378ADD', bg: 'rgba(55,138,221,0.10)' }}
             loading={isLoading}
           />
           <StatCard
-            label="Partial Refunds"
+            label={t('paymentsList.partialRefunds')}
             value={String(kpi.partialRefundCount)}
             icon={Receipt}
             accentColor="rgba(239, 159, 39, 0.12)"
             iconColor="#EF9F27"
             barColor="#EF9F27"
-            tag={{ text: 'pending', color: '#EF9F27', bg: 'rgba(239,159,39,0.10)' }}
+            tag={{ text: t('status.pending'), color: '#EF9F27', bg: 'rgba(239,159,39,0.10)' }}
             loading={isLoading}
           />
           <StatCard
-            label="Cancelled"
+            label={t('status.cancelled')}
             value={String(kpi.cancelledCount)}
             icon={AlertTriangle}
             accentColor="rgba(128, 128, 128, 0.12)"
@@ -919,7 +920,7 @@ export default function PaymentsPage() {
         pagination={{ pageSize: 20 }}
         pageSizes={[10, 20, 50]}
         defaultSort={[{ id: 'date', desc: true }]}
-        searchPlaceholder="Search by receipt #, invoice #, or student..."
+        searchPlaceholder={t('paymentsList.searchPlaceholder')}
         toolbarStart={
           <div className="flex items-center gap-2 flex-wrap">
             <Select
@@ -927,14 +928,29 @@ export default function PaymentsPage() {
               className="w-44"
               value={statusFilter}
               onChange={(v) => setStatusFilter(v ?? '')}
-              options={STATUS_OPTIONS}
+              options={[
+                { label: t('filters.allStatuses'), value: '' },
+                { label: t('status.completed'), value: 'completed' },
+                { label: t('status.failed'), value: 'failed' },
+                { label: t('status.cancelled'), value: 'cancelled' },
+                { label: t('status.refunded'), value: 'refunded' },
+                { label: t('status.pending'), value: 'pending' },
+              ]}
             />
             <Select
               size="sm"
               className="w-48"
               value={gatewayFilter}
               onChange={(v) => setGatewayFilter(v ?? '')}
-              options={GATEWAY_OPTIONS}
+              options={[
+                { label: t('paymentsList.allGateways'), value: '' },
+                { label: t('gateway.cash'), value: 'cash' },
+                { label: t('gateway.bankTransfer'), value: 'bank_transfer' },
+                { label: t('gateway.cheque'), value: 'cheque' },
+                { label: t('gateway.esewa'), value: 'esewa' },
+                { label: t('gateway.khalti'), value: 'khalti' },
+                { label: t('gateway.fonepay'), value: 'fonepay' },
+              ]}
             />
             {/* Sprint B.5 — grade filter routes through GSI14 (sparse) */}
             <Select
@@ -951,8 +967,8 @@ export default function PaymentsPage() {
             onClick={() => {
               if (!schoolId) return
               exportCsvMutation.mutate(schoolId, {
-                onSuccess: () => toast.success('Payments CSV exported'),
-                onError: () => toast.error('Failed to export payments CSV'),
+                onSuccess: () => toast.success(t('paymentsList.exportSuccess')),
+                onError: () => toast.error(t('paymentsList.exportFailed')),
               })
             }}
             isExporting={exportCsvMutation.isPending}
@@ -961,10 +977,10 @@ export default function PaymentsPage() {
         bulkActions={paymentBulkActions}
         emptyState={{
           icon: <CreditCard className="w-10 h-10" />,
-          title: 'No payments found',
-          description: 'Payments will appear here once students start paying invoices.',
+          title: t('empty.noPayments'),
+          description: t('empty.noPaymentsDescription'),
           action: {
-            label: 'Record Manual Payment',
+            label: t('paymentsList.recordManualPayment'),
             onClick: () => navigate({ to: '/payments/record' }),
           },
         }}

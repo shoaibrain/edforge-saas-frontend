@@ -22,13 +22,17 @@ import { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { AlertTriangle, Loader2, Pencil, X } from 'lucide-react'
 import { toast } from 'sonner'
+import { useTranslation } from '@edforge/i18n'
 import {
   useAsyncBulkJob,
   useBulkAdjustBalances,
   type BulkAdjustBalanceDto,
 } from '@edforge/finance-services'
 import type { StudentAccount } from '@edforge/types'
+import { useCurrency } from '@edforge/types/use-currency'
+import { useFinanceSettings } from '../../layouts/FinanceLayout'
 import { AsyncJobProgress } from './AsyncJobProgress'
+import { formatAsyncJobToast } from './async-job-i18n'
 
 export interface BulkAdjustBalanceDrawerProps {
   open: boolean
@@ -83,6 +87,9 @@ export function BulkAdjustBalanceDrawer({
   schoolId,
   onComplete,
 }: BulkAdjustBalanceDrawerProps) {
+  const { t } = useTranslation('payments')
+  const settings = useFinanceSettings()
+  const { format } = useCurrency(settings)
   const [form, setForm] = useState<FormState>(INITIAL_FORM)
   const [jobId, setJobId] = useState<string | null>(null)
 
@@ -99,18 +106,19 @@ export function BulkAdjustBalanceDrawer({
   useEffect(() => {
     if (!job.data) return
     if (job.data.status === 'succeeded') {
-      const parts: string[] = [`Adjusted ${job.data.succeeded} account${job.data.succeeded === 1 ? '' : 's'}`]
-      if (job.data.skipped > 0) parts.push(`${job.data.skipped} skipped`)
-      if (job.data.failed > 0) parts.push(`${job.data.failed} failed`)
-      if (job.data.failed === 0 && job.data.skipped === 0) toast.success(parts[0])
-      else if (job.data.succeeded === 0)
-        toast.error(`No adjustments applied — ${job.data.failed} failed; ${job.data.skipped} skipped`)
-      else toast.error(parts.join(' · '))
+      const result = formatAsyncJobToast(
+        t,
+        'adjustments',
+        job.data.succeeded,
+        job.data.skipped,
+        job.data.failed,
+      )
+      toast[result.tone](result.message)
       onComplete()
     } else if (job.data.status === 'failed') {
-      toast.error(job.data.error ?? 'Adjust-balance job failed.')
+      toast.error(job.data.error ?? t('asyncJobs.adjustments.jobFailed'))
     }
-  }, [job.data, onComplete])
+  }, [job.data, onComplete, t])
 
   const handleClose = () => {
     if (isWorking) return
@@ -135,7 +143,7 @@ export function BulkAdjustBalanceDrawer({
       })
       setJobId(ack.jobId)
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to start adjust-balance job.')
+      toast.error(err instanceof Error ? err.message : t('asyncJobs.adjustments.failedToStart'))
     }
   }
 
@@ -188,10 +196,10 @@ export function BulkAdjustBalanceDrawer({
                         id="bulk-adjust-balance-title"
                         className="text-lg font-semibold text-[rgb(var(--text-primary))] truncate"
                       >
-                        Adjust balance
+                        {t('asyncJobs.adjustments.title')}
                       </h2>
                       <p className="text-xs text-[rgb(var(--text-tertiary))] tabular-nums">
-                        {accounts.length} account{accounts.length === 1 ? '' : 's'} selected
+                        {t('asyncJobs.common.selected.accounts', { count: accounts.length })}
                       </p>
                     </div>
                   </div>
@@ -200,7 +208,7 @@ export function BulkAdjustBalanceDrawer({
                     onClick={handleClose}
                     disabled={isWorking}
                     className="p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-secondary))] transition-colors flex-shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
-                    aria-label="Close drawer"
+                    aria-label={t('asyncJobs.common.closeDrawer')}
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -208,7 +216,7 @@ export function BulkAdjustBalanceDrawer({
 
                 <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
                   {showProgress ? (
-                    <AsyncJobProgress job={job.data} verbingNoun="Posting ledger entries" />
+                    <AsyncJobProgress job={job.data} verbingNoun={t('asyncJobs.adjustments.progress')} />
                   ) : (
                     <>
                       <div
@@ -216,30 +224,26 @@ export function BulkAdjustBalanceDrawer({
                         role="alert"
                       >
                         <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                        <span>
-                          The same adjustment is written against every selected account's
-                          ledger. Use the override toggle to skip the sign-threshold guard
-                          (e.g. crediting an already-surplus account).
-                        </span>
+                        <span>{t('asyncJobs.adjustments.warning')}</span>
                       </div>
 
                       <section>
                         <label className="block text-sm font-medium text-[rgb(var(--text-primary))] mb-2">
-                          Type
+                          {t('asyncJobs.adjustments.type')}
                         </label>
                         <div className="grid grid-cols-2 gap-2">
-                          {(['debit', 'credit'] as const).map((t) => (
+                          {(['debit', 'credit'] as const).map((adjustmentType) => (
                             <button
-                              key={t}
+                              key={adjustmentType}
                               type="button"
-                              onClick={() => setForm((f) => ({ ...f, type: t }))}
+                              onClick={() => setForm((f) => ({ ...f, type: adjustmentType }))}
                               className={`px-3 py-2 text-sm font-medium border rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] ${
-                                form.type === t
+                                form.type === adjustmentType
                                   ? 'bg-[rgb(var(--action-primary-bg)/0.12)] border-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-bg))]'
                                   : 'bg-[rgb(var(--background-primary))] border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-secondary))]'
                               }`}
                             >
-                              {t === 'debit' ? 'Debit (increase owed)' : 'Credit (reduce owed)'}
+                              {t(`asyncJobs.adjustments.types.${adjustmentType}`)}
                             </button>
                           ))}
                         </div>
@@ -250,7 +254,7 @@ export function BulkAdjustBalanceDrawer({
                           htmlFor="bulk-adjust-amount"
                           className="block text-sm font-medium text-[rgb(var(--text-primary))] mb-2"
                         >
-                          Amount <span className="text-[rgb(var(--state-danger-fg))]">*</span>
+                          {t('asyncJobs.adjustments.amount')} <span className="text-[rgb(var(--state-danger-fg))]">*</span>
                         </label>
                         <input
                           id="bulk-adjust-amount"
@@ -270,7 +274,7 @@ export function BulkAdjustBalanceDrawer({
                           htmlFor="bulk-adjust-effective-date"
                           className="block text-sm font-medium text-[rgb(var(--text-primary))] mb-2"
                         >
-                          Effective date <span className="text-[rgb(var(--state-danger-fg))]">*</span>
+                          {t('asyncJobs.adjustments.effectiveDate')} <span className="text-[rgb(var(--state-danger-fg))]">*</span>
                         </label>
                         <input
                           id="bulk-adjust-effective-date"
@@ -286,14 +290,14 @@ export function BulkAdjustBalanceDrawer({
                           htmlFor="bulk-adjust-reason"
                           className="block text-sm font-medium text-[rgb(var(--text-primary))] mb-2"
                         >
-                          Reason <span className="text-[rgb(var(--state-danger-fg))]">*</span>
+                          {t('asyncJobs.adjustments.reason')} <span className="text-[rgb(var(--state-danger-fg))]">*</span>
                         </label>
                         <textarea
                           id="bulk-adjust-reason"
                           value={form.reason}
                           onChange={(e) => setForm((f) => ({ ...f, reason: e.target.value }))}
                           rows={3}
-                          placeholder="e.g. Scholarship credit applied at start of term"
+                          placeholder={t('asyncJobs.adjustments.reasonPlaceholder')}
                           className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] resize-none focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
                         />
                       </section>
@@ -306,10 +310,7 @@ export function BulkAdjustBalanceDrawer({
                             onChange={(e) => setForm((f) => ({ ...f, override: e.target.checked }))}
                             className="mt-0.5 rounded border-[rgb(var(--border-primary))] focus:ring-[rgb(var(--border-focus)/0.35)]"
                           />
-                          <span>
-                            Override sign-threshold guard — apply even for accounts where the
-                            adjustment crosses a balance sign boundary.
-                          </span>
+                          <span>{t('asyncJobs.adjustments.override')}</span>
                         </label>
                       </section>
                     </>
@@ -317,7 +318,7 @@ export function BulkAdjustBalanceDrawer({
 
                   <section>
                     <h3 className="text-sm font-medium text-[rgb(var(--text-primary))] mb-2">
-                      Recipients ({accounts.length})
+                      {t('asyncJobs.common.recipients', { count: accounts.length })}
                     </h3>
                     <ul className="space-y-1 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary)/0.4)] p-2 max-h-40 overflow-y-auto">
                       {accounts.map((a) => (
@@ -326,10 +327,10 @@ export function BulkAdjustBalanceDrawer({
                           className="flex items-center justify-between gap-2 px-2 py-1 text-sm"
                         >
                           <span className="text-[rgb(var(--text-primary))] truncate">
-                            {a.studentName ?? 'Unknown student'}
+                            {a.studentName ?? t('asyncJobs.common.unknownStudent')}
                           </span>
                           <span className="text-xs text-[rgb(var(--text-tertiary))] tabular-nums flex-shrink-0">
-                            balance {a.balance ?? 0}
+                            {t('asyncJobs.common.balance', { amount: format(a.balance ?? 0) })}
                           </span>
                         </li>
                       ))}
@@ -344,7 +345,7 @@ export function BulkAdjustBalanceDrawer({
                     disabled={isWorking}
                     className="px-4 py-2 text-sm font-medium text-[rgb(var(--text-secondary))] bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] rounded-lg hover:bg-[rgb(var(--background-secondary))] transition-colors disabled:opacity-50"
                   >
-                    {jobId && (job.data?.status === 'succeeded' || job.data?.status === 'failed') ? 'Close' : 'Cancel'}
+                    {jobId && (job.data?.status === 'succeeded' || job.data?.status === 'failed') ? t('actions.close') : t('actions.cancel')}
                   </button>
                   {!jobId && (
                     <button
@@ -356,12 +357,12 @@ export function BulkAdjustBalanceDrawer({
                       {start.isPending ? (
                         <>
                           <Loader2 className="w-4 h-4 animate-spin" />
-                          Starting…
+                          {t('asyncJobs.common.starting')}
                         </>
                       ) : (
                         <>
                           <Pencil className="w-4 h-4" />
-                          Apply to {accounts.length}
+                          {t('asyncJobs.adjustments.apply', { count: accounts.length })}
                         </>
                       )}
                     </button>

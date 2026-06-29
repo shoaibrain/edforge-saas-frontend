@@ -161,12 +161,6 @@ export interface ComputedBatch {
 // ---------------------------------------------------------------------------
 
 export type WizardStep = 0 | 1 | 2 | 3
-export const WIZARD_STEP_LABELS: ReadonlyArray<string> = [
-  'Select recipients',
-  'Fee structures',
-  'Invoice details',
-  'Review & confirm',
-]
 
 // ---------------------------------------------------------------------------
 // Re-exports — convenience so wizard files import everything from one place.

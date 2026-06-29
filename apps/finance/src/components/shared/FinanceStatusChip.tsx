@@ -7,6 +7,7 @@
  */
 
 import { StatusBadge, type StatusTone } from '@edforge/ui'
+import { useTranslation } from '@edforge/i18n'
 
 export interface FinanceStatusChipProps {
   status: string
@@ -51,9 +52,12 @@ function getStatusLabel(normalized: string, original: string): string {
 }
 
 export function FinanceStatusChip({ status }: FinanceStatusChipProps) {
+  const { t } = useTranslation('payments')
   const normalized = normalizeStatus(status)
   const tone = STATUS_TONE[normalized] ?? 'neutral'
-  const label = getStatusLabel(normalized, status)
+  const label = t(`status.${normalized}`, {
+    defaultValue: getStatusLabel(normalized, status),
+  })
 
   return (
     <StatusBadge tone={tone} dot size="sm" className="capitalize">

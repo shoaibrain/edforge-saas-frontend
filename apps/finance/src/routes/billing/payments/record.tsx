@@ -17,9 +17,10 @@ import {
   FileText,
 } from 'lucide-react'
 import { useSearch } from '@tanstack/react-router'
+import { useTranslation } from '@edforge/i18n'
 import { useAppStore } from '../../../stores/app.store'
 import { useRecordManualPayment, useInvoices } from '@edforge/finance-services'
-import type { Invoice } from '@edforge/types'
+import { formatGatewayLabel, type Invoice } from '@edforge/types'
 import { useCurrency } from '@edforge/types/use-currency'
 import { useFinanceSettings } from '../../../layouts/FinanceLayout'
 import { formatDate } from '../../../utils/format-date'
@@ -52,6 +53,13 @@ function statusLabel(status: string): string {
   return status === 'partially_paid' ? 'partial' : status
 }
 
+type Translate = (key: string, options?: Record<string, unknown>) => string
+
+function formatPaymentMethod(method: string, t: Translate): string {
+  const key = method === 'bank_transfer' ? 'bankTransfer' : method
+  return t(`gateway.${key}`, { defaultValue: formatGatewayLabel(method) })
+}
+
 // ============================================================================
 // STUDENT INVOICE LIST
 // ============================================================================
@@ -67,6 +75,7 @@ function StudentInvoiceList({
   selectedInvoiceId: string
   onSelect: (invoiceId: string, amountDue: number, label: string) => void
 }) {
+  const { t } = useTranslation('payments')
   const listSettings = useFinanceSettings()
   const { format } = useCurrency(listSettings)
   const { data: invoiceData, isLoading } = useInvoices(schoolId, { studentId })
@@ -87,7 +96,9 @@ function StudentInvoiceList({
     return (
       <div className="flex items-center justify-center py-6">
         <Loader2 className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] animate-spin" />
-        <span className="ml-2 text-sm text-[rgb(var(--text-tertiary))]">Loading invoices...</span>
+        <span className="ml-2 text-sm text-[rgb(var(--text-tertiary))]">
+          {t('recordPayment.loadingInvoices')}
+        </span>
       </div>
     )
   }
@@ -97,7 +108,7 @@ function StudentInvoiceList({
       <div className="py-6 text-center">
         <FileText className="w-6 h-6 mx-auto mb-1.5 text-[rgb(var(--text-tertiary))] opacity-40" />
         <p className="text-sm text-[rgb(var(--text-tertiary))]">
-          No unpaid invoices for this student.
+          {t('recordPayment.noUnpaidInvoices')}
         </p>
       </div>
     )
@@ -137,10 +148,16 @@ function StudentInvoiceList({
                 </div>
                 <div className="flex items-center justify-between gap-2 mt-0.5">
                   <span className="text-xs text-[rgb(var(--text-secondary))] truncate">
-                    {invoice.dueDate ? `Due ${formatDate(invoice.dueDate, listSettings)}` : ''}
+                    {invoice.dueDate
+                      ? t('recordPayment.dueDate', {
+                          date: formatDate(invoice.dueDate, listSettings),
+                        })
+                      : ''}
                   </span>
                   <span className={`text-xs px-1.5 py-0.5 rounded-full ${statusBadgeClass(invoice.status)}`}>
-                    {statusLabel(invoice.status)}
+                    {t(`status.${invoice.status}`, {
+                      defaultValue: statusLabel(invoice.status),
+                    })}
                   </span>
                 </div>
               </div>
@@ -157,6 +174,7 @@ function StudentInvoiceList({
 // ============================================================================
 
 export default function RecordPaymentPage() {
+  const { t } = useTranslation('payments')
   const schoolId = useAppStore((s) => s.activeSchoolId)
   const settings = useFinanceSettings()
   const { format: formatCurr } = useCurrency(settings)
@@ -206,15 +224,15 @@ export default function RecordPaymentPage() {
 
   const handleSubmit = async () => {
     if (!invoiceId.trim()) {
-      toast.error('Please select an invoice')
+      toast.error(t('recordPayment.selectInvoiceError'))
       return
     }
     if (parsedAmount <= 0) {
-      toast.error('Please enter a valid amount')
+      toast.error(t('recordPayment.validAmountError'))
       return
     }
     if ((paymentMethod === 'bank_transfer' || paymentMethod === 'cheque') && !referenceNumber.trim()) {
-      toast.error('Reference number is required for bank transfer / cheque')
+      toast.error(t('recordPayment.referenceRequired'))
       return
     }
 
@@ -228,10 +246,10 @@ export default function RecordPaymentPage() {
         notes: notes.trim() || undefined,
         paidDate: paidDate || undefined,
       })
-      toast.success('Payment recorded successfully')
+      toast.success(t('recordPayment.recordSuccess'))
       setSuccess(true)
     } catch {
-      toast.error('Failed to record payment')
+      toast.error(t('recordPayment.recordFailed'))
     }
   }
 
@@ -250,7 +268,7 @@ export default function RecordPaymentPage() {
   if (!schoolId) {
     return (
       <div className="p-6 text-center text-sm text-[rgb(var(--text-tertiary))]">
-        Select a school to record payments.
+        {t('recordPayment.selectSchool')}
       </div>
     )
   }
@@ -262,14 +280,14 @@ export default function RecordPaymentPage() {
         <div className="text-center py-16 space-y-4">
           <CheckCircle2 className="w-16 h-16 mx-auto text-[rgb(var(--state-success-fg))]" />
           <h2 className="text-xl font-semibold text-[rgb(var(--text-primary))]">
-            Payment Recorded
+            {t('recordPayment.successTitle')}
           </h2>
           <p className="text-sm text-[rgb(var(--text-secondary))]">
-            The manual payment has been recorded and the student account has been updated.
+            {t('recordPayment.successDescription')}
           </p>
           <Button onClick={handleRecordAnother}>
             <RotateCcw className="w-4 h-4 mr-1.5" />
-            Record Another Payment
+            {t('recordPayment.recordAnother')}
           </Button>
         </div>
       </div>
@@ -282,10 +300,10 @@ export default function RecordPaymentPage() {
         {/* Header */}
         <div>
           <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">
-            Record Payment
+            {t('recordPayment.title')}
           </h1>
           <p className="text-sm text-[rgb(var(--text-secondary))] mt-0.5">
-            Manually record a cash, bank transfer, or cheque payment.
+            {t('recordPayment.description')}
           </p>
         </div>
 
@@ -294,13 +312,13 @@ export default function RecordPaymentPage() {
           {/* Step 1: Select Student */}
           <div>
             <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
-              Student *
+              {t('recordPayment.studentRequired')}
             </label>
             <StudentSearchInput
               schoolId={schoolId}
               value={selectedStudent}
               onChange={handleStudentChange}
-              placeholder="Search student by name..."
+              placeholder={t('recordPayment.studentSearchPlaceholder')}
             />
           </div>
 
@@ -308,7 +326,7 @@ export default function RecordPaymentPage() {
           {selectedStudent && (
             <div>
               <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
-                Invoice *
+                {t('recordPayment.invoiceRequired')}
               </label>
               <StudentInvoiceList
                 schoolId={schoolId}
@@ -322,13 +340,13 @@ export default function RecordPaymentPage() {
           {/* Payment Method */}
           <div>
             <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-2">
-              Payment Method *
+              {t('recordPayment.paymentMethodRequired')}
             </label>
             <div className="flex gap-3">
               {([
-                { value: 'cash' as const, label: 'Cash' },
-                { value: 'bank_transfer' as const, label: 'Bank Transfer' },
-                { value: 'cheque' as const, label: 'Cheque' },
+                { value: 'cash' as const, label: t('gateway.cash') },
+                { value: 'bank_transfer' as const, label: t('gateway.bankTransfer') },
+                { value: 'cheque' as const, label: t('gateway.cheque') },
               ]).map((method) => (
                 <label
                   key={method.value}
@@ -355,7 +373,7 @@ export default function RecordPaymentPage() {
           {/* Amount */}
           <div>
             <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
-              Amount ({settings.currency}) *
+              {t('recordPayment.amountRequired', { currency: settings.currency })}
             </label>
             <input
               type="number"
@@ -372,13 +390,17 @@ export default function RecordPaymentPage() {
           {(paymentMethod === 'bank_transfer' || paymentMethod === 'cheque') && (
             <div>
               <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
-                Reference # *
+                {t('recordPayment.referenceRequiredLabel')}
               </label>
               <input
                 type="text"
                 value={referenceNumber}
                 onChange={(e) => setReferenceNumber(e.target.value)}
-                placeholder={paymentMethod === 'bank_transfer' ? 'Bank reference number' : 'Cheque number'}
+                placeholder={
+                  paymentMethod === 'bank_transfer'
+                    ? t('recordPayment.bankReferencePlaceholder')
+                    : t('recordPayment.chequeReferencePlaceholder')
+                }
                 className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
               />
             </div>
@@ -387,7 +409,7 @@ export default function RecordPaymentPage() {
           {/* Date Paid */}
           <div>
             <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
-              Date Paid
+              {t('recordPayment.datePaid')}
             </label>
             <input
               type="date"
@@ -400,13 +422,13 @@ export default function RecordPaymentPage() {
           {/* Notes */}
           <div>
             <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
-              Notes
+              {t('invoices.notes')}
             </label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
-              placeholder="Optional notes about this payment..."
+              placeholder={t('recordPayment.notesPlaceholder')}
               className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] resize-none focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
             />
           </div>
@@ -415,36 +437,38 @@ export default function RecordPaymentPage() {
         {/* Preview */}
         {parsedAmount > 0 && (
           <div className="bg-[rgb(var(--background-secondary))] rounded-lg p-4 space-y-2">
-            <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Preview</h3>
+            <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))]">
+              {t('recordPayment.preview')}
+            </h3>
             <div className="space-y-1.5">
               <div className="flex justify-between text-sm text-[rgb(var(--text-secondary))]">
-                <span>Invoice</span>
+                <span>{t('invoices.invoiceNumber')}</span>
                 <span className="font-medium text-[rgb(var(--text-primary))] max-w-[60%] truncate text-right">
                   {invoiceLabel || invoiceId || '--'}
                 </span>
               </div>
               <div className="flex justify-between text-sm text-[rgb(var(--text-secondary))]">
-                <span>Method</span>
+                <span>{t('recordPayment.method')}</span>
                 <span className="font-medium text-[rgb(var(--text-primary))]">
-                  {paymentMethod.replace('_', ' ')}
+                  {formatPaymentMethod(paymentMethod, t)}
                 </span>
               </div>
               {referenceNumber && (
                 <div className="flex justify-between text-sm text-[rgb(var(--text-secondary))]">
-                  <span>Reference #</span>
+                  <span>{t('recordPayment.reference')}</span>
                   <span className="font-medium text-[rgb(var(--text-primary))]">
                     {referenceNumber}
                   </span>
                 </div>
               )}
               <div className="flex justify-between text-sm text-[rgb(var(--text-secondary))]">
-                <span>Date</span>
+                <span>{t('paymentsList.date')}</span>
                 <span className="font-medium text-[rgb(var(--text-primary))]">
                   {paidDate ? formatDate(paidDate, settings) : '--'}
                 </span>
               </div>
               <div className="flex justify-between text-sm font-semibold text-[rgb(var(--text-primary))] border-t border-[rgb(var(--border-primary))] pt-2 mt-2">
-                <span>Amount</span>
+                <span>{t('lineItems.amount')}</span>
                 <span>{formatCurr(parsedAmount)}</span>
               </div>
             </div>
@@ -462,7 +486,7 @@ export default function RecordPaymentPage() {
           ) : (
             <Banknote className="w-4 h-4 mr-1.5" />
           )}
-          Record Payment
+          {t('recordPayment.title')}
         </Button>
       </div>
     </div>

@@ -125,6 +125,7 @@ function InvoiceDownloadIconButton({
 }
 
 export default function InvoicesPage() {
+  const { t } = useTranslation('payments')
   const navigate = useNavigate()
   const schoolId = useAppStore((s) => s.activeSchoolId)
   const settings = useFinanceSettings()
@@ -205,9 +206,9 @@ export default function InvoicesPage() {
   const handleIssue = async (invoiceId: string) => {
     try {
       await issueMutation.mutateAsync(invoiceId)
-      toast.success('Invoice issued successfully')
+      toast.success(t('invoices.issueSuccess'))
     } catch {
-      toast.error('Failed to issue invoice')
+      toast.error(t('invoices.issueFailed'))
     }
   }
 
@@ -223,10 +224,10 @@ export default function InvoicesPage() {
     if (!cancelTarget) return
     try {
       await cancelMutation.mutateAsync({ invoiceId: cancelTarget.id, reason })
-      toast.success('Invoice cancelled')
+      toast.success(t('invoices.cancelSuccess'))
       setCancelTarget(null)
     } catch {
-      toast.error('Failed to cancel invoice')
+      toast.error(t('invoices.cancelFailed'))
     }
   }
 
@@ -235,11 +236,15 @@ export default function InvoicesPage() {
       const result = await bulkIssueMutation.mutateAsync({ invoiceIds: selectedDraftIds })
       const issued = result.issued ?? selectedDraftIds.length
       const skipped = result.skipped ?? 0
-      toast.success(`Issued ${issued} invoices.${skipped > 0 ? ` ${skipped} skipped.` : ''}`)
+      toast.success(
+        skipped > 0
+          ? t('invoices.bulkIssueSuccessWithSkipped', { count: issued, skipped })
+          : t('invoices.bulkIssueSuccess', { count: issued }),
+      )
       setRowSelection({})
       setShowBulkIssueConfirm(false)
     } catch {
-      toast.error('Failed to issue invoices')
+      toast.error(t('invoices.bulkIssueFailed'))
       setShowBulkIssueConfirm(false)
     }
   }
@@ -250,7 +255,7 @@ export default function InvoicesPage() {
       createSelectColumn<Invoice>(),
       {
         accessorKey: 'invoiceNumber',
-        header: 'Invoice #',
+        header: t('invoices.invoiceNumber'),
         cell: ({ row }) => (
           <span className="font-medium text-[rgb(var(--text-primary))]">
             <EntityIdDisplay entity="invoice" data={row.original} variant="inline" />
@@ -260,7 +265,7 @@ export default function InvoicesPage() {
       },
       {
         accessorKey: 'studentName',
-        header: 'Student',
+        header: t('receipt.studentName'),
         cell: ({ row }) => {
           const invoice = row.original
           return invoice.studentName ? (
@@ -275,7 +280,7 @@ export default function InvoicesPage() {
       },
       {
         accessorKey: 'grandTotal',
-        header: 'Amount',
+        header: t('lineItems.amount'),
         cell: ({ row }) => (
           <span className="font-medium text-[rgb(var(--text-primary))]">
             {format(row.original.grandTotal, { decimals: 0 })}
@@ -286,7 +291,7 @@ export default function InvoicesPage() {
       },
       {
         accessorKey: 'dueDate',
-        header: 'Due Date',
+        header: t('invoices.dueDate'),
         cell: ({ row }) => {
           const invoice = row.original
           const overdueDays = invoice.status === 'overdue' ? getOverdueDays(invoice.dueDate) : 0
@@ -296,7 +301,7 @@ export default function InvoicesPage() {
               {invoice.status === 'overdue' && overdueDays > 0 && (
                 <span className="inline-flex items-center gap-0.5 text-xs text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]">
                   <Clock className="w-3 h-3" />
-                  Overdue by {overdueDays}d
+                  {t('invoices.overdueByDays', { count: overdueDays })}
                 </span>
               )}
             </div>
@@ -306,7 +311,7 @@ export default function InvoicesPage() {
       },
       {
         accessorKey: 'status',
-        header: 'Status',
+        header: t('invoices.status'),
         cell: ({ row }) => <FinanceStatusChip status={row.original.status} />,
         meta: { align: 'center' as const },
         enableSorting: true,
@@ -322,7 +327,8 @@ export default function InvoicesPage() {
               <button
                 onClick={() => navigate({ to: '/invoices/$invoiceId', params: { invoiceId: invoice.id } })}
                 className="p-1.5 rounded-md hover:bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))]"
-                title="View"
+                title={t('actions.viewInvoice')}
+                aria-label={t('actions.viewInvoice')}
               >
                 <Eye className="w-4 h-4" />
               </button>
@@ -347,7 +353,8 @@ export default function InvoicesPage() {
                     onClick={() => handleIssue(invoice.id)}
                     disabled={issueMutation.isPending}
                     className="p-1.5 rounded-md hover:bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] dark:hover:bg-[rgb(var(--state-success-bg)/0.18)] "
-                    title="Issue"
+                    title={t('invoices.issue')}
+                    aria-label={t('invoices.issue')}
                   >
                     <Check className="w-4 h-4" />
                   </button>
@@ -355,7 +362,8 @@ export default function InvoicesPage() {
                     onClick={() => openCancelDialog(invoice.id)}
                     disabled={cancelMutation.isPending}
                     className="p-1.5 rounded-md hover:bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))] dark:hover:bg-[rgb(var(--state-danger-bg)/0.18)] dark:text-[rgb(var(--state-danger-fg))]"
-                    title="Cancel"
+                    title={t('actions.cancel')}
+                    aria-label={t('actions.cancel')}
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -366,7 +374,8 @@ export default function InvoicesPage() {
                   onClick={() => openCancelDialog(invoice.id)}
                   disabled={cancelMutation.isPending}
                   className="p-1.5 rounded-md hover:bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))] dark:hover:bg-[rgb(var(--state-danger-bg)/0.18)] dark:text-[rgb(var(--state-danger-fg))]"
-                  title="Cancel"
+                  title={t('actions.cancel')}
+                  aria-label={t('actions.cancel')}
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -376,33 +385,33 @@ export default function InvoicesPage() {
         },
       }),
     ],
-    [navigate, issueMutation.isPending, cancelMutation.isPending]
+    [navigate, issueMutation.isPending, cancelMutation.isPending, t, format, settings, schoolId]
   )
 
   if (!schoolId) {
     return (
       <div className="p-6 text-center text-sm text-[rgb(var(--text-tertiary))]">
-        Select a school to manage invoices.
+        {t('invoices.selectSchool')}
       </div>
     )
   }
 
   const STATUS_FILTER_OPTIONS = [
-    { label: 'All', value: '' },
-    { label: 'Draft', value: 'draft' },
-    { label: 'Issued', value: 'issued' },
-    { label: 'Partial', value: 'partially_paid' },
-    { label: 'Paid', value: 'paid' },
-    { label: 'Overdue', value: 'overdue' },
-    { label: 'Cancelled', value: 'cancelled' },
+    { label: t('feeStructure.filters.all'), value: '' },
+    { label: t('status.draft'), value: 'draft' },
+    { label: t('status.issued'), value: 'issued' },
+    { label: t('status.partially_paid'), value: 'partially_paid' },
+    { label: t('status.paid'), value: 'paid' },
+    { label: t('status.overdue'), value: 'overdue' },
+    { label: t('status.cancelled'), value: 'cancelled' },
   ]
 
   return (
     <div className="p-6 space-y-5">
       {/* V2 Page Header */}
       <FinancePageHeader
-        title="Invoices"
-        subtitle="Generate, issue, and manage student invoices."
+        title={t('invoices.title')}
+        subtitle={t('invoices.manageDescription')}
         actions={
           <div className="flex items-center gap-2">
             <button
@@ -411,7 +420,7 @@ export default function InvoicesPage() {
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
             >
               <Users className="w-3.5 h-3.5" />
-              Bulk Generate
+              {t('bulkGenerate.title')}
             </button>
             <button
               type="button"
@@ -419,7 +428,7 @@ export default function InvoicesPage() {
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
             >
               <Plus className="w-3.5 h-3.5" />
-              Generate Invoice
+              {t('invoices.generateInvoice')}
             </button>
           </div>
         }
@@ -429,8 +438,19 @@ export default function InvoicesPage() {
       {!isLoading && kpi.overdueCount > 0 && (
         <FinanceInfoBanner
           variant="danger"
-          message={`${kpi.overdueCount} invoice${kpi.overdueCount !== 1 ? 's' : ''} overdue — ${formatCompact(kpi.overdue)} uncollected`}
-          subtitle={`Collection rate is ${kpi.collectionRate.toFixed(1)}%.${kpi.draftCount > 0 ? ` ${kpi.draftCount} drafts need to be issued.` : ''}`}
+          message={t('invoices.overdueBanner', {
+            count: kpi.overdueCount,
+            amount: formatCompact(kpi.overdue),
+          })}
+          subtitle={t(
+            kpi.draftCount > 0
+              ? 'invoices.overdueBannerWithDrafts'
+              : 'invoices.overdueBannerRate',
+            {
+              rate: kpi.collectionRate.toFixed(1),
+              drafts: kpi.draftCount,
+            },
+          )}
         />
       )}
 
@@ -438,44 +458,44 @@ export default function InvoicesPage() {
       <WidgetErrorBoundaryV2>
         <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
           <StatCard
-            label="Total Invoiced"
+            label={t('overview.kpi.totalInvoiced')}
             value={formatCompact(kpi.totalInvoiced)}
             icon={DollarSign}
             accentColor="rgba(55, 138, 221, 0.12)"
             iconColor="#378ADD"
             barColor="#378ADD"
-            tag={{ text: `${totalLoaded}${countSuffix} invoices`, color: '#378ADD', bg: 'rgba(55,138,221,0.10)' }}
+            tag={{ text: t('invoices.loadedInvoices', { count: `${totalLoaded}${countSuffix}` }), color: '#378ADD', bg: 'rgba(55,138,221,0.10)' }}
             loading={isLoading || dashboardLoading}
           />
           <StatCard
-            label="Collected"
+            label={t('overview.kpi.collected')}
             value={formatCompact(kpi.totalCollected)}
             icon={TrendingUp}
             accentColor="rgba(29, 158, 117, 0.12)"
             iconColor="#1D9E75"
             barColor="#1D9E75"
-            tag={{ text: `${kpi.paidCount} paid`, color: '#1D9E75', bg: 'rgba(29,158,117,0.10)' }}
+            tag={{ text: t('invoices.paidCount', { count: kpi.paidCount }), color: '#1D9E75', bg: 'rgba(29,158,117,0.10)' }}
             loading={isLoading || dashboardLoading}
             valueColor="#1D9E75"
           />
           <StatCard
-            label="Outstanding"
+            label={t('overview.kpi.outstanding')}
             value={formatCompact(kpi.outstanding)}
             icon={Receipt}
             accentColor="rgba(239, 159, 39, 0.12)"
             iconColor="#EF9F27"
             barColor="#EF9F27"
-            tag={{ text: `${totalLoaded}${countSuffix} loaded`, color: '#EF9F27', bg: 'rgba(239,159,39,0.10)' }}
+            tag={{ text: t('invoices.loadedCount', { count: `${totalLoaded}${countSuffix}` }), color: '#EF9F27', bg: 'rgba(239,159,39,0.10)' }}
             loading={isLoading || dashboardLoading}
           />
           <StatCard
-            label="Overdue"
+            label={t('overview.kpi.overdue')}
             value={formatCompact(kpi.overdue)}
             icon={AlertTriangle}
             accentColor="rgba(226, 75, 74, 0.12)"
             iconColor="#E24B4A"
             barColor="#E24B4A"
-            tag={{ text: `${kpi.overdueCount} overdue`, color: '#E24B4A', bg: 'rgba(226,75,74,0.10)' }}
+            tag={{ text: t('overview.insight.invoiceOverdue', { count: kpi.overdueCount }), color: '#E24B4A', bg: 'rgba(226,75,74,0.10)' }}
             loading={isLoading || dashboardLoading}
           />
         </div>
@@ -504,8 +524,9 @@ export default function InvoicesPage() {
       {/* DataTable */}
       {Object.keys(rowSelection).some((id) => rowSelection[id]) && hasMore && (
         <p className="text-xs text-[rgb(var(--text-tertiary))]">
-          Selection applies to loaded records only ({totalLoaded}
-          {countSuffix} shown). Load more pages to include additional invoices.
+          {t('invoices.loadedSelectionOnly', {
+            count: `${totalLoaded}${countSuffix}`,
+          })}
         </p>
       )}
 
@@ -531,11 +552,11 @@ export default function InvoicesPage() {
         pageSizes={[10, 20, 50]}
         defaultSort={[{ id: 'dueDate', desc: false }]}
         serverPagination={serverPagination}
-        searchPlaceholder="Search by invoice # or student..."
+        searchPlaceholder={t('invoices.searchPlaceholder')}
         bulkActions={[
           {
             id: 'issue',
-            label: `Issue Selected (${selectedDraftIds.length})`,
+            label: t('invoices.issueSelected', { count: selectedDraftIds.length }),
             onClick: () => setShowBulkIssueConfirm(true),
             icon: <Send className="w-4 h-4" />,
             variant: 'primary',
@@ -543,7 +564,7 @@ export default function InvoicesPage() {
           },
           {
             id: 'send-reminder',
-            label: 'Send reminder',
+            label: t('invoices.sendReminder'),
             icon: <Clock className="w-4 h-4" />,
             onRun: (rows) => setBulkReminderTarget(rows),
           },
@@ -551,10 +572,10 @@ export default function InvoicesPage() {
         exportOptions={{ filename: 'invoices', formats: ['csv'] }}
         emptyState={{
           icon: <FileText className="w-10 h-10 text-[rgb(var(--text-tertiary))] opacity-40" />,
-          title: 'No invoices found',
-          description: 'Generate your first invoice to get started.',
+          title: t('invoices.noInvoices'),
+          description: t('invoices.generateFirstInvoice'),
           action: {
-            label: 'Generate Invoice',
+            label: t('invoices.generateInvoice'),
             onClick: () => setShowGenerateForm(true),
           },
         }}
@@ -620,6 +641,7 @@ function CancelInvoiceDialog({
   onConfirm: (reason: string) => void
   onClose: () => void
 }) {
+  const { t } = useTranslation('payments')
   const [reason, setReason] = useState('')
 
   const handleKeyDown = useCallback(
@@ -651,23 +673,26 @@ function CancelInvoiceDialog({
           </div>
           <div>
             <h3 id="cancel-invoice-title" className="text-base font-semibold text-[rgb(var(--text-primary))]">
-              Cancel Invoice {invoiceNumber}?
+              {t('invoices.cancelTitle', { invoiceNumber })}
             </h3>
             <p className="text-sm text-[rgb(var(--text-secondary))] mt-1">
-              This action is <span className="font-semibold text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]">irreversible</span>.
-              The invoice will be permanently cancelled and cannot be re-issued.
+              {t('invoices.cancelDescriptionPrefix')}{' '}
+              <span className="font-semibold text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]">
+                {t('invoices.irreversible')}
+              </span>
+              . {t('invoices.cancelDescriptionSuffix')}
             </p>
           </div>
         </div>
 
         <div className="mb-4">
           <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
-            Reason for cancellation *
+            {t('invoices.cancelReason')}
           </label>
           <textarea
             value={reason}
             onChange={(e) => setReason(e.target.value)}
-            placeholder="Enter the reason for cancelling this invoice..."
+            placeholder={t('invoices.cancelReasonPlaceholder')}
             rows={3}
             className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] resize-none focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
             autoFocus
@@ -676,7 +701,7 @@ function CancelInvoiceDialog({
 
         <div className="flex justify-end gap-2">
           <Button variant="outline" onClick={onClose} disabled={isPending}>
-            Keep Invoice
+            {t('invoices.keepInvoice')}
           </Button>
           <Button
             onClick={() => onConfirm(reason.trim())}
@@ -688,7 +713,7 @@ function CancelInvoiceDialog({
             ) : (
               <X className="w-4 h-4 mr-1.5" />
             )}
-            Cancel Invoice
+            {t('invoices.cancelInvoice')}
           </Button>
         </div>
       </motion.div>
@@ -711,6 +736,7 @@ function BulkIssueConfirmModal({
   onConfirm: () => void
   onCancel: () => void
 }) {
+  const { t } = useTranslation('payments')
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && !isPending) onCancel()
@@ -736,18 +762,17 @@ function BulkIssueConfirmModal({
           </div>
           <div>
             <h3 id="bulk-issue-title" className="text-base font-semibold text-[rgb(var(--text-primary))]">
-              Issue {count} invoices?
+              {t('invoices.bulkIssueTitle', { count })}
             </h3>
             <p className="text-sm text-[rgb(var(--text-secondary))] mt-1">
-              Students will be able to see and pay these invoices once issued.
-              This action cannot be undone.
+              {t('invoices.bulkIssueDescription')}
             </p>
           </div>
         </div>
 
         <div className="flex justify-end gap-2">
           <Button variant="outline" onClick={onCancel} disabled={isPending}>
-            Cancel
+            {t('actions.cancel')}
           </Button>
           <Button onClick={onConfirm} disabled={isPending}>
             {isPending ? (
@@ -755,7 +780,7 @@ function BulkIssueConfirmModal({
             ) : (
               <Check className="w-4 h-4 mr-1.5" />
             )}
-            Issue {count} Invoices
+            {t('invoices.issueCountInvoices', { count })}
           </Button>
         </div>
       </motion.div>
@@ -774,6 +799,7 @@ function GenerateInvoiceModal({
   schoolId: string
   onClose: () => void
 }) {
+  const { t } = useTranslation('payments')
   const finSettings = useFinanceSettings()
   const { format: formatCurr } = useCurrency(finSettings)
   const generateMutation = useGenerateInvoice(schoolId)
@@ -823,7 +849,7 @@ function GenerateInvoiceModal({
 
   const handleSubmit = async () => {
     if (!selectedStudent || selectedFees.length === 0 || !dueDate || !academicYear) {
-      toast.error('Please fill all required fields')
+      toast.error(t('invoices.requiredFields'))
       return
     }
     try {
@@ -835,10 +861,10 @@ function GenerateInvoiceModal({
         billingPeriod: billingPeriod || undefined,
         notes: notes || undefined,
       })
-      toast.success('Invoice generated')
+      toast.success(t('invoices.generated'))
       onClose()
     } catch {
-      toast.error('Failed to generate invoice')
+      toast.error(t('invoices.generateFailed'))
     }
   }
 
@@ -859,14 +885,14 @@ function GenerateInvoiceModal({
         aria-labelledby="generate-invoice-title"
       >
         <h2 id="generate-invoice-title" className="text-lg font-semibold text-[rgb(var(--text-primary))] mb-4">
-          Generate Invoice
+          {t('invoices.generateInvoice')}
         </h2>
 
         <div className="space-y-4">
           {/* Student */}
           <div>
             <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
-              Student *
+              {t('invoices.studentRequired')}
             </label>
             <StudentSearchInput
               schoolId={schoolId}
@@ -878,11 +904,13 @@ function GenerateInvoiceModal({
           {/* Fee Structures */}
           <div>
             <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
-              Fee Structures *
+              {t('invoices.feeStructuresRequired')}
             </label>
             <div className="space-y-2 max-h-40 overflow-y-auto border border-[rgb(var(--border-primary))] rounded-lg p-2">
               {feeStructures.length === 0 ? (
-                <p className="text-xs text-[rgb(var(--text-tertiary))] p-2">No fee structures configured.</p>
+                <p className="text-xs text-[rgb(var(--text-tertiary))] p-2">
+                  {t('feeStructure.noFeeStructures')}
+                </p>
               ) : (
                 feeStructures.map((fee: any) => (
                   <label
@@ -908,19 +936,19 @@ function GenerateInvoiceModal({
           {/* Academic Year + Due Date */}
           <div className="grid grid-cols-2 gap-3">
             <Select
-              label="Academic Year"
+              label={t('feeStructure.fields.academicYear')}
               required
               value={academicYear}
               onChange={(v) => setAcademicYear(v ?? '')}
-              placeholder="Select academic year"
+              placeholder={t('invoices.selectAcademicYear')}
               options={academicYears.map((y) => ({
                 value: y.name,
-                label: `${y.name}${y.isCurrent ? ' (Current)' : ''}`,
+                label: `${y.name}${y.isCurrent ? ` (${t('feeStructure.academicYearStatus.current')})` : ''}`,
               }))}
             />
             <div>
               <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
-                Due Date *
+                {t('invoices.dueDateRequired')}
               </label>
               <input
                 type="date"
@@ -934,13 +962,13 @@ function GenerateInvoiceModal({
           {/* Billing Period */}
           <div>
             <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
-              Billing Period
+              {t('invoices.billingPeriod')}
             </label>
             <input
               type="text"
               value={billingPeriod}
               onChange={(e) => setBillingPeriod(e.target.value)}
-              placeholder="e.g., First Term, Admission"
+              placeholder={t('invoices.billingPeriodPlaceholder')}
               className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))]"
             />
           </div>
@@ -948,7 +976,7 @@ function GenerateInvoiceModal({
           {/* Notes */}
           <div>
             <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
-              Notes
+              {t('invoices.notes')}
             </label>
             <textarea
               value={notes}
@@ -962,17 +990,17 @@ function GenerateInvoiceModal({
           {selectedFees.length > 0 && (
             <div className="bg-[rgb(var(--background-secondary))] rounded-lg p-3 space-y-1">
               <div className="flex justify-between text-sm text-[rgb(var(--text-secondary))]">
-                <span>Subtotal</span>
+                <span>{t('summary.subtotal')}</span>
                 <span>{formatCurr(subtotal)}</span>
               </div>
               {taxTotal > 0 && (
                 <div className="flex justify-between text-sm text-[rgb(var(--text-secondary))]">
-                  <span>Tax</span>
+                  <span>{t('summary.taxTotal')}</span>
                   <span>{formatCurr(taxTotal)}</span>
                 </div>
               )}
               <div className="flex justify-between text-sm font-semibold text-[rgb(var(--text-primary))] border-t border-[rgb(var(--border-primary))] pt-1">
-                <span>Grand Total</span>
+                <span>{t('summary.grandTotal')}</span>
                 <span>{formatCurr(grandTotal)}</span>
               </div>
             </div>
@@ -982,13 +1010,13 @@ function GenerateInvoiceModal({
         {/* Actions */}
         <div className="flex justify-end gap-2 mt-6">
           <Button variant="outline" onClick={onClose}>
-            Cancel
+            {t('actions.cancel')}
           </Button>
           <Button onClick={handleSubmit} disabled={generateMutation.isPending}>
             {generateMutation.isPending ? (
               <Loader2 className="w-4 h-4 animate-spin mr-1.5" />
             ) : null}
-            Generate Invoice
+            {t('invoices.generateInvoice')}
           </Button>
         </div>
       </motion.div>

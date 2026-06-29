@@ -21,10 +21,24 @@ import {
   useInvoicePayments,
   useDownloadInvoicePdf,
 } from '@edforge/finance-services'
+import { formatGatewayLabel } from '@edforge/types'
 import { useCurrency } from '@edforge/types/use-currency'
 import { useFinanceSettings } from '../../../layouts/FinanceLayout'
 import { formatDate, formatDateTime, formatDateDual } from '../../../utils/format-date'
 import { StatusBadge } from '../../../components/StatusBadge'
+
+type Translate = (key: string, options?: Record<string, unknown>) => string
+
+function formatPaymentGateway(gateway: string | undefined, t: Translate): string {
+  if (!gateway) return t('invoiceDetail.paymentHistory.payment')
+  const normalized = gateway.toLowerCase().replace(/[-\s]+/g, '_')
+  const key = normalized === 'bank_transfer'
+    ? 'bankTransfer'
+    : normalized === 'connect_ips'
+      ? 'connectips'
+      : normalized
+  return t(`gateway.${key}`, { defaultValue: formatGatewayLabel(gateway) })
+}
 
 export default function InvoiceDetailPage() {
   const navigate = useNavigate()
@@ -45,19 +59,19 @@ export default function InvoiceDetailPage() {
   const handleIssue = async () => {
     try {
       await issueMutation.mutateAsync(invoiceId)
-      toast.success('Invoice issued successfully')
+      toast.success(t('invoices.issueSuccess'))
     } catch {
-      toast.error('Failed to issue invoice')
+      toast.error(t('invoices.issueFailed'))
     }
   }
 
   const handleConfirmCancel = async (reason: string) => {
     try {
       await cancelMutation.mutateAsync({ invoiceId, reason })
-      toast.success('Invoice cancelled')
+      toast.success(t('invoices.cancelSuccess'))
       setShowCancelDialog(false)
     } catch {
-      toast.error('Failed to cancel invoice')
+      toast.error(t('invoices.cancelFailed'))
     }
   }
 
@@ -80,7 +94,7 @@ export default function InvoiceDetailPage() {
         className="flex items-center gap-1.5 text-sm text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] transition-colors print:hidden"
       >
         <ArrowLeft className="w-4 h-4" />
-        Back to Invoices
+        {t('invoiceDetail.backToInvoices')}
       </button>
 
       {/* Header */}
@@ -90,15 +104,16 @@ export default function InvoiceDetailPage() {
             <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">
               {invoice.invoiceNumber || (
                 <>
-                  Invoice <UuidBadge value={invoice.id} />
+                  {t('invoiceDetail.invoice')} <UuidBadge value={invoice.id} />
                 </>
               )}
             </h1>
             <StatusBadge status={invoice.status} />
           </div>
           <p className="text-sm text-[rgb(var(--text-secondary))] mt-1">
-            {invoice.studentName && `Student: ${invoice.studentName}`}
-            {invoice.dueDate && ` · Due: ${formatDateDual(invoice.dueDate, settings)}`}
+            {invoice.studentName && t('invoiceDetail.student', { name: invoice.studentName })}
+            {invoice.studentName && invoice.dueDate && ' · '}
+            {invoice.dueDate && t('invoiceDetail.due', { date: formatDateDual(invoice.dueDate, settings) })}
           </p>
         </div>
 
@@ -141,18 +156,18 @@ export default function InvoiceDetailPage() {
                 ) : (
                   <Check className="w-4 h-4 mr-1.5" />
                 )}
-                Issue Invoice
+                {t('invoiceDetail.actions.issueInvoice')}
               </Button>
               <Button variant="outline" onClick={() => setShowCancelDialog(true)} disabled={cancelMutation.isPending}>
                 <X className="w-4 h-4 mr-1.5" />
-                Cancel
+                {t('actions.cancel')}
               </Button>
             </>
           )}
           {(invoice.status === 'issued' || invoice.status === 'overdue') && (
             <Button variant="outline" onClick={() => setShowCancelDialog(true)} disabled={cancelMutation.isPending}>
               <X className="w-4 h-4 mr-1.5" />
-              Cancel Invoice
+              {t('invoices.cancelInvoice')}
             </Button>
           )}
         </div>
@@ -161,23 +176,23 @@ export default function InvoiceDetailPage() {
       {/* Line Items */}
       <div className="border border-[rgb(var(--border-primary))] rounded-lg overflow-hidden">
         <div className="bg-[rgb(var(--background-secondary))] px-4 py-2.5 border-b border-[rgb(var(--border-primary))]">
-          <h2 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Line Items</h2>
+          <h2 className="text-sm font-semibold text-[rgb(var(--text-primary))]">{t('invoiceDetail.sections.lineItems')}</h2>
         </div>
         <table className="w-full">
           <thead>
             <tr className="border-b border-[rgb(var(--border-primary))]">
-              <th className="text-left px-4 py-2 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase">Description</th>
-              <th className="text-right px-4 py-2 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase">Amount</th>
-              <th className="text-right px-4 py-2 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase">Tax</th>
-              <th className="text-right px-4 py-2 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase">Discount</th>
-              <th className="text-right px-4 py-2 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase">Total</th>
+              <th className="text-left px-4 py-2 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase">{t('lineItems.description')}</th>
+              <th className="text-right px-4 py-2 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase">{t('lineItems.amount')}</th>
+              <th className="text-right px-4 py-2 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase">{t('lineItems.tax')}</th>
+              <th className="text-right px-4 py-2 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase">{t('lineItems.discount')}</th>
+              <th className="text-right px-4 py-2 text-xs font-medium text-[rgb(var(--text-secondary))] uppercase">{t('lineItems.total')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[rgb(var(--border-primary))]">
             {lineItems.length === 0 ? (
               <tr>
                 <td colSpan={5} className="px-4 py-6 text-center text-sm text-[rgb(var(--text-tertiary))]">
-                  No line items
+                  {t('invoiceDetail.empty.noLineItems')}
                 </td>
               </tr>
             ) : (
@@ -198,31 +213,31 @@ export default function InvoiceDetailPage() {
       {/* Totals */}
       <div className="bg-[rgb(var(--background-secondary))] rounded-lg p-4 space-y-2">
         <div className="flex justify-between text-sm text-[rgb(var(--text-secondary))]">
-          <span>Subtotal</span>
+          <span>{t('summary.subtotal')}</span>
           <span>{format(invoice.subtotal ?? 0)}</span>
         </div>
         {(invoice.discountTotal ?? 0) > 0 && (
           <div className="flex justify-between text-sm text-[rgb(var(--state-success-fg))] ">
-            <span>Discount</span>
+            <span>{t('summary.discountTotal')}</span>
             <span>-{format(invoice.discountTotal)}</span>
           </div>
         )}
         {(invoice.taxTotal ?? 0) > 0 && (
           <div className="flex justify-between text-sm text-[rgb(var(--text-secondary))]">
-            <span>Tax</span>
+            <span>{t('summary.taxTotal')}</span>
             <span>{format(invoice.taxTotal)}</span>
           </div>
         )}
         <div className="flex justify-between text-base font-semibold text-[rgb(var(--text-primary))] border-t border-[rgb(var(--border-primary))] pt-2">
-          <span>Grand Total</span>
+          <span>{t('summary.grandTotal')}</span>
           <span>{format(invoice.grandTotal)}</span>
         </div>
         <div className="flex justify-between text-sm text-[rgb(var(--text-secondary))]">
-          <span>Amount Paid</span>
+          <span>{t('summary.amountPaid')}</span>
           <span>{format(invoice.amountPaid ?? 0)}</span>
         </div>
         <div className="flex justify-between text-sm font-semibold text-amber-600 dark:text-amber-400">
-          <span>Amount Due</span>
+          <span>{t('summary.amountDue')}</span>
           <span>{format(invoice.amountDue ?? invoice.grandTotal)}</span>
         </div>
       </div>
@@ -231,17 +246,19 @@ export default function InvoiceDetailPage() {
       {paymentsList.length > 0 && (
         <div className="border border-[rgb(var(--border-primary))] rounded-lg overflow-hidden">
           <div className="bg-[rgb(var(--background-secondary))] px-4 py-2.5 border-b border-[rgb(var(--border-primary))]">
-            <h2 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Payment History</h2>
+            <h2 className="text-sm font-semibold text-[rgb(var(--text-primary))]">{t('invoiceDetail.sections.paymentHistory')}</h2>
           </div>
           <div className="divide-y divide-[rgb(var(--border-primary))]">
             {paymentsList.map((payment: any) => (
               <div key={payment.paymentId || payment.id} className="px-4 py-3 flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
-                    {payment.receiptNumber || payment.gateway || 'Payment'}
+                    {payment.receiptNumber || formatPaymentGateway(payment.gateway, t)}
                     {payment.receiptNumber && payment.gateway && (
-                      <span className="text-[rgb(var(--text-tertiary))] font-normal ml-1.5 text-xs capitalize">
-                        via {payment.gateway.replace('_', ' ')}
+                      <span className="text-[rgb(var(--text-tertiary))] font-normal ml-1.5 text-xs">
+                        {t('invoiceDetail.paymentHistory.via', {
+                          gateway: formatPaymentGateway(payment.gateway, t),
+                        })}
                       </span>
                     )}
                   </p>
@@ -260,9 +277,9 @@ export default function InvoiceDetailPage() {
 
       {/* Metadata */}
       <div className="text-xs text-[rgb(var(--text-tertiary))] space-y-0.5">
-        {invoice.createdAt && <p>Created: {formatDateTime(invoice.createdAt, settings)}</p>}
-        {invoice.issuedDate && <p>Issued: {formatDateDual(invoice.issuedDate, settings)}</p>}
-        {invoice.notes && <p>Notes: {invoice.notes}</p>}
+        {invoice.createdAt && <p>{t('invoiceDetail.metadata.created', { date: formatDateTime(invoice.createdAt, settings) })}</p>}
+        {invoice.issuedDate && <p>{t('invoiceDetail.metadata.issued', { date: formatDateDual(invoice.issuedDate, settings) })}</p>}
+        {invoice.notes && <p>{t('invoiceDetail.metadata.notes', { notes: invoice.notes })}</p>}
       </div>
 
       {/* Cancel Invoice Dialog */}
@@ -361,6 +378,7 @@ function CancelInvoiceDialog({
   onConfirm: (reason: string) => void
   onClose: () => void
 }) {
+  const { t } = useTranslation('payments')
   const [reason, setReason] = useState('')
 
   const handleKeyDown = useCallback(
@@ -392,23 +410,26 @@ function CancelInvoiceDialog({
           </div>
           <div>
             <h3 id="cancel-invoice-title" className="text-base font-semibold text-[rgb(var(--text-primary))]">
-              Cancel Invoice {invoiceNumber}?
+              {t('invoices.cancelTitle', { invoiceNumber })}
             </h3>
             <p className="text-sm text-[rgb(var(--text-secondary))] mt-1">
-              This action is <span className="font-semibold text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]">irreversible</span>.
-              The invoice will be permanently cancelled and cannot be re-issued.
+              {t('invoices.cancelDescriptionPrefix')}{' '}
+              <span className="font-semibold text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]">
+                {t('invoices.irreversible')}
+              </span>
+              . {t('invoices.cancelDescriptionSuffix')}
             </p>
           </div>
         </div>
 
         <div className="mb-4">
           <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
-            Reason for cancellation *
+            {t('invoices.cancelReason')}
           </label>
           <textarea
             value={reason}
             onChange={(e) => setReason(e.target.value)}
-            placeholder="Enter the reason for cancelling this invoice..."
+            placeholder={t('invoices.cancelReasonPlaceholder')}
             rows={3}
             className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] resize-none focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
             autoFocus
@@ -417,7 +438,7 @@ function CancelInvoiceDialog({
 
         <div className="flex justify-end gap-2">
           <Button variant="outline" onClick={onClose} disabled={isPending}>
-            Keep Invoice
+            {t('invoices.keepInvoice')}
           </Button>
           <Button
             onClick={() => onConfirm(reason.trim())}
@@ -429,7 +450,7 @@ function CancelInvoiceDialog({
             ) : (
               <X className="w-4 h-4 mr-1.5" />
             )}
-            Cancel Invoice
+            {t('invoices.cancelInvoice')}
           </Button>
         </div>
       </motion.div>

@@ -17,8 +17,10 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { AlertTriangle, Ban, Loader2, X } from 'lucide-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { useTranslation } from '@edforge/i18n'
 import { paymentKeys, voidPayment } from '@edforge/finance-services'
 import type { Payment } from '@edforge/types'
+import { formatAsyncJobToast, formatKnownSkipReason } from './async-job-i18n'
 
 export interface BulkVoidPaymentsDrawerProps {
   open: boolean
@@ -61,6 +63,7 @@ export function BulkVoidPaymentsDrawer({
   schoolId,
   onComplete,
 }: BulkVoidPaymentsDrawerProps) {
+  const { t } = useTranslation('payments')
   const queryClient = useQueryClient()
   const [reason, setReason] = useState('')
   const [isApplying, setIsApplying] = useState(false)
@@ -94,17 +97,8 @@ export function BulkVoidPaymentsDrawer({
       // and the student-accounts views the void touches.
       queryClient.invalidateQueries({ queryKey: paymentKeys.all })
 
-      const parts: string[] = [`Voided ${ok} payment${ok === 1 ? '' : 's'}`]
-      if (skipped.length > 0) parts.push(`${skipped.length} skipped`)
-      if (failures > 0) parts.push(`${failures} failed`)
-
-      if (failures === 0 && skipped.length === 0) {
-        toast.success(parts[0])
-      } else if (ok === 0) {
-        toast.error(`No payments voided — ${failures} failed; ${skipped.length} skipped`)
-      } else {
-        toast.error(parts.join(' · '))
-      }
+      const result = formatAsyncJobToast(t, 'voidPayments', ok, skipped.length, failures)
+      toast[result.tone](result.message)
 
       if (ok > 0) onComplete()
       setReason('')
@@ -156,10 +150,10 @@ export function BulkVoidPaymentsDrawer({
                         id="bulk-void-payments-title"
                         className="text-lg font-semibold text-[rgb(var(--text-primary))] truncate"
                       >
-                        Void payments
+                        {t('asyncJobs.voidPayments.title')}
                       </h2>
                       <p className="text-xs text-[rgb(var(--text-tertiary))] tabular-nums">
-                        {payments.length} payment{payments.length === 1 ? '' : 's'} selected
+                        {t('asyncJobs.common.selected.payments', { count: payments.length })}
                       </p>
                     </div>
                   </div>
@@ -167,7 +161,7 @@ export function BulkVoidPaymentsDrawer({
                     type="button"
                     onClick={handleClose}
                     className="p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-secondary))] transition-colors flex-shrink-0"
-                    aria-label="Close drawer"
+                    aria-label={t('asyncJobs.common.closeDrawer')}
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -180,11 +174,7 @@ export function BulkVoidPaymentsDrawer({
                     role="alert"
                   >
                     <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                    <span>
-                      Voiding reverses the ledger entry on each payment and restores
-                      the amount due on the linked invoice. Each row is a separate
-                      request and partial failures don't roll back.
-                    </span>
+                    <span>{t('asyncJobs.voidPayments.warning')}</span>
                   </div>
 
                   <section>
@@ -192,28 +182,28 @@ export function BulkVoidPaymentsDrawer({
                       htmlFor="bulk-void-reason"
                       className="block text-sm font-medium text-[rgb(var(--text-primary))] mb-2"
                     >
-                      Reason for voiding <span className="text-[rgb(var(--state-danger-fg))]">*</span>
+                      {t('asyncJobs.voidPayments.reason')} <span className="text-[rgb(var(--state-danger-fg))]">*</span>
                     </label>
                     <textarea
                       id="bulk-void-reason"
                       value={reason}
                       onChange={(e) => setReason(e.target.value)}
                       rows={3}
-                      placeholder="e.g. Duplicate payment, data entry error"
+                      placeholder={t('asyncJobs.voidPayments.reasonPlaceholder')}
                       className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] resize-none focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
                     />
                     <p className="mt-1 text-xs text-[rgb(var(--text-tertiary))]">
-                      The same reason is recorded against every voided payment.
+                      {t('asyncJobs.voidPayments.reasonHelp')}
                     </p>
                   </section>
 
                   <section>
                     <h3 className="text-sm font-medium text-[rgb(var(--text-primary))] mb-2">
-                      Will void ({eligible.length})
+                      {t('asyncJobs.voidPayments.willVoid', { count: eligible.length })}
                     </h3>
                     {eligible.length === 0 ? (
                       <p className="text-sm text-[rgb(var(--text-tertiary))]">
-                        None of the selected payments are eligible to void.
+                        {t('asyncJobs.voidPayments.noneEligible')}
                       </p>
                     ) : (
                       <ul className="space-y-1 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary)/0.4)] p-2 max-h-40 overflow-y-auto">
@@ -223,7 +213,7 @@ export function BulkVoidPaymentsDrawer({
                             className="flex items-center justify-between gap-2 px-2 py-1 text-sm"
                           >
                             <span className="text-[rgb(var(--text-primary))] truncate">
-                              {p.studentName ?? 'Unknown student'}
+                              {p.studentName ?? t('asyncJobs.common.unknownStudent')}
                             </span>
                             <span className="text-xs text-[rgb(var(--text-tertiary))] font-mono flex-shrink-0">
                               {p.receiptNumber}
@@ -237,7 +227,7 @@ export function BulkVoidPaymentsDrawer({
                   {skipped.length > 0 && (
                     <section>
                       <h3 className="text-sm font-medium text-[rgb(var(--text-tertiary))] mb-2">
-                        Will skip ({skipped.length})
+                        {t('asyncJobs.common.willSkip', { count: skipped.length })}
                       </h3>
                       <ul className="space-y-1 rounded-lg border border-dashed border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary)/0.2)] p-2 max-h-40 overflow-y-auto">
                         {skipped.map(({ payment, reason: skipReason }) => (
@@ -246,10 +236,10 @@ export function BulkVoidPaymentsDrawer({
                             className="flex items-center justify-between gap-2 px-2 py-1 text-sm"
                           >
                             <span className="text-[rgb(var(--text-secondary))] truncate">
-                              {payment.studentName ?? 'Unknown student'}
+                              {payment.studentName ?? t('asyncJobs.common.unknownStudent')}
                             </span>
                             <span className="text-xs text-[rgb(var(--text-tertiary))] flex-shrink-0">
-                              {skipReason}
+                              {formatKnownSkipReason(t, skipReason)}
                             </span>
                           </li>
                         ))}
@@ -266,7 +256,7 @@ export function BulkVoidPaymentsDrawer({
                     disabled={isApplying}
                     className="px-4 py-2 text-sm font-medium text-[rgb(var(--text-secondary))] bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] rounded-lg hover:bg-[rgb(var(--background-secondary))] transition-colors disabled:opacity-50"
                   >
-                    Cancel
+                    {t('actions.cancel')}
                   </button>
                   <button
                     type="button"
@@ -277,12 +267,12 @@ export function BulkVoidPaymentsDrawer({
                     {isApplying ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        Voiding…
+                        {t('asyncJobs.voidPayments.voiding')}
                       </>
                     ) : (
                       <>
                         <Ban className="w-4 h-4" />
-                        Void {eligible.length}
+                        {t('asyncJobs.voidPayments.apply', { count: eligible.length })}
                       </>
                     )}
                   </button>

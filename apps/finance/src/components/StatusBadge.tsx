@@ -5,6 +5,8 @@
  * Replaces duplicate statusBadge/paymentStatusBadge functions across pages.
  */
 
+import { useTranslation } from '@edforge/i18n'
+
 const STATUS_STYLES: Record<string, string> = {
   // Invoice statuses
   draft: 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))]',
@@ -31,13 +33,18 @@ const STATUS_STYLES: Record<string, string> = {
 const DEFAULT_STYLE = 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]'
 
 export function StatusBadge({ status, size = 'sm' }: { status: string; size?: 'xs' | 'sm' }) {
+  const { t } = useTranslation('payments')
+  const normalized = status.toLowerCase().replace(/ /g, '_')
   const sizeClass = size === 'xs'
     ? 'px-1.5 py-0.5 text-xs'
     : 'px-2 py-0.5 text-xs'
+  const label = t(`status.${normalized}`, {
+    defaultValue: status.replace(/_/g, ' '),
+  })
 
   return (
-    <span className={`inline-flex rounded-full font-medium ${sizeClass} ${STATUS_STYLES[status] || DEFAULT_STYLE}`}>
-      {status.replace(/_/g, ' ')}
+    <span className={`inline-flex rounded-full font-medium ${sizeClass} ${STATUS_STYLES[normalized] || DEFAULT_STYLE}`}>
+      {label}
     </span>
   )
 }

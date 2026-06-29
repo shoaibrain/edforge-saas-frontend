@@ -12,6 +12,7 @@
 import { Component, createContext, useContext, useEffect, useRef, useState } from 'react'
 import type { ReactNode, ErrorInfo } from 'react'
 import { useNavigate } from '@tanstack/react-router'
+import { useTranslation } from '@edforge/i18n'
 import { AlertTriangle, RotateCw, Home, Building2 } from 'lucide-react'
 import { onSchoolChange, getSchoolContext } from '@edforge/config/school-context-channel'
 import type { ResolvedSettings } from '@edforge/config/resolved-settings'
@@ -38,11 +39,18 @@ interface ErrorBoundaryState {
   error: Error | null
 }
 
+interface ErrorBoundaryCopy {
+  title: string
+  description: string
+  reload: string
+  overview: string
+}
+
 class FinanceErrorBoundary extends Component<
-  { children: ReactNode },
+  { children: ReactNode; copy: ErrorBoundaryCopy },
   ErrorBoundaryState
 > {
-  constructor(props: { children: ReactNode }) {
+  constructor(props: { children: ReactNode; copy: ErrorBoundaryCopy }) {
     super(props)
     this.state = { hasError: false, error: null }
   }
@@ -66,6 +74,7 @@ class FinanceErrorBoundary extends Component<
 
   render() {
     if (this.state.hasError) {
+      const copy = this.props.copy
       return (
         <div className="flex items-center justify-center min-h-[60vh] p-6">
           <div className="w-full max-w-md bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] rounded-xl shadow-sm p-8 text-center space-y-4">
@@ -75,11 +84,10 @@ class FinanceErrorBoundary extends Component<
 
             <div>
               <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
-                Something went wrong
+                {copy.title}
               </h2>
               <p className="text-sm text-[rgb(var(--text-secondary))] mt-1">
-                An unexpected error occurred in the Finance module. You can try
-                reloading the page or navigating back to the overview.
+                {copy.description}
               </p>
             </div>
 
@@ -95,14 +103,14 @@ class FinanceErrorBoundary extends Component<
                 className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
               >
                 <RotateCw className="w-4 h-4" />
-                Reload
+                {copy.reload}
               </button>
               <button
                 onClick={this.handleGoToOverview}
                 className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg border border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-secondary))] transition-colors"
               >
                 <Home className="w-4 h-4" />
-                Go to Overview
+                {copy.overview}
               </button>
             </div>
           </div>
@@ -119,6 +127,7 @@ class FinanceErrorBoundary extends Component<
 // ============================================================================
 
 export function FinanceLayout({ children }: { children: ReactNode }) {
+  const { t } = useTranslation('payments')
   const navigate = useNavigate()
   const prevSchoolRef = useRef<string | null>(null)
   const [settings, setSettings] = useState<ResolvedSettings>(() => {
@@ -224,17 +233,17 @@ export function FinanceLayout({ children }: { children: ReactNode }) {
           </div>
           <div>
             <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
-              No schools configured
+              {t('financeLayout.noSchools.title')}
             </h2>
             <p className="text-sm text-[rgb(var(--text-secondary))] mt-1">
-              Set up your organization in Settings → Organization before using Finance.
+              {t('financeLayout.noSchools.description')}
             </p>
           </div>
           <button
             onClick={() => { window.location.href = '/settings' }}
             className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
           >
-            Go to Settings
+            {t('financeLayout.noSchools.goToSettings')}
           </button>
         </div>
       </div>
@@ -245,7 +254,14 @@ export function FinanceLayout({ children }: { children: ReactNode }) {
   // This module just renders its content, wrapped in an error boundary
   return (
     <FinanceSettingsContext.Provider value={settings}>
-      <FinanceErrorBoundary>
+      <FinanceErrorBoundary
+        copy={{
+          title: t('financeLayout.error.title'),
+          description: t('financeLayout.error.description'),
+          reload: t('financeLayout.error.reload'),
+          overview: t('financeLayout.error.overview'),
+        }}
+      >
         {children}
       </FinanceErrorBoundary>
     </FinanceSettingsContext.Provider>

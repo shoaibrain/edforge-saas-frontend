@@ -9,6 +9,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import type { PaymentGateway, PaymentGatewayConfig } from '@edforge/types'
 import { Button } from '@edforge/ui'
+import { useTranslation } from '@edforge/i18n'
 import {
   Wallet, CreditCard, Landmark, Building2, QrCode, Banknote,
   Eye, EyeOff, Shield, CheckCircle2,
@@ -23,28 +24,6 @@ const GATEWAY_ICONS: Record<PaymentGateway, React.ComponentType<{ className?: st
   cash: Banknote,
   bank_transfer: Landmark,
   cheque: Landmark,
-}
-
-const GATEWAY_LABELS: Record<string, string> = {
-  esewa: 'eSewa',
-  khalti: 'Khalti',
-  fonepay: 'Fonepay',
-  connectips: 'ConnectIPS',
-  stripe: 'Stripe',
-  cash: 'Cash',
-  bank_transfer: 'Bank Transfer',
-  cheque: 'Cheque',
-}
-
-const GATEWAY_DESCRIPTIONS: Record<string, string> = {
-  esewa: 'Nepal\'s leading digital wallet for online payments',
-  khalti: 'Digital wallet and payment gateway for Nepal',
-  fonepay: 'QR-based interbank payment network',
-  connectips: 'Internet banking payment system by NCHL',
-  stripe: 'Global payment processing for cards and wallets',
-  cash: 'Manual cash payments',
-  bank_transfer: 'Direct bank transfer payments',
-  cheque: 'Payment by cheque',
 }
 
 // Credential fields per gateway (what the admin needs to enter)
@@ -83,6 +62,7 @@ interface GatewayConfigCardProps {
 }
 
 export function GatewayConfigCard({ gateway, config, onSave, isSaving }: GatewayConfigCardProps) {
+  const { t } = useTranslation('payments')
   const [isExpanded, setIsExpanded] = useState(false)
   const [showSecrets, setShowSecrets] = useState<Record<string, boolean>>({})
 
@@ -91,6 +71,9 @@ export function GatewayConfigCard({ gateway, config, onSave, isSaving }: Gateway
   const isEnabled = config?.isEnabled ?? false
   const isTestMode = config?.isTestMode ?? true
   const isConfigured = config && credFields.length > 0
+  const gatewayLabel = t(`paymentGateways.gatewayLabels.${gateway}`, {
+    defaultValue: t(`gateway.${gateway}`, { defaultValue: gateway }),
+  })
 
   const { register, handleSubmit } = useForm<Record<string, string | boolean>>({
     defaultValues: {
@@ -131,17 +114,17 @@ export function GatewayConfigCard({ gateway, config, onSave, isSaving }: Gateway
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
-            {GATEWAY_LABELS[gateway] ?? gateway}
+            {gatewayLabel}
           </p>
           <p className="text-xs text-[rgb(var(--text-tertiary))]">
-            {GATEWAY_DESCRIPTIONS[gateway] ?? ''}
+            {t(`paymentGateways.descriptions.${gateway}`, { defaultValue: '' })}
           </p>
         </div>
         <div className="flex items-center gap-2">
           {isEnabled && (
             <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] dark:bg-[rgb(var(--action-primary-bg))]/20 ">
               <CheckCircle2 className="w-3 h-3" />
-              {isTestMode ? 'Test Mode' : 'Production'}
+              {isTestMode ? t('gateway.testMode') : t('gateway.productionMode')}
             </span>
           )}
           {credFields.length > 0 && (
@@ -150,7 +133,7 @@ export function GatewayConfigCard({ gateway, config, onSave, isSaving }: Gateway
                 ? 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))]  '
                 : 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]  '
             }`}>
-              {isConfigured ? 'Configured' : 'Not Configured'}
+              {isConfigured ? t('gateway.configured') : t('gateway.notConfigured')}
             </span>
           )}
         </div>
@@ -167,7 +150,7 @@ export function GatewayConfigCard({ gateway, config, onSave, isSaving }: Gateway
                 {...register('isEnabled')}
                 className="w-4 h-4 rounded border-[rgb(var(--border-primary))] text-[rgb(var(--action-secondary-fg))] focus:ring-[rgb(var(--border-focus))]"
               />
-              <span className="text-sm text-[rgb(var(--text-primary))]">Enable</span>
+              <span className="text-sm text-[rgb(var(--text-primary))]">{t('paymentGateways.enable')}</span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
               <input
@@ -175,7 +158,7 @@ export function GatewayConfigCard({ gateway, config, onSave, isSaving }: Gateway
                 {...register('isTestMode')}
                 className="w-4 h-4 rounded border-[rgb(var(--border-primary))] text-amber-600 focus:ring-amber-500"
               />
-              <span className="text-sm text-[rgb(var(--text-primary))]">Test Mode</span>
+              <span className="text-sm text-[rgb(var(--text-primary))]">{t('gateway.testMode')}</span>
             </label>
           </div>
 
@@ -183,7 +166,7 @@ export function GatewayConfigCard({ gateway, config, onSave, isSaving }: Gateway
           {credFields.map((field) => (
             <div key={field.key}>
               <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1">
-                {field.label}
+                {t(`paymentGateways.credentials.${field.key}`, { defaultValue: field.label })}
               </label>
               <div className="relative">
                 <input
@@ -200,6 +183,7 @@ export function GatewayConfigCard({ gateway, config, onSave, isSaving }: Gateway
                     type="button"
                     onClick={() => setShowSecrets((s) => ({ ...s, [field.key]: !s[field.key] }))}
                     className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-[rgb(var(--text-tertiary))]"
+                    aria-label={showSecrets[field.key] ? t('paymentGateways.hideSecret') : t('paymentGateways.showSecret')}
                   >
                     {showSecrets[field.key] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -212,14 +196,14 @@ export function GatewayConfigCard({ gateway, config, onSave, isSaving }: Gateway
           <div className="flex items-start gap-2 p-3 rounded-lg bg-[rgb(var(--state-info-bg)/0.18)]">
             <Shield className="w-4 h-4 text-[rgb(var(--state-info-fg))] mt-0.5 shrink-0" />
             <p className="text-xs text-[rgb(var(--state-info-fg))] dark:text-[rgb(var(--state-info-fg))]">
-              Credentials are encrypted and stored securely. After saving, values will be masked.
+              {t('paymentGateways.securityNote')}
             </p>
           </div>
 
           {/* Save button */}
           <div className="flex justify-end">
             <Button type="submit" disabled={isSaving}>
-              {isSaving ? 'Saving...' : 'Save Configuration'}
+              {isSaving ? t('actions.saving') : t('paymentGateways.saveConfiguration')}
             </Button>
           </div>
         </form>

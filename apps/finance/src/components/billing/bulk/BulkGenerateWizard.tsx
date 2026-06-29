@@ -27,6 +27,7 @@ import {
   Loader2,
 } from 'lucide-react'
 import { Button } from '@edforge/ui'
+import { useTranslation } from '@edforge/i18n'
 import {
   useEnrolledStudents,
   useBulkGenerateInvoices,
@@ -43,7 +44,6 @@ import { GenerateSuccess, type GenerateResult } from './GenerateSuccess'
 import {
   emptySelection,
   defaultDetails,
-  WIZARD_STEP_LABELS,
   type SelectedFeesMap,
   type CustomLine,
   type WizardDetails,
@@ -56,6 +56,15 @@ import {
   resolveCustomLineItems,
   computeBatch,
 } from './compute'
+
+type Translate = (key: string, options?: Record<string, unknown>) => string
+
+const WIZARD_STEP_LABEL_KEYS = [
+  'bulkGenerate.steps.selectRecipients',
+  'bulkGenerate.steps.feeStructures',
+  'bulkGenerate.steps.invoiceDetails',
+  'bulkGenerate.steps.reviewConfirm',
+] as const
 
 export interface BulkGenerateWizardProps {
   schoolId: string
@@ -71,6 +80,7 @@ export function BulkGenerateWizard({
   onComplete,
   onCancel,
 }: BulkGenerateWizardProps) {
+  const { t } = useTranslation('payments')
   // ---- Data sources --------------------------------------------------------
   const studentsQuery = useEnrolledStudents(schoolId)
   const feesQuery = useFeeStructures(schoolId)
@@ -210,8 +220,12 @@ export function BulkGenerateWizard({
           invoices,
         })
         toast.success(
-          `${response.generated} invoice${response.generated === 1 ? '' : 's'} generated` +
-            (response.skipped > 0 ? ` · ${response.skipped} skipped` : ''),
+          response.skipped > 0
+            ? t('bulkGenerate.toast.generatedWithSkipped', {
+                count: response.generated,
+                skipped: response.skipped,
+              })
+            : t('bulkGenerate.toast.generated', { count: response.generated }),
         )
       },
       onError: (err: any) => {
@@ -219,14 +233,10 @@ export function BulkGenerateWizard({
         // we just toast — Sprint E adds the async path the operator can pivot to.
         const code = err?.response?.data?.code
         if (code === 'BULK_GENERATE_SYNC_LIMIT_EXCEEDED') {
-          toast.error(
-            `Too many students (>25) for synchronous generation. The async ` +
-              `path lands in Sprint E. For now, narrow the selection or pick a ` +
-              `single grade and try again.`,
-          )
+          toast.error(t('bulkGenerate.toast.syncLimitExceeded'))
           return
         }
-        const msg = err?.response?.data?.message || err?.message || 'Bulk generation failed.'
+        const msg = err?.response?.data?.message || err?.message || t('bulkGenerate.toast.failed')
         toast.error(msg)
       },
     })
@@ -246,7 +256,8 @@ export function BulkGenerateWizard({
   if (studentsQuery.isLoading || feesQuery.isLoading || academicYearsQuery.isLoading) {
     return (
       <div className="flex items-center justify-center py-12 text-sm text-[rgb(var(--text-tertiary))]">
-        <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Loading school roster…
+        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+        {t('bulkGenerate.loadingRoster')}
       </div>
     )
   }
@@ -311,11 +322,11 @@ export function BulkGenerateWizard({
       <div className="flex items-center justify-between pt-4 border-t border-[rgb(var(--border-primary))]">
         {step === 0 ? (
           <Button variant="ghost" onClick={onCancel}>
-            <X className="w-4 h-4 mr-1" /> Cancel
+            <X className="w-4 h-4 mr-1" /> {t('actions.cancel')}
           </Button>
         ) : (
           <Button variant="outline" onClick={goBack}>
-            <ChevronLeft className="w-4 h-4 mr-1" /> Back
+            <ChevronLeft className="w-4 h-4 mr-1" /> {t('actions.back')}
           </Button>
         )}
 
@@ -326,11 +337,12 @@ export function BulkGenerateWizard({
               selection.selectedIds.size,
               totalLineCount,
               previewQuery,
+              t,
             )}
           </span>
           {step < 3 ? (
             <Button onClick={goNext} disabled={!canAdvanceFromStep[step]}>
-              Next <ChevronRight className="w-4 h-4 ml-1" />
+              {t('actions.next')} <ChevronRight className="w-4 h-4 ml-1" />
             </Button>
           ) : (
             <Button
@@ -345,11 +357,13 @@ export function BulkGenerateWizard({
             >
               {generateMutation.isPending ? (
                 <>
-                  <Loader2 className="w-4 h-4 mr-1 animate-spin" /> Generating…
+                  <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                  {t('bulkGenerate.actions.generating')}
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-4 h-4 mr-1" /> Generate invoices
+                  <Sparkles className="w-4 h-4 mr-1" />
+                  {t('bulkGenerate.actions.generateInvoices')}
                 </>
               )}
             </Button>
@@ -373,10 +387,12 @@ function Stepper({
   maxReached: WizardStep
   onGoto: (n: WizardStep) => void
 }) {
+  const { t } = useTranslation('payments')
   return (
     <div className="flex items-center gap-2 text-xs">
-      {WIZARD_STEP_LABELS.map((label, i) => {
+      {WIZARD_STEP_LABEL_KEYS.map((labelKey, i) => {
         const idx = i as WizardStep
+        const label = t(labelKey)
         const isDone = i < step || (maxReached > i && step !== i)
         const isCurrent = step === i
         const reachable = i <= maxReached
@@ -410,7 +426,7 @@ function Stepper({
               </span>
               <span className="truncate">{label}</span>
             </button>
-            {i < WIZARD_STEP_LABELS.length - 1 && (
+            {i < WIZARD_STEP_LABEL_KEYS.length - 1 && (
               <span
                 className={[
                   'h-px flex-1',
@@ -432,19 +448,35 @@ function footerInfo(
   selN: number,
   lineN: number,
   previewQuery: ReturnType<typeof useBulkPreview>,
+  t: Translate,
 ): string {
   if (step === 0) {
-    if (selN === 0) return 'Select at least one student to continue'
-    return `${selN} student${selN === 1 ? '' : 's'} selected`
+    if (selN === 0) return t('bulkGenerate.footer.selectStudent')
+    return t('bulkGenerate.footer.studentsSelected', { count: selN })
   }
   if (step === 1) {
-    if (lineN === 0) return 'Add at least one fee or custom line'
-    return `${lineN} line item${lineN === 1 ? '' : 's'} · ${selN} students`
+    if (lineN === 0) return t('bulkGenerate.footer.addFeeOrLine')
+    return t('bulkGenerate.footer.lineItemsAndStudents', {
+      lineCount: lineN,
+      lineLabel: t(
+        lineN === 1
+          ? 'bulkGenerate.common.lineItem'
+          : 'bulkGenerate.common.lineItem_plural',
+      ),
+      studentCount: selN,
+      studentLabel: t(
+        selN === 1
+          ? 'bulkGenerate.common.student'
+          : 'bulkGenerate.common.student_plural',
+      ),
+    })
   }
   if (step === 2) {
-    return `${selN} invoice${selN === 1 ? '' : 's'} will be configured`
+    return t('bulkGenerate.footer.invoicesConfigured', { count: selN })
   }
-  if (previewQuery.isLoading || previewQuery.isFetching) return 'Resolving preview…'
+  if (previewQuery.isLoading || previewQuery.isFetching) {
+    return t('bulkGenerate.footer.resolvingPreview')
+  }
   const eligible = previewQuery.data?.eligibleCount ?? selN
-  return `Ready to generate ${eligible} invoice${eligible === 1 ? '' : 's'}`
+  return t('bulkGenerate.footer.readyToGenerate', { count: eligible })
 }

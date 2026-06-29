@@ -20,7 +20,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import type { FeeStructure, FeeType, FeeFrequency, TaxType } from '@edforge/types'
 import { Button, Select } from '@edforge/ui'
-import { X } from 'lucide-react'
+import { useTranslation } from '@edforge/i18n'
+import { ChevronDown, X } from 'lucide-react'
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
@@ -31,27 +32,7 @@ const FEE_TYPES: FeeType[] = [
   'lab', 'hostel', 'uniform', 'miscellaneous', 'custom',
 ]
 
-const FEE_TYPE_LABELS: Record<string, string> = {
-  tuition: 'Tuition',
-  admission: 'Admission',
-  exam: 'Exam',
-  transport: 'Transport',
-  library: 'Library',
-  lab: 'Lab',
-  hostel: 'Hostel',
-  uniform: 'Uniform',
-  miscellaneous: 'Miscellaneous',
-  custom: 'Custom',
-}
-
 const FREQUENCIES: FeeFrequency[] = ['one_time', 'monthly', 'quarterly', 'annual']
-
-const FREQUENCY_LABELS: Record<string, string> = {
-  one_time: 'One Time',
-  monthly: 'Monthly',
-  quarterly: 'Quarterly',
-  annual: 'Annual',
-}
 
 const TAX_TYPES: TaxType[] = ['none', 'PAN', 'VAT']
 
@@ -72,27 +53,27 @@ export interface AcademicYearOption {
 
 const feeStructureSchema = z
   .object({
-    name: z.string().min(1, 'Name is required').max(100, 'Name must be 100 characters or fewer'),
-    description: z.string().max(255, 'Description must be 255 characters or fewer').optional(),
+    name: z.string().min(1, 'nameRequired').max(100, 'nameMax'),
+    description: z.string().max(255, 'descriptionMax').optional(),
     feeType: z.enum([
       'tuition', 'admission', 'exam', 'transport', 'library',
       'lab', 'hostel', 'uniform', 'miscellaneous', 'custom',
     ]),
     amount: z
-      .number({ invalid_type_error: 'Amount is required' })
-      .min(0, 'Amount must be 0 or more')
-      .max(10_000_000, 'Amount cannot exceed 10,000,000'),
+      .number({ invalid_type_error: 'amountRequired' })
+      .min(0, 'amountMin')
+      .max(10_000_000, 'amountMax'),
     frequency: z.enum(['one_time', 'monthly', 'quarterly', 'annual']),
     taxRate: z
       .number()
-      .min(0, 'Tax rate must be 0 or more')
-      .max(100, 'Tax rate cannot exceed 100%')
+      .min(0, 'taxRateMin')
+      .max(100, 'taxRateMax')
       .optional(),
     taxType: z.enum(['none', 'PAN', 'VAT']).optional(),
     gradeLevels: z.array(z.string()),
-    effectiveFrom: z.string().min(1, 'Effective date is required'),
+    effectiveFrom: z.string().min(1, 'effectiveFromRequired'),
     effectiveTo: z.string().optional(),
-    academicYearId: z.string().min(1, 'Academic year is required'),
+    academicYearId: z.string().min(1, 'academicYearRequired'),
     autoApplyOnEnrollment: z.boolean().optional(),
     proRateOnMidTermEntry: z.boolean().optional(),
   })
@@ -104,7 +85,7 @@ const feeStructureSchema = z
       return true
     },
     {
-      message: 'Effective To must be after Effective From',
+      message: 'effectiveToAfterFrom',
       path: ['effectiveTo'],
     },
   )
@@ -138,6 +119,25 @@ export function FeeStructureForm({
   calendarSystem = 'gregorian',
   enableDualDateDisplay = false,
 }: FeeStructureFormProps) {
+  const { t } = useTranslation('payments')
+
+  const validationError = (message?: string) =>
+    message ? t(`feeStructure.validation.${message}`, { defaultValue: message }) : undefined
+  const feeTypeLabel = (feeType: FeeType) =>
+    t(`feeStructure.types.${feeType}`, { defaultValue: feeType })
+  const frequencyLabel = (frequency: FeeFrequency) =>
+    t(`feeStructure.frequencies.${frequency}`, { defaultValue: frequency })
+  const taxTypeLabel = (taxType: TaxType) =>
+    taxType === 'none' ? t('feeStructure.taxTypes.none') : taxType
+  const academicYearLabel = (academicYear: AcademicYearOption) => {
+    const statusLabel = academicYear.isCurrent
+      ? t('feeStructure.academicYearStatus.current')
+      : academicYear.status === 'planning'
+        ? t('feeStructure.academicYearStatus.planning')
+        : ''
+    return statusLabel ? `${academicYear.name} (${statusLabel})` : academicYear.name
+  }
+
   const defaultAcademicYearId = feeStructure?.academicYearId
     ?? academicYears.find((y) => y.isCurrent)?.id
     ?? academicYears.find((y) => y.status === 'active')?.id
@@ -220,11 +220,12 @@ export function FeeStructureForm({
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[rgb(var(--border-primary))] flex-shrink-0">
           <h2 id="fee-structure-form-title" className="text-lg font-semibold text-[rgb(var(--text-primary))]">
-            {feeStructure ? 'Edit Fee Structure' : 'Add Fee Structure'}
+            {feeStructure ? t('feeStructure.editFee') : t('feeStructure.addFee')}
           </h2>
           <button
             type="button"
             onClick={onClose}
+            aria-label={t('feeStructure.closeForm')}
             className="p-1.5 rounded-lg hover:bg-[rgb(var(--background-tertiary))] transition-colors"
           >
             <X className="w-5 h-5 text-[rgb(var(--text-tertiary))]" />
@@ -235,26 +236,26 @@ export function FeeStructureForm({
         <form onSubmit={handleSubmit(onSubmit)} className="px-6 py-4 space-y-5 overflow-y-auto flex-1">
 
           {/* ── Basic Info ── */}
-          <SectionHeader title="Basic Info" />
+          <SectionHeader title={t('feeStructure.sections.basicInfo')} />
 
-          <Field label="Name" error={errors.name?.message}>
+          <Field label={t('feeStructure.fields.name')} error={validationError(errors.name?.message)}>
             <input
               {...register('name')}
               className="input"
-              placeholder="e.g. Annual Tuition Fee"
+              placeholder={t('feeStructure.placeholders.name')}
             />
           </Field>
 
-          <Field label="Description" error={errors.description?.message}>
+          <Field label={t('feeStructure.fields.description')} error={validationError(errors.description?.message)}>
             <input
               {...register('description')}
               className="input"
-              placeholder="Optional description"
+              placeholder={t('feeStructure.placeholders.description')}
             />
           </Field>
 
           <div className="grid grid-cols-2 gap-4">
-            <Field label="Type" error={errors.feeType?.message}>
+            <Field label={t('feeStructure.fields.type')} error={validationError(errors.feeType?.message)}>
               <Controller
                 name="feeType"
                 control={control}
@@ -262,12 +263,12 @@ export function FeeStructureForm({
                   <Select
                     value={field.value}
                     onChange={field.onChange}
-                    options={FEE_TYPES.map((ft) => ({ value: ft, label: FEE_TYPE_LABELS[ft] }))}
+                    options={FEE_TYPES.map((ft) => ({ value: ft, label: feeTypeLabel(ft) }))}
                   />
                 )}
               />
             </Field>
-            <Field label="Academic Year" error={errors.academicYearId?.message}>
+            <Field label={t('feeStructure.fields.academicYear')} error={validationError(errors.academicYearId?.message)}>
               {academicYears.length > 0 ? (
                 <Controller
                   name="academicYearId"
@@ -276,27 +277,27 @@ export function FeeStructureForm({
                     <Select
                       value={field.value}
                       onChange={field.onChange}
-                      placeholder="Select year..."
+                      placeholder={t('feeStructure.placeholders.selectYear')}
                       options={academicYears.map((ay) => ({
                         value: ay.id,
-                        label: `${ay.name}${ay.isCurrent ? ' (Current)' : ay.status === 'planning' ? ' (Planning)' : ''}`,
+                        label: academicYearLabel(ay),
                       }))}
                     />
                   )}
                 />
               ) : (
                 <p className="text-xs text-[rgb(var(--text-tertiary))] py-2">
-                  No academic years configured.
+                  {t('feeStructure.academicYearStatus.noneConfigured')}
                 </p>
               )}
             </Field>
           </div>
 
           {/* ── Pricing ── */}
-          <SectionHeader title="Pricing" />
+          <SectionHeader title={t('feeStructure.sections.pricing')} />
 
           <div className="grid grid-cols-2 gap-4">
-            <Field label="Amount" error={errors.amount?.message}>
+            <Field label={t('feeStructure.fields.amount')} error={validationError(errors.amount?.message)}>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-medium text-[rgb(var(--text-tertiary))] pointer-events-none select-none">
                   {currency}
@@ -312,7 +313,7 @@ export function FeeStructureForm({
                 />
               </div>
             </Field>
-            <Field label="Frequency" error={errors.frequency?.message}>
+            <Field label={t('feeStructure.fields.frequency')} error={validationError(errors.frequency?.message)}>
               <Controller
                 name="frequency"
                 control={control}
@@ -320,7 +321,7 @@ export function FeeStructureForm({
                   <Select
                     value={field.value}
                     onChange={field.onChange}
-                    options={FREQUENCIES.map((freq) => ({ value: freq, label: FREQUENCY_LABELS[freq] }))}
+                    options={FREQUENCIES.map((freq) => ({ value: freq, label: frequencyLabel(freq) }))}
                   />
                 )}
               />
@@ -328,7 +329,7 @@ export function FeeStructureForm({
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <Field label="Tax Type" error={errors.taxType?.message}>
+            <Field label={t('feeStructure.fields.taxType')} error={validationError(errors.taxType?.message)}>
               <Controller
                 name="taxType"
                 control={control}
@@ -336,13 +337,13 @@ export function FeeStructureForm({
                   <Select
                     value={field.value ?? 'none'}
                     onChange={field.onChange}
-                    options={TAX_TYPES.map((tt) => ({ value: tt, label: tt === 'none' ? 'None' : tt }))}
+                    options={TAX_TYPES.map((tt) => ({ value: tt, label: taxTypeLabel(tt) }))}
                   />
                 )}
               />
             </Field>
             {watchedTaxType !== 'none' && (
-              <Field label="Tax Rate (%)" error={errors.taxRate?.message}>
+              <Field label={t('feeStructure.fields.taxRate')} error={validationError(errors.taxRate?.message)}>
                 <input
                   {...register('taxRate', { valueAsNumber: true })}
                   type="number"
@@ -357,7 +358,7 @@ export function FeeStructureForm({
           </div>
 
           {/* ── Scope ── */}
-          <SectionHeader title="Scope" />
+          <SectionHeader title={t('feeStructure.sections.scope')} />
 
           {/* Grade Levels — multi-select dropdown */}
           <Controller
@@ -368,13 +369,13 @@ export function FeeStructureForm({
                 value={field.value}
                 onChange={field.onChange}
                 gradeOptions={gradeOptions}
-                error={errors.gradeLevels?.message}
+                error={validationError(errors.gradeLevels?.message)}
               />
             )}
           />
 
           {/* ── Enrollment Rules ── */}
-          <SectionHeader title="Enrollment Rules" />
+          <SectionHeader title={t('feeStructure.sections.enrollmentRules')} />
 
           <div className="space-y-3 p-3 rounded-lg bg-[rgb(var(--background-tertiary))]">
             <label className="flex items-center gap-2 cursor-pointer">
@@ -383,7 +384,7 @@ export function FeeStructureForm({
                 {...register('autoApplyOnEnrollment')}
                 className="w-4 h-4 rounded border-[rgb(var(--border-primary))] text-[rgb(var(--action-secondary-fg))] focus:ring-[rgb(var(--border-focus))]"
               />
-              <span className="text-sm text-[rgb(var(--text-primary))]">Auto-apply on enrollment</span>
+              <span className="text-sm text-[rgb(var(--text-primary))]">{t('feeStructure.autoApplyOnEnrollment')}</span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
               <input
@@ -391,28 +392,28 @@ export function FeeStructureForm({
                 {...register('proRateOnMidTermEntry')}
                 className="w-4 h-4 rounded border-[rgb(var(--border-primary))] text-[rgb(var(--action-secondary-fg))] focus:ring-[rgb(var(--border-focus))]"
               />
-              <span className="text-sm text-[rgb(var(--text-primary))]">Pro-rate on mid-term entry</span>
+              <span className="text-sm text-[rgb(var(--text-primary))]">{t('feeStructure.enrollment.proRateOnMidTermEntry')}</span>
             </label>
             <p className="text-xs text-[rgb(var(--text-tertiary))]">
-              When enabled, fees are automatically calculated proportionally for students enrolling mid-term.
+              {t('feeStructure.enrollment.proRateHelp')}
             </p>
           </div>
 
           {/* ── Effective Period ── */}
-          <SectionHeader title="Effective Period" />
+          <SectionHeader title={t('feeStructure.sections.effectivePeriod')} />
 
           <div className="grid grid-cols-2 gap-4">
-            <Field label="Effective From" error={errors.effectiveFrom?.message}>
+            <Field label={t('feeStructure.fields.effectiveFrom')} error={validationError(errors.effectiveFrom?.message)}>
               <input {...register('effectiveFrom')} type="date" className="input" />
             </Field>
-            <Field label="Effective To" error={errors.effectiveTo?.message}>
+            <Field label={t('feeStructure.fields.effectiveTo')} error={validationError(errors.effectiveTo?.message)}>
               <input {...register('effectiveTo')} type="date" className="input" />
             </Field>
           </div>
           {calendarSystem === 'bikram_sambat' && (
             <p className="text-xs text-[rgb(var(--text-tertiary))]">
-              Dates are displayed in Gregorian (AD). The system stores all dates in AD format.
-              {enableDualDateDisplay && ' Bikram Sambat equivalents are shown where applicable.'}
+              {t('feeStructure.dateHelp.gregorianStorage')}
+              {enableDualDateDisplay && ` ${t('feeStructure.dateHelp.dualBs')}`}
             </p>
           )}
         </form>
@@ -420,13 +421,13 @@ export function FeeStructureForm({
         {/* Footer */}
         <div className="flex justify-end gap-3 px-6 py-4 border-t border-[rgb(var(--border-primary))] flex-shrink-0">
           <Button variant="outline" onClick={onClose}>
-            Cancel
+            {t('actions.cancel')}
           </Button>
           <Button
             onClick={handleSubmit(onSubmit)}
             disabled={isSubmitting || !isValid}
           >
-            {isSubmitting ? 'Saving...' : 'Save'}
+            {isSubmitting ? t('actions.saving') : t('actions.save')}
           </Button>
         </div>
       </div>
@@ -450,6 +451,7 @@ function GradeLevelSelect({
   gradeOptions: string[]
   error?: string
 }) {
+  const { t } = useTranslation('payments')
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
@@ -499,13 +501,18 @@ function GradeLevelSelect({
   }, [isOpen])
 
   const displayText = value.length === 0
-    ? 'Select grade levels...'
+    ? t('feeStructure.gradeSelect.placeholder')
     : allSelected
-      ? 'All Grades'
-      : `${value.length} grade${value.length !== 1 ? 's' : ''} selected`
+      ? t('feeStructure.allGrades')
+      : t(
+          value.length === 1
+            ? 'feeStructure.gradeSelect.selectedCount'
+            : 'feeStructure.gradeSelect.selectedCount_plural',
+          { count: value.length },
+        )
 
   return (
-    <Field label="Grade Levels" error={error}>
+    <Field label={t('feeStructure.fields.gradeLevels')} error={error}>
       <div className="relative" ref={dropdownRef}>
         {/* Trigger button */}
         <button
@@ -516,9 +523,7 @@ function GradeLevelSelect({
           <span className={value.length === 0 ? 'text-[rgb(var(--text-tertiary))]' : ''}>
             {displayText}
           </span>
-          <svg className={`w-4 h-4 text-[rgb(var(--text-tertiary))] transition-transform ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
+          <ChevronDown className={`w-4 h-4 text-[rgb(var(--text-tertiary))] transition-transform ${isOpen ? 'rotate-180' : ''}`} />
         </button>
 
         {/* Dropdown */}
@@ -532,7 +537,7 @@ function GradeLevelSelect({
                 onChange={toggleAll}
                 className="w-3.5 h-3.5 rounded border-[rgb(var(--border-primary))] text-[rgb(var(--action-secondary-fg))] focus:ring-[rgb(var(--border-focus))]"
               />
-              <span className="text-sm font-medium text-[rgb(var(--text-primary))]">All Grades</span>
+              <span className="text-sm font-medium text-[rgb(var(--text-primary))]">{t('feeStructure.allGrades')}</span>
             </label>
 
             {/* Individual grades */}
@@ -547,7 +552,7 @@ function GradeLevelSelect({
                   onChange={() => toggleGrade(grade)}
                   className="w-3.5 h-3.5 rounded border-[rgb(var(--border-primary))] text-[rgb(var(--state-info-fg))] focus:ring-[rgb(var(--border-focus))]"
                 />
-                <span className="text-sm text-[rgb(var(--text-primary))]">Grade {grade}</span>
+                <span className="text-sm text-[rgb(var(--text-primary))]">{t('feeStructure.gradeSelect.gradeLabel', { grade })}</span>
               </label>
             ))}
           </div>
@@ -565,6 +570,7 @@ function GradeLevelSelect({
                 <button
                   type="button"
                   onClick={() => toggleGrade(grade)}
+                  aria-label={t('feeStructure.gradeSelect.removeGradeAria', { grade })}
                   className="hover:text-[rgb(var(--state-info-fg))]"
                 >
                   &times;

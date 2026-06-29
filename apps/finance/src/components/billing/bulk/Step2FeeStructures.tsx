@@ -12,6 +12,7 @@
 import { Plus, X, Percent, Check, AlertTriangle, Ban, ChevronDown } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Button } from '@edforge/ui'
+import { useTranslation } from '@edforge/i18n'
 import { useCurrency } from '@edforge/types/use-currency'
 import { useFinanceSettings } from '../../../layouts/FinanceLayout'
 import { computeBatch, coverageOf } from './compute'
@@ -21,6 +22,8 @@ import type {
   SelectedFeesMap,
   StudentSearchResult,
 } from './types'
+
+type Translate = (key: string, options?: Record<string, unknown>) => string
 
 export interface Step2FeeStructuresProps {
   students: StudentSearchResult[]
@@ -39,6 +42,7 @@ export function Step2FeeStructures({
   customLines,
   setCustomLines,
 }: Step2FeeStructuresProps) {
+  const { t } = useTranslation('payments')
   const settings = useFinanceSettings()
   const { format: formatCurrency } = useCurrency(settings)
   const batch = useMemo(
@@ -56,9 +60,7 @@ export function Step2FeeStructures({
     <div className="grid grid-cols-1 lg:grid-cols-[1fr,320px] gap-6">
       <div className="space-y-4">
         <p className="text-sm text-[rgb(var(--text-secondary))]">
-          Each fee is checked against your {students.length} selected student
-          {students.length === 1 ? '' : 's'}. Fees that don&apos;t apply to a
-          student are skipped on that invoice automatically.
+          {t('bulkGenerate.step2.coverageIntro', { count: students.length })}
         </p>
 
         {groups.map(group => (
@@ -68,12 +70,14 @@ export function Step2FeeStructures({
             students={students}
             selectedFees={selectedFees}
             setSelectedFees={setSelectedFees}
+            t={t}
           />
         ))}
 
         <CustomLineItems
           customLines={customLines}
           setCustomLines={setCustomLines}
+          t={t}
         />
       </div>
 
@@ -81,28 +85,30 @@ export function Step2FeeStructures({
       <aside className="space-y-3 p-4 border border-[rgb(var(--border-primary))] rounded-md bg-[rgb(var(--background-secondary))] h-fit sticky top-2">
         <div>
           <div className="text-[11px] uppercase tracking-wider text-[rgb(var(--text-tertiary))]">
-            Estimated grand total
+            {t('bulkGenerate.step2.estimatedGrandTotal')}
           </div>
           <div className="text-2xl font-mono font-semibold text-[rgb(var(--text-primary))] mt-0.5">
             {formatCurrency(batch.billableTotal)}
           </div>
           <div className="text-xs font-mono text-[rgb(var(--text-tertiary))] mt-0.5">
-            {formatCurrency(batch.avgPerStudent)} avg / student
+            {t('bulkGenerate.step2.avgPerStudent', {
+              amount: formatCurrency(batch.avgPerStudent),
+            })}
           </div>
         </div>
 
         <div className="space-y-1.5 text-xs">
-          <RailRow label="Students" value={students.length} />
-          <RailRow label="Fee structures" value={feeCount} />
-          <RailRow label="Custom lines" value={customCount} />
+          <RailRow label={t('bulkGenerate.step2.students')} value={students.length} />
+          <RailRow label={t('bulkGenerate.step2.feeStructures')} value={feeCount} />
+          <RailRow label={t('bulkGenerate.step2.customLines')} value={customCount} />
           <hr className="my-2 border-[rgb(var(--border-primary))]" />
           <RailRow
-            label="Gross subtotal"
+            label={t('bulkGenerate.step2.grossSubtotal')}
             value={formatCurrency(batch.perStudent.reduce((s, p) => s + p.subtotal, 0))}
             mono
           />
           <RailRow
-            label="Fee discounts"
+            label={t('bulkGenerate.step2.feeDiscounts')}
             value={`−${formatCurrency(batch.perStudent.reduce((s, p) => s + p.discountTotal, 0))}`}
             mono
             tone="accent"
@@ -113,9 +119,7 @@ export function Step2FeeStructures({
           <div className="flex items-start gap-2 p-2 rounded bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] text-[11px] text-[rgb(var(--text-secondary))]">
             <AlertTriangle className="w-3.5 h-3.5 text-[rgb(var(--accent-strong))] flex-shrink-0 mt-0.5" />
             <span>
-              {batch.zeroCount} student{batch.zeroCount === 1 ? "'s" : 's'} projected
-              total is 0 — turn on <i>Skip zero-total</i> in Step 3 to exclude
-              them.
+              {t('bulkGenerate.step2.zeroTotalWarning', { count: batch.zeroCount })}
             </span>
           </div>
         )}
@@ -151,11 +155,13 @@ function FeeGroup({
   students,
   selectedFees,
   setSelectedFees,
+  t,
 }: {
   group: FeeGroupShape
   students: StudentSearchResult[]
   selectedFees: SelectedFeesMap
   setSelectedFees: (next: SelectedFeesMap) => void
+  t: Translate
 }) {
   const [open, setOpen] = useState(true)
   const selN = group.fees.filter(f => selectedFees[f.id]).length
@@ -174,7 +180,7 @@ function FeeGroup({
         className="flex items-center gap-3 px-3 py-2.5 cursor-pointer"
       >
         <div className="flex-1 min-w-0 text-sm font-medium text-[rgb(var(--text-primary))] capitalize">
-          {group.type.replace(/_/g, ' ')}
+          {formatFeeType(group.type, t)}
         </div>
         <span className="text-xs px-2 py-0.5 rounded-md bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-secondary))] tabular-nums">
           {selN} / {group.fees.length}
@@ -211,6 +217,7 @@ function FeeRow({
   selectedFees: SelectedFeesMap
   setSelectedFees: (next: SelectedFeesMap) => void
 }) {
+  const { t } = useTranslation('payments')
   const settings = useFinanceSettings()
   const { format: formatCurrency } = useCurrency(settings)
   const sel = !!selectedFees[fee.id]
@@ -261,11 +268,13 @@ function FeeRow({
         )}
         <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
           <span className="text-[10px] px-1.5 py-0.5 rounded bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-secondary))] capitalize">
-            {fee.frequency}
+            {t(`feeStructure.frequencies.${fee.frequency}`, {
+              defaultValue: fee.frequency,
+            })}
           </span>
           {fee.gradeLevels && fee.gradeLevels.length > 0 && (
             <span className="text-[10px] px-1.5 py-0.5 rounded bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-secondary))]">
-              Grades {fee.gradeLevels.join(', ')}
+              {t('bulkGenerate.common.gradesList', { grades: fee.gradeLevels.join(', ') })}
             </span>
           )}
           <CoverageChip full={full} zero={zero} cov={cov} total={total} />
@@ -278,7 +287,7 @@ function FeeRow({
         {sel && (
           <div
             className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))]"
-            title="Per-fee discount %"
+            title={t('bulkGenerate.step2.perFeeDiscount')}
           >
             <Percent className="w-3 h-3 text-[rgb(var(--text-tertiary))]" />
             <input
@@ -307,23 +316,29 @@ function CoverageChip({
   cov: number
   total: number
 }) {
+  const { t } = useTranslation('payments')
   if (full) {
     return (
       <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-[rgb(var(--accent-soft))] text-[rgb(var(--accent-strong))]">
-        <Check className="w-2.5 h-2.5" /> Applies to all {total}
+        <Check className="w-2.5 h-2.5" /> {t('bulkGenerate.step2.appliesToAll', { count: total })}
       </span>
     )
   }
   if (zero) {
     return (
       <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-red-50 text-red-700 dark:bg-red-950 dark:text-red-200">
-        <Ban className="w-2.5 h-2.5" /> Applies to 0 — not selectable
+        <Ban className="w-2.5 h-2.5" /> {t('bulkGenerate.step2.appliesToZero')}
       </span>
     )
   }
   return (
     <span className="inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-200">
-      <AlertTriangle className="w-2.5 h-2.5" /> {cov} of {total} · {total - cov} skipped
+      <AlertTriangle className="w-2.5 h-2.5" />
+      {t('bulkGenerate.step2.partialCoverage', {
+        covered: cov,
+        total,
+        skipped: total - cov,
+      })}
     </span>
   )
 }
@@ -335,9 +350,11 @@ function CoverageChip({
 function CustomLineItems({
   customLines,
   setCustomLines,
+  t,
 }: {
   customLines: CustomLine[]
   setCustomLines: (next: CustomLine[]) => void
+  t: Translate
 }) {
   const add = () =>
     setCustomLines([
@@ -356,7 +373,7 @@ function CustomLineItems({
     <div className="border border-[rgb(var(--border-primary))] rounded-md bg-[rgb(var(--background-primary))]">
       <div className="flex items-center gap-3 px-3 py-2.5">
         <div className="flex-1 min-w-0 text-sm font-medium text-[rgb(var(--text-primary))]">
-          Custom line items
+          {t('bulkGenerate.step2.customLineItems')}
         </div>
         <span className="text-xs px-2 py-0.5 rounded-md bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-secondary))] tabular-nums">
           {customLines.length} / 10
@@ -367,13 +384,12 @@ function CustomLineItems({
           disabled={customLines.length >= 10}
           className="text-xs"
         >
-          <Plus className="w-3 h-3 mr-1" /> Add line
+          <Plus className="w-3 h-3 mr-1" /> {t('bulkGenerate.step2.addLine')}
         </Button>
       </div>
       {customLines.length === 0 ? (
         <div className="px-3 py-2.5 text-xs text-[rgb(var(--text-tertiary))] border-t border-[rgb(var(--border-primary))]">
-          Optional one-off charges added to every selected student&apos;s invoice
-          (e.g., &ldquo;Annual picnic — voluntary&rdquo;).
+          {t('bulkGenerate.step2.customLineHelp')}
         </div>
       ) : (
         <div className="divide-y divide-[rgb(var(--border-primary))] border-t border-[rgb(var(--border-primary))]">
@@ -381,7 +397,7 @@ function CustomLineItems({
             <div key={line.id} className="flex items-center gap-2 px-3 py-2">
               <input
                 type="text"
-                placeholder="e.g. Annual picnic — voluntary"
+                placeholder={t('bulkGenerate.step2.customLinePlaceholder')}
                 value={line.name}
                 onChange={(e) => update(i, { name: e.target.value })}
                 className="flex-1 text-sm bg-transparent text-[rgb(var(--text-primary))] outline-none border-0 focus:outline-none"
@@ -397,7 +413,7 @@ function CustomLineItems({
                 type="button"
                 onClick={() => remove(i)}
                 className="p-1 rounded hover:bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))]"
-                aria-label="Remove line"
+                aria-label={t('bulkGenerate.step2.removeLine')}
               >
                 <X className="w-4 h-4" />
               </button>
@@ -407,6 +423,12 @@ function CustomLineItems({
       )}
     </div>
   )
+}
+
+function formatFeeType(type: string, t: Translate): string {
+  return t(`feeStructure.types.${type}`, {
+    defaultValue: type.replace(/_/g, ' '),
+  })
 }
 
 // ---------------------------------------------------------------------------
