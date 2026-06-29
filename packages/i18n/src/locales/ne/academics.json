@@ -1204,6 +1204,110 @@
       }
     }
   },
+  "iemisImport": {
+    "backToStudents": "विद्यार्थीहरूमा फर्कनुहोस्",
+    "title": "IEMIS बल्क विद्यार्थी आयात",
+    "subtitle": "{{schoolName}} मा विद्यार्थी भर्ना गर्न नेपाल IEMIS xlsx निर्यात अपलोड गर्नुहोस्।",
+    "thisSchool": "यो विद्यालय",
+    "states": {
+      "parsingTitle": "xlsx फाइल पार्स गर्दै",
+      "parsingDescription": "स्तम्भहरू पढ्दै र पङ्क्ति डिक्सनरी बनाउँदै। सामान्यतया 2 सेकेन्डभन्दा कम लाग्छ।",
+      "dryRunTitle": "IEMIS नियमहरूसँग जाँच गर्दै",
+      "dryRunDescription": "{{count}} पङ्क्तिमा त्रुटि, चेतावनी र डुप्लिकेट जाँच गर्दै। डाटा अझै सुरक्षित गरिएको छैन।",
+      "parseErrorTitle": "फाइल पार्स गर्न सकिएन",
+      "unknownParseError": "अज्ञात पार्स त्रुटि।",
+      "submittingTitle": "आयात पेश गर्दै",
+      "submittingDescription": "आयात job queue गर्दै।",
+      "importFailedTitle": "आयात असफल",
+      "unknownError": "अज्ञात त्रुटि।",
+      "rerunDryRun": "dry-run फेरि चलाउनुहोस्",
+      "checkingEligibilityTitle": "विद्यालय योग्यता जाँच गर्दै",
+      "checkingEligibilityDescription": "सक्रिय विद्यालयमा IEMIS कोड कन्फिगर भएको छ कि छैन पुष्टि गर्दै।",
+      "noSchoolTitle": "सक्रिय विद्यालय चयन गरिएको छैन",
+      "noSchoolMessage": "हेडरको switcher बाट विद्यालय चयन गर्नुहोस्, त्यसपछि यो पृष्ठ reload गर्नुहोस्।"
+    },
+    "gate": {
+      "missingCodeTitle": "{{schoolName}} मा IEMIS विद्यालय कोड छैन",
+      "missingCodeDescription": "IEMIS आयातका लागि विद्यालयमा नेपाल सरकारद्वारा जारी {{code}} सेट हुनुपर्छ। विद्यालय सिर्जना भएपछि यो मान immutable हुन्छ, त्यसैले विद्यालयमै प्रविष्ट हुनुपर्छ। IEMIS कोडसहित School Wizard बाट नयाँ विद्यालय सिर्जना गर्न tenant admin लाई भन्नुहोस्, वा यस विद्यालयको metadata अद्यावधिक गर्न support लाई सम्पर्क गर्नुहोस्।"
+    },
+    "chooser": {
+      "dropTitle": "IEMIS xlsx यहाँ छोड्नुहोस्",
+      "dropDescription": "वा फाइल खोज्न तल क्लिक गर्नुहोस्। प्रति फाइल {{maxRows}} पङ्क्तिसम्म।",
+      "browse": "फाइल ब्राउज गर्नुहोस्",
+      "expectedColumns": "अपेक्षित स्तम्भहरू",
+      "expectedDescription": "यो tool ले standard IEMIS xlsx निर्यात सीधै पढ्छ। आवश्यक स्तम्भहरू: Student Id, FullName, Gender, CurrentClass, DOB। Father Name, Guardian Name र ठेगाना जस्ता थप स्तम्भहरू उपलब्ध हुँदा समावेश हुन्छन्।",
+      "dateDescription": "मितिहरू Bikram Sambat रूपमा पढिन्छन् र server मा Gregorian मा रूपान्तरण हुन्छन्।"
+    },
+    "summary": {
+      "fileSummary": "{{rows}} पङ्क्ति · 20 मध्ये {{mapped}} IEMIS स्तम्भ mapped",
+      "fileSummary_plural": "{{rows}} पङ्क्ति · 20 मध्ये {{mapped}} IEMIS स्तम्भ mapped",
+      "extraColumns": "{{count}} अतिरिक्त स्तम्भ बेवास्ता गरियो",
+      "extraColumns_plural": "{{count}} अतिरिक्त स्तम्भहरू बेवास्ता गरियो",
+      "willImport": "आयात हुने",
+      "blocked": "त्रुटिका कारण रोकिएको",
+      "duplicates": "डुप्लिकेट (छोडिने)",
+      "warnings": "चेतावनीहरू",
+      "created": "सिर्जना",
+      "enrolled": "भर्ना",
+      "skipped": "छोडिएको (डुप्लिकेट)",
+      "failed": "असफल"
+    },
+    "enrollOption": {
+      "title": "सबै आयातित विद्यार्थीलाई यस वर्षमा भर्ना गर्नुहोस्",
+      "current": "हालको",
+      "noYear": "यस विद्यालयमा सक्रिय शैक्षिक वर्ष छैन। आयातित विद्यार्थी भर्ना रेकर्ड बिना सिर्जना हुनेछन्। यो विकल्प सक्षम गर्न पहिले शैक्षिक वर्ष सेटअप गर्नुहोस्।",
+      "description": "सक्षम हुँदा, सफलतापूर्वक सिर्जना भएका प्रत्येक विद्यार्थीलाई यस वर्षको SchoolEnrollment पनि दिइन्छ र active अवस्थामा सारिन्छ। असक्षम हुँदा, विद्यार्थीहरू pending अवस्थामा सिर्जना हुन्छन् र प्रत्येकलाई विद्यार्थी विवरण पृष्ठबाट अलग-अलग भर्ना गर्नुपर्छ।"
+    },
+    "actions": {
+      "downloadFindings": "findings CSV डाउनलोड गर्नुहोस्",
+      "cancel": "रद्द गर्नुहोस्",
+      "importStudents": "{{count}} विद्यार्थी आयात गर्नुहोस्",
+      "importStudents_plural": "{{count}} विद्यार्थी आयात गर्नुहोस्",
+      "noRows": "आयात गर्न पङ्क्ति छैन",
+      "importAnother": "अर्को फाइल आयात गर्नुहोस्",
+      "viewStudents": "विद्यार्थीहरू हेर्नुहोस्",
+      "backToPreview": "preview मा फर्कनुहोस्",
+      "importNow": "{{count}} अहिले आयात गर्नुहोस्"
+    },
+    "duplicates": {
+      "title": "{{count}} डुप्लिकेट छोडिनेछ",
+      "title_plural": "{{count}} डुप्लिकेटहरू छोडिनेछन्",
+      "description": "यी पङ्क्तिहरूमा यस tenant मा पहिले नै भएको emisStudentId छ। तिनीहरू फेरि सिर्जना हुने छैनन्; विद्यमान रेकर्डहरू परिवर्तन हुँदैनन्।",
+      "row": "पङ्क्ति {{row}} - emisStudentId {{emisStudentId}} पहिले नै student id {{studentId}} मा छ",
+      "andMore": "...र थप {{count}}"
+    },
+    "confirm": {
+      "title": "IEMIS आयात पुष्टि गर्नुहोस्",
+      "description": "तपाईं dry-run commit गर्न लाग्नुभएको छ। यो उल्ट्याउन सकिँदैन।",
+      "summary": "{{schoolName}} मा {{count}} विद्यार्थी रेकर्ड सिर्जना हुनेछ।",
+      "summary_plural": "{{schoolName}} मा {{count}} विद्यार्थी रेकर्डहरू सिर्जना हुनेछन्।",
+      "andEnrolled": "र {{yearName}} मा भर्ना हुनेछ",
+      "skipped": "{{count}} डुप्लिकेट छोडिनेछ।",
+      "skipped_plural": "{{count}} डुप्लिकेटहरू छोडिनेछन्।",
+      "failed": "त्रुटिका कारण {{count}} पङ्क्ति आयात हुने छैन।",
+      "failed_plural": "त्रुटिका कारण {{count}} पङ्क्तिहरू आयात हुने छैनन्।",
+      "ack": "मैले dry-run findings समीक्षा गरेको छु र गन्तव्य विद्यालय सही छ भनेर पुष्टि गर्छु।"
+    },
+    "progress": {
+      "queuedTitle": "आयात queued",
+      "runningTitle": "विद्यार्थी आयात गर्दै...",
+      "queuedDescription": "Job queued छ। {{count}} पङ्क्ति प्रक्रिया गर्दै।",
+      "runningDescription": "{{count}} पङ्क्ति आयात गर्दै।",
+      "runningDescriptionWithYear": "{{count}} पङ्क्ति आयात गर्दै र {{yearName}} मा भर्ना गर्दै।",
+      "keepOpen": "यो tab खुला राख्न सक्नुहुन्छ। आयात server-side चल्छ; tab बन्द गर्दा job रद्द हुँदैन, तर live status view हराउनेछ।"
+    },
+    "results": {
+      "complete": "आयात पूरा भयो",
+      "issues": "आयात समस्या सहित सकियो",
+      "summary": "{{created}} विद्यार्थी सिर्जना, {{skipped}} छोडियो (डुप्लिकेट), {{failed}} असफल, कुल {{total}} पङ्क्तिमध्ये।",
+      "summaryWithEnrollment": "{{created}} विद्यार्थी सिर्जना, {{enrolled}} भर्ना{{year}}, {{skipped}} छोडियो (डुप्लिकेट), {{failed}} असफल, कुल {{total}} पङ्क्तिमध्ये।",
+      "inYear": " {{yearName}} मा",
+      "duration": "{{seconds}}s लाग्यो।",
+      "truncated": "पहिलो 500 findings देखाइएको छ। पूर्ण findings CSV डाउनलोड गर्न dry-run फेरि चलाउनुहोस्।",
+      "findings": "आयातबाट {{count}} finding",
+      "findings_plural": "आयातबाट {{count}} findings"
+    }
+  },
   "iemisExport": {
     "title": "IEMiS मासिक निर्यात",
     "description": "क्यालेन्डर महिनाका लागि IEMiS Flash II मासिक उपस्थिति सारांश बनाउनुहोस्। निर्यातले प्रति-विद्यार्थी उपस्थित / अनुपस्थित / अनुमति सहित अनुपस्थित दिनहरू पुन: गणना गर्छ र CSV डाउनलोड गर्न दिन्छ। ग्रेड विद्यालयको स्थानीय ग्रेड स्तर हो।",

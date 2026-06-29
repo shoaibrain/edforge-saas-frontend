@@ -75,6 +75,7 @@ import {
   type IemisImportJob,
   type IemisParseResult,
 } from './iemis-import.types'
+import { useAcademicsI18n } from '../../../lib/i18n'
 
 // ============================================================================
 // MAIN COMPONENT
@@ -82,6 +83,7 @@ import {
 
 export function IemisImport() {
   const navigate = useNavigate()
+  const { t, formatNumber } = useAcademicsI18n()
   const schoolId = useActiveSchoolId()
 
   // Fetch the active school so we can (a) display its name/IEMIS code in
@@ -322,17 +324,16 @@ export function IemisImport() {
         <button
           onClick={() => navigate({ to: '/students' })}
           className="p-2 rounded-lg text-text-secondary hover:bg-surface-hover"
-          aria-label="Back to students"
+          aria-label={t('iemisImport.backToStudents')}
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div className="flex-1">
           <h1 className="text-xl font-semibold text-text-primary">
-            IEMIS Bulk Student Import
+            {t('iemisImport.title')}
           </h1>
           <p className="text-sm text-text-tertiary mt-0.5">
-            Upload a Nepal IEMIS xlsx export to enroll students into{' '}
-            {school?.name ?? 'this school'}.
+            {t('iemisImport.subtitle', { schoolName: school?.name ?? t('iemisImport.thisSchool') })}
           </p>
         </div>
       </header>
@@ -355,8 +356,8 @@ export function IemisImport() {
       {effectivePhase === 'parsing' && (
         <InlineStatus
           icon={<Loader2 className="w-5 h-5 animate-spin" />}
-          title="Parsing the xlsx file"
-          description="Reading columns and building row dictionaries. This usually takes under 2 seconds."
+          title={t('iemisImport.states.parsingTitle')}
+          description={t('iemisImport.states.parsingDescription')}
         />
       )}
 
@@ -364,16 +365,16 @@ export function IemisImport() {
       {effectivePhase === 'dryRunning' && (
         <InlineStatus
           icon={<Loader2 className="w-5 h-5 animate-spin" />}
-          title="Validating against IEMIS rules"
-          description={`Checking ${parseResult?.rowCount ?? '…'} rows for errors, warnings, and duplicates. No data is saved yet.`}
+          title={t('iemisImport.states.dryRunTitle')}
+          description={t('iemisImport.states.dryRunDescription', { count: parseResult?.rowCount != null ? formatNumber(parseResult.rowCount) : '...' })}
         />
       )}
 
       {/* Parse error */}
       {effectivePhase === 'parseError' && (
         <ErrorCard
-          title="Unable to parse the file"
-          message={parseError ?? 'Unknown parse error.'}
+          title={t('iemisImport.states.parseErrorTitle')}
+          message={parseError ?? t('iemisImport.states.unknownParseError')}
           onRetry={resetToChooser}
         />
       )}
@@ -397,7 +398,7 @@ export function IemisImport() {
         <ConfirmModal
           parse={parseResult}
           dryRun={dryRunResult}
-          schoolName={school?.name ?? 'this school'}
+          schoolName={school?.name ?? t('iemisImport.thisSchool')}
           enrollInAcademicYearName={
             enrollInAcademicYearId && eligibleAcademicYear?.yearId === enrollInAcademicYearId
               ? eligibleAcademicYear.name
@@ -412,8 +413,8 @@ export function IemisImport() {
       {effectivePhase === 'committing' && (
         <InlineStatus
           icon={<Loader2 className="w-5 h-5 animate-spin" />}
-          title="Submitting import"
-          description="Queuing the import job."
+          title={t('iemisImport.states.submittingTitle')}
+          description={t('iemisImport.states.submittingDescription')}
         />
       )}
 
@@ -433,10 +434,10 @@ export function IemisImport() {
       {/* Commit error */}
       {effectivePhase === 'commitError' && (
         <ErrorCard
-          title="Import failed"
-          message={commitError ?? 'Unknown error.'}
+          title={t('iemisImport.states.importFailedTitle')}
+          message={commitError ?? t('iemisImport.states.unknownError')}
           onRetry={() => parseResult && runDryRun(parseResult)}
-          retryLabel="Re-run dry-run"
+          retryLabel={t('iemisImport.states.rerunDryRun')}
         />
       )}
 
@@ -472,20 +473,21 @@ function GateView({
   school: { name: string; emisSchoolCode?: string } | undefined
   isEligible: boolean
 }) {
+  const { t } = useAcademicsI18n()
   if (isLoading) {
     return (
       <InlineStatus
         icon={<Loader2 className="w-5 h-5 animate-spin" />}
-        title="Checking school eligibility"
-        description="Confirming the active school has an IEMIS code configured."
+        title={t('iemisImport.states.checkingEligibilityTitle')}
+        description={t('iemisImport.states.checkingEligibilityDescription')}
       />
     )
   }
   if (!school) {
     return (
       <ErrorCard
-        title="No active school selected"
-        message="Select a school from the switcher in the header, then reload this page."
+        title={t('iemisImport.states.noSchoolTitle')}
+        message={t('iemisImport.states.noSchoolMessage')}
       />
     )
   }
@@ -496,15 +498,10 @@ function GateView({
           <AlertTriangle className="w-5 h-5 text-[rgb(var(--state-warning-fg))] flex-shrink-0 mt-0.5" />
           <div className="text-sm">
             <div className="font-medium text-amber-900 dark:text-amber-200">
-              {school.name} has no IEMIS school code
+              {t('iemisImport.gate.missingCodeTitle', { schoolName: school.name })}
             </div>
             <p className="mt-1 text-amber-800 dark:text-amber-300">
-              IEMIS imports require the school to have its Nepal government-issued{' '}
-              <code className="px-1 rounded bg-[rgb(var(--state-warning-bg)/0.18)] dark:bg-amber-900">emisSchoolCode</code>{' '}
-              set. That value is immutable after school creation, so it must be
-              entered on the school itself. Ask the tenant admin to create a
-              new school through the School Wizard with the IEMIS code, or
-              contact support to update this school's metadata.
+              {t('iemisImport.gate.missingCodeDescription', { code: 'emisSchoolCode' })}
             </p>
           </div>
         </div>
@@ -519,6 +516,7 @@ function FileChooserCard({
 }: {
   onFileSelected: (file: File) => void
 }) {
+  const { t, formatNumber } = useAcademicsI18n()
   const [isDragging, setIsDragging] = useState(false)
   const onDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault()
@@ -543,14 +541,14 @@ function FileChooserCard({
       >
         <FileSpreadsheet className="w-10 h-10 mx-auto text-text-tertiary" />
         <h3 className="mt-3 text-base font-medium text-text-primary">
-          Drop the IEMIS xlsx here
+          {t('iemisImport.chooser.dropTitle')}
         </h3>
         <p className="mt-1 text-sm text-text-tertiary">
-          or click below to browse. Up to {MAX_IEMIS_ROW_COUNT} rows per file.
+          {t('iemisImport.chooser.dropDescription', { maxRows: formatNumber(MAX_IEMIS_ROW_COUNT) })}
         </p>
         <label className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg-hover))] text-[rgb(var(--action-primary-fg))] text-sm font-medium cursor-pointer">
           <Upload className="w-4 h-4" />
-          Browse files
+          {t('iemisImport.chooser.browse')}
           <input
             type="file"
             accept=".xlsx,.xls"
@@ -567,18 +565,12 @@ function FileChooserCard({
         <div className="flex items-start gap-2">
           <Info className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] flex-shrink-0 mt-0.5" />
           <div className="space-y-1 text-text-secondary">
-            <div className="font-medium text-text-primary">Expected columns</div>
+            <div className="font-medium text-text-primary">{t('iemisImport.chooser.expectedColumns')}</div>
             <p>
-              This tool reads the standard IEMIS xlsx export directly. Required
-              columns: <code>Student Id</code>, <code>FullName</code>,{' '}
-              <code>Gender</code>, <code>CurrentClass</code>, <code>DOB</code>.
-              Additional columns like <code>Father Name</code>,{' '}
-              <code>Guardian Name</code>, and addresses are captured when
-              present.
+              {t('iemisImport.chooser.expectedDescription')}
             </p>
             <p>
-              Dates are read as Bikram Sambat (e.g. <code>2072-3-13</code>) and
-              converted to Gregorian on the server.
+              {t('iemisImport.chooser.dateDescription')}
             </p>
           </div>
         </div>
@@ -608,6 +600,7 @@ function PreviewView({
   onCancel: () => void
   onDownloadFindings: () => void
 }) {
+  const { t, formatNumber } = useAcademicsI18n()
   const errors = dryRun.findings.filter((f) => f.level === 'error')
   const warnings = dryRun.findings.filter((f) => f.level === 'warn')
   const willImport = parse.rowCount - dryRun.skipped - dryRun.failed
@@ -623,10 +616,13 @@ function PreviewView({
               {parse.fileName}
             </div>
             <div className="text-xs text-text-tertiary">
-              {parse.rowCount} row{parse.rowCount === 1 ? '' : 's'} ·{' '}
-              {parse.mappedColumns.length} of 20 IEMIS columns mapped
+              {t('iemisImport.summary.fileSummary', {
+                count: parse.rowCount,
+                rows: formatNumber(parse.rowCount),
+                mapped: formatNumber(parse.mappedColumns.length),
+              })}
               {parse.extraColumns.length > 0 &&
-                ` · ${parse.extraColumns.length} extra column${parse.extraColumns.length === 1 ? '' : 's'} ignored`}
+                ` · ${t('iemisImport.summary.extraColumns', { count: parse.extraColumns.length })}`}
             </div>
           </div>
         </div>
@@ -635,13 +631,13 @@ function PreviewView({
       {/* Count summary */}
       <div className="grid grid-cols-4 gap-3">
         <CountTile
-          label="Will import"
+          label={t('iemisImport.summary.willImport')}
           value={willImport}
           tone={willImport > 0 ? 'success' : 'neutral'}
         />
-        <CountTile label="Blocked by errors" value={dryRun.failed} tone={dryRun.failed > 0 ? 'danger' : 'neutral'} />
-        <CountTile label="Duplicates (skip)" value={dryRun.skipped} tone={dryRun.skipped > 0 ? 'warn' : 'neutral'} />
-        <CountTile label="Warnings" value={warnings.length} tone={warnings.length > 0 ? 'warn' : 'neutral'} />
+        <CountTile label={t('iemisImport.summary.blocked')} value={dryRun.failed} tone={dryRun.failed > 0 ? 'danger' : 'neutral'} />
+        <CountTile label={t('iemisImport.summary.duplicates')} value={dryRun.skipped} tone={dryRun.skipped > 0 ? 'warn' : 'neutral'} />
+        <CountTile label={t('iemisImport.summary.warnings')} value={warnings.length} tone={warnings.length > 0 ? 'warn' : 'neutral'} />
       </div>
 
       {/* Enroll-on-import — Sprint C4 ────────────────────────────────────
@@ -687,14 +683,14 @@ function PreviewView({
                 }`}
               >
                 <CalendarCheck className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] " />
-                Enroll all imported students into this year
+                {t('iemisImport.enrollOption.title')}
               </div>
               {eligibleAcademicYear ? (
                 <div className="mt-1 text-xs text-[rgb(var(--state-info-fg))] ">
                   <b>{eligibleAcademicYear.name}</b>
                   {eligibleAcademicYear.isCurrent && (
                     <span className="ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-[rgb(var(--state-info-bg)/0.18)]  text-[rgb(var(--state-info-fg))] ">
-                      current
+                      {t('iemisImport.enrollOption.current')}
                     </span>
                   )}
                   {' · '}
@@ -702,9 +698,7 @@ function PreviewView({
                 </div>
               ) : (
                 <div className="mt-1 text-xs text-text-tertiary">
-                  No active academic year on this school. Imported students
-                  will be created without an enrollment record. Set up an
-                  academic year first to enable this option.
+                  {t('iemisImport.enrollOption.noYear')}
                 </div>
               )}
               <div
@@ -714,11 +708,7 @@ function PreviewView({
                     : 'text-text-tertiary'
                 }`}
               >
-                When enabled, every successfully created student also gets a
-                SchoolEnrollment for the year and is moved to <i>active</i> status.
-                When disabled, students are created in <i>pending</i> status
-                and you'll need to enroll each one individually from the
-                student detail page.
+                {t('iemisImport.enrollOption.description')}
               </div>
             </div>
           </label>
@@ -738,23 +728,23 @@ function PreviewView({
       {dryRun.duplicates.length > 0 && (
         <div className="rounded-xl border border-amber-300 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800 p-4">
           <div className="text-sm font-medium text-amber-900 dark:text-amber-200">
-            {dryRun.duplicates.length} duplicate
-            {dryRun.duplicates.length === 1 ? '' : 's'} will be skipped
+            {t('iemisImport.duplicates.title', { count: dryRun.duplicates.length })}
           </div>
           <p className="mt-1 text-xs text-amber-800 dark:text-amber-300">
-            These rows have an <code>emisStudentId</code> that already exists in
-            this tenant. They will not be re-created; existing records are
-            untouched.
+            {t('iemisImport.duplicates.description')}
           </p>
           <ul className="mt-2 space-y-1 text-xs font-mono text-amber-900 dark:text-amber-200 max-h-40 overflow-y-auto">
             {dryRun.duplicates.slice(0, 20).map((d) => (
               <li key={`${d.row}-${d.emisStudentId}`}>
-                Row {d.row} — emisStudentId <b>{d.emisStudentId}</b> already at
-                student id <b>{d.existingStudentId}</b>
+                {t('iemisImport.duplicates.row', {
+                  row: formatNumber(d.row),
+                  emisStudentId: d.emisStudentId,
+                  studentId: d.existingStudentId,
+                })}
               </li>
             ))}
             {dryRun.duplicates.length > 20 && (
-              <li className="italic">…and {dryRun.duplicates.length - 20} more</li>
+              <li className="italic">{t('iemisImport.duplicates.andMore', { count: formatNumber(dryRun.duplicates.length - 20) })}</li>
             )}
           </ul>
         </div>
@@ -778,14 +768,14 @@ function PreviewView({
           className="inline-flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg border border-border-primary text-text-primary hover:bg-surface-hover disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <Download className="w-4 h-4" />
-          Download findings CSV
+          {t('iemisImport.actions.downloadFindings')}
         </button>
         <div className="flex items-center gap-2">
           <button
             onClick={onCancel}
             className="px-4 py-1.5 text-sm rounded-lg border border-border-primary text-text-primary hover:bg-surface-hover"
           >
-            Cancel
+            {t('iemisImport.actions.cancel')}
           </button>
           <button
             onClick={onConfirm}
@@ -793,8 +783,8 @@ function PreviewView({
             className="px-4 py-1.5 text-sm rounded-lg bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg-hover))] disabled:bg-text-tertiary disabled:cursor-not-allowed text-[rgb(var(--action-primary-fg))] font-medium"
           >
             {willImport > 0
-              ? `Import ${willImport} student${willImport === 1 ? '' : 's'}`
-              : 'No rows to import'}
+              ? t('iemisImport.actions.importStudents', { count: willImport })
+              : t('iemisImport.actions.noRows')}
           </button>
         </div>
       </div>
@@ -817,6 +807,7 @@ function ConfirmModal({
   onConfirm: () => void
   onCancel: () => void
 }) {
+  const { t, formatNumber } = useAcademicsI18n()
   const [ack, setAck] = useState(false)
   const willImport = parse.rowCount - dryRun.skipped - dryRun.failed
   return (
@@ -831,10 +822,10 @@ function ConfirmModal({
         <div className="flex items-start justify-between gap-3 p-5 border-b border-border-primary">
           <div>
             <h3 className="text-base font-semibold text-text-primary">
-              Confirm IEMIS import
+              {t('iemisImport.confirm.title')}
             </h3>
             <p className="mt-1 text-sm text-text-tertiary">
-              You are about to commit the dry-run. This cannot be undone.
+              {t('iemisImport.confirm.description')}
             </p>
           </div>
           <button onClick={onCancel} className="p-1 text-text-tertiary hover:text-text-primary">
@@ -843,21 +834,20 @@ function ConfirmModal({
         </div>
         <div className="p-5 space-y-3 text-sm text-text-secondary">
           <p>
-            <b>{willImport}</b> student record{willImport === 1 ? '' : 's'} will
-            be created in <b>{schoolName}</b>
+            {t('iemisImport.confirm.summary', { count: willImport, schoolName })}
             {enrollInAcademicYearName && (
               <>
-                {' '}and enrolled in <b>{enrollInAcademicYearName}</b>
+                {' '}{t('iemisImport.confirm.andEnrolled', { yearName: enrollInAcademicYearName })}
               </>
             )}.{' '}
             {dryRun.skipped > 0 && (
               <>
-                <b>{dryRun.skipped}</b> duplicate{dryRun.skipped === 1 ? '' : 's'} will be skipped.{' '}
+                {t('iemisImport.confirm.skipped', { count: dryRun.skipped })}{' '}
               </>
             )}
             {dryRun.failed > 0 && (
               <>
-                <b>{dryRun.failed}</b> row{dryRun.failed === 1 ? '' : 's'} blocked by errors will not import.
+                {t('iemisImport.confirm.failed', { count: dryRun.failed })}
               </>
             )}
           </p>
@@ -869,8 +859,7 @@ function ConfirmModal({
               className="mt-1"
             />
             <span>
-              I have reviewed the dry-run findings and confirm the destination
-              school is correct.
+              {t('iemisImport.confirm.ack')}
             </span>
           </label>
         </div>
@@ -879,14 +868,14 @@ function ConfirmModal({
             onClick={onCancel}
             className="px-4 py-1.5 text-sm rounded-lg border border-border-primary text-text-primary hover:bg-surface-hover"
           >
-            Back to preview
+            {t('iemisImport.actions.backToPreview')}
           </button>
           <button
             onClick={onConfirm}
             disabled={!ack || willImport <= 0}
             className="px-4 py-1.5 text-sm rounded-lg bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg-hover))] disabled:bg-text-tertiary disabled:cursor-not-allowed text-[rgb(var(--action-primary-fg))] font-medium"
           >
-            Import {willImport} now
+            {t('iemisImport.actions.importNow', { count: formatNumber(willImport) })}
           </button>
         </div>
       </div>
@@ -913,12 +902,14 @@ function ProgressView({
   totalRows: number
   enrollInAcademicYearName: string | undefined
 }) {
+  const { t, formatNumber } = useAcademicsI18n()
   const status = job?.status ?? 'queued'
   const isQueued = status === 'queued'
   const description = isQueued
-    ? `Job is queued. Processing ${totalRows} row${totalRows === 1 ? '' : 's'}.`
-    : `Importing ${totalRows} row${totalRows === 1 ? '' : 's'}` +
-      (enrollInAcademicYearName ? ` and enrolling into ${enrollInAcademicYearName}.` : '.')
+    ? t('iemisImport.progress.queuedDescription', { count: formatNumber(totalRows) })
+    : enrollInAcademicYearName
+      ? t('iemisImport.progress.runningDescriptionWithYear', { count: formatNumber(totalRows), yearName: enrollInAcademicYearName })
+      : t('iemisImport.progress.runningDescription', { count: formatNumber(totalRows) })
 
   return (
     <div className="rounded-xl border border-[rgb(var(--state-info-border)/0.45)] bg-[rgb(var(--state-info-bg)/0.18)]   p-5">
@@ -926,12 +917,11 @@ function ProgressView({
         <Loader2 className="w-5 h-5 text-[rgb(var(--action-secondary-fg))] animate-spin flex-shrink-0 mt-0.5" />
         <div className="flex-1">
           <div className="text-sm font-medium text-[rgb(var(--text-primary))] ">
-            {isQueued ? 'Import queued' : 'Importing students…'}
+            {isQueued ? t('iemisImport.progress.queuedTitle') : t('iemisImport.progress.runningTitle')}
           </div>
           <p className="mt-1 text-sm text-[rgb(var(--state-info-fg))] ">{description}</p>
           <p className="mt-2 text-xs text-[rgb(var(--text-secondary))] ">
-            You can keep this tab open. The import runs server-side; closing
-            the tab won't cancel the job, but you'll lose the live status view.
+            {t('iemisImport.progress.keepOpen')}
           </p>
         </div>
       </div>
@@ -969,6 +959,7 @@ function ResultsView({
   onViewStudents: () => void
   onDownloadFindings: () => void
 }) {
+  const { t, formatNumber } = useAcademicsI18n()
   const enrollAttempted = !!job.enrollInAcademicYearId
   const allSuccess =
     job.failed === 0 &&
@@ -992,45 +983,54 @@ function ResultsView({
           )}
           <div>
             <div className="text-base font-semibold text-text-primary">
-              {allSuccess ? 'Import complete' : 'Import finished with issues'}
+              {allSuccess ? t('iemisImport.results.complete') : t('iemisImport.results.issues')}
             </div>
             <div className="mt-1 text-sm text-text-secondary">
-              {job.studentsCreated} student{job.studentsCreated === 1 ? '' : 's'} created
-              {enrollAttempted && (
-                <>, {job.studentsEnrolled} enrolled{enrollInAcademicYearName ? ` in ${enrollInAcademicYearName}` : ''}</>
-              )}
-              , {job.skipped} skipped (duplicates), {job.failed} failed out of {totalRows} total rows.
+              {enrollAttempted
+                ? t('iemisImport.results.summaryWithEnrollment', {
+                    created: formatNumber(job.studentsCreated),
+                    enrolled: formatNumber(job.studentsEnrolled),
+                    year: enrollInAcademicYearName ? t('iemisImport.results.inYear', { yearName: enrollInAcademicYearName }) : '',
+                    skipped: formatNumber(job.skipped),
+                    failed: formatNumber(job.failed),
+                    total: formatNumber(totalRows),
+                  })
+                : t('iemisImport.results.summary', {
+                    created: formatNumber(job.studentsCreated),
+                    skipped: formatNumber(job.skipped),
+                    failed: formatNumber(job.failed),
+                    total: formatNumber(totalRows),
+                  })}
             </div>
             {job.durationMs !== undefined && (
               <div className="mt-1 text-xs text-text-tertiary">
-                Took {(job.durationMs / 1000).toFixed(1)}s.
+                {t('iemisImport.results.duration', { seconds: formatNumber(Number((job.durationMs / 1000).toFixed(1))) })}
               </div>
             )}
           </div>
         </div>
       </div>
       <div className={`grid gap-3 ${enrollAttempted ? 'grid-cols-4' : 'grid-cols-3'}`}>
-        <CountTile label="Created" value={job.studentsCreated} tone="success" />
+        <CountTile label={t('iemisImport.summary.created')} value={job.studentsCreated} tone="success" />
         {enrollAttempted && (
           <CountTile
-            label="Enrolled"
+            label={t('iemisImport.summary.enrolled')}
             value={job.studentsEnrolled}
             tone={job.studentsEnrolled === job.studentsCreated ? 'success' : 'warn'}
           />
         )}
-        <CountTile label="Skipped (duplicate)" value={job.skipped} tone="warn" />
-        <CountTile label="Failed" value={job.failed} tone={job.failed > 0 ? 'danger' : 'neutral'} />
+        <CountTile label={t('iemisImport.summary.skipped')} value={job.skipped} tone="warn" />
+        <CountTile label={t('iemisImport.summary.failed')} value={job.failed} tone={job.failed > 0 ? 'danger' : 'neutral'} />
       </div>
       {job.findingsTruncated && (
         <div className="rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800 p-3 text-xs text-amber-800 dark:text-amber-300">
-          The first 500 findings are shown. Re-run a dry-run to download the
-          full findings CSV.
+          {t('iemisImport.results.truncated')}
         </div>
       )}
       {job.findings.length > 0 && (
         <FindingsList
           tone="info"
-          title={`${job.findings.length} finding${job.findings.length === 1 ? '' : 's'} from import`}
+          title={t('iemisImport.results.findings', { count: job.findings.length })}
           findings={job.findings}
           collapsible
         />
@@ -1042,20 +1042,20 @@ function ResultsView({
           className="inline-flex items-center gap-2 px-3 py-1.5 text-sm rounded-lg border border-border-primary text-text-primary hover:bg-surface-hover disabled:opacity-40"
         >
           <Download className="w-4 h-4" />
-          Download findings CSV
+          {t('iemisImport.actions.downloadFindings')}
         </button>
         <div className="flex items-center gap-2">
           <button
             onClick={onImportAnother}
             className="px-4 py-1.5 text-sm rounded-lg border border-border-primary text-text-primary hover:bg-surface-hover"
           >
-            Import another file
+            {t('iemisImport.actions.importAnother')}
           </button>
           <button
             onClick={onViewStudents}
             className="px-4 py-1.5 text-sm rounded-lg bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg-hover))] text-[rgb(var(--action-primary-fg))] font-medium"
           >
-            View students
+            {t('iemisImport.actions.viewStudents')}
           </button>
         </div>
       </div>

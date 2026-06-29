@@ -1204,6 +1204,110 @@
       }
     }
   },
+  "iemisImport": {
+    "backToStudents": "Back to students",
+    "title": "IEMIS Bulk Student Import",
+    "subtitle": "Upload a Nepal IEMIS xlsx export to enroll students into {{schoolName}}.",
+    "thisSchool": "this school",
+    "states": {
+      "parsingTitle": "Parsing the xlsx file",
+      "parsingDescription": "Reading columns and building row dictionaries. This usually takes under 2 seconds.",
+      "dryRunTitle": "Validating against IEMIS rules",
+      "dryRunDescription": "Checking {{count}} rows for errors, warnings, and duplicates. No data is saved yet.",
+      "parseErrorTitle": "Unable to parse the file",
+      "unknownParseError": "Unknown parse error.",
+      "submittingTitle": "Submitting import",
+      "submittingDescription": "Queuing the import job.",
+      "importFailedTitle": "Import failed",
+      "unknownError": "Unknown error.",
+      "rerunDryRun": "Re-run dry-run",
+      "checkingEligibilityTitle": "Checking school eligibility",
+      "checkingEligibilityDescription": "Confirming the active school has an IEMIS code configured.",
+      "noSchoolTitle": "No active school selected",
+      "noSchoolMessage": "Select a school from the switcher in the header, then reload this page."
+    },
+    "gate": {
+      "missingCodeTitle": "{{schoolName}} has no IEMIS school code",
+      "missingCodeDescription": "IEMIS imports require the school to have its Nepal government-issued {{code}} set. That value is immutable after school creation, so it must be entered on the school itself. Ask the tenant admin to create a new school through the School Wizard with the IEMIS code, or contact support to update this school's metadata."
+    },
+    "chooser": {
+      "dropTitle": "Drop the IEMIS xlsx here",
+      "dropDescription": "or click below to browse. Up to {{maxRows}} rows per file.",
+      "browse": "Browse files",
+      "expectedColumns": "Expected columns",
+      "expectedDescription": "This tool reads the standard IEMIS xlsx export directly. Required columns: Student Id, FullName, Gender, CurrentClass, DOB. Additional columns like Father Name, Guardian Name, and addresses are captured when present.",
+      "dateDescription": "Dates are read as Bikram Sambat and converted to Gregorian on the server."
+    },
+    "summary": {
+      "fileSummary": "{{rows}} row · {{mapped}} of 20 IEMIS columns mapped",
+      "fileSummary_plural": "{{rows}} rows · {{mapped}} of 20 IEMIS columns mapped",
+      "extraColumns": "{{count}} extra column ignored",
+      "extraColumns_plural": "{{count}} extra columns ignored",
+      "willImport": "Will import",
+      "blocked": "Blocked by errors",
+      "duplicates": "Duplicates (skip)",
+      "warnings": "Warnings",
+      "created": "Created",
+      "enrolled": "Enrolled",
+      "skipped": "Skipped (duplicate)",
+      "failed": "Failed"
+    },
+    "enrollOption": {
+      "title": "Enroll all imported students into this year",
+      "current": "current",
+      "noYear": "No active academic year on this school. Imported students will be created without an enrollment record. Set up an academic year first to enable this option.",
+      "description": "When enabled, every successfully created student also gets a SchoolEnrollment for the year and is moved to active status. When disabled, students are created in pending status and you'll need to enroll each one individually from the student detail page."
+    },
+    "actions": {
+      "downloadFindings": "Download findings CSV",
+      "cancel": "Cancel",
+      "importStudents": "Import {{count}} student",
+      "importStudents_plural": "Import {{count}} students",
+      "noRows": "No rows to import",
+      "importAnother": "Import another file",
+      "viewStudents": "View students",
+      "backToPreview": "Back to preview",
+      "importNow": "Import {{count}} now"
+    },
+    "duplicates": {
+      "title": "{{count}} duplicate will be skipped",
+      "title_plural": "{{count}} duplicates will be skipped",
+      "description": "These rows have an emisStudentId that already exists in this tenant. They will not be re-created; existing records are untouched.",
+      "row": "Row {{row}} - emisStudentId {{emisStudentId}} already at student id {{studentId}}",
+      "andMore": "...and {{count}} more"
+    },
+    "confirm": {
+      "title": "Confirm IEMIS import",
+      "description": "You are about to commit the dry-run. This cannot be undone.",
+      "summary": "{{count}} student record will be created in {{schoolName}}.",
+      "summary_plural": "{{count}} student records will be created in {{schoolName}}.",
+      "andEnrolled": "and enrolled in {{yearName}}",
+      "skipped": "{{count}} duplicate will be skipped.",
+      "skipped_plural": "{{count}} duplicates will be skipped.",
+      "failed": "{{count}} row blocked by errors will not import.",
+      "failed_plural": "{{count}} rows blocked by errors will not import.",
+      "ack": "I have reviewed the dry-run findings and confirm the destination school is correct."
+    },
+    "progress": {
+      "queuedTitle": "Import queued",
+      "runningTitle": "Importing students...",
+      "queuedDescription": "Job is queued. Processing {{count}} rows.",
+      "runningDescription": "Importing {{count}} rows.",
+      "runningDescriptionWithYear": "Importing {{count}} rows and enrolling into {{yearName}}.",
+      "keepOpen": "You can keep this tab open. The import runs server-side; closing the tab won't cancel the job, but you'll lose the live status view."
+    },
+    "results": {
+      "complete": "Import complete",
+      "issues": "Import finished with issues",
+      "summary": "{{created}} students created, {{skipped}} skipped (duplicates), {{failed}} failed out of {{total}} total rows.",
+      "summaryWithEnrollment": "{{created}} students created, {{enrolled}} enrolled{{year}}, {{skipped}} skipped (duplicates), {{failed}} failed out of {{total}} total rows.",
+      "inYear": " in {{yearName}}",
+      "duration": "Took {{seconds}}s.",
+      "truncated": "The first 500 findings are shown. Re-run a dry-run to download the full findings CSV.",
+      "findings": "{{count}} finding from import",
+      "findings_plural": "{{count}} findings from import"
+    }
+  },
   "iemisExport": {
     "title": "IEMiS Monthly Export",
     "description": "Generate the IEMiS Flash II monthly attendance roll-up for a calendar month. The export recomputes per-student present / absent / excused day counts and lets you download a CSV. Grade is the school-local grade level.",
