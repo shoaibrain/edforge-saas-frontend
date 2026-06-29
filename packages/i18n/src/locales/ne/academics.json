@@ -846,6 +846,35 @@
       "sectionShort": "Sec {{section}}"
     }
   },
+  "teachersModule": {
+    "description": "School staff members र teaching assignments",
+    "stats": {
+      "totalStaff": "कुल Staff",
+      "teachers": "Teachers",
+      "active": "Active",
+      "roles": "Roles"
+    },
+    "roles": {
+      "staff": "Staff",
+      "teacher": "Teacher",
+      "principal": "Principal",
+      "vice_principal": "Vice Principal",
+      "counselor": "Counselor",
+      "admin": "Admin"
+    },
+    "drawer": {
+      "title": "Staff Profile",
+      "close": "Staff profile बन्द गर्नुहोस्",
+      "contactInformation": "Contact Information",
+      "hiredOn": "{{date}} मा hired",
+      "assignedSections": "Assigned Sections",
+      "sectionCount": "{{value}} section",
+      "sectionCount_plural": "{{value}} sections",
+      "noSections": "Assigned section छैन",
+      "sectionFallback": "Section",
+      "sectionTitle": "Section {{section}}"
+    }
+  },
   "examModule": {
     "description": "Midterm, final र term examinations योजना, सञ्चालन र publish गर्नुहोस्",
     "descriptionWithYear": "{{yearName}} का exam योजना, सञ्चालन र publish गर्नुहोस्",

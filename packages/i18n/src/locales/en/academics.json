@@ -846,6 +846,35 @@
       "sectionShort": "Sec {{section}}"
     }
   },
+  "teachersModule": {
+    "description": "School staff members and their teaching assignments",
+    "stats": {
+      "totalStaff": "Total Staff",
+      "teachers": "Teachers",
+      "active": "Active",
+      "roles": "Roles"
+    },
+    "roles": {
+      "staff": "Staff",
+      "teacher": "Teacher",
+      "principal": "Principal",
+      "vice_principal": "Vice Principal",
+      "counselor": "Counselor",
+      "admin": "Admin"
+    },
+    "drawer": {
+      "title": "Staff Profile",
+      "close": "Close staff profile",
+      "contactInformation": "Contact Information",
+      "hiredOn": "Hired {{date}}",
+      "assignedSections": "Assigned Sections",
+      "sectionCount": "{{value}} section",
+      "sectionCount_plural": "{{value}} sections",
+      "noSections": "No sections assigned",
+      "sectionFallback": "Section",
+      "sectionTitle": "Section {{section}}"
+    }
+  },
   "examModule": {
     "description": "Plan, run, and publish midterms, finals, and term examinations",
     "descriptionWithYear": "Plan, run, and publish exams for {{yearName}}",
