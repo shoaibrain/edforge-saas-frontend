@@ -4,12 +4,14 @@
 
 import { useState } from 'react'
 import { MoreVertical, CalendarDays } from 'lucide-react'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 interface CreateMenuProps {
   onCreateSection: () => void
 }
 
 export function CreateMenu({ onCreateSection }: CreateMenuProps) {
+  const { t } = useAcademicsI18n()
   const [isOpen, setIsOpen] = useState(false)
 
   return (
@@ -20,7 +22,7 @@ export function CreateMenu({ onCreateSection }: CreateMenuProps) {
         className="p-2 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-surface-secondary transition-colors"
         aria-expanded={isOpen}
         aria-haspopup="true"
-        aria-label="Create menu"
+        aria-label={t('classrooms.aria.createMenu')}
       >
         <MoreVertical className="w-5 h-5" />
       </button>
@@ -35,7 +37,7 @@ export function CreateMenu({ onCreateSection }: CreateMenuProps) {
               className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-text-primary hover:bg-surface-secondary transition-colors"
             >
               <CalendarDays className="w-4 h-4 text-[rgb(var(--action-secondary-fg))]" />
-              New Section
+              {t('classrooms.actions.newSection')}
             </button>
           </div>
         </>

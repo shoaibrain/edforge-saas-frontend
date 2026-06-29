@@ -10,6 +10,7 @@ import { useState, useMemo } from 'react'
 import { X, Loader2, Save, Plus, ClipboardPaste, BarChart2, Search } from 'lucide-react'
 import { Button, Field, Input, Select, Textarea } from '@edforge/ui'
 import { useRecordBulkGrades } from '../../hooks/useGrades'
+import { useAcademicsI18n } from '../../lib/i18n'
 import { ScoreEntryRow } from './ScoreEntryRow'
 import type { AssessmentCategory } from '../../services/academics.service'
 import type { StudentSectionResponseDto } from '@aibrains/shared-types'
@@ -31,19 +32,19 @@ interface AssignmentEditorProps {
 }
 
 const DEFAULT_CATEGORY_OPTIONS = [
-  { value: 'tests', label: 'Tests' },
-  { value: 'quizzes', label: 'Quizzes' },
-  { value: 'homework', label: 'Homework' },
-  { value: 'participation', label: 'Participation' },
-  { value: 'projects', label: 'Projects' },
-  { value: 'final', label: 'Final Exam' },
-  { value: 'other', label: 'Other' },
+  { value: 'tests', labelKey: 'gradesModule.management.categories.tests' },
+  { value: 'quizzes', labelKey: 'gradesModule.management.categories.quizzes' },
+  { value: 'homework', labelKey: 'gradesModule.management.categories.homework' },
+  { value: 'participation', labelKey: 'gradesModule.management.categories.participation' },
+  { value: 'projects', labelKey: 'gradesModule.management.categories.projects' },
+  { value: 'final', labelKey: 'gradesModule.management.categories.finalExam' },
+  { value: 'other', labelKey: 'gradesModule.management.categories.other' },
 ]
 
 const PURPOSE_OPTIONS = [
-  { value: '', label: 'Auto-detect' },
-  { value: 'formative', label: 'Formative' },
-  { value: 'summative', label: 'Summative' },
+  { value: '', labelKey: 'gradesModule.management.purposes.autoDetect' },
+  { value: 'formative', labelKey: 'gradesModule.management.purposes.formative' },
+  { value: 'summative', labelKey: 'gradesModule.management.purposes.summative' },
 ]
 
 // ============================================================================
@@ -61,9 +62,17 @@ export function AssignmentEditor({
   students,
   categories,
 }: AssignmentEditorProps) {
+  const { t, formatNumber } = useAcademicsI18n()
   const displayCategories = categories?.length
     ? categories.map((c) => ({ value: c.id, label: c.label }))
-    : DEFAULT_CATEGORY_OPTIONS
+    : DEFAULT_CATEGORY_OPTIONS.map((category) => ({
+        value: category.value,
+        label: t(category.labelKey),
+      }))
+  const purposeOptions = PURPOSE_OPTIONS.map((option) => ({
+    value: option.value,
+    label: t(option.labelKey),
+  }))
   const [assignmentName, setAssignmentName] = useState('')
   const [possiblePoints, setPossiblePoints] = useState('100')
   const [categoryId, setCategoryId] = useState('homework')
@@ -221,7 +230,9 @@ export function AssignmentEditor({
       <div className="bg-surface-primary w-full max-w-lg h-full shadow-xl flex flex-col overflow-hidden border-l border-border-secondary">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-border-secondary">
-          <h3 className="text-lg font-semibold text-text-primary">New Assignment</h3>
+          <h3 className="text-lg font-semibold text-text-primary">
+            {t('gradesModule.management.newAssignment')}
+          </h3>
           <button
             type="button"
             onClick={onClose}
@@ -235,23 +246,23 @@ export function AssignmentEditor({
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
           {/* Assignment Details */}
           <div className="space-y-3">
-            <Field label="Assignment Name" required>
+            <Field label={t('gradesModule.management.assignmentName')} required>
               <Input
                 value={assignmentName}
                 onChange={(e) => setAssignmentName(e.target.value)}
-                placeholder="e.g., Chapter 5 Quiz"
+                placeholder={t('gradesModule.management.assignmentPlaceholderAlt')}
               />
             </Field>
 
             <div className="grid grid-cols-2 gap-3">
               <Select
-                label="Category"
+                label={t('gradesModule.management.category')}
                 optionalText={null}
                 value={categoryId}
                 onChange={(v) => setCategoryId(v ?? 'homework')}
                 options={displayCategories}
               />
-              <Field label="Points Possible" optionalText={null}>
+              <Field label={t('gradesModule.management.pointsPossible')} optionalText={null}>
                 <Input
                   type="number"
                   value={possiblePoints}
@@ -263,13 +274,13 @@ export function AssignmentEditor({
 
             <div className="grid grid-cols-2 gap-3">
               <Select
-                label="Assessment Purpose"
+                label={t('gradesModule.management.assessmentPurpose')}
                 optionalText={null}
                 value={assessmentPurpose}
                 onChange={(v) => setAssessmentPurpose((v ?? '') as AssessmentCategory | '')}
-                options={PURPOSE_OPTIONS}
+                options={purposeOptions}
               />
-              <Field label="Due Date" optionalText={null}>
+              <Field label={t('gradesModule.management.dueDate')} optionalText={null}>
                 <Input
                   type="date"
                   value={dueDate}
@@ -285,28 +296,30 @@ export function AssignmentEditor({
               <div className="flex items-center gap-1.5 mb-2">
                 <BarChart2 className="w-3.5 h-3.5 text-[rgb(var(--action-secondary-fg))]" />
                 <span className="text-xs font-semibold text-text-primary">
-                  Score Statistics ({stats.count} entered)
+                  {t('gradesModule.management.scoreStatistics', {
+                    count: formatNumber(stats.count),
+                  })}
                 </span>
               </div>
               <div className="grid grid-cols-3 gap-2 text-xs">
                 <div>
-                  <span className="text-text-tertiary">Mean</span>
+                  <span className="text-text-tertiary">{t('gradesModule.management.stats.mean')}</span>
                   <p className="font-semibold text-text-primary">{stats.mean}</p>
                 </div>
                 <div>
-                  <span className="text-text-tertiary">Median</span>
+                  <span className="text-text-tertiary">{t('gradesModule.management.stats.median')}</span>
                   <p className="font-semibold text-text-primary">{stats.median}</p>
                 </div>
                 <div>
-                  <span className="text-text-tertiary">Std Dev</span>
+                  <span className="text-text-tertiary">{t('gradesModule.management.stats.stdDev')}</span>
                   <p className="font-semibold text-text-primary">{stats.stdDev}</p>
                 </div>
                 <div>
-                  <span className="text-text-tertiary">Min</span>
+                  <span className="text-text-tertiary">{t('gradesModule.management.stats.min')}</span>
                   <p className="font-semibold text-text-primary">{stats.min}</p>
                 </div>
                 <div>
-                  <span className="text-text-tertiary">Max</span>
+                  <span className="text-text-tertiary">{t('gradesModule.management.stats.max')}</span>
                   <p className="font-semibold text-text-primary">{stats.max}</p>
                 </div>
               </div>
@@ -316,18 +329,18 @@ export function AssignmentEditor({
           {/* Bulk Paste */}
           {showBulkPaste ? (
             <div className="space-y-2">
-              <Field label={`Paste Scores (Name${'\t'}Score per line)`} optionalText={null}>
+              <Field label={t('gradesModule.management.pasteScores')} optionalText={null}>
                 <Textarea
                   value={pasteText}
                   onChange={(e) => setPasteText(e.target.value)}
-                  placeholder={'John Smith\t95\nJane Doe\t88'}
+                  placeholder={t('gradesModule.management.pasteScoresPlaceholder')}
                   rows={6}
                   className="font-mono"
                 />
               </Field>
               <div className="flex gap-2">
                 <Button type="button" size="sm" onClick={handleBulkPaste}>
-                  Apply
+                  {t('gradesModule.management.apply')}
                 </Button>
                 <Button
                   type="button"
@@ -338,7 +351,7 @@ export function AssignmentEditor({
                     setPasteText('')
                   }}
                 >
-                  Cancel
+                  {t('actions.cancel')}
                 </Button>
               </div>
             </div>
@@ -349,16 +362,21 @@ export function AssignmentEditor({
               className="flex items-center gap-1.5 text-xs font-medium text-text-secondary hover:text-text-primary transition-colors"
             >
               <ClipboardPaste className="w-3.5 h-3.5" />
-              Paste scores from spreadsheet
+              {t('gradesModule.management.pasteFromSpreadsheet')}
             </button>
           )}
 
           {/* Student Scores */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-text-primary">Student Scores</span>
+              <span className="text-sm font-medium text-text-primary">
+                {t('gradesModule.management.studentScores')}
+              </span>
               <span className="text-xs text-text-tertiary tabular-nums">
-                {filledCount} / {students.length} entered
+                {t('gradesModule.management.enteredCount', {
+                  entered: formatNumber(filledCount),
+                  total: formatNumber(students.length),
+                })}
               </span>
             </div>
 
@@ -367,7 +385,7 @@ export function AssignmentEditor({
                 <Input
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search students by name…"
+                  placeholder={t('gradesModule.management.searchStudents')}
                   prefix={<Search className="w-4 h-4" />}
                 />
               </div>
@@ -384,7 +402,7 @@ export function AssignmentEditor({
               </div>
             ) : filteredStudents.length === 0 ? (
               <div className="border border-border-secondary rounded-lg px-4 py-8 text-center text-sm text-text-tertiary">
-                No students match “{search}”.
+                {t('gradesModule.management.noStudentMatches', { search })}
               </div>
             ) : (
               <div className="border border-border-secondary rounded-lg divide-y divide-border-secondary max-h-72 overflow-y-auto">
@@ -392,7 +410,11 @@ export function AssignmentEditor({
                   <ScoreEntryRow
                     key={student.studentId}
                     studentId={student.studentId}
-                    studentName={student.studentName || student.studentNumber || 'Student'}
+                    studentName={
+                      student.studentName ||
+                      student.studentNumber ||
+                      t('gradesModule.management.studentFallback')
+                    }
                     value={scores[student.studentId] ?? ''}
                     onChange={(v) => handleScoreChange(student.studentId, v)}
                     maxPoints={possiblePts}
@@ -412,11 +434,11 @@ export function AssignmentEditor({
             disabled={isSaving || !assignmentName.trim() || possiblePts <= 0 || students.length === 0}
           >
             {isSaving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Plus className="w-4 h-4 mr-2" />}
-            Create Assignment
+            {t('gradesModule.management.createAssignment')}
           </Button>
           <div className="flex items-center gap-3">
             <Button type="button" variant="ghost" onClick={onClose}>
-              Cancel
+              {t('actions.cancel')}
             </Button>
             <Button
               type="button"
@@ -428,7 +450,9 @@ export function AssignmentEditor({
               ) : (
                 <Save className="w-4 h-4 mr-2" />
               )}
-              Save with Scores ({filledCount})
+              {t('gradesModule.management.saveWithScores', {
+                count: formatNumber(filledCount),
+              })}
             </Button>
           </div>
         </div>

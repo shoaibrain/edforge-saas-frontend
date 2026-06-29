@@ -32,6 +32,7 @@ import type { ExamStatus } from '@aibrains/shared-types'
 import { useActiveSchoolId } from '../../stores/app.store'
 import { useGradingPeriods } from '../../hooks/useSchool'
 import { useExam, useExamPattern, useTransitionExamStatus } from '../../hooks/useExams'
+import { useAcademicsI18n } from '../../lib/i18n'
 import { getExamStatusMeta, humanizeExamType } from '../../schemas/exam.form'
 import {
   EXAM_STATUS_PIPELINE,
@@ -46,9 +47,9 @@ import { ExamScoresTab } from '../../components/exams/ExamScoresTab'
 type ExamDetailTab = 'overview' | 'subjects' | 'scores'
 
 const EXAM_DETAIL_TABS: { id: ExamDetailTab; label: string }[] = [
-  { id: 'overview', label: 'Overview' },
-  { id: 'subjects', label: 'Subjects' },
-  { id: 'scores', label: 'Scores' },
+  { id: 'overview', label: 'examModule.detail.tabs.overview' },
+  { id: 'subjects', label: 'examModule.detail.tabs.subjects' },
+  { id: 'scores', label: 'examModule.detail.tabs.scores' },
 ]
 
 // ============================================================================
@@ -56,10 +57,11 @@ const EXAM_DETAIL_TABS: { id: ExamDetailTab; label: string }[] = [
 // ============================================================================
 
 function StatusPill({ status }: { status: ExamStatus }) {
+  const { t } = useAcademicsI18n()
   const meta = getExamStatusMeta(status)
   return (
     <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${meta.className}`}>
-      {meta.label}
+      {t(`examModule.status.${status}`)}
     </span>
   )
 }
@@ -88,6 +90,7 @@ function GradeChips({ gradeLevels }: { gradeLevels?: string[] }) {
 }
 
 function StatusPipeline({ status }: { status: ExamStatus }) {
+  const { t } = useAcademicsI18n()
   const currentIndex = EXAM_STATUS_PIPELINE.indexOf(status)
   return (
     <div className="flex flex-wrap items-center gap-1.5">
@@ -107,7 +110,7 @@ function StatusPipeline({ status }: { status: ExamStatus }) {
               }`}
             >
               {done && <Check className="w-3 h-3" />}
-              {meta.label}
+              {t(`examModule.status.${s}`)}
             </span>
             {i < EXAM_STATUS_PIPELINE.length - 1 && (
               <ChevronRight className="w-3.5 h-3.5 text-text-tertiary" />
@@ -135,27 +138,30 @@ function ResultGenerationBadge({
   generatedAt?: string | null
   error?: string | null
 }) {
+  const { t, formatDateTime } = useAcademicsI18n()
   const meta = {
     pending: {
-      label: 'Generating result cards…',
+      label: t('examModule.resultGeneration.pending'),
       cls: 'text-[rgb(var(--state-warning-fg))]',
       icon: <Loader2 className="w-3.5 h-3.5 animate-spin" />,
     },
     generated: {
-      label: 'Result cards generated',
+      label: t('examModule.resultGeneration.generated'),
       cls: 'text-[rgb(var(--state-success-fg))]',
       icon: <CheckCircle2 className="w-3.5 h-3.5" />,
     },
     failed: {
-      label: 'Result generation failed',
+      label: t('examModule.resultGeneration.failed'),
       cls: 'text-[rgb(var(--state-danger-fg))]',
       icon: <AlertCircle className="w-3.5 h-3.5" />,
     },
   }[status]
-  const title = error ?? (generatedAt ? `Generated ${generatedAt}` : undefined)
+  const title = error ?? (generatedAt ? t('examModule.resultGeneration.generatedAt', { dateTime: formatDateTime(generatedAt) }) : undefined)
   return (
     <div className="flex items-center justify-between pt-2 border-t border-border-secondary/50">
-      <span className="text-xs text-text-tertiary">Result generation</span>
+      <span className="text-xs text-text-tertiary">
+        {t('examModule.resultGeneration.label')}
+      </span>
       <span
         className={`inline-flex items-center gap-1.5 text-xs font-medium ${meta.cls}`}
         title={title ?? undefined}
@@ -183,19 +189,12 @@ function DetailField({ label, value }: { label: string; value: React.ReactNode }
   )
 }
 
-function fmtDate(value?: string): string | undefined {
-  if (!value) return undefined
-  const d = new Date(value)
-  return Number.isNaN(d.getTime())
-    ? value
-    : d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
-}
-
 // ============================================================================
 // EXAM DETAIL MODULE
 // ============================================================================
 
 export function ExamDetailModule() {
+  const { t, formatDate } = useAcademicsI18n()
   const { examId } = useParams({ from: '/exams/$examId' })
   const navigate = useNavigate()
   const schoolId = useActiveSchoolId() || ''
@@ -235,7 +234,8 @@ export function ExamDetailModule() {
 
   const handleTransition = (action: ExamTransitionAction) => {
     if (!exam) return
-    if (action.confirm && !window.confirm(action.confirm)) return
+    const confirmMessage = t(`examModule.transitionConfirm.${action.to}`)
+    if (action.confirm && !window.confirm(confirmMessage)) return
     transition.mutate({ examId: exam.examId, schoolId, targetStatus: action.to })
   }
 
@@ -262,9 +262,11 @@ export function ExamDetailModule() {
       <div className="min-h-full flex items-center justify-center p-6">
         <div className="text-center">
           <AlertCircle className="w-12 h-12 mx-auto text-text-tertiary mb-4" />
-          <h2 className="text-lg font-semibold text-text-primary mb-2">Exam Not Found</h2>
+          <h2 className="text-lg font-semibold text-text-primary mb-2">
+            {t('examModule.detail.notFoundTitle')}
+          </h2>
           <p className="text-sm text-text-secondary mb-4">
-            This exam may have been removed or you don&apos;t have access.
+            {t('examModule.detail.notFoundDescription')}
           </p>
           <button
             type="button"
@@ -272,7 +274,7 @@ export function ExamDetailModule() {
             className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-info-fg))] rounded-lg hover:brightness-95 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to Exams
+            {t('examModule.detail.backToExams')}
           </button>
         </div>
       </div>
@@ -292,7 +294,7 @@ export function ExamDetailModule() {
             className="flex items-center gap-1.5 text-sm text-text-tertiary hover:text-text-secondary transition-colors mb-4"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to Exams
+            {t('examModule.detail.backToExams')}
           </button>
 
           <div className="flex items-start justify-between gap-4">
@@ -306,17 +308,19 @@ export function ExamDetailModule() {
                   <StatusPill status={exam.status} />
                 </div>
                 <div className="flex items-center gap-2 mt-0.5 text-sm text-text-secondary">
-                  <span>{humanizeExamType(exam.examType)}</span>
+                  <span>{t(`examModule.types.${exam.examType}`, { defaultValue: humanizeExamType(exam.examType) })}</span>
                   <span className="text-text-tertiary">·</span>
-                  <span>{termName ?? 'No term'}</span>
+                  <span>{termName ?? t('examModule.detail.noTerm')}</span>
                   <span className="text-text-tertiary">·</span>
                   <span className="whitespace-nowrap">
-                    {exam.startDate} → {exam.endDate}
+                    {formatDate(exam.startDate)} → {formatDate(exam.endDate)}
                   </span>
                 </div>
                 {exam.gradeLevels && exam.gradeLevels.length > 0 && (
                   <div className="flex items-center gap-2 mt-2">
-                    <span className="text-xs font-medium text-text-tertiary">Grades</span>
+                    <span className="text-xs font-medium text-text-tertiary">
+                      {t('examModule.detail.grades')}
+                    </span>
                     <GradeChips gradeLevels={exam.gradeLevels} />
                   </div>
                 )}
@@ -331,7 +335,7 @@ export function ExamDetailModule() {
                   className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-text-secondary border border-border-secondary rounded-lg hover:bg-surface-secondary transition-colors"
                 >
                   <Pencil className="w-4 h-4" />
-                  Edit
+                  {t('examModule.detail.edit')}
                 </button>
               )}
               <button
@@ -340,7 +344,7 @@ export function ExamDetailModule() {
                 className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-text-secondary border border-border-secondary rounded-lg hover:bg-surface-secondary transition-colors"
               >
                 <ScrollText className="w-4 h-4" />
-                Result Cards
+                {t('examModule.detail.resultCards')}
               </button>
             </div>
           </div>
@@ -353,7 +357,9 @@ export function ExamDetailModule() {
         <div className="rounded-xl border border-border-secondary p-5 space-y-4">
           <div className="flex items-center gap-2 pb-2 border-b border-border-secondary">
             <Clock className="w-4 h-4 text-text-tertiary" />
-            <h4 className="text-sm font-semibold text-text-secondary uppercase tracking-wide">Lifecycle</h4>
+            <h4 className="text-sm font-semibold text-text-secondary uppercase tracking-wide">
+              {t('examModule.detail.lifecycle')}
+            </h4>
           </div>
           <StatusPipeline status={exam.status} />
           {exam.status === 'closed' && exam.resultGenerationStatus && (
@@ -374,13 +380,13 @@ export function ExamDetailModule() {
                     disabled={transition.isPending}
                     className={transitionToneClass(action.tone)}
                   >
-                    {action.label}
+                    {t(`examModule.transitions.${action.to}`)}
                   </button>
                 ))}
               </div>
             ) : (
               <p className="text-sm text-text-tertiary pt-1">
-                This exam is published — its lifecycle is complete.
+                {t('examModule.detail.lifecycleComplete')}
               </p>
             )
           ) : null}
@@ -388,7 +394,7 @@ export function ExamDetailModule() {
 
         {/* Tabs */}
         <div>
-          <nav className="flex gap-1 border-b border-border-secondary mb-5" aria-label="Exam tabs">
+          <nav className="flex gap-1 border-b border-border-secondary mb-5" aria-label={t('examModule.detail.tabsAria')}>
             {EXAM_DETAIL_TABS.map((tab) => (
               <button
                 key={tab.id}
@@ -400,7 +406,7 @@ export function ExamDetailModule() {
                     : 'text-text-tertiary border-transparent hover:text-text-secondary'
                 }`}
               >
-                {tab.label}
+                {t(tab.label)}
               </button>
             ))}
           </nav>
@@ -410,19 +416,21 @@ export function ExamDetailModule() {
               <div className="rounded-xl border border-border-secondary p-5">
                 <div className="flex items-center gap-2 mb-4 pb-2 border-b border-border-secondary">
                   <CalendarDays className="w-4 h-4 text-text-tertiary" />
-                  <h4 className="text-sm font-semibold text-text-secondary uppercase tracking-wide">Overview</h4>
+                  <h4 className="text-sm font-semibold text-text-secondary uppercase tracking-wide">
+                    {t('examModule.detail.tabs.overview')}
+                  </h4>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                  <DetailField label="Type" value={humanizeExamType(exam.examType)} />
-                  <DetailField label="Term" value={termName} />
-                  <DetailField label="Status" value={getExamStatusMeta(exam.status).label} />
+                  <DetailField label={t('examModule.detail.fields.type')} value={t(`examModule.types.${exam.examType}`, { defaultValue: humanizeExamType(exam.examType) })} />
+                  <DetailField label={t('examModule.detail.fields.term')} value={termName} />
+                  <DetailField label={t('examModule.detail.fields.status')} value={t(`examModule.status.${exam.status}`)} />
                   <DetailField
-                    label="Grade Levels"
+                    label={t('examModule.detail.fields.gradeLevels')}
                     value={exam.gradeLevels?.length ? <GradeChips gradeLevels={exam.gradeLevels} /> : undefined}
                   />
-                  <DetailField label="Start Date" value={exam.startDate} />
-                  <DetailField label="End Date" value={exam.endDate} />
-                  <DetailField label="Created" value={fmtDate(exam.createdAt)} />
+                  <DetailField label={t('examModule.detail.fields.startDate')} value={formatDate(exam.startDate)} />
+                  <DetailField label={t('examModule.detail.fields.endDate')} value={formatDate(exam.endDate)} />
+                  <DetailField label={t('examModule.detail.fields.created')} value={formatDate(exam.createdAt)} />
                 </div>
               </div>
 
@@ -430,7 +438,9 @@ export function ExamDetailModule() {
                 <div className="rounded-xl border border-border-secondary p-5">
                   <div className="flex items-center gap-2 mb-3 pb-2 border-b border-border-secondary">
                     <FileText className="w-4 h-4 text-text-tertiary" />
-                    <h4 className="text-sm font-semibold text-text-secondary uppercase tracking-wide">Description</h4>
+                    <h4 className="text-sm font-semibold text-text-secondary uppercase tracking-wide">
+                      {t('examModule.detail.fields.description')}
+                    </h4>
                   </div>
                   <p className="text-sm text-text-secondary leading-relaxed">{exam.description}</p>
                 </div>

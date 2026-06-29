@@ -17,6 +17,7 @@ import { ContextBar } from '@edforge/ui'
 import { useSchoolStaff, flattenStaffData } from '../../hooks/useStaff'
 import { TeacherTable } from '../../components/teachers/TeacherTable'
 import { TeacherDetailDrawer } from '../../components/teachers/TeacherDetailDrawer'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 // ============================================================================
 // STAT CARD
@@ -55,6 +56,7 @@ function StatCard({
 // ============================================================================
 
 export function TeachersModule() {
+  const { t, formatNumber, formatDate } = useAcademicsI18n()
   const schoolId = useActiveSchoolId() || ''
   const { data: staffData, isLoading } = useSchoolStaff(schoolId)
   const staff = useMemo(() => flattenStaffData(staffData), [staffData])
@@ -77,7 +79,7 @@ export function TeachersModule() {
             divider={false}
             meta={
               <span>
-                {new Date().toLocaleDateString('en-US', {
+                {formatDate(new Date(), {
                   weekday: 'long',
                   month: 'short',
                   day: 'numeric',
@@ -86,7 +88,7 @@ export function TeachersModule() {
             }
             description={
               <p className="text-sm text-text-secondary">
-                School staff members and their teaching assignments
+                {t('teachersModule.description')}
               </p>
             }
           />
@@ -98,29 +100,29 @@ export function TeachersModule() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <StatCard
             icon={Users}
-            label="Total Staff"
-            value={isLoading ? '...' : totalStaff}
+            label={t('teachersModule.stats.totalStaff')}
+            value={isLoading ? '...' : formatNumber(totalStaff)}
             accent="text-[rgb(var(--state-info-fg))]"
             bg="bg-[rgb(var(--state-info-bg)/0.18)]"
           />
           <StatCard
             icon={GraduationCap}
-            label="Teachers"
-            value={isLoading ? '...' : teachers.length}
+            label={t('teachersModule.stats.teachers')}
+            value={isLoading ? '...' : formatNumber(teachers.length)}
             accent="text-[rgb(var(--state-info-fg))]"
             bg="bg-[rgb(var(--state-info-bg)/0.18)]"
           />
           <StatCard
             icon={UserCheck}
-            label="Active"
-            value={isLoading ? '...' : activeStaff.length}
+            label={t('teachersModule.stats.active')}
+            value={isLoading ? '...' : formatNumber(activeStaff.length)}
             accent="text-[rgb(var(--state-success-fg))]"
             bg="bg-[rgb(var(--state-success-bg)/0.18)]"
           />
           <StatCard
             icon={Briefcase}
-            label="Roles"
-            value={isLoading ? '...' : uniqueRoles.length}
+            label={t('teachersModule.stats.roles')}
+            value={isLoading ? '...' : formatNumber(uniqueRoles.length)}
             accent="text-[rgb(var(--state-warning-fg))]"
             bg="bg-[rgb(var(--state-warning-fg))]/10"
           />

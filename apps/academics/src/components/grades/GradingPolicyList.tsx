@@ -16,6 +16,7 @@ import { useResourcePermissions } from '@edforge/abac'
 import type { LetterGradeEntryDto } from '@aibrains/shared-types'
 import { useGradingPolicies } from '../../hooks/useGrades'
 import { useCurrentAcademicYear } from '../../hooks/useSchool'
+import { useAcademicsI18n } from '../../lib/i18n'
 import { useActiveSchoolId } from '../../stores/app.store'
 import type { GradingPolicyResponse } from '../../services/academics.service'
 import { NoCurrentAcademicYearEmptyState } from '../common'
@@ -32,6 +33,7 @@ function PolicyCard({
   policy: GradingPolicyResponse
   onEdit?: (policy: GradingPolicyResponse) => void
 }) {
+  const { t, formatNumber } = useAcademicsI18n()
   const totalWeight = policy.categoryWeights.reduce((sum, c) => sum + c.weight, 0)
 
   return (
@@ -42,7 +44,7 @@ function PolicyCard({
           {policy.isDefault && (
             <span className="flex items-center gap-1 px-2 py-0.5 text-xs font-medium text-amber-600 bg-amber-50 dark:bg-[rgb(var(--state-warning-fg))]/10 dark:text-amber-400 rounded-full">
               <Star className="w-3 h-3" />
-              Default
+              {t('gradesModule.policyList.default')}
             </span>
           )}
         </div>
@@ -51,7 +53,7 @@ function PolicyCard({
             type="button"
             onClick={() => onEdit(policy)}
             className="p-1.5 rounded-md text-text-tertiary hover:text-text-primary hover:bg-surface-hover transition-colors"
-            aria-label="Edit policy"
+            aria-label={t('gradesModule.policyList.editPolicy')}
           >
             <Edit3 className="w-4 h-4" />
           </button>
@@ -67,7 +69,9 @@ function PolicyCard({
         compile time.
       */}
       <div className="mb-3">
-        <p className="text-xs text-text-tertiary mb-1.5">Grade Scale</p>
+        <p className="text-xs text-text-tertiary mb-1.5">
+          {t('gradesModule.policyList.gradeScale')}
+        </p>
         <div className="flex flex-wrap gap-1">
           {policy.letterGrades.map((entry: LetterGradeEntryDto, idx: number) => (
             <span
@@ -83,7 +87,9 @@ function PolicyCard({
       {/* Category Weights */}
       <div>
         <p className="text-xs text-text-tertiary mb-1.5">
-          Category Weights ({totalWeight}%)
+          {t('gradesModule.policyList.categoryWeights', {
+            total: formatNumber(totalWeight),
+          })}
         </p>
         <div className="space-y-1.5">
           {policy.categoryWeights.map((cat) => (
@@ -104,7 +110,9 @@ function PolicyCard({
 
       <div className="mt-3 pt-3 border-t border-border-secondary flex items-center justify-between">
         <span className="text-xs text-text-tertiary">
-          Rounding: {policy.roundingRule}
+          {t('gradesModule.policyList.rounding', {
+            rule: t(`gradesModule.policyForm.rounding.${policy.roundingRule}`),
+          })}
         </span>
       </div>
     </div>
@@ -116,6 +124,7 @@ function PolicyCard({
 // ============================================================================
 
 export function GradingPolicyList() {
+  const { t, formatNumber } = useAcademicsI18n()
   const schoolId = useActiveSchoolId() || ''
   const gradePerms = useResourcePermissions('grades')
   // Grading Policies are scoped to a school but the page-level UX requires
@@ -147,8 +156,12 @@ export function GradingPolicyList() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Settings className="w-4 h-4 text-text-tertiary" />
-          <h3 className="text-sm font-semibold text-text-primary">Grading Policies</h3>
-          <span className="text-xs text-text-tertiary">({policies?.length ?? 0})</span>
+          <h3 className="text-sm font-semibold text-text-primary">
+            {t('gradesModule.policyList.title')}
+          </h3>
+          <span className="text-xs text-text-tertiary">
+            ({formatNumber(policies?.length ?? 0)})
+          </span>
         </div>
         {gradePerms.create && (
           <button
@@ -157,7 +170,7 @@ export function GradingPolicyList() {
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--text-primary))] bg-[rgb(var(--state-info-bg)/0.18)] hover:bg-[rgb(var(--state-info-bg)/0.26)] dark:bg-[rgb(var(--state-info-bg)/0.18)] dark:hover:bg-[rgb(var(--state-info-fg)/0.2)]  rounded-lg transition-colors"
           >
             <Plus className="w-3.5 h-3.5" />
-            New Policy
+            {t('gradesModule.policyList.newPolicy')}
           </button>
         )}
       </div>
@@ -166,10 +179,10 @@ export function GradingPolicyList() {
         <div className="py-12 text-center">
           <Scale className="w-10 h-10 mx-auto text-text-tertiary mb-3" />
           <h4 className="text-sm font-medium text-text-primary mb-1">
-            No grading policies configured
+            {t('gradesModule.policyList.emptyTitle')}
           </h4>
           <p className="text-xs text-text-tertiary max-w-sm mx-auto mb-4">
-            Create a grading policy to define grade scales, category weights, and rounding rules.
+            {t('gradesModule.policyList.emptyDescription')}
           </p>
           {gradePerms.create && (
             <button
@@ -178,7 +191,7 @@ export function GradingPolicyList() {
               className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--action-primary-bg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
             >
               <Plus className="w-4 h-4" />
-              Create Policy
+              {t('gradesModule.policyForm.createPolicy')}
             </button>
           )}
         </div>

@@ -27,6 +27,7 @@ import {
 } from '@aibrains/shared-types'
 import { useUpdateStudentDescriptors } from '../../../hooks'
 import type { StudentDescriptorPatchInput } from '../../../services/academics.service'
+import { useAcademicsI18n } from '../../../lib/i18n'
 
 // ============================================================================
 // PROPS
@@ -106,6 +107,7 @@ export function EditDemographicsModal({
   onClose,
   locale = 'en',
 }: EditDemographicsModalProps) {
+  const { t } = useAcademicsI18n()
   const mutation = useUpdateStudentDescriptors()
 
   const sexOptions = useMemo(() => listDescriptorUris('SexDescriptor'), [])
@@ -132,15 +134,17 @@ export function EditDemographicsModal({
     <Modal
       open
       onClose={onClose}
-      title="Edit Demographics"
-      description={`Ed-Fi descriptor fields for ${student.fullName ?? 'this student'}. Changes are audited.`}
+      title={t('studentProfile.demographics.editTitle')}
+      description={t('studentProfile.demographics.editDescription', {
+        student: student.fullName ?? t('studentProfile.demographics.thisStudent'),
+      })}
       size="lg"
     >
       <form onSubmit={onSubmit} className="space-y-5">
         {/* Identity descriptors */}
         <section className="space-y-3">
           <h4 className="text-xs font-semibold uppercase tracking-wider text-text-tertiary">
-            Identity
+            {t('studentProfile.demographics.identity')}
           </h4>
 
           <Controller
@@ -148,13 +152,13 @@ export function EditDemographicsModal({
             control={control}
             render={({ field }) => (
               <Select
-                label="Sex"
+                label={t('studentProfile.demographics.sex')}
                 optionalText={null}
                 value={field.value ?? ''}
                 onChange={(v) => field.onChange(v ?? '')}
                 disabled={isSubmitting}
                 options={[
-                  { value: '', label: '— Not specified —' },
+                  { value: '', label: t('studentProfile.demographics.notSpecifiedOption') },
                   ...sexOptions.map((uri) => ({ value: uri, label: getDisplayName(uri, locale) })),
                 ]}
               />
@@ -166,13 +170,13 @@ export function EditDemographicsModal({
             control={control}
             render={({ field }) => (
               <Select
-                label="Primary language"
+                label={t('studentProfile.demographics.primaryLanguage')}
                 optionalText={null}
                 value={field.value ?? ''}
                 onChange={(v) => field.onChange(v ?? '')}
                 disabled={isSubmitting}
                 options={[
-                  { value: '', label: '— Not specified —' },
+                  { value: '', label: t('studentProfile.demographics.notSpecifiedOption') },
                   ...languageOptions.map((uri) => ({ value: uri, label: getDisplayName(uri, locale) })),
                 ]}
               />
@@ -184,13 +188,13 @@ export function EditDemographicsModal({
             control={control}
             render={({ field }) => (
               <Select
-                label="Mother tongue"
+                label={t('studentProfile.demographics.motherTongue')}
                 optionalText={null}
                 value={field.value ?? ''}
                 onChange={(v) => field.onChange(v ?? '')}
                 disabled={isSubmitting}
                 options={[
-                  { value: '', label: '— Not specified —' },
+                  { value: '', label: t('studentProfile.demographics.notSpecifiedOption') },
                   ...languageOptions.map((uri) => ({ value: uri, label: getDisplayName(uri, locale) })),
                 ]}
               />
@@ -198,12 +202,12 @@ export function EditDemographicsModal({
           />
 
           <Field
-            label="Ethnicity descriptor URI"
+            label={t('studentProfile.demographics.ethnicityDescriptorUri')}
             optionalText={null}
             helperText={
               <>
-                Free-text URI for V1 (the ethnicity catalog ships in Sprint 6).
-                Format: <code>uri://...</code>
+                {t('studentProfile.demographics.ethnicityHelper')}{' '}
+                {t('studentProfile.demographics.format')}: <code>uri://...</code>
               </>
             }
           >
@@ -219,7 +223,7 @@ export function EditDemographicsModal({
         <section className="space-y-3">
           <div className="flex items-center justify-between">
             <h4 className="text-xs font-semibold uppercase tracking-wider text-text-tertiary">
-              Disabilities
+              {t('studentProfile.demographics.disabilities')}
             </h4>
             <button
               type="button"
@@ -228,12 +232,12 @@ export function EditDemographicsModal({
               className="inline-flex items-center gap-1 text-xs text-accent-primary hover:underline"
               disabled={isSubmitting}
             >
-              <Plus className="w-3 h-3" aria-hidden /> Add disability
+              <Plus className="w-3 h-3" aria-hidden /> {t('studentProfile.demographics.addDisability')}
             </button>
           </div>
 
           {disabilitiesArray.fields.length === 0 && (
-            <p className="text-xs italic text-text-tertiary py-1">No disabilities recorded.</p>
+            <p className="text-xs italic text-text-tertiary py-1">{t('studentProfile.demographics.noDisabilitiesPeriod')}</p>
           )}
 
           {disabilitiesArray.fields.map((field, index) => (
@@ -248,12 +252,12 @@ export function EditDemographicsModal({
                   name={`disabilities.${index}.descriptor`}
                   render={({ field: f }) => (
                     <Select
-                      aria-label="Disability"
+                      aria-label={t('studentProfile.demographics.disability')}
                       value={f.value ?? ''}
                       onChange={(v) => f.onChange(v ?? '')}
                       disabled={isSubmitting}
                       options={[
-                        { value: '', label: '— Select disability —' },
+                        { value: '', label: t('studentProfile.demographics.selectDisability') },
                         ...disabilityOptions.map((uri) => ({ value: uri, label: getDisplayName(uri, locale) })),
                       ]}
                     />
@@ -261,7 +265,7 @@ export function EditDemographicsModal({
                 />
                 <Textarea
                   {...register(`disabilities.${index}.notes`)}
-                  placeholder="Notes (optional — kept private; stripped before audit emit)"
+                  placeholder={t('studentProfile.demographics.disabilityNotesPlaceholder')}
                   rows={2}
                   disabled={isSubmitting}
                 />
@@ -269,7 +273,7 @@ export function EditDemographicsModal({
               <button
                 type="button"
                 onClick={() => disabilitiesArray.remove(index)}
-                aria-label="Remove disability"
+                aria-label={t('studentProfile.demographics.removeDisability')}
                 className="p-2 rounded-md text-text-tertiary hover:text-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--state-danger-bg)/0.18)] transition-colors self-start"
                 disabled={isSubmitting}
               >
@@ -281,14 +285,14 @@ export function EditDemographicsModal({
 
         {/* Flags */}
         <section className="space-y-3">
-          <h4 className="text-xs font-semibold uppercase tracking-wider text-text-tertiary">Flags</h4>
+          <h4 className="text-xs font-semibold uppercase tracking-wider text-text-tertiary">{t('studentProfile.demographics.flags')}</h4>
 
           <Controller
             name="isTransferred"
             control={control}
             render={({ field }) => (
               <Checkbox
-                label="Transferred from another school"
+                label={t('studentProfile.demographics.transferredFromAnotherSchool')}
                 checked={!!field.value}
                 onChange={(e) => field.onChange(e.target.checked)}
                 disabled={isSubmitting}
@@ -301,7 +305,7 @@ export function EditDemographicsModal({
             control={control}
             render={({ field }) => (
               <Checkbox
-                label="Below poverty line"
+                label={t('studentProfile.demographics.belowPovertyLine')}
                 checked={!!field.value}
                 onChange={(e) => field.onChange(e.target.checked)}
                 disabled={isSubmitting}
@@ -310,10 +314,10 @@ export function EditDemographicsModal({
           />
 
           {belowPovertyLine && (
-            <Field label="Scholarship category" optionalText={null}>
+            <Field label={t('studentProfile.demographics.scholarshipCategory')} optionalText={null}>
               <Input
                 {...register('scholarshipCategory')}
-                placeholder="e.g. Dalit, Janajati, …"
+                placeholder={t('studentProfile.demographics.scholarshipPlaceholder')}
                 disabled={isSubmitting}
               />
             </Field>
@@ -322,16 +326,16 @@ export function EditDemographicsModal({
 
         <ModalFooter>
           <Button type="button" variant="ghost" onClick={onClose} disabled={isSubmitting}>
-            Cancel
+            {t('actions.cancel')}
           </Button>
           <Button type="submit" disabled={isSubmitting || !formState.isDirty}>
             {isSubmitting ? (
               <>
-                <Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> Saving…
+                <Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> {t('actions.saving')}
               </>
             ) : (
               <>
-                <Save className="w-4 h-4 mr-1.5" /> Save
+                <Save className="w-4 h-4 mr-1.5" /> {t('actions.saveChanges')}
               </>
             )}
           </Button>

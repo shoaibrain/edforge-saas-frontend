@@ -9,6 +9,7 @@
 import { AlertTriangle, User, X, ChevronRight } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { DuplicateMatch } from '../../../services/academics.service'
+import { useAcademicsI18n } from '../../../lib/i18n'
 
 interface DuplicateWarningProps {
   matches: DuplicateMatch[]
@@ -20,28 +21,16 @@ interface DuplicateWarningProps {
 const confidenceStyles = {
   high: {
     badge: 'bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))] border-[rgb(var(--state-danger-border))]/20',
-    label: 'High',
+    labelKey: 'enrollmentModule.duplicate.confidence.high',
   },
   medium: {
     badge: 'bg-[rgb(var(--state-warning-fg))]/10 text-[rgb(var(--state-warning-fg))] border-amber-500/20',
-    label: 'Medium',
+    labelKey: 'enrollmentModule.duplicate.confidence.medium',
   },
   low: {
     badge: 'bg-[rgb(var(--background-tertiary)/0.1)] text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))] border-[rgb(var(--border-secondary))]',
-    label: 'Low',
+    labelKey: 'enrollmentModule.duplicate.confidence.low',
   },
-}
-
-function formatDate(dateStr: string): string {
-  try {
-    return new Date(dateStr).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    })
-  } catch {
-    return dateStr
-  }
 }
 
 export function DuplicateWarning({
@@ -50,6 +39,8 @@ export function DuplicateWarning({
   onDismiss,
   onViewStudent,
 }: DuplicateWarningProps) {
+  const { t, formatDate, formatNumber } = useAcademicsI18n()
+
   if (isLoading) {
     return (
       <motion.div
@@ -61,7 +52,7 @@ export function DuplicateWarning({
         <div className="p-4 rounded-xl bg-[rgb(var(--state-warning-fg))]/5 border border-amber-500/15 flex items-center gap-3">
           <div className="w-5 h-5 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
           <p className="text-sm text-[rgb(var(--state-warning-fg))]">
-            Checking for existing student records...
+            {t('enrollmentModule.duplicate.checking')}
           </p>
         </div>
       </motion.div>
@@ -106,14 +97,14 @@ export function DuplicateWarning({
                   }`}
                 >
                   {highConfidence.length > 0
-                    ? 'Possible Duplicate Found'
-                    : 'Similar Records Found'}
+                    ? t('enrollmentModule.duplicate.possibleDuplicate')
+                    : t('enrollmentModule.duplicate.similarRecords')}
                 </h4>
                 <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">
                   {matches.length === 1
-                    ? 'A student with similar information already exists.'
-                    : `${matches.length} students with similar information were found.`}{' '}
-                  You can continue if this is a new student.
+                    ? t('enrollmentModule.duplicate.singleMatch')
+                    : t('enrollmentModule.duplicate.multipleMatches', { count: formatNumber(matches.length) })}{' '}
+                  {t('enrollmentModule.duplicate.continueNew')}
                 </p>
               </div>
             </div>
@@ -121,7 +112,7 @@ export function DuplicateWarning({
               type="button"
               onClick={onDismiss}
               className="p-1 text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] rounded transition-colors"
-              aria-label="Dismiss warning"
+              aria-label={t('enrollmentModule.duplicate.dismiss')}
             >
               <X className="w-4 h-4" />
             </button>
@@ -145,13 +136,13 @@ export function DuplicateWarning({
                         {match.firstName} {match.lastName}
                       </p>
                       <p className="text-xs text-[rgb(var(--text-tertiary))]">
-                        DOB: {formatDate(match.dateOfBirth)}
-                        {match.currentGradeLevel && ` · Grade ${match.currentGradeLevel}`}
+                        {t('enrollmentModule.duplicate.dob', { date: formatDate(match.dateOfBirth) })}
+                        {match.currentGradeLevel && ` · ${t('enrollmentModule.duplicate.grade', { grade: match.currentGradeLevel })}`}
                         {match.status && ` · ${match.status}`}
                       </p>
                       {match.matchReasons.length > 0 && (
                         <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">
-                          Match: {match.matchReasons.join(', ')}
+                          {t('enrollmentModule.duplicate.match', { reasons: match.matchReasons.join(', ') })}
                         </p>
                       )}
                     </div>
@@ -161,14 +152,14 @@ export function DuplicateWarning({
                     <span
                       className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium border ${style.badge}`}
                     >
-                      {style.label}
+                      {t(style.labelKey)}
                     </span>
                     {onViewStudent && (
                       <button
                         type="button"
                         onClick={() => onViewStudent(match.studentId)}
                         className="p-1 text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] rounded transition-colors"
-                        aria-label={`View ${match.firstName} ${match.lastName}`}
+                        aria-label={t('enrollmentModule.duplicate.viewStudent', { name: `${match.firstName} ${match.lastName}` })}
                       >
                         <ChevronRight className="w-4 h-4" />
                       </button>

@@ -27,6 +27,7 @@ import {
   type StudentProfileResponseDto,
 } from '@aibrains/shared-types'
 import { EditDemographicsModal } from './EditDemographicsModal'
+import { useAcademicsI18n } from '../../../lib/i18n'
 
 // ============================================================================
 // TYPES
@@ -73,12 +74,14 @@ function FieldRow({
   label: string
   display: DescriptorDisplay
 }) {
+  const { t } = useAcademicsI18n()
+
   return (
     <div className="flex items-start justify-between gap-4 py-2.5 border-b border-[rgb(var(--border-primary))] last:border-0">
       <span className="text-sm text-[rgb(var(--text-tertiary))] min-w-40">{label}</span>
       <div className="flex-1 text-right">
         {display.kind === 'unset' && (
-          <span className="text-sm italic text-[rgb(var(--text-tertiary))]">Not specified</span>
+          <span className="text-sm italic text-[rgb(var(--text-tertiary))]">{t('studentProfile.demographics.notSpecified')}</span>
         )}
         {display.kind === 'set' && (
           <span className="text-sm text-[rgb(var(--text-primary))]">{display.label}</span>
@@ -91,7 +94,7 @@ function FieldRow({
               data-testid="derived-badge"
             >
               <AlertTriangle className="w-2.5 h-2.5" aria-hidden />
-              Derived — click Edit to confirm
+              {t('studentProfile.demographics.derivedConfirm')}
             </span>
           </div>
         )}
@@ -101,30 +104,34 @@ function FieldRow({
 }
 
 function BooleanRow({ label, value }: { label: string; value: boolean | undefined }) {
+  const { t } = useAcademicsI18n()
+
   return (
     <div className="flex items-center justify-between gap-4 py-2.5 border-b border-[rgb(var(--border-primary))] last:border-0">
       <span className="text-sm text-[rgb(var(--text-tertiary))] min-w-40">{label}</span>
       {value === true && (
-        <span className="text-sm font-medium text-[rgb(var(--accent-enrollment-text))]">Yes</span>
+        <span className="text-sm font-medium text-[rgb(var(--accent-enrollment-text))]">{t('yesNo.yes')}</span>
       )}
       {value === false && (
-        <span className="text-sm text-[rgb(var(--text-primary))]">No</span>
+        <span className="text-sm text-[rgb(var(--text-primary))]">{t('yesNo.no')}</span>
       )}
       {value === undefined && (
-        <span className="text-sm italic text-[rgb(var(--text-tertiary))]">Not specified</span>
+        <span className="text-sm italic text-[rgb(var(--text-tertiary))]">{t('studentProfile.demographics.notSpecified')}</span>
       )}
     </div>
   )
 }
 
 function TextRow({ label, value }: { label: string; value?: string }) {
+  const { t } = useAcademicsI18n()
+
   return (
     <div className="flex items-start justify-between gap-4 py-2.5 border-b border-[rgb(var(--border-primary))] last:border-0">
       <span className="text-sm text-[rgb(var(--text-tertiary))] min-w-40">{label}</span>
       {value ? (
         <span className="text-sm text-[rgb(var(--text-primary))] text-right">{value}</span>
       ) : (
-        <span className="text-sm italic text-[rgb(var(--text-tertiary))]">Not specified</span>
+        <span className="text-sm italic text-[rgb(var(--text-tertiary))]">{t('studentProfile.demographics.notSpecified')}</span>
       )}
     </div>
   )
@@ -137,10 +144,12 @@ function DisabilitiesBlock({
   disabilities: Array<{ descriptor: string; notes?: string }> | undefined
   locale: DescriptorLocale
 }) {
+  const { t } = useAcademicsI18n()
+
   if (!disabilities || disabilities.length === 0) {
     return (
       <div className="py-2.5 text-sm italic text-[rgb(var(--text-tertiary))]">
-        No disabilities recorded
+        {t('studentProfile.demographics.noDisabilities')}
       </div>
     )
   }
@@ -167,6 +176,7 @@ function DisabilitiesBlock({
 // ============================================================================
 
 export function DemographicsTab({ student, canEdit = false, locale = 'en' }: DemographicsTabProps) {
+  const { t } = useAcademicsI18n()
   const [editing, setEditing] = useState(false)
 
   // Auto-derive from legacy fields for students that predate Sprint 3.
@@ -205,10 +215,10 @@ export function DemographicsTab({ student, canEdit = false, locale = 'en' }: Dem
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-base font-semibold text-[rgb(var(--text-primary))]">
-            Ed-Fi Demographics
+            {t('studentProfile.demographics.title')}
           </h2>
           <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
-            IEMIS-aligned fields used for Flash I / II reporting. Edits are audited.
+            {t('studentProfile.demographics.description')}
           </p>
         </div>
         {canEdit && (
@@ -219,36 +229,36 @@ export function DemographicsTab({ student, canEdit = false, locale = 'en' }: Dem
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-[rgb(var(--border-primary))] text-xs font-medium text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary))] transition-colors"
           >
             <Pencil className="w-3.5 h-3.5" aria-hidden />
-            Edit
+            {t('studentProfile.demographics.edit')}
           </button>
         )}
       </div>
 
       <section className="rounded-lg border border-[rgb(var(--border-primary))] px-4 py-2">
         <h3 className="text-xs font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))] py-2">
-          Identity
+          {t('studentProfile.demographics.identity')}
         </h3>
-        <FieldRow label="Sex" display={sex} />
-        <FieldRow label="Primary language" display={lang} />
-        <FieldRow label="Mother tongue" display={mother} />
-        <FieldRow label="Ethnicity" display={ethnicity} />
+        <FieldRow label={t('studentProfile.demographics.sex')} display={sex} />
+        <FieldRow label={t('studentProfile.demographics.primaryLanguage')} display={lang} />
+        <FieldRow label={t('studentProfile.demographics.motherTongue')} display={mother} />
+        <FieldRow label={t('studentProfile.demographics.ethnicity')} display={ethnicity} />
       </section>
 
       <section className="rounded-lg border border-[rgb(var(--border-primary))] px-4 py-2">
         <h3 className="text-xs font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))] py-2">
-          Disabilities
+          {t('studentProfile.demographics.disabilities')}
         </h3>
         <DisabilitiesBlock disabilities={student.disabilities} locale={locale} />
       </section>
 
       <section className="rounded-lg border border-[rgb(var(--border-primary))] px-4 py-2">
         <h3 className="text-xs font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))] py-2">
-          Flags
+          {t('studentProfile.demographics.flags')}
         </h3>
-        <BooleanRow label="Transferred in?" value={student.isTransferred} />
-        <BooleanRow label="Below poverty line?" value={student.belowPovertyLine} />
+        <BooleanRow label={t('studentProfile.demographics.transferredIn')} value={student.isTransferred} />
+        <BooleanRow label={t('studentProfile.demographics.belowPovertyLine')} value={student.belowPovertyLine} />
         {student.belowPovertyLine && (
-          <TextRow label="Scholarship category" value={student.scholarshipCategory} />
+          <TextRow label={t('studentProfile.demographics.scholarshipCategory')} value={student.scholarshipCategory} />
         )}
       </section>
 

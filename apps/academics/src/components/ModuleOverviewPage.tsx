@@ -30,6 +30,7 @@ import {
     RefreshCw,
 } from 'lucide-react'
 import { useOverviewWidgetStore } from '../stores/overview-widgets.store'
+import { useAcademicsI18n } from '../lib/i18n'
 
 // ============================================================================
 // TYPE DEFINITIONS
@@ -71,6 +72,7 @@ interface WidgetVisibilityMenuProps {
 }
 
 function WidgetVisibilityMenu({ widgets, onToggle, onReset }: WidgetVisibilityMenuProps) {
+    const { t } = useAcademicsI18n()
     const [isOpen, setIsOpen] = useState(false)
     const [showWidgets, setShowWidgets] = useState(false)
     const menuRef = useRef<HTMLDivElement>(null)
@@ -107,7 +109,7 @@ function WidgetVisibilityMenu({ widgets, onToggle, onReset }: WidgetVisibilityMe
                     transition-colors
                     ${isOpen ? 'bg-[rgb(var(--background-tertiary))]' : ''}
                 `}
-                title="Page options"
+                title={t('moduleOverview.options.title')}
                 aria-expanded={isOpen}
                 aria-haspopup="true"
             >
@@ -127,7 +129,7 @@ function WidgetVisibilityMenu({ widgets, onToggle, onReset }: WidgetVisibilityMe
                         role="menuitem"
                     >
                         <Eye className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
-                        <span>Show/hide widgets</span>
+                        <span>{t('moduleOverview.options.showHideWidgets')}</span>
                         <span className="ml-auto text-[rgb(var(--text-tertiary))]">›</span>
                     </button>
                     <div className="my-1 border-t border-[rgb(var(--border-secondary))]" />
@@ -137,7 +139,7 @@ function WidgetVisibilityMenu({ widgets, onToggle, onReset }: WidgetVisibilityMe
                         role="menuitem"
                     >
                         <RotateCcw className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
-                        <span>Reset to default</span>
+                        <span>{t('moduleOverview.options.resetToDefault')}</span>
                     </button>
                 </motion.div>
             )}
@@ -155,7 +157,7 @@ function WidgetVisibilityMenu({ widgets, onToggle, onReset }: WidgetVisibilityMe
                         role="menuitem"
                     >
                         <span>‹</span>
-                        <span>Back</span>
+                        <span>{t('moduleOverview.options.back')}</span>
                     </button>
                     {widgets.map((widget) => (
                         <button
@@ -187,6 +189,7 @@ interface StatCardProps {
 }
 
 function StatCard({ stat, index }: StatCardProps) {
+    const { t } = useAcademicsI18n()
     const TrendIcon = stat.changeType === 'positive' ? TrendingUp
         : stat.changeType === 'negative' ? TrendingDown
             : Minus
@@ -217,10 +220,10 @@ function StatCard({ stat, index }: StatCardProps) {
                                 <button
                                     onClick={stat.onRetry}
                                     className="flex items-center gap-1 px-1.5 py-0.5 text-xs font-medium rounded bg-[rgb(var(--state-warning-fg))]/10 text-[rgb(var(--state-warning-fg))] hover:bg-[rgb(var(--state-warning-fg))]/20 transition-colors"
-                                    title="Retry loading"
+                                    title={t('moduleOverview.retryLoading')}
                                 >
                                     <RotateCcw className="w-2.5 h-2.5" />
-                                    Retry
+                                    {t('error.retry')}
                                 </button>
                             )}
                         </div>
@@ -254,6 +257,7 @@ interface StatsCarouselProps {
 }
 
 function StatsCarousel({ stats }: StatsCarouselProps) {
+    const { t } = useAcademicsI18n()
     const scrollRef = useRef<HTMLDivElement>(null)
     const [isHovered, setIsHovered] = useState(false)
     const [canScrollLeft, setCanScrollLeft] = useState(false)
@@ -299,7 +303,7 @@ function StatsCarousel({ stats }: StatsCarouselProps) {
                     animate={{ opacity: 1 }}
                     onClick={() => smoothScroll('left')}
                     className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full flex items-center justify-center bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] shadow-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))]"
-                    aria-label="Scroll stats left"
+                    aria-label={t('moduleOverview.stats.scrollLeft')}
                 >
                     <ChevronLeft className="w-5 h-5" />
                 </motion.button>
@@ -310,7 +314,7 @@ function StatsCarousel({ stats }: StatsCarouselProps) {
                     animate={{ opacity: 1 }}
                     onClick={() => smoothScroll('right')}
                     className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full flex items-center justify-center bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] shadow-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))]"
-                    aria-label="Scroll stats right"
+                    aria-label={t('moduleOverview.stats.scrollRight')}
                 >
                     <ChevronRight className="w-5 h-5" />
                 </motion.button>
@@ -321,7 +325,7 @@ function StatsCarousel({ stats }: StatsCarouselProps) {
                 onKeyDown={handleKeyDown}
                 tabIndex={0}
                 role="region"
-                aria-label="Key performance indicators"
+                aria-label={t('moduleOverview.stats.regionLabel')}
                 className="flex gap-3 overflow-x-auto scrollbar-none scroll-smooth py-2 -my-2 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] rounded-xl"
                 style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
@@ -373,19 +377,30 @@ function WidgetSection({ label, icon: Icon, visible, children }: WidgetSectionPr
 // ============================================================================
 
 function LastUpdatedIndicator({ date, onRefresh }: { date: Date | null; onRefresh?: () => void }) {
+    const { t, formatNumber } = useAcademicsI18n()
     if (!date) return null
 
     const diffMs = Date.now() - date.getTime()
     const diffMin = Math.floor(diffMs / 60000)
-    let label = 'Updated just now'
-    if (diffMin >= 1 && diffMin < 60) label = `Updated ${diffMin}m ago`
-    else if (diffMin >= 60) label = `Updated ${Math.floor(diffMin / 60)}h ago`
+    let label = t('moduleOverview.updated.justNow')
+    if (diffMin >= 1 && diffMin < 60) {
+        label = t('moduleOverview.updated.minutesAgo', {
+            count: diffMin,
+            value: formatNumber(diffMin),
+        })
+    } else if (diffMin >= 60) {
+        const hours = Math.floor(diffMin / 60)
+        label = t('moduleOverview.updated.hoursAgo', {
+            count: hours,
+            value: formatNumber(hours),
+        })
+    }
 
     return (
         <button
             onClick={onRefresh}
             className="flex items-center gap-1.5 text-xs text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] transition-colors"
-            title="Click to refresh"
+            title={t('moduleOverview.updated.refreshTitle')}
         >
             <RefreshCw className="w-3 h-3" />
             {label}
@@ -406,13 +421,14 @@ export function ModuleOverviewPage({
     lastUpdated,
     onRefresh,
 }: ModuleOverviewPageProps) {
+    const { t } = useAcademicsI18n()
     // Widget visibility from Zustand store (persisted in localStorage)
     const { visibleWidgets, toggleWidget, resetToDefaults } = useOverviewWidgetStore()
 
     const widgets = [
-        { id: 'quick-stats', label: 'Quick stats', visible: visibleWidgets['quick-stats'] ?? true },
-        { id: 'insights', label: 'Insights & Charts', visible: visibleWidgets['insights'] ?? true },
-        { id: 'activity-alerts', label: 'Activity & Alerts', visible: visibleWidgets['activity-alerts'] ?? true },
+        { id: 'quick-stats', label: t('moduleOverview.widgets.quickStats'), visible: visibleWidgets['quick-stats'] ?? true },
+        { id: 'insights', label: t('moduleOverview.widgets.insightsCharts'), visible: visibleWidgets['insights'] ?? true },
+        { id: 'activity-alerts', label: t('moduleOverview.widgets.activityAlerts'), visible: visibleWidgets['activity-alerts'] ?? true },
     ]
 
     const isWidgetVisible = (id: string) => visibleWidgets[id] ?? true
@@ -455,7 +471,7 @@ export function ModuleOverviewPage({
                     </motion.div>
                     <div>
                         <h1 className="text-2xl sm:text-3xl font-bold text-[rgb(var(--text-primary))]">
-                            {title} Overview
+                            {t('moduleOverview.title', { title })}
                         </h1>
                         <p className="text-[rgb(var(--text-secondary))] mt-1 max-w-2xl">
                             {description}
@@ -467,7 +483,7 @@ export function ModuleOverviewPage({
             {/* Stats Carousel */}
             {stats.length > 0 && (
                 <WidgetSection
-                    label="Quick stats"
+                    label={t('moduleOverview.widgets.quickStats')}
                     icon={ChartNoAxesColumnDecreasing}
                     visible={isWidgetVisible('quick-stats')}
                 >
@@ -478,7 +494,7 @@ export function ModuleOverviewPage({
             {/* Insights / Charts children slot */}
             {children && isWidgetVisible('insights') && (
                 <WidgetSection
-                    label="Insights"
+                    label={t('moduleOverview.widgets.insights')}
                     icon={BarChart3}
                     visible={isWidgetVisible('insights')}
                 >

@@ -35,19 +35,7 @@ import {
   RESIDENCY_STATUS_OPTIONS,
 } from '../../../../schemas/edfi-descriptors'
 import { CollapsibleSection } from '../CollapsibleSection'
-
-const ENROLLMENT_TYPE_RADIO = ENROLLMENT_TYPE_OPTIONS.map((o) => ({
-  value: o.value,
-  label: o.label,
-  description:
-    o.value === 'new'
-      ? 'First-time enrollment in this school'
-      : o.value === 'transfer'
-        ? 'Transferring from another school'
-        : o.value === 'returning'
-          ? 'Previously enrolled and returning'
-          : 'Re-enrolling after a break in enrollment',
-}))
+import { useAcademicsI18n } from '../../../../lib/i18n'
 
 export function EnrollmentStep({
   data,
@@ -55,6 +43,7 @@ export function EnrollmentStep({
   errors,
   clearError,
 }: WizardStepProps) {
+  const { t } = useAcademicsI18n()
   const form = useWizardForm({ data, updateData, errors, clearError })
   const enrollmentType = form.watch('enrollment.enrollmentType') as string
   const selectedYearId = form.watch('enrollment.academicYearId') as string
@@ -75,9 +64,26 @@ export function EnrollmentStep({
   const yearOptions = useMemo(() => {
     return eligibleYears.map((y) => ({
       value: y.yearId,
-      label: `${y.name}${y.isCurrent ? ' (Current)' : ''}`,
+      label: `${y.name}${y.isCurrent ? ` (${t('enrollmentModule.step.details.currentSuffix')})` : ''}`,
     }))
-  }, [eligibleYears])
+  }, [eligibleYears, t])
+
+  const enrollmentTypeOptions = useMemo(
+    () =>
+      ENROLLMENT_TYPE_OPTIONS.map((o) => ({
+        value: o.value,
+        label: o.label,
+        description:
+          o.value === 'new'
+            ? t('enrollmentModule.step.type.newDescription')
+            : o.value === 'transfer'
+              ? t('enrollmentModule.step.type.transferDescription')
+              : o.value === 'returning'
+                ? t('enrollmentModule.step.type.returningDescription')
+                : t('enrollmentModule.step.type.reenrollmentDescription'),
+      })),
+    [t],
+  )
 
   const selectedYear = useMemo(() => {
     if (!selectedYearId || !eligibleYears.length) return null
@@ -130,10 +136,10 @@ export function EnrollmentStep({
             <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-[rgb(var(--state-danger-fg))]" />
             <div>
               <p className="text-xs font-medium text-[rgb(var(--state-danger-fg))]">
-                No active academic year available
+                {t('enrollmentModule.step.details.noActiveYearTitle')}
               </p>
               <p className="text-2xs text-[rgb(var(--text-secondary))] mt-0.5">
-                Please configure and activate an academic year in School Settings before enrolling students.
+                {t('enrollmentModule.step.details.noActiveYearDescription')}
               </p>
             </div>
           </div>
@@ -143,14 +149,14 @@ export function EnrollmentStep({
         <CollapsibleSection
           id="enrollment-type"
           icon={ClipboardList}
-          title="Enrollment Type"
-          description="How the student is enrolling"
+          title={t('enrollmentModule.step.type.title')}
+          description={t('enrollmentModule.step.type.description')}
           fields={['enrollment.enrollmentType']}
           defaultExpanded
         >
           <RadioGroupField
             name="enrollment.enrollmentType"
-            options={ENROLLMENT_TYPE_RADIO}
+            options={enrollmentTypeOptions}
             direction="horizontal"
             optionsClassName="grid grid-cols-2 gap-4"
           />
@@ -160,8 +166,8 @@ export function EnrollmentStep({
         <CollapsibleSection
           id="enrollment-details"
           icon={CalendarDays}
-          title="Enrollment Details"
-          description="Academic year and enrollment date"
+          title={t('enrollmentModule.step.details.title')}
+          description={t('enrollmentModule.step.details.description')}
           fields={['enrollment.academicYearId', 'enrollment.enrollmentDate']}
           defaultExpanded
         >
@@ -171,27 +177,27 @@ export function EnrollmentStep({
               {yearsLoading ? (
                 <div className="space-y-1.5">
                   <label className="block text-sm font-medium text-[rgb(var(--text-secondary))]">
-                    Academic Year *
+                    {t('enrollmentModule.step.details.academicYear')} *
                   </label>
                   <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg border border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-tertiary))]">
                     <Loader2 className="w-4 h-4 animate-spin text-[rgb(var(--text-tertiary))]" />
-                    <span className="text-xs text-[rgb(var(--text-tertiary))]">Loading academic years...</span>
+                    <span className="text-xs text-[rgb(var(--text-tertiary))]">{t('enrollmentModule.step.details.loadingYears')}</span>
                   </div>
                 </div>
               ) : yearsError ? (
                 <div className="space-y-1.5">
                   <label className="block text-sm font-medium text-[rgb(var(--state-danger-fg))]">
-                    Academic Year *
+                    {t('enrollmentModule.step.details.academicYear')} *
                   </label>
                   <div className="px-3 py-2.5 rounded-lg text-xs border border-[rgb(var(--state-danger-border))] bg-[rgb(var(--state-danger-bg))] text-[rgb(var(--state-danger-fg))]">
-                    Failed to load academic years. Please refresh.
+                    {t('enrollmentModule.step.details.failedYears')}
                   </div>
                 </div>
               ) : (
                 <SelectField
                   name="enrollment.academicYearId"
-                  label="Academic Year"
-                  placeholder="Select academic year"
+                  label={t('enrollmentModule.step.details.academicYear')}
+                  placeholder={t('enrollmentModule.step.details.selectAcademicYear')}
                   options={yearOptions}
                   required
                 />
@@ -201,13 +207,13 @@ export function EnrollmentStep({
             <div>
               <DateField
                 name="enrollment.enrollmentDate"
-                label="Enrollment Date"
+                label={t('enrollmentModule.step.details.enrollmentDate')}
                 required
                 min={selectedYear?.startDate}
                 max={selectedYear?.endDate}
                 helperText={
                   selectedYear
-                    ? `Must be within ${selectedYear.startDate} – ${selectedYear.endDate}`
+                    ? t('enrollmentModule.step.details.dateRange', { start: selectedYear.startDate, end: selectedYear.endDate })
                     : undefined
                 }
               />
@@ -228,7 +234,7 @@ export function EnrollmentStep({
                   <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[rgb(var(--state-success-bg))] border border-[rgb(var(--state-success-border))]">
                     <CheckCircle2 className="w-4 h-4 shrink-0 text-[rgb(var(--accent-enrollment-text))]" />
                     <span className="text-xs text-[rgb(var(--accent-enrollment-text))]">
-                      Active academic year — enrollment will be immediately active
+                      {t('enrollmentModule.step.details.activeYear')}
                     </span>
                   </div>
                 ) : null}
@@ -241,25 +247,25 @@ export function EnrollmentStep({
         <CollapsibleSection
           id="enrollment-entry"
           icon={FileText}
-          title="Entry Details"
-          description="Ed-Fi descriptor fields for state reporting"
+          title={t('enrollmentModule.step.entry.title')}
+          description={t('enrollmentModule.step.entry.description')}
           fields={['enrollment.entryTypeDescriptor', 'enrollment.residencyStatusDescriptor']}
           defaultExpanded={false}
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
             <SelectField
               name="enrollment.entryTypeDescriptor"
-              label="Entry Type"
-              placeholder="Select entry type"
+              label={t('enrollmentModule.step.entry.entryType')}
+              placeholder={t('enrollmentModule.step.entry.selectEntryType')}
               options={ENTRY_TYPE_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
-              helperText="How the student is entering this school"
+              helperText={t('enrollmentModule.step.entry.entryTypeHelp')}
             />
             <SelectField
               name="enrollment.residencyStatusDescriptor"
-              label="Residency Status"
-              placeholder="Select residency status"
+              label={t('enrollmentModule.step.entry.residencyStatus')}
+              placeholder={t('enrollmentModule.step.entry.selectResidencyStatus')}
               options={RESIDENCY_STATUS_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
-              helperText="Student's residency relative to the school"
+              helperText={t('enrollmentModule.step.entry.residencyHelp')}
             />
           </div>
         </CollapsibleSection>
@@ -268,8 +274,8 @@ export function EnrollmentStep({
         <CollapsibleSection
           id="enrollment-settings"
           icon={Settings}
-          title="Enrollment Settings"
-          description="Defaults are pre-configured — adjust only if needed"
+          title={t('enrollmentModule.step.settings.title')}
+          description={t('enrollmentModule.step.settings.description')}
           fields={['enrollment.primarySchool', 'enrollment.fullTimeEquivalency', 'enrollment.repeatGradeIndicator']}
           defaultExpanded={false}
         >
@@ -286,19 +292,19 @@ export function EnrollmentStep({
                   htmlFor="enrollment.primarySchool"
                   className="text-sm select-none text-[rgb(var(--text-primary))]"
                 >
-                  Primary School
+                  {t('enrollmentModule.step.settings.primarySchool')}
                 </label>
               </div>
               <p className="text-3xs text-[rgb(var(--text-tertiary))] pl-1">
-                Is this the student's primary school of enrollment?
+                {t('enrollmentModule.step.settings.primarySchoolHelp')}
               </p>
             </div>
 
             <TextField
               name="enrollment.fullTimeEquivalency"
-              label="Full-Time Equivalency (FTE)"
+              label={t('enrollmentModule.step.settings.fte')}
               type="number"
-              helperText="1.0 = full-time, 0.5 = half-time"
+              helperText={t('enrollmentModule.step.settings.fteHelp')}
             />
 
             <div className="space-y-1">
@@ -313,11 +319,11 @@ export function EnrollmentStep({
                   htmlFor="enrollment.repeatGradeIndicator"
                   className="text-sm select-none text-[rgb(var(--text-primary))]"
                 >
-                  Repeat Grade
+                  {t('enrollmentModule.step.settings.repeatGrade')}
                 </label>
               </div>
               <p className="text-3xs text-[rgb(var(--text-tertiary))] pl-1">
-                Check if the student is repeating the current grade level
+                {t('enrollmentModule.step.settings.repeatGradeHelp')}
               </p>
             </div>
           </div>
@@ -336,8 +342,8 @@ export function EnrollmentStep({
               <CollapsibleSection
                 id="enrollment-transfer"
                 icon={ArrowRightLeft}
-                title="Transfer Information"
-                description="Details about the previous school"
+                title={t('enrollmentModule.step.transfer.title')}
+                description={t('enrollmentModule.step.transfer.description')}
                 fields={['enrollment.previousSchoolName', 'enrollment.previousSchoolAddress', 'enrollment.transferReason']}
                 defaultExpanded
               >
@@ -345,20 +351,20 @@ export function EnrollmentStep({
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
                     <TextField
                       name="enrollment.previousSchoolName"
-                      label="Previous School"
-                      placeholder="Name of previous school"
+                      label={t('enrollmentModule.step.transfer.previousSchool')}
+                      placeholder={t('enrollmentModule.step.transfer.previousSchoolPlaceholder')}
                       required
                     />
                     <TextField
                       name="enrollment.previousSchoolAddress"
-                      label="Previous School Address"
-                      placeholder="City, State"
+                      label={t('enrollmentModule.step.transfer.previousAddress')}
+                      placeholder={t('enrollmentModule.step.transfer.previousAddressPlaceholder')}
                     />
                   </div>
                   <TextareaField
                     name="enrollment.transferReason"
-                    label="Reason for Transfer"
-                    placeholder="Briefly describe the reason for transfer"
+                    label={t('enrollmentModule.step.transfer.reason')}
+                    placeholder={t('enrollmentModule.step.transfer.reasonPlaceholder')}
                     rows={3}
                   />
                 </div>
@@ -371,15 +377,15 @@ export function EnrollmentStep({
         <CollapsibleSection
           id="enrollment-notes"
           icon={MessageSquare}
-          title="Additional Notes"
-          description="Optional notes about this enrollment"
+          title={t('enrollmentModule.step.notes.title')}
+          description={t('enrollmentModule.step.notes.description')}
           fields={['enrollment.notes']}
           defaultExpanded={false}
         >
           <TextareaField
             name="enrollment.notes"
-            label="Notes"
-            placeholder="Any additional notes about this enrollment..."
+            label={t('enrollmentModule.step.notes.label')}
+            placeholder={t('enrollmentModule.step.notes.placeholder')}
             rows={3}
             maxLength={2000}
             showCharCount
@@ -390,7 +396,7 @@ export function EnrollmentStep({
         <div className="flex items-start gap-3 rounded-lg p-3 bg-[rgb(var(--background-tertiary)/0.5)] border border-[rgb(var(--border-primary)/0.35)]">
           <Info className="w-4 h-4 shrink-0 mt-0.5 text-[rgb(var(--text-tertiary))]" />
           <p className="text-2xs text-[rgb(var(--text-tertiary))]">
-            <span className="font-medium">Auto-populated:</span> School, grade level, and entry grade level descriptor are automatically set based on your school context and Step 1 selections.
+            <span className="font-medium">{t('enrollmentModule.step.auto.label')}</span> {t('enrollmentModule.step.auto.description')}
           </p>
         </div>
       </div>

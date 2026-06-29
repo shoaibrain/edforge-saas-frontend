@@ -23,6 +23,7 @@ import { useActiveSchoolId } from '../../stores/app.store'
 import { useCurrentAcademicYear, useGradingPeriods } from '../../hooks'
 import { useStudentGrades } from '../../hooks/useGrades'
 import { NoCurrentAcademicYearEmptyState } from '../../components/common'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 // ============================================================================
 // HELPERS
@@ -49,9 +50,10 @@ function getGpaBadge(gpa: number): { bg: string; text: string } {
 
 export function ReportCardPage() {
   const navigate = useNavigate()
+  const { t, formatDate, formatDateTime, formatNumber } = useAcademicsI18n()
   const search = useSearch({ strict: false }) as { studentId?: string; studentName?: string }
   const studentId = search.studentId || ''
-  const studentName = search.studentName || 'Student'
+  const studentName = search.studentName || t('tableHeaders.student')
 
   const schoolId = useActiveSchoolId() || ''
   const { data: currentYear } = useCurrentAcademicYear(schoolId)
@@ -94,10 +96,10 @@ export function ReportCardPage() {
       <div className="py-16 text-center">
         <GraduationCap className="w-12 h-12 mx-auto text-text-tertiary mb-4" />
         <h4 className="text-lg font-medium text-text-primary mb-2">
-          No Student Selected
+          {t('gradesModule.reportCard.noStudentTitle')}
         </h4>
         <p className="text-text-secondary max-w-md mx-auto mb-4">
-          Navigate to a student profile and click "View Report Card" to see their grades.
+          {t('gradesModule.reportCard.noStudentDescription')}
         </p>
         <button
           type="button"
@@ -105,7 +107,7 @@ export function ReportCardPage() {
           className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--text-primary))] transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          Go to Students
+          {t('gradesModule.reportCard.goToStudents')}
         </button>
       </div>
     )
@@ -120,7 +122,7 @@ export function ReportCardPage() {
       <div className="p-6">
         <NoCurrentAcademicYearEmptyState
           variant="subtle"
-          secondaryMessage="Set up an academic year before generating report cards."
+          secondaryMessage={t('gradesModule.reportCard.setAcademicYear')}
         />
       </div>
     )
@@ -141,7 +143,7 @@ export function ReportCardPage() {
             </button>
             <div>
               <h1 className="text-xl font-bold text-text-primary">
-                Report Card
+                {t('gradesModule.reportCard.title')}
               </h1>
               <p className="text-sm text-text-secondary">{studentName}</p>
             </div>
@@ -153,7 +155,7 @@ export function ReportCardPage() {
                 onChange={(e) => setSelectedTermId(e.target.value)}
                 className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
               >
-                <option value="">All Terms</option>
+                <option value="">{t('gradesModule.reportCard.allTerms')}</option>
                 {gradingPeriods.map((gp) => {
                   const id = gp.termId ?? gp.periodId ?? ''
                   return (
@@ -170,7 +172,7 @@ export function ReportCardPage() {
               className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg-hover))] rounded-lg transition-colors"
             >
               <Printer className="w-4 h-4" />
-              Print
+              {t('gradesModule.reportCard.print')}
             </button>
           </div>
         </div>
@@ -181,17 +183,17 @@ export function ReportCardPage() {
         {/* Print Header (only visible when printing) */}
         <div className="hidden print:block mb-8 border-b-2 border-[rgb(var(--text-primary))] pb-4">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">Student Report Card</h1>
+            <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))]">{t('gradesModule.reportCard.printTitle')}</h1>
             <p className="text-[rgb(var(--text-tertiary))] mt-1">
-              {currentYear?.name || 'Academic Year'}{selectedTermId ? ` — ${gradingPeriods?.find((gp) => (gp.termId ?? gp.periodId) === selectedTermId)?.name || 'Term'}` : ''}
+              {currentYear?.name || t('gradesModule.reportCard.academicYearFallback')}{selectedTermId ? ` - ${gradingPeriods?.find((gp) => (gp.termId ?? gp.periodId) === selectedTermId)?.name || t('gradesModule.reportCard.termFallback')}` : ''}
             </p>
           </div>
           <div className="mt-4 flex justify-between text-sm text-[rgb(var(--text-secondary))]">
             <div>
-              <strong>Student:</strong> {studentName}
+              <strong>{t('gradesModule.reportCard.student')}</strong> {studentName}
             </div>
             <div>
-              <strong>Date:</strong> {new Date().toLocaleDateString()}
+              <strong>{t('gradesModule.reportCard.date')}</strong> {formatDate(new Date())}
             </div>
           </div>
         </div>
@@ -211,10 +213,10 @@ export function ReportCardPage() {
           <div className="py-12 text-center">
             <GraduationCap className="w-10 h-10 mx-auto text-text-tertiary mb-3 print:hidden" />
             <h4 className="text-sm font-medium text-text-primary mb-1">
-              No grades recorded
+              {t('gradesModule.reportCard.noGradesTitle')}
             </h4>
             <p className="text-xs text-text-tertiary max-w-xs mx-auto">
-              Grades will appear here once they are recorded by teachers.
+              {t('gradesModule.reportCard.noGradesDescription')}
             </p>
           </div>
         ) : (
@@ -223,21 +225,21 @@ export function ReportCardPage() {
             {gpa && (
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 print:grid-cols-3">
                 <div className="bg-surface-secondary rounded-xl border border-border-secondary p-4 text-center print:border print:border-[rgb(var(--border-primary))] print:rounded print:bg-[rgb(var(--background-tertiary))]">
-                  <p className="text-xs text-text-tertiary mb-1 print:text-[rgb(var(--text-tertiary))]">Term GPA</p>
+                  <p className="text-xs text-text-tertiary mb-1 print:text-[rgb(var(--text-tertiary))]">{t('gradesModule.reportCard.termGpa')}</p>
                   <p className={`text-2xl font-bold ${getGpaBadge(gpa.termGpa).text} print:text-[rgb(var(--text-primary))]`}>
-                    {gpa.termGpa.toFixed(2)}
+                    {formatNumber(Number(gpa.termGpa.toFixed(2)))}
                   </p>
                 </div>
                 <div className="bg-surface-secondary rounded-xl border border-border-secondary p-4 text-center print:border print:border-[rgb(var(--border-primary))] print:rounded print:bg-[rgb(var(--background-tertiary))]">
-                  <p className="text-xs text-text-tertiary mb-1 print:text-[rgb(var(--text-tertiary))]">Cumulative GPA</p>
+                  <p className="text-xs text-text-tertiary mb-1 print:text-[rgb(var(--text-tertiary))]">{t('gradesModule.reportCard.cumulativeGpa')}</p>
                   <p className={`text-2xl font-bold ${getGpaBadge(gpa.cumulativeGpa).text} print:text-[rgb(var(--text-primary))]`}>
-                    {gpa.cumulativeGpa.toFixed(2)}
+                    {formatNumber(Number(gpa.cumulativeGpa.toFixed(2)))}
                   </p>
                 </div>
                 <div className="bg-surface-secondary rounded-xl border border-border-secondary p-4 text-center print:border print:border-[rgb(var(--border-primary))] print:rounded print:bg-[rgb(var(--background-tertiary))]">
-                  <p className="text-xs text-text-tertiary mb-1 print:text-[rgb(var(--text-tertiary))]">Weighted GPA</p>
+                  <p className="text-xs text-text-tertiary mb-1 print:text-[rgb(var(--text-tertiary))]">{t('gradesModule.reportCard.weightedGpa')}</p>
                   <p className={`text-2xl font-bold ${getGpaBadge(gpa.weightedGpa).text} print:text-[rgb(var(--text-primary))]`}>
-                    {gpa.weightedGpa.toFixed(2)}
+                    {formatNumber(Number(gpa.weightedGpa.toFixed(2)))}
                   </p>
                 </div>
               </div>
@@ -248,12 +250,12 @@ export function ReportCardPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-surface-secondary print:bg-[rgb(var(--background-tertiary))]">
-                    <th className="px-4 py-3 text-left font-semibold text-text-primary print:text-[rgb(var(--text-primary))]">Course</th>
-                    <th className="px-4 py-3 text-center font-medium text-text-secondary print:text-[rgb(var(--text-secondary))]">Assignments</th>
-                    <th className="px-4 py-3 text-center font-medium text-text-secondary print:text-[rgb(var(--text-secondary))]">Numeric</th>
-                    <th className="px-4 py-3 text-center font-medium text-text-secondary print:text-[rgb(var(--text-secondary))]">Letter</th>
-                    <th className="px-4 py-3 text-center font-medium text-text-secondary print:text-[rgb(var(--text-secondary))]">GPA Points</th>
-                    <th className="px-4 py-3 text-center font-medium text-text-secondary print:text-[rgb(var(--text-secondary))]">Status</th>
+                    <th className="px-4 py-3 text-left font-semibold text-text-primary print:text-[rgb(var(--text-primary))]">{t('gradesModule.reportCard.course')}</th>
+                    <th className="px-4 py-3 text-center font-medium text-text-secondary print:text-[rgb(var(--text-secondary))]">{t('gradesModule.reportCard.assignments')}</th>
+                    <th className="px-4 py-3 text-center font-medium text-text-secondary print:text-[rgb(var(--text-secondary))]">{t('gradesModule.reportCard.numeric')}</th>
+                    <th className="px-4 py-3 text-center font-medium text-text-secondary print:text-[rgb(var(--text-secondary))]">{t('gradesModule.reportCard.letter')}</th>
+                    <th className="px-4 py-3 text-center font-medium text-text-secondary print:text-[rgb(var(--text-secondary))]">{t('gradesModule.reportCard.gpaPoints')}</th>
+                    <th className="px-4 py-3 text-center font-medium text-text-secondary print:text-[rgb(var(--text-secondary))]">{t('gradesModule.reportCard.status')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border-secondary print:divide-gray-200">
@@ -268,11 +270,11 @@ export function ReportCardPage() {
                         </div>
                       </td>
                       <td className="px-4 py-3 text-center text-text-secondary print:text-[rgb(var(--text-tertiary))]">
-                        {grade.assignments?.length ?? 0}
+                        {formatNumber(grade.assignments?.length ?? 0)}
                       </td>
                       <td className="px-4 py-3 text-center">
                         <span className="font-semibold text-text-primary print:text-[rgb(var(--text-primary))]">
-                          {grade.numericGrade.toFixed(1)}%
+                          {formatNumber(Number(grade.numericGrade.toFixed(1)))}%
                         </span>
                       </td>
                       <td className="px-4 py-3 text-center">
@@ -281,17 +283,17 @@ export function ReportCardPage() {
                         </span>
                       </td>
                       <td className="px-4 py-3 text-center text-text-secondary print:text-[rgb(var(--text-tertiary))]">
-                        {grade.gpaPoints.toFixed(1)}
+                        {formatNumber(Number(grade.gpaPoints.toFixed(1)))}
                       </td>
                       <td className="px-4 py-3 text-center">
                         {grade.isFinal ? (
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium text-[rgb(var(--state-success-fg))] bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-fg)/0.2)]  rounded-full print:text-[rgb(var(--text-secondary))] print:bg-[rgb(var(--background-tertiary))]">
                             <Lock className="w-3 h-3 print:hidden" />
-                            Final
+                            {t('gradesModule.reportCard.final')}
                           </span>
                         ) : (
                           <span className="px-2 py-0.5 text-xs font-medium text-amber-700 bg-[rgb(var(--state-warning-bg)/0.18)] dark:bg-[rgb(var(--state-warning-fg))]/20 dark:text-amber-400 rounded-full print:text-[rgb(var(--text-tertiary))] print:bg-[rgb(var(--background-tertiary))]">
-                            In Progress
+                            {t('gradesModule.reportCard.inProgress')}
                           </span>
                         )}
                       </td>
@@ -303,7 +305,7 @@ export function ReportCardPage() {
 
             {/* Print Footer */}
             <div className="hidden print:block mt-8 pt-4 border-t border-[rgb(var(--border-primary))] text-xs text-[rgb(var(--text-tertiary))] text-center">
-              Generated on {new Date().toLocaleString()} — EdForge Student Information System
+              {t('gradesModule.reportCard.generated', { dateTime: formatDateTime(new Date()) })}
             </div>
           </div>
         )}

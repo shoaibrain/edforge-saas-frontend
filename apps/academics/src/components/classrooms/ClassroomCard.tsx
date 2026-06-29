@@ -12,6 +12,7 @@ import { getCapacityPercent } from '../../schemas/section.form'
 import { getColorForSubjectArea } from '../../lib/classroom-colors'
 import { getCoverForSubjectArea } from '../../lib/classroom-covers'
 import { getSubjectIcon, getCapacityColorV2 } from '../../utils/subject-icon'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 interface ClassroomCardProps {
   section: SectionResponseDto
@@ -23,6 +24,7 @@ interface ClassroomCardProps {
 }
 
 export function ClassroomCard({ section, subjectAreaOverride, onNavigate, onEdit, onToggleActive }: ClassroomCardProps) {
+  const { t, formatNumber } = useAcademicsI18n()
   const [menuOpen, setMenuOpen] = useState(false)
   const subjectArea = section.subjectArea ?? subjectAreaOverride
   const color = getColorForSubjectArea(subjectArea)
@@ -31,14 +33,20 @@ export function ClassroomCard({ section, subjectAreaOverride, onNavigate, onEdit
   const capacityColor = getCapacityColorV2(section.currentEnrollment, section.maxEnrollment)
   const SubjectIcon = getSubjectIcon(subjectArea)
 
-  const sectionName = section.sectionName || `${section.courseName || section.courseCode || 'Section'} - ${section.sectionNumber}`
+  const sectionName = section.sectionName || `${section.courseName || section.courseCode || t('classrooms.gradebook.sectionFallback')} - ${section.sectionNumber}`
   const courseName = section.courseName || section.courseCode || ''
-  const teacherName = section.primaryTeacherName || 'No teacher assigned'
+  const teacherName = section.primaryTeacherName || t('classrooms.card.noTeacherAssigned')
 
   return (
     <article
       className="group relative rounded-xl border overflow-hidden hover:-translate-y-px transition-all duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--accent-academics))] focus-visible:ring-offset-2 bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)] hover:border-[rgb(var(--border-primary)/0.5)]"
-      aria-label={`${sectionName} — ${courseName || 'No course'}, ${teacherName}, ${section.currentEnrollment} of ${section.maxEnrollment} students`}
+      aria-label={t('classrooms.card.articleLabel', {
+        sectionName,
+        courseName: courseName || t('classrooms.card.noCourse'),
+        teacherName,
+        current: formatNumber(section.currentEnrollment),
+        max: formatNumber(section.maxEnrollment),
+      })}
       role="link"
       tabIndex={0}
       onClick={() => onNavigate(section.sectionId)}
@@ -73,7 +81,7 @@ export function ClassroomCard({ section, subjectAreaOverride, onNavigate, onEdit
                 type="button"
                 onClick={(e) => { e.stopPropagation(); setMenuOpen(!menuOpen) }}
                 className="p-1 rounded-md text-text-tertiary hover:text-text-primary hover:bg-surface-secondary transition-colors opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
-                aria-label="Card actions"
+                aria-label={t('classrooms.aria.cardActions')}
                 aria-expanded={menuOpen}
                 aria-haspopup="menu"
               >
@@ -82,7 +90,7 @@ export function ClassroomCard({ section, subjectAreaOverride, onNavigate, onEdit
               {menuOpen && (
                 <>
                   <div className="fixed inset-0 z-10" onClick={(e) => { e.stopPropagation(); setMenuOpen(false) }} aria-hidden="true" />
-                  <div className="absolute right-0 z-20 mt-1 w-44 rounded-lg bg-surface-primary border border-border-primary shadow-lg py-1" role="menu" aria-label="Section actions">
+                  <div className="absolute right-0 z-20 mt-1 w-44 rounded-lg bg-surface-primary border border-border-primary shadow-lg py-1" role="menu" aria-label={t('classrooms.aria.sectionActions')}>
                     {onEdit && (
                       <button
                         type="button"
@@ -91,7 +99,7 @@ export function ClassroomCard({ section, subjectAreaOverride, onNavigate, onEdit
                         className="flex items-center gap-2 w-full px-3 py-2 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-secondary transition-colors"
                       >
                         <Pencil className="w-3.5 h-3.5" aria-hidden="true" />
-                        Edit
+                        {t('classrooms.actions.edit')}
                       </button>
                     )}
                     {onToggleActive && (
@@ -101,7 +109,7 @@ export function ClassroomCard({ section, subjectAreaOverride, onNavigate, onEdit
                         onClick={(e) => { e.stopPropagation(); setMenuOpen(false); onToggleActive(section) }}
                         className="flex items-center gap-2 w-full px-3 py-2 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-secondary transition-colors"
                       >
-                        {section.isActive ? <><ToggleLeft className="w-3.5 h-3.5" aria-hidden="true" />Deactivate</> : <><ToggleRight className="w-3.5 h-3.5" aria-hidden="true" />Activate</>}
+                        {section.isActive ? <><ToggleLeft className="w-3.5 h-3.5" aria-hidden="true" />{t('classrooms.actions.deactivate')}</> : <><ToggleRight className="w-3.5 h-3.5" aria-hidden="true" />{t('classrooms.actions.activate')}</>}
                       </button>
                     )}
                   </div>
@@ -118,13 +126,16 @@ export function ClassroomCard({ section, subjectAreaOverride, onNavigate, onEdit
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
             <span className="text-xs text-[rgb(var(--text-tertiary))]">
-              {section.currentEnrollment}/{section.maxEnrollment} students
+              {t('classrooms.card.enrollmentSummary', {
+                current: formatNumber(section.currentEnrollment),
+                max: formatNumber(section.maxEnrollment),
+              })}
             </span>
             {/* Status dot + text */}
             <div className="flex items-center gap-1.5 text-xs">
               <div className={`w-1.5 h-1.5 rounded-full ${section.isActive ? 'bg-[rgb(var(--accent-enrollment))]' : 'bg-[rgb(var(--text-disabled))]'}`} />
               <span className={section.isActive ? 'text-[rgb(var(--accent-enrollment-text))]' : 'text-[rgb(var(--text-tertiary))]'}>
-                {section.isActive ? 'Active' : 'Inactive'}
+                {section.isActive ? t('status.active') : t('status.inactive')}
               </span>
             </div>
           </div>

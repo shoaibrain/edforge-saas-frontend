@@ -4,6 +4,7 @@
 
 import { useState } from 'react'
 import { Plus, ClipboardList, HelpCircle, MessageCircle, FileText, FolderPlus } from 'lucide-react'
+import { useAcademicsI18n } from '../../../lib/i18n'
 
 interface ClassworkCreateMenuProps {
   onCreateAssignment?: () => void
@@ -20,6 +21,7 @@ export function ClassworkCreateMenu({
   onCreateQuestion,
   onCreateTopic,
 }: ClassworkCreateMenuProps) {
+  const { t } = useAcademicsI18n()
   const [isOpen, setIsOpen] = useState(false)
   const [showTopicInput, setShowTopicInput] = useState(false)
   const [topicName, setTopicName] = useState('')
@@ -40,16 +42,16 @@ export function ClassworkCreateMenu({
         className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--action-primary-bg))] rounded-full hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors shadow-sm"
         aria-expanded={isOpen}
         aria-haspopup="menu"
-        aria-label="Create classwork"
+        aria-label={t('classrooms.aria.createClasswork')}
       >
         <Plus className="w-4 h-4" aria-hidden="true" />
-        Create
+        {t('classrooms.classwork.create')}
       </button>
 
       {isOpen && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => { setIsOpen(false); setShowTopicInput(false) }} aria-hidden="true" />
-          <div className="absolute right-0 z-20 mt-2 w-56 rounded-xl bg-surface-primary border border-border-primary shadow-lg py-1.5" role="menu" aria-label="Create classwork options">
+          <div className="absolute right-0 z-20 mt-2 w-56 rounded-xl bg-surface-primary border border-border-primary shadow-lg py-1.5" role="menu" aria-label={t('classrooms.aria.createClassworkOptions')}>
             <button
               type="button"
               role="menuitem"
@@ -60,7 +62,7 @@ export function ClassworkCreateMenu({
               className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-text-primary hover:bg-surface-secondary transition-colors"
             >
               <ClipboardList className="w-4 h-4 text-[rgb(var(--state-info-fg))]" aria-hidden="true" />
-              Assignment
+              {t('classrooms.classwork.assignment')}
             </button>
             <button
               type="button"
@@ -72,7 +74,7 @@ export function ClassworkCreateMenu({
               className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-text-primary hover:bg-surface-secondary transition-colors"
             >
               <HelpCircle className="w-4 h-4 text-amber-500" aria-hidden="true" />
-              Quiz Assignment
+              {t('classrooms.classwork.quizAssignment')}
             </button>
             <button
               type="button"
@@ -84,7 +86,7 @@ export function ClassworkCreateMenu({
               className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-text-primary hover:bg-surface-secondary transition-colors"
             >
               <MessageCircle className="w-4 h-4 text-[rgb(var(--state-success-fg))]" aria-hidden="true" />
-              Question
+              {t('classrooms.classwork.question')}
             </button>
             <button
               type="button"
@@ -96,7 +98,7 @@ export function ClassworkCreateMenu({
               className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-text-primary hover:bg-surface-secondary transition-colors"
             >
               <FileText className="w-4 h-4 text-[rgb(var(--state-info-fg))]" aria-hidden="true" />
-              Material
+              {t('classrooms.classwork.material')}
             </button>
             <div className="border-t border-border-secondary my-1" role="separator" />
             {showTopicInput ? (
@@ -106,8 +108,8 @@ export function ClassworkCreateMenu({
                   value={topicName}
                   onChange={(e) => setTopicName(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') handleTopicSubmit() }}
-                  placeholder="Topic name..."
-                  aria-label="New topic name"
+                  placeholder={t('classrooms.classwork.topicNamePlaceholder')}
+                  aria-label={t('classrooms.aria.newTopicName')}
                   className="flex-1 px-2 py-1 text-sm bg-surface-secondary border border-border-primary rounded text-text-primary outline-none focus:ring-1 focus:ring-[rgb(var(--border-focus)/0.35)]"
                   autoFocus
                 />
@@ -115,10 +117,10 @@ export function ClassworkCreateMenu({
                   type="button"
                   onClick={handleTopicSubmit}
                   disabled={!topicName.trim()}
-                  aria-label="Add topic"
+                  aria-label={t('classrooms.aria.addTopic')}
                   className="text-xs font-medium text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--action-secondary-fg))] disabled:opacity-40"
                 >
-                  Add
+                  {t('classrooms.classwork.add')}
                 </button>
               </div>
             ) : (
@@ -129,7 +131,7 @@ export function ClassworkCreateMenu({
                 className="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-text-primary hover:bg-surface-secondary transition-colors"
               >
                 <FolderPlus className="w-4 h-4 text-[rgb(var(--action-secondary-fg))]" aria-hidden="true" />
-                Topic
+                {t('classrooms.classwork.topic')}
               </button>
             )}
           </div>

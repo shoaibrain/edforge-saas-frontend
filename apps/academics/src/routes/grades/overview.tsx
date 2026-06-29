@@ -33,6 +33,7 @@ import {
 import { useResourcePermissions } from '@edforge/abac'
 import { StatCard, WidgetErrorBoundaryV2 } from '@edforge/ui'
 import { useGradeOverview } from '../../hooks/useGrades'
+import { useAcademicsI18n } from '../../lib/i18n'
 import { getStudentGradient } from '../../utils/student-gradient'
 import type { GradeOverviewResponse } from '../../services/academics.service'
 
@@ -209,6 +210,7 @@ function ActionsDropdown({
   gradebookDisabled: boolean
   atRiskDisabled: boolean
 }) {
+  const { t } = useAcademicsI18n()
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
@@ -230,7 +232,7 @@ function ActionsDropdown({
         type="button"
         onClick={() => setOpen(!open)}
         className="p-1.5 rounded-md bg-transparent border-none text-[rgb(var(--text-tertiary))] cursor-pointer"
-        aria-label="More actions"
+        aria-label={t('gradesModule.overview.actions.more')}
       >
         <MoreHorizontal style={{ width: 14, height: 14 }} />
       </button>
@@ -250,7 +252,7 @@ function ActionsDropdown({
             }}
           >
             <Download style={{ width: 12, height: 12 }} />
-            Export Gradebook CSV
+            {t('gradesModule.overview.actions.exportGradebookCsv')}
           </button>
           <button
             type="button"
@@ -263,7 +265,7 @@ function ActionsDropdown({
             }}
           >
             <Download style={{ width: 12, height: 12 }} />
-            Export At-Risk CSV
+            {t('gradesModule.overview.actions.exportAtRiskCsv')}
           </button>
         </div>
       )}
@@ -315,14 +317,6 @@ const DIST_COLORS: Record<string, string> = {
   F: V2.danger,
 }
 
-const DIST_LABELS: Record<string, string> = {
-  A: 'A (90–100)',
-  B: 'B (80–89)',
-  C: 'C (70–79)',
-  D: 'D (60–69)',
-  F: 'F (0–59)',
-}
-
 // ============================================================================
 // CATEGORY BAR COLORS (cycle by index)
 // ============================================================================
@@ -348,6 +342,7 @@ export function GradeOverview({
   academicYearId,
   policyWeights,
 }: GradeOverviewProps) {
+  const { t, formatNumber } = useAcademicsI18n()
   const gradePerms = useResourcePermissions('grades')
   const { data, isLoading, isError } = useGradeOverview(schoolId, academicYearId)
 
@@ -392,14 +387,14 @@ export function GradeOverview({
   if (isError) {
     return (
       <div className="rounded-[10px] border border-[rgb(var(--state-danger-border))] bg-[rgb(var(--state-danger-bg))] p-6 text-xs text-center text-[rgb(var(--state-danger-fg))]">
-        Failed to load grade data. Please try refreshing.
+        {t('gradesModule.overview.error')}
       </div>
     )
   }
 
   if (isLoading) {
     return (
-      <WidgetErrorBoundaryV2 fallbackMessage="Failed to load grade statistics">
+      <WidgetErrorBoundaryV2 fallbackMessage={t('gradesModule.overview.errorStats')}>
         <div className="grid grid-cols-4 gap-2.5">
           {Array.from({ length: 4 }).map((_, i) => (
             <StatCard key={i} label="" value="" icon={Users} accentColor="rgba(55,138,221,0.10)" iconColor={V2.info} barColor={V2.info} loading />
@@ -413,7 +408,9 @@ export function GradeOverview({
     return (
       <div className="p-12 text-center">
         <GraduationCap className="text-[rgb(var(--text-tertiary))] mx-auto mb-3" style={{ width: 40, height: 40 }} />
-        <p className="text-sm text-[rgb(var(--text-tertiary))]">No grades recorded yet across sections.</p>
+        <p className="text-sm text-[rgb(var(--text-tertiary))]">
+          {t('gradesModule.overview.empty')}
+        </p>
       </div>
     )
   }
@@ -436,6 +433,21 @@ export function GradeOverview({
   const formOffset = gaugeC * (1 - formScore / 100)
   const summOffset = gaugeC * (1 - summScore / 100)
   const scoreDiff = Math.abs(formScore - summScore).toFixed(1)
+  const gradeDistributionLabels: Record<string, string> = {
+    A: t('gradesModule.overview.distribution.a'),
+    B: t('gradesModule.overview.distribution.b'),
+    C: t('gradesModule.overview.distribution.c'),
+    D: t('gradesModule.overview.distribution.d'),
+    F: t('gradesModule.overview.distribution.f'),
+  }
+  const courseHeaders = [
+    t('gradesModule.overview.courseHeaders.course'),
+    t('gradesModule.overview.courseHeaders.sections'),
+    t('gradesModule.overview.courseHeaders.students'),
+    t('gradesModule.overview.courseHeaders.avgGrade'),
+    t('gradesModule.overview.courseHeaders.gpa'),
+    t('gradesModule.overview.courseHeaders.passRate'),
+  ]
 
   return (
     <div>
@@ -450,13 +462,20 @@ export function GradeOverview({
             <BookIcon color={V2.info} />
           </div>
           <div>
-            <div className="text-xs font-semibold text-[rgb(var(--text-primary))]">Grade Analytics</div>
-            <div className="text-3xs text-[rgb(var(--text-disabled))]">School-wide academic performance &middot; 2025&ndash;2026</div>
+            <div className="text-xs font-semibold text-[rgb(var(--text-primary))]">
+              {t('gradesModule.overview.title')}
+            </div>
+            <div className="text-3xs text-[rgb(var(--text-disabled))]">
+              {t('gradesModule.overview.subtitle')}
+            </div>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <span className="text-3xs text-[rgb(var(--text-tertiary))]">
-            {data.sectionsWithGrades} of {data.totalSections} sections graded
+            {t('gradesModule.overview.sectionsGraded', {
+              graded: formatNumber(data.sectionsWithGrades),
+              total: formatNumber(data.totalSections),
+            })}
           </span>
           {gradePerms.view && (
             <ActionsDropdown
@@ -470,43 +489,48 @@ export function GradeOverview({
       </div>
 
       {/* ---- KPI ROW (CLS-005) ---- */}
-      <WidgetErrorBoundaryV2 fallbackMessage="Failed to load grade statistics">
+      <WidgetErrorBoundaryV2 fallbackMessage={t('gradesModule.overview.errorStats')}>
         <div className="grid grid-cols-4 gap-2.5 mb-3.5">
           <StatCard
-            label="STUDENTS GRADED"
-            value={String(data.totalStudentsGraded)}
+            label={t('gradesModule.overview.kpis.studentsGraded')}
+            value={formatNumber(data.totalStudentsGraded)}
             icon={Users}
             accentColor="rgba(55,138,221,0.10)"
             iconColor={V2.info}
             barColor={V2.info}
-            hint={`${data.sectionsWithGrades} of ${data.totalSections} sections graded`}
+            hint={t('gradesModule.overview.sectionsGraded', {
+              graded: formatNumber(data.sectionsWithGrades),
+              total: formatNumber(data.totalSections),
+            })}
           />
           <StatCard
-            label="AVERAGE GPA"
+            label={t('gradesModule.overview.kpis.averageGpa')}
             value={data.averageGpa.toFixed(2)}
             icon={Users}
             accentColor="rgba(29,158,117,0.10)"
             iconColor={V2.success}
             barColor={V2.success}
-            hint={`Avg grade: ${data.averageGrade.toFixed(1)}%`}
+            hint={t('gradesModule.overview.kpis.avgGradeHint', {
+              grade: data.averageGrade.toFixed(1),
+            })}
           />
           <StatCard
-            label="PASS RATE"
+            label={t('gradesModule.overview.kpis.passRate')}
             value={`${data.passRate.toFixed(1)}%`}
             icon={CheckCircle}
             accentColor="rgba(29,158,117,0.10)"
             iconColor={V2.success}
             barColor={V2.success}
-            hint="Students scoring 60%+"
+            hint={t('gradesModule.overview.kpis.passRateHint')}
           />
           <StatCard
-            label="AT RISK"
-            value={String(data.atRiskCount)}
+            label={t('gradesModule.overview.kpis.atRisk')}
+            value={formatNumber(data.atRiskCount)}
             icon={AlertTriangle}
             accentColor="rgba(226,75,74,0.10)"
             iconColor={V2.danger}
             barColor={V2.danger}
-            hint="Below 60% threshold"
+            hint={t('gradesModule.overview.kpis.atRiskHint')}
           />
         </div>
       </WidgetErrorBoundaryV2>
@@ -518,8 +542,8 @@ export function GradeOverview({
         <div className={CARD}>
           <CardHeader
             iconBg="rgba(127,119,221,0.10)"
-            title="Grading Completion"
-            subtitle="Assignment entries across active sections"
+            title={t('gradesModule.overview.completion.title')}
+            subtitle={t('gradesModule.overview.completion.subtitle')}
             icon={<CheckboxIcon color={V2.purple} />}
           />
           <div className={CARD_BODY}>
@@ -537,7 +561,9 @@ export function GradeOverview({
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center flex-col">
                   <span className="text-lg font-bold leading-none text-[rgb(var(--text-primary))]">{completionRate.toFixed(0)}%</span>
-                  <span className="text-4xs text-[rgb(var(--text-tertiary))] mt-0.5">graded</span>
+                  <span className="text-4xs text-[rgb(var(--text-tertiary))] mt-0.5">
+                    {t('gradesModule.overview.completion.gradedShort')}
+                  </span>
                 </div>
               </div>
               {/* Stats */}
@@ -545,19 +571,25 @@ export function GradeOverview({
                 <div className="flex items-center justify-between">
                   <span className="flex items-center gap-1.5 text-2xs text-[rgb(var(--text-tertiary))]">
                     <span className="w-2 h-2 rounded-full bg-[#7F77DD]" />
-                    Graded
+                    {t('gradesModule.overview.completion.graded')}
                   </span>
-                  <span className="text-xs font-semibold text-[rgb(var(--text-primary))]">{gradedEntries}</span>
+                  <span className="text-xs font-semibold text-[rgb(var(--text-primary))]">
+                    {formatNumber(gradedEntries)}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="flex items-center gap-1.5 text-2xs text-[rgb(var(--text-tertiary))]">
                     <span className="w-2 h-2 rounded-full bg-[rgb(var(--text-disabled))]" />
-                    Remaining
+                    {t('gradesModule.overview.completion.remaining')}
                   </span>
-                  <span className="text-xs font-semibold text-[rgb(var(--text-tertiary))]">{ungradedStubs}</span>
+                  <span className="text-xs font-semibold text-[rgb(var(--text-tertiary))]">
+                    {formatNumber(ungradedStubs)}
+                  </span>
                 </div>
                 <div className="text-3xs text-[rgb(var(--text-disabled))] mt-1 pt-2" style={{ borderTop: `1px solid ${V2.borderSeparator}` }}>
-                  {totalEntries} total assignment entries
+                  {t('gradesModule.overview.completion.totalEntries', {
+                    total: formatNumber(totalEntries),
+                  })}
                 </div>
               </div>
             </div>
@@ -568,8 +600,8 @@ export function GradeOverview({
         <div className={CARD}>
           <CardHeader
             iconBg="rgba(55,138,221,0.10)"
-            title="Assessment Performance"
-            subtitle="Average scores by assessment type"
+            title={t('gradesModule.overview.assessment.title')}
+            subtitle={t('gradesModule.overview.assessment.subtitle')}
             icon={<BookIcon color={V2.info} />}
           />
           <div className={CARD_BODY}>
@@ -587,8 +619,12 @@ export function GradeOverview({
                     <span className="text-base font-bold text-[#1D9E75]">{formScore.toFixed(0)}%</span>
                   </div>
                 </div>
-                <div className="text-2xs font-semibold text-[rgb(var(--text-secondary))] mt-1">Formative</div>
-                <div className="text-4xs text-[rgb(var(--text-disabled))]">Quizzes, homework, participation</div>
+                <div className="text-2xs font-semibold text-[rgb(var(--text-secondary))] mt-1">
+                  {t('gradesModule.management.purposes.formative')}
+                </div>
+                <div className="text-4xs text-[rgb(var(--text-disabled))]">
+                  {t('gradesModule.overview.assessment.formativeExamples')}
+                </div>
               </div>
 
               <div
@@ -614,8 +650,12 @@ export function GradeOverview({
                     >{summScore.toFixed(0)}%</span>
                   </div>
                 </div>
-                <div className="text-2xs font-semibold text-[rgb(var(--text-secondary))] mt-1">Summative</div>
-                <div className="text-4xs text-[rgb(var(--text-disabled))]">Tests, exams, projects</div>
+                <div className="text-2xs font-semibold text-[rgb(var(--text-secondary))] mt-1">
+                  {t('gradesModule.management.purposes.summative')}
+                </div>
+                <div className="text-4xs text-[rgb(var(--text-disabled))]">
+                  {t('gradesModule.overview.assessment.summativeExamples')}
+                </div>
               </div>
 
               <div
@@ -628,22 +668,33 @@ export function GradeOverview({
               <div className="flex-1">
                 <div className="text-3xs text-[rgb(var(--text-tertiary))] leading-normal">
                   {formScore > summScore ? (
-                    <><em className="not-italic text-[#1D9E75]">Formative {scoreDiff}% higher</em> than summative &mdash; well balanced.</>
+                    <>
+                      <em className="not-italic text-[#1D9E75]">
+                        {t('gradesModule.overview.assessment.formativeHigher', { diff: scoreDiff })}
+                      </em>{' '}
+                      {t('gradesModule.overview.assessment.higherSuffix')}
+                    </>
                   ) : summScore > formScore ? (
                     <>
                       <em
                         // allow-presentation-style: summative accent (info hex, not a brand-class literal)
                         className="not-italic"
                         style={{ color: V2.info }}
-                      >Summative {scoreDiff}% higher</em> than formative.
+                      >
+                        {t('gradesModule.overview.assessment.summativeHigher', { diff: scoreDiff })}
+                      </em>{' '}
+                      {t('gradesModule.overview.assessment.summativeHigherSuffix')}
                     </>
                   ) : (
-                    <>Formative and summative scores are equal &mdash; well balanced.</>
+                    <>{t('gradesModule.overview.assessment.equal')}</>
                   )}
                 </div>
                 {data.assessmentBreakdown?.unclassified && data.assessmentBreakdown.unclassified.count > 0 && (
                   <div className="text-4xs text-[rgb(var(--text-disabled))] mt-2">
-                    +{data.assessmentBreakdown.unclassified.count} unclassified (avg {data.assessmentBreakdown.unclassified.avgScore.toFixed(1)}%)
+                    {t('gradesModule.overview.assessment.unclassified', {
+                      count: formatNumber(data.assessmentBreakdown.unclassified.count),
+                      avg: data.assessmentBreakdown.unclassified.avgScore.toFixed(1),
+                    })}
                   </div>
                 )}
               </div>
@@ -657,8 +708,8 @@ export function GradeOverview({
         <div className={CARD}>
           <CardHeader
             iconBg="rgba(239,159,39,0.10)"
-            title="Grade Distribution"
-            subtitle="Number of students in each grade range based on overall course averages"
+            title={t('gradesModule.overview.distribution.title')}
+            subtitle={t('gradesModule.overview.distribution.subtitle')}
             icon={<BarChartIcon color={V2.warning} />}
           />
           <div className={CARD_BODY}>
@@ -672,7 +723,7 @@ export function GradeOverview({
                       // allow-presentation-style: per-grade-band label color
                       className="text-2xs font-bold mb-1"
                       style={{ color: labelColor }}
-                    >{bar.count}</span>
+                    >{formatNumber(bar.count)}</span>
                     <div
                       // allow-presentation-style: data-driven bar height + per-band fill color
                       className="w-full rounded-t"
@@ -685,7 +736,7 @@ export function GradeOverview({
             <div className="flex gap-2 pt-2 mt-3" style={{ borderTop: `1px solid ${V2.borderSeparator}` }}>
               {distBars.map((bar) => (
                 <div key={bar.letter} className="flex-1 text-center text-4xs text-[rgb(var(--text-disabled))]">
-                  {DIST_LABELS[bar.letter]}
+                  {gradeDistributionLabels[bar.letter]}
                 </div>
               ))}
             </div>
@@ -701,18 +752,18 @@ export function GradeOverview({
           <div className={CARD}>
             <CardHeader
               iconBg="rgba(29,158,117,0.10)"
-              title="Category Performance"
-              subtitle="Average scores by grading policy category"
+              title={t('gradesModule.overview.category.title')}
+              subtitle={t('gradesModule.overview.category.subtitle')}
               icon={<CircleArrowIcon color={V2.success} />}
             />
             <div className={CARD_BODY}>
               {/* Column headers */}
               <div className="flex items-center gap-3 mb-1.5 pb-1.5" style={{ borderBottom: `1px solid ${V2.borderSeparator}` }}>
-                <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px]" style={{ width: 110 }}>Category</span>
-                <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px] text-center" style={{ width: 36 }}>Wt.</span>
-                <span className="flex-1 text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px]">Score</span>
+                <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px]" style={{ width: 110 }}>{t('gradesModule.overview.category.headers.category')}</span>
+                <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px] text-center" style={{ width: 36 }}>{t('gradesModule.overview.category.headers.weight')}</span>
+                <span className="flex-1 text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px]">{t('gradesModule.overview.category.headers.score')}</span>
                 <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px] text-right" style={{ width: 50 }}>#</span>
-                <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px] text-right" style={{ width: 50 }}>Avg</span>
+                <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px] text-right" style={{ width: 50 }}>{t('gradesModule.overview.category.headers.avg')}</span>
               </div>
               {data.categoryPerformance.map((cat, idx) => {
                 const barColor = CATEGORY_COLORS[idx % CATEGORY_COLORS.length]
@@ -734,7 +785,7 @@ export function GradeOverview({
                         style={{ background: barColor, width: `${cat.avgScore}%` }}
                       />
                     </div>
-                    <span className="text-3xs text-[rgb(var(--text-tertiary))] text-right shrink-0" style={{ width: 50 }}>{cat.assignmentCount}</span>
+                    <span className="text-3xs text-[rgb(var(--text-tertiary))] text-right shrink-0" style={{ width: 50 }}>{formatNumber(cat.assignmentCount)}</span>
                     <span
                       // allow-presentation-style: category avg score color matches its bar
                       className="text-xs font-semibold text-right shrink-0"
@@ -752,15 +803,15 @@ export function GradeOverview({
           <div className={CARD}>
             <CardHeader
               iconBg="rgba(55,138,221,0.10)"
-              title="Course Performance"
-              subtitle="Aggregated grade metrics per course across sections"
+              title={t('gradesModule.overview.course.title')}
+              subtitle={t('gradesModule.overview.course.subtitle')}
               icon={<BookIcon color={V2.info} />}
             />
             <div className={CARD_BODY}>
               <table className="w-full border-collapse">
                 <thead>
                   <tr>
-                    {['Course', 'Sec.', 'Std.', 'Avg Grade ↓', 'GPA', 'Pass %'].map((h, i) => (
+                    {courseHeaders.map((h, i) => (
                       <th
                         key={h}
                         className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px] pb-2"
@@ -784,8 +835,8 @@ export function GradeOverview({
                   {sortedCourses.map((course) => (
                     <tr key={course.courseId}>
                       <td className="py-2.5 text-xs font-medium text-[rgb(var(--text-primary))]" style={{ borderBottom: `1px solid ${V2.borderRow}` }}>{course.courseName}</td>
-                      <td className="py-2.5 text-right text-2xs text-[rgb(var(--text-tertiary))]" style={{ borderBottom: `1px solid ${V2.borderRow}` }}>{course.sectionCount}</td>
-                      <td className="py-2.5 text-right text-2xs text-[rgb(var(--text-tertiary))]" style={{ borderBottom: `1px solid ${V2.borderRow}` }}>{course.studentCount}</td>
+                      <td className="py-2.5 text-right text-2xs text-[rgb(var(--text-tertiary))]" style={{ borderBottom: `1px solid ${V2.borderRow}` }}>{formatNumber(course.sectionCount)}</td>
+                      <td className="py-2.5 text-right text-2xs text-[rgb(var(--text-tertiary))]" style={{ borderBottom: `1px solid ${V2.borderRow}` }}>{formatNumber(course.studentCount)}</td>
                       <td
                         // allow-presentation-style: grade-band severity color
                         className="py-2.5 text-right text-xs font-semibold"
@@ -815,11 +866,15 @@ export function GradeOverview({
         <div className={CARD}>
           <CardHeader
             iconBg="rgba(226,75,74,0.10)"
-            title="At-Risk Students"
-            subtitle="Students scoring below 60% in any course"
+            title={t('gradesModule.overview.atRisk.title')}
+            subtitle={t('gradesModule.overview.atRisk.subtitle')}
             right={
               data.atRiskStudents.length > 0 ? (
-                <span className="text-3xs text-[rgb(var(--text-tertiary))]">{data.atRiskStudents.length} students</span>
+                <span className="text-3xs text-[rgb(var(--text-tertiary))]">
+                  {t('gradesModule.overview.atRisk.studentCount', {
+                    count: formatNumber(data.atRiskStudents.length),
+                  })}
+                </span>
               ) : undefined
             }
             icon={<WarningIcon color={V2.danger} />}
@@ -828,16 +883,18 @@ export function GradeOverview({
             {data.atRiskStudents.length === 0 ? (
               <div className="p-8 text-center">
                 <CheckCircle className="text-[#1D9E75] mx-auto mb-3" style={{ width: 40, height: 40 }} />
-                <p className="text-xs text-[rgb(var(--text-tertiary))]">No students below the grade threshold</p>
+                <p className="text-xs text-[rgb(var(--text-tertiary))]">
+                  {t('gradesModule.overview.atRisk.empty')}
+                </p>
               </div>
             ) : (
               <>
                 {/* Column headers */}
                 <div className="flex items-center gap-3 mb-1.5 pb-1.5" style={{ borderBottom: `1px solid ${V2.borderSeparator}` }}>
-                  <span className="flex-1 text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px]">Student</span>
-                  <span className="flex-1 text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px]">Course</span>
-                  <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px] text-right" style={{ width: 80 }}>Grade</span>
-                  <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px] text-right" style={{ width: 50 }}>Letter</span>
+                  <span className="flex-1 text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px]">{t('gradesModule.overview.atRisk.headers.student')}</span>
+                  <span className="flex-1 text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px]">{t('gradesModule.overview.atRisk.headers.course')}</span>
+                  <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px] text-right" style={{ width: 80 }}>{t('gradesModule.overview.atRisk.headers.grade')}</span>
+                  <span className="text-4xs font-bold text-[rgb(var(--text-disabled))] uppercase tracking-[0.5px] text-right" style={{ width: 50 }}>{t('gradesModule.overview.atRisk.headers.letter')}</span>
                 </div>
                 {data.atRiskStudents.map((student, i) => {
                   const gradeColor = student.numericGrade < 60 ? V2.danger : V2.warning

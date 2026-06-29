@@ -12,6 +12,7 @@ import type { WizardStepProps } from '@edforge/wizard'
 import { useWizardForm } from '../../../../hooks/useWizardForm'
 import { GuardianForm } from '../GuardianForm'
 import type { GuardianFormData } from '../../../../schemas/student.form'
+import { useAcademicsI18n } from '../../../../lib/i18n'
 
 const EMPTY_GUARDIAN: GuardianFormData = {
   firstName: '',
@@ -34,6 +35,7 @@ export function GuardiansStep({
   errors,
   clearError,
 }: WizardStepProps) {
+  const { t } = useAcademicsI18n()
   const form = useWizardForm({ data, updateData, errors, clearError })
   const guardians = (data.guardians as GuardianFormData[] | undefined) ?? []
 
@@ -78,10 +80,10 @@ export function GuardiansStep({
               <Users className="w-6 h-6 text-[rgb(var(--text-tertiary))]" />
             </div>
             <h3 className="text-sm font-medium text-[rgb(var(--text-primary))]">
-              No guardians added yet
+              {t('enrollmentModule.step.guardians.emptyTitle')}
             </h3>
             <p className="text-sm text-[rgb(var(--text-tertiary))] mt-1 mb-4">
-              Guardian information is optional but recommended.
+              {t('enrollmentModule.step.guardians.emptyDescription')}
             </p>
           </div>
         )}
@@ -94,13 +96,13 @@ export function GuardiansStep({
             className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-dashed border-[rgb(var(--border-secondary))] text-sm font-medium text-[rgb(var(--action-secondary-fg))] hover:bg-[rgb(var(--state-info-bg)/0.18)] hover:border-[rgb(var(--state-info-border)/0.45)] transition-colors w-full justify-center"
           >
             <Plus className="w-4 h-4" />
-            Add Guardian
+            {t('enrollmentModule.step.guardians.addGuardian')}
           </button>
         )}
 
         {guardians.length >= 10 && (
           <p className="text-xs text-[rgb(var(--text-tertiary))] text-center">
-            Maximum of 10 guardians reached.
+            {t('enrollmentModule.step.guardians.maxReached')}
           </p>
         )}
       </div>

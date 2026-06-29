@@ -19,6 +19,7 @@ import {
   CREDIT_TYPE_OPTIONS,
 } from '../../schemas/course.form'
 import { useSchoolEnabledGradeOptions } from '../../hooks/useGradeOptions'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 // ============================================================================
 // TYPES
@@ -38,6 +39,7 @@ interface CourseFiltersProps {
 // ============================================================================
 
 export function CourseFilters({ totalCount: _totalCount, schoolId, onExport }: CourseFiltersProps) {
+  const { t, formatNumber } = useAcademicsI18n()
   const filters = useCourseFilters()
   const actions = useCourseFilterActions()
   const { options: gradeOptions } = useSchoolEnabledGradeOptions(schoolId)
@@ -66,9 +68,9 @@ export function CourseFilters({ totalCount: _totalCount, schoolId, onExport }: C
   const filterCount = actions.activeFilterCount()
 
   const statusChips: { label: string; value: boolean | null }[] = [
-    { label: 'All', value: null },
-    { label: 'Active', value: true },
-    { label: 'Inactive', value: false },
+    { label: t('curriculumModule.filters.all'), value: null },
+    { label: t('common.active'), value: true },
+    { label: t('common.inactive'), value: false },
   ]
 
   return (
@@ -77,7 +79,7 @@ export function CourseFilters({ totalCount: _totalCount, schoolId, onExport }: C
       <Input
         ref={searchInputRef}
         prefix={<Search className="w-3.5 h-3.5" />}
-        placeholder="Search by course code or name..."
+        placeholder={t('curriculumModule.filters.search')}
         defaultValue={filters.searchTerm}
         onChange={(e) => handleSearchChange(e.target.value)}
         className="flex-1 min-w-52"
@@ -85,43 +87,43 @@ export function CourseFilters({ totalCount: _totalCount, schoolId, onExport }: C
 
       {/* Subject Area */}
       <Select
-        aria-label="Subject area"
+        aria-label={t('curriculumModule.filters.subjectArea')}
         size="sm"
         className="w-40"
         value={filters.subjectArea ?? ''}
         onChange={(v) => actions.setSubjectArea(v ? (v as typeof filters.subjectArea) : null)}
-        options={[{ value: '', label: 'All Subjects' }, ...SUBJECT_AREA_OPTIONS]}
+        options={[{ value: '', label: t('curriculumModule.filters.allSubjects') }, ...SUBJECT_AREA_OPTIONS]}
       />
 
       {/* Course Type */}
       <Select
-        aria-label="Course type"
+        aria-label={t('curriculumModule.filters.courseType')}
         size="sm"
         className="w-40"
         value={filters.courseType ?? ''}
         onChange={(v) => actions.setCourseType(v ? (v as typeof filters.courseType) : null)}
-        options={[{ value: '', label: 'All Types' }, ...COURSE_TYPE_OPTIONS]}
+        options={[{ value: '', label: t('curriculumModule.filters.allTypes') }, ...COURSE_TYPE_OPTIONS]}
       />
 
       {/* Credit Type */}
       <Select
-        aria-label="Credit type"
+        aria-label={t('curriculumModule.filters.creditType')}
         size="sm"
         className="w-44"
         value={filters.creditType ?? ''}
         onChange={(v) => actions.setCreditType(v ? (v as typeof filters.creditType) : null)}
-        options={[{ value: '', label: 'All Credit Types' }, ...CREDIT_TYPE_OPTIONS]}
+        options={[{ value: '', label: t('curriculumModule.filters.allCreditTypes') }, ...CREDIT_TYPE_OPTIONS]}
       />
 
       {/* Grade Level */}
       <Select
-        aria-label="Grade level"
+        aria-label={t('curriculumModule.filters.gradeLevel')}
         size="sm"
         className="w-36"
         value={filters.gradeLevel ?? ''}
         onChange={(v) => actions.setGradeLevel(v || null)}
         options={[
-          { value: '', label: 'All Grades' },
+          { value: '', label: t('curriculumModule.filters.allGrades') },
           ...gradeOptions.map((o) => ({ value: o.value, label: o.label })),
         ]}
       />
@@ -158,7 +160,7 @@ export function CourseFilters({ totalCount: _totalCount, schoolId, onExport }: C
           className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-[rgb(var(--accent-enrollment-text))] hover:opacity-80 transition-opacity"
         >
           <X className="w-3 h-3" />
-          Clear ({filterCount})
+          {t('curriculumModule.filters.clear', { count: formatNumber(filterCount) })}
         </button>
       )}
 
@@ -168,13 +170,13 @@ export function CourseFilters({ totalCount: _totalCount, schoolId, onExport }: C
           type="button"
           variant="outline"
           size="sm"
-          aria-label="Export courses as CSV"
+          aria-label={t('curriculumModule.filters.exportAria')}
           onClick={handleExport}
           isLoading={isExporting}
           disabled={!onExport || isExporting}
         >
           <Download className="w-3 h-3 mr-1.5" />
-          Export CSV
+          {t('curriculumModule.filters.exportCsv')}
         </Button>
       </div>
     </div>

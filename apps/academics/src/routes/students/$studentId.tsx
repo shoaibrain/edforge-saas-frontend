@@ -223,7 +223,7 @@ export function StudentProfilePage() {
 
         {/* Tabs — shared @edforge/ui primitive (house standard, accessible) */}
         <Tabs
-          aria-label="Student profile sections"
+          aria-label={t('studentProfile.tabsAria')}
           value={activeTab}
           onChange={(value) => setActiveTab(value as TabId)}
           className="overflow-x-auto no-scrollbar"

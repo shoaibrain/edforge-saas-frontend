@@ -69,74 +69,81 @@ import {
 } from '../../../schemas/edfi-descriptors'
 import type { CreateStudentDto, CreateEnrollmentDto } from '../../../services/academics.service'
 import type { GuardianFormData } from '../../../schemas/student.form'
+import { useAcademicsI18n } from '../../../lib/i18n'
 
 // ============================================================================
 // WIZARD STEPS CONFIGURATION
 // ============================================================================
 
-const WIZARD_STEPS: WizardStep[] = [
-  {
-    id: 'personal',
-    title: 'Personal Info',
-    description: "Enter the student's basic personal details.",
-    icon: User,
-    schema: personalInfoStepSchema,
-    component: PersonalInfoStep,
-  },
-  {
-    id: 'contact',
-    title: 'Contact',
-    description: 'Provide contact details and address information.',
-    icon: Phone,
-    schema: contactInfoStepSchema,
-    component: ContactInfoStep,
-  },
-  {
-    id: 'guardians',
-    title: 'Guardians',
-    description: "Add the student's parents or legal guardians.",
-    icon: Users,
-    schema: guardiansStepSchema,
-    component: GuardiansStep,
-    isOptional: true,
-  },
-  {
-    id: 'medical',
-    title: 'Medical',
-    description: 'Provide health information and demographic details.',
-    icon: Heart,
-    schema: medicalStepSchema,
-    component: MedicalStep,
-    isOptional: true,
-  },
-  {
-    id: 'enrollment',
-    title: 'Enrollment',
-    description: 'Set the enrollment type, academic year, and Ed-Fi details.',
-    icon: GraduationCap,
-    schema: enrollmentStepSchema,
-    component: EnrollmentStep,
-  },
-  {
-    id: 'review',
-    title: 'Review',
-    description: 'Review all information before creating the student record.',
-    icon: ClipboardCheck,
-    component: ReviewStep,
-  },
-]
+function useRegistrationSteps(): WizardStep[] {
+  const { t } = useAcademicsI18n()
+  return useMemo(
+    () => [
+      {
+        id: 'personal',
+        title: t('enrollmentModule.wizard.steps.personal.title'),
+        description: t('enrollmentModule.wizard.steps.personal.description'),
+        icon: User,
+        schema: personalInfoStepSchema,
+        component: PersonalInfoStep,
+      },
+      {
+        id: 'contact',
+        title: t('enrollmentModule.wizard.steps.contact.title'),
+        description: t('enrollmentModule.wizard.steps.contact.description'),
+        icon: Phone,
+        schema: contactInfoStepSchema,
+        component: ContactInfoStep,
+      },
+      {
+        id: 'guardians',
+        title: t('enrollmentModule.wizard.steps.guardians.title'),
+        description: t('enrollmentModule.wizard.steps.guardians.description'),
+        icon: Users,
+        schema: guardiansStepSchema,
+        component: GuardiansStep,
+        isOptional: true,
+      },
+      {
+        id: 'medical',
+        title: t('enrollmentModule.wizard.steps.medical.title'),
+        description: t('enrollmentModule.wizard.steps.medical.description'),
+        icon: Heart,
+        schema: medicalStepSchema,
+        component: MedicalStep,
+        isOptional: true,
+      },
+      {
+        id: 'enrollment',
+        title: t('enrollmentModule.wizard.steps.enrollment.title'),
+        description: t('enrollmentModule.wizard.steps.enrollment.description'),
+        icon: GraduationCap,
+        schema: enrollmentStepSchema,
+        component: EnrollmentStep,
+      },
+      {
+        id: 'review',
+        title: t('enrollmentModule.wizard.steps.review.title'),
+        description: t('enrollmentModule.wizard.steps.review.description'),
+        icon: ClipboardCheck,
+        component: ReviewStep,
+      },
+    ],
+    [t],
+  )
+}
 
 // ============================================================================
 // EDFI REQUIRED FIELDS
 // ============================================================================
 
 const EDFI_REQUIRED_FIELDS = [
-  { key: 'firstName', label: 'First name', field: 'firstName', step: 1 },
-  { key: 'lastName', label: 'Last name', field: 'lastName', step: 1 },
-  { key: 'dateOfBirth', label: 'Date of birth', field: 'dateOfBirth', step: 1 },
-  { key: 'gender', label: 'Gender', field: 'gender', step: 1 },
-  { key: 'gradeLevel', label: 'Grade level', field: 'currentGradeLevel', step: 1 },
-  { key: 'entryDate', label: 'Entry date', field: 'enrollment.enrollmentDate', step: 5 },
+  { key: 'firstName', labelKey: 'enrollmentModule.wizard.sidebar.fields.firstName', field: 'firstName', step: 1 },
+  { key: 'lastName', labelKey: 'enrollmentModule.wizard.sidebar.fields.lastName', field: 'lastName', step: 1 },
+  { key: 'dateOfBirth', labelKey: 'enrollmentModule.wizard.sidebar.fields.dateOfBirth', field: 'dateOfBirth', step: 1 },
+  { key: 'gender', labelKey: 'enrollmentModule.wizard.sidebar.fields.gender', field: 'gender', step: 1 },
+  { key: 'gradeLevel', labelKey: 'enrollmentModule.wizard.sidebar.fields.gradeLevel', field: 'currentGradeLevel', step: 1 },
+  { key: 'entryDate', labelKey: 'enrollmentModule.wizard.sidebar.fields.entryDate', field: 'enrollment.enrollmentDate', step: 5 },
 ]
 
 // ============================================================================
@@ -144,11 +151,12 @@ const EDFI_REQUIRED_FIELDS = [
 // ============================================================================
 
 function RegistrationStepper() {
+  const { t } = useAcademicsI18n()
   const { steps, getStepStatus, goToStep, canGoToStep } = useWizard()
 
   return (
     <nav
-      aria-label="Registration progress"
+      aria-label={t('enrollmentModule.wizard.progressAria')}
       className="w-full rounded-[10px] px-5 py-3.5 bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary)/0.35)]"
     >
       <div className="flex items-center">
@@ -274,6 +282,7 @@ function StepContent({
 // ============================================================================
 
 function RegistrationFooter() {
+  const { t } = useAcademicsI18n()
   const { currentStep, steps, goToBack, goToNext, submit, isSubmitting, currentStepData } = useWizard()
   const isFirst = currentStep === 0
   const isLast = currentStep === steps.length - 1
@@ -290,7 +299,7 @@ function RegistrationFooter() {
               className="flex items-center gap-2 transition-colors hover:opacity-80 bg-transparent border border-[rgb(var(--border-primary)/0.35)] rounded-lg px-4 py-2 text-xs text-[rgb(var(--text-tertiary))]"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              Back
+              {t('enrollmentModule.actions.back')}
             </button>
           )}
         </div>
@@ -302,7 +311,7 @@ function RegistrationFooter() {
               onClick={() => goToNext()}
               className="px-4 py-2 text-xs font-medium transition-colors hover:opacity-80 text-[rgb(var(--text-tertiary))]"
             >
-              Skip
+              {t('enrollmentModule.actions.skip')}
             </button>
           )}
 
@@ -318,7 +327,7 @@ function RegistrationFooter() {
               ) : (
                 <Check className="w-3.5 h-3.5" />
               )}
-              Create Student
+              {t('enrollmentModule.actions.createStudent')}
             </button>
           ) : (
             <button
@@ -326,7 +335,7 @@ function RegistrationFooter() {
               onClick={() => goToNext()}
               className="flex items-center gap-2 px-5 py-2 text-xs font-semibold text-[rgb(var(--action-primary-fg))] rounded-[8px] transition-all hover:opacity-90 bg-[rgb(var(--action-primary-bg))]"
             >
-              Continue
+              {t('enrollmentModule.actions.continue')}
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           )}
@@ -345,6 +354,7 @@ const SIDEBAR_CARD =
   'rounded-[10px] p-3.5 bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary)/0.35)]'
 
 function ContextSidebar() {
+  const { t, formatNumber } = useAcademicsI18n()
   const { steps, getStepStatus, formData, currentStep } = useWizard()
   const schoolId = useActiveSchoolId() || ''
   const { data: currentYear } = useCurrentAcademicYear(schoolId)
@@ -375,26 +385,26 @@ function ContextSidebar() {
         <div className="flex items-center gap-2 mb-3">
           <BookOpen className="w-3.5 h-3.5 text-[rgb(var(--accent-enrollment-text))]" />
           <span className="text-2xs font-medium text-[rgb(var(--text-secondary))]">
-            Enrollment Context
+            {t('enrollmentModule.wizard.sidebar.context')}
           </span>
         </div>
         <div className="space-y-2">
           <div className="flex justify-between">
-            <span className="text-3xs text-[rgb(var(--text-tertiary))]">Academic Year</span>
+            <span className="text-3xs text-[rgb(var(--text-tertiary))]">{t('enrollmentModule.wizard.sidebar.academicYear')}</span>
             <span className="text-2xs font-medium text-[rgb(var(--text-secondary))]">
               {currentYear?.name ?? '--'}
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-3xs text-[rgb(var(--text-tertiary))]">Enrolled</span>
+            <span className="text-3xs text-[rgb(var(--text-tertiary))]">{t('enrollmentModule.wizard.sidebar.enrolled')}</span>
             <span className="text-2xs font-medium text-[rgb(var(--text-secondary))]">
-              {summary?.totalEnrolled ?? '--'}
+              {summary?.totalEnrolled != null ? formatNumber(summary.totalEnrolled) : '--'}
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-3xs text-[rgb(var(--text-tertiary))]">Grade Levels</span>
+            <span className="text-3xs text-[rgb(var(--text-tertiary))]">{t('enrollmentModule.wizard.sidebar.gradeLevels')}</span>
             <span className="text-2xs font-medium text-[rgb(var(--text-secondary))]">
-              {gradeLevelCount || '--'}
+              {gradeLevelCount ? formatNumber(gradeLevelCount) : '--'}
             </span>
           </div>
         </div>
@@ -405,7 +415,7 @@ function ContextSidebar() {
         <div className="flex items-center gap-2 mb-3">
           <Shield className="w-3.5 h-3.5 text-[rgb(var(--accent-enrollment-text))]" />
           <span className="text-2xs font-medium text-[rgb(var(--text-secondary))]">
-            Required for EdFi
+            {t('enrollmentModule.wizard.sidebar.requiredForEdFi')}
           </span>
         </div>
         <div>
@@ -415,13 +425,13 @@ function ContextSidebar() {
               className="flex items-center justify-between py-1"
               style={{ borderBottom: i < edfiStatus.length - 1 ? '1px solid rgb(var(--border-primary) / 0.2)' : 'none' }}
             >
-              <span className="text-3xs text-[rgb(var(--text-tertiary))]">{f.label}</span>
+              <span className="text-3xs text-[rgb(var(--text-tertiary))]">{t(f.labelKey)}</span>
               {f.filled ? (
-                <span className="text-2xs font-medium text-[rgb(var(--accent-enrollment-text))]">Filled</span>
+                <span className="text-2xs font-medium text-[rgb(var(--accent-enrollment-text))]">{t('enrollmentModule.wizard.sidebar.filled')}</span>
               ) : f.step === currentStep + 1 ? (
-                <span className="text-2xs font-medium text-[rgb(var(--state-warning-fg))]">Required</span>
+                <span className="text-2xs font-medium text-[rgb(var(--state-warning-fg))]">{t('enrollmentModule.wizard.sidebar.required')}</span>
               ) : (
-                <span className="text-2xs font-medium text-[rgb(var(--state-warning-fg))]">Step {f.step}</span>
+                <span className="text-2xs font-medium text-[rgb(var(--state-warning-fg))]">{t('enrollmentModule.wizard.sidebar.step', { step: formatNumber(f.step) })}</span>
               )}
             </div>
           ))}
@@ -433,7 +443,7 @@ function ContextSidebar() {
         <div className="flex items-center gap-2 mb-3">
           <ListChecks className="w-3.5 h-3.5 text-[rgb(var(--accent-enrollment-text))]" />
           <span className="text-2xs font-medium text-[rgb(var(--text-secondary))]">
-            Progress
+            {t('enrollmentModule.wizard.sidebar.progress')}
           </span>
         </div>
         <div className="space-y-1.5">
@@ -460,7 +470,7 @@ function ContextSidebar() {
                   {step.title}
                 </span>
                 <span className={`ml-auto text-4xs ${status === 'completed' ? 'text-[rgb(var(--accent-enrollment-text))]' : status === 'current' ? 'text-[rgb(var(--text-tertiary))]' : 'text-[rgb(var(--text-disabled))]'}`}>
-                  {status === 'completed' ? 'Done' : status === 'current' ? 'Current' : ''}
+                  {status === 'completed' ? t('enrollmentModule.wizard.sidebar.done') : status === 'current' ? t('enrollmentModule.wizard.sidebar.current') : ''}
                 </span>
               </div>
             )
@@ -480,7 +490,8 @@ function WizardLayout({
 }: {
   schoolId: string
 }) {
-  const { currentStep, currentStepData, formData } = useWizard()
+  const { t, formatNumber } = useAcademicsI18n()
+  const { currentStep, currentStepData, formData, steps } = useWizard()
   const checkDuplicate = useCheckDuplicate()
   const [duplicateMatches, setDuplicateMatches] = useState<DuplicateMatch[]>([])
   const [isDuplicateCheckLoading, setIsDuplicateCheckLoading] = useState(false)
@@ -528,7 +539,11 @@ function WizardLayout({
 
       {/* Screen reader step announcement */}
       <div className="sr-only" aria-live="polite" aria-atomic="true">
-        Step {currentStep + 1} of {WIZARD_STEPS.length}: {currentStepData.title}
+        {t('enrollmentModule.wizard.stepAnnouncement', {
+          current: formatNumber(currentStep + 1),
+          total: formatNumber(steps.length),
+          title: currentStepData.title,
+        })}
       </div>
 
       {/* Main content area: Form + Sidebar */}
@@ -579,6 +594,8 @@ function WizardLayout({
 export function RegistrationWizard() {
   const navigate = useNavigate()
   const schoolId = useActiveSchoolId()
+  const { t } = useAcademicsI18n()
+  const steps = useRegistrationSteps()
   const createStudent = useCreateStudent()
   const createEnrollment = useCreateEnrollment()
   const [showCancelDialog, setShowCancelDialog] = useState(false)
@@ -694,21 +711,21 @@ export function RegistrationWizard() {
         if (enrollmentPayload) {
           try {
             await createEnrollment.mutateAsync(enrollmentPayload)
-            toast.success(`${student.firstName} ${student.lastName} has been registered and enrolled!`)
+            toast.success(t('enrollmentModule.wizard.toast.registeredAndEnrolled', { studentName: `${student.firstName} ${student.lastName}` }))
           } catch (enrollErr) {
             const parsed = parseApiError(enrollErr)
             if (parsed.statusCode === 409) {
               toast.warning(
-                `Student created. Enrollment conflict: ${parsed.message}. The student may already be enrolled.`
+                t('enrollmentModule.wizard.toast.enrollmentConflict', { message: parsed.message })
               )
             } else {
               toast.warning(
-                `Student created, but enrollment failed: ${parsed.message}. You can add enrollment from the student profile.`
+                t('enrollmentModule.wizard.toast.enrollmentFailed', { message: parsed.message })
               )
             }
           }
         } else {
-          toast.success(`${student.firstName} ${student.lastName} has been registered!`)
+          toast.success(t('enrollmentModule.wizard.toast.registered', { studentName: `${student.firstName} ${student.lastName}` }))
         }
 
         navigate({ to: `/students/${student.studentId}` })
@@ -718,7 +735,7 @@ export function RegistrationWizard() {
         throw error
       }
     },
-    [buildStudentPayload, buildEnrollmentPayload, createStudent, createEnrollment, navigate]
+    [buildStudentPayload, buildEnrollmentPayload, createStudent, createEnrollment, navigate, t]
   )
 
   const handleCancel = useCallback(() => {
@@ -733,7 +750,7 @@ export function RegistrationWizard() {
   return (
     <>
       <WizardProvider
-        steps={WIZARD_STEPS}
+        steps={steps}
         initialData={{
           ...defaultStudentFormData,
           schoolId: schoolId || '',
@@ -749,10 +766,10 @@ export function RegistrationWizard() {
         open={showCancelDialog}
         onClose={() => setShowCancelDialog(false)}
         onConfirm={handleConfirmCancel}
-        title="Discard changes?"
-        description="You have unsaved student information. Are you sure you want to leave? All entered data will be lost."
-        confirmText="Discard"
-        cancelText="Keep Editing"
+        title={t('enrollmentModule.confirm.discardTitle')}
+        description={t('enrollmentModule.confirm.discardDescription')}
+        confirmText={t('classrooms.actions.discard')}
+        cancelText={t('classrooms.actions.keepEditing')}
         variant="destructive"
       />
     </>

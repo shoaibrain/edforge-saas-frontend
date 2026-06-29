@@ -38,6 +38,7 @@ import {
   dedupeCourseCode,
   type CourseFormData,
 } from '../../schemas/course.form'
+import { useAcademicsI18n } from '../../lib/i18n'
 import { useSchoolEnabledGradeOptions } from '../../hooks/useGradeOptions'
 
 // ============================================================================
@@ -363,6 +364,7 @@ function MaterialsList() {
 // ============================================================================
 
 export function CourseForm({ isEdit = false, schoolId, existingCourseCodes }: CourseFormProps) {
+  const { t } = useAcademicsI18n()
   const { watch } = useFormContext<CourseFormData>()
   const academicSubject = watch('academicSubject')
   // Legacy courses created before academicSubject became required can load without
@@ -372,23 +374,22 @@ export function CourseForm({ isEdit = false, schoolId, existingCourseCodes }: Co
   return (
     <div className="space-y-8">
       {subjectMissing && (
-        <InlineAlert variant="warning" title="Incomplete course data">
-          This course has no granular Academic Subject. Set it below so report cards and the Ed-Fi
-          subject rollup label correctly, then Save.
+        <InlineAlert variant="warning" title={t('curriculumModule.form.incompleteTitle')}>
+          {t('curriculumModule.form.incompleteDescription')}
         </InlineAlert>
       )}
 
       {/* Section 1: Identity */}
       <FormSection
-        title="Course Identity"
-        description="The course code is auto-generated from the subject and grade levels. It's a unique identifier and cannot be changed after creation."
+        title={t('curriculumModule.form.identityTitle')}
+        description={t('curriculumModule.form.identityDescription')}
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <TextField
               name="courseCode"
-              label="Course Code"
-              placeholder="e.g., MATH-101"
+              label={t('curriculumModule.form.courseCode')}
+              placeholder={t('curriculumModule.form.courseCodePlaceholder')}
               icon={Hash}
               disabled={isEdit}
             />
@@ -396,8 +397,8 @@ export function CourseForm({ isEdit = false, schoolId, existingCourseCodes }: Co
           </div>
           <TextField
             name="courseName"
-            label="Course Name"
-            placeholder="e.g., Algebra I"
+            label={t('tables.courses.columns.courseName')}
+            placeholder={t('curriculumModule.form.courseNamePlaceholder')}
             icon={BookOpen}
           />
         </div>
@@ -405,8 +406,8 @@ export function CourseForm({ isEdit = false, schoolId, existingCourseCodes }: Co
 
       {/* Section 2: Classification */}
       <FormSection
-        title="Classification"
-        description="Categorize this course by subject, type, and credit level. The broad Ed-Fi subject area is derived automatically from the academic subject."
+        title={t('curriculumModule.form.classificationTitle')}
+        description={t('curriculumModule.form.classificationDescription')}
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <SelectField
@@ -414,48 +415,48 @@ export function CourseForm({ isEdit = false, schoolId, existingCourseCodes }: Co
             label={
               subjectMissing ? (
                 <span className="inline-flex items-center gap-1">
-                  Academic Subject
-                  <Tooltip content="Missing — required for report-card labels and the Ed-Fi subject rollup.">
+                  {t('curriculumModule.form.academicSubject')}
+                  <Tooltip content={t('curriculumModule.form.academicSubjectMissingTooltip')}>
                     <AlertTriangle className="w-3.5 h-3.5 text-[rgb(var(--state-warning-fg))]" />
                   </Tooltip>
                 </span>
               ) : (
-                'Academic Subject'
+                t('curriculumModule.form.academicSubject')
               )
             }
-            placeholder="Select academic subject"
+            placeholder={t('curriculumModule.form.selectAcademicSubject')}
             options={ACADEMIC_SUBJECT_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
             icon={GraduationCap}
           />
           <SelectField
             name="courseType"
-            label="Course Type"
-            placeholder="Select course type"
+            label={t('tables.courses.columns.type')}
+            placeholder={t('curriculumModule.form.selectCourseType')}
             options={COURSE_TYPE_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
           />
           <SelectField
             name="creditType"
-            label="Credit Type"
-            placeholder="Select credit type"
+            label={t('curriculumModule.form.creditType')}
+            placeholder={t('curriculumModule.form.selectCreditType')}
             options={CREDIT_TYPE_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
             icon={Award}
           />
           <TextField
             name="credits"
-            label="Credits"
+            label={t('tables.courses.columns.credits')}
             type="number"
             placeholder="e.g., 1"
           />
           <SelectField
             name="typicalDuration"
-            label="Duration"
-            placeholder="Select duration"
+            label={t('tables.courses.columns.duration')}
+            placeholder={t('curriculumModule.form.selectDuration')}
             options={DURATION_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
             icon={Clock}
           />
           <TextField
             name="periodsPerWeek"
-            label="Periods per Week"
+            label={t('curriculumModule.form.periodsPerWeek')}
             type="number"
             placeholder="e.g., 5"
           />
@@ -464,21 +465,21 @@ export function CourseForm({ isEdit = false, schoolId, existingCourseCodes }: Co
 
       {/* Section 3: Grade Levels */}
       <FormSection
-        title="Grade Levels"
-        description="Select which grade levels this course is offered to."
+        title={t('tables.courses.columns.grades')}
+        description={t('curriculumModule.form.gradeLevelsDescription')}
       >
         <GradeLevelSelector schoolId={schoolId} />
       </FormSection>
 
       {/* Section 4: Description & Objectives */}
       <FormSection
-        title="Description & Objectives"
-        description="Provide a course description and define learning objectives."
+        title={t('curriculumModule.form.descriptionObjectivesTitle')}
+        description={t('curriculumModule.form.descriptionObjectivesDescription')}
       >
         <TextareaField
           name="description"
-          label="Course Description"
-          placeholder="Describe what this course covers, its goals, and student expectations..."
+          label={t('curriculumModule.form.courseDescription')}
+          placeholder={t('curriculumModule.form.courseDescriptionPlaceholder')}
         />
         <div className="mt-4">
           <ObjectivesInput />
@@ -487,8 +488,8 @@ export function CourseForm({ isEdit = false, schoolId, existingCourseCodes }: Co
 
       {/* Section 5: Materials (optional) */}
       <FormSection
-        title="Course Materials"
-        description="Add textbooks, workbooks, or digital resources for this course."
+        title={t('curriculumModule.form.materialsTitle')}
+        description={t('curriculumModule.form.materialsDescription')}
       >
         <MaterialsList />
       </FormSection>

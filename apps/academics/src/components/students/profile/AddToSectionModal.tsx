@@ -17,6 +17,7 @@ import {
 } from '../../../hooks'
 import { useActiveSchoolId } from '../../../stores/app.store'
 import { parseApiError } from '../../../services/academics.service'
+import { useAcademicsI18n } from '../../../lib/i18n'
 import type { StudentProfileResponseDto } from '@aibrains/shared-types'
 
 // ============================================================================
@@ -38,6 +39,7 @@ export function AddToSectionModal({
   onClose,
   student,
 }: AddToSectionModalProps) {
+  const { t } = useAcademicsI18n()
   const schoolId = useActiveSchoolId() || ''
   const selectRef = useRef<HTMLButtonElement>(null)
   const enrollStudentMutation = useEnrollStudent()
@@ -66,7 +68,7 @@ export function AddToSectionModal({
 
   const handleSubmit = async () => {
     if (!selectedSectionId) {
-      setError('Please select a section')
+      setError(t('studentProfile.section.selectRequired'))
       return
     }
 
@@ -80,9 +82,9 @@ export function AddToSectionModal({
     } catch (err) {
       const parsed = parseApiError(err as Error)
       if (parsed.statusCode === 409) {
-        setError('Student is already rostered in this section')
+        setError(t('studentProfile.section.alreadyRostered'))
       } else {
-        setError(parsed.message || 'Failed to add student to section')
+        setError(parsed.message || t('studentProfile.section.addFailed'))
       }
     }
   }
@@ -91,8 +93,8 @@ export function AddToSectionModal({
     <Modal
       open={open}
       onClose={onClose}
-      title="Add to Section"
-      description={`Add ${student.fullName} to a class section`}
+      title={t('actions.addToSection')}
+      description={t('studentProfile.section.addDescription', { student: student.fullName })}
       size="md"
     >
       <div className="space-y-4">
@@ -100,8 +102,7 @@ export function AddToSectionModal({
         {!hasActiveEnrollment && (
           <div className="p-3 rounded-lg bg-[rgb(var(--state-warning-fg))]/5 border border-amber-500/15">
             <p className="text-sm text-[rgb(var(--state-warning-fg))]">
-              Student must have an active enrollment before being added to
-              sections. Please enroll the student first.
+              {t('studentProfile.section.activeEnrollmentRequired')}
             </p>
           </div>
         )}
@@ -117,9 +118,9 @@ export function AddToSectionModal({
                 {student.fullName}
               </p>
               <p className="text-xs text-text-tertiary">
-                Grade {student.currentGradeLevel}
+                {t('studentProfile.section.grade', { grade: student.currentGradeLevel })}
                 {student.currentEnrollment &&
-                  ` · ${student.currentEnrollment.academicYearName || 'Current Year'}`}
+                  ` · ${student.currentEnrollment.academicYearName || t('studentProfile.section.currentYear')}`}
               </p>
             </div>
           </div>
@@ -130,7 +131,7 @@ export function AddToSectionModal({
           <Select
             controlId="sectionId"
             ref={selectRef}
-            label="Section"
+            label={t('studentProfile.section.section')}
             required
             value={selectedSectionId}
             onChange={(v) => {
@@ -139,7 +140,7 @@ export function AddToSectionModal({
             }}
             disabled={!hasActiveEnrollment || enrollStudentMutation.isPending}
             error={error || undefined}
-            placeholder="Select a section..."
+            placeholder={t('studentProfile.section.selectPlaceholder')}
             options={sections.map((section: any) => ({
               value: section.sectionId,
               label: `${section.sectionName || section.name}${section.courseName ? ` — ${section.courseName}` : ''}${section.primaryTeacherName ? ` (${section.primaryTeacherName})` : ''}`,
@@ -147,7 +148,7 @@ export function AddToSectionModal({
           />
           {sections.length === 0 && hasActiveEnrollment && (
             <p className="mt-1 text-xs text-[rgb(var(--text-tertiary))]">
-              No sections found. Create sections in Scheduling first.
+              {t('studentProfile.section.noSectionsFound')}
             </p>
           )}
         </div>
@@ -160,7 +161,7 @@ export function AddToSectionModal({
           onClick={onClose}
           disabled={enrollStudentMutation.isPending}
         >
-          Cancel
+          {t('actions.cancel')}
         </Button>
         <Button
           type="button"
@@ -175,12 +176,12 @@ export function AddToSectionModal({
           {enrollStudentMutation.isPending ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Adding...
+              {t('actions.adding')}
             </>
           ) : (
             <>
               <BookOpen className="w-4 h-4 mr-2" />
-              Add to Section
+              {t('actions.addToSection')}
             </>
           )}
         </Button>

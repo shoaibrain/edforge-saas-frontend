@@ -24,6 +24,7 @@ import {
   useSetCurrentAcademicYear,
   useUpdateAcademicYearStatus,
 } from '../../hooks'
+import { useAcademicsI18n } from '../../lib/i18n'
 import { useActiveSchoolId } from '../../stores/app.store'
 import type { AcademicYearResponseDto } from '../../services/school.service'
 
@@ -33,28 +34,24 @@ import type { AcademicYearResponseDto } from '../../services/school.service'
 
 const statusConfig: Record<
   AcademicYearResponseDto['status'],
-  { label: string; bg: string; text: string; dot: string }
+  { bg: string; text: string; dot: string }
 > = {
   planning: {
-    label: 'Planning',
     bg: 'bg-[rgb(var(--state-info-bg)/0.18)] dark:bg-[rgb(var(--state-info-fg))]/20',
     text: 'text-[rgb(var(--state-info-fg))] ',
     dot: 'bg-[rgb(var(--state-info-fg))]',
   },
   active: {
-    label: 'Active',
     bg: 'bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-fg)/0.2)]',
     text: 'text-[rgb(var(--state-success-fg))] ',
     dot: 'bg-[rgb(var(--state-success-fg))]',
   },
   completed: {
-    label: 'Completed',
     bg: 'bg-[rgb(var(--state-warning-bg)/0.18)] dark:bg-[rgb(var(--state-warning-fg))]/20',
     text: 'text-[rgb(var(--state-warning-fg))]',
     dot: 'bg-[rgb(var(--state-warning-fg))]',
   },
   archived: {
-    label: 'Archived',
     bg: 'bg-[rgb(var(--background-tertiary))] dark:bg-[rgb(var(--background-tertiary)/0.2)]',
     text: 'text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]',
     dot: 'bg-[rgb(var(--background-tertiary))]',
@@ -72,11 +69,12 @@ const NEXT_STATUS: Record<
   archived: null,
 }
 
-const STATUS_ACTION_LABEL: Record<AcademicYearResponseDto['status'], string> = {
-  planning: 'Activate',
-  active: 'Complete',
-  completed: 'Archive',
-  archived: '',
+function statusLabelKey(status: AcademicYearResponseDto['status']) {
+  return `calendarModule.status.${status}`
+}
+
+function actionLabelKey(status: AcademicYearResponseDto['status']) {
+  return `calendarModule.actions.${status}`
 }
 
 // ============================================================================
@@ -88,13 +86,14 @@ function AcademicYearStatusBadge({
 }: {
   status: AcademicYearResponseDto['status']
 }) {
+  const { t } = useAcademicsI18n()
   const config = statusConfig[status] || statusConfig.planning
   return (
     <span
       className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${config.bg} ${config.text}`}
     >
       <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`} />
-      {config.label}
+      {t(statusLabelKey(status))}
     </span>
   )
 }
@@ -118,8 +117,9 @@ function AcademicYearCard({
   isSettingCurrent,
   isUpdatingStatus,
 }: AcademicYearCardProps) {
+  const { t, formatDate } = useAcademicsI18n()
   const nextStatus = NEXT_STATUS[year.status]
-  const actionLabel = STATUS_ACTION_LABEL[year.status]
+  const actionLabel = t(actionLabelKey(year.status))
 
   // Business Rule 2: Only active or planning years can be set as current
   const canSetCurrent =
@@ -129,12 +129,12 @@ function AcademicYearCard({
   const canAdvanceStatus =
     nextStatus !== null && !(nextStatus === 'archived' && year.isCurrent)
 
-  const startDate = new Date(year.startDate).toLocaleDateString('en-US', {
+  const startDate = formatDate(year.startDate, {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
   })
-  const endDate = new Date(year.endDate).toLocaleDateString('en-US', {
+  const endDate = formatDate(year.endDate, {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
@@ -162,7 +162,7 @@ function AcademicYearCard({
           {year.isCurrent && (
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-fg)/0.2)] text-[rgb(var(--state-success-fg))] ">
               <CheckCircle2 className="w-3 h-3" />
-              Current
+              {t('calendarModule.current')}
             </span>
           )}
         </div>
@@ -178,7 +178,7 @@ function AcademicYearCard({
             isLoading={isSettingCurrent}
           >
             <Star className="w-3.5 h-3.5 mr-1.5" />
-            Set as Current
+            {t('calendarModule.actions.setCurrent')}
           </Button>
         )}
         {canAdvanceStatus && (
@@ -195,11 +195,13 @@ function AcademicYearCard({
         )}
         {year.isCurrent && nextStatus === 'archived' && (
           <p className="text-xs text-text-tertiary italic">
-            Set another year as current before archiving
+            {t('calendarModule.archiveCurrentHint')}
           </p>
         )}
         {!canSetCurrent && !canAdvanceStatus && !year.isCurrent && year.status === 'archived' && (
-          <p className="text-xs text-text-tertiary italic">Archived</p>
+          <p className="text-xs text-text-tertiary italic">
+            {t(statusLabelKey('archived'))}
+          </p>
         )}
       </div>
     </div>
@@ -249,6 +251,7 @@ function StatCard({
 // ============================================================================
 
 function NoSchoolSelected() {
+  const { t } = useAcademicsI18n()
   return (
     <div className="min-h-96 flex items-center justify-center">
       <div className="text-center max-w-md">
@@ -256,10 +259,10 @@ function NoSchoolSelected() {
           <AlertCircle className="w-8 h-8 text-[rgb(var(--state-warning-fg))]" />
         </div>
         <h3 className="text-lg font-semibold text-text-primary mb-2">
-          No School Selected
+          {t('calendarModule.noSchool.title')}
         </h3>
         <p className="text-text-secondary">
-          Please select a school from the sidebar to manage academic years.
+          {t('calendarModule.noSchool.description')}
         </p>
       </div>
     </div>
@@ -267,6 +270,7 @@ function NoSchoolSelected() {
 }
 
 function ErrorState({ onRetry }: { onRetry: () => void }) {
+  const { t } = useAcademicsI18n()
   return (
     <div className="min-h-96 flex items-center justify-center">
       <div className="text-center max-w-md">
@@ -274,14 +278,14 @@ function ErrorState({ onRetry }: { onRetry: () => void }) {
           <AlertCircle className="w-8 h-8 text-[rgb(var(--state-danger-fg))]" />
         </div>
         <h3 className="text-lg font-semibold text-text-primary mb-2">
-          Failed to Load Academic Years
+          {t('calendarModule.error.title')}
         </h3>
         <p className="text-text-secondary mb-4">
-          Something went wrong. Please try again.
+          {t('calendarModule.error.description')}
         </p>
         <Button onClick={onRetry} variant="outline">
           <RefreshCw className="w-4 h-4 mr-2" />
-          Retry
+          {t('calendarModule.error.retry')}
         </Button>
       </div>
     </div>
@@ -289,15 +293,15 @@ function ErrorState({ onRetry }: { onRetry: () => void }) {
 }
 
 function EmptyState() {
+  const { t } = useAcademicsI18n()
   return (
     <div className="bg-surface-secondary rounded-xl border border-border-secondary p-8 text-center">
       <Calendar className="w-12 h-12 mx-auto text-text-tertiary mb-4" />
       <h4 className="text-lg font-medium text-text-primary mb-2">
-        No Academic Years
+        {t('calendarModule.empty.title')}
       </h4>
       <p className="text-text-secondary max-w-md mx-auto">
-        No academic years have been created yet. Create your first academic year
-        to get started with term and grading period management.
+        {t('calendarModule.empty.description')}
       </p>
     </div>
   )
@@ -308,6 +312,7 @@ function EmptyState() {
 // ============================================================================
 
 export function CalendarModule() {
+  const { t, formatDate, formatNumber } = useAcademicsI18n()
   const activeSchoolId = useActiveSchoolId()
   const schoolId = activeSchoolId ?? ''
 
@@ -335,15 +340,15 @@ export function CalendarModule() {
   // Computed stats
   const stats = useMemo(() => {
     if (!academicYears || academicYears.length === 0) {
-      return { total: 0, active: 0, planning: 0, currentName: 'None set' }
+      return { total: 0, active: 0, planning: 0, currentName: t('calendarModule.noneSet') }
     }
     return {
       total: academicYears.length,
       active: academicYears.filter((y) => y.status === 'active').length,
       planning: academicYears.filter((y) => y.status === 'planning').length,
-      currentName: currentYear?.name ?? 'None set',
+      currentName: currentYear?.name ?? t('calendarModule.noneSet'),
     }
-  }, [academicYears, currentYear])
+  }, [academicYears, currentYear, t])
 
   // Handlers
   const handleSetCurrent = useCallback((year: AcademicYearResponseDto) => {
@@ -404,7 +409,7 @@ export function CalendarModule() {
                 {currentYear?.name ? <ContextBarYear>{currentYear.name}</ContextBarYear> : null}
                 {currentYear?.name ? <ContextBarSep /> : null}
                 <span>
-                  {new Date().toLocaleDateString('en-US', {
+                  {formatDate(new Date(), {
                     weekday: 'long',
                     month: 'short',
                     day: 'numeric',
@@ -414,7 +419,7 @@ export function CalendarModule() {
             }
             description={
               <p className="text-sm text-text-secondary">
-                Manage academic years, terms, and grading periods
+                {t('calendarModule.description')}
               </p>
             }
           />
@@ -426,7 +431,7 @@ export function CalendarModule() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <StatCard
             icon={CalendarDays}
-            label="Current Year"
+            label={t('calendarModule.stats.currentYear')}
             value={stats.currentName}
             accent="text-[rgb(var(--state-success-fg))]"
             bg="bg-[rgb(var(--state-success-bg)/0.18)]"
@@ -434,24 +439,24 @@ export function CalendarModule() {
           />
           <StatCard
             icon={Calendar}
-            label="Total Years"
-            value={stats.total}
+            label={t('calendarModule.stats.totalYears')}
+            value={formatNumber(stats.total)}
             accent="text-[rgb(var(--state-info-fg))]"
             bg="bg-[rgb(var(--state-info-bg)/0.18)]"
             isLoading={isLoading}
           />
           <StatCard
             icon={Star}
-            label="Active"
-            value={stats.active}
+            label={t('calendarModule.stats.active')}
+            value={formatNumber(stats.active)}
             accent="text-[rgb(var(--state-warning-fg))]"
             bg="bg-[rgb(var(--state-warning-fg))]/10"
             isLoading={isLoading}
           />
           <StatCard
             icon={Clock}
-            label="Planning"
-            value={stats.planning}
+            label={t('calendarModule.stats.planning')}
+            value={formatNumber(stats.planning)}
             accent="text-[rgb(var(--state-info-fg))]"
             bg="bg-[rgb(var(--state-info-bg)/0.18)]"
             isLoading={isLoading}
@@ -506,16 +511,21 @@ export function CalendarModule() {
         open={!!confirmSetCurrent}
         onClose={() => setConfirmSetCurrent(null)}
         onConfirm={handleConfirmSetCurrent}
-        title="Set as Current Academic Year"
+        title={t('calendarModule.confirm.setCurrentTitle')}
         description={
           confirmSetCurrent
             ? currentYear && currentYear.yearId !== confirmSetCurrent.yearId
-              ? `This will replace "${currentYear.name}" as the current academic year with "${confirmSetCurrent.name}". All modules that depend on the current year (attendance, grades, scheduling) will switch to the new selection.`
-              : `Set "${confirmSetCurrent.name}" as the current academic year? This determines which year is active across all modules.`
+              ? t('calendarModule.confirm.replaceCurrentDescription', {
+                  currentName: currentYear.name,
+                  nextName: confirmSetCurrent.name,
+                })
+              : t('calendarModule.confirm.setCurrentDescription', {
+                  yearName: confirmSetCurrent.name,
+                })
             : ''
         }
-        confirmText="Set as Current"
-        cancelText="Cancel"
+        confirmText={t('calendarModule.actions.setCurrent')}
+        cancelText={t('calendarModule.actions.cancel')}
         variant="default"
         isLoading={setCurrentMutation.isPending}
         icon={
@@ -530,20 +540,28 @@ export function CalendarModule() {
         onConfirm={handleConfirmAdvanceStatus}
         title={
           confirmAdvanceStatus
-            ? `${STATUS_ACTION_LABEL[confirmAdvanceStatus.status]} Academic Year`
-            : 'Update Status'
+            ? t('calendarModule.confirm.advanceTitle', {
+                action: t(actionLabelKey(confirmAdvanceStatus.status)),
+              })
+            : t('calendarModule.confirm.updateStatusTitle')
         }
         description={
           confirmAdvanceStatus
-            ? `Are you sure you want to change "${confirmAdvanceStatus.name}" from ${statusConfig[confirmAdvanceStatus.status].label.toLowerCase()} to ${NEXT_STATUS[confirmAdvanceStatus.status] ? statusConfig[NEXT_STATUS[confirmAdvanceStatus.status]!].label.toLowerCase() : ''}? This action cannot be reversed.`
+            ? t('calendarModule.confirm.advanceDescription', {
+                yearName: confirmAdvanceStatus.name,
+                fromStatus: t(statusLabelKey(confirmAdvanceStatus.status)).toLowerCase(),
+                toStatus: NEXT_STATUS[confirmAdvanceStatus.status]
+                  ? t(statusLabelKey(NEXT_STATUS[confirmAdvanceStatus.status]!)).toLowerCase()
+                  : '',
+              })
             : ''
         }
         confirmText={
           confirmAdvanceStatus
-            ? STATUS_ACTION_LABEL[confirmAdvanceStatus.status]
-            : 'Confirm'
+            ? t(actionLabelKey(confirmAdvanceStatus.status))
+            : t('calendarModule.actions.confirm')
         }
-        cancelText="Cancel"
+        cancelText={t('calendarModule.actions.cancel')}
         variant={
           confirmAdvanceStatus?.status === 'completed' ? 'destructive' : 'default'
         }

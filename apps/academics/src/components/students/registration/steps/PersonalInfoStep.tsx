@@ -16,6 +16,7 @@ import { GENDER_OPTIONS } from '../../../../schemas/student.form'
 import { useActiveSchoolId } from '../../../../stores/app.store'
 import { useSchoolEnabledGradeOptions } from '../../../../hooks/useGradeOptions'
 import { CollapsibleSection } from '../CollapsibleSection'
+import { useAcademicsI18n } from '../../../../lib/i18n'
 
 // Age bounds for date field (3–22 years)
 const today = new Date()
@@ -32,6 +33,7 @@ export function PersonalInfoStep({
   errors,
   clearError,
 }: WizardStepProps) {
+  const { t } = useAcademicsI18n()
   const form = useWizardForm({ data, updateData, errors, clearError })
   const schoolId = useActiveSchoolId()
   const { options: filteredGradeOptions } = useSchoolEnabledGradeOptions(schoolId)
@@ -43,38 +45,38 @@ export function PersonalInfoStep({
         <CollapsibleSection
           id="personal-name"
           icon={User}
-          title="Student Name"
-          description="Legal name as it appears on official documents"
+          title={t('enrollmentModule.step.personal.studentName')}
+          description={t('enrollmentModule.step.personal.studentNameDescription')}
           fields={['firstName', 'lastName', 'middleName', 'preferredName', 'suffix']}
           defaultExpanded
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
             <TextField
               name="firstName"
-              label="First Name"
-              placeholder="Enter first name"
+              label={t('fields.firstName')}
+              placeholder={t('enrollmentModule.step.personal.firstNamePlaceholder')}
               required
             />
             <TextField
               name="lastName"
-              label="Last Name"
-              placeholder="Enter last name"
+              label={t('fields.lastName')}
+              placeholder={t('enrollmentModule.step.personal.lastNamePlaceholder')}
               required
             />
             <TextField
               name="middleName"
-              label="Middle Name"
-              placeholder="Enter middle name"
+              label={t('fields.middleName')}
+              placeholder={t('enrollmentModule.step.personal.middleNamePlaceholder')}
             />
             <TextField
               name="preferredName"
-              label="Preferred Name"
-              placeholder="Nickname or preferred name"
+              label={t('enrollmentModule.step.personal.preferredName')}
+              placeholder={t('enrollmentModule.step.personal.preferredNamePlaceholder')}
             />
             <TextField
               name="suffix"
-              label="Suffix"
-              placeholder="Jr., III, etc."
+              label={t('enrollmentModule.step.personal.suffix')}
+              placeholder={t('enrollmentModule.step.personal.suffixPlaceholder')}
               className="md:col-span-1"
             />
           </div>
@@ -84,32 +86,32 @@ export function PersonalInfoStep({
         <CollapsibleSection
           id="personal-details"
           icon={CalendarDays}
-          title="Basic Details"
-          description="Date of birth, gender, and grade level"
+          title={t('enrollmentModule.step.personal.basicDetails')}
+          description={t('enrollmentModule.step.personal.basicDetailsDescription')}
           fields={['dateOfBirth', 'gender', 'currentGradeLevel']}
           defaultExpanded
         >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
             <DateField
               name="dateOfBirth"
-              label="Date of Birth"
+              label={t('fields.dateOfBirth')}
               required
               min={minDate}
               max={maxDate}
-              helperText="Student must be between 3 and 22 years old"
+              helperText={t('enrollmentModule.step.personal.ageHelp')}
             />
             <SelectField
               name="gender"
-              label="Gender"
+              label={t('fields.gender')}
               options={GENDER_OPTIONS}
-              placeholder="Select gender"
+              placeholder={t('enrollmentModule.step.personal.selectGender')}
               required
             />
             <SelectField
               name="currentGradeLevel"
-              label="Grade Level"
+              label={t('fields.gradeLevel')}
               options={[...filteredGradeOptions]}
-              placeholder="Select grade level"
+              placeholder={t('enrollmentModule.step.personal.selectGradeLevel')}
               required
             />
           </div>

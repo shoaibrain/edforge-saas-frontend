@@ -18,6 +18,7 @@ import {
 import { useSections, flattenSectionPages } from '../../hooks'
 import { useEscapeToClose } from '../../hooks/useEscapeToClose'
 import { useActiveSchoolId } from '../../stores/app.store'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 // ============================================================================
 // TYPES
@@ -47,6 +48,7 @@ interface TeacherDetailDrawerProps {
 // ============================================================================
 
 export function TeacherDetailDrawer({ member, onClose }: TeacherDetailDrawerProps) {
+  const { t, formatNumber, formatDate, enumLabel } = useAcademicsI18n()
   const schoolId = useActiveSchoolId() || ''
   const teacherId = member?.staffId || member?.userId || ''
   useEscapeToClose(onClose, !!member)
@@ -90,10 +92,13 @@ export function TeacherDetailDrawer({ member, onClose }: TeacherDetailDrawerProp
           >
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-border-secondary">
-              <h3 id="staff-profile-title" className="text-lg font-semibold text-text-primary">Staff Profile</h3>
+              <h3 id="staff-profile-title" className="text-lg font-semibold text-text-primary">
+                {t('teachersModule.drawer.title')}
+              </h3>
               <button
                 type="button"
                 onClick={onClose}
+                aria-label={t('teachersModule.drawer.close')}
                 className="p-1.5 rounded-md text-text-tertiary hover:text-text-primary hover:bg-surface-hover transition-colors"
               >
                 <X className="w-5 h-5" />
@@ -109,7 +114,7 @@ export function TeacherDetailDrawer({ member, onClose }: TeacherDetailDrawerProp
                 <div>
                   <h4 className="text-lg font-semibold text-text-primary">{fullName}</h4>
                   <p className="text-sm text-text-secondary capitalize">
-                    {member.role?.replace(/_/g, ' ') || 'Staff'}
+                    {member.role ? enumLabel('teachersModule.roles', member.role) : t('teachersModule.roles.staff')}
                   </p>
                 </div>
               </div>
@@ -117,7 +122,7 @@ export function TeacherDetailDrawer({ member, onClose }: TeacherDetailDrawerProp
               {/* Contact Info */}
               <div className="space-y-3">
                 <h5 className="text-xs font-semibold text-text-tertiary uppercase tracking-wider">
-                  Contact Information
+                  {t('teachersModule.drawer.contactInformation')}
                 </h5>
                 {member.email && (
                   <div className="flex items-center gap-3 text-sm">
@@ -135,7 +140,7 @@ export function TeacherDetailDrawer({ member, onClose }: TeacherDetailDrawerProp
                   <div className="flex items-center gap-3 text-sm">
                     <Calendar className="w-4 h-4 text-text-tertiary" />
                     <span className="text-text-primary">
-                      Hired {new Date(member.hireDate).toLocaleDateString()}
+                      {t('teachersModule.drawer.hiredOn', { date: formatDate(member.hireDate) })}
                     </span>
                   </div>
                 )}
@@ -145,10 +150,13 @@ export function TeacherDetailDrawer({ member, onClose }: TeacherDetailDrawerProp
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <h5 className="text-xs font-semibold text-text-tertiary uppercase tracking-wider">
-                    Assigned Sections
+                    {t('teachersModule.drawer.assignedSections')}
                   </h5>
                   <span className="text-xs text-text-tertiary">
-                    {sections.length} section{sections.length !== 1 ? 's' : ''}
+                    {t('teachersModule.drawer.sectionCount', {
+                      count: sections.length,
+                      value: formatNumber(sections.length),
+                    })}
                   </span>
                 </div>
 
@@ -161,7 +169,7 @@ export function TeacherDetailDrawer({ member, onClose }: TeacherDetailDrawerProp
                 ) : sections.length === 0 ? (
                   <div className="py-6 text-center">
                     <BookOpen className="w-8 h-8 mx-auto text-text-tertiary mb-2" />
-                    <p className="text-sm text-text-secondary">No sections assigned</p>
+                    <p className="text-sm text-text-secondary">{t('teachersModule.drawer.noSections')}</p>
                   </div>
                 ) : (
                   <div className="space-y-2">
@@ -173,10 +181,10 @@ export function TeacherDetailDrawer({ member, onClose }: TeacherDetailDrawerProp
                         <div className="flex items-center justify-between">
                           <div>
                             <p className="text-sm font-medium text-text-primary">
-                              {section.courseName || section.courseCode || 'Section'}
+                              {section.courseName || section.courseCode || t('teachersModule.drawer.sectionFallback')}
                             </p>
                             <p className="text-xs text-text-tertiary">
-                              Section {section.sectionNumber}
+                              {t('teachersModule.drawer.sectionTitle', { section: section.sectionNumber })}
                             </p>
                           </div>
                           <div className="flex items-center gap-1.5 text-xs text-text-tertiary">

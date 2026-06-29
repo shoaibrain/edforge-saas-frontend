@@ -12,6 +12,7 @@ import { useRecordGrade } from '../../hooks/useGrades'
 import { UserAvatar } from '../common/UserAvatar'
 import type { GradeRecord } from '../../services/academics.service'
 import type { StudentSectionResponseDto } from '@aibrains/shared-types'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 // ============================================================================
 // TYPES
@@ -84,6 +85,7 @@ export function GradebookGrid({
   onViewReportCard,
   onAddAssignment,
 }: GradebookGridProps) {
+  const { t, formatNumber } = useAcademicsI18n()
   const [editingCell, setEditingCell] = useState<EditingCell | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const cancelledRef = useRef(false)
@@ -100,7 +102,7 @@ export function GradebookGrid({
     // Start with roster students (in roster order)
     const result: MergedStudent[] = roster.map((s, idx) => ({
       studentId: s.studentId,
-      studentName: s.studentName || s.studentNumber || `Student #${idx + 1}`,
+      studentName: s.studentName || s.studentNumber || `${t('gradesModule.gradebook.student')} #${formatNumber(idx + 1)}`,
       grade: gradeMap.get(s.studentId) || null,
     }))
 
@@ -109,14 +111,14 @@ export function GradebookGrid({
       if (!rosterIds.has(g.studentId)) {
         result.push({
           studentId: g.studentId,
-          studentName: g.studentName || `Student (transferred)`,
+          studentName: g.studentName || `${t('gradesModule.gradebook.student')} (transferred)`,
           grade: g,
         })
       }
     })
 
     return result
-  }, [roster, grades])
+  }, [roster, grades, t, formatNumber])
 
   // Get unique assignment names with metadata for tooltips (Ticket 3.1)
   const assignmentColumns = useMemo(() => {
@@ -280,10 +282,10 @@ export function GradebookGrid({
       <div className="py-16 text-center">
         <GraduationCap className="w-10 h-10 mx-auto text-text-tertiary mb-3" />
         <h4 className="text-sm font-medium text-text-primary mb-1">
-          No students enrolled
+          {t('gradesModule.gradebook.noStudentsTitle')}
         </h4>
         <p className="text-xs text-text-tertiary max-w-sm mx-auto">
-          Enroll students in this section to begin recording grades.
+          {t('gradesModule.gradebook.noStudentsDescription')}
         </p>
       </div>
     )
@@ -296,7 +298,7 @@ export function GradebookGrid({
           <tr className="bg-surface-secondary">
             {/* Frozen student column (sticky on both axes — top-left corner) */}
             <th className="sticky left-0 top-0 z-20 bg-surface-secondary px-4 py-3 text-left font-semibold text-text-primary border-r border-border-secondary min-w-52">
-              Student
+              {t('gradesModule.gradebook.student')}
             </th>
             {/* Assignment columns with tooltips (Ticket 3.1) */}
             {assignmentColumns.map((col) => (
@@ -307,7 +309,7 @@ export function GradebookGrid({
               >
                 <div className="truncate max-w-32">{col.name}</div>
                 <div className="text-xs text-text-tertiary font-normal mt-0.5">
-                  {col.possiblePoints} pts
+                  {t('gradesModule.gradebook.pointsShort', { points: formatNumber(col.possiblePoints) })}
                 </div>
               </th>
             ))}
@@ -318,7 +320,7 @@ export function GradebookGrid({
                   type="button"
                   onClick={onAddAssignment}
                   className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-[rgb(var(--action-secondary-fg))] hover:bg-[rgb(var(--state-info-bg)/0.18)] dark:hover:bg-[rgb(var(--state-info-bg)/0.18)] rounded transition-colors"
-                  title="Add assignment"
+                  title={t('gradesModule.gradebook.addAssignment')}
                 >
                   <Plus className="w-3.5 h-3.5" />
                 </button>
@@ -326,10 +328,10 @@ export function GradebookGrid({
             )}
             {/* Overall Grade */}
             <th className="sticky top-0 z-10 px-4 py-3 text-center font-semibold text-text-primary min-w-24 bg-surface-hover">
-              Overall
+              {t('gradesModule.gradebook.overall')}
             </th>
             <th className="sticky top-0 z-10 px-4 py-3 text-center font-semibold text-text-primary min-w-20 bg-surface-hover">
-              Letter
+              {t('gradesModule.reportCard.letter')}
             </th>
           </tr>
         </thead>
@@ -352,14 +354,14 @@ export function GradebookGrid({
                       {student.studentName}
                     </span>
                     {isFinal && (
-                      <Lock className="w-3 h-3 text-text-tertiary flex-shrink-0" aria-label="Grade finalized" />
+                      <Lock className="w-3 h-3 text-text-tertiary flex-shrink-0" aria-label={t('gradesModule.gradebook.gradeFinalized')} />
                     )}
                     {onViewReportCard && (
                       <button
                         type="button"
                         onClick={() => onViewReportCard(student.studentId, student.studentName)}
                         className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-text-tertiary hover:text-[rgb(var(--action-secondary-fg))] transition-all flex-shrink-0"
-                        title="View Report Card"
+                        title={t('gradesModule.gradebook.viewReportCard')}
                       >
                         <FileText className="w-3.5 h-3.5" />
                       </button>

@@ -24,6 +24,7 @@ import {
 } from 'lucide-react'
 import type { ExamResponseDto } from '@aibrains/shared-types'
 import { cn, focusRing } from '@edforge/ui'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 // ============================================================================
 // PUBLIC API
@@ -80,7 +81,11 @@ export function ExamSummary({
   activeBucket,
   onBucketChange,
 }: ExamSummaryProps) {
-  const summary = useMemo(() => computeSummary(exams), [exams])
+  const { t, formatNumber } = useAcademicsI18n()
+  const summary = useMemo(
+    () => computeSummary(exams, t, formatNumber),
+    [exams, t, formatNumber],
+  )
 
   // 'total' is the reset state — it's never toggled off. Any other bucket
   // toggles back to 'total' when re-clicked, matching the prototype's
@@ -101,13 +106,16 @@ export function ExamSummary({
       <SummaryButton
         active={activeBucket === 'total'}
         onClick={() => toggle('total')}
-        label="Total Exams"
+        label={t('examModule.summary.total')}
       >
         <CompactTile
           icon={ClipboardList}
-          label="Total Exams"
-          value={summary.total}
-          sub={`${summary.typeCount} type${summary.typeCount === 1 ? '' : 's'} · ${summary.termCount} term${summary.termCount === 1 ? '' : 's'}`}
+          label={t('examModule.summary.total')}
+          value={formatNumber(summary.total)}
+          sub={t('examModule.summary.typeTermCount', {
+            types: formatNumber(summary.typeCount),
+            terms: formatNumber(summary.termCount),
+          })}
           loading={isLoading}
         />
       </SummaryButton>
@@ -115,13 +123,13 @@ export function ExamSummary({
       <SummaryButton
         active={activeBucket === 'live'}
         onClick={() => toggle('live')}
-        label="Live Now"
+        label={t('examModule.summary.live')}
       >
         <CompactTile
           icon={PlayCircle}
-          label="Live Now"
-          value={summary.live}
-          sub={summary.live > 0 ? 'In session' : 'Nothing live'}
+          label={t('examModule.summary.live')}
+          value={formatNumber(summary.live)}
+          sub={summary.live > 0 ? t('examModule.summary.inSession') : t('examModule.summary.nothingLive')}
           loading={isLoading}
         />
       </SummaryButton>
@@ -129,12 +137,12 @@ export function ExamSummary({
       <SummaryButton
         active={activeBucket === 'upcoming'}
         onClick={() => toggle('upcoming')}
-        label="Upcoming"
+        label={t('examModule.summary.upcoming')}
       >
         <CompactTile
           icon={CalendarClock}
-          label="Upcoming"
-          value={summary.upcoming}
+          label={t('examModule.summary.upcoming')}
+          value={formatNumber(summary.upcoming)}
           sub={summary.nextHint}
           loading={isLoading}
         />
@@ -143,13 +151,13 @@ export function ExamSummary({
       <SummaryButton
         active={activeBucket === 'awaiting'}
         onClick={() => toggle('awaiting')}
-        label="Awaiting Results"
+        label={t('examModule.summary.awaiting')}
       >
         <CompactTile
           icon={Flag}
-          label="Awaiting Results"
-          value={summary.awaiting}
-          sub={summary.awaiting === 0 ? 'All caught up' : 'Action needed'}
+          label={t('examModule.summary.awaiting')}
+          value={formatNumber(summary.awaiting)}
+          sub={summary.awaiting === 0 ? t('examModule.summary.allCaughtUp') : t('examModule.summary.actionNeeded')}
           emphasize={summary.awaiting > 0 ? 'warning' : undefined}
           loading={isLoading}
         />
@@ -158,12 +166,15 @@ export function ExamSummary({
       {/* Result Readiness — read-only, not wrapped in SummaryButton. */}
       <CompactTile
         icon={Target}
-        label="Result Readiness"
+        label={t('examModule.summary.readiness')}
         value={`${summary.readinessPercent}%`}
         sub={
           summary.readinessTotal === 0
-            ? 'No closed exams'
-            : `${summary.readinessGenerated}/${summary.readinessTotal} generated`
+            ? t('examModule.summary.noClosed')
+            : t('examModule.summary.generatedCount', {
+                generated: formatNumber(summary.readinessGenerated),
+                total: formatNumber(summary.readinessTotal),
+              })
         }
         rightSlot={
           summary.readinessTotal > 0 ? (
@@ -171,7 +182,11 @@ export function ExamSummary({
           ) : undefined
         }
         loading={isLoading}
-        ariaLabel={`Result Readiness: ${summary.readinessPercent}% (${summary.readinessGenerated} of ${summary.readinessTotal} generated)`}
+        ariaLabel={t('examModule.summary.readinessAria', {
+          percent: summary.readinessPercent,
+          generated: formatNumber(summary.readinessGenerated),
+          total: formatNumber(summary.readinessTotal),
+        })}
       />
     </nav>
   )
@@ -265,7 +280,7 @@ function SummaryButton({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      aria-label={`Filter by ${label}`}
+      aria-label={label}
       className={cn(
         'rounded-lg text-left transition-colors duration-150',
         'motion-reduce:transition-none',
@@ -345,7 +360,11 @@ interface SummaryShape {
   readinessTotal: number
 }
 
-function computeSummary(exams: ExamResponseDto[]): SummaryShape {
+function computeSummary(
+  exams: ExamResponseDto[],
+  t: ReturnType<typeof useAcademicsI18n>['t'],
+  formatNumber: ReturnType<typeof useAcademicsI18n>['formatNumber'],
+): SummaryShape {
   const today = isoToday()
 
   const types = new Set<string>()
@@ -381,9 +400,12 @@ function computeSummary(exams: ExamResponseDto[]): SummaryShape {
   )
   const next = upcomingExams[0]
   const nextHint = next
-    ? `Next: ${next.examName} · in ${daysFromTodayUntil(next.startDate)}d`
+    ? t('examModule.summary.nextHint', {
+        examName: next.examName,
+        days: formatNumber(daysFromTodayUntil(next.startDate)),
+      })
     : exams.length > 0
-      ? 'No upcoming'
+      ? t('examModule.summary.noUpcoming')
       : undefined
 
   const readinessPercent = readinessTotal === 0

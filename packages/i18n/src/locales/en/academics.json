@@ -168,6 +168,175 @@
     "pickupAuth": "Pickup Auth",
     "atEmployer": "at {{employer}}"
   },
+  "studentProfile": {
+    "tabsAria": "Student profile sections",
+    "overview": {
+      "attendanceTrendAria": "Student attendance trend",
+      "categoryBreakdown": "Category Breakdown"
+    },
+    "guardian": {
+      "addTitle": "Add Guardian",
+      "addDescription": "Add a parent or guardian to {{student}}'s profile",
+      "unsavedChangesConfirm": "You have unsaved changes. Are you sure you want to close?",
+      "unsavedChanges": "You have unsaved changes",
+      "firstName": "First Name",
+      "firstNamePlaceholder": "Guardian first name",
+      "lastName": "Last Name",
+      "lastNamePlaceholder": "Guardian last name",
+      "relationship": "Relationship",
+      "phone": "Phone",
+      "email": "Email",
+      "primaryContact": "Primary Contact",
+      "pickupAuthorized": "Pickup Authorized",
+      "noGuardian": "No guardian on file",
+      "guardians": "Guardians",
+      "guardianCount": "{{value}} Guardian",
+      "guardianCount_plural": "{{value}} Guardians",
+      "cellAria": "{{value}} guardian(s); primary {{firstName}} {{lastName}}, {{relationship}}",
+      "relationships": {
+        "mother": "Mother",
+        "father": "Father",
+        "guardian": "Legal Guardian",
+        "grandparent": "Grandparent",
+        "sibling": "Sibling",
+        "aunt": "Aunt",
+        "uncle": "Uncle",
+        "other": "Other"
+      },
+      "badges": {
+        "primary": "Primary",
+        "portal": "Portal",
+        "pickup": "Pickup"
+      }
+    },
+    "section": {
+      "addDescription": "Add {{student}} to a class section",
+      "activeEnrollmentRequired": "Student must have an active enrollment before being added to sections. Please enroll the student first.",
+      "selectRequired": "Please select a section",
+      "alreadyRostered": "Student is already rostered in this section",
+      "addFailed": "Failed to add student to section",
+      "grade": "Grade {{grade}}",
+      "currentYear": "Current Year",
+      "section": "Section",
+      "selectPlaceholder": "Select a section...",
+      "noSectionsFound": "No sections found. Create sections in Scheduling first."
+    },
+    "demographics": {
+      "title": "Ed-Fi Demographics",
+      "description": "IEMIS-aligned fields used for Flash I / II reporting. Edits are audited.",
+      "edit": "Edit",
+      "editTitle": "Edit Demographics",
+      "editDescription": "Ed-Fi descriptor fields for {{student}}. Changes are audited.",
+      "thisStudent": "this student",
+      "identity": "Identity",
+      "sex": "Sex",
+      "primaryLanguage": "Primary language",
+      "motherTongue": "Mother tongue",
+      "ethnicity": "Ethnicity",
+      "disabilities": "Disabilities",
+      "flags": "Flags",
+      "transferredIn": "Transferred in?",
+      "belowPovertyLine": "Below poverty line?",
+      "scholarshipCategory": "Scholarship category",
+      "notSpecified": "Not specified",
+      "notSpecifiedOption": "— Not specified —",
+      "derivedConfirm": "Derived — click Edit to confirm",
+      "noDisabilities": "No disabilities recorded",
+      "noDisabilitiesPeriod": "No disabilities recorded.",
+      "ethnicityDescriptorUri": "Ethnicity descriptor URI",
+      "ethnicityHelper": "Free-text URI for V1 (the ethnicity catalog ships in Sprint 6).",
+      "format": "Format",
+      "addDisability": "Add disability",
+      "disability": "Disability",
+      "selectDisability": "— Select disability —",
+      "disabilityNotesPlaceholder": "Notes (optional — kept private; stripped before audit emit)",
+      "removeDisability": "Remove disability",
+      "transferredFromAnotherSchool": "Transferred from another school",
+      "scholarshipPlaceholder": "e.g. Dalit, Janajati, ..."
+    },
+    "schedule": {
+      "attendanceSummary": "Attendance Summary",
+      "rate": "Rate",
+      "totalDays": "Total Days",
+      "class": "Class",
+      "subject": "Subject",
+      "removeConfirm": "Remove {{student}} from {{section}}? This will unlink the student from this section.",
+      "removeFromSection": "Remove from section",
+      "credits": "Credits",
+      "noScheduleData": "No schedule data",
+      "addSectionsHint": "Add this student to class sections to begin tracking attendance and grades.",
+      "enrollSectionsHint": "Classes and attendance data will appear here once the student is enrolled in sections.",
+      "attendanceHistory": "Attendance History",
+      "viewGrades": "View Grades"
+    }
+  },
+  "studentsModule": {
+    "insight": {
+      "enrolledAcrossGrades": "{{students}} students enrolled across {{grades}} grades",
+      "attendanceToday": "{{rate}}% attendance today",
+      "noAttendanceData": "no attendance data",
+      "atRiskStudents": "{{value}} at-risk student",
+      "atRiskStudents_plural": "{{value}} at-risk students",
+      "noAtRiskStudents": "no at-risk students"
+    },
+    "empty": {
+      "noStudentsFound": "No students found",
+      "adjustFilters": "Try adjusting your filters or search term"
+    },
+    "noSchool": {
+      "title": "Select a school",
+      "description": "Choose a school from the sidebar to view the student directory."
+    },
+    "error": {
+      "title": "Failed to Load Students",
+      "description": "Something went wrong while loading the student directory."
+    },
+    "bulk": {
+      "message": "Message",
+      "moveSection": "Move section",
+      "archive": "Archive"
+    },
+    "actions": {
+      "importIemis": "Import IEMIS",
+      "importIemisAria": "Import from IEMIS",
+      "governmentReports": "Govt. Reports",
+      "governmentReportsAria": "Government reports",
+      "enrollStudent": "Enroll student",
+      "enrollStudentAria": "Enroll student",
+      "exportCsvAria": "Export students as CSV"
+    },
+    "widgets": {
+      "enrollmentLoadFailed": "Unable to load enrollment data",
+      "atRiskLoadFailed": "Unable to load at-risk data",
+      "attendanceLoadFailed": "Unable to load attendance data",
+      "gradeLoadFailed": "Unable to load grade data"
+    },
+    "stats": {
+      "totalEnrolled": "Total Enrolled",
+      "recentEnrollments": "+{{value}} recent",
+      "acrossGrades": "across {{value}} grades",
+      "thisAcademicYear": "this academic year",
+      "atRiskStudents": "At-Risk Students",
+      "criticalCount": "{{value}} critical",
+      "riskBreakdown": "{{critical}} critical · {{warning}} warning",
+      "belowThreshold": "below 90% threshold",
+      "todayAttendance": "Today's Attendance",
+      "partialData": "Partial data",
+      "attendanceBreakdown": "{{present}} present · {{absent}} absent · {{late}} late",
+      "today": "today",
+      "gradeLevels": "Grade Levels",
+      "coveredThisYear": "covered this year"
+    },
+    "withdraw": {
+      "title": "Withdraw Student",
+      "description": "Are you sure you want to withdraw {{student}}? This action can be reversed by a school administrator.",
+      "confirm": "Withdraw"
+    },
+    "profiles": {
+      "title": "Student Profiles",
+      "description": "Detailed student profiles and records - to be populated with migrated content from the monolith."
+    }
+  },
   "privacy": {
     "showSensitive": "Show sensitive details",
     "hideSensitive": "Hide sensitive details"
@@ -727,6 +896,1282 @@
       "saveScores": "Save Scores"
     }
   },
+  "curriculumModule": {
+    "actions": {
+      "addCourse": "Add course"
+    },
+    "summary": {
+      "coursesAcross": "courses across",
+      "subjectAreasSuffix": "subject areas",
+      "elective": "{{count}} elective",
+      "specializedTypesSuffix": "specialized course types (Honors, AP, Dual Enrollment)",
+      "basedOnLoaded": "based on loaded courses"
+    },
+    "stats": {
+      "totalCourses": "Total Courses",
+      "activeTag": "{{count}} active",
+      "subjectAreas": "Subject Areas",
+      "subjectHint": "Math · Science · ELA · SS · Arts · Voc.",
+      "electives": "Electives",
+      "specializedTypes": "Specialized Types",
+      "specializedTag": "Honors · AP · Dual Enroll."
+    },
+    "filters": {
+      "all": "All",
+      "search": "Search by course code or name...",
+      "subjectArea": "Subject area",
+      "allSubjects": "All Subjects",
+      "courseType": "Course type",
+      "allTypes": "All Types",
+      "creditType": "Credit type",
+      "allCreditTypes": "All Credit Types",
+      "gradeLevel": "Grade level",
+      "allGrades": "All Grades",
+      "clear": "Clear ({{count}})",
+      "exportAria": "Export courses as CSV",
+      "exportCsv": "Export CSV"
+    },
+    "form": {
+      "incompleteTitle": "Incomplete course data",
+      "incompleteDescription": "This course has no granular Academic Subject. Set it below so report cards and the Ed-Fi subject rollup label correctly, then Save.",
+      "identityTitle": "Course Identity",
+      "identityDescription": "The course code is auto-generated from the subject and grade levels. It's a unique identifier and cannot be changed after creation.",
+      "courseCode": "Course Code",
+      "courseCodePlaceholder": "e.g., MATH-101",
+      "courseNamePlaceholder": "e.g., Algebra I",
+      "classificationTitle": "Classification",
+      "classificationDescription": "Categorize this course by subject, type, and credit level. The broad Ed-Fi subject area is derived automatically from the academic subject.",
+      "academicSubject": "Academic Subject",
+      "academicSubjectMissingTooltip": "Missing — required for report-card labels and the Ed-Fi subject rollup.",
+      "selectAcademicSubject": "Select academic subject",
+      "selectCourseType": "Select course type",
+      "creditType": "Credit Type",
+      "selectCreditType": "Select credit type",
+      "selectDuration": "Select duration",
+      "periodsPerWeek": "Periods per Week",
+      "gradeLevelsDescription": "Select which grade levels this course is offered to.",
+      "descriptionObjectivesTitle": "Description & Objectives",
+      "descriptionObjectivesDescription": "Provide a course description and define learning objectives.",
+      "courseDescription": "Course Description",
+      "courseDescriptionPlaceholder": "Describe what this course covers, its goals, and student expectations...",
+      "materialsTitle": "Course Materials",
+      "materialsDescription": "Add textbooks, workbooks, or digital resources for this course."
+    },
+    "courseDetail": {
+      "actions": {
+        "editCourse": "Edit Course",
+        "printDetails": "Print Details",
+        "activate": "Activate",
+        "deactivate": "Deactivate"
+      },
+      "tabs": {
+        "overview": "Overview",
+        "sections": "Sections",
+        "standards": "Standards"
+      },
+      "periodsPerWeekShort": "Periods/Week",
+      "description": "Description",
+      "learningObjectives": "Learning Objectives",
+      "byAuthor": "by {{author}}",
+      "metadata": "Metadata",
+      "created": "Created",
+      "lastUpdated": "Last Updated",
+      "noSectionsTitle": "No Sections Yet",
+      "noSectionsDescription": "No class sections have been created for this course.",
+      "goToScheduling": "Go to Scheduling",
+      "sectionTitle": "Section {{section}}",
+      "loadMoreSections": "Load More Sections",
+      "standardsTitle": "Learning Standards",
+      "standardsDescription": "Standards alignment for this course will be available in a future release. Link Common Core, NGSS, or state-specific standards to track competency-based outcomes.",
+      "notFoundTitle": "Course Not Found",
+      "notFoundDescription": "This course may have been removed or you don't have access.",
+      "backToCurriculum": "Back to Curriculum",
+      "credits": "{{value}} credit",
+      "credits_plural": "{{value}} credits",
+      "courseTabs": "Course tabs"
+    }
+  },
+  "rosteringModule": {
+    "description": "Manage student-to-section assignments across all active sections",
+    "actions": {
+      "applyChanges": "Apply Changes",
+      "applying": "Applying..."
+    },
+    "cell": {
+      "addToSection": "Add to {{section}}",
+      "removeFromSection": "Remove from {{section}}"
+    },
+    "conflict": {
+      "title": "Schedule Conflict",
+      "samePeriod": "Same class period as {{count}} other section(s)"
+    },
+    "student": {
+      "gradeShort": "Gr {{grade}}"
+    },
+    "summary": {
+      "additions": "{{value}} addition",
+      "additions_plural": "{{value}} additions",
+      "removals": "{{value}} removal",
+      "removals_plural": "{{value}} removals",
+      "conflicts": "{{value}} conflict",
+      "conflicts_plural": "{{value}} conflicts",
+      "processing": "Processing {{progress}} of {{total}}..."
+    },
+    "toast": {
+      "allApplied": "All {{value}} change applied successfully",
+      "allApplied_plural": "All {{value}} changes applied successfully",
+      "partialApplied": "{{success}} changes applied, {{failed}} failed. Review and retry failed changes.",
+      "allFailed": "All {{value}} change failed. Please check your connection and try again.",
+      "allFailed_plural": "All {{value}} changes failed. Please check your connection and try again."
+    },
+    "filters": {
+      "gradeLevel": "Grade Level",
+      "loadingGrades": "Loading grades...",
+      "allGrades": "All Grades",
+      "course": "Course",
+      "allCourses": "All Courses",
+      "matrixCount": "{{students}} students x {{sections}} sections"
+    },
+    "loading": {
+      "title": "Loading rostering data...",
+      "description": "Fetching students, sections, and current enrollments"
+    },
+    "empty": {
+      "noCurrentYear": "Set up an academic year in school settings before rostering students.",
+      "noDataTitle": "No data available",
+      "noStudents": "No active students found for the selected grade level.",
+      "noSections": "No active sections found for the current academic year."
+    },
+    "table": {
+      "student": "Student",
+      "sectionTitle": "Section {{section}}",
+      "sectionShort": "Sec {{section}}"
+    }
+  },
+  "teachersModule": {
+    "description": "School staff members and their teaching assignments",
+    "stats": {
+      "totalStaff": "Total Staff",
+      "teachers": "Teachers",
+      "active": "Active",
+      "roles": "Roles"
+    },
+    "roles": {
+      "staff": "Staff",
+      "teacher": "Teacher",
+      "principal": "Principal",
+      "vice_principal": "Vice Principal",
+      "counselor": "Counselor",
+      "admin": "Admin"
+    },
+    "drawer": {
+      "title": "Staff Profile",
+      "close": "Close staff profile",
+      "contactInformation": "Contact Information",
+      "hiredOn": "Hired {{date}}",
+      "assignedSections": "Assigned Sections",
+      "sectionCount": "{{value}} section",
+      "sectionCount_plural": "{{value}} sections",
+      "noSections": "No sections assigned",
+      "sectionFallback": "Section",
+      "sectionTitle": "Section {{section}}"
+    }
+  },
+  "moduleOverview": {
+    "title": "{{title}} Overview",
+    "retryLoading": "Retry loading",
+    "options": {
+      "title": "Page options",
+      "showHideWidgets": "Show/hide widgets",
+      "resetToDefault": "Reset to default",
+      "back": "Back"
+    },
+    "stats": {
+      "scrollLeft": "Scroll stats left",
+      "scrollRight": "Scroll stats right",
+      "regionLabel": "Key performance indicators"
+    },
+    "updated": {
+      "justNow": "Updated just now",
+      "minutesAgo": "Updated {{value}}m ago",
+      "hoursAgo": "Updated {{value}}h ago",
+      "refreshTitle": "Click to refresh"
+    },
+    "widgets": {
+      "quickStats": "Quick stats",
+      "insights": "Insights",
+      "insightsCharts": "Insights & Charts",
+      "activityAlerts": "Activity & Alerts"
+    }
+  },
+  "examModule": {
+    "description": "Plan, run, and publish midterms, finals, and term examinations",
+    "descriptionWithYear": "Plan, run, and publish exams for {{yearName}}",
+    "createExam": "Create Exam",
+    "createDisabledTitle": "An academic year with terms is required first",
+    "noActiveYear": {
+      "title": "No Active Academic Year",
+      "description": "Set a current academic year for this school to begin scheduling exams."
+    },
+    "bulk": {
+      "changeStatus": "Change status",
+      "generateResults": "Generate results",
+      "changeStatusComingSoon": "Bulk change status for {{count}} exam(s) — coming soon",
+      "generateComingSoon": "Will queue result generation for {{count}} exam(s) — coming soon",
+      "onlyClosed": "Only closed exams can generate result cards."
+    },
+    "filter": {
+      "filteredBy": "Filtered by",
+      "clear": "Clear (1)"
+    },
+    "summary": {
+      "total": "Total Exams",
+      "live": "Live Now",
+      "upcoming": "Upcoming",
+      "awaiting": "Awaiting Results",
+      "readiness": "Result Readiness",
+      "typeTermCount": "{{types}} types · {{terms}} terms",
+      "inSession": "In session",
+      "nothingLive": "Nothing live",
+      "allCaughtUp": "All caught up",
+      "actionNeeded": "Action needed",
+      "noClosed": "No closed exams",
+      "generatedCount": "{{generated}}/{{total}} generated",
+      "readinessAria": "Result Readiness: {{percent}}% ({{generated}} of {{total}} generated)",
+      "nextHint": "Next: {{examName}} · in {{days}}d",
+      "noUpcoming": "No upcoming"
+    },
+    "status": {
+      "draft": "Draft",
+      "scheduled": "Scheduled",
+      "in_progress": "In Progress",
+      "closed": "Closed",
+      "published": "Published"
+    },
+    "transitions": {
+      "draft": "Move to Draft",
+      "scheduled": "Schedule",
+      "in_progress": "Start Exam",
+      "closed": "Close Exam",
+      "published": "Publish Exam"
+    },
+    "transitionConfirm": {
+      "closed": "Close this exam? Scores lock and result cards are generated for every enrolled student. You can only publish after closing.",
+      "published": "Publish this exam? This marks the exam lifecycle complete."
+    },
+    "types": {
+      "midterm": "Midterm",
+      "final": "Final",
+      "unit_test": "Unit Test",
+      "quiz": "Quiz"
+    },
+    "resultGeneration": {
+      "label": "Result generation",
+      "pending": "Generating result cards...",
+      "generated": "Result cards generated",
+      "failed": "Result generation failed",
+      "generatedAt": "Generated {{dateTime}}"
+    },
+    "detail": {
+      "backToExams": "Back to Exams",
+      "notFoundTitle": "Exam Not Found",
+      "notFoundDescription": "This exam may have been removed or you don't have access.",
+      "noTerm": "No term",
+      "grades": "Grades",
+      "edit": "Edit",
+      "resultCards": "Result Cards",
+      "closeDrawer": "Close drawer",
+      "lifecycle": "Lifecycle",
+      "lifecycleComplete": "This exam is published — its lifecycle is complete.",
+      "tabsAria": "Exam tabs",
+      "tabs": {
+        "overview": "Overview",
+        "subjects": "Subjects",
+        "scores": "Scores"
+      },
+      "fields": {
+        "type": "Type",
+        "term": "Term",
+        "status": "Status",
+        "gradeLevels": "Grade Levels",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "created": "Created",
+        "description": "Description"
+      }
+    },
+    "drawer": {
+      "createTitle": "Create Exam",
+      "editTitle": "Edit Exam",
+      "saving": "Saving...",
+      "creating": "Creating...",
+      "detailsTitle": "Exam Details",
+      "detailsDescription": "Name this exam and choose its type and term.",
+      "examName": "Exam Name",
+      "examNamePlaceholder": "e.g., First Term Exam",
+      "selectExamType": "Select exam type",
+      "selectTerm": "Select term",
+      "examTypeLocked": "Locked: exam type can only change while the exam is in Draft.",
+      "termLocked": "Term cannot be changed after creation.",
+      "gradeLevelsDescription": "Scope this exam to the grade(s) sitting it. Drives the Subjects picker, score roster, and Result Card generation.",
+      "gradeLevelsLocked": "Locked: grade levels can only change while the exam is in Draft.",
+      "gradeLevelsHelper": "Pick one for a per-grade exam, or multiple for a grade-split (e.g., Grade 9 + 10).",
+      "scheduleTitle": "Schedule",
+      "scheduleDescription": "When does this exam run?",
+      "descriptionDescription": "Optional notes about this exam.",
+      "descriptionPlaceholder": "Optional description...",
+      "loadingGradeLevels": "Loading available grade levels...",
+      "noGradeLevels": "This school has no enabled grade levels configured. Set them under Settings -> Grade Levels before creating exams."
+    },
+    "subjects": {
+      "count": "{{count}} subject(s)",
+      "addSubject": "Add Subject",
+      "locked": "Subjects are locked while the exam is {{status}}. They can only be changed in Draft or Scheduled.",
+      "noGradeMatch": "No courses match this exam's grade levels ({{grades}}). Add courses tagged for those grades in Curriculum first.",
+      "course": "Course",
+      "selectCourse": "Select a course...",
+      "maxMarks": "Max Marks",
+      "passMarks": "Pass Marks",
+      "components": "Components",
+      "componentsHint": "(optional - e.g. Theory + Practical)",
+      "splitComponents": "+ Split into components",
+      "componentsSum": "Σ {{sum}} / {{max}} full",
+      "componentLabelPlaceholder": "Label (e.g. Theory)",
+      "fullPlaceholder": "Full",
+      "passPlaceholder": "Pass",
+      "componentLabelAria": "Component {{index}} label",
+      "componentFullAria": "Component {{index}} full marks",
+      "componentPassAria": "Component {{index}} pass marks",
+      "removeComponent": "Remove component",
+      "addComponent": "Add component",
+      "clearComponents": "Clear (single subject)",
+      "componentsInvalid": "Each component needs a label, full >= 1, 0 <= pass <= full, and the full marks must sum to Max Marks ({{max}}).",
+      "emptyMutable": "No subjects yet. Add the courses this exam will cover.",
+      "emptyReadonly": "No subjects yet.",
+      "courseFallback": "Course",
+      "maxShort": "max",
+      "passShort": "pass",
+      "editMarks": "Edit marks",
+      "removeSubject": "Remove subject",
+      "removeConfirm": "Remove {{subject}} from the exam?",
+      "thisSubject": "this subject",
+      "theory": "Theory",
+      "practical": "Practical"
+    },
+    "resultCards": {
+      "absentTitle": "Absent / Not graded",
+      "fail": "Fail",
+      "gradeLabel": "Grade {{grade}}",
+      "published": "Published",
+      "draft": "Draft",
+      "publishConfirm": "Publish this result card? Publishing is final and cannot be undone.",
+      "allCards": "All result cards",
+      "percentage": "Percentage",
+      "division": "Division",
+      "result": "Result",
+      "passUpper": "PASS",
+      "failUpper": "FAIL",
+      "position": "Position",
+      "termGpa": "Term GPA",
+      "overall": "Overall",
+      "subject": "Subject",
+      "marks": "Marks",
+      "passMarksShort": "Pass M.",
+      "score": "Score",
+      "grade": "Grade",
+      "pass": "Pass",
+      "total": "Total",
+      "conduct": "Conduct",
+      "conductPlaceholder": "Conduct note...",
+      "saveConduct": "Save conduct",
+      "classTeacherRemark": "Class-Teacher Remark",
+      "remarkPlaceholder": "Class-teacher remark...",
+      "saveRemark": "Save remark",
+      "publishedReadOnly": "Published - read only",
+      "draftReview": "Draft - review then publish",
+      "printPdf": "Print / PDF",
+      "publish": "Publish",
+      "generatingTitle": "Generating result cards...",
+      "generatingDescription": "This usually takes a few seconds. The list updates automatically when they're ready.",
+      "generationFailedTitle": "Result generation failed",
+      "generationFailedDescription": "Something went wrong generating the result cards. Re-opening and re-closing the exam will retry.",
+      "emptyTitle": "No Result Cards Yet",
+      "emptyDescription": "Result cards are generated automatically once this exam is closed. Close the exam after all scores are entered.",
+      "student": "Student"
+    }
+  },
+  "classrooms": {
+    "tabs": {
+      "overview": "Overview",
+      "gradebook": "Gradebook",
+      "policies": "Grading Policies",
+      "attendance": "Attendance",
+      "attendanceBoard": "Attendance Board",
+      "classwork": "Classwork",
+      "people": "People",
+      "progress": "Progress"
+    },
+    "actions": {
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "sendNotification": "Send notification",
+      "newClassroom": "New classroom",
+      "newSection": "New Section",
+      "record": "Record",
+      "finalize": "Finalize",
+      "gradeAnalytics": "Grade Analytics",
+      "gridView": "Grid view",
+      "listView": "List view",
+      "edit": "Edit",
+      "editSection": "Edit Section",
+      "printRoster": "Print Roster",
+      "backToClassrooms": "Back to Classrooms",
+      "backToSection": "Back to section",
+      "openGradebook": "Open Gradebook",
+      "openAttendance": "Open Attendance",
+      "viewAllClasswork": "View All Classwork",
+      "takeAttendance": "Take Attendance",
+      "viewRoster": "View Roster",
+      "loadMore": "Load More",
+      "loading": "Loading...",
+      "retry": "Retry",
+      "cancel": "Cancel",
+      "create": "Create",
+      "saveChanges": "Save Changes",
+      "saving": "Saving...",
+      "creating": "Creating...",
+      "createSection": "Create Section",
+      "discard": "Discard",
+      "keepEditing": "Keep Editing"
+    },
+    "aria": {
+      "tabs": "Classrooms tabs",
+      "classroomTabs": "Classroom tabs",
+      "progressViews": "Progress views",
+      "createMenu": "Create menu",
+      "cardActions": "Card actions",
+      "sectionActions": "Section actions",
+      "createClasswork": "Create classwork",
+      "createClassworkOptions": "Create classwork options",
+      "loadingClasswork": "Loading classwork",
+      "loadingClassworkItems": "Loading classwork items...",
+      "retryLoadingClasswork": "Retry loading classwork",
+      "closeDrawer": "Close drawer",
+      "openItem": "Open {{title}}",
+      "newTopicName": "New topic name",
+      "addTopic": "Add topic",
+      "attachments": "Attachments:"
+    },
+    "stats": {
+      "totalSections": "Total Sections",
+      "totalStudents": "Total Students",
+      "avgUtilization": "Avg Utilization",
+      "activeTeachers": "Active Teachers",
+      "activeClassrooms": "active classrooms",
+      "acrossAllSections": "across all sections",
+      "ofSeatCapacity": "of seat capacity",
+      "assignedSections": "assigned sections",
+      "failedToLoad": "Failed to load statistics"
+    },
+    "empty": {
+      "noClassesTitle": "No classes yet",
+      "noClassesDescription": "Create your first class section to get started. Classes will appear here as cards.",
+      "noSectionsAssigned": "No sections assigned. Contact your administrator.",
+      "selectClassSectionTitle": "Select a Class Section",
+      "selectClassSectionDescription": "Choose a section from the dropdown to view and manage student grades.",
+      "sectionNotFound": "Section Not Found",
+      "sectionNotFoundDescription": "This section may have been removed or you don't have access.",
+      "noGradesRecorded": "No grades recorded yet",
+      "noAttendanceToday": "No attendance recorded for today yet",
+      "noStudentsEnrolled": "No students enrolled yet",
+      "noClassworkYet": "No classwork yet",
+      "noClassworkWithTopics": "You have topics set up but no classwork items yet. Create assignments, quizzes, or materials to get started.",
+      "noClassworkDescription": "Create assignments, quizzes, and materials for your class.",
+      "noClassworkItems": "No classwork items yet"
+    },
+    "gradebook": {
+      "selectSection": "Select a section...",
+      "sectionFallback": "Section",
+      "selectGradingPeriod": "Select grading period...",
+      "selectGradingPeriodPrompt": "Select a grading period",
+      "noPolicyTitle": "No grading policy configured",
+      "noPolicyDescription": "Grades will use simple averaging without letter grades or category weights.",
+      "noDefaultPolicyTitle": "No default grading policy set",
+      "noDefaultPolicyDescription": "You have {{count}} grading policy, but none is marked as default.",
+      "noDefaultPolicyDescription_plural": "You have {{count}} grading policies, but none is marked as default.",
+      "setAcademicYearBeforeGrades": "Set up an academic year before recording grades.",
+      "classAverage": "class average"
+    },
+    "context": {
+      "activeSections": "active sections",
+      "across": "across",
+      "courses": "courses",
+      "studentsEnrolled": "students enrolled",
+      "avgUtilization": "avg utilization",
+      "studentsAtRisk": "students at risk (below 60%)",
+      "concentratedIn": "concentrated in",
+      "atFullPassRate": "at 100% pass rate",
+      "grading": "Grading",
+      "complete": "complete",
+      "recordedToday": "recorded today",
+      "sevenDayAverage": "7-day average",
+      "vsThirtyDay": "vs 30-day",
+      "flaggedBelowAttendance": "flagged below 90% attendance"
+    },
+    "card": {
+      "noCourse": "No course",
+      "noTeacherAssigned": "No teacher assigned",
+      "students": "students",
+      "enrollmentSummary": "{{current}}/{{max}} students",
+      "articleLabel": "{{sectionName}} - {{courseName}}, {{teacherName}}, {{current}} of {{max}} students"
+    },
+    "detail": {
+      "sectionFallback": "Section {{number}}",
+      "createSectionTitle": "Create Class Section",
+      "createSectionDescription": "Set up a new class section with course, teacher, and schedule details.",
+      "studentsWithCapacity": "{{current}}/{{max}} students ({{percent}}%)",
+      "enrolledWithCapacity": "{{current}}/{{max}} enrolled ({{percent}}%)",
+      "studentsRecordedToday": "{{recorded}} of {{total}} students recorded today",
+      "studentsEnrolledCount": "{{count}} students enrolled",
+      "studentsEnrolledCount_plural": "{{count}} students enrolled",
+      "todayRate": "today's rate",
+      "course": "Course",
+      "teacher": "Teacher",
+      "room": "Room",
+      "period": "Period",
+      "notAvailable": "N/A",
+      "notAssigned": "Not assigned"
+    },
+    "classwork": {
+      "title": "All Classwork",
+      "failedToLoad": "Failed to load classwork",
+      "failedToLoadDescription": "There was an error fetching classwork data. Please try again.",
+      "other": "Other",
+      "create": "Create",
+      "assignment": "Assignment",
+      "quiz": "Quiz",
+      "quizAssignment": "Quiz Assignment",
+      "material": "Material",
+      "question": "Question",
+      "topic": "Topic",
+      "topicNamePlaceholder": "Topic name...",
+      "add": "Add",
+      "editTitle": "Edit Classwork",
+      "createTitle": "Create Classwork",
+      "editing": "Editing",
+      "type": "Type",
+      "titleLabel": "Title",
+      "titlePlaceholder": "e.g. Chapter 3 Reading Response",
+      "titleRequired": "Title is required",
+      "description": "Description",
+      "questionPlaceholder": "Write your question here...",
+      "instructionsPlaceholder": "Add instructions or details...",
+      "topicLabel": "Topic",
+      "noTopic": "No topic",
+      "quizSettings": "Quiz Settings",
+      "assignmentSettings": "Assignment Settings",
+      "dueDate": "Due Date",
+      "pointsPossible": "Points Possible",
+      "visibility": "Visibility",
+      "draft": "Draft",
+      "published": "Published",
+      "discardTitle": "Discard changes?",
+      "discardDescription": "You have unsaved changes. Are you sure you want to close?",
+      "discardLeaveDescription": "You have unsaved changes. Are you sure you want to leave? Your changes will be lost.",
+      "dueDateShort": "Due {{date}}",
+      "pointsShort": "{{points}} pts",
+      "typeCount": "{{type}}s"
+    },
+    "overviewPanels": {
+      "grades": "Grades",
+      "attendance": "Attendance",
+      "classwork": "Classwork",
+      "failedLoadGrades": "Failed to load grades",
+      "failedLoadAttendance": "Failed to load attendance",
+      "failedLoadClasswork": "Failed to load classwork"
+    },
+    "toast": {
+      "notifyComingSoon": "Notify {{count}} section - coming soon",
+      "notifyComingSoon_plural": "Notify {{count}} sections - coming soon"
+    }
+  },
+  "enrollmentModule": {
+    "tabs": {
+      "registration": "Registration",
+      "records": "Enrollment records"
+    },
+    "actions": {
+      "cancelEnrollment": "Cancel enrollment",
+      "export": "Export",
+      "exportCsv": "Export enrollments as CSV",
+      "closeYear": "Close Year",
+      "closing": "Closing...",
+      "back": "Back",
+      "skip": "Skip",
+      "continue": "Continue",
+      "createStudent": "Create Student"
+    },
+    "header": {
+      "title": "Enroll student",
+      "registering": "Registering a new student",
+      "academicYear": "Academic year {{year}}",
+      "studentsCurrentlyEnrolled": "{{count}} students currently enrolled",
+      "tabsAria": "Enrollment tabs"
+    },
+    "summary": {
+      "enrolled": "enrolled",
+      "active": "active",
+      "gradeLevels": "grade levels",
+      "progressPercent": "{{percent}}%"
+    },
+    "confirm": {
+      "markNoShow": "Mark {{studentName}} as no-show? This will withdraw the enrollment.",
+      "thisStudent": "this student",
+      "closeYear": "Close all open enrollments for {{yearName}}? This will mark all enrolled students as graduated for this year. This action cannot be undone.",
+      "discardTitle": "Discard changes?",
+      "discardDescription": "You have unsaved student information. Are you sure you want to leave? All entered data will be lost."
+    },
+    "export": {
+      "failedTitle": "Export Failed",
+      "failedDescription": "Could not download the file."
+    },
+    "wizard": {
+      "progressAria": "Registration progress",
+      "stepAnnouncement": "Step {{current}} of {{total}}: {{title}}",
+      "steps": {
+        "personal": {
+          "title": "Personal Info",
+          "description": "Enter the student's basic personal details."
+        },
+        "contact": {
+          "title": "Contact",
+          "description": "Provide contact details and address information."
+        },
+        "guardians": {
+          "title": "Guardians",
+          "description": "Add the student's parents or legal guardians."
+        },
+        "medical": {
+          "title": "Medical",
+          "description": "Provide health information and demographic details."
+        },
+        "enrollment": {
+          "title": "Enrollment",
+          "description": "Set the enrollment type, academic year, and Ed-Fi details."
+        },
+        "review": {
+          "title": "Review",
+          "description": "Review all information before creating the student record."
+        }
+      },
+      "sidebar": {
+        "context": "Enrollment Context",
+        "academicYear": "Academic Year",
+        "enrolled": "Enrolled",
+        "gradeLevels": "Grade Levels",
+        "requiredForEdFi": "Required for EdFi",
+        "progress": "Progress",
+        "filled": "Filled",
+        "required": "Required",
+        "step": "Step {{step}}",
+        "done": "Done",
+        "current": "Current",
+        "fields": {
+          "firstName": "First name",
+          "lastName": "Last name",
+          "dateOfBirth": "Date of birth",
+          "gender": "Gender",
+          "gradeLevel": "Grade level",
+          "entryDate": "Entry date"
+        }
+      },
+      "toast": {
+        "registeredAndEnrolled": "{{studentName}} has been registered and enrolled!",
+        "enrollmentConflict": "Student created. Enrollment conflict: {{message}}. The student may already be enrolled.",
+        "enrollmentFailed": "Student created, but enrollment failed: {{message}}. You can add enrollment from the student profile.",
+        "registered": "{{studentName}} has been registered!"
+      }
+    },
+    "duplicate": {
+      "checking": "Checking for existing student records...",
+      "possibleDuplicate": "Possible Duplicate Found",
+      "similarRecords": "Similar Records Found",
+      "singleMatch": "A student with similar information already exists.",
+      "multipleMatches": "{{count}} students with similar information were found.",
+      "continueNew": "You can continue if this is a new student.",
+      "dismiss": "Dismiss warning",
+      "dob": "DOB: {{date}}",
+      "grade": "Grade {{grade}}",
+      "match": "Match: {{reasons}}",
+      "viewStudent": "View {{name}}",
+      "confidence": {
+        "high": "High",
+        "medium": "Medium",
+        "low": "Low"
+      }
+    },
+    "step": {
+      "type": {
+        "title": "Enrollment Type",
+        "description": "How the student is enrolling",
+        "newDescription": "First-time enrollment in this school",
+        "transferDescription": "Transferring from another school",
+        "returningDescription": "Previously enrolled and returning",
+        "reenrollmentDescription": "Re-enrolling after a break in enrollment"
+      },
+      "details": {
+        "title": "Enrollment Details",
+        "description": "Academic year and enrollment date",
+        "academicYear": "Academic Year",
+        "loadingYears": "Loading academic years...",
+        "failedYears": "Failed to load academic years. Please refresh.",
+        "selectAcademicYear": "Select academic year",
+        "currentSuffix": "Current",
+        "enrollmentDate": "Enrollment Date",
+        "dateRange": "Must be within {{start}} - {{end}}",
+        "activeYear": "Active academic year - enrollment will be immediately active",
+        "noActiveYearTitle": "No active academic year available",
+        "noActiveYearDescription": "Please configure and activate an academic year in School Settings before enrolling students."
+      },
+      "entry": {
+        "title": "Entry Details",
+        "description": "Ed-Fi descriptor fields for state reporting",
+        "entryType": "Entry Type",
+        "selectEntryType": "Select entry type",
+        "entryTypeHelp": "How the student is entering this school",
+        "residencyStatus": "Residency Status",
+        "selectResidencyStatus": "Select residency status",
+        "residencyHelp": "Student's residency relative to the school"
+      },
+      "settings": {
+        "title": "Enrollment Settings",
+        "description": "Defaults are pre-configured - adjust only if needed",
+        "primarySchool": "Primary School",
+        "primarySchoolHelp": "Is this the student's primary school of enrollment?",
+        "fte": "Full-Time Equivalency (FTE)",
+        "fteHelp": "1.0 = full-time, 0.5 = half-time",
+        "repeatGrade": "Repeat Grade",
+        "repeatGradeHelp": "Check if the student is repeating the current grade level"
+      },
+      "transfer": {
+        "title": "Transfer Information",
+        "description": "Details about the previous school",
+        "previousSchool": "Previous School",
+        "previousSchoolPlaceholder": "Name of previous school",
+        "previousAddress": "Previous School Address",
+        "previousAddressPlaceholder": "City, State",
+        "reason": "Reason for Transfer",
+        "reasonPlaceholder": "Briefly describe the reason for transfer"
+      },
+      "notes": {
+        "title": "Additional Notes",
+        "description": "Optional notes about this enrollment",
+        "label": "Notes",
+        "placeholder": "Any additional notes about this enrollment..."
+      },
+      "auto": {
+        "label": "Auto-populated:",
+        "description": "School, grade level, and entry grade level descriptor are automatically set based on your school context and Step 1 selections."
+      },
+      "personal": {
+        "studentName": "Student Name",
+        "studentNameDescription": "Legal name as it appears on official documents",
+        "firstNamePlaceholder": "Enter first name",
+        "lastNamePlaceholder": "Enter last name",
+        "middleNamePlaceholder": "Enter middle name",
+        "preferredName": "Preferred Name",
+        "preferredNamePlaceholder": "Nickname or preferred name",
+        "suffix": "Suffix",
+        "suffixPlaceholder": "Jr., III, etc.",
+        "basicDetails": "Basic Details",
+        "basicDetailsDescription": "Date of birth, gender, and grade level",
+        "ageHelp": "Student must be between 3 and 22 years old",
+        "selectGender": "Select gender",
+        "selectGradeLevel": "Select grade level"
+      },
+      "contact": {
+        "details": "Contact Details",
+        "detailsDescription": "Email and phone information",
+        "emailAddress": "Email Address",
+        "emailHelp": "Optional for students",
+        "phoneNumber": "Phone Number",
+        "phoneType": "Phone Type",
+        "selectType": "Select type",
+        "physicalAddress": "Physical Address",
+        "physicalAddressDescription": "Student's primary residential address",
+        "mailingAddress": "Mailing Address",
+        "mailingAddressDescription": "Only if different from physical address",
+        "differentMailingAddress": "Use a different mailing address",
+        "differentMailingAddressDescription": "Enable this if the mailing address is different from the physical address above"
+      },
+      "guardians": {
+        "guardianNumber": "Guardian {{number}}",
+        "remove": "Remove guardian",
+        "relationship": "Relationship",
+        "select": "Select",
+        "employer": "Employer",
+        "employerPlaceholder": "Employer name",
+        "occupationPlaceholder": "Occupation",
+        "permissions": "Permissions",
+        "primaryGuardian": "Primary Guardian",
+        "primaryGuardianDescription": "Main point of contact",
+        "portalAccess": "Portal Access",
+        "portalAccessDescription": "Can view student records",
+        "pickup": "Authorized for Pickup",
+        "pickupDescription": "Can pick up the student",
+        "emptyTitle": "No guardians added yet",
+        "emptyDescription": "Guardian information is optional but recommended.",
+        "addGuardian": "Add Guardian",
+        "maxReached": "Maximum of 10 guardians reached."
+      },
+      "medical": {
+        "optionalInfo": "All fields on this page are optional. You can skip this step and add information later.",
+        "health": "Health Information",
+        "healthDescription": "Allergies, medications, conditions, dietary restrictions",
+        "allergyPlaceholder": "Type an allergy and press Enter",
+        "allergyHelp": "e.g. Peanuts, Latex, Penicillin",
+        "currentMedications": "Current Medications",
+        "medicationPlaceholder": "Type a medication and press Enter",
+        "medicalConditions": "Medical Conditions",
+        "conditionPlaceholder": "Type a condition and press Enter",
+        "conditionHelp": "e.g. Asthma, Diabetes, Epilepsy",
+        "dietaryPlaceholder": "Type a dietary restriction and press Enter",
+        "physicianInsurance": "Physician & Insurance",
+        "physicianInsuranceDescription": "Primary care physician and insurance details",
+        "physicianName": "Physician Name",
+        "physicianPlaceholder": "Dr. Jane Smith",
+        "insuranceProvider": "Insurance Provider",
+        "insurancePlaceholder": "Insurance company name",
+        "policyNumber": "Policy Number",
+        "policyPlaceholder": "Policy or ID number",
+        "demographics": "Demographics",
+        "demographicsDescription": "Ethnicity, language, and country of birth",
+        "selectEthnicity": "Select ethnicity",
+        "selectLanguage": "Select language",
+        "countryOfBirthPlaceholder": "Country of birth"
+      },
+      "review": {
+        "edit": "Edit",
+        "creating": "Creating student record and enrollment...",
+        "whatWillHappen": "What will happen when you click \"Create Student\"",
+        "studentRecordCreated": "A student record will be created for {{studentName}}",
+        "enrolledIn": "Enrolled in {{academicYear}} as {{gradeLevel}}",
+        "enrollmentTypeDate": "Enrollment type: {{type}} - Date: {{date}}",
+        "noEnrollment": "No enrollment data - student will be created without enrollment",
+        "noGuardiansWarning": "No guardians added - consider adding at least one guardian",
+        "personalInfo": "Personal Information",
+        "contactInfo": "Contact Information",
+        "medicalDemographics": "Medical & Demographics",
+        "noGuardians": "No guardians added",
+        "primary": "Primary",
+        "emailValue": "Email: {{email}}",
+        "phoneValue": "Phone: {{phone}}",
+        "authorizedPickup": "Authorized for pickup",
+        "portalAccess": "Portal access",
+        "allergies": "Allergies",
+        "medications": "Medications",
+        "conditions": "Conditions",
+        "physician": "Physician",
+        "fullTimeEquivalency": "Full-Time Equivalency",
+        "transferReason": "Transfer Reason"
+      }
+    }
+  },
+  "iemisImport": {
+    "backToStudents": "Back to students",
+    "title": "IEMIS Bulk Student Import",
+    "subtitle": "Upload a Nepal IEMIS xlsx export to enroll students into {{schoolName}}.",
+    "thisSchool": "this school",
+    "states": {
+      "parsingTitle": "Parsing the xlsx file",
+      "parsingDescription": "Reading columns and building row dictionaries. This usually takes under 2 seconds.",
+      "dryRunTitle": "Validating against IEMIS rules",
+      "dryRunDescription": "Checking {{count}} rows for errors, warnings, and duplicates. No data is saved yet.",
+      "parseErrorTitle": "Unable to parse the file",
+      "unknownParseError": "Unknown parse error.",
+      "submittingTitle": "Submitting import",
+      "submittingDescription": "Queuing the import job.",
+      "importFailedTitle": "Import failed",
+      "unknownError": "Unknown error.",
+      "rerunDryRun": "Re-run dry-run",
+      "checkingEligibilityTitle": "Checking school eligibility",
+      "checkingEligibilityDescription": "Confirming the active school has an IEMIS code configured.",
+      "noSchoolTitle": "No active school selected",
+      "noSchoolMessage": "Select a school from the switcher in the header, then reload this page."
+    },
+    "gate": {
+      "missingCodeTitle": "{{schoolName}} has no IEMIS school code",
+      "missingCodeDescription": "IEMIS imports require the school to have its Nepal government-issued {{code}} set. That value is immutable after school creation, so it must be entered on the school itself. Ask the tenant admin to create a new school through the School Wizard with the IEMIS code, or contact support to update this school's metadata."
+    },
+    "chooser": {
+      "dropTitle": "Drop the IEMIS xlsx here",
+      "dropDescription": "or click below to browse. Up to {{maxRows}} rows per file.",
+      "browse": "Browse files",
+      "expectedColumns": "Expected columns",
+      "expectedDescription": "This tool reads the standard IEMIS xlsx export directly. Required columns: Student Id, FullName, Gender, CurrentClass, DOB. Additional columns like Father Name, Guardian Name, and addresses are captured when present.",
+      "dateDescription": "Dates are read as Bikram Sambat and converted to Gregorian on the server."
+    },
+    "summary": {
+      "fileSummary": "{{rows}} row · {{mapped}} of 20 IEMIS columns mapped",
+      "fileSummary_plural": "{{rows}} rows · {{mapped}} of 20 IEMIS columns mapped",
+      "extraColumns": "{{count}} extra column ignored",
+      "extraColumns_plural": "{{count}} extra columns ignored",
+      "willImport": "Will import",
+      "blocked": "Blocked by errors",
+      "duplicates": "Duplicates (skip)",
+      "warnings": "Warnings",
+      "created": "Created",
+      "enrolled": "Enrolled",
+      "skipped": "Skipped (duplicate)",
+      "failed": "Failed"
+    },
+    "enrollOption": {
+      "title": "Enroll all imported students into this year",
+      "current": "current",
+      "noYear": "No active academic year on this school. Imported students will be created without an enrollment record. Set up an academic year first to enable this option.",
+      "description": "When enabled, every successfully created student also gets a SchoolEnrollment for the year and is moved to active status. When disabled, students are created in pending status and you'll need to enroll each one individually from the student detail page."
+    },
+    "actions": {
+      "downloadFindings": "Download findings CSV",
+      "cancel": "Cancel",
+      "importStudents": "Import {{count}} student",
+      "importStudents_plural": "Import {{count}} students",
+      "noRows": "No rows to import",
+      "importAnother": "Import another file",
+      "viewStudents": "View students",
+      "backToPreview": "Back to preview",
+      "importNow": "Import {{count}} now"
+    },
+    "duplicates": {
+      "title": "{{count}} duplicate will be skipped",
+      "title_plural": "{{count}} duplicates will be skipped",
+      "description": "These rows have an emisStudentId that already exists in this tenant. They will not be re-created; existing records are untouched.",
+      "row": "Row {{row}} - emisStudentId {{emisStudentId}} already at student id {{studentId}}",
+      "andMore": "...and {{count}} more"
+    },
+    "confirm": {
+      "title": "Confirm IEMIS import",
+      "description": "You are about to commit the dry-run. This cannot be undone.",
+      "summary": "{{count}} student record will be created in {{schoolName}}.",
+      "summary_plural": "{{count}} student records will be created in {{schoolName}}.",
+      "andEnrolled": "and enrolled in {{yearName}}",
+      "skipped": "{{count}} duplicate will be skipped.",
+      "skipped_plural": "{{count}} duplicates will be skipped.",
+      "failed": "{{count}} row blocked by errors will not import.",
+      "failed_plural": "{{count}} rows blocked by errors will not import.",
+      "ack": "I have reviewed the dry-run findings and confirm the destination school is correct."
+    },
+    "progress": {
+      "queuedTitle": "Import queued",
+      "runningTitle": "Importing students...",
+      "queuedDescription": "Job is queued. Processing {{count}} rows.",
+      "runningDescription": "Importing {{count}} rows.",
+      "runningDescriptionWithYear": "Importing {{count}} rows and enrolling into {{yearName}}.",
+      "keepOpen": "You can keep this tab open. The import runs server-side; closing the tab won't cancel the job, but you'll lose the live status view."
+    },
+    "results": {
+      "complete": "Import complete",
+      "issues": "Import finished with issues",
+      "summary": "{{created}} students created, {{skipped}} skipped (duplicates), {{failed}} failed out of {{total}} total rows.",
+      "summaryWithEnrollment": "{{created}} students created, {{enrolled}} enrolled{{year}}, {{skipped}} skipped (duplicates), {{failed}} failed out of {{total}} total rows.",
+      "inYear": " in {{yearName}}",
+      "duration": "Took {{seconds}}s.",
+      "truncated": "The first 500 findings are shown. Re-run a dry-run to download the full findings CSV.",
+      "findings": "{{count}} finding from import",
+      "findings_plural": "{{count}} findings from import"
+    }
+  },
+  "calendarModule": {
+    "description": "Manage academic years, terms, and grading periods",
+    "current": "Current",
+    "noneSet": "None set",
+    "archiveCurrentHint": "Set another year as current before archiving",
+    "status": {
+      "planning": "Planning",
+      "active": "Active",
+      "completed": "Completed",
+      "archived": "Archived"
+    },
+    "actions": {
+      "planning": "Activate",
+      "active": "Complete",
+      "completed": "Archive",
+      "archived": "Archived",
+      "setCurrent": "Set as Current",
+      "cancel": "Cancel",
+      "confirm": "Confirm"
+    },
+    "stats": {
+      "currentYear": "Current Year",
+      "totalYears": "Total Years",
+      "active": "Active",
+      "planning": "Planning"
+    },
+    "noSchool": {
+      "title": "No School Selected",
+      "description": "Please select a school from the sidebar to manage academic years."
+    },
+    "error": {
+      "title": "Failed to Load Academic Years",
+      "description": "Something went wrong. Please try again.",
+      "retry": "Retry"
+    },
+    "empty": {
+      "title": "No Academic Years",
+      "description": "No academic years have been created yet. Create your first academic year to get started with term and grading period management."
+    },
+    "confirm": {
+      "setCurrentTitle": "Set as Current Academic Year",
+      "replaceCurrentDescription": "This will replace \"{{currentName}}\" as the current academic year with \"{{nextName}}\". All modules that depend on the current year (attendance, grades, scheduling) will switch to the new selection.",
+      "setCurrentDescription": "Set \"{{yearName}}\" as the current academic year? This determines which year is active across all modules.",
+      "advanceTitle": "{{action}} Academic Year",
+      "updateStatusTitle": "Update Status",
+      "advanceDescription": "Are you sure you want to change \"{{yearName}}\" from {{fromStatus}} to {{toStatus}}? This action cannot be reversed."
+    }
+  },
+  "gradesModule": {
+    "reportCard": {
+      "noStudentTitle": "No Student Selected",
+      "noStudentDescription": "Navigate to a student profile and click \"View Report Card\" to see their grades.",
+      "goToStudents": "Go to Students",
+      "setAcademicYear": "Set up an academic year before generating report cards.",
+      "title": "Report Card",
+      "printTitle": "Student Report Card",
+      "student": "Student:",
+      "date": "Date:",
+      "academicYearFallback": "Academic Year",
+      "termFallback": "Term",
+      "allTerms": "All Terms",
+      "print": "Print",
+      "noGradesTitle": "No grades recorded",
+      "noGradesDescription": "Grades will appear here once they are recorded by teachers.",
+      "termGpa": "Term GPA",
+      "cumulativeGpa": "Cumulative GPA",
+      "weightedGpa": "Weighted GPA",
+      "course": "Course",
+      "assignments": "Assignments",
+      "numeric": "Numeric",
+      "letter": "Letter",
+      "gpaPoints": "GPA Points",
+      "status": "Status",
+      "final": "Final",
+      "inProgress": "In Progress",
+      "generated": "Generated on {{dateTime}} - EdForge Student Information System"
+    },
+    "gradebook": {
+      "noStudentsTitle": "No students enrolled",
+      "noStudentsDescription": "Enroll students in this section to begin recording grades.",
+      "student": "Student",
+      "addAssignment": "Add assignment",
+      "overall": "Overall",
+      "pointsShort": "{{points}} pts",
+      "gradeFinalized": "Grade finalized",
+      "viewReportCard": "View Report Card"
+    },
+    "management": {
+      "recordGrades": "Record Grades",
+      "newAssignment": "New Assignment",
+      "assignmentName": "Assignment Name",
+      "assignmentPlaceholder": "e.g., Chapter 3 Quiz",
+      "assignmentPlaceholderAlt": "e.g., Chapter 5 Quiz",
+      "pointsPossible": "Points Possible",
+      "category": "Category",
+      "assessmentPurpose": "Assessment Purpose",
+      "dueDate": "Due Date",
+      "studentScores": "Student Scores",
+      "enteredCount": "{{entered}} / {{total}} entered",
+      "searchStudents": "Search students by name...",
+      "noStudents": "No students enrolled in this section.",
+      "noStudentMatches": "No students match \"{{search}}\".",
+      "saveGrades": "Save Grades ({{count}})",
+      "saveWithScores": "Save with Scores ({{count}})",
+      "createAssignment": "Create Assignment",
+      "scoreStatistics": "Score Statistics ({{count}} entered)",
+      "pasteScores": "Paste Scores (Name\\tScore per line)",
+      "pasteScoresPlaceholder": "John Smith\\t95\nJane Doe\\t88",
+      "pasteFromSpreadsheet": "Paste scores from spreadsheet",
+      "apply": "Apply",
+      "studentFallback": "Student",
+      "studentFallbackNumbered": "Student #{{number}}",
+      "categories": {
+        "tests": "Tests",
+        "quizzes": "Quizzes",
+        "homework": "Homework",
+        "participation": "Participation",
+        "projects": "Projects",
+        "finalExam": "Final Exam",
+        "other": "Other"
+      },
+      "purposes": {
+        "autoDetect": "Auto-detect",
+        "formative": "Formative",
+        "summative": "Summative"
+      },
+      "stats": {
+        "mean": "Mean",
+        "median": "Median",
+        "stdDev": "Std Dev",
+        "min": "Min",
+        "max": "Max"
+      }
+    },
+    "finalization": {
+      "title": "Finalize Grades",
+      "titleWithTerm": "Finalize Grades — {{termName}}",
+      "loading": "Loading grades...",
+      "reviewDescription": "Review grades before finalizing. Finalized grades are locked and cannot be changed.",
+      "toFinalize": "To Finalize",
+      "alreadyFinal": "Already Final",
+      "noScores": "No Scores",
+      "emptyStubsWarning": "{{count}} student(s) have no scored assignments and will be skipped.",
+      "lowGradesWarning": "{{count}} student(s) are below passing grade.",
+      "columns": {
+        "student": "Student",
+        "grade": "Grade",
+        "letter": "Letter",
+        "status": "Status"
+      },
+      "pass": "Pass",
+      "fail": "Fail",
+      "allFinalized": "All grades are already finalized!",
+      "noneToFinalize": "No students have scored assignments to finalize.",
+      "irreversibleTitle": "This action cannot be undone",
+      "irreversibleBefore": "You are about to finalize",
+      "irreversibleAfter": "grade(s). Finalized grades are locked and cannot be modified.",
+      "finalizing": "Finalizing grades...",
+      "completeTitle": "Grades Finalized",
+      "completeDescription": "Successfully finalized {{count}} grade(s). These grades are now locked.",
+      "errorCount": "{{count}} grade(s) could not be finalized.",
+      "continue": "Continue",
+      "back": "Back",
+      "finalizeGrades": "Finalize {{count}} Grades",
+      "done": "Done"
+    },
+    "policyForm": {
+      "createTitle": "Create Grading Policy",
+      "editTitle": "Edit Grading Policy",
+      "policyName": "Policy Name",
+      "policyNamePlaceholder": "e.g., Standard A-F Scale",
+      "description": "Description",
+      "descriptionPlaceholder": "Brief description of this policy",
+      "roundingRule": "Rounding Rule",
+      "rounding": {
+        "nearest": "Round to Nearest",
+        "up": "Round Up",
+        "down": "Round Down"
+      },
+      "passingGrade": "Passing Grade",
+      "setDefault": "Set as default",
+      "letterGrades": "Letter Grades",
+      "gpaScale": "GPA scale",
+      "to": "to",
+      "gpaPlaceholder": "GPA",
+      "categoryWeights": "Category Weights",
+      "totalWeight": "Total: {{total}}%",
+      "categoryNamePlaceholder": "Category name",
+      "dropLowestTitle": "Drop lowest N scores",
+      "drop": "drop",
+      "addCategory": "Add Category",
+      "createPolicy": "Create Policy",
+      "updatePolicy": "Update Policy"
+    },
+    "policyList": {
+      "title": "Grading Policies",
+      "default": "Default",
+      "editPolicy": "Edit policy",
+      "gradeScale": "Grade Scale",
+      "categoryWeights": "Category Weights ({{total}}%)",
+      "rounding": "Rounding: {{rule}}",
+      "newPolicy": "New Policy",
+      "emptyTitle": "No grading policies configured",
+      "emptyDescription": "Create a grading policy to define grade scales, category weights, and rounding rules."
+    },
+    "overview": {
+      "title": "Grade Analytics",
+      "subtitle": "School-wide academic performance",
+      "error": "Failed to load grade data. Please try refreshing.",
+      "errorStats": "Failed to load grade statistics",
+      "empty": "No grades recorded yet across sections.",
+      "sectionsGraded": "{{graded}} of {{total}} sections graded",
+      "actions": {
+        "more": "More actions",
+        "exportGradebookCsv": "Export Gradebook CSV",
+        "exportAtRiskCsv": "Export At-Risk CSV"
+      },
+      "kpis": {
+        "studentsGraded": "STUDENTS GRADED",
+        "averageGpa": "AVERAGE GPA",
+        "passRate": "PASS RATE",
+        "atRisk": "AT RISK",
+        "avgGradeHint": "Avg grade: {{grade}}%",
+        "passRateHint": "Students scoring 60%+",
+        "atRiskHint": "Below 60% threshold"
+      },
+      "completion": {
+        "title": "Grading Completion",
+        "subtitle": "Assignment entries across active sections",
+        "gradedShort": "graded",
+        "graded": "Graded",
+        "remaining": "Remaining",
+        "totalEntries": "{{total}} total assignment entries"
+      },
+      "assessment": {
+        "title": "Assessment Performance",
+        "subtitle": "Average scores by assessment type",
+        "formativeExamples": "Quizzes, homework, participation",
+        "summativeExamples": "Tests, exams, projects",
+        "formativeHigher": "Formative {{diff}}% higher",
+        "higherSuffix": "than summative — well balanced.",
+        "summativeHigher": "Summative {{diff}}% higher",
+        "summativeHigherSuffix": "than formative.",
+        "equal": "Formative and summative scores are equal — well balanced.",
+        "unclassified": "+{{count}} unclassified (avg {{avg}}%)"
+      },
+      "distribution": {
+        "title": "Grade Distribution",
+        "subtitle": "Number of students in each grade range based on overall course averages",
+        "a": "A (90–100)",
+        "b": "B (80–89)",
+        "c": "C (70–79)",
+        "d": "D (60–69)",
+        "f": "F (0–59)"
+      },
+      "category": {
+        "title": "Category Performance",
+        "subtitle": "Average scores by grading policy category",
+        "headers": {
+          "category": "Category",
+          "weight": "Wt.",
+          "score": "Score",
+          "avg": "Avg"
+        }
+      },
+      "course": {
+        "title": "Course Performance",
+        "subtitle": "Aggregated grade metrics per course across sections"
+      },
+      "courseHeaders": {
+        "course": "Course",
+        "sections": "Sec.",
+        "students": "Std.",
+        "avgGrade": "Avg Grade ↓",
+        "gpa": "GPA",
+        "passRate": "Pass %"
+      },
+      "atRisk": {
+        "title": "At-Risk Students",
+        "subtitle": "Students scoring below 60% in any course",
+        "studentCount": "{{count}} students",
+        "empty": "No students below the grade threshold",
+        "headers": {
+          "student": "Student",
+          "course": "Course",
+          "grade": "Grade",
+          "letter": "Letter"
+        }
+      }
+    }
+  },
   "iemisExport": {
     "title": "IEMiS Monthly Export",
     "description": "Generate the IEMiS Flash II monthly attendance roll-up for a calendar month. The export recomputes per-student present / absent / excused day counts and lets you download a CSV. Grade is the school-local grade level.",
@@ -770,6 +2215,95 @@
       "absent": "Absent",
       "excused": "Excused",
       "schoolDays": "School Days"
+    }
+  },
+  "governmentReports": {
+    "title": "Government Reports",
+    "descriptionPrefix": "Generate, download, and track CEHRD IEMIS Flash I / Flash II submissions for",
+    "iemisCode": "IEMIS {{code}}",
+    "noSchool": "Select a school to generate government reports.",
+    "noIemisCode": {
+      "title": "This school has no IEMIS code yet",
+      "beforeCode": "CEHRD Flash I/II exports require the school's government-issued IEMIS code (the",
+      "afterCode": "column). Add it under School Settings, then return here to generate reports."
+    },
+    "fields": {
+      "report": "Report",
+      "academicYearBs": "Academic year (BS)",
+      "academicYearAria": "Academic year in Bikram Sambat"
+    },
+    "year": {
+      "currentOption": "{{yearName}} · current",
+      "bs": "BS {{year}}"
+    },
+    "templates": {
+      "IEMIS_NPL_CEHRD_FLASH_I": "Flash I — Enrollment census",
+      "IEMIS_NPL_CEHRD_FLASH_II": "Flash II — Outcomes & attendance"
+    },
+    "status": {
+      "generating": "Generating",
+      "generated": "Ready",
+      "submitted": "Submitted",
+      "verified": "Verified",
+      "failed": "Failed"
+    },
+    "actions": {
+      "back": "Back",
+      "validate": "Validate",
+      "generate": "Generate report",
+      "downloadCsv": "Download CSV",
+      "csv": "CSV",
+      "retry": "Retry",
+      "retryGeneration": "Retry generation",
+      "markSubmitted": "Mark submitted",
+      "markVerified": "Mark verified",
+      "refresh": "Refresh",
+      "dismiss": "Dismiss"
+    },
+    "validation": {
+      "invalidBsYear": "Enter a 4-digit BS year, e.g. 2083."
+    },
+    "flashIi": {
+      "beforeExam": "Flash II's",
+      "examMarks": "exam marks",
+      "and": "and",
+      "gpa": "GPA",
+      "afterGpa": "columns are entered manually in this version; all other columns (enrollment, attendance, demographics) are generated automatically."
+    },
+    "existingReport": "A {{template}} for BS {{year}} already exists ({{status}}). Generating creates a new version.",
+    "history": {
+      "title": "Report history",
+      "filterAria": "Filter by report",
+      "filters": {
+        "all": "All",
+        "flashI": "Flash I",
+        "flashII": "Flash II"
+      },
+      "empty": "No reports generated yet for this school.",
+      "emptyFilter": "No reports match this filter.",
+      "rowsPrefix": "{{count}} rows · ",
+      "generated": "generated {{dateTime}}",
+      "created": "created {{dateTime}}",
+      "dryRunSuffix": " · dry-run"
+    },
+    "guidance": {
+      "beforeLink": "After downloading, upload the CSV to the IEMIS portal (",
+      "afterLink": "), then mark the report",
+      "and": "and",
+      "afterVerified": "once CEHRD confirms acceptance."
+    },
+    "preflight": {
+      "passed": "Validation passed",
+      "blocked": "Validation blocked",
+      "description": "Validation confirms the school and academic year exist. Per-student field issues are reported on the report row during generation."
+    },
+    "active": {
+      "generating": "Generating report...",
+      "stalled": "Taking longer than expected",
+      "ready": "Report ready",
+      "failed": "Generation failed",
+      "stalledDescription": "This is unusual for a single school; it may have failed. Refresh to check the latest status.",
+      "emptyReport": "This report has 0 students. Double-check the academic year before submitting."
     }
   }
 }

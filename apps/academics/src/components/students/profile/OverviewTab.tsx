@@ -256,7 +256,7 @@ function AttendanceTrendChart({ studentId }: { studentId: string }) {
   }
 
   return (
-    <figure role="img" aria-label="Student attendance trend">
+    <figure role="img" aria-label={tAcad('studentProfile.overview.attendanceTrendAria')}>
       <ResponsiveContainer width="100%" height={160}>
         <AreaChart data={chartData} margin={{ top: 8, right: 8, left: -20, bottom: 0 }}>
           <defs>
@@ -392,6 +392,7 @@ function CourseGradeCard({
   grade: any
   courseName: string
 }) {
+  const { t: tAcad } = useTranslation('academics')
   const [expanded, setExpanded] = useState(false)
 
   const numericGrade = grade.numericGrade
@@ -474,7 +475,7 @@ function CourseGradeCard({
           {/* Category breakdown */}
           {categoryGrades.length > 0 && (
             <div className="px-4 pt-3 pb-2">
-              <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wide mb-2">Category Breakdown</p>
+              <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wide mb-2">{tAcad('studentProfile.overview.categoryBreakdown')}</p>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {categoryGrades.map((cat: any, i: number) => (
                   <div key={cat.categoryId || i} className="flex items-center justify-between gap-2 px-2.5 py-1.5 rounded-lg bg-surface-secondary">

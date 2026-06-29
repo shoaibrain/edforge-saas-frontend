@@ -18,6 +18,7 @@ import { useTenantContext } from '@edforge/forms'
 import { phoneFormatForArchetype } from '@aibrains/shared-types'
 import { useUpdateStudent } from '../../../hooks'
 import { parseApiError } from '../../../services/academics.service'
+import { useAcademicsI18n } from '../../../lib/i18n'
 import type { StudentProfileResponseDto } from '@aibrains/shared-types'
 
 // ============================================================================
@@ -50,12 +51,12 @@ type GuardianFormData = z.infer<typeof guardianFormSchema>
 // OPTIONS
 // ============================================================================
 
-const RELATIONSHIP_OPTIONS = [
-  { value: 'mother', label: 'Mother' },
-  { value: 'father', label: 'Father' },
-  { value: 'guardian', label: 'Legal Guardian' },
-  { value: 'grandparent', label: 'Grandparent' },
-  { value: 'other', label: 'Other' },
+const RELATIONSHIP_VALUES = [
+  'mother',
+  'father',
+  'guardian',
+  'grandparent',
+  'other',
 ] as const
 
 // ============================================================================
@@ -67,6 +68,7 @@ export function AddGuardianModal({
   onClose,
   student,
 }: AddGuardianModalProps) {
+  const { t } = useAcademicsI18n()
   const firstInputRef = useRef<HTMLInputElement>(null)
   const updateMutation = useUpdateStudent()
 
@@ -119,7 +121,7 @@ export function AddGuardianModal({
   const handleClose = () => {
     if (isDirty) {
       const confirmed = window.confirm(
-        'You have unsaved changes. Are you sure you want to close?'
+        t('studentProfile.guardian.unsavedChangesConfirm')
       )
       if (!confirmed) return
     }
@@ -161,28 +163,28 @@ export function AddGuardianModal({
     <Modal
       open={open}
       onClose={handleClose}
-      title="Add Guardian"
-      description={`Add a parent or guardian to ${student.fullName}'s profile`}
+      title={t('studentProfile.guardian.addTitle')}
+      description={t('studentProfile.guardian.addDescription', { student: student.fullName })}
       size="md"
     >
       <form onSubmit={onSubmit} className="space-y-4">
         {/* Name Row */}
         <div className="grid grid-cols-2 gap-4">
-          <Field label="First Name" required error={errors.firstName?.message}>
+          <Field label={t('studentProfile.guardian.firstName')} required error={errors.firstName?.message}>
             <Input
               {...register('firstName')}
               ref={(e) => {
                 register('firstName').ref(e)
                 if (e) firstInputRef.current = e
               }}
-              placeholder="Guardian first name"
+              placeholder={t('studentProfile.guardian.firstNamePlaceholder')}
               disabled={isSubmitting}
             />
           </Field>
-          <Field label="Last Name" required error={errors.lastName?.message}>
+          <Field label={t('studentProfile.guardian.lastName')} required error={errors.lastName?.message}>
             <Input
               {...register('lastName')}
-              placeholder="Guardian last name"
+              placeholder={t('studentProfile.guardian.lastNamePlaceholder')}
               disabled={isSubmitting}
             />
           </Field>
@@ -194,20 +196,23 @@ export function AddGuardianModal({
           control={control}
           render={({ field, fieldState }) => (
             <Select
-              label="Relationship"
+              label={t('studentProfile.guardian.relationship')}
               required
               value={field.value}
               onChange={field.onChange}
               disabled={isSubmitting}
               error={fieldState.error?.message}
-              options={RELATIONSHIP_OPTIONS}
+              options={RELATIONSHIP_VALUES.map((value) => ({
+                value,
+                label: t(`studentProfile.guardian.relationships.${value}`),
+              }))}
             />
           )}
         />
 
         {/* Contact Info */}
         <div className="grid grid-cols-2 gap-4">
-          <Field label="Phone" required error={errors.phone?.message}>
+          <Field label={t('studentProfile.guardian.phone')} required error={errors.phone?.message}>
             <Input
               type="tel"
               {...register('phone')}
@@ -220,7 +225,7 @@ export function AddGuardianModal({
               disabled={isSubmitting}
             />
           </Field>
-          <Field label="Email" optionalText={null} error={errors.email?.message}>
+          <Field label={t('studentProfile.guardian.email')} optionalText={null} error={errors.email?.message}>
             <Input
               type="email"
               {...register('email')}
@@ -237,7 +242,7 @@ export function AddGuardianModal({
             control={control}
             render={({ field }) => (
               <Checkbox
-                label="Primary Contact"
+                label={t('studentProfile.guardian.primaryContact')}
                 checked={!!field.value}
                 onChange={(e) => field.onChange(e.target.checked)}
                 disabled={isSubmitting}
@@ -249,7 +254,7 @@ export function AddGuardianModal({
             control={control}
             render={({ field }) => (
               <Checkbox
-                label="Pickup Authorized"
+                label={t('studentProfile.guardian.pickupAuthorized')}
                 checked={!!field.value}
                 onChange={(e) => field.onChange(e.target.checked)}
                 disabled={isSubmitting}
@@ -260,7 +265,7 @@ export function AddGuardianModal({
 
         {isDirty && (
           <p className="text-sm text-[rgb(var(--state-warning-fg))]">
-            You have unsaved changes
+            {t('studentProfile.guardian.unsavedChanges')}
           </p>
         )}
 
@@ -271,7 +276,7 @@ export function AddGuardianModal({
             onClick={handleClose}
             disabled={isSubmitting}
           >
-            Cancel
+            {t('actions.cancel')}
           </Button>
           <Button
             type="submit"
@@ -281,12 +286,12 @@ export function AddGuardianModal({
             {isSubmitting ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Adding...
+                {t('actions.adding')}
               </>
             ) : (
               <>
                 <Users className="w-4 h-4 mr-2" />
-                Add Guardian
+                {t('actions.addGuardian')}
               </>
             )}
           </Button>

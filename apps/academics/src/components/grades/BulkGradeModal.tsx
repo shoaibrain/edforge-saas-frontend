@@ -10,6 +10,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { Loader2, Save, Search } from 'lucide-react'
 import { Modal, ModalFooter, Button, Field, Input, Select } from '@edforge/ui'
 import { useRecordBulkGrades } from '../../hooks/useGrades'
+import { useAcademicsI18n } from '../../lib/i18n'
 import { ScoreEntryRow } from './ScoreEntryRow'
 import type { AssessmentCategory } from '../../services/academics.service'
 import type { StudentSectionResponseDto } from '@aibrains/shared-types'
@@ -39,17 +40,17 @@ interface StudentGradeEntry {
 }
 
 const DEFAULT_CATEGORIES = [
-  { id: 'tests', label: 'Tests' },
-  { id: 'quizzes', label: 'Quizzes' },
-  { id: 'homework', label: 'Homework' },
-  { id: 'participation', label: 'Participation' },
-  { id: 'projects', label: 'Projects' },
+  { id: 'tests', labelKey: 'gradesModule.management.categories.tests' },
+  { id: 'quizzes', labelKey: 'gradesModule.management.categories.quizzes' },
+  { id: 'homework', labelKey: 'gradesModule.management.categories.homework' },
+  { id: 'participation', labelKey: 'gradesModule.management.categories.participation' },
+  { id: 'projects', labelKey: 'gradesModule.management.categories.projects' },
 ]
 
 const PURPOSE_OPTIONS = [
-  { value: '', label: 'Auto-detect' },
-  { value: 'formative', label: 'Formative' },
-  { value: 'summative', label: 'Summative' },
+  { value: '', labelKey: 'gradesModule.management.purposes.autoDetect' },
+  { value: 'formative', labelKey: 'gradesModule.management.purposes.formative' },
+  { value: 'summative', labelKey: 'gradesModule.management.purposes.summative' },
 ]
 
 // ============================================================================
@@ -69,7 +70,17 @@ export function BulkGradeModal({
   teacherId,
   categories,
 }: BulkGradeModalProps) {
-  const displayCategories = categories?.length ? categories : DEFAULT_CATEGORIES
+  const { t, formatNumber } = useAcademicsI18n()
+  const displayCategories = categories?.length
+    ? categories
+    : DEFAULT_CATEGORIES.map((category) => ({
+        id: category.id,
+        label: t(category.labelKey),
+      }))
+  const purposeOptions = PURPOSE_OPTIONS.map((option) => ({
+    value: option.value,
+    label: t(option.labelKey),
+  }))
   const bulkMutation = useRecordBulkGrades()
 
   const [assignmentName, setAssignmentName] = useState('')
@@ -87,12 +98,17 @@ export function BulkGradeModal({
         const existingMap = new Map(prev.map((e) => [e.studentId, e.earnedPoints]))
         return students.map((s, idx) => ({
           studentId: s.studentId,
-          studentName: s.studentName || s.studentNumber || `Student #${idx + 1}`,
+          studentName:
+            s.studentName ||
+            s.studentNumber ||
+            t('gradesModule.management.studentFallbackNumbered', {
+              number: formatNumber(idx + 1),
+            }),
           earnedPoints: existingMap.get(s.studentId) ?? '',
         }))
       })
     }
-  }, [students])
+  }, [students, t, formatNumber])
 
   const validEntries = useMemo(
     () => entries.filter((e) => e.earnedPoints !== '' && !isNaN(Number(e.earnedPoints))),
@@ -143,20 +159,20 @@ export function BulkGradeModal({
   const isStudentsLoading = students.length === 0 && entries.length === 0
 
   return (
-    <Modal open={open} onClose={onClose} title="Record Grades" size="2xl">
+    <Modal open={open} onClose={onClose} title={t('gradesModule.management.recordGrades')} size="2xl">
       <div className="space-y-5">
         {/* Assignment Info */}
         <div className="grid grid-cols-3 gap-4">
           <div className="col-span-2">
-            <Field label="Assignment Name" required>
+            <Field label={t('gradesModule.management.assignmentName')} required>
               <Input
                 value={assignmentName}
                 onChange={(e) => setAssignmentName(e.target.value)}
-                placeholder="e.g., Chapter 3 Quiz"
+                placeholder={t('gradesModule.management.assignmentPlaceholder')}
               />
             </Field>
           </div>
-          <Field label="Points Possible" optionalText={null}>
+          <Field label={t('gradesModule.management.pointsPossible')} optionalText={null}>
             <Input
               type="number"
               value={possiblePoints}
@@ -168,27 +184,32 @@ export function BulkGradeModal({
 
         <div className="grid grid-cols-2 gap-4">
           <Select
-            label="Category"
+            label={t('gradesModule.management.category')}
             optionalText={null}
             value={categoryId}
             onChange={(v) => setCategoryId(v ?? 'homework')}
             options={displayCategories.map((c) => ({ value: c.id, label: c.label }))}
           />
           <Select
-            label="Assessment Purpose"
+            label={t('gradesModule.management.assessmentPurpose')}
             optionalText={null}
             value={assessmentPurpose}
             onChange={(v) => setAssessmentPurpose((v ?? '') as AssessmentCategory | '')}
-            options={PURPOSE_OPTIONS}
+            options={purposeOptions}
           />
         </div>
 
         {/* Student Grade Entries */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <h4 className="text-sm font-semibold text-text-primary">Student Scores</h4>
+            <h4 className="text-sm font-semibold text-text-primary">
+              {t('gradesModule.management.studentScores')}
+            </h4>
             <span className="text-xs text-text-tertiary tabular-nums">
-              {validEntries.length} / {entries.length} entered
+              {t('gradesModule.management.enteredCount', {
+                entered: formatNumber(validEntries.length),
+                total: formatNumber(entries.length),
+              })}
             </span>
           </div>
 
@@ -197,7 +218,7 @@ export function BulkGradeModal({
               <Input
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search students by name…"
+                placeholder={t('gradesModule.management.searchStudents')}
                 prefix={<Search className="w-4 h-4" />}
               />
             </div>
@@ -213,11 +234,11 @@ export function BulkGradeModal({
               ))
             ) : entries.length === 0 ? (
               <div className="px-4 py-8 text-center text-sm text-text-tertiary">
-                No students enrolled in this section.
+                {t('gradesModule.management.noStudents')}
               </div>
             ) : filteredEntries.length === 0 ? (
               <div className="px-4 py-8 text-center text-sm text-text-tertiary">
-                No students match “{search}”.
+                {t('gradesModule.management.noStudentMatches', { search })}
               </div>
             ) : (
               filteredEntries.map((entry) => (
@@ -237,7 +258,7 @@ export function BulkGradeModal({
 
       <ModalFooter>
         <Button type="button" variant="outline" onClick={onClose}>
-          Cancel
+          {t('actions.cancel')}
         </Button>
         <Button
           type="button"
@@ -249,7 +270,9 @@ export function BulkGradeModal({
           ) : (
             <Save className="w-4 h-4 mr-2" />
           )}
-          Save Grades ({validEntries.length})
+          {t('gradesModule.management.saveGrades', {
+            count: formatNumber(validEntries.length),
+          })}
         </Button>
       </ModalFooter>
     </Modal>
