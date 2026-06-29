@@ -57,6 +57,53 @@ describe('DataTable pagination — client-side', () => {
     expect(nextBtn.disabled).toBe(true)
     cleanup()
   })
+
+  it('renders supplied labels for shared table chrome', () => {
+    const { getByLabelText, getByPlaceholderText, getByText } = render(
+      <DataTable<Row>
+        columns={columns}
+        data={rows(3)}
+        pagination={{ pageSize: 2, pageSizeOptions: [2, 3] }}
+        searchPlaceholder="विद्यार्थी खोज्नुहोस्"
+        enableColumnVisibility
+        enableDensityToggle
+        exportOptions={{ filename: 'students' }}
+        labels={{
+          clearSearch: 'खोज खाली गर्नुहोस्',
+          clearActiveFilters: (count) => `हटाउनुहोस् (${count})`,
+          paginationShowing: (start, end, total) =>
+            `${start}-${end} / ${total} नतिजा`,
+          rowsPerPage: (size) => `${size} प्रति पृष्ठ`,
+          previousPage: 'अघिल्लो',
+          nextPage: 'अर्को',
+          rowDensity: 'पङ्क्ति घनत्व',
+          comfortableDensity: 'आरामदायी',
+          comfortableDensityTitle: 'आरामदायी पङ्क्तिहरू',
+          compactDensity: 'सघन',
+          compactDensityTitle: 'सघन पङ्क्तिहरू',
+          viewOptions: 'दृश्य',
+          export: 'निर्यात',
+        }}
+      />,
+    )
+
+    expect(getByText('1-2 / 3 नतिजा')).toBeTruthy()
+    expect(getByText('2 प्रति पृष्ठ')).toBeTruthy()
+    expect(getByText('अघिल्लो')).toBeTruthy()
+    expect(getByText('अर्को')).toBeTruthy()
+    expect(getByLabelText('पङ्क्ति घनत्व')).toBeTruthy()
+    expect(getByLabelText('आरामदायी')).toBeTruthy()
+    expect(getByText('दृश्य')).toBeTruthy()
+    expect(getByText('निर्यात')).toBeTruthy()
+
+    fireEvent.change(getByPlaceholderText('विद्यार्थी खोज्नुहोस्'), {
+      target: { value: 'Row 1' },
+    })
+
+    expect(getByLabelText('खोज खाली गर्नुहोस्')).toBeTruthy()
+    expect(getByText('हटाउनुहोस् (1)')).toBeTruthy()
+    cleanup()
+  })
 })
 
 describe('DataTable pagination — server-side', () => {

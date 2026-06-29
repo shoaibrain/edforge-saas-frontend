@@ -6,9 +6,11 @@ import { DataTableFacetedFilter } from './DataTableFacetedFilter'
 import { DataTableViewOptions } from './DataTableViewOptions'
 import { DataTableDensityToggle } from './DataTableDensityToggle'
 import { DataTableExport } from './DataTableExport'
+import { DEFAULT_DATA_TABLE_LABELS } from './labels'
 import type {
   DataTableDensity,
   DataTableExportOptions,
+  DataTableLabels,
   FacetedFilterConfig,
 } from './types'
 
@@ -23,6 +25,7 @@ interface DataTableToolbarProps<TData> {
   onDensityChange?: (next: DataTableDensity) => void
   enableDensityToggle?: boolean
   exportOptions?: DataTableExportOptions
+  labels?: DataTableLabels
 }
 
 export function DataTableToolbar<TData>({
@@ -36,7 +39,9 @@ export function DataTableToolbar<TData>({
   onDensityChange,
   enableDensityToggle,
   exportOptions,
+  labels,
 }: DataTableToolbarProps<TData>) {
+  const resolvedLabels = labels ?? DEFAULT_DATA_TABLE_LABELS
   const globalFilter = (table.getState().globalFilter as string) ?? ''
   const activeFilterCount =
     table.getState().columnFilters.length + (globalFilter ? 1 : 0)
@@ -97,7 +102,7 @@ export function DataTableToolbar<TData>({
                   table.setGlobalFilter('')
                   table.setPageIndex(0)
                 }}
-                aria-label="Clear search"
+                aria-label={resolvedLabels.clearSearch}
                 className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-secondary))]"
               >
                 <X className="w-3.5 h-3.5" />
@@ -116,6 +121,7 @@ export function DataTableToolbar<TData>({
               column={column}
               title={filter.title}
               options={filter.options}
+              labels={resolvedLabels}
             />
           )
         })}
@@ -132,7 +138,9 @@ export function DataTableToolbar<TData>({
             )}
           >
             <X className="w-3 h-3" />
-            <span className="tabular-nums">Clear ({activeFilterCount})</span>
+            <span className="tabular-nums">
+              {resolvedLabels.clearActiveFilters(activeFilterCount)}
+            </span>
           </button>
         )}
       </div>
@@ -145,11 +153,18 @@ export function DataTableToolbar<TData>({
             <DataTableDensityToggle
               density={density}
               onChange={onDensityChange}
+              labels={resolvedLabels}
             />
           )}
-          {enableColumnVisibility && <DataTableViewOptions table={table} />}
+          {enableColumnVisibility && (
+            <DataTableViewOptions table={table} labels={resolvedLabels} />
+          )}
           {exportOptions && (
-            <DataTableExport table={table} options={exportOptions} />
+            <DataTableExport
+              table={table}
+              options={exportOptions}
+              labels={resolvedLabels}
+            />
           )}
           {toolbarExtra}
         </div>

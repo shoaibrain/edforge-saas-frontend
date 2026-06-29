@@ -3,14 +3,19 @@ import { Popover, PopoverButton, PopoverPanel, Transition } from '@headlessui/re
 import { SlidersHorizontal } from 'lucide-react'
 import type { Table } from '@tanstack/react-table'
 import { focusRingInset } from '../../utils'
+import { DEFAULT_DATA_TABLE_LABELS } from './labels'
+import type { DataTableLabels } from './types'
 
 interface DataTableViewOptionsProps<TData> {
   table: Table<TData>
+  labels?: DataTableLabels
 }
 
 export function DataTableViewOptions<TData>({
   table,
+  labels,
 }: DataTableViewOptionsProps<TData>) {
+  const resolvedLabels = labels ?? DEFAULT_DATA_TABLE_LABELS
   const columns = table
     .getAllColumns()
     .filter((col) => col.getCanHide())
@@ -21,7 +26,7 @@ export function DataTableViewOptions<TData>({
     <Popover className="relative">
       <PopoverButton className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg border border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-secondary))] transition-colors">
         <SlidersHorizontal className="w-3.5 h-3.5" />
-        View
+        {resolvedLabels.viewOptions}
       </PopoverButton>
 
       <Transition
@@ -36,7 +41,7 @@ export function DataTableViewOptions<TData>({
         <PopoverPanel className="absolute right-0 z-50 mt-1 w-48 origin-top-right rounded-xl bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] shadow-lg focus:outline-none overflow-hidden">
           <div className="px-3 py-2 border-b border-[rgb(var(--border-secondary))]">
             <span className="text-xs font-semibold text-[rgb(var(--text-secondary))] uppercase tracking-wider">
-              Toggle columns
+              {resolvedLabels.toggleColumns}
             </span>
           </div>
           <div className="py-1 max-h-64 overflow-y-auto">

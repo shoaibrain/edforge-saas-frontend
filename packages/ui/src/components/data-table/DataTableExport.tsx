@@ -3,17 +3,25 @@ import { Popover, PopoverButton, PopoverPanel, Transition } from '@headlessui/re
 import { Download } from 'lucide-react'
 import type { Cell, Table } from '@tanstack/react-table'
 import { cn, focusRingInset } from '../../utils'
-import type { DataTableExportFormat, DataTableExportOptions } from './types'
+import { DEFAULT_DATA_TABLE_LABELS } from './labels'
+import type {
+  DataTableExportFormat,
+  DataTableExportOptions,
+  DataTableLabels,
+} from './types'
 
 interface DataTableExportProps<TData> {
   table: Table<TData>
   options: DataTableExportOptions
+  labels?: DataTableLabels
 }
 
 export function DataTableExport<TData>({
   table,
   options,
+  labels,
 }: DataTableExportProps<TData>) {
+  const resolvedLabels = labels ?? DEFAULT_DATA_TABLE_LABELS
   const formats = options.formats?.length ? options.formats : (['csv'] as DataTableExportFormat[])
 
   const handleExport = (format: DataTableExportFormat, close: () => void) => {
@@ -32,11 +40,11 @@ export function DataTableExport<TData>({
           'border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-secondary))]',
           focusRingInset
         )}
-        aria-label="Export"
-        title="Export"
+        aria-label={resolvedLabels.export}
+        title={resolvedLabels.export}
       >
         <Download className="w-3.5 h-3.5" />
-        Export
+        {resolvedLabels.export}
       </PopoverButton>
       <Transition
         as={Fragment}
@@ -58,7 +66,7 @@ export function DataTableExport<TData>({
                     type="button"
                     onClick={() => !disabled && handleExport(format, close)}
                     disabled={disabled}
-                    title={disabled ? 'XLSX export ships in a follow-up' : undefined}
+                    title={disabled ? resolvedLabels.xlsxUnavailable : undefined}
                     className={cn(
                       'block w-full px-3 py-2 text-left text-sm transition-colors',
                       'text-[rgb(var(--text-primary))]',
@@ -68,7 +76,7 @@ export function DataTableExport<TData>({
                       focusRingInset
                     )}
                   >
-                    {format === 'csv' ? 'Export as CSV' : 'Export as XLSX'}
+                    {resolvedLabels.exportFormat(format)}
                   </button>
                 )
               })}
