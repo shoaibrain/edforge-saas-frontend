@@ -250,6 +250,69 @@
       "viewGrades": "Grades हेर्नुहोस्"
     }
   },
+  "studentsModule": {
+    "insight": {
+      "enrolledAcrossGrades": "{{students}} विद्यार्थी {{grades}} grades मा enrolled",
+      "attendanceToday": "आज {{rate}}% attendance",
+      "noAttendanceData": "attendance data छैन",
+      "atRiskStudents": "{{value}} at-risk विद्यार्थी",
+      "atRiskStudents_plural": "{{value}} at-risk विद्यार्थी",
+      "noAtRiskStudents": "at-risk विद्यार्थी छैन"
+    },
+    "empty": {
+      "noStudentsFound": "विद्यार्थी भेटिएन",
+      "adjustFilters": "Filters वा search term समायोजन गर्नुहोस्"
+    },
+    "noSchool": {
+      "title": "School छान्नुहोस्",
+      "description": "Student directory हेर्न sidebar बाट school छान्नुहोस्।"
+    },
+    "error": {
+      "title": "Students लोड गर्न असफल",
+      "description": "Student directory लोड गर्दा समस्या भयो।"
+    },
+    "bulk": {
+      "message": "Message",
+      "moveSection": "Section सार्नुहोस्",
+      "archive": "Archive"
+    },
+    "actions": {
+      "importIemis": "IEMIS Import",
+      "importIemisAria": "IEMIS बाट import",
+      "governmentReports": "Govt. Reports",
+      "governmentReportsAria": "Government reports",
+      "enrollStudent": "विद्यार्थी enroll",
+      "enrollStudentAria": "विद्यार्थी enroll गर्नुहोस्",
+      "exportCsvAria": "विद्यार्थी CSV export"
+    },
+    "widgets": {
+      "enrollmentLoadFailed": "Enrollment data लोड गर्न सकिएन",
+      "atRiskLoadFailed": "At-risk data लोड गर्न सकिएन",
+      "attendanceLoadFailed": "Attendance data लोड गर्न सकिएन",
+      "gradeLoadFailed": "Grade data लोड गर्न सकिएन"
+    },
+    "stats": {
+      "totalEnrolled": "कुल Enrolled",
+      "recentEnrollments": "+{{value}} recent",
+      "acrossGrades": "{{value}} grades मा",
+      "thisAcademicYear": "यो academic year",
+      "atRiskStudents": "At-Risk Students",
+      "criticalCount": "{{value}} critical",
+      "riskBreakdown": "{{critical}} critical · {{warning}} warning",
+      "belowThreshold": "90% threshold भन्दा तल",
+      "todayAttendance": "आजको Attendance",
+      "partialData": "Partial data",
+      "attendanceBreakdown": "{{present}} present · {{absent}} absent · {{late}} late",
+      "today": "आज",
+      "gradeLevels": "Grade Levels",
+      "coveredThisYear": "यस वर्ष covered"
+    },
+    "withdraw": {
+      "title": "विद्यार्थी withdraw",
+      "description": "{{student}} लाई withdraw गर्ने हो? यो action school administrator ले reverse गर्न सक्छ।",
+      "confirm": "Withdraw"
+    }
+  },
   "privacy": {
     "showSensitive": "संवेदनशील विवरण देखाउनुहोस्",
     "hideSensitive": "संवेदनशील विवरण लुकाउनुहोस्"

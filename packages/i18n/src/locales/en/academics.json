@@ -250,6 +250,69 @@
       "viewGrades": "View Grades"
     }
   },
+  "studentsModule": {
+    "insight": {
+      "enrolledAcrossGrades": "{{students}} students enrolled across {{grades}} grades",
+      "attendanceToday": "{{rate}}% attendance today",
+      "noAttendanceData": "no attendance data",
+      "atRiskStudents": "{{value}} at-risk student",
+      "atRiskStudents_plural": "{{value}} at-risk students",
+      "noAtRiskStudents": "no at-risk students"
+    },
+    "empty": {
+      "noStudentsFound": "No students found",
+      "adjustFilters": "Try adjusting your filters or search term"
+    },
+    "noSchool": {
+      "title": "Select a school",
+      "description": "Choose a school from the sidebar to view the student directory."
+    },
+    "error": {
+      "title": "Failed to Load Students",
+      "description": "Something went wrong while loading the student directory."
+    },
+    "bulk": {
+      "message": "Message",
+      "moveSection": "Move section",
+      "archive": "Archive"
+    },
+    "actions": {
+      "importIemis": "Import IEMIS",
+      "importIemisAria": "Import from IEMIS",
+      "governmentReports": "Govt. Reports",
+      "governmentReportsAria": "Government reports",
+      "enrollStudent": "Enroll student",
+      "enrollStudentAria": "Enroll student",
+      "exportCsvAria": "Export students as CSV"
+    },
+    "widgets": {
+      "enrollmentLoadFailed": "Unable to load enrollment data",
+      "atRiskLoadFailed": "Unable to load at-risk data",
+      "attendanceLoadFailed": "Unable to load attendance data",
+      "gradeLoadFailed": "Unable to load grade data"
+    },
+    "stats": {
+      "totalEnrolled": "Total Enrolled",
+      "recentEnrollments": "+{{value}} recent",
+      "acrossGrades": "across {{value}} grades",
+      "thisAcademicYear": "this academic year",
+      "atRiskStudents": "At-Risk Students",
+      "criticalCount": "{{value}} critical",
+      "riskBreakdown": "{{critical}} critical · {{warning}} warning",
+      "belowThreshold": "below 90% threshold",
+      "todayAttendance": "Today's Attendance",
+      "partialData": "Partial data",
+      "attendanceBreakdown": "{{present}} present · {{absent}} absent · {{late}} late",
+      "today": "today",
+      "gradeLevels": "Grade Levels",
+      "coveredThisYear": "covered this year"
+    },
+    "withdraw": {
+      "title": "Withdraw Student",
+      "description": "Are you sure you want to withdraw {{student}}? This action can be reversed by a school administrator.",
+      "confirm": "Withdraw"
+    }
+  },
   "privacy": {
     "showSensitive": "Show sensitive details",
     "hideSensitive": "Hide sensitive details"
