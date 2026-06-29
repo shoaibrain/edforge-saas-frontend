@@ -65,29 +65,24 @@ export function resolveAccent(
 }
 
 /**
- * Registry: lucide-react `displayName` → signature glyph name. Lets any consumer
- * pass a plain Lucide icon (which the nav manifest already carries) and get the
- * matching animated glyph. Precise call sites should pass `name` explicitly.
+ * Registry: lucide-react `displayName` → signature glyph name. Lets a consumer
+ * pass a plain Lucide icon and get the matching animated glyph WITHOUT an explicit
+ * `name`. Deliberately conservative: it only contains glyphs whose Lucide shape is
+ * (near-)identical to the signature glyph, so a bare `<AnimatedIcon icon={X} />`
+ * never silently swaps a recognisable icon for a different-looking one. Anything
+ * ambiguous (e.g. School, Wallet, Calendar) must be paired explicitly — either via
+ * an explicit `name` prop or `registerSignature(icon, name)`.
  */
 const DISPLAY_NAME_TO_SIGNATURE: Record<string, IconName> = {
   Home: 'home',
-  School: 'academics',
   GraduationCap: 'academics',
   UsersRound: 'people',
-  Users: 'account',
   DollarSign: 'finance',
-  Wallet: 'finance',
   Settings: 'settings',
-  GalleryVerticalEnd: 'overview',
-  Layers: 'preferences',
-  Palette: 'preferences',
   ShieldCheck: 'security',
-  Shield: 'security',
   Building2: 'organization',
-  BrickWallShield: 'rbac',
   Bug: 'authdebug',
-  Calendar: 'academicsetup',
-  ClipboardCheck: 'attendance',
+  GalleryVerticalEnd: 'overview',
 };
 
 /** Resolve a signature glyph name from a lucide-react component's displayName. */

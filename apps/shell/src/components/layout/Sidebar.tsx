@@ -6,6 +6,11 @@
  * (icon-motion.css). This file only wires the trigger contract (`.ef-motion` +
  * `.is-active` on the focusable <a>) and sets the per-item `--accent`; CSS owns the
  * motion. Features ABAC permission filtering.
+ *
+ * Icon mapping is EXPLICIT (NAV_SIGNATURE): an item animates only when it has a
+ * hand-picked signature glyph. Every other item renders its original Lucide glyph
+ * unchanged (static, but still accent-tinted) — so the manifest's icon choice is
+ * never silently swapped. Accent falls back to the module hue for unmapped items.
  */
 
 import { useState, useEffect, useSyncExternalStore, type CSSProperties } from 'react'
@@ -16,21 +21,22 @@ import {
   ArrowLeft,
   type LucideIcon,
 } from 'lucide-react'
-import { AnimatedIcon, nameForLucide, resolveAccent, type IconName } from '@edforge/ui/motion'
+import { AnimatedIcon, resolveAccent, type IconName, type AccentHue } from '@edforge/ui/motion'
 import { useAppStore } from '../../stores/app.store'
 import { useSidebarStore } from '../../stores/sidebar.store'
 import { SIDEBAR_NAV_ICON_SIZE, SIDEBAR_NAV_ICON_SIZE_COLLAPSED } from '../../config/ui-constants'
 import { useSidebarModule, useActiveNavItem } from '../../hooks/useSidebarModule'
 import { useSecureNavGroups } from '../../hooks/useSecureNavItems'
-import type { NavItem, NavItemGroup } from '../../config/sidebar-modules'
+import type { NavItem, NavItemGroup, SidebarModule } from '../../config/sidebar-modules'
 import { Tooltip } from '@edforge/ui'
 import { useTranslation } from '@edforge/i18n'
 import { cn } from '../../lib/utils'
 
 // ============================================================================
 // SIGNATURE MAPPING — nav-item id → animated-glyph name
-// High-confidence pairings only; anything not listed resolves via the icon's
-// lucide displayName in @edforge/ui/motion, else renders the static lucide glyph.
+// EXPLICIT and conservative: only items whose signature glyph is a clean match
+// for the manifest's icon are listed. Unlisted items keep their original Lucide
+// glyph (static). Adding a new animated item is a one-line entry here.
 // The accent hue per glyph lives in the motion registry (ICON_ACCENT).
 // ============================================================================
 
@@ -40,13 +46,22 @@ const NAV_SIGNATURE: Record<string, IconName> = {
   people: 'people',
   finance: 'finance',
   settings: 'settings',
-  // module overviews
+  // module overviews (GalleryVerticalEnd)
   'academics-home': 'overview',
   'finance-home': 'overview',
   'people-home': 'overview',
   'analytics-overview': 'overview',
   'analytics-dashboard': 'overview',
   'settings-home': 'overview',
+  // people-shaped sub-items (UsersRound)
+  students: 'people',
+  'staff-directory': 'people',
+  'student-accounts': 'people',
+  // book-shaped (BookOpen ≈ academic-setup open book)
+  curriculum: 'academicsetup',
+  // grades (GraduationCap ≈ academics mortarboard)
+  'my-grades': 'academics',
+  'children-grades': 'academics',
   // settings sub-nav
   'my-account': 'account',
   preferences: 'preferences',
@@ -57,19 +72,37 @@ const NAV_SIGNATURE: Record<string, IconName> = {
   'auth-debug': 'authdebug',
 }
 
+// Accent hue per module — the fallback for items without their own signature, so
+// every item in a module shares a coherent tint. Mirrors the prototype's primary
+// nav hues (home emerald, academics violet, people amber, finance teal, settings blue).
+const MODULE_HUE: Record<SidebarModule, AccentHue> = {
+  home: 'emerald',
+  'home-student': 'emerald',
+  'home-parent': 'emerald',
+  'student-portal': 'emerald',
+  'parent-portal': 'emerald',
+  academics: 'violet',
+  finance: 'teal',
+  people: 'amber',
+  settings: 'blue',
+  analytics: 'sky',
+}
+
 /** Resolve the inline `--accent` value for a nav item (danger items go red). */
-function navAccent(item: { id: string; icon: LucideIcon; variant?: 'default' | 'danger' }): string {
+function navAccent(item: NavItem, moduleId: SidebarModule): string {
   if (item.variant === 'danger') return 'var(--color-danger)'
-  const name = NAV_SIGNATURE[item.id] ?? nameForLucide(item.icon.displayName)
-  return resolveAccent(name, {})
+  const sig = NAV_SIGNATURE[item.id]
+  if (sig) return resolveAccent(sig, {})
+  return resolveAccent(undefined, { accent: MODULE_HUE[moduleId] ?? 'emerald' })
 }
 
 // ============================================================================
-// NAV ICON — signature glyph in the holder (+ collapsed container tint)
+// NAV ICON — signature glyph (animated) or original Lucide glyph (static),
+// both inside the `.nav-ico` holder so the accent tint + glow apply uniformly.
 // ============================================================================
 
 function NavIcon({
-  icon,
+  icon: IconEl,
   sigName,
   isActive,
   isHovered,
@@ -99,8 +132,16 @@ function NavIcon({
       // allow-presentation-style: collapsed active/hover icon container tint is accent-driven
       style={{ background: containerBg }}
     >
-      {/* Accent is owned by the .ef-motion ancestor (<a>), so applyAccent={false}. */}
-      <AnimatedIcon name={sigName} icon={icon} size={iconSize} applyAccent={false} />
+      {/* Accent is owned by the .ef-motion ancestor (<a>), so applyAccent={false}.
+          Mapped items animate; unmapped items render their original glyph static
+          (still inside .nav-ico for the accent tint + glow). */}
+      {sigName ? (
+        <AnimatedIcon name={sigName} size={iconSize} applyAccent={false} />
+      ) : (
+        <span className="nav-ico">
+          <IconEl size={iconSize} strokeWidth={1.75} aria-hidden="true" />
+        </span>
+      )}
     </div>
   )
 }
@@ -114,18 +155,20 @@ function NavItemLink({
   collapsed,
   isActive,
   index,
+  moduleId,
 }: {
   item: NavItem
   collapsed: boolean
   isActive: boolean
   index: number
+  moduleId: SidebarModule
 }) {
   const { t: tNav } = useTranslation('nav')
   const [isHovered, setIsHovered] = useState(false)
   const isDanger = item.variant === 'danger'
   const translatedLabel = tNav(`sidebar.${item.id}`, { defaultValue: item.label })
 
-  const accentValue = navAccent(item)
+  const accentValue = navAccent(item, moduleId)
   const sigName = NAV_SIGNATURE[item.id]
   const activeTextColor = 'color-mix(in oklch, var(--accent) 92%, var(--shell-text-1))'
 
@@ -254,11 +297,13 @@ function NavGroup({
   collapsed,
   activeItemId,
   startIndex,
+  moduleId,
 }: {
   group: NavItemGroup
   collapsed: boolean
   activeItemId: string | null
   startIndex: number
+  moduleId: SidebarModule
 }) {
   const { t: tNav } = useTranslation('nav')
 
@@ -283,6 +328,7 @@ function NavGroup({
           collapsed={collapsed}
           isActive={activeItemId === item.id}
           index={startIndex + idx}
+          moduleId={moduleId}
         />
       ))}
     </div>
@@ -318,10 +364,10 @@ function HomeNavButton({
   const showBackMode = isSubModule
 
   const CurrentIcon = showBackMode ? ArrowLeft : Home
+  // Home animates (hop); the back arrow has no signature (static) but keeps the hue.
   const sigName: IconName | undefined = showBackMode ? undefined : 'home'
   const label = tNav('home')
 
-  // Home is emerald; the back-arrow has no signature (static) but keeps the hue.
   const accentValue = resolveAccent('home', {})
   const activeTextColor = 'color-mix(in oklch, var(--accent) 92%, var(--shell-text-1))'
 
@@ -471,6 +517,7 @@ export function Sidebar() {
                 collapsed={collapsed}
                 activeItemId={activeItemId}
                 startIndex={groupStartIndex}
+                moduleId={moduleId}
               />
             )
           })}
