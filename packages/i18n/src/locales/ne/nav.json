@@ -51,7 +51,7 @@
 
   "sidebar": {
     "academics": "शैक्षिक",
-    "people": "व्यक्ति र एचआर",
+    "people": "व्यक्तिहरू",
     "finance": "वित्त",
     "analytics": "विश्लेषण",
     "settings": "प्रणाली प्रशासन",
@@ -121,7 +121,7 @@
     "settings": "सेटिङ्हरू",
     "academics": "शैक्षिक",
     "finance": "वित्त",
-    "people": "व्यक्ति र एचआर",
+    "people": "व्यक्तिहरू",
     "analytics": "विश्लेषण",
     "student-portal": "विद्यार्थी पोर्टल",
     "parent-portal": "पारिवारिक पोर्टल"
@@ -159,7 +159,7 @@
     "assessments": "मूल्याङ्कनहरू",
     "exams": "परीक्षाहरू",
     "academicCalendar": "शैक्षिक पात्रो",
-    "peopleHr": "व्यक्ति र एचआर",
+    "peopleHr": "व्यक्तिहरू",
     "staffDirectory": "कर्मचारी निर्देशिका",
     "humanResources": "मानव संसाधन",
     "departments": "विभागहरू",

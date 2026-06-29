@@ -51,7 +51,7 @@
 
   "sidebar": {
     "academics": "Academics",
-    "people": "People & HR",
+    "people": "People",
     "finance": "Finance",
     "analytics": "Analytics",
     "settings": "Settings",
@@ -121,7 +121,7 @@
     "settings": "Settings",
     "academics": "Academics",
     "finance": "Finance",
-    "people": "People & HR",
+    "people": "People",
     "analytics": "Analytics",
     "student-portal": "Student Portal",
     "parent-portal": "Family Portal"
@@ -159,7 +159,7 @@
     "assessments": "Assessments",
     "exams": "Exams",
     "academicCalendar": "Academic Calendar",
-    "peopleHr": "People & HR",
+    "peopleHr": "People",
     "staffDirectory": "Staff Directory",
     "humanResources": "Human Resources",
     "departments": "Departments",

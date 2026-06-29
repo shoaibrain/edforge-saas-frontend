@@ -31,7 +31,7 @@ const ROUTE_LABELS: Record<string, string> = {
   // Top-level modules
   home: 'Home',
   academics: 'Academics',
-  people: 'People & HR',
+  people: 'People',
   settings: 'Settings',
   'student-portal': 'Student Portal',
   'parent-portal': 'Family Portal',

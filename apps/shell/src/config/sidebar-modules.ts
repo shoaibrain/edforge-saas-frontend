@@ -120,7 +120,7 @@ const homeModule: ModuleConfig = {
         },
         {
           id: 'people',
-          label: 'People & HR',
+          label: 'People',
           icon: UsersRound,
           href: '/people',
           permission: { action: 'view', resource: 'staff' },
@@ -458,7 +458,7 @@ const financeModule: ModuleConfig = {
 
 const peopleModule: ModuleConfig = {
   id: 'people',
-  title: 'People & HR',
+  title: 'People',
   icon: Users,
   backTo: { path: '/home', label: 'Back to Home' },
   groups: [
@@ -703,4 +703,3 @@ export function detectModuleFromPath(pathname: string): SidebarModule {
 export function isHomeModule(moduleId: SidebarModule): boolean {
   return moduleId === 'home' || moduleId === 'home-student' || moduleId === 'home-parent'
 }
-
