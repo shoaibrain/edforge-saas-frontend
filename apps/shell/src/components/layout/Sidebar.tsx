@@ -199,9 +199,12 @@ function NavItemLink({
             transition={{ type: 'spring', stiffness: 400, damping: 30 }}
           />
         )}
-        {/* Danger active bg — expanded only */}
+        {/* Danger active bg — expanded only (accent is already var(--color-danger)) */}
         {isActive && isDanger && !collapsed && (
-          <div className="absolute inset-0 rounded-3xl bg-[rgb(var(--accent-finance)/0.1)]" />
+          <div
+            className="absolute inset-0 rounded-3xl"
+            style={{ background: 'color-mix(in oklch, var(--accent) 12%, transparent)' }}
+          />
         )}
         {/* Hover bg — expanded only (collapsed hover handled by icon container) */}
         {!isActive && isHovered && !collapsed && (

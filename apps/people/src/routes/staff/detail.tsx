@@ -1616,7 +1616,7 @@ export default function StaffDetailPage() {
                                 label: (
                                     <span className="flex items-center gap-2">
                                         {sig ? (
-                                            <AnimatedIcon name={sig} icon={Icon} size={16} />
+                                            <AnimatedIcon name={sig} icon={Icon} size={16} applyAccent={false} />
                                         ) : (
                                             <Icon className="w-4 h-4" />
                                         )}

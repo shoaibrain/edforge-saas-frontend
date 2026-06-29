@@ -1,10 +1,12 @@
 /**
  * EdForge — Signature registry contract.
  *
- * Maps an icon to (a) its signature glyph name and (b) its accent hue. The shell
- * and every MFE animate icons by registering `{ icon, signature }` ONCE here — no
- * per-MFE animation code. The CSS engine (packages/theme/src/icon-motion.css) does
- * the rest, keyed off the part classes the signature glyph renders.
+ * Maps an icon to (a) its signature glyph name and (b) its accent hue. Call sites
+ * pair an item to a signature explicitly via the `name` prop (see the shell's
+ * NAV_SIGNATURE and each MFE's TAB_SIGNATURE maps); `registerSignature` is an
+ * optional convenience for auto-resolving a bare lucide icon. The CSS engine
+ * (packages/theme/src/icon-motion.css) does the rest, keyed off the part classes
+ * the signature glyph renders — there is no per-MFE animation code.
  *
  * Accent assignment + the 8-hue chroma family are ported from the locked prototype
  * (edforge/final/app.jsx). `resolveAccent` returns the inline `--accent` value;

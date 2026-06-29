@@ -288,5 +288,10 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ico, .ico * { animation: none !important; }
+  /* Kill signature animations AND the holder's glow/colour transitions, so the
+     resting state is fully static (no fade-in glow, no colour fade). */
+  .ico, .ico *, .nav-ico, .nav-ico::after {
+    animation: none !important;
+    transition: none !important;
+  }
 }

@@ -810,6 +810,7 @@ export function ClassroomsModule() {
                       name={sig}
                       icon={tab.icon}
                       size={16}
+                      applyAccent={false}
                       className={isActive ? 'opacity-100' : 'opacity-70'}
                     />
                   ) : (
