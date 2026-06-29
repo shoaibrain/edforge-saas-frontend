@@ -36,6 +36,7 @@ import { DateSelector } from './DateSelector'
 import { AttendanceGrid } from './AttendanceGrid'
 import { DailySummary } from './DailySummary'
 import type { AttendanceStatus } from '../../services/academics.service'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 // ============================================================================
 // SAVE STATUS INDICATOR
@@ -48,13 +49,14 @@ function SaveStatusIndicator({
   status: 'idle' | 'saved' | 'saving' | 'offline' | 'error'
   isOnline: boolean
 }) {
+  const { t } = useAcademicsI18n()
   if (status === 'idle' && isOnline) return null
 
   const config = {
-    saved: { icon: Check, text: 'Saved', className: 'text-[rgb(var(--state-success-fg))]' },
-    saving: { icon: Loader2, text: 'Saving...', className: 'text-[rgb(var(--state-warning-fg))]' },
-    offline: { icon: WifiOff, text: 'Offline — changes saved locally', className: 'text-[rgb(var(--state-danger-fg))]' },
-    error: { icon: CloudOff, text: 'Save failed — will retry', className: 'text-[rgb(var(--state-danger-fg))]' },
+    saved: { icon: Check, text: t('attendance.saveStatus.saved'), className: 'text-[rgb(var(--state-success-fg))]' },
+    saving: { icon: Loader2, text: t('attendance.saveStatus.saving'), className: 'text-[rgb(var(--state-warning-fg))]' },
+    offline: { icon: WifiOff, text: t('attendance.saveStatus.offlineLocal'), className: 'text-[rgb(var(--state-danger-fg))]' },
+    error: { icon: CloudOff, text: t('attendance.saveStatus.errorRetry'), className: 'text-[rgb(var(--state-danger-fg))]' },
     idle: { icon: Wifi, text: '', className: 'text-text-tertiary' },
   }
 
@@ -74,13 +76,15 @@ function SaveStatusIndicator({
 // ============================================================================
 
 function CalendarBanner({ description, eventType }: { description: string; eventType: string }) {
+  const { t } = useAcademicsI18n()
+  const resolvedDescription = description || t('attendance.calendar.nonInstructionalFallback', { eventType })
   return (
     <div className="flex items-center gap-3 p-4 rounded-xl bg-amber-50 dark:bg-[rgb(var(--state-warning-fg))]/10 border border-amber-200 dark:border-amber-500/20">
       <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
       <div>
-        <p className="text-sm font-medium text-amber-800 dark:text-amber-300">Non-Instructional Day</p>
+        <p className="text-sm font-medium text-amber-800 dark:text-amber-300">{t('attendance.calendar.nonInstructionalTitle')}</p>
         <p className="text-xs text-[rgb(var(--state-warning-fg))] mt-0.5">
-          {description || `This is a ${eventType} day.`} Attendance cannot be submitted for this date.
+          {t('attendance.calendar.cannotSubmit', { description: resolvedDescription })}
         </p>
       </div>
     </div>
@@ -96,6 +100,7 @@ interface SectionAttendanceWrapperProps {
 }
 
 export function SectionAttendanceWrapper({ sectionId }: SectionAttendanceWrapperProps) {
+  const { t } = useAcademicsI18n()
   const schoolId = useActiveSchoolId() || ''
   const selectedDate = useAttendanceStore((s) => s.selectedDate)
   const dateActions = useAttendanceDateActions()
@@ -257,9 +262,9 @@ export function SectionAttendanceWrapper({ sectionId }: SectionAttendanceWrapper
       ) : !roster?.students?.length ? (
         <div className="bg-surface-secondary rounded-xl border border-border-secondary p-12 text-center">
           <ClipboardCheck className="w-12 h-12 mx-auto text-text-tertiary mb-4" />
-          <h4 className="text-lg font-medium text-text-primary mb-2">No Students Enrolled</h4>
+          <h4 className="text-lg font-medium text-text-primary mb-2">{t('attendance.empty.noStudentsEnrolledTitle')}</h4>
           <p className="text-text-secondary max-w-md mx-auto">
-            This section has no students enrolled yet. Add students from the People tab.
+            {t('attendance.empty.noStudentsEnrolledDescription')}
           </p>
         </div>
       ) : (

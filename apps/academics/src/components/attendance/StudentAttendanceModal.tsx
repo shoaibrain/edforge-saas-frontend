@@ -21,6 +21,7 @@ import {
 import { StatusBadge } from './StatusBadge'
 import { ATTENDANCE_STATUS_META, TONE_CLASSES, summarizeByBucket } from './attendanceStatus'
 import type { AttendanceStatus } from '../../services/academics.service'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 // ============================================================================
 // TREND (F3.T1) — recent-half vs older-half attending rate over the window.
@@ -49,13 +50,14 @@ function computeTrend(history: Array<{ date: string; status: AttendanceStatus }>
 }
 
 function TrendChip({ trend }: { trend: Trend }) {
+  const { t } = useAcademicsI18n()
   const cfg = {
-    improving: { Icon: TrendingUp, text: 'Improving', cls: 'text-[rgb(var(--state-success-fg))]' },
-    declining: { Icon: TrendingDown, text: 'Declining', cls: 'text-[rgb(var(--state-danger-fg))]' },
-    stable: { Icon: Minus, text: 'Stable', cls: 'text-text-tertiary' },
+    improving: { Icon: TrendingUp, text: t('attendance.modal.trends.improving'), cls: 'text-[rgb(var(--state-success-fg))]' },
+    declining: { Icon: TrendingDown, text: t('attendance.modal.trends.declining'), cls: 'text-[rgb(var(--state-danger-fg))]' },
+    stable: { Icon: Minus, text: t('attendance.modal.trends.stable'), cls: 'text-text-tertiary' },
   }[trend]
   return (
-    <span className={`inline-flex items-center gap-1 text-xs font-medium ${cfg.cls}`} title="Trend over the window (recent vs earlier)">
+    <span className={`inline-flex items-center gap-1 text-xs font-medium ${cfg.cls}`} title={t('attendance.modal.trendTitle')}>
       <cfg.Icon className="w-3.5 h-3.5" />
       {cfg.text}
     </span>
@@ -106,6 +108,7 @@ function CalendarHeatmap({
 }: {
   records: Array<{ date: string; status: AttendanceStatus }>
 }) {
+  const { t, formatDate, attendanceStatusLabel } = useAcademicsI18n()
   // Build last 30 days grid
   const days = useMemo(() => {
     const today = new Date()
@@ -118,7 +121,7 @@ function CalendarHeatmap({
       const iso = d.toISOString().split('T')[0]
       grid.push({
         date: iso,
-        label: `${d.getMonth() + 1}/${d.getDate()}`,
+        label: formatDate(d, { month: 'numeric', day: 'numeric' }),
         status: recordMap.get(iso),
       })
     }
@@ -129,7 +132,7 @@ function CalendarHeatmap({
     <div>
       <div className="flex items-center gap-2 mb-2">
         <Calendar className="w-3.5 h-3.5 text-text-tertiary" />
-        <span className="text-xs text-text-tertiary font-medium">Last 30 Days</span>
+        <span className="text-xs text-text-tertiary font-medium">{t('attendance.modal.last30Days')}</span>
       </div>
       <div className="grid grid-cols-10 gap-1">
         {days.map((day) => (
@@ -140,18 +143,18 @@ function CalendarHeatmap({
                 ? statusCellColor(day.status)
                 : 'bg-[rgb(var(--background-tertiary))] '
             }`}
-            title={`${day.label}: ${day.status || 'No record'}`}
+            title={`${day.label}: ${day.status ? attendanceStatusLabel(day.status) : t('attendance.modal.noRecord')}`}
           />
         ))}
       </div>
       {/* Legend */}
       <div className="flex flex-wrap gap-3 mt-2">
         {[
-          { label: 'Present', color: statusCellColor('present') },
-          { label: 'Absent', color: statusCellColor('absent') },
-          { label: 'Late', color: statusCellColor('late') },
-          { label: 'Excused', color: statusCellColor('excused') },
-          { label: 'No Record', color: 'bg-[rgb(var(--background-tertiary))] ' },
+          { label: attendanceStatusLabel('present'), color: statusCellColor('present') },
+          { label: attendanceStatusLabel('absent'), color: statusCellColor('absent') },
+          { label: attendanceStatusLabel('late'), color: statusCellColor('late') },
+          { label: attendanceStatusLabel('excused'), color: statusCellColor('excused') },
+          { label: t('attendance.modal.noRecord'), color: 'bg-[rgb(var(--background-tertiary))] ' },
         ].map((item) => (
           <span key={item.label} className="flex items-center gap-1 text-xs text-text-tertiary">
             <span className={`w-2 h-2 rounded-sm ${item.color}`} />
@@ -224,6 +227,7 @@ export function StudentAttendanceModal({
   studentName,
   schoolId: _schoolId,
 }: StudentAttendanceModalProps) {
+  const { t, formatDate, formatNumber } = useAcademicsI18n()
   // Compute date range: last 90 days
   const { startDate, endDate } = useMemo(() => {
     const today = new Date()
@@ -347,29 +351,29 @@ export function StudentAttendanceModal({
                       {/* Summary Stats Row */}
                       {summary && (
                         <div className="grid grid-cols-6 gap-2 p-4 bg-surface-secondary rounded-xl">
-                          <SummaryStatRow label="Total" value={summary.totalDays} />
+                          <SummaryStatRow label={t('attendance.modal.total')} value={formatNumber(summary.totalDays)} />
                           <SummaryStatRow
-                            label="Present"
-                            value={summary.present}
+                            label={t('attendance.status.present.label')}
+                            value={formatNumber(summary.present)}
                             color="text-[rgb(var(--state-success-fg))]"
                           />
                           <SummaryStatRow
-                            label="Absent"
-                            value={summary.absent}
+                            label={t('attendance.status.absent.label')}
+                            value={formatNumber(summary.absent)}
                             color="text-[rgb(var(--state-danger-fg))]"
                           />
                           <SummaryStatRow
-                            label="Late"
-                            value={summary.late}
+                            label={t('attendance.status.late.label')}
+                            value={formatNumber(summary.late)}
                             color="text-[rgb(var(--state-warning-fg))]"
                           />
                           <SummaryStatRow
-                            label="Excused"
-                            value={summary.excused}
+                            label={t('attendance.status.excused.label')}
+                            value={formatNumber(summary.excused)}
                             color="text-[rgb(var(--state-info-fg))]"
                           />
                           <SummaryStatRow
-                            label="Rate"
+                            label={t('attendance.modal.rate')}
                             value={`${summary.attendanceRate.toFixed(1)}%`}
                             color={
                               summary.attendanceRate >= 90
@@ -386,11 +390,11 @@ export function StudentAttendanceModal({
                       {/* Recent Records Table */}
                       <div>
                         <h4 className="text-xs font-medium text-text-tertiary uppercase tracking-wider mb-2">
-                          Recent Records
+                          {t('attendance.modal.recentRecords')}
                         </h4>
                         {recentRecords.length === 0 ? (
                           <p className="text-sm text-text-tertiary py-4 text-center">
-                            No attendance records found.
+                            {t('attendance.modal.noRecords')}
                           </p>
                         ) : (
                           <div className="overflow-x-auto">
@@ -398,20 +402,19 @@ export function StudentAttendanceModal({
                               <thead>
                                 <tr className="border-b border-border-secondary">
                                   <th className="text-left py-1.5 pr-4 text-text-tertiary font-medium text-xs">
-                                    Date
+                                    {t('attendance.modal.date')}
                                   </th>
                                   <th className="text-left py-1.5 px-4 text-text-tertiary font-medium text-xs">
-                                    Status
+                                    {t('attendance.modal.status')}
                                   </th>
                                   <th className="text-left py-1.5 pl-4 text-text-tertiary font-medium text-xs">
-                                    Notes
+                                    {t('attendance.modal.notes')}
                                   </th>
                                 </tr>
                               </thead>
                               <tbody>
                                 {recentRecords.map((record) => {
-                                  const d = new Date(record.date)
-                                  const dateLabel = `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}`
+                                  const dateLabel = formatDate(record.date, { year: 'numeric', month: 'numeric', day: 'numeric' })
                                   return (
                                     <tr
                                       key={record.date}
@@ -448,7 +451,7 @@ export function StudentAttendanceModal({
                     onClick={onClose}
                     className="px-4 py-2 text-sm font-medium rounded-lg bg-surface-secondary border border-border-secondary text-text-secondary hover:text-text-primary hover:bg-surface-hover transition-colors"
                   >
-                    Close
+                    {t('attendance.modal.close')}
                   </button>
                 </div>
               </Dialog.Panel>

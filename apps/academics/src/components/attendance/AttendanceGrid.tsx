@@ -23,6 +23,7 @@ import { RosterSummaryStrip } from './roster/RosterSummaryStrip'
 import { useHasHover } from '../../hooks/useHasHover'
 import { ENTRY_STATUSES, ATTENDANCE_STATUS_META, isLockedOverrideStatus, summarizeByBucket } from './attendanceStatus'
 import type { SaveStatus } from '../../hooks/useOfflineAttendance'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 // ============================================================================
 // TYPES
@@ -122,6 +123,7 @@ export function AttendanceGrid({
   lockedStudents,
   defaultStatus = null,
 }: AttendanceGridProps) {
+  const { t, attendanceStatusLabel } = useAcademicsI18n()
   // Task 4.6: Determine if this is a past date
   const isPastDate = useMemo(() => {
     const today = new Date().toISOString().split('T')[0]
@@ -328,8 +330,8 @@ export function AttendanceGrid({
         return { ...e, status: 'present' as AttendanceStatus }
       })
     )
-    setAnnouncement('All students marked present')
-  }, [lockedStudents])
+    setAnnouncement(t('attendance.announcements.allPresent'))
+  }, [lockedStudents, t])
 
   const markAllAbsent = useCallback(() => {
     setEntries((prev) =>
@@ -339,8 +341,8 @@ export function AttendanceGrid({
         return { ...e, status: 'absent' as AttendanceStatus }
       })
     )
-    setAnnouncement('All students marked absent')
-  }, [lockedStudents])
+    setAnnouncement(t('attendance.announcements.allAbsent'))
+  }, [lockedStudents, t])
 
   const clearAll = useCallback(() => {
     setEntries((prev) =>
@@ -350,8 +352,8 @@ export function AttendanceGrid({
         return { ...e, status: null, notes: '', excuseType: undefined }
       })
     )
-    setAnnouncement('All entries cleared')
-  }, [lockedStudents])
+    setAnnouncement(t('attendance.announcements.allCleared'))
+  }, [lockedStudents, t])
 
   const handleSave = () => {
     // Only send records that actually changed (dirty records)
@@ -381,7 +383,7 @@ export function AttendanceGrid({
       }))
     if (records.length === 0) return
     onSave(records)
-    setAnnouncement(`Attendance saved for ${records.length} students`)
+    setAnnouncement(t('attendance.announcements.saved', { count: records.length }))
   }
 
   // Task 4.6: Correction handler for individual past-date edits
@@ -462,10 +464,10 @@ export function AttendanceGrid({
       <div className="py-16 text-center">
         <Users className="w-10 h-10 mx-auto text-text-tertiary mb-3" />
         <h4 className="text-sm font-medium text-text-primary mb-1">
-          No students in this section
+          {t('attendance.empty.noStudentsTitle')}
         </h4>
         <p className="text-xs text-text-tertiary">
-          Enroll students in this section to start taking attendance.
+          {t('attendance.empty.noStudentsDescription')}
         </p>
       </div>
     )
@@ -482,19 +484,20 @@ export function AttendanceGrid({
           single status source (F0.T2/F2.T3) so labels + shortcuts can't drift. */}
       {!isPastDate && (
         <div className="text-xs text-text-tertiary px-1 hidden sm:block">
-          Keyboard shortcuts:{' '}
+          {t('attendance.grid.keyboardShortcuts')}{' '}
           {ENTRY_STATUSES.map((s) => {
             const meta = ATTENDANCE_STATUS_META[s]
+            const label = attendanceStatusLabel(s)
             return (
               <span key={s}>
                 <kbd className="px-1 py-0.5 bg-surface-secondary rounded text-text-secondary">
                   {meta.shortcut ?? meta.shortLabel}
                 </kbd>{' '}
-                {meta.label}{' '}
+                {label}{' '}
               </span>
             )
           })}
-          <kbd className="px-1 py-0.5 bg-surface-secondary rounded text-text-secondary">↑↓</kbd> Navigate
+          <kbd className="px-1 py-0.5 bg-surface-secondary rounded text-text-secondary">↑↓</kbd> {t('attendance.grid.navigate')}
         </div>
       )}
 
@@ -505,7 +508,7 @@ export function AttendanceGrid({
         className="flex flex-col overflow-hidden rounded-xl border border-border-secondary"
         style={{ maxHeight: 'min(70vh, 720px)' }}
         role="grid"
-        aria-label="Attendance entry grid"
+        aria-label={t('attendance.grid.ariaLabel')}
       >
         <RosterToolbar
           search={searchQuery}
@@ -537,10 +540,10 @@ export function AttendanceGrid({
         {/* Hide column headers on mobile (stacked layout doesn't need them). */}
         <div className="hidden flex-shrink-0 items-center gap-3 border-b border-border-secondary bg-surface-secondary px-4 py-2 sm:flex">
           <div className="min-w-0 flex-1">
-            <SortableHeader label="Name" field="name" currentSort={sortKey} currentDir={sortDir} onSort={toggleSort} />
+            <SortableHeader label={t('attendance.grid.name')} field="name" currentSort={sortKey} currentDir={sortDir} onSort={toggleSort} />
           </div>
           <div className="pr-2">
-            <SortableHeader label="Status" field="status" currentSort={sortKey} currentDir={sortDir} onSort={toggleSort} />
+            <SortableHeader label={t('attendance.grid.status')} field="status" currentSort={sortKey} currentDir={sortDir} onSort={toggleSort} />
           </div>
         </div>
 

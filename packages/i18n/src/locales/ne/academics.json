@@ -214,6 +214,248 @@
     "filterAriaLabel": "{{title}} फिल्टर",
     "clearFilter": "फिल्टर हटाउनुहोस्"
   },
+  "attendance": {
+    "title": "उपस्थिति",
+    "subtitle": "कक्षा सेक्सनअनुसार उपस्थिति रेकर्ड र समीक्षा गर्नुहोस् · {{year}}",
+    "academicYearFallback": "शैक्षिक वर्ष",
+    "lastUpdated": "अन्तिम अद्यावधिक: {{time}}",
+    "tabs": {
+      "overview": "अवलोकन",
+      "dailyEntry": "दैनिक प्रविष्टि",
+      "iemisExport": "IEMiS निर्यात",
+      "aria": "उपस्थिति ट्याबहरू"
+    },
+    "status": {
+      "present": { "label": "उपस्थित", "short": "उ" },
+      "absent": { "label": "अनुपस्थित", "short": "अ" },
+      "late": { "label": "ढिलो", "short": "ढ" },
+      "excused": { "label": "अनुमति सहित", "short": "क्ष" },
+      "remote": { "label": "दूरस्थ", "short": "दू" },
+      "half_day": { "label": "आधा दिन", "short": "आ" },
+      "early_departure": { "label": "छिटो छुट्टी", "short": "छु" }
+    },
+    "dateSelector": {
+      "previousDay": "अघिल्लो दिन",
+      "nextDay": "अर्को दिन",
+      "selectDate": "मिति छान्नुहोस्",
+      "today": "आज",
+      "bsSuffix": "वि.सं."
+    },
+    "sectionSelector": {
+      "empty": "कुनै सेक्सन तोकिएको छैन। कृपया प्रशासकलाई सम्पर्क गर्नुहोस्।",
+      "placeholder": "सेक्सन छान्नुहोस्...",
+      "fallback": "सेक्सन",
+      "completedPrefix": "रेकर्ड गरिएको"
+    },
+    "calendar": {
+      "nonInstructionalTitle": "पठन-पाठन नभएको दिन",
+      "nonInstructionalFallback": "यो {{eventType}} दिन हो।",
+      "cannotSubmit": "{{description}} यस मितिका लागि उपस्थिति पेश गर्न सकिँदैन।"
+    },
+    "policy": {
+      "modeLabel": "उपस्थिति मोड:",
+      "dailyPresence": "दैनिक उपस्थिति",
+      "perSection": "प्रति-सेक्सन",
+      "dailyPresenceDescription": "विद्यार्थी कुनै पनि सेक्सनमा उपस्थित भए दिनभर उपस्थित मानिन्छ; पछिल्ला सेक्सनमा लक देखिन्छ।",
+      "perSectionDescription": "प्रत्येक सेक्सन स्वतन्त्र रूपमा रेकर्ड गरिन्छ।",
+      "dismiss": "बुझेँ",
+      "dismissAria": "बुझेँ, उपस्थिति मोड सूचना बन्द गर्नुहोस्"
+    },
+    "notRecorded": {
+      "past": "यस दिन उपस्थिति रेकर्ड गरिएको थिएन। विद्यार्थीमा Edit प्रयोग गरेर रेकर्ड पछि भर्नुहोस्।",
+      "current": "यस दिनको उपस्थिति अझै रेकर्ड गरिएको छैन। All Present प्रयोग गरी अपवादहरू चिन्ह लगाउनुहोस्, वा विद्यार्थीहरू छुट्टाछुट्टै चिन्ह लगाएर सुरक्षित गर्नुहोस्।"
+    },
+    "empty": {
+      "selectSectionTitle": "कक्षा सेक्सन छान्नुहोस्",
+      "selectSectionDescription": "उपस्थिति रेकर्ड गर्न माथिको ड्रपडाउनबाट सेक्सन छान्नुहोस्। सबैलाई उपस्थित चिन्ह लगाउन द्रुत कार्य प्रयोग गर्नुहोस्, त्यसपछि विद्यार्थीअनुसार मिलाउनुहोस्।",
+      "noStudentsTitle": "यस सेक्सनमा विद्यार्थी छैनन्",
+      "noStudentsDescription": "उपस्थिति लिन सुरु गर्न यस सेक्सनमा विद्यार्थी भर्ना गर्नुहोस्।",
+      "noStudentsEnrolledTitle": "कुनै विद्यार्थी भर्ना छैन",
+      "noStudentsEnrolledDescription": "यस सेक्सनमा अझै विद्यार्थी भर्ना छैनन्। People ट्याबबाट विद्यार्थी थप्नुहोस्।",
+      "noSearchMatches": "तपाईंको खोजसँग मिल्ने विद्यार्थी छैन।",
+      "noDataForDate": "यस मितिका लागि कुनै उपस्थिति डाटा छैन",
+      "notRecordedForDate": "यस मितिका लागि उपस्थिति रेकर्ड गरिएको छैन"
+    },
+    "grid": {
+      "ariaLabel": "उपस्थिति प्रविष्टि ग्रिड",
+      "rowAria": "{{studentName}} को उपस्थिति",
+      "statusAria": "उपस्थिति स्थिति",
+      "keyboardShortcuts": "किबोर्ड सर्टकटहरू:",
+      "navigate": "सार्नुहोस्",
+      "name": "नाम",
+      "status": "स्थिति",
+      "allMarked": "सबै {{total}} चिन्ह लगाइयो — राम्रो भयो",
+      "markedCount": "{{marked}} / {{total}} चिन्ह लगाइयो",
+      "coverageTitle": "कभरेज = रेकर्ड गरिएका विद्यार्थी ÷ भर्ना भएका विद्यार्थी (रोल-कल कति पूरा भयो)। यो उपस्थिति दरभन्दा फरक हो।",
+      "rateTitle": "उपस्थिति दर = उपस्थित विद्यार्थी ÷ भर्ना भएका विद्यार्थी।",
+      "coverage": "कभरेज",
+      "rate": "दर",
+      "ofTotal": "{{recorded}} मध्ये {{total}}"
+    },
+    "toolbar": {
+      "search": "विद्यार्थी खोज्नुहोस्...",
+      "searchAria": "नाम वा नम्बरबाट विद्यार्थी खोज्नुहोस्",
+      "clearSearch": "खोज खाली गर्नुहोस्",
+      "filterAria": "विद्यार्थी फिल्टर गर्नुहोस्",
+      "filters": {
+        "all": "सबै",
+        "unmarked": "चिन्ह नलगाइएको",
+        "absent": "अनुपस्थित",
+        "flagged": "चिन्हित",
+        "locked": "लक"
+      },
+      "allPresent": "सबै उपस्थित",
+      "allAbsent": "सबै अनुपस्थित",
+      "markPresent": "{{count}} उपस्थित चिन्ह लगाउनुहोस्",
+      "markAbsent": "{{count}} अनुपस्थित चिन्ह लगाउनुहोस्",
+      "clear": "हटाउनुहोस्"
+    },
+    "actions": {
+      "saveAttendance": "उपस्थिति सुरक्षित गर्नुहोस्",
+      "save": "सुरक्षित गर्नुहोस्",
+      "edit": "सम्पादन",
+      "editFor": "{{studentName}} को उपस्थिति सम्पादन गर्नुहोस्",
+      "cancelEdit": "सम्पादन रद्द गर्नुहोस्",
+      "markStatus": "{{status}} चिन्ह लगाउनुहोस्",
+      "mark": "चिन्ह लगाउनुहोस्",
+      "addNoteReason": "टिप्पणी वा कारण थप्नुहोस्",
+      "editNoteReason": "टिप्पणी वा कारण सम्पादन गर्नुहोस्",
+      "addNoteReasonTitle": "टिप्पणी / कारण थप्नुहोस्",
+      "editNoteReasonTitle": "टिप्पणी / कारण सम्पादन गर्नुहोस्"
+    },
+    "announcements": {
+      "allPresent": "सबै विद्यार्थी उपस्थित चिन्ह लगाइयो",
+      "allAbsent": "सबै विद्यार्थी अनुपस्थित चिन्ह लगाइयो",
+      "allCleared": "सबै प्रविष्टि हटाइयो",
+      "saved": "{{count}} विद्यार्थीका लागि उपस्थिति सुरक्षित गरियो",
+      "saved_plural": "{{count}} विद्यार्थीका लागि उपस्थिति सुरक्षित गरियो"
+    },
+    "saveStatus": {
+      "saved": "सुरक्षित भयो",
+      "saving": "सुरक्षित गर्दै...",
+      "savingEllipsis": "सुरक्षित गर्दै…",
+      "offline": "अफलाइन",
+      "offlineLocal": "अफलाइन — परिवर्तन स्थानीय रूपमा सुरक्षित भयो",
+      "error": "सुरक्षित गर्न असफल",
+      "errorRetry": "सुरक्षित गर्न असफल — पुन: प्रयास हुनेछ"
+    },
+    "row": {
+      "lockedFallback": "दैनिक उपस्थिति पहिले नै रेकर्ड गरिएको छ",
+      "reason": "कारण",
+      "reasonAria": "अनुपस्थितिको कारण",
+      "selectReason": "कारण छान्नुहोस्…",
+      "note": "टिप्पणी",
+      "noteAria": "उपस्थिति टिप्पणी",
+      "notePlaceholder": "टिप्पणी थप्नुहोस्…"
+    },
+    "summary": {
+      "recorded": "{{recorded}} मध्ये {{total}} रेकर्ड",
+      "notTakenYet": "अझै लिइएको छैन",
+      "schoolAverage": "विद्यालय औसत",
+      "sevenDay": "७-दिन: {{value}}%",
+      "thirtyDay": "३०-दिन: {{value}}%",
+      "coverage": "कभरेज"
+    },
+    "dashboard": {
+      "ofTotalRecorded": "{{total}} मध्ये {{recorded}} रेकर्ड",
+      "ofTotal": "{{total}} मध्ये {{count}}",
+      "schoolAverage": "विद्यालय औसत",
+      "sevenDayAvg": "७-दिन औसत:",
+      "thirtyDayAvg": "३०-दिन औसत:",
+      "coverage": "कभरेज",
+      "coverageTitle": "कभरेज = रेकर्ड गरिएका विद्यार्थी ÷ भर्ना भएका विद्यार्थी (आजको रोल-कल कति पूरा भयो)। यो रेकर्ड गरिएका विद्यार्थीमध्ये कति उपस्थित थिए भन्ने उपस्थिति दरभन्दा फरक हो।",
+      "absenceBreakdownTitle": "आजको अनुपस्थिति विवरण",
+      "noAbsencesYet": "अझै अनुपस्थिति रेकर्ड छैन",
+      "absences": "{{count}} अनुपस्थिति",
+      "absences_plural": "{{count}} अनुपस्थिति",
+      "absenceCategories": {
+        "unexcused": "अनुमति बिना",
+        "excused": "अनुमति सहित",
+        "late": "ढिलो",
+        "halfDay": "आधा दिन",
+        "remote": "दूरस्थ"
+      },
+      "dowTitle": "हप्ताको दिन अनुसार ढाँचा",
+      "dowSubtitle": "हप्ताका दिनअनुसार औसत उपस्थिति दर",
+      "dowInsight": "{{minDay}} मा औसत उपस्थिति सबैभन्दा कम छ ({{minRate}}%)। {{maxDay}} सबैभन्दा उच्च छ।",
+      "daysShort": {
+        "Sunday": "आइत",
+        "Monday": "सोम",
+        "Tuesday": "मंगल",
+        "Wednesday": "बुध",
+        "Thursday": "बिही",
+        "Friday": "शुक्र",
+        "Saturday": "शनि"
+      },
+      "trendTitle": "३०-दिन उपस्थिति दर",
+      "trendEmptySubtitle": "प्रवृत्ति डाटा उपलब्ध छैन",
+      "trendEmpty": "छानिएको अवधिका लागि प्रवृत्ति डाटा उपलब्ध छैन।",
+      "trendSubtitle": "दैनिक रेकर्ड गरिएको उपस्थिति दर प्रवृत्ति — {{start}} देखि {{end}} सम्म",
+      "sectionCompletionTitle": "सेक्सन पूरा स्थिति",
+      "sectionCompletionSubtitle": "आजको प्रति-सेक्सन रेकर्ड स्थिति",
+      "section": "सेक्सन",
+      "enrolledAbbr": "भर्ना",
+      "recordedAbbr": "रेक.",
+      "completionStatus": "स्थिति",
+      "completion": {
+        "complete": "पूरा",
+        "partial": "आंशिक",
+        "notStarted": "सुरु नभएको"
+      },
+      "periodAveragesTitle": "अवधि औसत",
+      "periodAveragesSubtitle": "विभिन्न समय अवधिमा उपस्थिति दरहरू",
+      "periods": {
+        "sevenDay": "७-दिन",
+        "thirtyDay": "३०-दिन",
+        "yearly": "वार्षिक"
+      },
+      "trendDirection": "पछिल्ला ७ दिनको उपस्थिति ३०-दिन आधाररेखासँग तुलना गर्दा {{direction}} हुँदैछ।",
+      "directions": {
+        "upward": "बढ्दो",
+        "downward": "घट्दो"
+      },
+      "alertsTitle": "उपस्थिति चेतावनीहरू",
+      "alertsSubtitle": "{{threshold}}% भन्दा कम उपस्थिति दर भएका विद्यार्थी · गम्भीरताअनुसार क्रमबद्ध",
+      "below": "भन्दा कम",
+      "thresholdAria": "कम-उपस्थिति चेतावनी सीमा",
+      "showingAtRisk": "जोखिममा रहेका {{total}} मध्ये {{shown}} विद्यार्थी देखाइँदै",
+      "showingAtRisk_plural": "जोखिममा रहेका {{total}} मध्ये {{shown}} विद्यार्थी देखाइँदै",
+      "noBelowThreshold": "उपस्थिति सीमाभन्दा तल कुनै विद्यार्थी छैन",
+      "columns": {
+        "student": "विद्यार्थी",
+        "rate": "दर",
+        "absent": "अनुपस्थित",
+        "total": "कुल",
+        "trend": "प्रवृत्ति"
+      },
+      "trends": {
+        "improving": "↑ सुधार हुँदै",
+        "declining": "↓ घट्दै",
+        "stable": "— स्थिर"
+      },
+      "scopeSections": "तपाईंका सेक्सनहरूको डाटा देखाइँदै ({{count}} विद्यार्थी)",
+      "loadFailed": "उपस्थिति अवलोकन लोड गर्न असफल",
+      "loadFailedDescription": "कृपया पृष्ठ पुन: ताजा गर्नुहोस्। समस्या रहिरहेमा सहायता टोलीलाई सम्पर्क गर्नुहोस्।"
+    },
+    "modal": {
+      "trendTitle": "विन्डोमा प्रवृत्ति (हालको बनाम अघिल्लो)",
+      "trends": {
+        "improving": "सुधार हुँदै",
+        "declining": "घट्दै",
+        "stable": "स्थिर"
+      },
+      "last30Days": "पछिल्ला ३० दिन",
+      "noRecord": "रेकर्ड छैन",
+      "total": "कुल",
+      "rate": "दर",
+      "recentRecords": "हालका रेकर्डहरू",
+      "noRecords": "कुनै उपस्थिति रेकर्ड भेटिएन।",
+      "date": "मिति",
+      "status": "स्थिति",
+      "notes": "टिप्पणीहरू",
+      "close": "बन्द गर्नुहोस्"
+    }
+  },
   "common": {
     "actions": "कार्यहरू",
     "active": "सक्रिय",

@@ -20,6 +20,7 @@ import { ChevronDown } from 'lucide-react'
 import { focusRingInset } from '@edforge/ui'
 import { ATTENDANCE_STATUS_META, ENTRY_STATUSES, TONE_CLASSES } from '../attendanceStatus'
 import type { AttendanceStatus } from '../../../services/academics.service'
+import { useAcademicsI18n } from '../../../lib/i18n'
 
 export interface StatusControlProps {
   value: AttendanceStatus | null
@@ -43,6 +44,7 @@ export function StatusControl({
   disabled = false,
   expandTrigger = 'hover',
 }: StatusControlProps) {
+  const { t, attendanceStatusLabel, attendanceStatusShortLabel } = useAcademicsI18n()
   const btnRefs = useRef<(HTMLButtonElement | null)[]>([])
 
   const focusIndex = (i: number) => {
@@ -72,11 +74,13 @@ export function StatusControl({
   const rovingIdx = activeIdx >= 0 ? activeIdx : 0
 
   const segments = (
-    <div role="radiogroup" aria-label="Attendance status" className="flex items-center gap-1">
+    <div role="radiogroup" aria-label={t('attendance.grid.statusAria')} className="flex items-center gap-1">
       {allowed.map((s, i) => {
         const meta = ATTENDANCE_STATUS_META[s]
         const tone = TONE_CLASSES[meta.tone]
         const active = value === s
+        const label = attendanceStatusLabel(s)
+        const shortLabel = attendanceStatusShortLabel(s, meta.shortLabel)
         return (
           <button
             key={s}
@@ -86,8 +90,8 @@ export function StatusControl({
             type="button"
             role="radio"
             aria-checked={active}
-            aria-label={`Mark ${meta.label}`}
-            title={`${meta.label}${meta.shortcut ? ` (${meta.shortcut})` : ''}`}
+            aria-label={t('attendance.actions.markStatus', { status: label })}
+            title={`${label}${meta.shortcut ? ` (${meta.shortcut})` : ''}`}
             tabIndex={i === rovingIdx ? 0 : -1}
             disabled={disabled}
             onClick={() => onChange(s)}
@@ -96,7 +100,7 @@ export function StatusControl({
               active ? tone.btnActive : `bg-surface-secondary text-text-tertiary ${tone.btnHover}`
             }`}
           >
-            {meta.shortLabel}
+            {shortLabel}
           </button>
         )
       })}
@@ -109,6 +113,7 @@ export function StatusControl({
 
   const restMeta = value ? ATTENDANCE_STATUS_META[value] : null
   const restTone = restMeta ? TONE_CLASSES[restMeta.tone] : null
+  const restLabel = value ? attendanceStatusLabel(value) : ''
 
   return (
     <div className="group/sc relative inline-flex items-center">
@@ -122,11 +127,11 @@ export function StatusControl({
             className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${restTone.badgeBg} ${restTone.fg}`}
           >
             <span className={`h-1.5 w-1.5 rounded-full ${restTone.dot}`} />
-            {restMeta.label}
+            {restLabel}
           </span>
         ) : (
           <span className="inline-flex items-center rounded-full border border-dashed border-border-secondary px-2.5 py-1 text-xs text-text-tertiary">
-            Mark
+            {t('attendance.actions.mark')}
           </span>
         )}
         <ChevronDown className="h-3 w-3 text-text-tertiary" />

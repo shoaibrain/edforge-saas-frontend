@@ -46,13 +46,15 @@ import { IemisExportPanel } from '../../components/attendance/IemisExportPanel'
 import { AttendanceDashboard } from './dashboard'
 import { NoCurrentAcademicYearEmptyState } from '../../components/common'
 import type { AttendanceStatus } from '../../services/academics.service'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 type TabId = 'overview' | 'daily-entry' | 'iemis-export'
+type TabLabelKey = 'overview' | 'dailyEntry' | 'iemisExport'
 
-const TABS: { id: TabId; label: string; icon: typeof BarChart3 }[] = [
-  { id: 'overview', label: 'Overview', icon: BarChart3 },
-  { id: 'daily-entry', label: 'Daily Entry', icon: ClipboardCheck },
-  { id: 'iemis-export', label: 'IEMiS Export', icon: FileSpreadsheet },
+const TABS: { id: TabId; labelKey: TabLabelKey; icon: typeof BarChart3 }[] = [
+  { id: 'overview', labelKey: 'overview', icon: BarChart3 },
+  { id: 'daily-entry', labelKey: 'dailyEntry', icon: ClipboardCheck },
+  { id: 'iemis-export', labelKey: 'iemisExport', icon: FileSpreadsheet },
 ]
 
 // ============================================================================
@@ -66,10 +68,11 @@ function TabBar({
 }: {
   activeTab: TabId
   onTabChange: (tab: TabId) => void
-  tabs: { id: TabId; label: string; icon: typeof BarChart3 }[]
+  tabs: { id: TabId; labelKey: TabLabelKey; icon: typeof BarChart3 }[]
 }) {
+  const { t } = useAcademicsI18n()
   return (
-    <nav className="flex gap-1" aria-label="Attendance tabs">
+    <nav className="flex gap-1" aria-label={t('attendance.tabs.aria')}>
       {tabs.map((tab) => {
         const isActive = activeTab === tab.id
         return (
@@ -84,7 +87,7 @@ function TabBar({
             }`}
           >
             <tab.icon style={{ width: 11, height: 11 }} />
-            {tab.label}
+            {t(`attendance.tabs.${tab.labelKey}`)}
           </button>
         )
       })}
@@ -103,15 +106,17 @@ function CalendarBanner({
   description: string
   eventType: string
 }) {
+  const { t } = useAcademicsI18n()
+  const resolvedDescription = description || t('attendance.calendar.nonInstructionalFallback', { eventType })
   return (
     <div className="flex items-center gap-3 p-4 rounded-xl bg-amber-50 dark:bg-[rgb(var(--state-warning-fg))]/10 border border-amber-200 dark:border-amber-500/20">
       <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
       <div>
         <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
-          Non-Instructional Day
+          {t('attendance.calendar.nonInstructionalTitle')}
         </p>
         <p className="text-xs text-[rgb(var(--state-warning-fg))] mt-0.5">
-          {description || `This is a ${eventType} day.`} Attendance cannot be submitted for this date.
+          {t('attendance.calendar.cannotSubmit', { description: resolvedDescription })}
         </p>
       </div>
     </div>
@@ -136,6 +141,7 @@ function SectionSelector({
   /** Task 4.1: Section IDs that have completed attendance today */
   completedSectionIds?: Set<string>
 }) {
+  const { t } = useAcademicsI18n()
   // Auto-select first section when sections load and nothing is selected
   useEffect(() => {
     if (!selectedId && sections.length > 0 && sections.length <= 5) {
@@ -146,7 +152,7 @@ function SectionSelector({
   if (!isLoading && sections.length === 0) {
     return (
       <div className="px-3 py-2 text-sm text-text-tertiary bg-surface-secondary border border-border-secondary rounded-lg max-w-xs">
-        No sections assigned. Contact your administrator.
+        {t('attendance.sectionSelector.empty')}
       </div>
     )
   }
@@ -158,10 +164,10 @@ function SectionSelector({
       onChange={(v) => onSelect(v || null)}
       disabled={isLoading}
       loading={isLoading}
-      placeholder="Select a section..."
+      placeholder={t('attendance.sectionSelector.placeholder')}
       options={sections.map((s) => ({
         value: s.sectionId,
-        label: `${completedSectionIds?.has(s.sectionId) ? '\u2713 ' : ''}${s.courseName || s.courseCode || 'Section'} - ${s.sectionNumber}`,
+        label: `${completedSectionIds?.has(s.sectionId) ? '\u2713 ' : ''}${s.courseName || s.courseCode || t('attendance.sectionSelector.fallback')} - ${s.sectionNumber}`,
       }))}
     />
   )
@@ -213,11 +219,18 @@ interface AttendanceModuleContentProps {
 }
 
 function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: AttendanceModuleContentProps) {
+  const { t, locale } = useAcademicsI18n()
   const selectedDate = useAttendanceStore((s) => s.selectedDate)
   const selectedSectionId = useAttendanceStore((s) => s.selectedSectionId)
   const setSelectedSectionId = useAttendanceStore((s) => s.setSelectedSectionId)
   const dateActions = useAttendanceDateActions()
   const [activeTab, setActiveTab] = useState<TabId>('overview')
+  const lastUpdatedLabel = useMemo(
+    () => t('attendance.lastUpdated', {
+      time: new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' }).format(new Date()),
+    }),
+    [locale, t],
+  )
 
   // ABAC: check if user can create/edit attendance
   const canCreateAttendance = usePermission('create', 'attendance')
@@ -410,15 +423,15 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
               <ClipboardCheck className="w-4 h-4 text-[rgb(var(--accent-attendance-text))]" />
             </div>
             <div>
-              <div className="text-base font-semibold tracking-[-0.2px] text-[rgb(var(--text-primary))]">Attendance</div>
+              <div className="text-base font-semibold tracking-[-0.2px] text-[rgb(var(--text-primary))]">{t('attendance.title')}</div>
               <div className="text-3xs text-[rgb(var(--text-disabled))]">
-                Record and review attendance by class section · {currentYearName || 'Academic Year'}
+                {t('attendance.subtitle', { year: currentYearName || t('attendance.academicYearFallback') })}
               </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-3xs text-[rgb(var(--text-disabled))]">
-              Last updated: {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              {lastUpdatedLabel}
             </span>
           </div>
         </div>
@@ -480,20 +493,20 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
                   <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-[rgb(var(--state-info-bg)/0.12)] border border-[rgb(var(--state-info-fg)/0.2)] text-xs text-text-secondary">
                     <Info className="w-3.5 h-3.5 mt-0.5 text-[rgb(var(--state-info-fg))] shrink-0" />
                     <span className="flex-1">
-                      Attendance mode:{' '}
-                      <strong>{isDailyPresence ? 'Daily presence' : 'Per-section'}</strong>
+                      {t('attendance.policy.modeLabel')}{' '}
+                      <strong>{isDailyPresence ? t('attendance.policy.dailyPresence') : t('attendance.policy.perSection')}</strong>
                       {isDailyPresence
-                        ? ' — a student present in any section counts present for the day; later sections show them locked.'
-                        : ' — each section is recorded independently.'}
+                        ? ` — ${t('attendance.policy.dailyPresenceDescription')}`
+                        : ` — ${t('attendance.policy.perSectionDescription')}`}
                     </span>
                     <button
                       type="button"
                       onClick={ackModeBanner}
                       className="flex shrink-0 items-center gap-1 rounded-md px-2 py-1 font-medium text-[rgb(var(--state-info-fg))] transition-colors hover:bg-[rgb(var(--state-info-bg)/0.2)]"
-                      aria-label="Got it, dismiss attendance mode notice"
+                      aria-label={t('attendance.policy.dismissAria')}
                     >
                       <Check className="h-3.5 w-3.5" />
-                      Got it
+                      {t('attendance.policy.dismiss')}
                     </button>
                   </div>
                 )}
@@ -510,8 +523,8 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
                       <Info className="w-3.5 h-3.5 mt-0.5 text-[rgb(var(--state-warning-fg))] shrink-0" />
                       <span>
                         {isPastDate
-                          ? 'Attendance was not recorded for this day. Use Edit on a student to backfill a record.'
-                          : 'Attendance has not been recorded for this day yet. Use “All Present” then mark the exceptions — or mark students individually — and Save.'}
+                          ? t('attendance.notRecorded.past')
+                          : t('attendance.notRecorded.current')}
                       </span>
                     </div>
                   )}
@@ -521,11 +534,10 @@ function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: A
                   <div className="bg-surface-secondary rounded-xl border border-border-secondary p-12 text-center">
                     <ClipboardCheck className="w-12 h-12 mx-auto text-text-tertiary mb-4" />
                     <h4 className="text-lg font-medium text-text-primary mb-2">
-                      Select a Class Section
+                      {t('attendance.empty.selectSectionTitle')}
                     </h4>
                     <p className="text-text-secondary max-w-md mx-auto">
-                      Choose a section from the dropdown above to record today's attendance.
-                      Use quick actions to mark all present, then adjust individual students.
+                      {t('attendance.empty.selectSectionDescription')}
                     </p>
                   </div>
                 ) : rosterLoading ? (

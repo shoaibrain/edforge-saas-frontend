@@ -8,6 +8,7 @@
 import { useMemo } from 'react'
 import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react'
 import { formatBSLong, adToBS } from '../../lib/bikram-sambat'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 interface DateSelectorProps {
   selectedDate: string
@@ -24,12 +25,12 @@ export function DateSelector({
   onNext,
   onToday,
 }: DateSelectorProps) {
+  const { t, formatDate } = useAcademicsI18n()
   const today = new Date().toISOString().split('T')[0]
   const isToday = selectedDate === today
   const isFutureDisabled = selectedDate >= today
 
-  const displayDate = new Date(selectedDate + 'T00:00:00')
-  const formattedDate = displayDate.toLocaleDateString('en-US', {
+  const formattedDate = formatDate(selectedDate + 'T00:00:00', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
@@ -49,7 +50,7 @@ export function DateSelector({
           type="button"
           onClick={onPrevious}
           className="p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-secondary transition-colors"
-          aria-label="Previous day"
+          aria-label={t('attendance.dateSelector.previousDay')}
         >
           <ChevronLeft className="w-4 h-4" />
         </button>
@@ -58,7 +59,7 @@ export function DateSelector({
           onClick={onNext}
           disabled={isFutureDisabled}
           className="p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-secondary transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-          aria-label="Next day"
+          aria-label={t('attendance.dateSelector.nextDay')}
         >
           <ChevronRight className="w-4 h-4" />
         </button>
@@ -73,14 +74,14 @@ export function DateSelector({
             max={today}
             onChange={(e) => onDateChange(e.target.value)}
             className="absolute inset-0 opacity-0 cursor-pointer"
-            aria-label="Select date"
+            aria-label={t('attendance.dateSelector.selectDate')}
           />
           <div className="flex items-center gap-2 px-3 py-1.5 bg-surface-secondary border border-border-secondary rounded-lg cursor-pointer hover:bg-surface-hover transition-colors">
             <Calendar className="w-4 h-4 text-text-tertiary" />
             <div>
               <span className="text-sm font-medium text-text-primary block">{formattedDate}</span>
               {/* Task 5.6: BS date below Gregorian */}
-              <span className="text-xs text-text-tertiary block">{bsDateLabel} BS</span>
+              <span className="text-xs text-text-tertiary block">{bsDateLabel} {t('attendance.dateSelector.bsSuffix')}</span>
             </div>
           </div>
         </div>
@@ -91,14 +92,14 @@ export function DateSelector({
             onClick={onToday}
             className="px-3 py-1.5 text-xs font-medium text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--text-primary))] bg-[rgb(var(--state-info-bg)/0.18)] hover:bg-[rgb(var(--state-info-bg)/0.26)] dark:bg-[rgb(var(--state-info-bg)/0.18)] dark:hover:bg-[rgb(var(--state-info-fg)/0.2)]  rounded-lg transition-colors"
           >
-            Today
+            {t('attendance.dateSelector.today')}
           </button>
         )}
       </div>
 
       {isToday && (
         <span className="px-2 py-0.5 text-xs font-medium text-[rgb(var(--state-success-fg))] bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-bg)/0.18)]  rounded-full">
-          Today
+          {t('attendance.dateSelector.today')}
         </span>
       )}
     </div>

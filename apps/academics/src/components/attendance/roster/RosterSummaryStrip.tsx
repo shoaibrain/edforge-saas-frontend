@@ -11,14 +11,16 @@ import { Loader2, Save, Check, WifiOff, CloudOff, CheckCircle } from 'lucide-rea
 import { ATTENDANCE_STATUS_META, TONE_CLASSES } from '../attendanceStatus'
 import type { AttendanceBucket } from '../attendanceStatus'
 import type { SaveStatus } from '../../../hooks/useOfflineAttendance'
+import { useAcademicsI18n } from '../../../lib/i18n'
 
 function SaveStatusBadge({ status }: { status?: SaveStatus }) {
+  const { t } = useAcademicsI18n()
   if (!status || status === 'idle') return null
   const configs: Record<string, { icon: typeof Check; text: string; className: string }> = {
-    saved: { icon: Check, text: 'Saved', className: 'text-[rgb(var(--state-success-fg))]' },
-    saving: { icon: Loader2, text: 'Saving…', className: 'text-[rgb(var(--state-warning-fg))]' },
-    offline: { icon: WifiOff, text: 'Offline', className: 'text-[rgb(var(--state-danger-fg))]' },
-    error: { icon: CloudOff, text: 'Save failed', className: 'text-[rgb(var(--state-danger-fg))]' },
+    saved: { icon: Check, text: t('attendance.saveStatus.saved'), className: 'text-[rgb(var(--state-success-fg))]' },
+    saving: { icon: Loader2, text: t('attendance.saveStatus.savingEllipsis'), className: 'text-[rgb(var(--state-warning-fg))]' },
+    offline: { icon: WifiOff, text: t('attendance.saveStatus.offline'), className: 'text-[rgb(var(--state-danger-fg))]' },
+    error: { icon: CloudOff, text: t('attendance.saveStatus.error'), className: 'text-[rgb(var(--state-danger-fg))]' },
   }
   const config = configs[status]
   if (!config) return null
@@ -60,6 +62,7 @@ export function RosterSummaryStrip({
   disabled = false,
   onSave,
 }: RosterSummaryStripProps) {
+  const { t, formatNumber } = useAcademicsI18n()
   const pct = total > 0 ? (marked / total) * 100 : 0
   const complete = marked === total && total > 0
 
@@ -70,25 +73,25 @@ export function RosterSummaryStrip({
         // mounts), gently popping in. `v2-pop-in` is reduced-motion-gated.
         <span className="v2-pop-in flex items-center gap-1.5 rounded-full bg-[rgb(var(--state-success-bg)/0.18)] px-2.5 py-1 text-xs font-medium text-[rgb(var(--state-success-fg))]">
           <CheckCircle className="h-3.5 w-3.5" />
-          All {total} marked — nicely done
+          {t('attendance.grid.allMarked', { total: formatNumber(total) })}
         </span>
       ) : (
         <div className="flex items-center gap-3 text-xs">
           <span className="flex items-center gap-1.5">
             <span className={`h-2 w-2 rounded-full ${dotFor('present')}`} />
-            <span className="font-medium tabular-nums text-text-primary">{buckets.present}</span>
-            <span className="text-text-tertiary">present</span>
+            <span className="font-medium tabular-nums text-text-primary">{formatNumber(buckets.present)}</span>
+            <span className="text-text-tertiary">{t('attendance.status.present.label')}</span>
           </span>
           <span className="flex items-center gap-1.5">
             <span className={`h-2 w-2 rounded-full ${dotFor('absent')}`} />
-            <span className="font-medium tabular-nums text-text-primary">{buckets.absent}</span>
-            <span className="text-text-tertiary">absent</span>
+            <span className="font-medium tabular-nums text-text-primary">{formatNumber(buckets.absent)}</span>
+            <span className="text-text-tertiary">{t('attendance.status.absent.label')}</span>
           </span>
           {buckets.excused > 0 && (
             <span className="flex items-center gap-1.5">
               <span className={`h-2 w-2 rounded-full ${dotFor('excused')}`} />
-              <span className="font-medium tabular-nums text-text-primary">{buckets.excused}</span>
-              <span className="text-text-tertiary">excused</span>
+              <span className="font-medium tabular-nums text-text-primary">{formatNumber(buckets.excused)}</span>
+              <span className="text-text-tertiary">{t('attendance.status.excused.label')}</span>
             </span>
           )}
         </div>
@@ -104,7 +107,7 @@ export function RosterSummaryStrip({
           />
         </div>
         <span className="text-xs tabular-nums text-text-tertiary">
-          {marked} / {total} marked
+          {t('attendance.grid.markedCount', { marked: formatNumber(marked), total: formatNumber(total) })}
         </span>
         <SaveStatusBadge status={saveStatus} />
         {!isPastDate && (
@@ -115,7 +118,7 @@ export function RosterSummaryStrip({
             className="flex items-center justify-center gap-1.5 rounded-lg bg-[rgb(var(--action-primary-bg))] px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] transition-colors hover:bg-[rgb(var(--action-primary-bg-hover))] disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-            Save Attendance
+            {t('attendance.actions.saveAttendance')}
           </button>
         )}
       </div>
