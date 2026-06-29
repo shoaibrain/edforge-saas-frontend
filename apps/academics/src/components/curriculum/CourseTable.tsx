@@ -331,8 +331,9 @@ export function CourseTable({
       data={courses}
       getRowId={(course) => course.courseId}
       isLoading={isLoading}
+      tableId="academics.courses"
       emptyState={{
-        icon: <BookOpen className="w-12 h-12" />,
+        icon: <BookOpen className="w-10 h-10" />,
         title: t('tables.courses.empty.title'),
         description: t('tables.courses.empty.description'),
         action: onAddCourse

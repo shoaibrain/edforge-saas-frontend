@@ -469,11 +469,12 @@ export function OrgNetworkManager() {
         data={networks}
         getRowId={(row) => row.id}
         isLoading={isLoading}
+        tableId="settings.org-networks"
         enableSorting={true}
         pagination={{ pageSize: 20 }}
         maxHeight="calc(100vh - 15rem)"
         emptyState={{
-          icon: <Network className="w-10 h-10 text-[rgb(var(--text-tertiary))]" />,
+          icon: <Network className="w-10 h-10" />,
           title: 'No networks yet',
           description: 'Create a network to group organizations for reporting or collaboration.',
           action: canManage

@@ -123,7 +123,7 @@ export function StaffTable({
         header: t('tableHeaders.hired'),
         size: 120,
         cell: ({ row }) => (
-          <span className="text-xs text-[rgb(var(--text-tertiary))]">
+          <span className="text-xs text-[rgb(var(--text-tertiary))] tabular-nums">
             {formatDate(row.original.hireDate)}
           </span>
         ),
@@ -187,11 +187,12 @@ export function StaffTable({
       data={staff}
       getRowId={(s) => s.staffId}
       isLoading={isLoading}
+      tableId="people.staff"
       enableSorting={true}
       pagination={{ pageSize: 20 }}
       maxHeight="calc(100vh - 22rem)"
       emptyState={{
-        icon: <UsersRound className="w-12 h-12" />,
+        icon: <UsersRound className="w-10 h-10" />,
         title: t('empty.noStaff'),
         description: t('empty.getStarted'),
         action: onAddStaff

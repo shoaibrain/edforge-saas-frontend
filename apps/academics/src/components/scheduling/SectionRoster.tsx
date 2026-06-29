@@ -293,6 +293,7 @@ export function SectionRoster({ section }: SectionRosterProps) {
         data={students}
         getRowId={(student) => student.studentId}
         isLoading={isLoading}
+        tableId="academics.section-roster"
         enableSorting={true}
         searchPlaceholder={t('tables.sectionRoster.search')}
         pagination={{ pageSize: 20 }}

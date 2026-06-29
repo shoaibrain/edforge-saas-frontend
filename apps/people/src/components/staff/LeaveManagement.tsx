@@ -23,9 +23,11 @@ import {
 } from 'lucide-react'
 import type { LeaveRequestResponseDto } from '@aibrains/shared-types'
 import {
+  StatusBadge,
   TanstackDataTable,
   type ColumnDef,
   type FacetedFilterConfig,
+  type StatusTone,
 } from '@edforge/ui'
 import { useStaffLeaveRequests, useApproveLeave, useRejectLeave, useCancelLeave } from '../../hooks'
 import { CreateLeaveModal } from './CreateLeaveModal'
@@ -35,13 +37,27 @@ import { formatDate } from '../../lib/utils'
 // CONSTANTS
 // ============================================================================
 
-const LEAVE_STATUS_COLORS: Record<string, string> = {
-  pending: 'bg-[rgb(var(--state-warning-bg)/0.18)] text-[rgb(var(--state-warning-fg))]',
-  approved: 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))]',
-  rejected: 'bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))]',
-  cancelled: 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]',
-  in_progress: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]',
-  completed: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--action-secondary-fg))]',
+/**
+ * Domain status → semantic StatusBadge tone. Keeps the leave-specific
+ * vocabulary in one place; visual styling is delegated to the shared
+ * `<StatusBadge>` (state-token-backed), so dark mode + future token
+ * shifts come for free.
+ */
+function leaveStatusTone(status: string): StatusTone {
+  switch (status) {
+    case 'approved':
+    case 'completed':
+      return 'success'
+    case 'rejected':
+      return 'danger'
+    case 'pending':
+      return 'warning'
+    case 'in_progress':
+      return 'info'
+    case 'cancelled':
+    default:
+      return 'neutral'
+  }
 }
 
 const LEAVE_TYPE_LABELS: Record<string, string> = {
@@ -60,15 +76,22 @@ const LEAVE_TYPE_LABELS: Record<string, string> = {
   other: 'Other',
 }
 
-const LEAVE_TYPE_COLORS: Record<string, string> = {
-  annual: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]',
-  sick: 'bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))]',
-  personal: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]',
-  bereavement: 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))]',
-  maternity: 'bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))]',
-  paternity: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]',
-  family_medical: 'bg-[rgb(var(--state-warning-bg)/0.18)] text-[rgb(var(--state-warning-fg))]',
-  professional_development: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]',
+/**
+ * Leave type → tone. Most types are neutral; the medical/family bucket
+ * is `info` so it scans distinctly without leaning on danger red for
+ * benign categories.
+ */
+function leaveTypeTone(type: string): StatusTone {
+  switch (type) {
+    case 'sick':
+    case 'maternity':
+    case 'paternity':
+      return 'info'
+    case 'family_medical':
+      return 'warning'
+    default:
+      return 'neutral'
+  }
 }
 
 const fadeInUp = {
@@ -211,11 +234,10 @@ export function LeaveManagement({
         header: 'Type',
         cell: ({ row }) => {
           const t = row.original.leaveType
-          const tone = LEAVE_TYPE_COLORS[t] ?? 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))]'
           return (
-            <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${tone}`}>
+            <StatusBadge tone={leaveTypeTone(t)} size="sm">
               {LEAVE_TYPE_LABELS[t] ?? t}
-            </span>
+            </StatusBadge>
           )
         },
         filterFn: (row, _id, value) => {
@@ -254,11 +276,10 @@ export function LeaveManagement({
         header: 'Status',
         cell: ({ row }) => {
           const s = row.original.status
-          const tone = LEAVE_STATUS_COLORS[s] ?? LEAVE_STATUS_COLORS.pending
           return (
-            <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium ${tone}`}>
+            <StatusBadge tone={leaveStatusTone(s)} size="sm" dot>
               {formatStatusLabel(s)}
-            </span>
+            </StatusBadge>
           )
         },
         filterFn: (row, _id, value) => {

@@ -17,6 +17,7 @@ import {
   type ColumnDef,
   type FacetedFilterConfig,
 } from '@edforge/ui'
+import { UuidBadge } from '@edforge/archetype'
 import { tenantService } from '@/services/tenant.service'
 import type { AuditLogEntry } from '@/services/tenant.service'
 
@@ -134,11 +135,7 @@ export function AuditLogViewer({ schoolId }: AuditLogViewerProps) {
         id: 'targetEntityId',
         accessorKey: 'targetEntityId',
         header: 'Entity ID',
-        cell: ({ row }) => (
-          <span className="text-xs font-mono text-[rgb(var(--text-tertiary))] truncate inline-block max-w-[14ch]">
-            {row.original.targetEntityId}
-          </span>
-        ),
+        cell: ({ row }) => <UuidBadge value={row.original.targetEntityId} />,
       },
       {
         id: 'changedByName',

@@ -231,7 +231,7 @@ export function GradeLevelsTab({
         size: 130,
         cell: ({ row }) => (
           <div className="flex items-center gap-2">
-            <span className="text-sm font-semibold text-text-primary">
+            <span className="text-sm font-semibold text-text-primary tabular-nums">
               {row.original.courseCount}
             </span>
             {row.original.courseCount > 0 && (
@@ -270,7 +270,7 @@ export function GradeLevelsTab({
           }
           return (
             <div className="flex items-center gap-2">
-              <span className="text-sm font-semibold text-text-primary">
+              <span className="text-sm font-semibold text-text-primary tabular-nums">
                 {row.original.studentCount}
               </span>
               {row.original.studentCount > 0 && (
@@ -328,10 +328,11 @@ export function GradeLevelsTab({
         data={gradeData}
         getRowId={(grade) => grade.value}
         isLoading={isLoading}
+        tableId="academics.grade-levels"
         enableSorting={true}
         pagination={{ pageSize: 20 }}
         emptyState={{
-          icon: <Layers className="w-12 h-12" />,
+          icon: <Layers className="w-10 h-10" />,
           title: t('tables.gradeLevels.empty.title'),
           description: t('tables.gradeLevels.empty.description'),
         }}

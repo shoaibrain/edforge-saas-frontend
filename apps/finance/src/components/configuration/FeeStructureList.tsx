@@ -87,7 +87,7 @@ export function FeeStructureList({
           const fee = row.original;
           return (
             <div className="text-right flex flex-col gap-0.5">
-              <span className="text-sm font-semibold text-[rgb(var(--text-primary))]">
+              <span className="text-sm font-semibold text-[rgb(var(--text-primary))] tabular-nums">
                 {formatCompact(fee.amount)}
               </span>
               <span className="text-4xs text-[rgb(var(--text-disabled))]">
@@ -169,13 +169,12 @@ export function FeeStructureList({
       columns={columns}
       data={safeList}
       isLoading={isLoading}
+      tableId="finance.fee-structures"
       enableSorting={true}
       pagination={{ pageSize: 10 }}
       maxHeight="calc(100vh - 24rem)"
       emptyState={{
-        icon: (
-          <Layers className="w-10 h-10 text-[rgb(var(--text-tertiary))] opacity-40" />
-        ),
+        icon: <Layers className="w-10 h-10" />,
         title: t("feeStructure.noFeeStructures"),
         description: t("feeStructure.noFeeStructuresDescription"),
       }}
