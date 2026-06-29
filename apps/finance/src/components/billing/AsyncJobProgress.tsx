@@ -14,6 +14,7 @@
  */
 
 import { CheckCircle2, Loader2, XCircle } from 'lucide-react'
+import { useTranslation } from '@edforge/i18n'
 import type { AsyncBulkJobResult } from '@edforge/finance-services'
 
 interface AsyncJobProgressProps {
@@ -23,12 +24,14 @@ interface AsyncJobProgressProps {
 }
 
 export function AsyncJobProgress({ job, verbingNoun }: AsyncJobProgressProps) {
+  const { t } = useTranslation('payments')
+
   if (!job || job.status === 'queued') {
     return (
       <div className="flex items-center gap-3 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary)/0.5)] px-4 py-3">
         <Loader2 className="w-4 h-4 text-[rgb(var(--text-tertiary))] animate-spin flex-shrink-0" />
         <div className="text-sm text-[rgb(var(--text-secondary))]">
-          Queued — waiting for a worker to pick up the job.
+          {t('asyncJobs.progress.queued')}
         </div>
       </div>
     )
@@ -45,7 +48,7 @@ export function AsyncJobProgress({ job, verbingNoun }: AsyncJobProgressProps) {
               {verbingNoun}…
             </div>
             <div className="text-xs text-[rgb(var(--text-tertiary))] tabular-nums">
-              {done} / {job.totalRecords} processed
+              {t('asyncJobs.progress.processed', { done, total: job.totalRecords })}
             </div>
           </div>
         </div>
@@ -64,9 +67,13 @@ export function AsyncJobProgress({ job, verbingNoun }: AsyncJobProgressProps) {
       <div className="flex items-start gap-3 rounded-lg border border-[rgb(var(--state-success-border)/0.4)] bg-[rgb(var(--state-success-bg)/0.18)] px-4 py-3">
         <CheckCircle2 className="w-4 h-4 text-[rgb(var(--state-success-fg))] mt-0.5 flex-shrink-0" />
         <div className="text-sm text-[rgb(var(--state-success-fg))]">
-          <div className="font-medium">Done</div>
+          <div className="font-medium">{t('asyncJobs.progress.done')}</div>
           <div className="text-xs mt-0.5 tabular-nums">
-            {job.succeeded} succeeded · {job.skipped} skipped · {job.failed} failed
+            {t('asyncJobs.progress.summary', {
+              succeeded: job.succeeded,
+              skipped: job.skipped,
+              failed: job.failed,
+            })}
           </div>
         </div>
       </div>
@@ -78,8 +85,8 @@ export function AsyncJobProgress({ job, verbingNoun }: AsyncJobProgressProps) {
     <div className="flex items-start gap-3 rounded-lg border border-[rgb(var(--state-danger-border)/0.4)] bg-[rgb(var(--state-danger-bg)/0.18)] px-4 py-3">
       <XCircle className="w-4 h-4 text-[rgb(var(--state-danger-fg))] mt-0.5 flex-shrink-0" />
       <div className="text-sm text-[rgb(var(--state-danger-fg))]">
-        <div className="font-medium">Job failed</div>
-        <div className="text-xs mt-0.5">{job.error ?? 'The job ended with an unrecoverable error.'}</div>
+        <div className="font-medium">{t('asyncJobs.progress.failed')}</div>
+        <div className="text-xs mt-0.5">{job.error ?? t('asyncJobs.progress.failureFallback')}</div>
       </div>
     </div>
   )

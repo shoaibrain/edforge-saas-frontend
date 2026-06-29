@@ -14,6 +14,10 @@ import { formatInvoiceStatus, formatGatewayLabel } from "@edforge/types";
 import { useCurrency } from "@edforge/types/use-currency";
 import { useTranslation } from "@edforge/i18n";
 import { useFinanceSettings } from "../../layouts/FinanceLayout";
+import {
+  getLocalizedAgingInsight,
+  localizeAgingBucketLabel,
+} from "./aging-i18n";
 
 // ─── Colors ──────────────────────────────────────────────────────────────────
 
@@ -163,28 +167,6 @@ function DonutTooltip({ active, payload }: any) {
   );
 }
 
-// ─── Aging Insight Generator ─────────────────────────────────────────────────
-
-function getAgingInsight(
-  buckets: AgingBucket[],
-  fmtShort: (amount: number) => string,
-): string | null {
-  const activeBuckets = buckets.filter((b) => b.count > 0);
-  if (activeBuckets.length === 0) return null;
-
-  const total = activeBuckets.reduce((sum, b) => sum + b.count, 0);
-  const totalAmount = activeBuckets.reduce((sum, b) => sum + b.amount, 0);
-
-  if (activeBuckets.length === 1) {
-    const b = activeBuckets[0];
-    return `${b.count} invoice${b.count !== 1 ? "s" : ""} overdue (${fmtShort(b.amount)}), all within the ${b.label} window.`;
-  }
-
-  // Multiple buckets active — find the worst
-  const worst = activeBuckets[activeBuckets.length - 1];
-  return `${total} invoices overdue totaling ${fmtShort(totalAmount)}. ${worst.count} invoice${worst.count !== 1 ? "s" : ""} in the ${worst.label} bucket need${worst.count === 1 ? "s" : ""} immediate attention.`;
-}
-
 // ─── Default Buckets ─────────────────────────────────────────────────────────
 
 const DEFAULT_BUCKETS: AgingBucket[] = [
@@ -252,8 +234,8 @@ export function BillingHealthCard({
   const buckets = agingReport.length > 0 ? agingReport : DEFAULT_BUCKETS;
   const hasAnyOverdue = buckets.some((b) => b.count > 0);
   const agingInsight = useMemo(
-    () => getAgingInsight(buckets, formatShort),
-    [buckets, formatShort],
+    () => getLocalizedAgingInsight(buckets, formatShort, t),
+    [buckets, formatShort, t],
   );
 
   // Spectrum bar segment widths — proportional to count, minimum 6% for visibility
@@ -430,7 +412,11 @@ export function BillingHealthCard({
                               ? "1px solid rgb(var(--background-primary))"
                               : undefined,
                         }}
-                        title={`${bucket.label}: ${bucket.count} invoices (${formatShort(bucket.amount)})`}
+                        title={t("overview.billingHealth.agingBucketTitle", {
+                          bucket: localizeAgingBucketLabel(bucket, t),
+                          count: bucket.count,
+                          amount: formatShort(bucket.amount),
+                        })}
                       >
                         {isActive && bucket.count > 0 && (
                           <span className="text-xs font-bold text-[rgb(var(--action-primary-fg))] drop-shadow-sm">
@@ -471,7 +457,7 @@ export function BillingHealthCard({
                               : "rgb(var(--text-disabled))",
                           }}
                         >
-                          {bucket.label}
+                          {localizeAgingBucketLabel(bucket, t)}
                         </div>
                         {isActive && (
                           <div className="text-xs tabular-nums text-[rgb(var(--text-tertiary))]">

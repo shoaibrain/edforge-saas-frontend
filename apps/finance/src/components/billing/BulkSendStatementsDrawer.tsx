@@ -15,12 +15,16 @@ import { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { FileText, Loader2, X } from 'lucide-react'
 import { toast } from 'sonner'
+import { useTranslation } from '@edforge/i18n'
 import {
   useAsyncBulkJob,
   useBulkSendStatements,
 } from '@edforge/finance-services'
 import type { StudentAccount } from '@edforge/types'
+import { useCurrency } from '@edforge/types/use-currency'
+import { useFinanceSettings } from '../../layouts/FinanceLayout'
 import { AsyncJobProgress } from './AsyncJobProgress'
+import { formatAsyncJobToast, formatKnownSkipReason } from './async-job-i18n'
 
 export interface BulkSendStatementsDrawerProps {
   open: boolean
@@ -52,6 +56,9 @@ export function BulkSendStatementsDrawer({
   schoolId,
   onComplete,
 }: BulkSendStatementsDrawerProps) {
+  const { t } = useTranslation('payments')
+  const settings = useFinanceSettings()
+  const { format } = useCurrency(settings)
   const [jobId, setJobId] = useState<string | null>(null)
 
   const start = useBulkSendStatements(schoolId)
@@ -64,18 +71,19 @@ export function BulkSendStatementsDrawer({
   useEffect(() => {
     if (!job.data) return
     if (job.data.status === 'succeeded') {
-      const parts: string[] = [`Sent ${job.data.succeeded} statement${job.data.succeeded === 1 ? '' : 's'}`]
-      if (job.data.skipped > 0) parts.push(`${job.data.skipped} skipped`)
-      if (job.data.failed > 0) parts.push(`${job.data.failed} failed`)
-      if (job.data.failed === 0 && job.data.skipped === 0) toast.success(parts[0])
-      else if (job.data.succeeded === 0)
-        toast.error(`No statements sent — ${job.data.failed} failed; ${job.data.skipped} skipped`)
-      else toast.error(parts.join(' · '))
+      const result = formatAsyncJobToast(
+        t,
+        'statements',
+        job.data.succeeded,
+        job.data.skipped,
+        job.data.failed,
+      )
+      toast[result.tone](result.message)
       onComplete()
     } else if (job.data.status === 'failed') {
-      toast.error(job.data.error ?? 'Send-statements job failed.')
+      toast.error(job.data.error ?? t('asyncJobs.statements.jobFailed'))
     }
-  }, [job.data, onComplete])
+  }, [job.data, onComplete, t])
 
   const handleClose = () => {
     if (isWorking) return
@@ -93,7 +101,7 @@ export function BulkSendStatementsDrawer({
       })
       setJobId(ack.jobId)
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to start send-statements job.')
+      toast.error(err instanceof Error ? err.message : t('asyncJobs.statements.failedToStart'))
     }
   }
 
@@ -139,10 +147,10 @@ export function BulkSendStatementsDrawer({
                         id="bulk-send-statements-title"
                         className="text-lg font-semibold text-[rgb(var(--text-primary))] truncate"
                       >
-                        Send statements
+                        {t('asyncJobs.statements.title')}
                       </h2>
                       <p className="text-xs text-[rgb(var(--text-tertiary))] tabular-nums">
-                        {accounts.length} account{accounts.length === 1 ? '' : 's'} selected
+                        {t('asyncJobs.common.selected.accounts', { count: accounts.length })}
                       </p>
                     </div>
                   </div>
@@ -151,7 +159,7 @@ export function BulkSendStatementsDrawer({
                     onClick={handleClose}
                     disabled={isWorking}
                     className="p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-secondary))] transition-colors flex-shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
-                    aria-label="Close drawer"
+                    aria-label={t('asyncJobs.common.closeDrawer')}
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -159,17 +167,16 @@ export function BulkSendStatementsDrawer({
 
                 <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
                   {showProgress ? (
-                    <AsyncJobProgress job={job.data} verbingNoun="Sending statements" />
+                    <AsyncJobProgress job={job.data} verbingNoun={t('asyncJobs.statements.progress')} />
                   ) : (
                     <div className="rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary)/0.4)] px-3 py-2.5 text-sm text-[rgb(var(--text-secondary))]">
-                      Each guardian on file receives the current balance + recent ledger
-                      activity as a PDF attachment. Delivered by email only.
+                      {t('asyncJobs.statements.description')}
                     </div>
                   )}
 
                   <section>
                     <h3 className="text-sm font-medium text-[rgb(var(--text-primary))] mb-2">
-                      Recipients ({eligible.length})
+                      {t('asyncJobs.common.recipients', { count: eligible.length })}
                     </h3>
                     <ul className="space-y-1 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary)/0.4)] p-2 max-h-60 overflow-y-auto">
                       {eligible.map((a) => (
@@ -178,10 +185,10 @@ export function BulkSendStatementsDrawer({
                           className="flex items-center justify-between gap-2 px-2 py-1 text-sm"
                         >
                           <span className="text-[rgb(var(--text-primary))] truncate">
-                            {a.studentName ?? 'Unknown student'}
+                            {a.studentName ?? t('asyncJobs.common.unknownStudent')}
                           </span>
                           <span className="text-xs text-[rgb(var(--text-tertiary))] tabular-nums flex-shrink-0">
-                            balance {a.balance ?? 0}
+                            {t('asyncJobs.common.balance', { amount: format(a.balance ?? 0) })}
                           </span>
                         </li>
                       ))}
@@ -191,7 +198,7 @@ export function BulkSendStatementsDrawer({
                   {skipped.length > 0 && (
                     <section>
                       <h3 className="text-sm font-medium text-[rgb(var(--text-tertiary))] mb-2">
-                        Will skip ({skipped.length})
+                        {t('asyncJobs.common.willSkip', { count: skipped.length })}
                       </h3>
                       <ul className="space-y-1 rounded-lg border border-dashed border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary)/0.2)] p-2 max-h-40 overflow-y-auto">
                         {skipped.map(({ account, reason }) => (
@@ -200,10 +207,10 @@ export function BulkSendStatementsDrawer({
                             className="flex items-center justify-between gap-2 px-2 py-1 text-sm"
                           >
                             <span className="text-[rgb(var(--text-secondary))] truncate">
-                              {account.studentName ?? 'Unknown student'}
+                              {account.studentName ?? t('asyncJobs.common.unknownStudent')}
                             </span>
                             <span className="text-xs text-[rgb(var(--text-tertiary))] flex-shrink-0">
-                              {reason}
+                              {formatKnownSkipReason(t, reason)}
                             </span>
                           </li>
                         ))}
@@ -219,7 +226,7 @@ export function BulkSendStatementsDrawer({
                     disabled={isWorking}
                     className="px-4 py-2 text-sm font-medium text-[rgb(var(--text-secondary))] bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] rounded-lg hover:bg-[rgb(var(--background-secondary))] transition-colors disabled:opacity-50"
                   >
-                    {jobId && (job.data?.status === 'succeeded' || job.data?.status === 'failed') ? 'Close' : 'Cancel'}
+                    {jobId && (job.data?.status === 'succeeded' || job.data?.status === 'failed') ? t('actions.close') : t('actions.cancel')}
                   </button>
                   {!jobId && (
                     <button
@@ -231,12 +238,12 @@ export function BulkSendStatementsDrawer({
                       {start.isPending ? (
                         <>
                           <Loader2 className="w-4 h-4 animate-spin" />
-                          Starting…
+                          {t('asyncJobs.common.starting')}
                         </>
                       ) : (
                         <>
                           <FileText className="w-4 h-4" />
-                          Send {eligible.length}
+                          {t('asyncJobs.statements.send', { count: eligible.length })}
                         </>
                       )}
                     </button>

@@ -32,6 +32,10 @@
       "exportCsv": "Export CSV",
       "exportCsvAria": "Export invoices as CSV"
     },
+    "export": {
+      "success": "CSV export downloaded",
+      "failed": "Failed to export CSV"
+    },
     "alert": {
       "title": "{{count}} invoices overdue — {{amount}} uncollected",
       "collectionRate": "Collection rate is {{rate}}%",
@@ -78,6 +82,18 @@
       "invoiceCount_plural": "{{count}} invoices",
       "agingOverview": "Aging overview",
       "overdueCount": "{{count}} overdue",
+      "agingBucketTitle": "{{bucket}}: {{count}} invoices ({{amount}})",
+      "agingBuckets": {
+        "current": "Current",
+        "days1To30": "1-30 days",
+        "days31To60": "31-60 days",
+        "days61To90": "61-90 days",
+        "days90Plus": "90+ days"
+      },
+      "agingInsight": {
+        "singleBucket": "{{count}} overdue · {{amount}}, all within the {{bucket}} window.",
+        "multipleBuckets": "{{count}} overdue totaling {{amount}}. {{worstCount}} in {{bucket}} need immediate attention."
+      },
       "noOverdue": "No overdue invoices — all accounts are current.",
       "paymentMethods": "Payment methods",
       "noPaymentsRecorded": "No payments recorded yet."
@@ -98,24 +114,97 @@
   "invoices": {
     "title": "Invoices",
     "description": "View and manage fee invoices",
+    "manageDescription": "Generate, issue, and manage student invoices.",
     "outstanding": "Outstanding",
     "paid": "Paid",
     "overdue": "Overdue",
     "all": "All Invoices",
     "invoiceNumber": "Invoice #",
+    "status": "Status",
     "dueDate": "Due Date",
+    "dueDateRequired": "Due Date *",
     "issuedDate": "Issued Date",
     "billingPeriod": "Billing Period",
+    "billingPeriodPlaceholder": "e.g., First Term, Admission",
+    "notes": "Notes",
     "amountDue": "Amount Due",
     "grandTotal": "Total",
     "noInvoices": "No invoices found",
     "noInvoicesDescription": "There are no invoices for the selected period.",
+    "generateFirstInvoice": "Generate your first invoice to get started.",
     "noOutstanding": "All caught up!",
     "noOutstandingDescription": "There are no outstanding invoices at this time.",
     "generateInvoice": "Generate Invoice",
     "selectFees": "Select fees to include",
     "selectStudent": "Select student",
-    "generated": "Invoice generated successfully"
+    "selectSchool": "Select a school to manage invoices.",
+    "selectAcademicYear": "Select academic year",
+    "studentRequired": "Student *",
+    "feeStructuresRequired": "Fee Structures *",
+    "generated": "Invoice generated successfully",
+    "generateFailed": "Failed to generate invoice",
+    "requiredFields": "Please fill all required fields",
+    "issue": "Issue",
+    "issueSuccess": "Invoice issued successfully",
+    "issueFailed": "Failed to issue invoice",
+    "cancelSuccess": "Invoice cancelled",
+    "cancelFailed": "Failed to cancel invoice",
+    "bulkIssueSuccess": "Issued {{count}} invoice.",
+    "bulkIssueSuccess_plural": "Issued {{count}} invoices.",
+    "bulkIssueSuccessWithSkipped": "Issued {{count}} invoice. {{skipped}} skipped.",
+    "bulkIssueSuccessWithSkipped_plural": "Issued {{count}} invoices. {{skipped}} skipped.",
+    "bulkIssueFailed": "Failed to issue invoices",
+    "overdueByDays": "Overdue by {{count}}d",
+    "overdueBanner": "{{count}} invoice overdue - {{amount}} uncollected",
+    "overdueBanner_plural": "{{count}} invoices overdue - {{amount}} uncollected",
+    "overdueBannerRate": "Collection rate is {{rate}}%.",
+    "overdueBannerWithDrafts": "Collection rate is {{rate}}%. {{drafts}} drafts need to be issued.",
+    "loadedInvoices": "{{count}} invoices",
+    "loadedCount": "{{count}} loaded",
+    "paidCount": "{{count}} paid",
+    "loadedSelectionOnly": "Selection applies to loaded records only ({{count}} shown). Load more pages to include additional invoices.",
+    "searchPlaceholder": "Search by invoice # or student...",
+    "issueSelected": "Issue Selected ({{count}})",
+    "sendReminder": "Send reminder",
+    "cancelTitle": "Cancel Invoice {{invoiceNumber}}?",
+    "cancelDescriptionPrefix": "This action is",
+    "irreversible": "irreversible",
+    "cancelDescriptionSuffix": "The invoice will be permanently cancelled and cannot be re-issued.",
+    "cancelReason": "Reason for cancellation *",
+    "cancelReasonPlaceholder": "Enter the reason for cancelling this invoice...",
+    "keepInvoice": "Keep Invoice",
+    "cancelInvoice": "Cancel Invoice",
+    "bulkIssueTitle": "Issue {{count}} invoice?",
+    "bulkIssueTitle_plural": "Issue {{count}} invoices?",
+    "bulkIssueDescription": "Students will be able to see and pay these invoices once issued. This action cannot be undone.",
+    "issueCountInvoices": "Issue {{count}} Invoice",
+    "issueCountInvoices_plural": "Issue {{count}} Invoices"
+  },
+
+  "invoiceDetail": {
+    "backToInvoices": "Back to Invoices",
+    "invoice": "Invoice",
+    "student": "Student: {{name}}",
+    "due": "Due: {{date}}",
+    "actions": {
+      "issueInvoice": "Issue Invoice"
+    },
+    "sections": {
+      "lineItems": "Line Items",
+      "paymentHistory": "Payment History"
+    },
+    "empty": {
+      "noLineItems": "No line items"
+    },
+    "paymentHistory": {
+      "payment": "Payment",
+      "via": "via {{gateway}}"
+    },
+    "metadata": {
+      "created": "Created: {{date}}",
+      "issued": "Issued: {{date}}",
+      "notes": "Notes: {{notes}}"
+    }
   },
 
   "lineItems": {
@@ -218,7 +307,9 @@
     "completed": "Completed",
     "failed": "Failed",
     "refunded": "Refunded",
-    "partially_refunded": "Partially Refunded"
+    "partially_refunded": "Partially Refunded",
+    "debit": "Debit",
+    "credit": "Credit"
   },
 
   "feeStructure": {
@@ -263,6 +354,68 @@
       "inactive": "Inactive"
     },
     "autoApplyOnEnrollment": "Auto-apply on enrollment",
+    "closeForm": "Close fee structure form",
+    "sections": {
+      "basicInfo": "Basic Info",
+      "pricing": "Pricing",
+      "scope": "Scope",
+      "enrollmentRules": "Enrollment Rules",
+      "effectivePeriod": "Effective Period"
+    },
+    "fields": {
+      "name": "Name",
+      "description": "Description",
+      "type": "Type",
+      "academicYear": "Academic Year",
+      "amount": "Amount",
+      "frequency": "Frequency",
+      "taxType": "Tax Type",
+      "taxRate": "Tax Rate (%)",
+      "gradeLevels": "Grade Levels",
+      "effectiveFrom": "Effective From",
+      "effectiveTo": "Effective To"
+    },
+    "placeholders": {
+      "name": "e.g. Annual Tuition Fee",
+      "description": "Optional description",
+      "selectYear": "Select year..."
+    },
+    "academicYearStatus": {
+      "current": "Current",
+      "planning": "Planning",
+      "noneConfigured": "No academic years configured."
+    },
+    "taxTypes": {
+      "none": "None"
+    },
+    "enrollment": {
+      "proRateOnMidTermEntry": "Pro-rate on mid-term entry",
+      "proRateHelp": "When enabled, fees are automatically calculated proportionally for students enrolling mid-term."
+    },
+    "dateHelp": {
+      "gregorianStorage": "Dates are displayed in Gregorian (AD). The system stores all dates in AD format.",
+      "dualBs": "Bikram Sambat equivalents are shown where applicable."
+    },
+    "gradeSelect": {
+      "placeholder": "Select grade levels...",
+      "selectedCount": "{{count}} grade selected",
+      "selectedCount_plural": "{{count}} grades selected",
+      "gradeLabel": "Grade {{grade}}",
+      "removeGradeAria": "Remove grade {{grade}}"
+    },
+    "validation": {
+      "nameRequired": "Name is required",
+      "nameMax": "Name must be 100 characters or fewer",
+      "descriptionMax": "Description must be 255 characters or fewer",
+      "amountRequired": "Amount is required",
+      "amountMin": "Amount cannot be negative",
+      "amountMax": "Amount cannot exceed 10,000,000",
+      "taxRateMin": "Tax rate cannot be negative",
+      "taxRateMax": "Tax rate cannot exceed 100%",
+      "effectiveFromRequired": "Effective start date is required",
+      "academicYearRequired": "Academic year is required",
+      "effectiveToAfterFrom": "Effective end date must be after the start date"
+    },
     "editAria": "Edit fee structure",
     "deleteAria": "Delete fee structure",
     "deleteTitle": "Delete Fee Structure",
@@ -289,6 +442,180 @@
     }
   },
 
+  "bulkGenerate": {
+    "title": "Bulk Generate Invoices",
+    "description": "Generate invoices for multiple students at once - by grade, by student, or by smart segment.",
+    "selectSchool": "Select a school to generate bulk invoices.",
+    "loadingRoster": "Loading school roster...",
+    "steps": {
+      "selectRecipients": "Select recipients",
+      "feeStructures": "Fee structures",
+      "invoiceDetails": "Invoice details",
+      "reviewConfirm": "Review & confirm"
+    },
+    "actions": {
+      "generating": "Generating...",
+      "generateInvoices": "Generate invoices"
+    },
+    "toast": {
+      "generated": "{{count}} invoice generated",
+      "generated_plural": "{{count}} invoices generated",
+      "generatedWithSkipped": "{{count}} invoice generated · {{skipped}} skipped",
+      "generatedWithSkipped_plural": "{{count}} invoices generated · {{skipped}} skipped",
+      "syncLimitExceeded": "Too many students (>25) for synchronous generation. For now, narrow the selection or pick a single grade and try again.",
+      "failed": "Bulk generation failed."
+    },
+    "footer": {
+      "selectStudent": "Select at least one student to continue",
+      "studentsSelected": "{{count}} student selected",
+      "studentsSelected_plural": "{{count}} students selected",
+      "addFeeOrLine": "Add at least one fee or custom line",
+      "lineItemsAndStudents": "{{lineCount}} {{lineLabel}} · {{studentCount}} {{studentLabel}}",
+      "invoicesConfigured": "{{count}} invoice will be configured",
+      "invoicesConfigured_plural": "{{count}} invoices will be configured",
+      "resolvingPreview": "Resolving preview...",
+      "readyToGenerate": "Ready to generate {{count}} invoice",
+      "readyToGenerate_plural": "Ready to generate {{count}} invoices"
+    },
+    "common": {
+      "unknown": "Unknown",
+      "grade": "grade",
+      "grade_plural": "grades",
+      "gradeLabel": "Grade {{grade}}",
+      "gradesList": "Grades {{grades}}",
+      "student": "student",
+      "student_plural": "students",
+      "studentCount": "{{count}} student",
+      "studentCount_plural": "{{count}} students",
+      "selectedCount": "{{count}} selected",
+      "notSelectedCount": "{{count}} not selected",
+      "noneSelected": "none selected",
+      "lineItem": "line item",
+      "lineItem_plural": "line items",
+      "optional": "(optional)"
+    },
+    "step1": {
+      "byGrade": "By grade",
+      "byStudent": "By student",
+      "searchPlaceholder": "Search name, student ID, or student number...",
+      "quickSegments": "Quick segments",
+      "studentTotalCount": "{{count}} student total",
+      "studentTotalCount_plural": "{{count}} students total",
+      "studentMatchCount": "{{count}} student match",
+      "studentMatchCount_plural": "{{count}} students match",
+      "selectAll": "Select all",
+      "selectAllMatching": "Select all matching",
+      "clear": "Clear",
+      "phase1Tooltip": "Counter wiring lands with the bulk-preview integration; chip filtering follows in a follow-up PR",
+      "phase2Tooltip": "Coming in Phase 2 - requires student demographic data",
+      "segments": {
+        "outstanding": "Outstanding balance",
+        "new": "New admissions",
+        "not-billed-this-period": "Not yet billed this period",
+        "transport": "Transport users",
+        "boarders": "Boarders",
+        "scholarship": "Scholarship / BPL"
+      },
+      "noStudentsMatch": "No students match the current search.",
+      "recipientsSelected": "Recipients selected",
+      "gradesCovered": "Grades covered",
+      "emptyRailPrefix": "Nobody selected yet. Tick a grade to add everyone in it, then untick individual students you want to skip - or switch to",
+      "emptyRailSuffix": "to cherry-pick."
+    },
+    "step2": {
+      "coverageIntro": "Each fee is checked against your {{count}} selected student. Fees that do not apply to a student are skipped on that invoice automatically.",
+      "coverageIntro_plural": "Each fee is checked against your {{count}} selected students. Fees that do not apply to a student are skipped on that invoice automatically.",
+      "estimatedGrandTotal": "Estimated grand total",
+      "avgPerStudent": "{{amount}} avg / student",
+      "students": "Students",
+      "feeStructures": "Fee structures",
+      "customLines": "Custom lines",
+      "grossSubtotal": "Gross subtotal",
+      "feeDiscounts": "Fee discounts",
+      "zeroTotalWarning": "{{count}} student's projected total is 0. Turn on Skip zero-total in Step 3 to exclude them.",
+      "zeroTotalWarning_plural": "{{count}} students' projected total is 0. Turn on Skip zero-total in Step 3 to exclude them.",
+      "perFeeDiscount": "Per-fee discount %",
+      "appliesToAll": "Applies to all {{count}}",
+      "appliesToZero": "Applies to 0 - not selectable",
+      "partialCoverage": "{{covered}} of {{total}} · {{skipped}} skipped",
+      "customLineItems": "Custom line items",
+      "addLine": "Add line",
+      "customLineHelp": "Optional one-off charges added to every selected student's invoice (e.g., Annual picnic - voluntary).",
+      "customLinePlaceholder": "e.g. Annual picnic - voluntary",
+      "customLineFallback": "Custom line item",
+      "removeLine": "Remove line"
+    },
+    "step3": {
+      "academicYear": "Academic year",
+      "academicYearHelp": "Active year - drives invoice + ledger anchoring.",
+      "noAcademicYears": "No academic years configured",
+      "billingPeriod": "Billing period / term",
+      "billingPeriodHelp": "Grading-period aligned billing window.",
+      "selectPeriod": "- Select -",
+      "terms": {
+        "first": "First Term",
+        "second": "Second Term",
+        "third": "Third Term",
+        "fourth": "Fourth Term"
+      },
+      "issueDate": "Issue date",
+      "dueDate": "Due date",
+      "numberPreview": "Invoice number preview",
+      "sequentialNumbers": "{{count}} sequential number",
+      "sequentialNumbers_plural": "{{count}} sequential numbers",
+      "numberPreviewHelp": "Format only - actual numbers are reserved at generate time. Format:",
+      "note": "Note on every invoice",
+      "notePlaceholder": "e.g. Please pay at the accounts counter or via eSewa before the due date.",
+      "reviewEveryInvoice": "Review every invoice before generating",
+      "reviewEveryInvoiceHelp": "Show a per-student line-item preview on the next step.",
+      "skipZeroTotal": "Skip students whose total comes to zero",
+      "skipZeroTotalHelp": "Do not issue zero-amount invoices (e.g. fully-discounted students)."
+    },
+    "step4": {
+      "verifyIntro": "Verify everything below. {{count}} invoice will be generated",
+      "verifyIntro_plural": "Verify everything below. {{count}} invoices will be generated",
+      "skippedZeroParenthetical": "({{count}} skipped - zero total)",
+      "recipients": "Recipients",
+      "recipientSummary": "{{studentCount}} {{studentLabel}} · {{gradeCount}} {{gradeLabel}}",
+      "feeStructures": "Fee structures",
+      "noFeesSelected": "No fees selected.",
+      "period": "Period",
+      "issueDue": "Issue {{issueDate}} · Due {{dueDate}}",
+      "perStudentPreview": "Per-student preview",
+      "tapToExpand": "tap a row to expand",
+      "noBillableStudents": "No billable students.",
+      "allProjectedZero": "All projected totals are 0.",
+      "invoices": "Invoices",
+      "avgPerStudent": "Avg / student",
+      "grandTotal": "Grand total",
+      "postingNotice": "Posts to the General Ledger on issue. Notifications send per guardian channel preferences.",
+      "resolvingServerPreview": "Resolving server preview...",
+      "serverPreviewUnavailable": "Server preview unavailable - generate will still work, but duplicate / segment counts will not be shown.",
+      "serverPreview": "Server preview",
+      "duplicateSkip": "Duplicate skip",
+      "hasBalanceDue": "Has balance due",
+      "newAdmissions": "New admissions",
+      "notBilledThisPeriod": "Not billed this period",
+      "estimatedDuration": "Estimated duration ≈ {{seconds}}s",
+      "lineItemCount": "{{count}} line item",
+      "lineItemCount_plural": "{{count}} line items",
+      "customBadge": "custom",
+      "invoiceTotal": "Invoice total"
+    },
+    "success": {
+      "generatedTitle": "{{count}} invoice generated",
+      "generatedTitle_plural": "{{count}} invoices generated",
+      "notice": "Guardians will be notified per their channel preferences.",
+      "periodNotice": "For {{billingPeriod}}. Guardians will be notified per their channel preferences.",
+      "invoices": "Invoices",
+      "totalBilled": "Total billed",
+      "skipped": "Skipped",
+      "downloadAll": "Download all (PDF)",
+      "downloadAllTooltip": "Bulk PDF download lands in a later sprint",
+      "newBatch": "New batch"
+    }
+  },
+
   "gatewayConfig": {
     "title": "Payment Gateways",
     "description": "Configure payment gateways for your school",
@@ -305,13 +632,333 @@
     "credentialsMasked": "Credentials are masked for security"
   },
 
+  "paymentsList": {
+    "title": "Payments",
+    "description": "View and manage all payment transactions.",
+    "selectSchool": "Select a school to view payments.",
+    "gateway": "Gateway",
+    "date": "Date",
+    "allGateways": "All Gateways",
+    "viewReceipt": "View receipt",
+    "voidPayment": "Void Payment",
+    "voidDescription": "This will reverse the ledger entry and restore the amount due on the invoice. This action cannot be undone.",
+    "voidReason": "Reason for voiding *",
+    "voidReasonPlaceholder": "e.g. Duplicate payment, data entry error",
+    "refundPayment": "Refund Payment",
+    "refundPartial": "Refund (Partial)",
+    "originalAmount": "Original amount",
+    "alreadyRefunded": "Already refunded",
+    "maxRefundable": "Max refundable",
+    "refundAmount": "Refund Amount ({{currency}}) *",
+    "reasonRequired": "Reason *",
+    "refundReasonPlaceholder": "Reason for refund...",
+    "amountGreaterThanZero": "Amount must be greater than 0",
+    "exceedsRefundable": "Exceeds refundable amount ({{amount}})",
+    "voidSuccess": "Payment voided successfully",
+    "voidFailed": "Failed to void payment",
+    "refundSuccess": "Refund initiated successfully",
+    "refundFailed": "Failed to create refund",
+    "voidSelected": "Void selected",
+    "sendReceipt": "Send receipt",
+    "paymentCount": "{{count}} payment",
+    "paymentCount_plural": "{{count}} payments",
+    "processed": "processed",
+    "partialRefunds": "Partial Refunds",
+    "searchPlaceholder": "Search by receipt #, invoice #, or student...",
+    "exportSuccess": "Payments CSV exported",
+    "exportFailed": "Failed to export payments CSV",
+    "recordManualPayment": "Record Manual Payment"
+  },
+
+  "recordPayment": {
+    "title": "Record Payment",
+    "description": "Manually record a cash, bank transfer, or cheque payment.",
+    "selectSchool": "Select a school to record payments.",
+    "loadingInvoices": "Loading invoices...",
+    "noUnpaidInvoices": "No unpaid invoices for this student.",
+    "dueDate": "Due {{date}}",
+    "selectInvoiceError": "Please select an invoice",
+    "validAmountError": "Please enter a valid amount",
+    "referenceRequired": "Reference number is required for bank transfer / cheque",
+    "recordSuccess": "Payment recorded successfully",
+    "recordFailed": "Failed to record payment",
+    "successTitle": "Payment Recorded",
+    "successDescription": "The manual payment has been recorded and the student account has been updated.",
+    "recordAnother": "Record Another Payment",
+    "studentRequired": "Student *",
+    "studentSearchPlaceholder": "Search student by name...",
+    "invoiceRequired": "Invoice *",
+    "paymentMethodRequired": "Payment Method *",
+    "amountRequired": "Amount ({{currency}}) *",
+    "referenceRequiredLabel": "Reference # *",
+    "bankReferencePlaceholder": "Bank reference number",
+    "chequeReferencePlaceholder": "Cheque number",
+    "datePaid": "Date Paid",
+    "notesPlaceholder": "Optional notes about this payment...",
+    "preview": "Preview",
+    "method": "Method",
+    "reference": "Reference #"
+  },
+
+  "asyncJobs": {
+    "common": {
+      "closeDrawer": "Close drawer",
+      "starting": "Starting...",
+      "channel": "Channel",
+      "optional": "(optional)",
+      "unknownStudent": "Unknown student",
+      "recipients": "Recipients ({{count}})",
+      "willSkip": "Will skip ({{count}})",
+      "balance": "balance {{amount}}",
+      "selected": {
+        "accounts": "{{count}} account selected",
+        "accounts_plural": "{{count}} accounts selected",
+        "payments": "{{count}} payment selected",
+        "payments_plural": "{{count}} payments selected",
+        "invoices": "{{count}} invoice selected",
+        "invoices_plural": "{{count}} invoices selected"
+      },
+      "channels": {
+        "email": "Email",
+        "sms": "SMS",
+        "both": "Both"
+      }
+    },
+    "progress": {
+      "queued": "Queued - waiting for a worker to pick up the job.",
+      "processed": "{{done}} / {{total}} processed",
+      "done": "Done",
+      "summary": "{{succeeded}} succeeded · {{skipped}} skipped · {{failed}} failed",
+      "failed": "Job failed",
+      "failureFallback": "The job ended with an unrecoverable error."
+    },
+    "toast": {
+      "skipped": "{{count}} skipped",
+      "failed": "{{count}} failed",
+      "statements": {
+        "success": "Sent {{count}} statement",
+        "success_plural": "Sent {{count}} statements",
+        "none": "No statements sent - {{failed}} failed; {{skipped}} skipped"
+      },
+      "receipts": {
+        "success": "Sent {{count}} receipt",
+        "success_plural": "Sent {{count}} receipts",
+        "none": "No receipts sent - {{failed}} failed; {{skipped}} skipped"
+      },
+      "reminders": {
+        "success": "Sent {{count}} reminder",
+        "success_plural": "Sent {{count}} reminders",
+        "none": "No reminders sent - {{failed}} failed; {{skipped}} skipped"
+      },
+      "adjustments": {
+        "success": "Adjusted {{count}} account",
+        "success_plural": "Adjusted {{count}} accounts",
+        "none": "No adjustments applied - {{failed}} failed; {{skipped}} skipped"
+      },
+      "voidPayments": {
+        "success": "Voided {{count}} payment",
+        "success_plural": "Voided {{count}} payments",
+        "none": "No payments voided - {{failed}} failed; {{skipped}} skipped"
+      }
+    },
+    "skip": {
+      "noReceiptNumber": "no receipt number",
+      "notCompleted": "not completed ({{status}})",
+      "notOutstanding": "not outstanding ({{status}})"
+    },
+    "statements": {
+      "title": "Send statements",
+      "progress": "Sending statements",
+      "description": "Each guardian on file receives the current balance and recent ledger activity as a PDF attachment. Delivered by email only.",
+      "send": "Send {{count}}",
+      "jobFailed": "Send-statements job failed.",
+      "failedToStart": "Failed to start send-statements job."
+    },
+    "receipts": {
+      "title": "Send receipts",
+      "progress": "Sending receipts",
+      "willSend": "Will send ({{count}})",
+      "noneEligible": "None of the selected payments are eligible - receipts require a completed payment with a receipt number.",
+      "send": "Send {{count}}",
+      "jobFailed": "Send-receipts job failed.",
+      "failedToStart": "Failed to start send-receipts job."
+    },
+    "reminders": {
+      "title": "Send reminders",
+      "progress": "Sending reminders",
+      "customNote": "Custom note",
+      "customNotePlaceholder": "e.g. Friendly reminder - please settle before term-end.",
+      "willRemind": "Will remind ({{count}})",
+      "noneEligible": "None of the selected invoices have an outstanding balance.",
+      "send": "Send {{count}}",
+      "jobFailed": "Send-reminders job failed.",
+      "failedToStart": "Failed to start send-reminders job."
+    },
+    "adjustments": {
+      "title": "Adjust balance",
+      "progress": "Posting ledger entries",
+      "warning": "The same adjustment is written against every selected account's ledger. Use the override toggle to skip the sign-threshold guard, for example crediting an already-surplus account.",
+      "type": "Type",
+      "types": {
+        "debit": "Debit (increase owed)",
+        "credit": "Credit (reduce owed)"
+      },
+      "amount": "Amount",
+      "effectiveDate": "Effective date",
+      "reason": "Reason",
+      "reasonPlaceholder": "e.g. Scholarship credit applied at start of term",
+      "override": "Override sign-threshold guard - apply even for accounts where the adjustment crosses a balance sign boundary.",
+      "apply": "Apply to {{count}}",
+      "jobFailed": "Adjust-balance job failed.",
+      "failedToStart": "Failed to start adjust-balance job."
+    },
+    "voidPayments": {
+      "title": "Void payments",
+      "warning": "Voiding reverses the ledger entry on each payment and restores the amount due on the linked invoice. Each row is a separate request and partial failures do not roll back.",
+      "reason": "Reason for voiding",
+      "reasonPlaceholder": "e.g. Duplicate payment, data entry error",
+      "reasonHelp": "The same reason is recorded against every voided payment.",
+      "willVoid": "Will void ({{count}})",
+      "noneEligible": "None of the selected payments are eligible to void.",
+      "voiding": "Voiding...",
+      "apply": "Void {{count}}"
+    }
+  },
+
+  "financeLayout": {
+    "error": {
+      "title": "Something went wrong",
+      "description": "An unexpected error occurred in the Finance module. You can try reloading the page or navigating back to the overview.",
+      "reload": "Reload",
+      "overview": "Go to Overview"
+    },
+    "noSchools": {
+      "title": "No schools configured",
+      "description": "Set up your organization in Settings > Organization before using Finance.",
+      "goToSettings": "Go to Settings"
+    }
+  },
+
+  "paymentGateways": {
+    "title": "Payment Gateways",
+    "description": "Configure which payment gateways are available for your school.",
+    "selectSchool": "Select a school to manage payment gateways.",
+    "saved": "Gateway configuration saved",
+    "saveFailed": "Failed to save gateway configuration",
+    "loadFailed": "Failed to load gateway configurations",
+    "enable": "Enable",
+    "saveConfiguration": "Save Configuration",
+    "securityNote": "Credentials are encrypted and stored securely. After saving, values will be masked.",
+    "showSecret": "Show secret value",
+    "hideSecret": "Hide secret value",
+    "gatewayLabels": {
+      "esewa": "eSewa",
+      "khalti": "Khalti",
+      "fonepay": "Fonepay",
+      "connectips": "ConnectIPS",
+      "stripe": "Stripe",
+      "cash": "Cash",
+      "bank_transfer": "Bank Transfer",
+      "cheque": "Cheque"
+    },
+    "descriptions": {
+      "esewa": "Nepal's leading digital wallet for online payments",
+      "khalti": "Digital wallet and payment gateway for Nepal",
+      "fonepay": "QR-based interbank payment network",
+      "connectips": "Internet banking payment system by NCHL",
+      "stripe": "Global payment processing for cards and wallets",
+      "cash": "Manual cash payments",
+      "bank_transfer": "Direct bank transfer payments",
+      "cheque": "Payment by cheque"
+    },
+    "credentials": {
+      "merchantCode": "Merchant Code",
+      "secretKey": "Secret Key",
+      "publicKey": "Public Key",
+      "apiKey": "API Key"
+    }
+  },
+
+  "studentSearch": {
+    "placeholder": "Search by name or student number...",
+    "searching": "Searching...",
+    "noStudents": "No students found.",
+    "grade": "Grade {{grade}}"
+  },
+
   "studentAccount": {
     "title": "Student Account",
+    "pageTitle": "Student Accounts",
+    "description": "View student billing accounts, invoices, payments, and ledger history.",
+    "selectSchool": "Select a school to view student accounts.",
     "balance": "Outstanding Balance",
     "totalPaid": "Total Paid",
     "lastPayment": "Last Payment",
     "ledger": "Account Ledger",
-    "noTransactions": "No transactions yet"
+    "noTransactions": "No transactions yet",
+    "never": "Never",
+    "searchPlaceholder": "Search by student name...",
+    "tabs": {
+      "ledger": "Ledger",
+      "invoices": "Invoices",
+      "payments": "Payments"
+    },
+    "summary": {
+      "totalStudents": "Total Students",
+      "outstanding": "Outstanding",
+      "fullyPaid": "Fully Paid",
+      "withBalance": "With Balance",
+      "accounts": "{{count}} account",
+      "accounts_plural": "{{count}} accounts",
+      "withBalanceCount": "{{count}} with balance",
+      "noBalance": "no balance"
+    },
+    "actions": {
+      "sendStatement": "Send statement",
+      "adjustBalance": "Adjust balance"
+    },
+    "columns": {
+      "student": "Student",
+      "studentName": "Student Name",
+      "date": "Date",
+      "type": "Type",
+      "description": "Description",
+      "debit": "Debit",
+      "credit": "Credit",
+      "balance": "Balance",
+      "balanceBucket": "Balance bucket",
+      "invoiceNumber": "Invoice #",
+      "status": "Status",
+      "total": "Total",
+      "due": "Due",
+      "dueDate": "Due Date",
+      "amountPaid": "Amount Paid",
+      "grandTotal": "Grand Total"
+    },
+    "balanceBuckets": {
+      "noBalance": "No balance"
+    },
+    "openingBalance": {
+      "title": "Opening Balance (Previous Dues)",
+      "amount": "Amount",
+      "asOf": "As of",
+      "remaining": "Remaining",
+      "settled": "{{amount}} settled",
+      "note": "Note",
+      "showMore": "Show more",
+      "showLess": "Show less"
+    },
+    "empty": {
+      "noAccounts": "No student accounts found",
+      "noAccountsDescription": "Student accounts are created automatically when invoices are generated.",
+      "noLedger": "No ledger entries yet.",
+      "noInvoices": "No invoices for this student.",
+      "noPayments": "No payments recorded for this student."
+    },
+    "error": {
+      "ledgerLoadFailed": "Failed to load ledger entries.",
+      "unknown": "Unknown error"
+    }
   },
 
   "currency": {

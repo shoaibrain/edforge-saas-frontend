@@ -13,8 +13,11 @@
 
 import { CheckCircle, Download, RotateCcw, X } from 'lucide-react'
 import { Button } from '@edforge/ui'
+import { useTranslation } from '@edforge/i18n'
 import { useCurrency } from '@edforge/types/use-currency'
 import { useFinanceSettings } from '../../../layouts/FinanceLayout'
+
+type Translate = (key: string, options?: Record<string, unknown>) => string
 
 export interface GenerateResultInvoice {
   number: string
@@ -39,6 +42,7 @@ export interface GenerateSuccessProps {
 }
 
 export function GenerateSuccess({ result, onReset, onClose }: GenerateSuccessProps) {
+  const { t } = useTranslation('payments')
   const settings = useFinanceSettings()
   const { format: formatCurrency } = useCurrency(settings)
   return (
@@ -49,18 +53,21 @@ export function GenerateSuccess({ result, onReset, onClose }: GenerateSuccessPro
         </div>
         <div>
           <h2 className="text-2xl font-semibold text-[rgb(var(--text-primary))]">
-            {result.count} invoice{result.count === 1 ? '' : 's'} generated
+            {t('bulkGenerate.success.generatedTitle', { count: result.count })}
           </h2>
           <p className="text-sm text-[rgb(var(--text-secondary))] mt-1">
-            For{result.billingPeriod ? ` ${result.billingPeriod}` : ''}. Guardians
-            will be notified per their channel preferences.
+            {result.billingPeriod
+              ? t('bulkGenerate.success.periodNotice', {
+                  billingPeriod: result.billingPeriod,
+                })
+              : t('bulkGenerate.success.notice')}
           </p>
         </div>
         <div className="flex items-center justify-center gap-8 text-sm">
-          <Stat label="Invoices" value={result.count} />
-          <Stat label="Total billed" value={formatCurrency(result.total)} mono />
+          <Stat label={t('bulkGenerate.success.invoices')} value={result.count} />
+          <Stat label={t('bulkGenerate.success.totalBilled')} value={formatCurrency(result.total)} mono />
           {result.skipped > 0 && (
-            <Stat label="Skipped" value={result.skipped} tone="muted" />
+            <Stat label={t('bulkGenerate.success.skipped')} value={result.skipped} tone="muted" />
           )}
         </div>
       </div>
@@ -69,16 +76,17 @@ export function GenerateSuccess({ result, onReset, onClose }: GenerateSuccessPro
         <Button
           variant="outline"
           disabled
-          title="Bulk PDF download lands in Sprint F"
+          title={t('bulkGenerate.success.downloadAllTooltip')}
         >
-          <Download className="w-4 h-4 mr-1.5" /> Download all (PDF)
+          <Download className="w-4 h-4 mr-1.5" />
+          {t('bulkGenerate.success.downloadAll')}
         </Button>
         <Button variant="outline" onClick={onReset}>
-          <RotateCcw className="w-4 h-4 mr-1.5" /> New batch
+          <RotateCcw className="w-4 h-4 mr-1.5" /> {t('bulkGenerate.success.newBatch')}
         </Button>
         {onClose && (
           <Button onClick={onClose}>
-            <X className="w-4 h-4 mr-1.5" /> Close
+            <X className="w-4 h-4 mr-1.5" /> {t('actions.close')}
           </Button>
         )}
       </div>
@@ -97,7 +105,7 @@ export function GenerateSuccess({ result, onReset, onClose }: GenerateSuccessPro
               <span className="flex-1 min-w-0 text-sm text-[rgb(var(--text-primary))] truncate">
                 {iv.studentName}{' '}
                 <span className="text-[rgb(var(--text-tertiary))]">
-                  · {gradeLabel(iv.gradeLevel)}
+                  · {gradeLabel(iv.gradeLevel, t)}
                 </span>
               </span>
               <span className="text-sm font-mono font-semibold text-[rgb(var(--text-primary))] whitespace-nowrap">
@@ -143,7 +151,7 @@ function Stat({
   )
 }
 
-function gradeLabel(g: string): string {
-  if (!g) return 'Unknown'
-  return /^\d+$/.test(g) ? `Grade ${g}` : g
+function gradeLabel(g: string, t: Translate): string {
+  if (!g) return t('bulkGenerate.common.unknown')
+  return /^\d+$/.test(g) ? t('bulkGenerate.common.gradeLabel', { grade: g }) : g
 }
