@@ -10,6 +10,7 @@
 import { useMemo } from 'react'
 import { ClipboardList, CheckCircle2, Clock } from 'lucide-react'
 import type { ExamResponseDto, ExamStatus } from '@aibrains/shared-types'
+import type { OnChangeFn, RowSelectionState } from '@tanstack/react-table'
 import {
   DataTable,
   createSelectColumn,
@@ -27,6 +28,10 @@ interface ExamTableProps {
   onSelectExam?: (exam: ExamResponseDto) => void
   /** Optional bulk actions wired from the page (status drawer, generate, etc). */
   bulkActions?: BulkAction<ExamResponseDto>[]
+  /** Controlled row selection — lift state into the page when an action
+   *  needs to clear selection (e.g. after a bulk status apply). */
+  rowSelection?: RowSelectionState
+  onRowSelectionChange?: OnChangeFn<RowSelectionState>
 }
 
 type ExamWithResults = ExamResponseDto & {
@@ -47,6 +52,8 @@ export function ExamTable({
   isLoading,
   onSelectExam,
   bulkActions,
+  rowSelection,
+  onRowSelectionChange,
 }: ExamTableProps) {
   const { t, dataTableLabels, formatDate } = useAcademicsI18n()
   // Augment every row with a stable "results bucket" so the facet filter and
@@ -292,7 +299,9 @@ export function ExamTable({
       getRowId={(row) => row.examId}
       isLoading={isLoading}
       enableSorting
-      enableRowSelection={!!bulkActions?.length}
+      enableRowSelection={!!bulkActions?.length || !!onRowSelectionChange}
+      rowSelection={rowSelection}
+      onRowSelectionChange={onRowSelectionChange}
       enableColumnVisibility
       facets={facets}
       searchPlaceholder={t('tables.exams.search')}
