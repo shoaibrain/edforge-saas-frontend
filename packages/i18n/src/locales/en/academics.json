@@ -789,6 +789,63 @@
       "materialsDescription": "Add textbooks, workbooks, or digital resources for this course."
     }
   },
+  "rosteringModule": {
+    "description": "Manage student-to-section assignments across all active sections",
+    "actions": {
+      "applyChanges": "Apply Changes",
+      "applying": "Applying..."
+    },
+    "cell": {
+      "addToSection": "Add to {{section}}",
+      "removeFromSection": "Remove from {{section}}"
+    },
+    "conflict": {
+      "title": "Schedule Conflict",
+      "samePeriod": "Same class period as {{count}} other section(s)"
+    },
+    "student": {
+      "gradeShort": "Gr {{grade}}"
+    },
+    "summary": {
+      "additions": "{{value}} addition",
+      "additions_plural": "{{value}} additions",
+      "removals": "{{value}} removal",
+      "removals_plural": "{{value}} removals",
+      "conflicts": "{{value}} conflict",
+      "conflicts_plural": "{{value}} conflicts",
+      "processing": "Processing {{progress}} of {{total}}..."
+    },
+    "toast": {
+      "allApplied": "All {{value}} change applied successfully",
+      "allApplied_plural": "All {{value}} changes applied successfully",
+      "partialApplied": "{{success}} changes applied, {{failed}} failed. Review and retry failed changes.",
+      "allFailed": "All {{value}} change failed. Please check your connection and try again.",
+      "allFailed_plural": "All {{value}} changes failed. Please check your connection and try again."
+    },
+    "filters": {
+      "gradeLevel": "Grade Level",
+      "loadingGrades": "Loading grades...",
+      "allGrades": "All Grades",
+      "course": "Course",
+      "allCourses": "All Courses",
+      "matrixCount": "{{students}} students x {{sections}} sections"
+    },
+    "loading": {
+      "title": "Loading rostering data...",
+      "description": "Fetching students, sections, and current enrollments"
+    },
+    "empty": {
+      "noCurrentYear": "Set up an academic year in school settings before rostering students.",
+      "noDataTitle": "No data available",
+      "noStudents": "No active students found for the selected grade level.",
+      "noSections": "No active sections found for the current academic year."
+    },
+    "table": {
+      "student": "Student",
+      "sectionTitle": "Section {{section}}",
+      "sectionShort": "Sec {{section}}"
+    }
+  },
   "examModule": {
     "description": "Plan, run, and publish midterms, finals, and term examinations",
     "descriptionWithYear": "Plan, run, and publish exams for {{yearName}}",

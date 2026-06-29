@@ -789,6 +789,63 @@
       "materialsDescription": "यस course का textbooks, workbooks वा digital resources थप्नुहोस्।"
     }
   },
+  "rosteringModule": {
+    "description": "सबै active sections मा student-to-section assignment व्यवस्थापन गर्नुहोस्",
+    "actions": {
+      "applyChanges": "परिवर्तन लागू गर्नुहोस्",
+      "applying": "लागू गर्दै..."
+    },
+    "cell": {
+      "addToSection": "{{section}} मा थप्नुहोस्",
+      "removeFromSection": "{{section}} बाट हटाउनुहोस्"
+    },
+    "conflict": {
+      "title": "Schedule Conflict",
+      "samePeriod": "{{count}} अन्य section सँग एउटै class period"
+    },
+    "student": {
+      "gradeShort": "Gr {{grade}}"
+    },
+    "summary": {
+      "additions": "{{value}} थपाइ",
+      "additions_plural": "{{value}} थपाइ",
+      "removals": "{{value}} हटाइ",
+      "removals_plural": "{{value}} हटाइ",
+      "conflicts": "{{value}} conflict",
+      "conflicts_plural": "{{value}} conflict",
+      "processing": "{{total}} मध्ये {{progress}} processing..."
+    },
+    "toast": {
+      "allApplied": "सबै {{value}} परिवर्तन सफलतापूर्वक लागू भयो",
+      "allApplied_plural": "सबै {{value}} परिवर्तन सफलतापूर्वक लागू भए",
+      "partialApplied": "{{success}} परिवर्तन लागू भयो, {{failed}} असफल। असफल परिवर्तन review गरी पुनः प्रयास गर्नुहोस्।",
+      "allFailed": "सबै {{value}} परिवर्तन असफल भयो। connection जाँच गरी पुनः प्रयास गर्नुहोस्।",
+      "allFailed_plural": "सबै {{value}} परिवर्तन असफल भए। connection जाँच गरी पुनः प्रयास गर्नुहोस्।"
+    },
+    "filters": {
+      "gradeLevel": "Grade Level",
+      "loadingGrades": "Grade लोड हुँदै...",
+      "allGrades": "सबै Grade",
+      "course": "Course",
+      "allCourses": "सबै Course",
+      "matrixCount": "{{students}} विद्यार्थी x {{sections}} section"
+    },
+    "loading": {
+      "title": "Rostering data लोड हुँदै...",
+      "description": "विद्यार्थी, sections र current enrollments ल्याउँदै"
+    },
+    "empty": {
+      "noCurrentYear": "विद्यार्थी rostering अघि school settings मा academic year सेट गर्नुहोस्।",
+      "noDataTitle": "Data उपलब्ध छैन",
+      "noStudents": "छानिएको grade level मा active विद्यार्थी भेटिएन।",
+      "noSections": "Current academic year का लागि active sections भेटिएन।"
+    },
+    "table": {
+      "student": "विद्यार्थी",
+      "sectionTitle": "Section {{section}}",
+      "sectionShort": "Sec {{section}}"
+    }
+  },
   "examModule": {
     "description": "Midterm, final र term examinations योजना, सञ्चालन र publish गर्नुहोस्",
     "descriptionWithYear": "{{yearName}} का exam योजना, सञ्चालन र publish गर्नुहोस्",

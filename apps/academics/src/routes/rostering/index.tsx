@@ -30,6 +30,7 @@ import {
 } from '../../hooks/useSections'
 import { parseApiError } from '../../services/academics.service'
 import { NoCurrentAcademicYearEmptyState } from '../../components/common'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 // ============================================================================
 // TYPES
@@ -181,6 +182,7 @@ function MatrixCell({
   sectionLabel: string
   onToggle: () => void
 }) {
+  const { t, formatNumber } = useAcademicsI18n()
   const hasConflict = conflict !== null && checked
 
   return (
@@ -201,7 +203,10 @@ function MatrixCell({
                 : 'border-border-secondary hover:border-[rgb(var(--border-focus))] hover:bg-surface-hover'
           }
         `}
-        aria-label={`${checked ? 'Remove from' : 'Add to'} ${sectionLabel}`}
+        aria-label={t(
+          checked ? 'rosteringModule.cell.removeFromSection' : 'rosteringModule.cell.addToSection',
+          { section: sectionLabel },
+        )}
       >
         {checked && !hasConflict && (
           <Check className="w-4 h-4 text-[rgb(var(--action-primary-fg))]" />
@@ -219,8 +224,12 @@ function MatrixCell({
       {/* Conflict tooltip */}
       {hasConflict && (
         <div className="absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-[rgb(var(--action-danger-bg))] text-[rgb(var(--action-primary-fg))] text-xs rounded-lg shadow-lg whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity">
-          <div className="font-medium mb-0.5">Schedule Conflict</div>
-          <div>Same class period as {conflict.conflictingSectionIds.length} other section(s)</div>
+          <div className="font-medium mb-0.5">{t('rosteringModule.conflict.title')}</div>
+          <div>
+            {t('rosteringModule.conflict.samePeriod', {
+              count: conflict ? formatNumber(conflict.conflictingSectionIds.length) : formatNumber(0),
+            })}
+          </div>
           <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-red-600" />
         </div>
       )}
@@ -253,6 +262,8 @@ function MatrixStudentRow({
   conflictMap: Map<string, Map<string, string[]>>
   onToggleCell: (studentId: string, sectionId: string) => void
 }) {
+  const { t } = useAcademicsI18n()
+
   return (
     <tr
       className="hover:bg-surface-hover/50 transition-colors"
@@ -268,7 +279,7 @@ function MatrixStudentRow({
         </div>
         <div className="text-xs text-text-tertiary">
           {student.studentNumber && `#${student.studentNumber}`}
-          {student.currentGradeLevel && ` · Gr ${student.currentGradeLevel}`}
+          {student.currentGradeLevel && ` · ${t('rosteringModule.student.gradeShort', { grade: student.currentGradeLevel })}`}
         </div>
       </td>
       {sections.map((section) => {
@@ -319,6 +330,7 @@ function SummaryBar({
   total: number
   onApply: () => void
 }) {
+  const { t, formatNumber } = useAcademicsI18n()
   const hasChanges = addCount > 0 || removeCount > 0
 
   if (!hasChanges && !isSubmitting) return null
@@ -340,24 +352,27 @@ function SummaryBar({
           {addCount > 0 && (
             <span className="flex items-center gap-1.5 text-sm font-medium text-[rgb(var(--state-success-fg))]">
               <Plus className="w-4 h-4" />
-              {addCount} addition{addCount !== 1 ? 's' : ''}
+              {t('rosteringModule.summary.additions', { count: addCount, value: formatNumber(addCount) })}
             </span>
           )}
           {removeCount > 0 && (
             <span className="flex items-center gap-1.5 text-sm font-medium text-[rgb(var(--state-danger-fg))]">
               <Minus className="w-4 h-4" />
-              {removeCount} removal{removeCount !== 1 ? 's' : ''}
+              {t('rosteringModule.summary.removals', { count: removeCount, value: formatNumber(removeCount) })}
             </span>
           )}
           {conflictCount > 0 && (
             <span className="flex items-center gap-1.5 text-sm font-medium text-[rgb(var(--state-warning-fg))]">
               <AlertTriangle className="w-4 h-4" />
-              {conflictCount} conflict{conflictCount !== 1 ? 's' : ''}
+              {t('rosteringModule.summary.conflicts', { count: conflictCount, value: formatNumber(conflictCount) })}
             </span>
           )}
           {isSubmitting && (
             <span className="text-sm text-text-secondary">
-              Processing {progress} of {total}...
+              {t('rosteringModule.summary.processing', {
+                progress: formatNumber(progress),
+                total: formatNumber(total),
+              })}
             </span>
           )}
         </div>
@@ -372,7 +387,7 @@ function SummaryBar({
           ) : (
             <Save className="w-4 h-4" />
           )}
-          {isSubmitting ? 'Applying...' : 'Apply Changes'}
+          {isSubmitting ? t('rosteringModule.actions.applying') : t('rosteringModule.actions.applyChanges')}
         </button>
       </div>
     </div>
@@ -384,6 +399,7 @@ function SummaryBar({
 // ============================================================================
 
 export function BulkRosteringPage() {
+  const { t, formatNumber, formatDate } = useAcademicsI18n()
   const schoolId = useActiveSchoolId() || ''
   const { data: currentYear, isLoading: yearLoading } = useCurrentAcademicYear(schoolId)
   // Gate dropdown on profile-load — see EnrollmentTable comment.
@@ -621,18 +637,27 @@ export function BulkRosteringPage() {
     setIsSubmitting(false)
 
     if (successCount > 0 && errorCount === 0) {
-      toast.success(`All ${successCount} change${successCount !== 1 ? 's' : ''} applied successfully`)
+      toast.success(t('rosteringModule.toast.allApplied', {
+        count: successCount,
+        value: formatNumber(successCount),
+      }))
       setPendingChanges(new Map())
     } else if (successCount > 0 && errorCount > 0) {
       toast.warning(
-        `${successCount} change${successCount !== 1 ? 's' : ''} applied, ${errorCount} failed. Review and retry failed changes.`,
+        t('rosteringModule.toast.partialApplied', {
+          success: formatNumber(successCount),
+          failed: formatNumber(errorCount),
+        }),
       )
       // Clear only successful changes; keep failed ones
       setPendingChanges(() => new Map())
     } else {
-      toast.error(`All ${errorCount} changes failed. Please check your connection and try again.`)
+      toast.error(t('rosteringModule.toast.allFailed', {
+        count: errorCount,
+        value: formatNumber(errorCount),
+      }))
     }
-  }, [pendingChanges, enrollMutation, removeMutation, schoolId])
+  }, [pendingChanges, enrollMutation, removeMutation, schoolId, t, formatNumber])
 
   // ---------------------------------------------------------------------------
   // Unique course names for filter dropdown
@@ -659,7 +684,7 @@ export function BulkRosteringPage() {
     return (
       <div className="p-6">
         <NoCurrentAcademicYearEmptyState
-          secondaryMessage="Set up an academic year in school settings before rostering students."
+          secondaryMessage={t('rosteringModule.empty.noCurrentYear')}
         />
       </div>
     )
@@ -680,7 +705,7 @@ export function BulkRosteringPage() {
                 {currentYear?.name ? <ContextBarYear>{currentYear.name}</ContextBarYear> : null}
                 {currentYear?.name ? <ContextBarSep /> : null}
                 <span>
-                  {new Date().toLocaleDateString('en-US', {
+                  {formatDate(new Date(), {
                     weekday: 'long',
                     month: 'short',
                     day: 'numeric',
@@ -690,7 +715,7 @@ export function BulkRosteringPage() {
             }
             description={
               <p className="text-sm text-text-secondary">
-                Manage student-to-section assignments across all active sections
+                {t('rosteringModule.description')}
               </p>
             }
           />
@@ -701,7 +726,7 @@ export function BulkRosteringPage() {
       <div className="border-b border-border-secondary bg-surface-primary px-6 py-3 flex items-center gap-4 flex-wrap">
         <div className="flex items-center gap-2">
           <label htmlFor="grade-filter" className="text-sm font-medium text-text-secondary">
-            Grade Level
+            {t('rosteringModule.filters.gradeLevel')}
           </label>
           <select
             id="grade-filter"
@@ -713,7 +738,9 @@ export function BulkRosteringPage() {
             disabled={gradeOptionsLoading}
             className="px-3 py-1.5 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            <option value="">{gradeOptionsLoading ? 'Loading grades…' : 'All Grades'}</option>
+            <option value="">
+              {gradeOptionsLoading ? t('rosteringModule.filters.loadingGrades') : t('rosteringModule.filters.allGrades')}
+            </option>
             {!gradeOptionsLoading && gradeLevelOptions.map((opt) => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
@@ -723,7 +750,7 @@ export function BulkRosteringPage() {
         </div>
         <div className="flex items-center gap-2">
           <label htmlFor="course-filter" className="text-sm font-medium text-text-secondary">
-            Course
+            {t('rosteringModule.filters.course')}
           </label>
           <select
             id="course-filter"
@@ -731,7 +758,7 @@ export function BulkRosteringPage() {
             onChange={(e) => setCourseFilter(e.target.value)}
             className="px-3 py-1.5 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors"
           >
-            <option value="">All Courses</option>
+            <option value="">{t('rosteringModule.filters.allCourses')}</option>
             {uniqueCourseNames.map((name) => (
               <option key={name} value={name}>
                 {name}
@@ -740,8 +767,10 @@ export function BulkRosteringPage() {
           </select>
         </div>
         <div className="ml-auto text-xs text-text-tertiary">
-          {allStudents.length} student{allStudents.length !== 1 ? 's' : ''} x{' '}
-          {allSections.length} section{allSections.length !== 1 ? 's' : ''}
+          {t('rosteringModule.filters.matrixCount', {
+            students: formatNumber(allStudents.length),
+            sections: formatNumber(allSections.length),
+          })}
         </div>
       </div>
 
@@ -750,19 +779,19 @@ export function BulkRosteringPage() {
         {isInitialLoading ? (
           <div className="flex flex-col items-center justify-center py-24">
             <Loader2 className="w-10 h-10 text-[rgb(var(--action-secondary-fg))] animate-spin mb-4" />
-            <p className="text-sm text-text-secondary">Loading rostering data...</p>
+            <p className="text-sm text-text-secondary">{t('rosteringModule.loading.title')}</p>
             <p className="text-xs text-text-tertiary mt-1">
-              Fetching students, sections, and current enrollments
+              {t('rosteringModule.loading.description')}
             </p>
           </div>
         ) : allStudents.length === 0 || allSections.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24">
             <Grid3x3 className="w-12 h-12 text-text-tertiary mb-4" />
-            <p className="text-lg font-medium text-text-primary mb-1">No data available</p>
+            <p className="text-lg font-medium text-text-primary mb-1">{t('rosteringModule.empty.noDataTitle')}</p>
             <p className="text-sm text-text-secondary max-w-md text-center">
               {allStudents.length === 0
-                ? 'No active students found for the selected grade level.'
-                : 'No active sections found for the current academic year.'}
+                ? t('rosteringModule.empty.noStudents')
+                : t('rosteringModule.empty.noSections')}
             </p>
           </div>
         ) : (
@@ -773,7 +802,7 @@ export function BulkRosteringPage() {
                 {/* Top-left corner cell */}
                 <th className="sticky left-0 z-30 bg-surface-secondary px-3 py-3 border-r-2 border-b border-border-secondary min-w-56 text-left">
                   <span className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
-                    Student
+                    {t('rosteringModule.table.student')}
                   </span>
                 </th>
                 {allSections.map((section) => (
@@ -781,11 +810,11 @@ export function BulkRosteringPage() {
                     key={section.sectionId}
                     className="px-1 py-2 border-r border-b border-border-secondary min-w-20 max-w-32"
                   >
-                    <div className="text-xs font-semibold text-text-primary truncate" title={`${section.courseName ?? ''} - Section ${section.sectionNumber}`}>
+                    <div className="text-xs font-semibold text-text-primary truncate" title={`${section.courseName ?? ''} - ${t('rosteringModule.table.sectionTitle', { section: section.sectionNumber })}`}>
                       {section.courseCode ?? section.courseName ?? ''}
                     </div>
                     <div className="text-xs text-text-tertiary truncate">
-                      Sec {section.sectionNumber}
+                      {t('rosteringModule.table.sectionShort', { section: section.sectionNumber })}
                     </div>
                     <div className="text-xs text-text-tertiary">
                       {section.currentEnrollment}/{section.maxEnrollment}
