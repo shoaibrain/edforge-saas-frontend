@@ -1,5 +1,6 @@
 import { X } from 'lucide-react'
-import type { DataTableEmptyStateConfig } from './types'
+import type { DataTableEmptyStateConfig, DataTableLabels } from './types'
+import { DEFAULT_DATA_TABLE_LABELS } from './labels'
 import { cn, focusRing } from '../../utils'
 
 interface DataTableEmptyProps {
@@ -11,6 +12,7 @@ interface DataTableEmptyProps {
   /** When set, swaps the primary CTA for a "Clear filters" shortcut. The
    *  consumer wires this to the same logic as the toolbar's `Clear (N)`. */
   onClearFilters?: () => void
+  labels?: DataTableLabels
 }
 
 export function DataTableEmpty({
@@ -18,7 +20,9 @@ export function DataTableEmpty({
   className,
   bare = false,
   onClearFilters,
+  labels,
 }: DataTableEmptyProps) {
+  const resolvedLabels = labels ?? DEFAULT_DATA_TABLE_LABELS
   return (
     <div
       className={cn(
@@ -53,7 +57,7 @@ export function DataTableEmpty({
           )}
         >
           <X className="w-3.5 h-3.5" />
-          Clear filters
+          {resolvedLabels.clearFilters}
         </button>
       ) : (
         config.action && (

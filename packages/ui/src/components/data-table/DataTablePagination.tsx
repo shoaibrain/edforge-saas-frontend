@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'react'
 import type { Table } from '@tanstack/react-table'
 import { cn, focusRingInset } from '../../utils'
-import type { ServerPaginationConfig } from './types'
+import { DEFAULT_DATA_TABLE_LABELS } from './labels'
+import type { DataTableLabels, ServerPaginationConfig } from './types'
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>
@@ -13,6 +14,7 @@ interface DataTablePaginationProps<TData> {
    * been exhausted client-side. See `ServerPaginationConfig` for details.
    */
   serverPagination?: ServerPaginationConfig
+  labels?: DataTableLabels
 }
 
 export function DataTablePagination<TData>({
@@ -20,7 +22,9 @@ export function DataTablePagination<TData>({
   totalCount,
   pageSizeOptions = [10, 20, 50, 100],
   serverPagination,
+  labels,
 }: DataTablePaginationProps<TData>) {
+  const resolvedLabels = labels ?? DEFAULT_DATA_TABLE_LABELS
   const pageIndex = table.getState().pagination.pageIndex
   const pageSize = table.getState().pagination.pageSize
   const pageCount = table.getPageCount()
@@ -65,7 +69,7 @@ export function DataTablePagination<TData>({
   return (
     <div className="flex items-center justify-between px-4 py-2.5 border-t border-[rgb(var(--border-primary)/0.3)] bg-[rgb(var(--background-tertiary)/0.25)]">
       <span className="text-xs text-[rgb(var(--text-secondary))]">
-        Showing {start}-{end} of {totalDisplay} results
+        {resolvedLabels.paginationShowing(start, end, totalDisplay)}
       </span>
       <div className="flex items-center gap-1">
         {/* Page size selector */}
@@ -82,7 +86,7 @@ export function DataTablePagination<TData>({
         >
           {pageSizeOptions.map((size) => (
             <option key={size} value={size}>
-              {size} / page
+              {resolvedLabels.rowsPerPage(size)}
             </option>
           ))}
         </select>
@@ -94,7 +98,7 @@ export function DataTablePagination<TData>({
           disabled={!table.getCanPreviousPage()}
           className="px-2.5 py-1 text-xs font-medium rounded-md border border-[rgb(var(--border-primary)/0.6)] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary)/0.5)] hover:text-[rgb(var(--text-primary))] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
-          Prev
+          {resolvedLabels.previousPage}
         </button>
 
         {/* Page numbers — only in pure client-side mode. When server
@@ -133,7 +137,9 @@ export function DataTablePagination<TData>({
           disabled={!canNext || serverPagination?.isFetching}
           className="px-2.5 py-1 text-xs font-medium rounded-md border border-[rgb(var(--border-primary)/0.6)] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary)/0.5)] hover:text-[rgb(var(--text-primary))] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
-          {serverPagination?.isFetching ? 'Loading…' : 'Next'}
+          {serverPagination?.isFetching
+            ? resolvedLabels.loadingPage
+            : resolvedLabels.nextPage}
         </button>
       </div>
     </div>

@@ -3,19 +3,27 @@ import { Popover, PopoverButton, PopoverPanel, Transition } from '@headlessui/re
 import { Check, ListFilter } from 'lucide-react'
 import type { Column } from '@tanstack/react-table'
 import { cn, focusRingInset } from '../../utils'
-import type { DataTableColumnMeta, FacetedFilterOption } from './types'
+import { DEFAULT_DATA_TABLE_LABELS } from './labels'
+import type {
+  DataTableColumnMeta,
+  DataTableLabels,
+  FacetedFilterOption,
+} from './types'
 
 interface DataTableFacetedFilterProps<TData> {
   column: Column<TData>
   title: string
   options: FacetedFilterOption[]
+  labels?: DataTableLabels
 }
 
 export function DataTableFacetedFilter<TData>({
   column,
   title,
   options,
+  labels,
 }: DataTableFacetedFilterProps<TData>) {
+  const resolvedLabels = labels ?? DEFAULT_DATA_TABLE_LABELS
   const selectedValues = new Set(
     (column.getFilterValue() as string[] | undefined) ?? []
   )
@@ -64,7 +72,7 @@ export function DataTableFacetedFilter<TData>({
             ? 'bg-[var(--mint-soft)] border-[var(--mint-border)] text-[rgb(var(--text-primary))]'
             : 'border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-secondary))]'
         )}
-        aria-label={`${title} filter`}
+        aria-label={resolvedLabels.filterAriaLabel(title)}
       >
         <ListFilter className="w-3.5 h-3.5" />
         {title}
@@ -141,7 +149,7 @@ export function DataTableFacetedFilter<TData>({
                 onClick={() => column.setFilterValue(undefined)}
                 className="w-full px-3 py-1.5 text-xs font-medium text-center text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))] transition-colors"
               >
-                Clear filter
+                {resolvedLabels.clearFilter}
               </button>
             </div>
           )}

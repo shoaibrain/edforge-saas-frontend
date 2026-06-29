@@ -12,6 +12,10 @@ export { DataTableSkeleton } from './DataTableSkeleton'
 export { DataTableEmpty } from './DataTableEmpty'
 export { DataTableDensityToggle } from './DataTableDensityToggle'
 export { DataTableExport } from './DataTableExport'
+export {
+  DEFAULT_DATA_TABLE_LABELS,
+  resolveDataTableLabels,
+} from './labels'
 
 // Column helpers
 export {
@@ -36,6 +40,8 @@ export type {
   DataTableDensity,
   DataTableExportOptions,
   DataTableExportFormat,
+  DataTableLabels,
+  DataTableLabelsInput,
   FacetedFilterOption,
   FacetedFilterConfig,
   BulkAction,
