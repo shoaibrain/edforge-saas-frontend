@@ -550,6 +550,7 @@ export function ExamScoresTab({
           data={enrollments}
           getRowId={(e) => e.enrollmentId}
           isLoading={rosterLoading || scoresLoading}
+          tableId="academics.exam-scores"
           enableSorting
           searchPlaceholder={t('tables.examScores.search')}
           pagination={{ pageSize: 20 }}

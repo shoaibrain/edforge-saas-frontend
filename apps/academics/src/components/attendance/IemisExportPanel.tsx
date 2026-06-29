@@ -231,6 +231,7 @@ export function IemisExportPanel({ schoolId, academicYearId }: IemisExportPanelP
               columns={columns}
               data={result.rows}
               getRowId={(r) => r.studentId}
+              tableId="academics.iemis-export"
               enableSorting
               searchPlaceholder={t('iemisExport.search')}
               pagination={{ pageSize: 25 }}

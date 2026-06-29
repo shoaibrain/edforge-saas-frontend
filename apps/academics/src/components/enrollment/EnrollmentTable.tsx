@@ -228,7 +228,7 @@ export function EnrollmentTable({
         header: t('tables.enrollment.columns.entryDate'),
         enableSorting: true,
         cell: ({ getValue }) => (
-          <span className="text-xs text-[rgb(var(--text-secondary))]">
+          <span className="text-xs text-[rgb(var(--text-secondary))] tabular-nums">
             {formatDate(getValue<string | null>())}
           </span>
         ),
@@ -241,7 +241,7 @@ export function EnrollmentTable({
         cell: ({ getValue }) => {
           const val = getValue<string | null>()
           return (
-            <span className={`text-xs ${val ? 'text-[rgb(var(--text-secondary))]' : 'text-[rgb(var(--text-disabled))]'}`}>
+            <span className={`text-xs tabular-nums ${val ? 'text-[rgb(var(--text-secondary))]' : 'text-[rgb(var(--text-disabled))]'}`}>
               {formatDate(val)}
             </span>
           )
@@ -297,6 +297,7 @@ export function EnrollmentTable({
       data={filteredData}
       getRowId={(row) => `${row.studentId}-${row.schoolId}`}
       isLoading={isLoading}
+      tableId="academics.enrollment"
       enableSorting={true}
       pagination={{ pageSize: 20 }}
       serverPagination={
@@ -306,7 +307,7 @@ export function EnrollmentTable({
       }
       searchPlaceholder={t('tables.enrollment.search')}
       emptyState={{
-        icon: <Users className="w-10 h-10 opacity-40 text-[rgb(var(--text-disabled))]" />,
+        icon: <Users className="w-10 h-10" />,
         title: t('tables.enrollment.empty.title'),
         description: t('tables.enrollment.empty.description'),
       }}

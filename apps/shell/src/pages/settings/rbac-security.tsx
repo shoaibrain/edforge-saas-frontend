@@ -590,6 +590,7 @@ function UsersTab({ onAssign }: { onAssign: () => void }) {
           data={filtered}
           getRowId={(u) => u.userId}
           isLoading={isLoading}
+          tableId="settings.rbac-users"
           enableSorting
           pagination={{ pageSize: 10, pageSizeOptions: [10, 25, 50] }}
           toolbarExtra={
@@ -599,9 +600,10 @@ function UsersTab({ onAssign }: { onAssign: () => void }) {
             </Button>
           }
           emptyState={{
-            icon: <Users className="h-10 w-10 text-[rgb(var(--text-tertiary))] opacity-40" />,
+            icon: <Users className="h-10 w-10" />,
             title: 'No users found',
             description: 'Assign a user to grant system access.',
+            action: { label: 'Assign user', onClick: onAssign },
           }}
         />
       </div>
