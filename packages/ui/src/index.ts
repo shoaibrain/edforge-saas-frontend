@@ -140,6 +140,8 @@ export {
   DataTableEmpty,
   DataTableDensityToggle,
   DataTableExport,
+  DEFAULT_DATA_TABLE_LABELS,
+  resolveDataTableLabels,
   useDataTable,
   readPersistedTableState,
   usePersistTableState,
@@ -155,6 +157,8 @@ export {
   type DataTableDensity,
   type DataTableExportOptions,
   type DataTableExportFormat,
+  type DataTableLabels,
+  type DataTableLabelsInput,
   type FacetedFilterOption,
   type FacetedFilterConfig,
   type BulkAction,
@@ -247,4 +251,3 @@ export {
   MfeNotFoundBoundary,
   type MfeNotFoundBoundaryProps,
 } from './components/MfeNotFoundBoundary'
-

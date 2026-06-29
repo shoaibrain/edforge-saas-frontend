@@ -24,6 +24,7 @@ import {
 import { ConfirmationDialog } from '../common/ConfirmationDialog'
 import { StudentSelector } from '../common/StudentSelector'
 import { UserAvatar } from '../common/UserAvatar'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 // ============================================================================
 // TYPES
@@ -31,22 +32,6 @@ import { UserAvatar } from '../common/UserAvatar'
 
 interface SectionRosterProps {
   section: SectionResponseDto
-}
-
-// ============================================================================
-// DATE FORMATTING
-// ============================================================================
-
-function formatEnrolledDate(iso: string): string {
-  try {
-    return new Date(iso).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    })
-  } catch {
-    return iso
-  }
 }
 
 // ============================================================================
@@ -63,6 +48,7 @@ function RowActions({
   studentName: string
 }) {
   const [open, setOpen] = useState(false)
+  const { t } = useAcademicsI18n()
 
   return (
     <div className="relative">
@@ -71,7 +57,7 @@ function RowActions({
         onClick={() => setOpen((prev) => !prev)}
         disabled={isRemoving}
         className="p-1.5 rounded-md text-text-tertiary hover:text-text-primary hover:bg-surface-secondary transition-colors disabled:opacity-50"
-        aria-label={`Actions for ${studentName}`}
+        aria-label={t('tables.sectionRoster.actions.forStudent', { studentName })}
         aria-haspopup="true"
         aria-expanded={open}
       >
@@ -100,7 +86,7 @@ function RowActions({
               className="flex items-center gap-2 w-full px-3 py-2 text-sm text-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--state-danger-bg)/0.18)] dark:hover:bg-[rgb(var(--state-danger-bg)/0.18)] transition-colors"
             >
               <UserMinus className="w-4 h-4" />
-              Remove from Section
+              {t('tables.sectionRoster.actions.removeFromSection')}
             </button>
           </div>
         </>
@@ -126,12 +112,13 @@ function CapacityBar({
 }) {
   const percent = getCapacityPercent(current, max)
   const barColor = getCapacityColor(current, max)
+  const { t } = useAcademicsI18n()
 
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-3 min-w-0 flex-1">
         <span className="text-sm font-medium text-text-primary whitespace-nowrap">
-          {current}/{max} enrolled
+          {t('tables.sectionRoster.capacity', { current, max })}
         </span>
         <div className="h-1 flex-1 max-w-32 bg-surface-secondary rounded-full overflow-hidden">
           <div
@@ -145,10 +132,10 @@ function CapacityBar({
         onClick={onAddStudents}
         disabled={isFull}
         className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--text-primary))] bg-[rgb(var(--state-info-bg)/0.18)] hover:bg-[rgb(var(--state-info-bg)/0.26)]  dark:hover:bg-[rgb(var(--state-info-bg)/0.18)] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        aria-label="Add students to section"
+        aria-label={t('tables.sectionRoster.actions.addStudents')}
       >
         <UserPlus className="w-3.5 h-3.5" />
-        Add Students
+        {t('tables.sectionRoster.actions.addStudents')}
       </button>
     </div>
   )
@@ -159,6 +146,7 @@ function CapacityBar({
 // ============================================================================
 
 export function SectionRoster({ section }: SectionRosterProps) {
+  const { t, dataTableLabels, formatDate } = useAcademicsI18n()
   const schoolId = useActiveSchoolId() || ''
   const [showSelector, setShowSelector] = useState(false)
   const [removeTarget, setRemoveTarget] = useState<StudentSectionResponseDto | null>(null)
@@ -190,7 +178,7 @@ export function SectionRoster({ section }: SectionRosterProps) {
     () => [
       {
         accessorKey: 'studentName',
-        header: 'Name',
+        header: t('tables.sectionRoster.columns.name'),
         size: 240,
         cell: ({ row }) => {
           const student = row.original
@@ -212,7 +200,7 @@ export function SectionRoster({ section }: SectionRosterProps) {
       },
       {
         accessorKey: 'studentNumber',
-        header: 'Student ID',
+        header: t('tables.sectionRoster.columns.studentId'),
         size: 140,
         cell: ({ row }) => {
           const studentNumber = row.original.studentNumber
@@ -227,7 +215,7 @@ export function SectionRoster({ section }: SectionRosterProps) {
       },
       {
         accessorKey: 'currentGradeLevel',
-        header: 'Grade',
+        header: t('tables.sectionRoster.columns.grade'),
         size: 100,
         cell: ({ row }) => {
           const gradeLevel = row.original.currentGradeLevel
@@ -240,11 +228,11 @@ export function SectionRoster({ section }: SectionRosterProps) {
       },
       {
         accessorKey: 'enrolledAt',
-        header: 'Enrolled',
+        header: t('tables.sectionRoster.columns.enrolled'),
         size: 130,
         cell: ({ row }) => (
           <span className="text-sm text-text-secondary">
-            {formatEnrolledDate(row.original.enrolledAt)}
+            {formatDate(row.original.enrolledAt)}
           </span>
         ),
       },
@@ -265,7 +253,7 @@ export function SectionRoster({ section }: SectionRosterProps) {
         },
       }),
     ],
-    [removeMutation.isPending, removeMutation.variables?.studentId]
+    [removeMutation.isPending, removeMutation.variables?.studentId, formatDate, t]
   )
 
   return (
@@ -275,18 +263,18 @@ export function SectionRoster({ section }: SectionRosterProps) {
         <div className="flex items-center gap-3 px-4 py-3 bg-surface-secondary/60 rounded-lg border border-border-secondary">
           <UserAvatar
             userId={section.primaryTeacherId}
-            userName={section.primaryTeacherName || 'Teacher'}
+            userName={section.primaryTeacherName || t('common.teacher')}
             role="staff"
             size="md"
           />
           <div className="min-w-0 flex-1">
             <p className="text-sm font-medium text-text-primary truncate">
-              {section.primaryTeacherName || 'Teacher'}
+              {section.primaryTeacherName || t('common.teacher')}
             </p>
-            <p className="text-xs text-text-tertiary">Primary Instructor</p>
+            <p className="text-xs text-text-tertiary">{t('common.primaryInstructor')}</p>
           </div>
           <StatusBadge tone="info" className="flex-shrink-0">
-            Teacher
+            {t('common.teacher')}
           </StatusBadge>
         </div>
       )}
@@ -306,17 +294,18 @@ export function SectionRoster({ section }: SectionRosterProps) {
         getRowId={(student) => student.studentId}
         isLoading={isLoading}
         enableSorting={true}
-        searchPlaceholder="Search by name or student ID..."
+        searchPlaceholder={t('tables.sectionRoster.search')}
         pagination={{ pageSize: 20 }}
         emptyState={{
           icon: <Users className="w-10 h-10" />,
-          title: 'No students enrolled yet',
-          description: 'Add students to this section to build your class roster.',
+          title: t('tables.sectionRoster.empty.title'),
+          description: t('tables.sectionRoster.empty.description'),
           action: {
-            label: 'Add Students',
+            label: t('tables.sectionRoster.actions.addStudents'),
             onClick: () => setShowSelector(true),
           },
         }}
+        labels={dataTableLabels}
         onRowClick={(_student) => {
           // Row click preserved for future navigation
         }}
@@ -338,9 +327,11 @@ export function SectionRoster({ section }: SectionRosterProps) {
         open={!!removeTarget}
         onClose={() => setRemoveTarget(null)}
         onConfirm={handleRemove}
-        title="Remove Student"
-        description={`Are you sure you want to remove ${removeTarget?.studentName || 'this student'} from this section?`}
-        confirmText="Remove"
+        title={t('tables.sectionRoster.confirmRemove.title')}
+        description={t('tables.sectionRoster.confirmRemove.description', {
+          studentName: removeTarget?.studentName || t('tables.sectionRoster.confirmRemove.fallbackStudent'),
+        })}
+        confirmText={t('tables.sectionRoster.confirmRemove.confirm')}
         variant="destructive"
         isLoading={removeMutation.isPending}
       />

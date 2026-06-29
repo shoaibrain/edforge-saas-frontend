@@ -28,6 +28,7 @@ import { UserAvatar } from '../common/UserAvatar'
 import { GradeChip } from './cells/GradeChip'
 import { GuardianCell } from './cells/GuardianCell'
 import { StudentLocationCell } from './cells/StudentLocationCell'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 // ============================================================================
 // TYPES
@@ -73,15 +74,6 @@ interface StudentTableProps {
 // HELPERS
 // ============================================================================
 
-function formatDate(dateStr: string | undefined): string {
-  if (!dateStr) return '-'
-  try {
-    return new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
-  } catch {
-    return '-'
-  }
-}
-
 const CENTER: DataTableColumnMeta = { align: 'center' }
 
 // Responsive initial visibility, used only on first mount when no persisted
@@ -108,12 +100,13 @@ function RowActionMenu({
   onWithdraw?: (student: StudentResponseDto) => void
 }) {
   const [open, setOpen] = useState(false)
+  const { t } = useAcademicsI18n()
   return (
     <div className="relative" onClick={(e) => e.stopPropagation()}>
       <button
         onClick={() => setOpen(!open)}
         className="p-1 rounded-md transition-colors hover:opacity-80 text-[rgb(var(--text-tertiary))]"
-        aria-label="Student actions"
+        aria-label={t('tables.students.actions.studentActions')}
       >
         <MoreVertical className="w-3.5 h-3.5" />
       </button>
@@ -127,7 +120,7 @@ function RowActionMenu({
                 className="flex items-center gap-2 w-full px-3 py-2 text-xs transition-colors hover:opacity-80 text-[rgb(var(--text-secondary))]"
               >
                 <ExternalLink className="w-3 h-3" />
-                View Profile
+                {t('tables.students.actions.viewProfile')}
               </button>
             )}
             {onWithdraw && (
@@ -136,7 +129,7 @@ function RowActionMenu({
                 className="flex items-center gap-2 w-full px-3 py-2 text-xs transition-colors hover:opacity-80 text-[rgb(var(--accent-finance-text))]"
               >
                 <UserMinus className="w-3 h-3" />
-                Withdraw
+                {t('tables.students.actions.withdraw')}
               </button>
             )}
           </div>
@@ -170,12 +163,13 @@ export function StudentTable({
   rowSelection,
   onRowSelectionChange,
 }: StudentTableProps) {
+  const { t, dataTableLabels, formatDate } = useAcademicsI18n()
   const columns: ColumnDef<StudentResponseDto, unknown>[] = useMemo(() => {
     const cols: ColumnDef<StudentResponseDto, unknown>[] = [
       createSelectColumn<StudentResponseDto>(),
       {
         accessorKey: 'fullName',
-        header: 'Student',
+        header: t('tables.students.columns.student'),
         size: 230,
         cell: ({ row }) => {
           const student = row.original
@@ -198,7 +192,7 @@ export function StudentTable({
       },
       {
         accessorKey: 'currentGradeLevel',
-        header: 'Grade',
+        header: t('tables.students.columns.grade'),
         size: 64,
         meta: CENTER,
         sortingFn: (a, b) => gradeSort(a.original.currentGradeLevel ?? '', b.original.currentGradeLevel ?? ''),
@@ -206,7 +200,7 @@ export function StudentTable({
       },
       {
         id: 'attendance',
-        header: 'Attendance',
+        header: t('tables.students.columns.attendance'),
         size: 132,
         enableSorting: false,
         cell: ({ row }) => {
@@ -226,7 +220,7 @@ export function StudentTable({
     if (canViewGuardians) {
       cols.push({
         id: 'guardian',
-        header: 'Guardian',
+        header: t('tables.students.columns.guardian'),
         size: 176,
         enableSorting: false,
         meta: { enableHiding: true },
@@ -237,7 +231,7 @@ export function StudentTable({
     if (canViewLocation) {
       cols.push({
         id: 'location',
-        header: 'Location',
+        header: t('tables.students.columns.location'),
         size: 148,
         enableSorting: false,
         meta: { enableHiding: true },
@@ -248,13 +242,13 @@ export function StudentTable({
     cols.push(
       {
         accessorKey: 'status',
-        header: 'Status',
+        header: t('tables.students.columns.status'),
         size: 96,
         cell: ({ row }) => <StudentStatusBadge status={row.original.status} />,
       },
       {
         accessorKey: 'enrollmentDate',
-        header: 'Enrolled',
+        header: t('tables.students.columns.enrolled'),
         size: 116,
         meta: { enableHiding: true },
         cell: ({ row }) => (
@@ -273,7 +267,7 @@ export function StudentTable({
     )
 
     return cols
-  }, [attendanceByStudent, onViewStudent, onWithdraw, locale, canViewGuardians, canViewLocation])
+  }, [attendanceByStudent, onViewStudent, onWithdraw, locale, canViewGuardians, canViewLocation, formatDate, t])
 
   const initialColumnVisibility = useMemo(computeInitialVisibility, [])
 
@@ -289,28 +283,34 @@ export function StudentTable({
     () => [
       {
         id: 'message',
-        label: 'Message',
+        label: t('tables.students.actions.message'),
         icon: <MessageSquare className="w-4 h-4" />,
-        onRun: (rows) =>
-          toast.info(`Message ${rows.length} student${rows.length === 1 ? '' : 's'} — coming soon`),
+        onRun: (rows) => toast.info(t('common.comingSoon', {
+          action: t('tables.students.bulk.message'),
+          countLabel: t('common.students', { count: rows.length }),
+        })),
       },
       {
         id: 'move',
-        label: 'Move section',
+        label: t('tables.students.actions.moveSection'),
         icon: <ArrowRightLeft className="w-4 h-4" />,
-        onRun: (rows) =>
-          toast.info(`Move ${rows.length} student${rows.length === 1 ? '' : 's'} — coming soon`),
+        onRun: (rows) => toast.info(t('common.comingSoon', {
+          action: t('tables.students.bulk.move'),
+          countLabel: t('common.students', { count: rows.length }),
+        })),
       },
       {
         id: 'archive',
-        label: 'Archive',
+        label: t('tables.students.actions.archive'),
         icon: <Archive className="w-4 h-4" />,
         tone: 'critical',
-        onRun: (rows) =>
-          toast.info(`Archive ${rows.length} student${rows.length === 1 ? '' : 's'} — coming soon`),
+        onRun: (rows) => toast.info(t('common.comingSoon', {
+          action: t('tables.students.bulk.archive'),
+          countLabel: t('common.students', { count: rows.length }),
+        })),
       },
     ],
-    [],
+    [t],
   )
 
   const bulkActions = bulkActionsProp ?? defaultBulkActions
@@ -336,10 +336,11 @@ export function StudentTable({
       onRowSelectionChange={onRowSelectionChange}
       emptyState={{
         icon: <User className="w-12 h-12" />,
-        title: 'No students found',
-        description: 'Get started by adding your first student to the directory.',
-        action: onAddStudent ? { label: 'Add Student', onClick: onAddStudent } : undefined,
+        title: t('tables.students.empty.title'),
+        description: t('tables.students.empty.description'),
+        action: onAddStudent ? { label: t('tables.students.empty.action'), onClick: onAddStudent } : undefined,
       }}
+      labels={dataTableLabels}
       onRowClick={onViewStudent}
       maxHeight="calc(100vh - 22rem)"
     />

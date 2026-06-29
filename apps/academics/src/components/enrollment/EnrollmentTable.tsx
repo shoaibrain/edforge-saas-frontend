@@ -31,6 +31,7 @@ import {
 import { UuidBadge } from '@edforge/archetype'
 import type { EnrollmentResponseDto } from '../../services/academics.service'
 import { useSchoolEnabledGradeOptions } from '../../hooks/useGradeOptions'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 // ============================================================================
 // TYPES
@@ -58,13 +59,7 @@ interface EnrollmentTableProps {
   schoolId: string | null
 }
 
-const statusOptions = [
-  { value: 'enrolled', label: 'Enrolled' },
-  { value: 'pending', label: 'Pending' },
-  { value: 'withdrawn', label: 'Withdrawn' },
-  { value: 'transferred', label: 'Transferred' },
-  { value: 'graduated', label: 'Graduated' },
-]
+const STATUS_VALUES = ['enrolled', 'pending', 'withdrawn', 'transferred', 'graduated'] as const
 
 // ============================================================================
 // STATUS BADGE — domain status -> semantic tone
@@ -80,9 +75,10 @@ const STATUS_TONE: Record<string, StatusTone> = {
 }
 
 function StatusBadge({ status }: { status: string }) {
+  const { t } = useAcademicsI18n()
   return (
     <UiStatusBadge tone={STATUS_TONE[status] ?? 'neutral'} className="capitalize">
-      {status}
+      {t(`status.${status}`, { defaultValue: status })}
     </UiStatusBadge>
   )
 }
@@ -90,27 +86,6 @@ function StatusBadge({ status }: { status: string }) {
 // ============================================================================
 // HELPERS
 // ============================================================================
-
-function formatDate(dateStr: string | undefined | null): string {
-  if (!dateStr) return '\u2014'
-  try {
-    return new Date(dateStr).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    })
-  } catch {
-    return '\u2014'
-  }
-}
-
-function formatEnrollmentType(type: string | undefined | null): string {
-  if (!type) return '\u2014'
-  return type
-    .replace(/_/g, '-')
-    .replace(/^(.)/, (m) => m.toUpperCase())
-    .replace(/-(.)/g, (_, c) => `-${c}`)
-}
 
 // ============================================================================
 // ACTION MENU
@@ -128,6 +103,7 @@ function ActionMenu({
   onMarkNoShow?: () => void
 }) {
   const [open, setOpen] = useState(false)
+  const { t } = useAcademicsI18n()
   const isActive = enrollment.status === 'enrolled' || enrollment.status === 'active' || enrollment.status === 'pending'
 
   if (!isActive) return null
@@ -151,7 +127,7 @@ function ActionMenu({
               className="flex items-center gap-2 w-full px-3 py-2 text-xs transition-colors hover:opacity-80 text-[rgb(var(--accent-finance-text))]"
             >
               <UserMinus className="w-3.5 h-3.5" />
-              Withdraw
+              {t('tables.enrollment.actions.withdraw')}
             </button>
             <button
               type="button"
@@ -159,7 +135,7 @@ function ActionMenu({
               className="flex items-center gap-2 w-full px-3 py-2 text-xs transition-colors hover:opacity-80 text-[rgb(var(--accent-academics-text))]"
             >
               <ArrowRightLeft className="w-3.5 h-3.5" />
-              Transfer
+              {t('tables.enrollment.actions.transfer')}
             </button>
             {onMarkNoShow && (
               <button
@@ -168,7 +144,7 @@ function ActionMenu({
                 className="flex items-center gap-2 w-full px-3 py-2 text-xs transition-colors hover:opacity-80 text-[rgb(var(--accent-attendance-text))]"
               >
                 <UserX className="w-3.5 h-3.5" />
-                Mark No-Show
+                {t('tables.enrollment.actions.markNoShow')}
               </button>
             )}
           </div>
@@ -199,6 +175,7 @@ export function EnrollmentTable({
   onMarkNoShow,
   schoolId,
 }: EnrollmentTableProps) {
+  const { t, dataTableLabels, formatDate, enumLabel } = useAcademicsI18n()
   // Gate the dropdown on profile-load so the user doesn't see the full
   // 20-code catalog flash before the school's enabledGradeLevels resolve.
   // When schoolId is null the underlying query is disabled → isLoading=false
@@ -207,6 +184,13 @@ export function EnrollmentTable({
   const { options: gradeLevelOptions, isLoading: gradeOptionsLoading } =
     useSchoolEnabledGradeOptions(schoolId)
   const hasActions = !!(onWithdraw || onTransfer || onMarkNoShow)
+  const statusOptions = useMemo(
+    () => STATUS_VALUES.map((value) => ({
+      value,
+      label: t(`status.${value}`, { defaultValue: value }),
+    })),
+    [t],
+  )
 
   const columns: ColumnDef<EnrollmentResponseDto, unknown>[] = useMemo(() => {
     const cols: ColumnDef<EnrollmentResponseDto, unknown>[] = [
@@ -214,7 +198,7 @@ export function EnrollmentTable({
         accessorFn: (row) =>
           ((row as Record<string, unknown>).studentName as string) || '',
         id: 'studentName',
-        header: 'Student',
+        header: t('tables.enrollment.columns.student'),
         enableSorting: true,
         cell: ({ getValue, row }) => (
           <span className="font-medium text-xs text-[rgb(var(--text-primary))]">
@@ -224,7 +208,7 @@ export function EnrollmentTable({
       },
       {
         accessorKey: 'gradeLevel',
-        header: 'Grade Level',
+        header: t('tables.enrollment.columns.gradeLevel'),
         enableSorting: true,
         cell: ({ getValue }) => (
           <span className="text-xs text-[rgb(var(--text-secondary))]">
@@ -234,14 +218,14 @@ export function EnrollmentTable({
       },
       {
         accessorKey: 'status',
-        header: 'Status',
+        header: t('tables.enrollment.columns.status'),
         enableSorting: true,
         cell: ({ getValue }) => <StatusBadge status={getValue<string>()} />,
       },
       {
         accessorFn: (row) => row.entryDate || row.enrollmentDate || null,
         id: 'entryDate',
-        header: 'Entry Date',
+        header: t('tables.enrollment.columns.entryDate'),
         enableSorting: true,
         cell: ({ getValue }) => (
           <span className="text-xs text-[rgb(var(--text-secondary))]">
@@ -252,7 +236,7 @@ export function EnrollmentTable({
       {
         accessorFn: (row) => row.exitWithdrawDate || row.withdrawalDate || null,
         id: 'exitDate',
-        header: 'Exit Date',
+        header: t('tables.enrollment.columns.exitDate'),
         enableSorting: true,
         cell: ({ getValue }) => {
           const val = getValue<string | null>()
@@ -265,11 +249,11 @@ export function EnrollmentTable({
       },
       {
         accessorKey: 'enrollmentType',
-        header: 'Type',
+        header: t('tables.enrollment.columns.type'),
         enableSorting: true,
         cell: ({ getValue }) => (
           <span className="text-xs text-[rgb(var(--text-secondary))]">
-            {formatEnrollmentType(getValue<string>())}
+            {enumLabel('tables.enrollment.types', getValue<string>())}
           </span>
         ),
       },
@@ -294,7 +278,7 @@ export function EnrollmentTable({
     }
 
     return cols
-  }, [hasActions, onWithdraw, onTransfer, onMarkNoShow])
+  }, [hasActions, onWithdraw, onTransfer, onMarkNoShow, enumLabel, formatDate, t])
 
   const filteredData = useMemo(() => {
     let result = enrollments
@@ -320,12 +304,13 @@ export function EnrollmentTable({
           ? { hasMore: Boolean(hasMore), isFetching: Boolean(isFetchingMore), onLoadMore }
           : undefined
       }
-      searchPlaceholder="Search students..."
+      searchPlaceholder={t('tables.enrollment.search')}
       emptyState={{
         icon: <Users className="w-10 h-10 opacity-40 text-[rgb(var(--text-disabled))]" />,
-        title: 'No enrollments found',
-        description: 'Try adjusting your filters or search term.',
+        title: t('tables.enrollment.empty.title'),
+        description: t('tables.enrollment.empty.description'),
       }}
+      labels={dataTableLabels}
       maxHeight="calc(100vh - 13rem)"
       toolbarExtra={
         <div className="flex items-center gap-2">
@@ -336,7 +321,7 @@ export function EnrollmentTable({
             value={gradeLevel ?? ''}
             onChange={(v) => onGradeLevelChange(v || null)}
             disabled={gradeOptionsLoading}
-            placeholder={gradeOptionsLoading ? 'Loading grades…' : 'All Grades'}
+            placeholder={gradeOptionsLoading ? t('tables.enrollment.filters.loadingGrades') : t('tables.enrollment.filters.allGrades')}
             options={gradeOptionsLoading ? [] : gradeLevelOptions}
           />
           <Select
@@ -345,7 +330,7 @@ export function EnrollmentTable({
             clearable
             value={statusFilter ?? ''}
             onChange={(v) => onStatusChange(v || null)}
-            placeholder="All Status"
+            placeholder={t('tables.enrollment.filters.allStatus')}
             options={statusOptions}
           />
           {(gradeLevel || statusFilter) && (
@@ -355,7 +340,7 @@ export function EnrollmentTable({
               className="flex items-center gap-1 px-2.5 py-1.5 text-xs rounded-[8px] transition-colors hover:opacity-80 bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-tertiary))]"
             >
               <X className="w-3 h-3" />
-              Clear
+              {t('tables.enrollment.filters.clear')}
             </button>
           )}
         </div>
