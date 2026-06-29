@@ -6,6 +6,7 @@ import { Loader2, School } from 'lucide-react'
 import type { SectionResponseDto } from '@aibrains/shared-types'
 import { ClassroomCard } from './ClassroomCard'
 import { ClassroomCardSkeleton } from './ClassroomCardSkeleton'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 interface ClassroomCardGridProps {
   sections: SectionResponseDto[]
@@ -31,6 +32,8 @@ export function ClassroomCardGrid({
   onEdit,
   onToggleActive,
 }: ClassroomCardGridProps) {
+  const { t } = useAcademicsI18n()
+
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
@@ -45,9 +48,9 @@ export function ClassroomCardGrid({
     return (
       <div className="rounded-xl border p-12 text-center bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]">
         <School className="w-12 h-12 mx-auto mb-4 text-[rgb(var(--text-tertiary))]" />
-        <h4 className="text-lg font-medium mb-2 text-[rgb(var(--text-primary))]">No classes yet</h4>
+        <h4 className="text-lg font-medium mb-2 text-[rgb(var(--text-primary))]">{t('classrooms.empty.noClassesTitle')}</h4>
         <p className="max-w-md mx-auto text-[rgb(var(--text-tertiary))]">
-          Create your first class section to get started. Classes will appear here as cards.
+          {t('classrooms.empty.noClassesDescription')}
         </p>
       </div>
     )
@@ -79,10 +82,10 @@ export function ClassroomCardGrid({
             {isFetchingMore ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                Loading...
+                {t('classrooms.actions.loading')}
               </>
             ) : (
-              'Load More'
+              t('classrooms.actions.loadMore')
             )}
           </button>
         </div>

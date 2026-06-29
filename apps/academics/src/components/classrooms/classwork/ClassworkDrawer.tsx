@@ -25,6 +25,7 @@ import {
   useCreateClassworkItem,
   useUpdateClassworkItem,
 } from '../../../hooks/useClasswork'
+import { useAcademicsI18n } from '../../../lib/i18n'
 
 // ============================================================================
 // FORM SCHEMA
@@ -60,15 +61,15 @@ interface ClassworkFormData {
 
 const TYPE_OPTIONS: Array<{
   value: ClassworkItemType
-  label: string
+  labelKey: string
   icon: typeof ClipboardList
   color: string
   bg: string
 }> = [
-  { value: 'assignment', label: 'Assignment', icon: ClipboardList, color: 'text-[rgb(var(--state-info-fg))]', bg: 'bg-[rgb(var(--state-info-bg)/0.18)]' },
-  { value: 'quiz', label: 'Quiz', icon: HelpCircle, color: 'text-amber-500', bg: 'bg-[rgb(var(--state-warning-fg))]/10' },
-  { value: 'material', label: 'Material', icon: FileText, color: 'text-[rgb(var(--state-info-fg))]', bg: 'bg-[rgb(var(--state-info-bg)/0.18)]' },
-  { value: 'question', label: 'Question', icon: MessageCircle, color: 'text-[rgb(var(--state-success-fg))]', bg: 'bg-[rgb(var(--state-success-bg)/0.18)]' },
+  { value: 'assignment', labelKey: 'classrooms.classwork.assignment', icon: ClipboardList, color: 'text-[rgb(var(--state-info-fg))]', bg: 'bg-[rgb(var(--state-info-bg)/0.18)]' },
+  { value: 'quiz', labelKey: 'classrooms.classwork.quiz', icon: HelpCircle, color: 'text-amber-500', bg: 'bg-[rgb(var(--state-warning-fg))]/10' },
+  { value: 'material', labelKey: 'classrooms.classwork.material', icon: FileText, color: 'text-[rgb(var(--state-info-fg))]', bg: 'bg-[rgb(var(--state-info-bg)/0.18)]' },
+  { value: 'question', labelKey: 'classrooms.classwork.question', icon: MessageCircle, color: 'text-[rgb(var(--state-success-fg))]', bg: 'bg-[rgb(var(--state-success-bg)/0.18)]' },
 ]
 
 // ============================================================================
@@ -105,6 +106,7 @@ export function ClassworkDrawer({
   defaultType,
   topics = [],
 }: ClassworkDrawerProps) {
+  const { t } = useAcademicsI18n()
   const isEditMode = !!editItem
   const panelRef = useRef<HTMLDivElement>(null)
 
@@ -206,6 +208,7 @@ export function ClassworkDrawer({
         const field = issue.path[0]?.toString()
         if (field && !fieldErrors[field]) {
           fieldErrors[field] = issue.message
+          if (field === 'title') fieldErrors[field] = t('classrooms.classwork.titleRequired')
         }
       }
       setErrors(fieldErrors)
@@ -253,13 +256,13 @@ export function ClassworkDrawer({
     }
 
     onClose()
-  }, [form, isEditMode, editItem, sectionId, schoolId, createMutation, updateMutation, onClose])
+  }, [form, isEditMode, editItem, sectionId, schoolId, createMutation, updateMutation, onClose, t])
 
   // Whether points/due date fields apply
   const showPointsAndDue = form.type === 'assignment' || form.type === 'quiz'
 
   // Drawer title
-  const title = isEditMode ? 'Edit Classwork' : 'Create Classwork'
+  const title = isEditMode ? t('classrooms.classwork.editTitle') : t('classrooms.classwork.createTitle')
 
   return (
     <AnimatePresence>
@@ -303,7 +306,7 @@ export function ClassworkDrawer({
                         </h2>
                         {isEditMode && (
                           <span className="flex-shrink-0 text-xs bg-[rgb(var(--state-warning-bg)/0.18)] text-amber-700 dark:bg-[rgb(var(--state-warning-fg))]/20 dark:text-amber-400 px-2 py-0.5 rounded-full font-medium">
-                            Editing
+                            {t('classrooms.classwork.editing')}
                           </span>
                         )}
                       </div>
@@ -313,7 +316,7 @@ export function ClassworkDrawer({
                     type="button"
                     onClick={handleAttemptClose}
                     className="p-1.5 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-surface-secondary transition-colors flex-shrink-0"
-                    aria-label="Close drawer"
+                    aria-label={t('classrooms.aria.closeDrawer')}
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -323,7 +326,7 @@ export function ClassworkDrawer({
                 <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
                   {/* Type selector — compact inline pills */}
                   <div>
-                    <label className="block text-xs font-medium text-text-secondary mb-2">Type</label>
+                    <label className="block text-xs font-medium text-text-secondary mb-2">{t('classrooms.classwork.type')}</label>
                     <div className="flex flex-wrap gap-2">
                       {TYPE_OPTIONS.map((opt) => {
                         const Icon = opt.icon
@@ -344,7 +347,7 @@ export function ClassworkDrawer({
                             `}
                           >
                             <Icon className={`w-3.5 h-3.5 ${isSelected ? opt.color : 'text-text-tertiary'}`} />
-                            {opt.label}
+                            {t(opt.labelKey)}
                           </button>
                         )
                       })}
@@ -354,14 +357,14 @@ export function ClassworkDrawer({
                   {/* Title */}
                   <div>
                     <label htmlFor="cw-title" className="block text-xs font-medium text-text-secondary mb-1.5">
-                      Title <span className="text-[rgb(var(--state-danger-fg))]">*</span>
+                      {t('classrooms.classwork.titleLabel')} <span className="text-[rgb(var(--state-danger-fg))]">*</span>
                     </label>
                     <input
                       id="cw-title"
                       type="text"
                       value={form.title}
                       onChange={(e) => updateField('title', e.target.value)}
-                      placeholder="e.g. Chapter 3 Reading Response"
+                      placeholder={t('classrooms.classwork.titlePlaceholder')}
                       className={`w-full px-3 py-2 text-sm bg-surface-primary border rounded-lg text-text-primary placeholder:text-text-tertiary outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors ${errors.title ? 'border-[rgb(var(--state-danger-border))]' : 'border-border-primary'}`}
                       autoFocus
                     />
@@ -371,13 +374,13 @@ export function ClassworkDrawer({
                   {/* Description */}
                   <div>
                     <label htmlFor="cw-desc" className="block text-xs font-medium text-text-secondary mb-1.5">
-                      Description
+                      {t('classrooms.classwork.description')}
                     </label>
                     <textarea
                       id="cw-desc"
                       value={form.description}
                       onChange={(e) => updateField('description', e.target.value)}
-                      placeholder={form.type === 'question' ? 'Write your question here...' : 'Add instructions or details...'}
+                      placeholder={form.type === 'question' ? t('classrooms.classwork.questionPlaceholder') : t('classrooms.classwork.instructionsPlaceholder')}
                       rows={form.type === 'material' || form.type === 'question' ? 5 : 4}
                       className="w-full px-3 py-2 text-sm bg-surface-primary border border-border-primary rounded-lg text-text-primary placeholder:text-text-tertiary outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors resize-y min-h-20"
                     />
@@ -386,7 +389,7 @@ export function ClassworkDrawer({
                   {/* Topic */}
                   <div>
                     <label htmlFor="cw-topic" className="block text-xs font-medium text-text-secondary mb-1.5">
-                      Topic
+                      {t('classrooms.classwork.topicLabel')}
                     </label>
                     <select
                       id="cw-topic"
@@ -394,7 +397,7 @@ export function ClassworkDrawer({
                       onChange={(e) => updateField('topicId', e.target.value)}
                       className="w-full px-3 py-2 text-sm bg-surface-primary border border-border-primary rounded-lg text-text-primary outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors"
                     >
-                      <option value="">No topic</option>
+                      <option value="">{t('classrooms.classwork.noTopic')}</option>
                       {topics.map((t) => (
                         <option key={t.topicId} value={t.topicId}>
                           {t.name}
@@ -407,12 +410,12 @@ export function ClassworkDrawer({
                   {showPointsAndDue && (
                     <div className="space-y-4 p-4 bg-surface-secondary/50 rounded-lg border border-border-secondary">
                       <p className="text-xs font-medium text-text-tertiary uppercase tracking-wider">
-                        {form.type === 'quiz' ? 'Quiz Settings' : 'Assignment Settings'}
+                        {form.type === 'quiz' ? t('classrooms.classwork.quizSettings') : t('classrooms.classwork.assignmentSettings')}
                       </p>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <label htmlFor="cw-due" className="block text-xs font-medium text-text-secondary mb-1.5">
-                            Due Date
+                            {t('classrooms.classwork.dueDate')}
                           </label>
                           <input
                             id="cw-due"
@@ -424,7 +427,7 @@ export function ClassworkDrawer({
                         </div>
                         <div>
                           <label htmlFor="cw-points" className="block text-xs font-medium text-text-secondary mb-1.5">
-                            Points Possible
+                            {t('classrooms.classwork.pointsPossible')}
                           </label>
                           <input
                             id="cw-points"
@@ -444,7 +447,7 @@ export function ClassworkDrawer({
 
                   {/* Status toggle */}
                   <div>
-                    <label className="block text-xs font-medium text-text-secondary mb-2">Visibility</label>
+                    <label className="block text-xs font-medium text-text-secondary mb-2">{t('classrooms.classwork.visibility')}</label>
                     <div className="flex gap-2">
                       {(['draft', 'published'] as const).map((s) => (
                         <button
@@ -462,7 +465,7 @@ export function ClassworkDrawer({
                           `}
                         >
                           <div className={`w-1.5 h-1.5 rounded-full ${form.status === s ? (s === 'published' ? 'bg-[rgb(var(--state-success-fg))]' : 'bg-[rgb(var(--state-warning-fg))]') : 'bg-text-tertiary'}`} />
-                          {s === 'draft' ? 'Draft' : 'Published'}
+                          {s === 'draft' ? t('classrooms.classwork.draft') : t('classrooms.classwork.published')}
                         </button>
                       ))}
                     </div>
@@ -477,7 +480,7 @@ export function ClassworkDrawer({
                     disabled={isPending}
                     className="px-4 py-2 text-sm font-medium text-[rgb(var(--text-secondary))] bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] rounded-lg hover:bg-[rgb(var(--background-secondary))] transition-colors disabled:opacity-50"
                   >
-                    Cancel
+                    {t('classrooms.actions.cancel')}
                   </button>
                   <button
                     type="button"
@@ -488,12 +491,12 @@ export function ClassworkDrawer({
                     {isPending ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        Saving...
+                        {t('classrooms.actions.saving')}
                       </>
                     ) : isEditMode ? (
-                      'Save Changes'
+                      t('classrooms.actions.saveChanges')
                     ) : (
-                      'Create'
+                      t('classrooms.actions.create')
                     )}
                   </button>
                 </div>
@@ -514,10 +517,10 @@ export function ClassworkDrawer({
                         className="bg-surface-primary rounded-xl shadow-lg border border-border-primary p-6 mx-8 max-w-sm"
                       >
                         <h3 className="text-sm font-semibold text-text-primary mb-2">
-                          Discard changes?
+                          {t('classrooms.classwork.discardTitle')}
                         </h3>
                         <p className="text-sm text-text-secondary mb-4">
-                          You have unsaved changes. Are you sure you want to close?
+                          {t('classrooms.classwork.discardDescription')}
                         </p>
                         <div className="flex justify-end gap-2">
                           <button
@@ -525,14 +528,14 @@ export function ClassworkDrawer({
                             onClick={() => setShowDiscardConfirm(false)}
                             className="px-3 py-1.5 text-sm font-medium text-text-secondary hover:bg-surface-secondary rounded-lg transition-colors"
                           >
-                            Keep Editing
+                            {t('classrooms.actions.keepEditing')}
                           </button>
                           <button
                             type="button"
                             onClick={() => { setShowDiscardConfirm(false); onClose() }}
                             className="px-3 py-1.5 text-sm font-medium text-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--state-danger-bg)/0.18)] dark:hover:bg-[rgb(var(--state-danger-bg)/0.18)] rounded-lg transition-colors"
                           >
-                            Discard
+                            {t('classrooms.actions.discard')}
                           </button>
                         </div>
                       </motion.div>

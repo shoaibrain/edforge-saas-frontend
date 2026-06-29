@@ -76,6 +76,7 @@ import { TabErrorBoundary } from '../../components/common/TabErrorBoundary'
 import { NoCurrentAcademicYearEmptyState } from '../../components/common'
 import { StatCard, WidgetErrorBoundaryV2, Button, Select, ContextBar } from '@edforge/ui'
 import { useAttendanceOverview } from '../../hooks/useAttendance'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 // ============================================================================
 // TYPES
@@ -83,11 +84,11 @@ import { useAttendanceOverview } from '../../hooks/useAttendance'
 
 type ClassroomTabId = 'overview' | 'gradebook' | 'policies' | 'attendance'
 
-const TABS: { id: ClassroomTabId; label: string; icon: typeof School }[] = [
-  { id: 'overview', label: 'Overview', icon: School },
-  { id: 'gradebook', label: 'Gradebook', icon: BookCheck },
-  { id: 'policies', label: 'Grading Policies', icon: Settings },
-  { id: 'attendance', label: 'Attendance', icon: ClipboardCheck },
+const TABS: { id: ClassroomTabId; labelKey: string; icon: typeof School }[] = [
+  { id: 'overview', labelKey: 'classrooms.tabs.overview', icon: School },
+  { id: 'gradebook', labelKey: 'classrooms.tabs.gradebook', icon: BookCheck },
+  { id: 'policies', labelKey: 'classrooms.tabs.policies', icon: Settings },
+  { id: 'attendance', labelKey: 'classrooms.tabs.attendance', icon: ClipboardCheck },
 ]
 
 const VALID_TABS = new Set<string>(TABS.map((t) => t.id))
@@ -115,6 +116,7 @@ function getUtilizationAccentTint(utilization: number) {
 function OverviewTab() {
   const schoolId = useActiveSchoolId() || ''
   const navigate = useNavigate()
+  const { t, formatNumber } = useAcademicsI18n()
   const schedPerms = useResourcePermissions('scheduling')
   const { viewMode, setViewMode } = useViewMode()
 
@@ -180,25 +182,25 @@ function OverviewTab() {
     () => [
       {
         id: 'activate',
-        label: 'Activate',
+        label: t('classrooms.actions.activate'),
         icon: <ToggleRight className="w-4 h-4" />,
         onRun: (rows) => setBulkStatusTarget({ rows, targetActive: true }),
       },
       {
         id: 'deactivate',
-        label: 'Deactivate',
+        label: t('classrooms.actions.deactivate'),
         icon: <ToggleLeft className="w-4 h-4" />,
         onRun: (rows) => setBulkStatusTarget({ rows, targetActive: false }),
       },
       {
         id: 'notify',
-        label: 'Send notification',
+        label: t('classrooms.actions.sendNotification'),
         icon: <Send className="w-4 h-4" />,
         onRun: (rows) =>
-          toast.info(`Notify ${rows.length} section${rows.length === 1 ? '' : 's'} — coming soon`),
+          toast.info(t('classrooms.toast.notifyComingSoon', { count: rows.length })),
       },
     ],
-    [],
+    [t],
   )
 
   const handleNavigateToDetail = (section: SectionResponseDto) => {
@@ -212,46 +214,46 @@ function OverviewTab() {
   return (
     <div className="space-y-6">
       {/* V2 KPI Tiles */}
-      <WidgetErrorBoundaryV2 fallbackMessage="Failed to load statistics">
+      <WidgetErrorBoundaryV2 fallbackMessage={t('classrooms.stats.failedToLoad')}>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <StatCard
-            label="Total Sections"
-            value={String(total ?? stats.totalSections)}
+            label={t('classrooms.stats.totalSections')}
+            value={formatNumber(total ?? stats.totalSections)}
             icon={LayoutGrid}
             accentColor="rgb(var(--accent-academics)/0.1)"
             iconColor="rgb(var(--accent-academics))"
             barColor="rgb(var(--accent-academics))"
-            hint="active classrooms"
+            hint={t('classrooms.stats.activeClassrooms')}
             loading={isLoading}
           />
           <StatCard
-            label="Total Students"
-            value={String(stats.totalEnrolled)}
+            label={t('classrooms.stats.totalStudents')}
+            value={formatNumber(stats.totalEnrolled)}
             icon={Users}
             accentColor="rgb(var(--accent-enrollment)/0.1)"
             iconColor="rgb(var(--accent-enrollment))"
             barColor="rgb(var(--accent-enrollment))"
-            hint="across all sections"
+            hint={t('classrooms.stats.acrossAllSections')}
             loading={isLoading}
           />
           <StatCard
-            label="Avg Utilization"
-            value={stats.utilization + '%'}
+            label={t('classrooms.stats.avgUtilization')}
+            value={`${formatNumber(stats.utilization)}%`}
             icon={Gauge}
             accentColor={getUtilizationAccentTint(stats.utilization)}
             iconColor={getUtilizationAccent(stats.utilization)}
             barColor={getUtilizationAccent(stats.utilization)}
-            hint="of seat capacity"
+            hint={t('classrooms.stats.ofSeatCapacity')}
             loading={isLoading}
           />
           <StatCard
-            label="Active Teachers"
-            value={String(stats.uniqueTeachers)}
+            label={t('classrooms.stats.activeTeachers')}
+            value={formatNumber(stats.uniqueTeachers)}
             icon={UsersRound}
             accentColor="rgb(var(--accent-reports)/0.1)"
             iconColor="rgb(var(--accent-reports))"
             barColor="rgb(var(--accent-reports))"
-            hint="assigned sections"
+            hint={t('classrooms.stats.assignedSections')}
             loading={isLoading}
           />
         </div>
@@ -267,7 +269,7 @@ function OverviewTab() {
             type="button"
             onClick={() => setViewMode('grid')}
             className={`p-1.5 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-[rgb(var(--accent-academics)/0.12)] text-[rgb(var(--accent-academics-text))]' : 'bg-transparent text-[rgb(var(--text-tertiary))]'}`}
-            aria-label="Grid view"
+            aria-label={t('classrooms.actions.gridView')}
           >
             <LayoutGrid className="w-4 h-4" />
           </button>
@@ -275,7 +277,7 @@ function OverviewTab() {
             type="button"
             onClick={() => setViewMode('list')}
             className={`p-1.5 rounded-md transition-colors ${viewMode === 'list' ? 'bg-[rgb(var(--accent-academics)/0.12)] text-[rgb(var(--accent-academics-text))]' : 'bg-transparent text-[rgb(var(--text-tertiary))]'}`}
-            aria-label="List view"
+            aria-label={t('classrooms.actions.listView')}
           >
             <List className="w-4 h-4" />
           </button>
@@ -329,6 +331,7 @@ function OverviewTab() {
 function GradebookTab() {
   const schoolId = useActiveSchoolId() || ''
   const navigate = useNavigate()
+  const { t } = useAcademicsI18n()
   const gradePerms = useResourcePermissions('grades')
   // Default-collapsed: the gradebook grid is the primary surface; analytics is
   // opt-in so the page doesn't open with a tall dashboard pushing the grid below
@@ -416,7 +419,7 @@ function GradebookTab() {
       <div className="flex items-center gap-3 flex-wrap">
         {!sectionsLoading && sections.length === 0 ? (
           <div className="px-3 py-2 text-sm text-text-tertiary bg-surface-secondary border border-border-secondary rounded-lg min-w-64">
-            No sections assigned. Contact your administrator.
+            {t('classrooms.empty.noSectionsAssigned')}
           </div>
         ) : (
           <Select
@@ -424,10 +427,10 @@ function GradebookTab() {
             value={selectedSectionId ?? ''}
             onChange={(v) => setSelectedSectionId(v || null)}
             disabled={sectionsLoading}
-            placeholder="Select a section..."
+            placeholder={t('classrooms.gradebook.selectSection')}
             options={sections.map((s) => ({
               value: s.sectionId,
-              label: `${s.courseName || s.courseCode || 'Section'} - ${s.sectionNumber}`,
+              label: `${s.courseName || s.courseCode || t('classrooms.gradebook.sectionFallback')} - ${s.sectionNumber}`,
             }))}
           />
         )}
@@ -437,7 +440,7 @@ function GradebookTab() {
             className="min-w-48"
             value={selectedTermId ?? ''}
             onChange={(v) => setSelectedTermId(v || null)}
-            placeholder="Select grading period..."
+            placeholder={t('classrooms.gradebook.selectGradingPeriod')}
             options={gradingPeriods.map((gp) => ({
               value: gp.termId ?? gp.periodId ?? '',
               label: gp.name,
@@ -449,7 +452,7 @@ function GradebookTab() {
           <>
             <div className="w-px h-6 bg-border-primary/30" />
             {hasGradingPeriods && !selectedTermId && (
-              <span className="text-xs text-caramel-300">Select a grading period</span>
+              <span className="text-xs text-caramel-300">{t('classrooms.gradebook.selectGradingPeriodPrompt')}</span>
             )}
             {gradePerms.create && (
               <Button
@@ -458,7 +461,7 @@ function GradebookTab() {
                 disabled={!effectiveTermId || !currentYear?.yearId}
               >
                 <Plus className="w-3.5 h-3.5" />
-                Record
+                {t('classrooms.actions.record')}
               </Button>
             )}
             {gradePerms.edit && (
@@ -469,7 +472,7 @@ function GradebookTab() {
                 disabled={!effectiveTermId || !currentYear?.yearId}
               >
                 <Lock className="w-3.5 h-3.5" />
-                Finalize
+                {t('classrooms.actions.finalize')}
               </Button>
             )}
           </>
@@ -483,7 +486,7 @@ function GradebookTab() {
           aria-expanded={!analyticsCollapsed}
         >
           <BarChart3 className="w-4 h-4" />
-          Grade Analytics
+          {t('classrooms.actions.gradeAnalytics')}
           <ChevronDown className={`w-4 h-4 transition-transform ${analyticsCollapsed ? '-rotate-90' : ''}`} />
         </button>
       </div>
@@ -505,9 +508,9 @@ function GradebookTab() {
         <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-caramel-50/40 dark:bg-caramel-500/8 border border-caramel-300/25 dark:border-caramel-400/15">
           <AlertTriangle className="w-6 h-6 text-golden-400 flex-shrink-0" />
           <div>
-            <p className="text-sm text-text-primary font-medium">No grading policy configured</p>
+            <p className="text-sm text-text-primary font-medium">{t('classrooms.gradebook.noPolicyTitle')}</p>
             <p className="text-xs text-text-secondary mt-0.5">
-              Grades will use simple averaging without letter grades or category weights.
+              {t('classrooms.gradebook.noPolicyDescription')}
             </p>
           </div>
         </div>
@@ -516,9 +519,9 @@ function GradebookTab() {
         <div className="flex items-start gap-3 px-4 py-3 rounded-xl bg-[rgb(var(--state-info-bg)/0.18)]/30 dark:bg-[rgb(var(--state-info-fg))]/8 border border-[rgb(var(--state-info-border)/0.30)] ">
           <AlertTriangle className="w-5 h-5 text-[rgb(var(--state-info-fg))] flex-shrink-0 mt-0.5" />
           <div>
-            <p className="text-sm text-text-primary font-medium">No default grading policy set</p>
+            <p className="text-sm text-text-primary font-medium">{t('classrooms.gradebook.noDefaultPolicyTitle')}</p>
             <p className="text-xs text-text-secondary mt-0.5">
-              You have {policies?.length} grading {policies?.length === 1 ? 'policy' : 'policies'}, but none is marked as default.
+              {t('classrooms.gradebook.noDefaultPolicyDescription', { count: policies?.length ?? 0 })}
             </p>
           </div>
         </div>
@@ -528,8 +531,8 @@ function GradebookTab() {
       {!selectedSectionId ? (
         <div className="bg-surface-secondary rounded-xl border border-border-secondary p-12 text-center">
           <GraduationCap className="w-12 h-12 mx-auto text-text-tertiary mb-4" />
-          <h4 className="text-lg font-medium text-text-primary mb-2">Select a Class Section</h4>
-          <p className="text-text-secondary max-w-md mx-auto">Choose a section from the dropdown to view and manage student grades.</p>
+          <h4 className="text-lg font-medium text-text-primary mb-2">{t('classrooms.empty.selectClassSectionTitle')}</h4>
+          <p className="text-text-secondary max-w-md mx-auto">{t('classrooms.empty.selectClassSectionDescription')}</p>
         </div>
       ) : (
         <GradebookGrid
@@ -608,6 +611,7 @@ function ContextBanner({
   activeTab: ClassroomTabId
   schoolId: string
 }) {
+  const { t, formatNumber } = useAcademicsI18n()
   // Overview data — from sections
   const { data: sectionsPages } = useSections({
     schoolId,
@@ -645,13 +649,13 @@ function ContextBanner({
     if (activeTab === 'overview') {
       return (
         <>
-          <em className="not-italic text-[rgb(var(--accent-academics-text))]">{overviewStats.total} active sections</em>
-          {' '}across{' '}
-          <em className="not-italic text-[rgb(var(--accent-academics-text))]">{overviewStats.courses} courses</em>
+          <em className="not-italic text-[rgb(var(--accent-academics-text))]">{formatNumber(overviewStats.total)} {t('classrooms.context.activeSections')}</em>
+          {' '}{t('classrooms.context.across')}{' '}
+          <em className="not-italic text-[rgb(var(--accent-academics-text))]">{formatNumber(overviewStats.courses)} {t('classrooms.context.courses')}</em>
           {' '}&mdash;{' '}
-          <em className="not-italic text-[rgb(var(--accent-enrollment-text))]">{overviewStats.students} students enrolled</em>
-          , avg utilization{' '}
-          <em className="not-italic text-[rgb(var(--accent-attendance-text))]">{overviewStats.utilization}%</em>
+          <em className="not-italic text-[rgb(var(--accent-enrollment-text))]">{formatNumber(overviewStats.students)} {t('classrooms.context.studentsEnrolled')}</em>
+          , {t('classrooms.context.avgUtilization')}{' '}
+          <em className="not-italic text-[rgb(var(--accent-attendance-text))]">{formatNumber(overviewStats.utilization)}%</em>
           .
         </>
       )
@@ -665,13 +669,13 @@ function ContextBanner({
       const completionPct = gradeData.gradingProgress?.completionRate?.toFixed(0) ?? '—'
       return (
         <>
-          <em className="not-italic text-[rgb(var(--accent-finance-text))]">{gradeData.atRiskCount} students</em>
-          {' '}at risk (below 60%){worstCourse && (
-            <> &mdash; concentrated in <em className="not-italic text-[rgb(var(--accent-finance-text))]">{worstCourse}</em></>
+          <em className="not-italic text-[rgb(var(--accent-finance-text))]">{formatNumber(gradeData.atRiskCount)}</em>
+          {' '}{t('classrooms.context.studentsAtRisk')}{worstCourse && (
+            <> &mdash; {t('classrooms.context.concentratedIn')} <em className="not-italic text-[rgb(var(--accent-finance-text))]">{worstCourse}</em></>
           )}.{' '}
-          <em className="not-italic text-[rgb(var(--accent-enrollment-text))]">{passingCourses} at 100% pass rate</em>
-          . Grading{' '}
-          <em className="not-italic text-[rgb(var(--accent-academics-text))]">{completionPct}% complete</em>
+          <em className="not-italic text-[rgb(var(--accent-enrollment-text))]">{formatNumber(passingCourses)} {t('classrooms.context.atFullPassRate')}</em>
+          . {t('classrooms.context.grading')}{' '}
+          <em className="not-italic text-[rgb(var(--accent-academics-text))]">{completionPct}% {t('classrooms.context.complete')}</em>
           .
         </>
       )
@@ -685,20 +689,20 @@ function ContextBanner({
       const atRiskCount = attendanceData.atRiskStudents?.length ?? 0
       return (
         <>
-          <em className="not-italic text-[rgb(var(--accent-academics-text))]">{recorded} of {totalStudents} students</em>
-          {' '}recorded today. 7-day average{' '}
+          <em className="not-italic text-[rgb(var(--accent-academics-text))]">{formatNumber(recorded)} of {formatNumber(totalStudents)} {t('classrooms.card.students')}</em>
+          {' '}{t('classrooms.context.recordedToday')}. {t('classrooms.context.sevenDayAverage')}{' '}
           <em className="not-italic text-[rgb(var(--accent-enrollment-text))]">{avg7}%</em>
-          {' '}vs 30-day{' '}
+          {' '}{t('classrooms.context.vsThirtyDay')}{' '}
           <em className="not-italic text-[rgb(var(--accent-attendance-text))]">{avg30}%</em>
           .{atRiskCount > 0 && (
-            <>{' '}<em className="not-italic text-[rgb(var(--accent-finance-text))]">{atRiskCount} students</em> flagged below 90% attendance.</>
+            <>{' '}<em className="not-italic text-[rgb(var(--accent-finance-text))]">{formatNumber(atRiskCount)} {t('classrooms.card.students')}</em> {t('classrooms.context.flaggedBelowAttendance')}.</>
           )}
         </>
       )
     }
 
     return null
-  }, [activeTab, overviewStats, gradeData, attendanceData])
+  }, [activeTab, overviewStats, gradeData, attendanceData, t, formatNumber])
 
   if (!bannerContent) return null
 
@@ -717,6 +721,7 @@ export function ClassroomsModule() {
   const navigate = useNavigate()
   const schedPerms = useResourcePermissions('scheduling')
   const schoolId = useActiveSchoolId() || ''
+  const { t, formatDate, formatNumber } = useAcademicsI18n()
 
   // Lightweight section count for tab badge
   const { data: sectionPages } = useSections({ schoolId, enabled: !!schoolId, limit: 1 })
@@ -743,7 +748,7 @@ export function ClassroomsModule() {
             divider={false}
             meta={
               <span>
-                {new Date().toLocaleDateString('en-US', {
+                {formatDate(new Date(), {
                   weekday: 'long',
                   month: 'short',
                   day: 'numeric',
@@ -754,11 +759,11 @@ export function ClassroomsModule() {
               schedPerms.create ? (
                 <button
                   onClick={() => navigate({ to: '/classrooms/create' })}
-                  aria-label="New classroom"
+                  aria-label={t('classrooms.actions.newClassroom')}
                   className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-[9px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-enrollment)/0.4)] bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
                 >
                   <Plus className="w-3.5 h-3.5" />
-                  New classroom
+                  {t('classrooms.actions.newClassroom')}
                 </button>
               ) : undefined
             }
@@ -772,7 +777,7 @@ export function ClassroomsModule() {
         <div className="px-6">
           <nav
             className="flex overflow-x-auto gap-0 border-b border-[rgb(var(--border-primary)/0.35)]"
-            aria-label="Classrooms tabs"
+            aria-label={t('classrooms.aria.tabs')}
             role="tablist"
           >
             {TABS.map((tab) => {
@@ -792,7 +797,7 @@ export function ClassroomsModule() {
                   }`}
                 >
                   <tab.icon className={`w-4 h-4 ${isActive ? 'opacity-100' : 'opacity-70'}`} />
-                  {tab.label}
+                  {t(tab.labelKey)}
                   {tab.id === 'overview' && sectionCount !== undefined && (
                     <span
                       className={`text-2xs font-semibold py-0.5 px-1.5 rounded-md ${
@@ -801,7 +806,7 @@ export function ClassroomsModule() {
                           : 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]'
                       }`}
                     >
-                      {sectionCount}
+                      {formatNumber(sectionCount)}
                     </span>
                   )}
                 </button>
@@ -822,25 +827,25 @@ export function ClassroomsModule() {
             transition={{ duration: 0.15 }}
           >
             {activeTab === 'overview' && (
-              <TabErrorBoundary tabName="Overview">
+              <TabErrorBoundary tabName={t('classrooms.tabs.overview')}>
                 <OverviewTab />
               </TabErrorBoundary>
             )}
 
             {activeTab === 'gradebook' && (
-              <TabErrorBoundary tabName="Gradebook">
+              <TabErrorBoundary tabName={t('classrooms.tabs.gradebook')}>
                 <GradebookTab />
               </TabErrorBoundary>
             )}
 
             {activeTab === 'policies' && (
-              <TabErrorBoundary tabName="Grading Policies">
+              <TabErrorBoundary tabName={t('classrooms.tabs.policies')}>
                 <GradingPolicyList />
               </TabErrorBoundary>
             )}
 
             {activeTab === 'attendance' && (
-              <TabErrorBoundary tabName="Attendance Board">
+              <TabErrorBoundary tabName={t('classrooms.tabs.attendanceBoard')}>
                 <AttendanceModule />
               </TabErrorBoundary>
             )}

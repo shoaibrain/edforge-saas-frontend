@@ -16,12 +16,14 @@ import { ClassworkCreateMenu } from './ClassworkCreateMenu'
 import { ClassworkDrawer } from './ClassworkDrawer'
 import { TopicSection } from './TopicSection'
 import type { ClassworkItemResponseDto, ClassworkItemType } from '@aibrains/shared-types'
+import { useAcademicsI18n } from '../../../lib/i18n'
 
 interface ClassworkFeedProps {
   sectionId: string
 }
 
 export function ClassworkFeed({ sectionId }: ClassworkFeedProps) {
+  const { t } = useAcademicsI18n()
   const schoolId = useActiveSchoolId() || ''
   const { data: classwork, isLoading, isError, refetch } = useClassworkItems(sectionId, schoolId)
 
@@ -80,11 +82,11 @@ export function ClassworkFeed({ sectionId }: ClassworkFeedProps) {
   // Loading skeleton
   if (isLoading) {
     return (
-      <div className="space-y-4 max-w-2xl mx-auto" role="status" aria-label="Loading classwork">
+      <div className="space-y-4 max-w-2xl mx-auto" role="status" aria-label={t('classrooms.aria.loadingClasswork')}>
         {Array.from({ length: 4 }).map((_, i) => (
           <div key={i} className="h-16 rounded-lg bg-surface-secondary animate-pulse" />
         ))}
-        <span className="sr-only">Loading classwork items...</span>
+        <span className="sr-only">{t('classrooms.aria.loadingClassworkItems')}</span>
       </div>
     )
   }
@@ -96,19 +98,19 @@ export function ClassworkFeed({ sectionId }: ClassworkFeedProps) {
         <div className="bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)] rounded-xl border border-[rgb(var(--state-danger-border))] dark:border-[rgb(var(--state-danger-border))]/20 p-8 text-center">
           <AlertCircle className="w-10 h-10 mx-auto text-[rgb(var(--state-danger-fg))] mb-3" />
           <h4 className="text-sm font-medium text-[rgb(var(--state-danger-fg))]  mb-1">
-            Failed to load classwork
+            {t('classrooms.classwork.failedToLoad')}
           </h4>
           <p className="text-xs text-[rgb(var(--state-danger-fg))]/70 /70 mb-4">
-            There was an error fetching classwork data. Please try again.
+            {t('classrooms.classwork.failedToLoadDescription')}
           </p>
           <button
             type="button"
             onClick={() => refetch()}
-            aria-label="Retry loading classwork"
+            aria-label={t('classrooms.aria.retryLoadingClasswork')}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[rgb(var(--state-danger-fg))]  bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-fg)/0.2)] rounded-lg hover:bg-[rgb(var(--state-danger-bg)/0.28)] dark:hover:bg-[rgb(var(--state-danger-fg)/0.3)] transition-colors"
           >
             <RefreshCw className="w-3.5 h-3.5" />
-            Retry
+            {t('classrooms.actions.retry')}
           </button>
         </div>
       </div>
@@ -119,7 +121,7 @@ export function ClassworkFeed({ sectionId }: ClassworkFeedProps) {
     <div className="space-y-6 max-w-2xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-text-primary">All Classwork</h2>
+        <h2 className="text-sm font-semibold text-text-primary">{t('classrooms.classwork.title')}</h2>
         <ClassworkCreateMenu
           onCreateTopic={handleCreateTopic}
           onCreateAssignment={() => handleOpenCreate('assignment')}
@@ -148,7 +150,7 @@ export function ClassworkFeed({ sectionId }: ClassworkFeedProps) {
       {/* Ungrouped items */}
       {groupedItems.ungrouped.length > 0 && (
         <TopicSection
-          name="Other"
+          name={t('classrooms.classwork.other')}
           items={groupedItems.ungrouped}
           onItemClick={handleOpenEdit}
         />
@@ -158,11 +160,11 @@ export function ClassworkFeed({ sectionId }: ClassworkFeedProps) {
       {items.length === 0 && (
         <div className="bg-surface-secondary rounded-xl border border-border-secondary p-12 text-center" role="status">
           <FileText className="w-12 h-12 mx-auto text-text-tertiary mb-4" aria-hidden="true" />
-          <h4 className="text-lg font-medium text-text-primary mb-2">No classwork yet</h4>
+          <h4 className="text-lg font-medium text-text-primary mb-2">{t('classrooms.empty.noClassworkYet')}</h4>
           <p className="text-text-secondary max-w-md mx-auto">
             {topics.length > 0
-              ? 'You have topics set up but no classwork items yet. Create assignments, quizzes, or materials to get started.'
-              : 'Create assignments, quizzes, and materials for your class.'}
+              ? t('classrooms.empty.noClassworkWithTopics')
+              : t('classrooms.empty.noClassworkDescription')}
           </p>
         </div>
       )}

@@ -60,6 +60,7 @@ import { ClassroomOverview } from '../../components/classrooms/overview'
 
 // --- Classwork ---
 import { ClassworkFeed } from '../../components/classrooms/classwork'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 // ============================================================================
 // TYPES
@@ -67,11 +68,11 @@ import { ClassworkFeed } from '../../components/classrooms/classwork'
 
 type ClassroomDetailTab = 'overview' | 'classwork' | 'people' | 'progress'
 
-const TABS: { id: ClassroomDetailTab; label: string; icon: LucideIcon }[] = [
-  { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-  { id: 'classwork', label: 'Classwork', icon: FileText },
-  { id: 'people', label: 'People', icon: Users },
-  { id: 'progress', label: 'Progress', icon: TrendingUp },
+const TABS: { id: ClassroomDetailTab; labelKey: string; icon: LucideIcon }[] = [
+  { id: 'overview', labelKey: 'classrooms.tabs.overview', icon: LayoutDashboard },
+  { id: 'classwork', labelKey: 'classrooms.tabs.classwork', icon: FileText },
+  { id: 'people', labelKey: 'classrooms.tabs.people', icon: Users },
+  { id: 'progress', labelKey: 'classrooms.tabs.progress', icon: TrendingUp },
 ]
 
 const VALID_TABS = new Set<string>(TABS.map((t) => t.id))
@@ -113,6 +114,7 @@ function ActionsDropdown({
   onToggleActive: () => void
   isActive: boolean
 }) {
+  const { t } = useAcademicsI18n()
   const [isOpen, setIsOpen] = useState(false)
   return (
     <div className="relative">
@@ -120,7 +122,7 @@ function ActionsDropdown({
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="p-2 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-surface-secondary transition-colors"
-        aria-label="Section actions"
+        aria-label={t('classrooms.aria.sectionActions')}
         aria-expanded={isOpen}
         aria-haspopup="menu"
       >
@@ -129,7 +131,7 @@ function ActionsDropdown({
       {isOpen && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} aria-hidden="true" />
-          <div className="absolute right-0 z-20 mt-1 w-48 rounded-lg bg-surface-primary border border-border-primary shadow-lg py-1" role="menu" aria-label="Section actions">
+          <div className="absolute right-0 z-20 mt-1 w-48 rounded-lg bg-surface-primary border border-border-primary shadow-lg py-1" role="menu" aria-label={t('classrooms.aria.sectionActions')}>
             <button
               type="button"
               role="menuitem"
@@ -137,7 +139,7 @@ function ActionsDropdown({
               className="flex items-center gap-2 w-full px-3 py-2 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-secondary transition-colors"
             >
               <Pencil className="w-4 h-4" aria-hidden="true" />
-              Edit Section
+              {t('classrooms.actions.editSection')}
             </button>
             <button
               type="button"
@@ -146,7 +148,7 @@ function ActionsDropdown({
               className="flex items-center gap-2 w-full px-3 py-2 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-secondary transition-colors"
             >
               <Printer className="w-4 h-4" aria-hidden="true" />
-              Print Roster
+              {t('classrooms.actions.printRoster')}
             </button>
             <div className="border-t border-border-secondary my-1" role="separator" />
             <button
@@ -155,7 +157,7 @@ function ActionsDropdown({
               onClick={() => { setIsOpen(false); onToggleActive() }}
               className="flex items-center gap-2 w-full px-3 py-2 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-secondary transition-colors"
             >
-              {isActive ? <><ToggleLeft className="w-4 h-4" aria-hidden="true" />Deactivate</> : <><ToggleRight className="w-4 h-4" aria-hidden="true" />Activate</>}
+              {isActive ? <><ToggleLeft className="w-4 h-4" aria-hidden="true" />{t('classrooms.actions.deactivate')}</> : <><ToggleRight className="w-4 h-4" aria-hidden="true" />{t('classrooms.actions.activate')}</>}
             </button>
           </div>
         </>
@@ -171,6 +173,7 @@ function ActionsDropdown({
 function SectionGradesTab({ sectionId, section }: { sectionId: string; section: any }) {
   const schoolId = useActiveSchoolId() || ''
   const navigate = useNavigate()
+  const { t } = useAcademicsI18n()
   const gradePerms = useResourcePermissions('grades')
 
   const [selectedTermId, setSelectedTermId] = useState<string | null>(null)
@@ -221,7 +224,7 @@ function SectionGradesTab({ sectionId, section }: { sectionId: string; section: 
     return (
       <NoCurrentAcademicYearEmptyState
         variant="subtle"
-        secondaryMessage="Set up an academic year before recording grades."
+        secondaryMessage={t('classrooms.gradebook.setAcademicYearBeforeGrades')}
       />
     )
   }
@@ -236,7 +239,7 @@ function SectionGradesTab({ sectionId, section }: { sectionId: string; section: 
             onChange={(e) => setSelectedTermId(e.target.value || null)}
             className="px-3 py-2 bg-surface-secondary border border-border-secondary rounded-lg text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
           >
-            <option value="">Select grading period...</option>
+            <option value="">{t('classrooms.gradebook.selectGradingPeriod')}</option>
             {gradingPeriods.map((gp) => {
               const id = gp.termId ?? gp.periodId ?? ''
               return <option key={id} value={id}>{gp.name}</option>
@@ -251,7 +254,7 @@ function SectionGradesTab({ sectionId, section }: { sectionId: string; section: 
             className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--action-primary-bg))] hover:bg-[rgb(var(--action-primary-bg-hover))] rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <Plus className="w-3.5 h-3.5" />
-            Record
+            {t('classrooms.actions.record')}
           </button>
         )}
         {gradePerms.edit && (
@@ -262,7 +265,7 @@ function SectionGradesTab({ sectionId, section }: { sectionId: string; section: 
             className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-text-secondary border border-border-primary rounded-lg hover:bg-surface-tertiary transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <Lock className="w-3.5 h-3.5" />
-            Finalize
+            {t('classrooms.actions.finalize')}
           </button>
         )}
       </div>
@@ -338,6 +341,7 @@ function ProgressOverview({
   sectionId: string
   onNavigate: (view: ProgressView) => void
 }) {
+  const { t, formatNumber } = useAcademicsI18n()
   const schoolId = useActiveSchoolId() || ''
   const today = useMemo(() => new Date().toISOString().split('T')[0], [])
   const { data: roster } = useSectionRoster({ sectionId, schoolId, enabled: !!schoolId })
@@ -393,21 +397,21 @@ function ProgressOverview({
       <div className="bg-surface-primary rounded-xl border border-border-primary p-6 space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-semibold text-text-primary uppercase tracking-wide">
-            Grades
+            {t('classrooms.overviewPanels.grades')}
           </h3>
           <button
             type="button"
             onClick={() => onNavigate('gradebook')}
             className="text-xs text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--action-secondary-fg))] font-medium"
           >
-            Open Gradebook &rarr;
+            {t('classrooms.actions.openGradebook')} &rarr;
           </button>
         </div>
         {gradeStats ? (
           <div className="space-y-3">
             <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-bold text-text-primary">{gradeStats.avg}%</span>
-              <span className="text-sm text-text-secondary">class average</span>
+              <span className="text-3xl font-bold text-text-primary">{formatNumber(gradeStats.avg)}%</span>
+              <span className="text-sm text-text-secondary">{t('classrooms.gradebook.classAverage')}</span>
             </div>
             <div className="flex gap-0.5 h-2.5 rounded-full overflow-hidden bg-surface-secondary">
               {Object.entries(gradeStats.distribution).map(([letter, count]) => {
@@ -428,7 +432,7 @@ function ProgressOverview({
                 <div key={letter} className="flex items-center gap-1.5">
                   <span className={`w-2 h-2 rounded-full ${distColors[letter]}`} />
                   <span className="text-text-secondary font-medium">{letter}</span>
-                  <span className="text-text-tertiary">{count}</span>
+                  <span className="text-text-tertiary">{formatNumber(count)}</span>
                 </div>
               ))}
             </div>
@@ -436,7 +440,7 @@ function ProgressOverview({
         ) : (
           <div className="text-center py-8">
             <GraduationCap className="w-8 h-8 mx-auto text-text-tertiary mb-2" aria-hidden="true" />
-            <p className="text-sm text-text-secondary">No grades recorded yet</p>
+            <p className="text-sm text-text-secondary">{t('classrooms.empty.noGradesRecorded')}</p>
           </div>
         )}
       </div>
@@ -445,14 +449,14 @@ function ProgressOverview({
       <div className="bg-surface-primary rounded-xl border border-border-primary p-6 space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-semibold text-text-primary uppercase tracking-wide">
-            Attendance
+            {t('classrooms.overviewPanels.attendance')}
           </h3>
           <button
             type="button"
             onClick={() => onNavigate('attendance')}
             className="text-xs text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--action-secondary-fg))] font-medium"
           >
-            Open Attendance &rarr;
+            {t('classrooms.actions.openAttendance')} &rarr;
           </button>
         </div>
         {attendanceStats && attendanceStats.recorded > 0 ? (
@@ -463,9 +467,9 @@ function ProgressOverview({
                 attendanceStats.rate >= 90 ? 'text-[rgb(var(--state-warning-fg))]' :
                 'text-[rgb(var(--state-danger-fg))]'
               }`}>
-                {attendanceStats.rate.toFixed(1)}%
+                {formatNumber(Number(attendanceStats.rate.toFixed(1)))}%
               </span>
-              <span className="text-sm text-text-secondary">today&apos;s rate</span>
+              <span className="text-sm text-text-secondary">{t('classrooms.detail.todayRate')}</span>
             </div>
 
             <div className="flex gap-0.5 h-2.5 rounded-full overflow-hidden bg-surface-secondary">
@@ -485,21 +489,24 @@ function ProgressOverview({
 
             <div className="flex flex-wrap gap-4 text-xs">
               {[
-                { label: 'Present', value: attendanceStats.present, dot: 'bg-[rgb(var(--state-success-fg))]' },
-                { label: 'Late', value: attendanceStats.late, dot: 'bg-[rgb(var(--state-warning-fg))]' },
-                { label: 'Remote', value: attendanceStats.remote, dot: 'bg-[rgb(var(--state-info-fg))]' },
-                { label: 'Absent', value: attendanceStats.absent, dot: 'bg-[rgb(var(--state-danger-fg))]' },
+                { label: t('attendance.status.present.label'), value: attendanceStats.present, dot: 'bg-[rgb(var(--state-success-fg))]' },
+                { label: t('attendance.status.late.label'), value: attendanceStats.late, dot: 'bg-[rgb(var(--state-warning-fg))]' },
+                { label: t('attendance.status.remote.label'), value: attendanceStats.remote, dot: 'bg-[rgb(var(--state-info-fg))]' },
+                { label: t('attendance.status.absent.label'), value: attendanceStats.absent, dot: 'bg-[rgb(var(--state-danger-fg))]' },
               ].filter(s => s.value > 0).map((s) => (
                 <div key={s.label} className="flex items-center gap-1.5">
                   <span className={`w-2 h-2 rounded-full ${s.dot}`} />
                   <span className="text-text-secondary font-medium">{s.label}</span>
-                  <span className="text-text-tertiary">{s.value}</span>
+                  <span className="text-text-tertiary">{formatNumber(s.value)}</span>
                 </div>
               ))}
             </div>
 
             <p className="text-xs text-text-tertiary">
-              {attendanceStats.recorded} of {attendanceStats.total} students recorded today
+              {t('classrooms.detail.studentsRecordedToday', {
+                recorded: formatNumber(attendanceStats.recorded),
+                total: formatNumber(attendanceStats.total),
+              })}
             </p>
           </div>
         ) : (
@@ -508,14 +515,14 @@ function ProgressOverview({
             {(roster?.students?.length ?? 0) > 0 ? (
               <>
                 <p className="text-sm text-text-secondary">
-                  {roster?.students?.length} students enrolled
+                  {t('classrooms.detail.studentsEnrolledCount', { count: roster?.students?.length ?? 0 })}
                 </p>
                 <p className="text-xs text-text-tertiary mt-1">
-                  No attendance recorded for today yet
+                  {t('classrooms.empty.noAttendanceToday')}
                 </p>
               </>
             ) : (
-              <p className="text-sm text-text-secondary">No students enrolled yet</p>
+              <p className="text-sm text-text-secondary">{t('classrooms.empty.noStudentsEnrolled')}</p>
             )}
           </div>
         )}
@@ -539,16 +546,17 @@ function ProgressTab({
   activeView: ProgressView
   onViewChange: (view: ProgressView) => void
 }) {
+  const { t } = useAcademicsI18n()
   const views: { id: ProgressView; label: string }[] = [
-    { id: 'overview', label: 'Overview' },
-    { id: 'gradebook', label: 'Gradebook' },
-    { id: 'attendance', label: 'Attendance' },
+    { id: 'overview', label: t('classrooms.tabs.overview') },
+    { id: 'gradebook', label: t('classrooms.tabs.gradebook') },
+    { id: 'attendance', label: t('classrooms.tabs.attendance') },
   ]
 
   return (
     <div className="space-y-6">
       {/* Segmented control */}
-      <div className="flex items-center gap-1 p-1 bg-surface-secondary rounded-lg w-fit" role="tablist" aria-label="Progress views">
+      <div className="flex items-center gap-1 p-1 bg-surface-secondary rounded-lg w-fit" role="tablist" aria-label={t('classrooms.aria.progressViews')}>
         {views.map((v) => (
           <button
             key={v.id}
@@ -605,6 +613,7 @@ export function ClassroomDetailPage() {
   const sectionId = params.sectionId || ''
   const navigate = useNavigate()
   const schoolId = useActiveSchoolId() || ''
+  const { t, formatNumber } = useAcademicsI18n()
 
   // Tab state from URL (with redirects for old tab names)
   const search = useSearch({ strict: false }) as { tab?: string; view?: string }
@@ -668,9 +677,9 @@ export function ClassroomDetailPage() {
       <div className="min-h-full flex items-center justify-center p-6">
         <div className="text-center">
           <AlertCircle className="w-12 h-12 mx-auto text-text-tertiary mb-4" />
-          <h2 className="text-lg font-semibold text-text-primary mb-2">Section Not Found</h2>
+          <h2 className="text-lg font-semibold text-text-primary mb-2">{t('classrooms.empty.sectionNotFound')}</h2>
           <p className="text-sm text-text-secondary mb-4">
-            This section may have been removed or you don't have access.
+            {t('classrooms.empty.sectionNotFoundDescription')}
           </p>
           <button
             type="button"
@@ -678,7 +687,7 @@ export function ClassroomDetailPage() {
             className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--action-primary-bg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to Classrooms
+            {t('classrooms.actions.backToClassrooms')}
           </button>
         </div>
       </div>
@@ -712,7 +721,7 @@ export function ClassroomDetailPage() {
                   : 'bg-[rgb(var(--background-overlay)/0.20)] text-[rgb(var(--action-primary-fg))]/80'
               }`}>
                 <div className={`w-1.5 h-1.5 rounded-full ${section.isActive ? 'bg-[rgb(var(--background-secondary))]' : 'bg-[rgb(var(--background-primary)/0.50)]'}`} />
-                {section.isActive ? 'Active' : 'Inactive'}
+                {section.isActive ? t('status.active') : t('status.inactive')}
               </div>
               {schedPerms.edit && (
                 <ActionsDropdown
@@ -726,20 +735,24 @@ export function ClassroomDetailPage() {
 
           {/* Title + meta on banner — tighter layout */}
           <h1 className="text-2xl font-bold text-[rgb(var(--action-primary-fg))] drop-shadow-sm">
-            {section.sectionName || `Section ${section.sectionNumber}`}
+            {section.sectionName || t('classrooms.detail.sectionFallback', { number: section.sectionNumber })}
           </h1>
           <p className="text-[rgb(var(--action-primary-fg))]/80 text-sm mt-0.5 drop-shadow-sm">
             {section.courseName}
             {section.courseCode && ` (${section.courseCode})`}
             {' · '}
-            {section.primaryTeacherName || 'No teacher assigned'}
+            {section.primaryTeacherName || t('classrooms.card.noTeacherAssigned')}
           </p>
 
           {/* Compact inline badges: enrollment + room */}
           <div className="mt-2 flex items-center gap-2 flex-wrap">
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[rgb(var(--background-primary)/0.15)] text-[rgb(var(--action-primary-fg))]/90">
               <Users className="w-3 h-3" />
-              {section.currentEnrollment}/{section.maxEnrollment} students ({percent}%)
+              {t('classrooms.detail.studentsWithCapacity', {
+                current: formatNumber(section.currentEnrollment),
+                max: formatNumber(section.maxEnrollment),
+                percent: formatNumber(percent),
+              })}
             </span>
             {(section.locationRoomNumber || section.roomNumber) && (
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[rgb(var(--background-primary)/0.15)] text-[rgb(var(--action-primary-fg))]/90">
@@ -755,7 +768,7 @@ export function ClassroomDetailPage() {
       <div className="bg-surface-secondary/50">
         <div className="px-4 sm:px-8">
           <Tabs
-            aria-label="Classroom tabs"
+            aria-label={t('classrooms.aria.classroomTabs')}
             value={activeTab}
             onChange={(value) => setActiveTab(value as ClassroomDetailTab)}
             className="overflow-x-auto"
@@ -764,7 +777,7 @@ export function ClassroomDetailPage() {
               label: (
                 <span className="flex items-center gap-2">
                   <tab.icon className="w-4 h-4" />
-                  {tab.label}
+                  {t(tab.labelKey)}
                 </span>
               ),
             }))}
@@ -783,7 +796,7 @@ export function ClassroomDetailPage() {
             transition={{ duration: 0.15 }}
           >
             {activeTab === 'overview' && (
-              <TabErrorBoundary tabName="Overview">
+              <TabErrorBoundary tabName={t('classrooms.tabs.overview')}>
                 <ClassroomOverview
                   sectionId={sectionId}
                   section={section}
@@ -800,19 +813,19 @@ export function ClassroomDetailPage() {
             )}
 
             {activeTab === 'classwork' && (
-              <TabErrorBoundary tabName="Classwork">
+              <TabErrorBoundary tabName={t('classrooms.tabs.classwork')}>
                 <ClassworkFeed sectionId={sectionId} />
               </TabErrorBoundary>
             )}
 
             {activeTab === 'people' && (
-              <TabErrorBoundary tabName="People">
+              <TabErrorBoundary tabName={t('classrooms.tabs.people')}>
                 <SectionRoster section={section} />
               </TabErrorBoundary>
             )}
 
             {activeTab === 'progress' && (
-              <TabErrorBoundary tabName="Progress">
+              <TabErrorBoundary tabName={t('classrooms.tabs.progress')}>
                 <ProgressTab
                   sectionId={sectionId}
                   section={section}

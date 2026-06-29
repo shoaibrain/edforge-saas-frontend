@@ -20,12 +20,14 @@ import {
 } from '../../schemas/section.form'
 import { SectionForm } from '../../components/scheduling/SectionForm'
 import { ConfirmationDialog } from '../../components/common/ConfirmationDialog'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 export function SectionEditPage() {
   const params = useParams({ strict: false }) as { sectionId?: string }
   const sectionId = params.sectionId || ''
   const navigate = useNavigate()
   const schoolId = useActiveSchoolId() || ''
+  const { t } = useAcademicsI18n()
   const updateMutation = useUpdateSection()
   const [showDiscardDialog, setShowDiscardDialog] = useState(false)
 
@@ -139,9 +141,9 @@ export function SectionEditPage() {
     return (
       <div className="min-h-full flex items-center justify-center p-6">
         <div className="text-center">
-          <h2 className="text-lg font-semibold text-text-primary mb-2">Section Not Found</h2>
+          <h2 className="text-lg font-semibold text-text-primary mb-2">{t('classrooms.empty.sectionNotFound')}</h2>
           <p className="text-sm text-text-secondary mb-4">
-            This section may have been removed or you don't have access.
+            {t('classrooms.empty.sectionNotFoundDescription')}
           </p>
           <button
             type="button"
@@ -149,7 +151,7 @@ export function SectionEditPage() {
             className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--action-primary-bg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to Classrooms
+            {t('classrooms.actions.backToClassrooms')}
           </button>
         </div>
       </div>
@@ -166,16 +168,16 @@ export function SectionEditPage() {
               type="button"
               onClick={handleCancel}
               className="p-2 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-surface-secondary transition-colors"
-              aria-label="Back to section"
+              aria-label={t('classrooms.actions.backToSection')}
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div>
               <h1 className="text-xl font-bold text-text-primary">
-                Edit Section
+                {t('classrooms.actions.editSection')}
               </h1>
               <p className="text-sm text-text-secondary mt-0.5">
-                {section.sectionName || `Section ${section.sectionNumber}`}
+                {section.sectionName || t('classrooms.detail.sectionFallback', { number: section.sectionNumber })}
                 {' · '}
                 {section.courseName}
                 {section.courseCode && ` (${section.courseCode})`}
@@ -203,7 +205,7 @@ export function SectionEditPage() {
                 disabled={updateMutation.isPending}
                 className="px-4 py-2 text-sm font-medium text-[rgb(var(--text-secondary))] bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] rounded-lg hover:bg-[rgb(var(--background-secondary))] transition-colors disabled:opacity-50"
               >
-                Cancel
+                {t('classrooms.actions.cancel')}
               </button>
               <button
                 type="submit"
@@ -213,10 +215,10 @@ export function SectionEditPage() {
                 {updateMutation.isPending ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    Saving...
+                    {t('classrooms.actions.saving')}
                   </>
                 ) : (
-                  'Save Changes'
+                  t('classrooms.actions.saveChanges')
                 )}
               </button>
             </div>
@@ -229,10 +231,10 @@ export function SectionEditPage() {
         open={showDiscardDialog}
         onClose={() => setShowDiscardDialog(false)}
         onConfirm={() => navigate({ to: `/classrooms/${sectionId}` })}
-        title="Discard changes?"
-        description="You have unsaved changes. Are you sure you want to leave? Your changes will be lost."
-        confirmText="Discard"
-        cancelText="Keep Editing"
+        title={t('classrooms.classwork.discardTitle')}
+        description={t('classrooms.classwork.discardLeaveDescription')}
+        confirmText={t('classrooms.actions.discard')}
+        cancelText={t('classrooms.actions.keepEditing')}
         variant="destructive"
       />
     </div>
