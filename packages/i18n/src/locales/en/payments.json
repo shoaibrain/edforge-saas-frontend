@@ -465,6 +465,43 @@
       "syncLimitExceeded": "Too many students (>25) for synchronous generation. For now, narrow the selection or pick a single grade and try again.",
       "failed": "Bulk generation failed."
     },
+    "confirm": {
+      "title": "Generate invoices?",
+      "description": "Generate {{count}} invoice? This cannot be undone.",
+      "description_plural": "Generate {{count}} invoices? This cannot be undone.",
+      "body": "Invoices for {{count}} student will be created as drafts. You can review and issue them from the invoices list.",
+      "body_plural": "Invoices for {{count}} students will be created as drafts. You can review and issue them from the invoices list.",
+      "generateCount": "Generate {{count}}",
+      "generateCount_plural": "Generate {{count}}"
+    },
+    "async": {
+      "inProgressTitle": "Generating invoices...",
+      "failedTitle": "Bulk generation failed",
+      "failedDescription": "The worker reported a job-level failure before any, or all, invoices were created.",
+      "runningDescription": "Creating draft invoices for {{count}} student. This typically completes in under 90 seconds.",
+      "runningDescription_plural": "Creating draft invoices for {{count}} students. This typically completes in under 90 seconds.",
+      "progressVerb": "Generating invoices",
+      "startOver": "Start over",
+      "runInBackground": "Run in background",
+      "toastSucceeded": "{{count}} draft invoice created",
+      "toastSucceeded_plural": "{{count}} draft invoices created",
+      "toastSkipped": "{{count}} skipped",
+      "toastFailed": "{{count}} failed"
+    },
+    "asyncSuccess": {
+      "title": "{{count}} invoice created as drafts",
+      "title_plural": "{{count}} invoices created as drafts",
+      "notice": "Click Issue on each invoice, or use bulk-issue, to send them to families.",
+      "periodNotice": "For {{billingPeriod}}. Click Issue on each invoice, or use bulk-issue, to send them to families.",
+      "created": "Created",
+      "skipped": "Skipped",
+      "failed": "Failed",
+      "retryFailed": "Retry failed ({{count}})",
+      "failureCount": "{{count}} failure",
+      "failureCount_plural": "{{count}} failures",
+      "showingFirst": "(showing first {{count}})",
+      "noReasons": "No per-record reasons were returned by the worker."
+    },
     "footer": {
       "selectStudent": "Select at least one student to continue",
       "studentsSelected": "{{count}} student selected",

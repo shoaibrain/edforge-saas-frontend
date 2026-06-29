@@ -6,12 +6,21 @@
  * `019de553-4cad-797c-83c1-fc706ec63fac` → file `Bulk Generate Invoices.html`)
  * per .claude/plans/finance-module-bulk-mighty-honey.md §5b Phase 1 scope.
  *
+ * Sprint E.5 — wires the async worker branch on bulk-generate. The BE
+ * returns 200 + counters when studentCount ≤ 25 (sync path; existing
+ * behavior), or 202 + jobId when studentCount > 25 OR caller opted in
+ * with ?async=true. The async branch creates DRAFT invoices (operator-
+ * review by design); the wizard polls via `useAsyncBulkJob` until terminal
+ * and surfaces success / failure summaries built from the job's counters.
+ *
  * Owns:
  *   - selection state (recipient set + segment chips + mode)
  *   - selectedFees + customLines + wizard details
  *   - step navigation + maxReachedStep
  *   - the bulk-generate mutation + the bulk-preview query (gated to Step 4)
- *   - the generated-batch result (success screen)
+ *   - sync result (success screen)
+ *   - async jobId + polling state (Sprint E.5)
+ *   - studentCount > 100 confirmation modal
  *
  * Renders one Step* component at a time + Stepper + nav footer.
  */
@@ -26,7 +35,7 @@ import {
   Sparkles,
   Loader2,
 } from 'lucide-react'
-import { Button } from '@edforge/ui'
+import { Button, Modal, ModalFooter } from '@edforge/ui'
 import { useTranslation } from '@edforge/i18n'
 import {
   useEnrolledStudents,
@@ -34,13 +43,19 @@ import {
   useFeeStructures,
   useAcademicYears,
   useBulkPreview,
+  useAsyncBulkJob,
 } from '@edforge/finance-services'
-import type { BulkGenerateInvoiceDto } from '@edforge/finance-services'
+import type {
+  BulkGenerateInvoiceDto,
+  BulkGenerateResult,
+} from '@edforge/finance-services'
 import { Step1Recipients } from './Step1Recipients'
 import { Step2FeeStructures } from './Step2FeeStructures'
 import { Step3InvoiceDetails } from './Step3InvoiceDetails'
 import { Step4Review } from './Step4Review'
 import { GenerateSuccess, type GenerateResult } from './GenerateSuccess'
+import { AsyncGenerateSuccess } from './AsyncGenerateSuccess'
+import { AsyncJobProgress } from '../AsyncJobProgress'
 import {
   emptySelection,
   defaultDetails,
@@ -65,6 +80,14 @@ const WIZARD_STEP_LABEL_KEYS = [
   'bulkGenerate.steps.invoiceDetails',
   'bulkGenerate.steps.reviewConfirm',
 ] as const
+
+/**
+ * Operator-protection threshold from the plan §3 C.5: any bulk-generate
+ * touching more than this many students gets a confirmation modal so the
+ * operator can back out. Applies to BOTH sync and async paths defensively
+ * (sync is capped at 25 today, so in practice this only fires on async).
+ */
+export const BULK_GENERATE_CONFIRM_THRESHOLD = 100
 
 export interface BulkGenerateWizardProps {
   schoolId: string
@@ -102,6 +125,40 @@ export function BulkGenerateWizard({
     return { ...d, academicYear: academicYears[0]?.name ?? '' }
   })
   const [result, setResult] = useState<GenerateResult | null>(null)
+
+  // Sprint E.5 — async branch: jobId is set when the mutation returns 202.
+  // The polling hook keys off jobId; passing null disables the poll.
+  const [asyncJobId, setAsyncJobId] = useState<string | null>(null)
+  const asyncJobQuery = useAsyncBulkJob(schoolId, 'invoices', asyncJobId)
+  const asyncJob = asyncJobQuery.data
+
+  // Sprint E.5 — toast-once gate so the terminal-status useState transition
+  // (queued → running → succeeded) doesn't double-fire on each render. We
+  // key by jobId so a fresh retry-failed job re-arms it.
+  const [toastedJobId, setToastedJobId] = useState<string | null>(null)
+  if (
+    asyncJob &&
+    asyncJobId &&
+    toastedJobId !== asyncJobId &&
+    (asyncJob.status === 'succeeded' || asyncJob.status === 'failed')
+  ) {
+    if (asyncJob.status === 'succeeded') {
+      const parts = [
+        t('bulkGenerate.async.toastSucceeded', { count: asyncJob.succeeded }),
+      ]
+      if (asyncJob.skipped > 0) {
+        parts.push(t('bulkGenerate.async.toastSkipped', { count: asyncJob.skipped }))
+      }
+      if (asyncJob.failed > 0) {
+        parts.push(t('bulkGenerate.async.toastFailed', { count: asyncJob.failed }))
+      }
+      if (asyncJob.failed > 0) toast.error(parts.join(' · '))
+      else toast.success(parts.join(' · '))
+    } else {
+      toast.error(asyncJob.error ?? t('bulkGenerate.toast.failed'))
+    }
+    setToastedJobId(asyncJobId)
+  }
 
   // Auto-bind academicYear when the dropdown data lands and the form was
   // initialized with no AY (first render before the query resolved).
@@ -171,11 +228,21 @@ export function BulkGenerateWizard({
     if (n <= maxReached) setStep(n)
   }
 
-  // ---- Submit --------------------------------------------------------------
-  const submit = () => {
+  // ---- Submit + confirmation modal -----------------------------------------
+  const [confirmOpen, setConfirmOpen] = useState(false)
+
+  /**
+   * Build the bulk-generate DTO from the current wizard state. Pure so the
+   * confirmation flow can dispatch the same payload the inline-submit
+   * builds. `restrictToStudentIds` lets the retry-failed-only flow narrow
+   * the recipient set without touching the rest of the wizard state.
+   */
+  const buildSubmitDto = (
+    restrictToStudentIds?: string[],
+  ): BulkGenerateInvoiceDto & { discounts?: ReturnType<typeof resolveDiscounts> } => {
     const dto: BulkGenerateInvoiceDto = {
       selectionMode: 'students',
-      studentIds: [...selection.selectedIds],
+      studentIds: restrictToStudentIds ?? [...selection.selectedIds],
       feeStructureIds: Object.keys(selectedFees),
       academicYear: details.academicYear,
       billingPeriod: details.billingPeriod || undefined,
@@ -184,66 +251,85 @@ export function BulkGenerateWizard({
       customLineItems: resolveCustomLineItems(customLines),
       skipZeroTotal: details.skipZeroTotal,
     }
-    // Convert per-fee discount % into the BE-shaped discounts[] AFTER spread —
-    // discounts isn't currently typed on BulkGenerateInvoiceDto but the BE
-    // accepts it (existing generate.discounts path). Pass through as any.
     const discounts = resolveDiscounts(fees, selectedFees)
-    const withDiscounts = discounts.length > 0 ? { ...dto, discounts } : dto
+    return discounts.length > 0 ? { ...dto, discounts } : dto
+  }
 
-    generateMutation.mutate(withDiscounts as BulkGenerateInvoiceDto, {
-      onSuccess: response => {
-        // Client-side projection for the success-screen per-invoice list.
-        // The BE's generated count is authoritative; the projection is just
-        // the visible breakdown.
-        const projection = computeBatch(
-          selectedStudents,
-          fees,
-          selectedFees,
-          customLines,
-          { skipZeroTotal: details.skipZeroTotal },
-        )
-        const billableRows = projection.perStudent.filter(p =>
-          details.skipZeroTotal ? p.total > 0 : true,
-        )
-        const invoices = billableRows.map((p, i) => ({
-          number: numberPreview.prefix + String(i + 1).padStart(4, '0'),
-          studentId: p.studentId,
-          studentName: p.studentName,
-          gradeLevel: p.gradeLevel,
-          total: p.total,
-        }))
-        setResult({
-          count: response.generated,
-          skipped: response.skipped,
-          total: projection.billableTotal,
-          billingPeriod: details.billingPeriod,
-          invoices,
-        })
-        toast.success(
-          response.skipped > 0
-            ? t('bulkGenerate.toast.generatedWithSkipped', {
-                count: response.generated,
-                skipped: response.skipped,
-              })
-            : t('bulkGenerate.toast.generated', { count: response.generated }),
-        )
-      },
-      onError: (err: any) => {
-        // 413 from the SYNC_LIMIT_EXCEEDED contract surfaces here. For Phase 1
-        // we just toast — Sprint E adds the async path the operator can pivot to.
-        const code = err?.response?.data?.code
-        if (code === 'BULK_GENERATE_SYNC_LIMIT_EXCEEDED') {
-          toast.error(t('bulkGenerate.toast.syncLimitExceeded'))
-          return
-        }
-        const msg = err?.response?.data?.message || err?.message || t('bulkGenerate.toast.failed')
-        toast.error(msg)
-      },
+  const handleSubmitResult = (response: BulkGenerateResult) => {
+    if (response.mode === 'async') {
+      // Reset the toast gate so the new job's terminal toast fires.
+      setToastedJobId(null)
+      setAsyncJobId(response.jobId)
+      return
+    }
+    // Sync path — unchanged behaviour from Sprint C.
+    const projection = computeBatch(
+      selectedStudents,
+      fees,
+      selectedFees,
+      customLines,
+      { skipZeroTotal: details.skipZeroTotal },
+    )
+    const billableRows = projection.perStudent.filter(p =>
+      details.skipZeroTotal ? p.total > 0 : true,
+    )
+    const invoices = billableRows.map((p, i) => ({
+      number: numberPreview.prefix + String(i + 1).padStart(4, '0'),
+      studentId: p.studentId,
+      studentName: p.studentName,
+      gradeLevel: p.gradeLevel,
+      total: p.total,
+    }))
+    setResult({
+      count: response.generated,
+      skipped: response.skipped,
+      total: projection.billableTotal,
+      billingPeriod: details.billingPeriod,
+      invoices,
     })
+    toast.success(
+      response.skipped > 0
+        ? t('bulkGenerate.toast.generatedWithSkipped', {
+            count: response.generated,
+            skipped: response.skipped,
+          })
+        : t('bulkGenerate.toast.generated', { count: response.generated }),
+    )
+  }
+
+  const handleSubmitError = (err: any) => {
+    // 413 from the SYNC_LIMIT_EXCEEDED contract surfaces here. Sprint E
+    // adds the auto-async behaviour BE-side so this branch should be rare
+    // post-deploy — kept as defense for staggered rollouts.
+    const code = err?.response?.data?.code
+    if (code === 'BULK_GENERATE_SYNC_LIMIT_EXCEEDED') {
+      toast.error(t('bulkGenerate.toast.syncLimitExceeded'))
+      return
+    }
+    const msg = err?.response?.data?.message || err?.message || t('bulkGenerate.toast.failed')
+    toast.error(msg)
+  }
+
+  const dispatchSubmit = (restrictToStudentIds?: string[]) => {
+    const dto = buildSubmitDto(restrictToStudentIds)
+    generateMutation.mutate(dto as BulkGenerateInvoiceDto, {
+      onSuccess: handleSubmitResult,
+      onError: handleSubmitError,
+    })
+  }
+
+  const submit = () => {
+    if (selection.selectedIds.size > BULK_GENERATE_CONFIRM_THRESHOLD) {
+      setConfirmOpen(true)
+      return
+    }
+    dispatchSubmit()
   }
 
   const reset = () => {
     setResult(null)
+    setAsyncJobId(null)
+    setToastedJobId(null)
     setStep(0)
     setMaxReached(0)
     setSelection(emptySelection())
@@ -262,6 +348,8 @@ export function BulkGenerateWizard({
     )
   }
 
+  // Sync-success screen wins first because the sync path resolves before
+  // any async path takes over.
   if (result) {
     return (
       <GenerateSuccess
@@ -272,11 +360,52 @@ export function BulkGenerateWizard({
     )
   }
 
+  // Async terminal-success / terminal-failure. Both branches gate on
+  // `asyncJobId` being set — otherwise a stale cached job result (or a
+  // test mock returning a job for a never-set jobId) would short-circuit
+  // the wizard into the success view on mount.
+  if (asyncJobId && asyncJob && asyncJob.status === 'succeeded') {
+    return (
+      <AsyncGenerateSuccess
+        job={asyncJob}
+        billingPeriod={details.billingPeriod}
+        onReset={reset}
+        onClose={onComplete}
+        onRetryFailed={(failedStudentIds) => {
+          setAsyncJobId(null)
+          setToastedJobId(null)
+          dispatchSubmit(failedStudentIds)
+        }}
+        retryPending={generateMutation.isPending}
+      />
+    )
+  }
+
+  // In-flight async job (queued / running) → drawer-style progress card.
+  if (asyncJobId && (!asyncJob || asyncJob.status === 'queued' || asyncJob.status === 'running' || asyncJob.status === 'failed')) {
+    return (
+      <AsyncJobInProgress
+        job={asyncJob}
+        studentCount={selection.selectedIds.size}
+        onRunInBackground={() => {
+          // The wizard component unmounts when `onComplete` navigates away,
+          // which stops the polling subscription. The cache holds the last
+          // result for 60s (gcTime) but no further polls fire. A follow-up
+          // can move the active jobId into a shell-mounted global watcher;
+          // for now "Run in background" = "close and trust your inbox /
+          // come back to the invoices list to see the drafts land."
+          onComplete?.()
+        }}
+        onReset={reset}
+      />
+    )
+  }
+
   return (
     <div className="space-y-6">
       <Stepper step={step} maxReached={maxReached} onGoto={gotoStep} />
 
-      <div className="min-h-[420px]">
+      <div className="min-h-96">
         {step === 0 && (
           <Step1Recipients
             students={students}
@@ -370,6 +499,88 @@ export function BulkGenerateWizard({
           )}
         </div>
       </div>
+
+      {/* Confirmation modal for studentCount > BULK_GENERATE_CONFIRM_THRESHOLD */}
+      <Modal
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        title={t('bulkGenerate.confirm.title')}
+        description={t('bulkGenerate.confirm.description', {
+          count: selection.selectedIds.size,
+        })}
+      >
+        <div className="text-sm text-[rgb(var(--text-secondary))] space-y-2">
+          <p>
+            {t('bulkGenerate.confirm.body', {
+              count: selection.selectedIds.size,
+            })}
+          </p>
+        </div>
+        <ModalFooter>
+          <Button variant="outline" onClick={() => setConfirmOpen(false)}>
+            {t('actions.cancel')}
+          </Button>
+          <Button
+            onClick={() => {
+              setConfirmOpen(false)
+              dispatchSubmit()
+            }}
+          >
+            {t('bulkGenerate.confirm.generateCount', {
+              count: selection.selectedIds.size,
+            })}
+          </Button>
+        </ModalFooter>
+      </Modal>
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// AsyncJobInProgress — drawer-style screen while the worker churns.
+// ---------------------------------------------------------------------------
+
+function AsyncJobInProgress({
+  job,
+  studentCount,
+  onRunInBackground,
+  onReset,
+}: {
+  job: ReturnType<typeof useAsyncBulkJob>['data']
+  studentCount: number
+  onRunInBackground: () => void
+  onReset: () => void
+}) {
+  const { t } = useTranslation('payments')
+  const isFailed = job?.status === 'failed'
+  return (
+    <div className="space-y-6 max-w-2xl mx-auto">
+      <div className="text-center space-y-2 py-4">
+        <h2 className="text-xl font-semibold text-[rgb(var(--text-primary))]">
+          {isFailed
+            ? t('bulkGenerate.async.failedTitle')
+            : t('bulkGenerate.async.inProgressTitle')}
+        </h2>
+        <p className="text-sm text-[rgb(var(--text-secondary))]">
+          {isFailed
+            ? t('bulkGenerate.async.failedDescription')
+            : t('bulkGenerate.async.runningDescription', { count: studentCount })}
+        </p>
+      </div>
+
+      <AsyncJobProgress job={job} verbingNoun={t('bulkGenerate.async.progressVerb')} />
+
+      <div className="flex items-center justify-center gap-3">
+        {isFailed ? (
+          <Button variant="outline" onClick={onReset}>
+            {t('bulkGenerate.async.startOver')}
+          </Button>
+        ) : (
+          <Button variant="outline" onClick={onRunInBackground}>
+            {t('bulkGenerate.async.runInBackground')}
+          </Button>
+        )}
+      </div>
     </div>
   )
 }
@@ -416,9 +627,9 @@ function Stepper({
                 className={[
                   'inline-flex items-center justify-center w-6 h-6 rounded-full text-xs',
                   isDone
-                    ? 'bg-[rgb(var(--accent-strong))] text-white'
+                    ? 'bg-[rgb(var(--accent-strong))] text-[rgb(var(--action-primary-fg))]'
                     : isCurrent
-                    ? 'bg-[rgb(var(--accent-strong))] text-white'
+                    ? 'bg-[rgb(var(--accent-strong))] text-[rgb(var(--action-primary-fg))]'
                     : 'bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-tertiary))]',
                 ].join(' ')}
               >

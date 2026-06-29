@@ -16,16 +16,23 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 vi.mock('@edforge/api-client', () => ({
   apiGet: vi.fn(() => Promise.resolve({})),
   apiPost: vi.fn(() => Promise.resolve({ generated: 0, skipped: 0, errors: [] })),
+  // Sprint E.5 — bulkGenerateInvoices switched to apiPostWithStatus to
+  // discriminate 200 (sync) vs 202 (async). The Phase-1 body-shape assertions
+  // below still target the POST body and URL — both arguments are forwarded
+  // verbatim to this helper, so the assertions still hold.
+  apiPostWithStatus: vi.fn(() =>
+    Promise.resolve({ status: 200, data: { generated: 0, skipped: 0, errors: [] } }),
+  ),
 }))
 
-import { apiGet, apiPost } from '@edforge/api-client'
+import { apiGet, apiPostWithStatus } from '@edforge/api-client'
 import {
   getBulkPreview,
   bulkGenerateInvoices,
 } from '../services/invoices.service'
 
 const mockApiGet = vi.mocked(apiGet)
-const mockApiPost = vi.mocked(apiPost)
+const mockApiPost = vi.mocked(apiPostWithStatus)
 
 const SCHOOL = 'sch-1'
 

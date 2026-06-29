@@ -25,6 +25,8 @@ export type {
   InvoiceListParams,
   BulkGenerateInvoiceResponse,
   BulkGenerateInvoiceDto,
+  BulkGenerateOptions,
+  BulkGenerateResult,
   BulkIssueInvoicesDto,
   BulkIssueInvoicesResponse,
   BulkPreviewParams,
