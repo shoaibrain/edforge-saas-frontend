@@ -145,7 +145,7 @@ function StandardsContent() {
 // ============================================================================
 
 export function CurriculumModule() {
-  const { t, formatNumber } = useAcademicsI18n()
+  const { t, formatNumber, formatCount } = useAcademicsI18n()
   const [activeTab, setActiveTab] = useState<CurriculumTab>('courses')
   const navigate = useNavigate()
   const schoolId = useActiveSchoolId()
@@ -322,9 +322,7 @@ export function CurriculumModule() {
               {formatNumber(stats.subjects)}
             </span>{' '}
             {t('curriculumModule.summary.subjectAreasSuffix')} ·{' '}
-            {t('curriculumModule.summary.elective', {
-              count: formatNumber(stats.elective),
-            })} ·{' '}
+            {formatCount('curriculumModule.summary.elective', stats.elective)} ·{' '}
             <span className="font-medium text-[rgb(var(--accent-academics-text))]">
               {formatNumber(stats.specializedTypes)}
             </span>{' '}
@@ -361,7 +359,7 @@ export function CurriculumModule() {
           iconColor="rgb(var(--accent-reports))"
           barColor="rgb(var(--accent-reports))"
           tag={{
-            text: t('curriculumModule.stats.activeTag', { count: formatNumber(stats.active) }),
+            text: formatCount('curriculumModule.stats.activeTag', stats.active),
             color: 'rgb(var(--accent-enrollment))',
             bg: 'rgb(var(--accent-enrollment)/0.1)',
           }}

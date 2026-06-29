@@ -57,7 +57,7 @@ export function ExamSubjectsTab({
    */
   examGradeLevels: string[]
 }) {
-  const { t, formatNumber } = useAcademicsI18n()
+  const { t, formatNumber, formatCount } = useAcademicsI18n()
   const mutable = canManage && acceptsExamCourseMutations(status)
 
   const { data, isLoading } = useExamCourses(examId)
@@ -232,7 +232,7 @@ export function ExamSubjectsTab({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <p className="text-sm text-text-secondary">
-          {t('examModule.subjects.count', { count: formatNumber(examCourses.length) })}
+          {formatCount('examModule.subjects.count', examCourses.length)}
         </p>
         {mutable && !adding && availableCourses.length > 0 && (
           <button

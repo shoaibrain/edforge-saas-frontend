@@ -39,7 +39,7 @@ export function DuplicateWarning({
   onDismiss,
   onViewStudent,
 }: DuplicateWarningProps) {
-  const { t, formatDate, formatNumber } = useAcademicsI18n()
+  const { t, formatDate, formatCount } = useAcademicsI18n()
 
   if (isLoading) {
     return (
@@ -103,7 +103,7 @@ export function DuplicateWarning({
                 <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">
                   {matches.length === 1
                     ? t('enrollmentModule.duplicate.singleMatch')
-                    : t('enrollmentModule.duplicate.multipleMatches', { count: formatNumber(matches.length) })}{' '}
+                    : formatCount('enrollmentModule.duplicate.multipleMatches', matches.length)}{' '}
                   {t('enrollmentModule.duplicate.continueNew')}
                 </p>
               </div>

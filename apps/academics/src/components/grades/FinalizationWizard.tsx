@@ -47,7 +47,7 @@ export function FinalizationWizard({
   termId,
   termName,
 }: FinalizationWizardProps) {
-  const { t, formatNumber } = useAcademicsI18n()
+  const { t, formatNumber, formatCount } = useAcademicsI18n()
   const [step, setStep] = useState<WizardStep>('review')
   const [finalizedCount, setFinalizedCount] = useState(0)
   const [errorCount, setErrorCount] = useState(0)
@@ -193,9 +193,7 @@ export function FinalizationWizard({
                       <div className="flex items-start gap-2 p-3 bg-surface-secondary rounded-lg">
                         <AlertTriangle className="w-4 h-4 text-text-tertiary mt-0.5" />
                         <p className="text-xs text-text-secondary">
-                          {t('gradesModule.finalization.emptyStubsWarning', {
-                            count: formatNumber(analysis.emptyStubs.length),
-                          })}
+                          {formatCount('gradesModule.finalization.emptyStubsWarning', analysis.emptyStubs.length)}
                         </p>
                       </div>
                     )}
@@ -205,9 +203,7 @@ export function FinalizationWizard({
                       <div className="flex items-start gap-2 p-3 bg-amber-50 dark:bg-[rgb(var(--state-warning-fg))]/10 rounded-lg">
                         <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5" />
                         <p className="text-xs text-[rgb(var(--state-warning-fg))]">
-                          {t('gradesModule.finalization.lowGradesWarning', {
-                            count: formatNumber(analysis.lowGrades.length),
-                          })}
+                          {formatCount('gradesModule.finalization.lowGradesWarning', analysis.lowGrades.length)}
                         </p>
                       </div>
                     )}
@@ -335,14 +331,10 @@ export function FinalizationWizard({
                   {t('gradesModule.finalization.completeTitle')}
                 </h4>
                 <p className="text-sm text-text-secondary">
-                  {t('gradesModule.finalization.completeDescription', {
-                    count: formatNumber(finalizedCount),
-                  })}
+                  {formatCount('gradesModule.finalization.completeDescription', finalizedCount)}
                   {errorCount > 0 && (
                     <span className="block mt-1 text-[rgb(var(--state-warning-fg))]">
-                      {t('gradesModule.finalization.errorCount', {
-                        count: formatNumber(errorCount),
-                      })}
+                      {formatCount('gradesModule.finalization.errorCount', errorCount)}
                     </span>
                   )}
                 </p>
@@ -387,9 +379,7 @@ export function FinalizationWizard({
                 className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-[rgb(var(--action-primary-fg))] bg-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--state-danger-fg))] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isProcessing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Lock className="w-4 h-4" />}
-                {t('gradesModule.finalization.finalizeGrades', {
-                  count: formatNumber(analysis.eligibleGrades.length),
-                })}
+                {formatCount('gradesModule.finalization.finalizeGrades', analysis.eligibleGrades.length)}
               </button>
             </>
           )}
