@@ -121,7 +121,7 @@ export function RecentInvoicesCard({
                       locale: i18n.language,
                       today: t("overview.recent.today"),
                       yesterday: t("overview.recent.yesterday"),
-                      daysAgo: (days) =>
+                      daysAgo: (days: number) =>
                         t("overview.recent.daysAgo", { count: days }),
                     })}
                   </div>
