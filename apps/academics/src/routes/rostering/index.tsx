@@ -182,7 +182,7 @@ function MatrixCell({
   sectionLabel: string
   onToggle: () => void
 }) {
-  const { t, formatNumber } = useAcademicsI18n()
+  const { t, formatCount } = useAcademicsI18n()
   const hasConflict = conflict !== null && checked
 
   return (
@@ -226,9 +226,7 @@ function MatrixCell({
         <div className="absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-[rgb(var(--action-danger-bg))] text-[rgb(var(--action-primary-fg))] text-xs rounded-lg shadow-lg whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity">
           <div className="font-medium mb-0.5">{t('rosteringModule.conflict.title')}</div>
           <div>
-            {t('rosteringModule.conflict.samePeriod', {
-              count: conflict ? formatNumber(conflict.conflictingSectionIds.length) : formatNumber(0),
-            })}
+            {formatCount('rosteringModule.conflict.samePeriod', conflict?.conflictingSectionIds.length ?? 0)}
           </div>
           <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-red-600" />
         </div>
@@ -330,7 +328,7 @@ function SummaryBar({
   total: number
   onApply: () => void
 }) {
-  const { t, formatNumber } = useAcademicsI18n()
+  const { t, formatNumber, formatCount } = useAcademicsI18n()
   const hasChanges = addCount > 0 || removeCount > 0
 
   if (!hasChanges && !isSubmitting) return null
@@ -352,19 +350,19 @@ function SummaryBar({
           {addCount > 0 && (
             <span className="flex items-center gap-1.5 text-sm font-medium text-[rgb(var(--state-success-fg))]">
               <Plus className="w-4 h-4" />
-              {t('rosteringModule.summary.additions', { count: addCount, value: formatNumber(addCount) })}
+              {formatCount('rosteringModule.summary.additions', addCount)}
             </span>
           )}
           {removeCount > 0 && (
             <span className="flex items-center gap-1.5 text-sm font-medium text-[rgb(var(--state-danger-fg))]">
               <Minus className="w-4 h-4" />
-              {t('rosteringModule.summary.removals', { count: removeCount, value: formatNumber(removeCount) })}
+              {formatCount('rosteringModule.summary.removals', removeCount)}
             </span>
           )}
           {conflictCount > 0 && (
             <span className="flex items-center gap-1.5 text-sm font-medium text-[rgb(var(--state-warning-fg))]">
               <AlertTriangle className="w-4 h-4" />
-              {t('rosteringModule.summary.conflicts', { count: conflictCount, value: formatNumber(conflictCount) })}
+              {formatCount('rosteringModule.summary.conflicts', conflictCount)}
             </span>
           )}
           {isSubmitting && (
@@ -399,7 +397,7 @@ function SummaryBar({
 // ============================================================================
 
 export function BulkRosteringPage() {
-  const { t, formatNumber, formatDate } = useAcademicsI18n()
+  const { t, formatNumber, formatCount, formatDate } = useAcademicsI18n()
   const schoolId = useActiveSchoolId() || ''
   const { data: currentYear, isLoading: yearLoading } = useCurrentAcademicYear(schoolId)
   // Gate dropdown on profile-load — see EnrollmentTable comment.
@@ -637,10 +635,7 @@ export function BulkRosteringPage() {
     setIsSubmitting(false)
 
     if (successCount > 0 && errorCount === 0) {
-      toast.success(t('rosteringModule.toast.allApplied', {
-        count: successCount,
-        value: formatNumber(successCount),
-      }))
+      toast.success(formatCount('rosteringModule.toast.allApplied', successCount))
       setPendingChanges(new Map())
     } else if (successCount > 0 && errorCount > 0) {
       toast.warning(
@@ -652,12 +647,9 @@ export function BulkRosteringPage() {
       // Clear only successful changes; keep failed ones
       setPendingChanges(() => new Map())
     } else {
-      toast.error(t('rosteringModule.toast.allFailed', {
-        count: errorCount,
-        value: formatNumber(errorCount),
-      }))
+      toast.error(formatCount('rosteringModule.toast.allFailed', errorCount))
     }
-  }, [pendingChanges, enrollMutation, removeMutation, schoolId, t, formatNumber])
+  }, [pendingChanges, enrollMutation, removeMutation, schoolId, t, formatNumber, formatCount])
 
   // ---------------------------------------------------------------------------
   // Unique course names for filter dropdown

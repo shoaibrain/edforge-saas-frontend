@@ -399,7 +399,7 @@ function SectionsTab({
   schoolId: string
   onViewSection: (section: SectionResponseDto) => void
 }) {
-  const { t, formatNumber } = useAcademicsI18n()
+  const { t, formatCount } = useAcademicsI18n()
   const navigate = useNavigate()
 
   const {
@@ -454,9 +454,7 @@ function SectionsTab({
       {/* Header */}
       <div className="flex items-center justify-between">
         <p className="text-sm text-text-secondary">
-          {t('common.sections', {
-            count: totalCount ?? sections.length,
-          }).replace(String(totalCount ?? sections.length), formatNumber(totalCount ?? sections.length))}
+          {formatCount('curriculumModule.courseDetail.sectionCount', totalCount ?? sections.length)}
         </p>
       </div>
 

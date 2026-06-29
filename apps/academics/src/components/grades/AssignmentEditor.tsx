@@ -62,7 +62,7 @@ export function AssignmentEditor({
   students,
   categories,
 }: AssignmentEditorProps) {
-  const { t, formatNumber } = useAcademicsI18n()
+  const { t, formatNumber, formatCount } = useAcademicsI18n()
   const displayCategories = categories?.length
     ? categories.map((c) => ({ value: c.id, label: c.label }))
     : DEFAULT_CATEGORY_OPTIONS.map((category) => ({
@@ -296,9 +296,7 @@ export function AssignmentEditor({
               <div className="flex items-center gap-1.5 mb-2">
                 <BarChart2 className="w-3.5 h-3.5 text-[rgb(var(--action-secondary-fg))]" />
                 <span className="text-xs font-semibold text-text-primary">
-                  {t('gradesModule.management.scoreStatistics', {
-                    count: formatNumber(stats.count),
-                  })}
+                  {formatCount('gradesModule.management.scoreStatistics', stats.count)}
                 </span>
               </div>
               <div className="grid grid-cols-3 gap-2 text-xs">
@@ -450,9 +448,7 @@ export function AssignmentEditor({
               ) : (
                 <Save className="w-4 h-4 mr-2" />
               )}
-              {t('gradesModule.management.saveWithScores', {
-                count: formatNumber(filledCount),
-              })}
+              {formatCount('gradesModule.management.saveWithScores', filledCount)}
             </Button>
           </div>
         </div>

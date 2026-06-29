@@ -342,7 +342,7 @@ export function GradeOverview({
   academicYearId,
   policyWeights,
 }: GradeOverviewProps) {
-  const { t, formatNumber } = useAcademicsI18n()
+  const { t, formatNumber, formatCount } = useAcademicsI18n()
   const gradePerms = useResourcePermissions('grades')
   const { data, isLoading, isError } = useGradeOverview(schoolId, academicYearId)
 
@@ -692,7 +692,8 @@ export function GradeOverview({
                 {data.assessmentBreakdown?.unclassified && data.assessmentBreakdown.unclassified.count > 0 && (
                   <div className="text-4xs text-[rgb(var(--text-disabled))] mt-2">
                     {t('gradesModule.overview.assessment.unclassified', {
-                      count: formatNumber(data.assessmentBreakdown.unclassified.count),
+                      count: data.assessmentBreakdown.unclassified.count,
+                      value: formatNumber(data.assessmentBreakdown.unclassified.count),
                       avg: data.assessmentBreakdown.unclassified.avgScore.toFixed(1),
                     })}
                   </div>
@@ -871,9 +872,7 @@ export function GradeOverview({
             right={
               data.atRiskStudents.length > 0 ? (
                 <span className="text-3xs text-[rgb(var(--text-tertiary))]">
-                  {t('gradesModule.overview.atRisk.studentCount', {
-                    count: formatNumber(data.atRiskStudents.length),
-                  })}
+                  {formatCount('gradesModule.overview.atRisk.studentCount', data.atRiskStudents.length)}
                 </span>
               ) : undefined
             }

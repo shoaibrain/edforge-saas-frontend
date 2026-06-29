@@ -71,6 +71,16 @@ export function useAcademicsI18n() {
     [locale],
   )
 
+  const formatCount = useCallback(
+    (key: string, count: number, options?: TranslateOptions) =>
+      t(key, {
+        ...options,
+        count,
+        value: formatNumber(count),
+      }),
+    [formatNumber, t],
+  )
+
   const formatDate = useCallback(
     (
       value: string | Date | null | undefined,
@@ -165,6 +175,7 @@ export function useAcademicsI18n() {
     locale,
     dataTableLabels,
     formatNumber,
+    formatCount,
     formatDate,
     formatDateTime,
     enumLabel,
