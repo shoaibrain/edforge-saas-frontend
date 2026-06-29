@@ -836,7 +836,7 @@ export default function PaymentsPage() {
             onClick={() => navigate({ to: '/payments/record' })}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
           >
-            {t('overview.header.recordPayment')}
+            {t('overview.actions.recordPayment')}
           </button>
         }
       />
