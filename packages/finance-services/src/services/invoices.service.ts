@@ -4,7 +4,7 @@
  * API client for invoice operations (CRUD, generation, filtering).
  */
 
-import { api, apiGet, apiPost, apiPatch } from '@edforge/api-client'
+import { api, apiGet, apiPost, apiPatch, apiPostWithStatus } from '@edforge/api-client'
 import type {
   Invoice,
   InvoiceFilterDto,
@@ -138,6 +138,28 @@ export interface BulkGenerateInvoiceResponse {
 }
 
 /**
+ * Sprint E — async worker branch on `bulk-generate`.
+ *
+ * The BE returns 202 + { jobId } when the resolved student count exceeds
+ * the sync threshold (currently 25) OR the caller opts in with
+ * `?async=true`. Worker creates DRAFT invoices (operator-review by
+ * design — operator clicks Issue to dispatch). Poll via
+ * `useAsyncBulkJob(schoolId, 'invoices', jobId)` until terminal.
+ */
+export type BulkGenerateResult =
+  | ({ mode: 'sync' } & BulkGenerateInvoiceResponse)
+  | { mode: 'async'; jobId: string }
+
+export interface BulkGenerateOptions {
+  /**
+   * Opt into the async worker path regardless of resolved student count.
+   * Sent as `?async=true`. When omitted, the BE picks sync vs async by
+   * the configured threshold (>25 students → async).
+   */
+  async?: boolean
+}
+
+/**
  * Sprint C Phase 1 — three operator-facing modes (single object schema +
  * .refine() on the BE per `bulkGenerateInvoiceSchema`). All shapes share
  * the base fields; only `studentIds[]` / `gradeLevels[]` differ.
@@ -161,14 +183,34 @@ export interface BulkGenerateInvoiceDto {
   skipZeroTotal?: boolean
 }
 
+/**
+ * Sprint C kept the simple Promise<BulkGenerateInvoiceResponse> signature
+ * because there was only one return shape. Sprint E.5 widens to a
+ * discriminated union — the BE now returns either:
+ *
+ *   - 200 + { generated, skipped, errors, resolvedStudentCount }     (sync)
+ *   - 202 + { jobId }                                                (async)
+ *
+ * The shapes are disjoint, so we use the HTTP status code (not body
+ * inspection) to pick the mode. `apiPostWithStatus` returns the raw
+ * status alongside the unwrapped body — kept off the standard `apiPost`
+ * path to avoid widening every caller's return type for a one-call need.
+ */
 export async function bulkGenerateInvoices(
   schoolId: string,
   data: BulkGenerateInvoiceDto,
-): Promise<BulkGenerateInvoiceResponse> {
-  return apiPost<BulkGenerateInvoiceResponse, BulkGenerateInvoiceDto>(
-    `/finance/schools/${schoolId}/invoices/bulk-generate`,
-    data,
-  )
+  options: BulkGenerateOptions = {},
+): Promise<BulkGenerateResult> {
+  const url = `/finance/schools/${schoolId}/invoices/bulk-generate`
+  const config = options.async ? { params: { async: true } } : undefined
+  const { status, data: body } = await apiPostWithStatus<
+    BulkGenerateInvoiceResponse | { jobId: string },
+    BulkGenerateInvoiceDto
+  >(url, data, config)
+  if (status === 202) {
+    return { mode: 'async', jobId: (body as { jobId: string }).jobId }
+  }
+  return { mode: 'sync', ...(body as BulkGenerateInvoiceResponse) }
 }
 
 // ============================================================================

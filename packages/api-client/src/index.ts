@@ -148,6 +148,25 @@ export async function apiPost<T, B = unknown>(
   return unwrapResponse<T>(response.data)
 }
 
+/**
+ * POST helper that preserves the HTTP status code alongside the unwrapped
+ * body. Use when the caller needs to discriminate 2xx variants — e.g.,
+ * `finance/invoices/bulk-generate` returns 200 + { generated, skipped }
+ * for sync and 202 + { jobId } for async, and the JSON shape doesn't
+ * include the status.
+ *
+ * Kept as a separate function (not a config flag on `apiPost`) so the
+ * common case stays simple and the unwrap behavior is shared verbatim.
+ */
+export async function apiPostWithStatus<T, B = unknown>(
+  url: string,
+  body?: B,
+  config?: ExtraConfig,
+): Promise<{ status: number; data: T }> {
+  const response = await api.post<T>(url, body, config)
+  return { status: response.status, data: unwrapResponse<T>(response.data) }
+}
+
 export async function apiPut<T, B = unknown>(
   url: string,
   body?: B,
