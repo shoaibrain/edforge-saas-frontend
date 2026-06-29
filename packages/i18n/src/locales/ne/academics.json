@@ -875,6 +875,33 @@
       "sectionTitle": "Section {{section}}"
     }
   },
+  "moduleOverview": {
+    "title": "{{title}} Overview",
+    "retryLoading": "पुनः लोड गर्नुहोस्",
+    "options": {
+      "title": "Page options",
+      "showHideWidgets": "Widgets देखाउने/लुकाउने",
+      "resetToDefault": "Default मा reset",
+      "back": "पछाडि"
+    },
+    "stats": {
+      "scrollLeft": "Stats बायाँ scroll",
+      "scrollRight": "Stats दायाँ scroll",
+      "regionLabel": "Key performance indicators"
+    },
+    "updated": {
+      "justNow": "अहिले update भयो",
+      "minutesAgo": "{{value}}m अघि update भयो",
+      "hoursAgo": "{{value}}h अघि update भयो",
+      "refreshTitle": "Refresh गर्न क्लिक गर्नुहोस्"
+    },
+    "widgets": {
+      "quickStats": "Quick stats",
+      "insights": "Insights",
+      "insightsCharts": "Insights & Charts",
+      "activityAlerts": "Activity & Alerts"
+    }
+  },
   "examModule": {
     "description": "Midterm, final र term examinations योजना, सञ्चालन र publish गर्नुहोस्",
     "descriptionWithYear": "{{yearName}} का exam योजना, सञ्चालन र publish गर्नुहोस्",

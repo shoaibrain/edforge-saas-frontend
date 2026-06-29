@@ -875,6 +875,33 @@
       "sectionTitle": "Section {{section}}"
     }
   },
+  "moduleOverview": {
+    "title": "{{title}} Overview",
+    "retryLoading": "Retry loading",
+    "options": {
+      "title": "Page options",
+      "showHideWidgets": "Show/hide widgets",
+      "resetToDefault": "Reset to default",
+      "back": "Back"
+    },
+    "stats": {
+      "scrollLeft": "Scroll stats left",
+      "scrollRight": "Scroll stats right",
+      "regionLabel": "Key performance indicators"
+    },
+    "updated": {
+      "justNow": "Updated just now",
+      "minutesAgo": "Updated {{value}}m ago",
+      "hoursAgo": "Updated {{value}}h ago",
+      "refreshTitle": "Click to refresh"
+    },
+    "widgets": {
+      "quickStats": "Quick stats",
+      "insights": "Insights",
+      "insightsCharts": "Insights & Charts",
+      "activityAlerts": "Activity & Alerts"
+    }
+  },
   "examModule": {
     "description": "Plan, run, and publish midterms, finals, and term examinations",
     "descriptionWithYear": "Plan, run, and publish exams for {{yearName}}",
