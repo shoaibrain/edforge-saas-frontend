@@ -727,6 +727,68 @@
       "saveScores": "अङ्क सुरक्षित गर्नुहोस्"
     }
   },
+  "curriculumModule": {
+    "actions": {
+      "addCourse": "Course थप्नुहोस्"
+    },
+    "summary": {
+      "coursesAcross": "course",
+      "subjectAreasSuffix": "subject area मा",
+      "elective": "{{count}} elective",
+      "specializedTypesSuffix": "specialized course type (Honors, AP, Dual Enrollment)",
+      "basedOnLoaded": "लोड भएका course को आधारमा"
+    },
+    "stats": {
+      "totalCourses": "कुल Course",
+      "activeTag": "{{count}} active",
+      "subjectAreas": "Subject Areas",
+      "subjectHint": "Math · Science · ELA · SS · Arts · Voc.",
+      "electives": "Electives",
+      "specializedTypes": "Specialized Types",
+      "specializedTag": "Honors · AP · Dual Enroll."
+    },
+    "filters": {
+      "all": "सबै",
+      "search": "Course code वा नामबाट खोज्नुहोस्...",
+      "subjectArea": "Subject area",
+      "allSubjects": "सबै Subject",
+      "courseType": "Course type",
+      "allTypes": "सबै Type",
+      "creditType": "Credit type",
+      "allCreditTypes": "सबै Credit Type",
+      "gradeLevel": "Grade level",
+      "allGrades": "सबै Grade",
+      "clear": "Clear ({{count}})",
+      "exportAria": "Course CSV export गर्नुहोस्",
+      "exportCsv": "CSV Export"
+    },
+    "form": {
+      "incompleteTitle": "Course data अपूर्ण छ",
+      "incompleteDescription": "यस course मा granular Academic Subject छैन। Report card label र Ed-Fi subject rollup सही बनाउन तल सेट गरेर Save गर्नुहोस्।",
+      "identityTitle": "Course Identity",
+      "identityDescription": "Course code subject र grade levels बाट auto-generate हुन्छ। यो unique identifier हो र सिर्जना भएपछि परिवर्तन गर्न सकिँदैन।",
+      "courseCode": "Course Code",
+      "courseCodePlaceholder": "जस्तै MATH-101",
+      "courseNamePlaceholder": "जस्तै Algebra I",
+      "classificationTitle": "Classification",
+      "classificationDescription": "यस course लाई subject, type र credit level अनुसार वर्गीकरण गर्नुहोस्। Broad Ed-Fi subject area academic subject बाट स्वतः निस्किन्छ।",
+      "academicSubject": "Academic Subject",
+      "academicSubjectMissingTooltip": "Missing — report-card labels र Ed-Fi subject rollup का लागि आवश्यक।",
+      "selectAcademicSubject": "Academic subject छान्नुहोस्",
+      "selectCourseType": "Course type छान्नुहोस्",
+      "creditType": "Credit Type",
+      "selectCreditType": "Credit type छान्नुहोस्",
+      "selectDuration": "Duration छान्नुहोस्",
+      "periodsPerWeek": "हप्ताको Periods",
+      "gradeLevelsDescription": "यो course उपलब्ध हुने grade levels छान्नुहोस्।",
+      "descriptionObjectivesTitle": "Description & Objectives",
+      "descriptionObjectivesDescription": "Course description र learning objectives परिभाषित गर्नुहोस्।",
+      "courseDescription": "Course Description",
+      "courseDescriptionPlaceholder": "यस course ले समेट्ने विषय, लक्ष्य र विद्यार्थी अपेक्षा लेख्नुहोस्...",
+      "materialsTitle": "Course Materials",
+      "materialsDescription": "यस course का textbooks, workbooks वा digital resources थप्नुहोस्।"
+    }
+  },
   "examModule": {
     "description": "Midterm, final र term examinations योजना, सञ्चालन र publish गर्नुहोस्",
     "descriptionWithYear": "{{yearName}} का exam योजना, सञ्चालन र publish गर्नुहोस्",

@@ -727,6 +727,68 @@
       "saveScores": "Save Scores"
     }
   },
+  "curriculumModule": {
+    "actions": {
+      "addCourse": "Add course"
+    },
+    "summary": {
+      "coursesAcross": "courses across",
+      "subjectAreasSuffix": "subject areas",
+      "elective": "{{count}} elective",
+      "specializedTypesSuffix": "specialized course types (Honors, AP, Dual Enrollment)",
+      "basedOnLoaded": "based on loaded courses"
+    },
+    "stats": {
+      "totalCourses": "Total Courses",
+      "activeTag": "{{count}} active",
+      "subjectAreas": "Subject Areas",
+      "subjectHint": "Math · Science · ELA · SS · Arts · Voc.",
+      "electives": "Electives",
+      "specializedTypes": "Specialized Types",
+      "specializedTag": "Honors · AP · Dual Enroll."
+    },
+    "filters": {
+      "all": "All",
+      "search": "Search by course code or name...",
+      "subjectArea": "Subject area",
+      "allSubjects": "All Subjects",
+      "courseType": "Course type",
+      "allTypes": "All Types",
+      "creditType": "Credit type",
+      "allCreditTypes": "All Credit Types",
+      "gradeLevel": "Grade level",
+      "allGrades": "All Grades",
+      "clear": "Clear ({{count}})",
+      "exportAria": "Export courses as CSV",
+      "exportCsv": "Export CSV"
+    },
+    "form": {
+      "incompleteTitle": "Incomplete course data",
+      "incompleteDescription": "This course has no granular Academic Subject. Set it below so report cards and the Ed-Fi subject rollup label correctly, then Save.",
+      "identityTitle": "Course Identity",
+      "identityDescription": "The course code is auto-generated from the subject and grade levels. It's a unique identifier and cannot be changed after creation.",
+      "courseCode": "Course Code",
+      "courseCodePlaceholder": "e.g., MATH-101",
+      "courseNamePlaceholder": "e.g., Algebra I",
+      "classificationTitle": "Classification",
+      "classificationDescription": "Categorize this course by subject, type, and credit level. The broad Ed-Fi subject area is derived automatically from the academic subject.",
+      "academicSubject": "Academic Subject",
+      "academicSubjectMissingTooltip": "Missing — required for report-card labels and the Ed-Fi subject rollup.",
+      "selectAcademicSubject": "Select academic subject",
+      "selectCourseType": "Select course type",
+      "creditType": "Credit Type",
+      "selectCreditType": "Select credit type",
+      "selectDuration": "Select duration",
+      "periodsPerWeek": "Periods per Week",
+      "gradeLevelsDescription": "Select which grade levels this course is offered to.",
+      "descriptionObjectivesTitle": "Description & Objectives",
+      "descriptionObjectivesDescription": "Provide a course description and define learning objectives.",
+      "courseDescription": "Course Description",
+      "courseDescriptionPlaceholder": "Describe what this course covers, its goals, and student expectations...",
+      "materialsTitle": "Course Materials",
+      "materialsDescription": "Add textbooks, workbooks, or digital resources for this course."
+    }
+  },
   "examModule": {
     "description": "Plan, run, and publish midterms, finals, and term examinations",
     "descriptionWithYear": "Plan, run, and publish exams for {{yearName}}",

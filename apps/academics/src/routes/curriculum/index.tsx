@@ -37,6 +37,7 @@ import { CourseDrawer, type DrawerMode } from '../../components/curriculum/Cours
 import { GradeLevelsTab } from '../../components/curriculum/GradeLevelsTab'
 import { downloadCoursesCsv } from '../../components/curriculum/course-csv-export'
 import { getAllCourses, parseApiError } from '../../services/academics.service'
+import { useAcademicsI18n } from '../../lib/i18n'
 import type { CourseResponseDto } from '@aibrains/shared-types'
 
 // ============================================================================
@@ -144,6 +145,7 @@ function StandardsContent() {
 // ============================================================================
 
 export function CurriculumModule() {
+  const { t, formatNumber } = useAcademicsI18n()
   const [activeTab, setActiveTab] = useState<CurriculumTab>('courses')
   const navigate = useNavigate()
   const schoolId = useActiveSchoolId()
@@ -315,19 +317,22 @@ export function CurriculumModule() {
             <span className="font-medium text-[rgb(var(--accent-academics-text))]">
               {stats.total}
             </span>{' '}
-            courses across{' '}
+            {t('curriculumModule.summary.coursesAcross')}{' '}
             <span className="font-medium text-[rgb(var(--accent-academics-text))]">
-              {stats.subjects}
+              {formatNumber(stats.subjects)}
             </span>{' '}
-            subject areas · {stats.elective} elective ·{' '}
+            {t('curriculumModule.summary.subjectAreasSuffix')} ·{' '}
+            {t('curriculumModule.summary.elective', {
+              count: formatNumber(stats.elective),
+            })} ·{' '}
             <span className="font-medium text-[rgb(var(--accent-academics-text))]">
-              {stats.specializedTypes}
+              {formatNumber(stats.specializedTypes)}
             </span>{' '}
-            specialized course types (Honors, AP, Dual Enrollment)
+            {t('curriculumModule.summary.specializedTypesSuffix')}
             {!stats.allLoaded && (
               <span className="text-[rgb(var(--text-disabled))]">
                 {' '}
-                · based on loaded courses
+                · {t('curriculumModule.summary.basedOnLoaded')}
               </span>
             )}
           </p>
@@ -340,7 +345,7 @@ export function CurriculumModule() {
               className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-[9px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-enrollment)/0.4)] cursor-pointer bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
             >
               <Plus className="w-3.5 h-3.5" />
-              Add course
+              {t('curriculumModule.actions.addCourse')}
             </button>
           ) : undefined
         }
@@ -349,32 +354,32 @@ export function CurriculumModule() {
       {/* ---- KPI Tiles ---- */}
       <div className="grid gap-3 grid-cols-2 lg:grid-cols-4 mb-3.5">
         <StatCard
-          label="Total Courses"
-          value={String(stats.total)}
+          label={t('curriculumModule.stats.totalCourses')}
+          value={formatNumber(stats.total)}
           icon={BookOpen}
           accentColor="rgb(var(--accent-reports)/0.1)"
           iconColor="rgb(var(--accent-reports))"
           barColor="rgb(var(--accent-reports))"
           tag={{
-            text: `${stats.active} active`,
+            text: t('curriculumModule.stats.activeTag', { count: formatNumber(stats.active) }),
             color: 'rgb(var(--accent-enrollment))',
             bg: 'rgb(var(--accent-enrollment)/0.1)',
           }}
           loading={isLoading}
         />
         <StatCard
-          label="Subject Areas"
-          value={String(stats.subjects)}
+          label={t('curriculumModule.stats.subjectAreas')}
+          value={formatNumber(stats.subjects)}
           icon={Layers}
           accentColor="rgb(var(--accent-academics)/0.1)"
           iconColor="rgb(var(--accent-academics))"
           barColor="rgb(var(--accent-academics))"
-          hint={stats.allLoaded ? 'Math · Science · ELA · SS · Arts · Voc.' : 'Based on loaded courses'}
+          hint={stats.allLoaded ? t('curriculumModule.stats.subjectHint') : t('curriculumModule.summary.basedOnLoaded')}
           loading={isLoading}
         />
         <StatCard
-          label="Electives"
-          value={String(stats.elective)}
+          label={t('curriculumModule.stats.electives')}
+          value={formatNumber(stats.elective)}
           icon={BookOpen}
           accentColor="rgb(var(--accent-coral)/0.1)"
           iconColor="rgb(var(--accent-coral))"
@@ -391,14 +396,14 @@ export function CurriculumModule() {
           loading={isLoading}
         />
         <StatCard
-          label="Specialized Types"
-          value={String(stats.specializedTypes)}
+          label={t('curriculumModule.stats.specializedTypes')}
+          value={formatNumber(stats.specializedTypes)}
           icon={BookOpen}
           accentColor="rgb(var(--accent-attendance)/0.1)"
           iconColor="rgb(var(--accent-attendance))"
           barColor="rgb(var(--accent-attendance))"
           tag={{
-            text: 'Honors · AP · Dual Enroll.',
+            text: t('curriculumModule.stats.specializedTag'),
             color: 'rgb(var(--accent-attendance))',
             bg: 'rgb(var(--accent-attendance)/0.1)',
           }}
