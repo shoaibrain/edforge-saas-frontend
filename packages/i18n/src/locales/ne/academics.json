@@ -1512,6 +1512,91 @@
       "newPolicy": "नयाँ नीति",
       "emptyTitle": "ग्रेडिङ नीति configured छैन",
       "emptyDescription": "ग्रेड scale, category weight र rounding rule परिभाषित गर्न grading policy सिर्जना गर्नुहोस्।"
+    },
+    "overview": {
+      "title": "ग्रेड विश्लेषण",
+      "subtitle": "विद्यालयभरको शैक्षिक प्रदर्शन",
+      "error": "ग्रेड data लोड गर्न असफल। कृपया refresh गर्नुहोस्।",
+      "errorStats": "ग्रेड तथ्याङ्क लोड गर्न असफल",
+      "empty": "सेक्सनहरूमा अहिलेसम्म ग्रेड रेकर्ड गरिएको छैन।",
+      "sectionsGraded": "{{graded}} / {{total}} सेक्सन graded",
+      "actions": {
+        "more": "थप actions",
+        "exportGradebookCsv": "Gradebook CSV निर्यात गर्नुहोस्",
+        "exportAtRiskCsv": "At-Risk CSV निर्यात गर्नुहोस्"
+      },
+      "kpis": {
+        "studentsGraded": "ग्रेड भएका विद्यार्थी",
+        "averageGpa": "औसत GPA",
+        "passRate": "पास दर",
+        "atRisk": "जोखिममा",
+        "avgGradeHint": "औसत ग्रेड: {{grade}}%",
+        "passRateHint": "60%+ ल्याएका विद्यार्थी",
+        "atRiskHint": "60% threshold भन्दा तल"
+      },
+      "completion": {
+        "title": "ग्रेडिङ प्रगति",
+        "subtitle": "सक्रिय सेक्सनका assignment entries",
+        "gradedShort": "graded",
+        "graded": "ग्रेड गरिएको",
+        "remaining": "बाँकी",
+        "totalEntries": "कुल {{total}} assignment entries"
+      },
+      "assessment": {
+        "title": "मूल्यांकन प्रदर्शन",
+        "subtitle": "Assessment type अनुसार औसत अङ्क",
+        "formativeExamples": "क्विज, गृहकार्य, सहभागिता",
+        "summativeExamples": "परीक्षा, exams, projects",
+        "formativeHigher": "Formative {{diff}}% बढी",
+        "higherSuffix": "summative भन्दा — राम्रो सन्तुलन।",
+        "summativeHigher": "Summative {{diff}}% बढी",
+        "summativeHigherSuffix": "formative भन्दा।",
+        "equal": "Formative र summative अङ्क बराबर छन् — राम्रो सन्तुलन।",
+        "unclassified": "+{{count}} unclassified (avg {{avg}}%)"
+      },
+      "distribution": {
+        "title": "ग्रेड वितरण",
+        "subtitle": "समग्र course average का आधारमा प्रत्येक grade range मा विद्यार्थी संख्या",
+        "a": "A (90–100)",
+        "b": "B (80–89)",
+        "c": "C (70–79)",
+        "d": "D (60–69)",
+        "f": "F (0–59)"
+      },
+      "category": {
+        "title": "श्रेणी प्रदर्शन",
+        "subtitle": "ग्रेडिङ policy category अनुसार औसत अङ्क",
+        "headers": {
+          "category": "श्रेणी",
+          "weight": "Wt.",
+          "score": "अङ्क",
+          "avg": "औसत"
+        }
+      },
+      "course": {
+        "title": "Course प्रदर्शन",
+        "subtitle": "सेक्सनहरूमा course अनुसार aggregated grade metrics"
+      },
+      "courseHeaders": {
+        "course": "Course",
+        "sections": "Sec.",
+        "students": "Std.",
+        "avgGrade": "Avg Grade ↓",
+        "gpa": "GPA",
+        "passRate": "Pass %"
+      },
+      "atRisk": {
+        "title": "जोखिममा रहेका विद्यार्थी",
+        "subtitle": "कुनै course मा 60% भन्दा तल रहेका विद्यार्थी",
+        "studentCount": "{{count}} विद्यार्थी",
+        "empty": "ग्रेड threshold भन्दा तल विद्यार्थी छैनन्",
+        "headers": {
+          "student": "विद्यार्थी",
+          "course": "Course",
+          "grade": "ग्रेड",
+          "letter": "अक्षर"
+        }
+      }
     }
   },
   "iemisExport": {

@@ -1512,6 +1512,91 @@
       "newPolicy": "New Policy",
       "emptyTitle": "No grading policies configured",
       "emptyDescription": "Create a grading policy to define grade scales, category weights, and rounding rules."
+    },
+    "overview": {
+      "title": "Grade Analytics",
+      "subtitle": "School-wide academic performance",
+      "error": "Failed to load grade data. Please try refreshing.",
+      "errorStats": "Failed to load grade statistics",
+      "empty": "No grades recorded yet across sections.",
+      "sectionsGraded": "{{graded}} of {{total}} sections graded",
+      "actions": {
+        "more": "More actions",
+        "exportGradebookCsv": "Export Gradebook CSV",
+        "exportAtRiskCsv": "Export At-Risk CSV"
+      },
+      "kpis": {
+        "studentsGraded": "STUDENTS GRADED",
+        "averageGpa": "AVERAGE GPA",
+        "passRate": "PASS RATE",
+        "atRisk": "AT RISK",
+        "avgGradeHint": "Avg grade: {{grade}}%",
+        "passRateHint": "Students scoring 60%+",
+        "atRiskHint": "Below 60% threshold"
+      },
+      "completion": {
+        "title": "Grading Completion",
+        "subtitle": "Assignment entries across active sections",
+        "gradedShort": "graded",
+        "graded": "Graded",
+        "remaining": "Remaining",
+        "totalEntries": "{{total}} total assignment entries"
+      },
+      "assessment": {
+        "title": "Assessment Performance",
+        "subtitle": "Average scores by assessment type",
+        "formativeExamples": "Quizzes, homework, participation",
+        "summativeExamples": "Tests, exams, projects",
+        "formativeHigher": "Formative {{diff}}% higher",
+        "higherSuffix": "than summative — well balanced.",
+        "summativeHigher": "Summative {{diff}}% higher",
+        "summativeHigherSuffix": "than formative.",
+        "equal": "Formative and summative scores are equal — well balanced.",
+        "unclassified": "+{{count}} unclassified (avg {{avg}}%)"
+      },
+      "distribution": {
+        "title": "Grade Distribution",
+        "subtitle": "Number of students in each grade range based on overall course averages",
+        "a": "A (90–100)",
+        "b": "B (80–89)",
+        "c": "C (70–79)",
+        "d": "D (60–69)",
+        "f": "F (0–59)"
+      },
+      "category": {
+        "title": "Category Performance",
+        "subtitle": "Average scores by grading policy category",
+        "headers": {
+          "category": "Category",
+          "weight": "Wt.",
+          "score": "Score",
+          "avg": "Avg"
+        }
+      },
+      "course": {
+        "title": "Course Performance",
+        "subtitle": "Aggregated grade metrics per course across sections"
+      },
+      "courseHeaders": {
+        "course": "Course",
+        "sections": "Sec.",
+        "students": "Std.",
+        "avgGrade": "Avg Grade ↓",
+        "gpa": "GPA",
+        "passRate": "Pass %"
+      },
+      "atRisk": {
+        "title": "At-Risk Students",
+        "subtitle": "Students scoring below 60% in any course",
+        "studentCount": "{{count}} students",
+        "empty": "No students below the grade threshold",
+        "headers": {
+          "student": "Student",
+          "course": "Course",
+          "grade": "Grade",
+          "letter": "Letter"
+        }
+      }
     }
   },
   "iemisExport": {
