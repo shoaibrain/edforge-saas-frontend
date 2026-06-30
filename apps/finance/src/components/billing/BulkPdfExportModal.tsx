@@ -112,7 +112,7 @@ export function BulkPdfExportModal({
             const body = getErrorBody<ActiveExportConflictBody>(err)
             if (body?.runningJobId) {
               setJobId(body.runningJobId)
-              toast.info(t('bulkPdfExport.alreadyRunning'))
+              toast.info(t('invoices.bulkPdfExport.alreadyRunning'))
               return
             }
           }
@@ -120,7 +120,7 @@ export function BulkPdfExportModal({
           if (getErrorStatus(err) === 413) {
             const body = getErrorBody<PayloadTooLargeBody>(err)
             toast.error(
-              t('bulkPdfExport.payloadTooLarge', {
+              t('invoices.bulkPdfExport.payloadTooLarge', {
                 limit: body?.limit ?? 2000,
                 requested: body?.requested ?? invoiceIds.length,
               }),
@@ -130,7 +130,7 @@ export function BulkPdfExportModal({
           }
           // Other errors — generic toast; modal stays open so the operator
           // can see the error state (rendered below).
-          toast.error(t('bulkPdfExport.kickoffFailed'))
+          toast.error(t('invoices.bulkPdfExport.kickoffFailed'))
         },
       },
     )
@@ -143,21 +143,21 @@ export function BulkPdfExportModal({
     if (!job.data || terminalLogged) return
     if (job.data.status === 'succeeded') {
       toast.success(
-        t('bulkPdfExport.succeeded', {
+        t('invoices.bulkPdfExport.succeeded', {
           succeeded: job.data.counters.succeeded,
           failed: job.data.counters.failed,
         }),
       )
       setTerminalLogged(true)
     } else if (job.data.status === 'failed') {
-      toast.error(t('bulkPdfExport.failed'))
+      toast.error(t('invoices.bulkPdfExport.failed'))
       setTerminalLogged(true)
     }
   }, [job.data, t, terminalLogged])
 
   const status = job.data?.status ?? (exportMutation.isPending ? 'queued' : null)
   const isTerminal = status === 'succeeded' || status === 'failed'
-  const message = exportMutation.data?.message ?? t('bulkPdfExport.backgroundDefault')
+  const message = exportMutation.data?.message ?? t('invoices.bulkPdfExport.backgroundDefault')
 
   return (
     <AnimatePresence>
@@ -186,12 +186,12 @@ export function BulkPdfExportModal({
                 id="bulk-pdf-export-title"
                 className="text-base font-semibold text-[rgb(var(--text-primary))]"
               >
-                {t('bulkPdfExport.title', { count: invoiceIds.length })}
+                {t('invoices.bulkPdfExport.title', { count: invoiceIds.length })}
               </h2>
               <button
                 type="button"
                 onClick={onClose}
-                aria-label={t('bulkPdfExport.close')}
+                aria-label={t('invoices.bulkPdfExport.close')}
                 className="rounded p-1 text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))]"
               >
                 <X className="w-4 h-4" />
@@ -213,7 +213,7 @@ export function BulkPdfExportModal({
                   className="rounded-md border border-[rgb(var(--border-primary))] px-3 py-1.5 text-sm text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-secondary))]"
                   data-testid="bulk-pdf-export-background"
                 >
-                  {t('bulkPdfExport.runInBackground')}
+                  {t('invoices.bulkPdfExport.runInBackground')}
                 </button>
               )}
               {isTerminal && (
@@ -223,7 +223,7 @@ export function BulkPdfExportModal({
                   className="rounded-md bg-[rgb(var(--action-primary-bg))] px-3 py-1.5 text-sm text-white hover:bg-[rgb(var(--action-primary-bg-hover))]"
                   data-testid="bulk-pdf-export-close"
                 >
-                  {t('bulkPdfExport.done')}
+                  {t('invoices.bulkPdfExport.done')}
                 </button>
               )}
             </div>
@@ -250,7 +250,7 @@ function BulkPdfExportProgress({ job, status, fallbackMessage, kickoffError }: P
         <XCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
         <div>
           <div className="text-sm font-medium text-red-900">
-            {t('bulkPdfExport.kickoffFailed')}
+            {t('invoices.bulkPdfExport.kickoffFailed')}
           </div>
           <div className="text-xs text-red-700 mt-0.5">{kickoffError.message}</div>
         </div>
@@ -276,10 +276,10 @@ function BulkPdfExportProgress({ job, status, fallbackMessage, kickoffError }: P
           <Loader2 className="w-4 h-4 text-[rgb(var(--action-primary-bg))] animate-spin flex-shrink-0" />
           <div className="flex-1 min-w-0">
             <div className="text-sm font-medium text-[rgb(var(--text-primary))]">
-              {t('bulkPdfExport.runningTitle')}
+              {t('invoices.bulkPdfExport.runningTitle')}
             </div>
             <div className="text-xs text-[rgb(var(--text-tertiary))] tabular-nums">
-              {t('bulkPdfExport.runningProgress', { done, total: job.counters.requested })}
+              {t('invoices.bulkPdfExport.runningProgress', { done, total: job.counters.requested })}
             </div>
           </div>
         </div>
@@ -307,14 +307,14 @@ function BulkPdfExportProgress({ job, status, fallbackMessage, kickoffError }: P
           <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
             <div className="text-sm font-medium text-green-900">
-              {t('bulkPdfExport.succeededTitle', {
+              {t('invoices.bulkPdfExport.succeededTitle', {
                 succeeded: job.counters.succeeded,
                 failed: job.counters.failed,
               })}
             </div>
             {job.counters.failed > 0 && (
               <div className="text-xs text-green-800 mt-0.5">
-                {t('bulkPdfExport.partialFailed', { count: job.counters.failed })}
+                {t('invoices.bulkPdfExport.partialFailed', { count: job.counters.failed })}
               </div>
             )}
           </div>
@@ -328,11 +328,11 @@ function BulkPdfExportProgress({ job, status, fallbackMessage, kickoffError }: P
             data-testid="bulk-pdf-export-download-link"
           >
             <Download className="w-4 h-4" />
-            {t('bulkPdfExport.downloadZip')}
+            {t('invoices.bulkPdfExport.downloadZip')}
           </a>
         ) : (
           <div className="text-xs text-[rgb(var(--text-tertiary))]">
-            {t('bulkPdfExport.urlPending')}
+            {t('invoices.bulkPdfExport.urlPending')}
           </div>
         )}
       </div>
@@ -340,12 +340,12 @@ function BulkPdfExportProgress({ job, status, fallbackMessage, kickoffError }: P
   }
 
   // status === 'failed'
-  const firstErr = job.errors?.[0]?.message ?? t('bulkPdfExport.failedGeneric')
+  const firstErr = job.errors?.[0]?.message ?? t('invoices.bulkPdfExport.failedGeneric')
   return (
     <div className="flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
       <XCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
       <div>
-        <div className="text-sm font-medium text-red-900">{t('bulkPdfExport.failedTitle')}</div>
+        <div className="text-sm font-medium text-red-900">{t('invoices.bulkPdfExport.failedTitle')}</div>
         <div className="text-xs text-red-700 mt-0.5">{firstErr}</div>
       </div>
     </div>
