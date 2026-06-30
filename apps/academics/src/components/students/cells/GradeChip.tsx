@@ -6,18 +6,22 @@
  * a report-time concern and is intentionally NOT applied here.
  */
 
+import { useAcademicsI18n } from '../../../lib/i18n'
+
 interface GradeChipProps {
   grade?: string | null
 }
 
 export function GradeChip({ grade }: GradeChipProps) {
+  const { t } = useAcademicsI18n()
+
   if (!grade) {
     return <span className="text-xs text-[rgb(var(--text-tertiary))]">—</span>
   }
   return (
     <span
       className="inline-grid place-items-center h-6 min-w-8 px-2 rounded-[7px] text-xs font-semibold tabular-nums bg-[rgb(var(--accent-academics)/0.12)] text-[rgb(var(--accent-academics-text))]"
-      title={`Grade ${grade}`}
+      title={t('gradeLabel', { level: grade })}
     >
       {grade}
     </span>

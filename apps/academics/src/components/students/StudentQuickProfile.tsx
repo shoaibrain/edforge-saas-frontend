@@ -13,6 +13,7 @@ import type { StudentResponseDto } from '@aibrains/shared-types'
 import { QuickDrawer, AttendanceDonutRing, focusRing, focusRingInset } from '@edforge/ui'
 import { useDateFormatter, adToBS, formatBSDate } from '@edforge/date-utils'
 import { UserAvatar } from '../common/UserAvatar'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 // ============================================================================
 // TYPES
@@ -85,6 +86,7 @@ export function StudentQuickProfile({
   academicYearName,
 }: StudentQuickProfileProps) {
   const navigate = useNavigate()
+  const { t, formatNumber, formatDate } = useAcademicsI18n()
   const { calendarSystem } = useDateFormatter()
 
   const handleViewProfile = useCallback(() => {
@@ -97,17 +99,15 @@ export function StudentQuickProfile({
 
   // ── derived values ──────────────────────────────────────────────
   const ss = STATUS_STYLES[student.status] || DEFAULT_STATUS
-  const statusText = student.status
-    ? student.status.charAt(0).toUpperCase() + student.status.slice(1)
-    : 'Active'
+  const statusText = student.status ? t(`status.${student.status}`) : t('status.active')
   const isAtRisk = attendanceRate != null && attendanceRate < 80
   const accent = attColor(attendanceRate)
 
   // locale-aware enrolled date
   const dt = student.enrollmentDate ? new Date(student.enrollmentDate) : null
   const ok = dt && !isNaN(dt.getTime())
-  const ad = ok ? dt.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '—'
-  const bs = ok ? `BS ${formatBSDate(adToBS(dt))}` : null
+  const ad = ok ? formatDate(dt, { year: 'numeric', month: 'short', day: 'numeric' }) : '—'
+  const bs = ok ? t('studentsModule.quickProfile.bsPrefix', { date: formatBSDate(adToBS(dt)) }) : null
   const enrollPrimary = calendarSystem === 'bs' ? (bs || '—') : ad
   const enrollSub = calendarSystem === 'bs' ? ad : bs
 
@@ -150,7 +150,7 @@ export function StudentQuickProfile({
             type="button"
             onClick={onClose}
             className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md border border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-tertiary)/0.6)] transition-colors hover:opacity-80 ${focusRingInset}`}
-            aria-label="Close"
+            aria-label={t('studentsModule.quickProfile.close')}
           >
             <X className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))]" />
           </button>
@@ -169,7 +169,7 @@ export function StudentQuickProfile({
             >
               <AlertTriangle className="h-3.5 w-3.5 flex-shrink-0 text-[rgb(var(--state-danger-fg))]" />
               <span className="text-xs font-medium text-[rgb(var(--state-danger-fg))]">
-                At-risk &middot; {attendanceRate!.toFixed(0)}% attendance (30-day)
+                {t('studentsModule.quickProfile.atRiskBanner', { rate: formatNumber(Math.round(attendanceRate!)) })}
               </span>
             </div>
           )}
@@ -179,13 +179,13 @@ export function StudentQuickProfile({
             <Tile
               icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#378ADD" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>}
               value={student.currentGradeLevel || '—'}
-              label="Grade"
+              label={t('studentsModule.quickProfile.grade')}
               accent="#378ADD"
             />
             <Tile
               icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7F77DD" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>}
               value="—"
-              label="GPA"
+              label={t('studentsModule.quickProfile.gpa')}
               accent="#7F77DD"
               muted
             />
@@ -196,7 +196,7 @@ export function StudentQuickProfile({
                 <div className="w-5 h-5 rounded-full border-2 border-[rgb(var(--text-disabled))]" />
               )}
               <div className="text-xs font-semibold uppercase tracking-[0.5px] mt-[2px] text-[rgb(var(--text-tertiary))]">
-                Attendance
+                {t('studentsModule.quickProfile.attendance')}
               </div>
               <div
                 // allow-presentation-style: accent underline reflects the attendance-rate severity color
@@ -209,12 +209,12 @@ export function StudentQuickProfile({
           {/* ── Enrollment card ── */}
           <div className="bg-[rgb(var(--background-tertiary)/0.5)] border border-[rgb(var(--border-primary)/0.35)] rounded-[10px] pt-3 px-3.5 pb-3.5">
             <div className="text-xs font-bold uppercase tracking-[0.6px] mb-[10px] pb-[6px] text-[rgb(var(--text-tertiary))] border-b border-[rgb(var(--border-primary)/0.35)]">
-              Enrollment
+              {t('studentsModule.quickProfile.enrollment')}
             </div>
             <div className="grid grid-cols-2 gap-x-[14px] gap-y-[10px]">
-              <Field label="Grade Level" value={student.currentGradeLevel ? `Grade ${student.currentGradeLevel}` : '—'} />
-              <Field label="Enrolled" value={enrollPrimary} sub={enrollSub} />
-              <Field label="Academic Year" value={academicYearName || '—'} />
+              <Field label={t('studentsModule.quickProfile.gradeLevel')} value={student.currentGradeLevel ? t('studentsModule.quickProfile.gradeValue', { grade: student.currentGradeLevel }) : '—'} />
+              <Field label={t('studentsModule.quickProfile.enrolled')} value={enrollPrimary} sub={enrollSub} />
+              <Field label={t('studentsModule.quickProfile.academicYear')} value={academicYearName || '—'} />
             </div>
           </div>
 
@@ -222,7 +222,7 @@ export function StudentQuickProfile({
           <div className="flex gap-2 px-3 py-2 bg-[rgb(var(--accent-academics)/0.04)] border border-[rgb(var(--accent-academics)/0.1)] rounded-[7px]">
             <Lock className="flex-shrink-0 mt-[1px] text-[rgb(var(--state-info-fg))]" style={{ width: 11, height: 11 }} />
             <span className="text-xs leading-snug text-[rgb(var(--text-tertiary))]">
-              Demographics, contact info, and guardian details are on the full profile page.
+              {t('studentsModule.quickProfile.privacyNote')}
             </span>
           </div>
 
@@ -231,9 +231,9 @@ export function StudentQuickProfile({
             type="button"
             onClick={handleViewProfile}
             className={`flex h-10 w-full items-center justify-center gap-1.5 rounded-lg bg-[rgb(var(--action-primary-bg))] text-xs font-medium text-[rgb(var(--action-primary-fg))] transition-all hover:bg-[rgb(var(--action-primary-bg-hover))] active:scale-[0.98] ${focusRing}`}
-            aria-label={`View full profile for ${student.fullName}`}
+            aria-label={t('studentsModule.quickProfile.viewFullProfileAria', { student: student.fullName })}
           >
-            View Full Profile
+            {t('studentsModule.quickProfile.viewFullProfile')}
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>

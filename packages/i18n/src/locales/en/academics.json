@@ -350,6 +350,22 @@
     "profiles": {
       "title": "Student Profiles",
       "description": "Detailed student profiles and records - to be populated with migrated content from the monolith."
+    },
+    "quickProfile": {
+      "close": "Close",
+      "atRiskBanner": "At-risk · {{rate}}% attendance (30-day)",
+      "grade": "Grade",
+      "gpa": "GPA",
+      "attendance": "Attendance",
+      "enrollment": "Enrollment",
+      "gradeLevel": "Grade Level",
+      "enrolled": "Enrolled",
+      "academicYear": "Academic Year",
+      "gradeValue": "Grade {{grade}}",
+      "privacyNote": "Demographics, contact info, and guardian details are on the full profile page.",
+      "viewFullProfile": "View Full Profile",
+      "viewFullProfileAria": "View full profile for {{student}}",
+      "bsPrefix": "BS {{date}}"
     }
   },
   "privacy": {

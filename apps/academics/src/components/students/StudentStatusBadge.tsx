@@ -6,6 +6,7 @@
  */
 
 import type { StudentStatus } from '@aibrains/shared-types'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 interface StudentStatusBadgeProps {
   status: StudentStatus
@@ -13,46 +14,47 @@ interface StudentStatusBadgeProps {
 
 const statusConfig: Record<
   StudentStatus,
-  { label: string; bg: string; color: string }
+  { labelKey: string; bg: string; color: string }
 > = {
   active: {
-    label: 'Active',
+    labelKey: 'status.active',
     bg: 'rgb(var(--accent-enrollment)/0.12)',
     color: 'rgb(var(--accent-enrollment))',
   },
   inactive: {
-    label: 'Inactive',
+    labelKey: 'status.inactive',
     bg: 'rgb(var(--text-tertiary)/0.12)',
     color: 'rgb(var(--text-tertiary))',
   },
   pending: {
-    label: 'Pending',
+    labelKey: 'status.pending',
     bg: 'rgb(var(--accent-attendance)/0.12)',
     color: 'rgb(var(--accent-attendance))',
   },
   graduated: {
-    label: 'Graduated',
+    labelKey: 'status.graduated',
     bg: 'rgb(var(--accent-academics)/0.12)',
     color: 'rgb(var(--accent-academics))',
   },
   transferred: {
-    label: 'Transferred',
+    labelKey: 'status.transferred',
     bg: 'rgb(var(--accent-attendance)/0.12)',
     color: 'rgb(var(--accent-attendance))',
   },
   withdrawn: {
-    label: 'Withdrawn',
+    labelKey: 'status.withdrawn',
     bg: 'rgb(var(--accent-finance)/0.12)',
     color: 'rgb(var(--accent-finance))',
   },
   suspended: {
-    label: 'Suspended',
+    labelKey: 'status.suspended',
     bg: 'rgb(var(--accent-attendance)/0.12)',
     color: 'rgb(var(--accent-attendance))',
   },
 }
 
 export function StudentStatusBadge({ status }: StudentStatusBadgeProps) {
+  const { t } = useAcademicsI18n()
   const config = statusConfig[status] || statusConfig.inactive
 
   return (
@@ -61,7 +63,7 @@ export function StudentStatusBadge({ status }: StudentStatusBadgeProps) {
       className="inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-[10px]"
       style={{ background: config.bg, color: config.color }}
     >
-      {config.label}
+      {t(config.labelKey)}
     </span>
   )
 }
