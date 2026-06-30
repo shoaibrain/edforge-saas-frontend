@@ -17,6 +17,7 @@ import {
   AlertTriangle,
 } from 'lucide-react'
 import { Button, Modal, ModalFooter } from '@edforge/ui'
+import { useTranslation } from '@edforge/i18n'
 import { usePermission } from '@edforge/abac'
 import { useQueryClient, useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -107,6 +108,7 @@ function DeleteEdOrgModal({
   onClose: () => void
   node: HierarchyNode | null
 }) {
+  const { t } = useTranslation('settings')
   const [confirmText, setConfirmText] = useState('')
   const deleteLeaMutation = useDeleteLea()
   const deleteEscMutation = useDeleteEsc()
@@ -116,7 +118,7 @@ function DeleteEdOrgModal({
   const isLea = node.type === 'localEducationAgency'
   const schoolCount = node.schoolCount || 0
   const requiresTyping = isLea && schoolCount > 0
-  const entityLabel = isLea ? 'District' : 'Service Center'
+  const entityLabel = isLea ? t('organization.entities.district') : t('organization.entities.serviceCenter')
   const isPending = deleteLeaMutation.isPending || deleteEscMutation.isPending
   const canConfirm = !requiresTyping || confirmText === node.name
 
@@ -140,18 +142,18 @@ function DeleteEdOrgModal({
     <Modal
       open={open}
       onClose={handleClose}
-      title={`Delete ${entityLabel}`}
-      description={`Are you sure you want to delete "${node.name}"?`}
+      title={t('organization.delete.title', { entity: entityLabel })}
+      description={t('organization.delete.description', { name: node.name })}
       size="md"
     >
       <div className="space-y-4 py-2">
         <div className="flex items-start gap-3 p-3 rounded-lg bg-[rgb(var(--state-danger-bg)/0.18)]0/10 border border-[rgb(var(--state-danger-border)/0.35)]">
           <AlertTriangle className="w-5 h-5 text-[rgb(var(--state-danger-fg))] shrink-0 mt-0.5" />
           <div className="text-sm">
-            <p className="font-medium text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]">This action cannot be undone.</p>
+            <p className="font-medium text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]">{t('organization.delete.irreversible')}</p>
             {isLea && schoolCount > 0 && (
               <p className="mt-1 text-[rgb(var(--text-secondary))]">
-                This district has <strong>{schoolCount}</strong> {schoolCount === 1 ? 'school' : 'schools'} that will become unassigned.
+                {t('organization.delete.schoolsBecomeUnassigned', { count: schoolCount })}
               </p>
             )}
           </div>
@@ -160,7 +162,7 @@ function DeleteEdOrgModal({
         {requiresTyping && (
           <div>
             <label className="block text-sm text-[rgb(var(--text-secondary))] mb-1.5">
-              Type <strong>{node.name}</strong> to confirm:
+              {t('organization.delete.typeToConfirm', { name: node.name })}
             </label>
             <input
               type="text"
@@ -175,7 +177,7 @@ function DeleteEdOrgModal({
 
       <ModalFooter>
         <Button variant="outline" onClick={handleClose} disabled={isPending}>
-          Cancel
+          {t('organization.actions.cancel')}
         </Button>
         <Button
           variant="danger"
@@ -183,7 +185,7 @@ function DeleteEdOrgModal({
           disabled={!canConfirm || isPending}
           isLoading={isPending}
         >
-          Delete {entityLabel}
+          {t('organization.delete.confirmAction', { entity: entityLabel })}
         </Button>
       </ModalFooter>
     </Modal>
@@ -195,6 +197,7 @@ function DeleteEdOrgModal({
 // ============================================================================
 
 function OrgEmptyState({ onSetupSea }: { onSetupSea?: () => void }) {
+  const { t } = useTranslation('settings')
   const canManage = usePermission('manage', 'education-organizations')
 
   return (
@@ -271,11 +274,10 @@ function OrgEmptyState({ onSetupSea }: { onSetupSea?: () => void }) {
           className="text-center max-w-lg mb-8"
         >
           <h2 className="text-2xl font-semibold text-[rgb(var(--text-primary))] mb-3 tracking-tight">
-            Build your organization hierarchy
+            {t('organization.empty.title')}
           </h2>
           <p className="text-[rgb(var(--text-secondary))] leading-relaxed">
-            Set up your State Education Agency, add districts (LEAs) and service centers (ESCs), then
-            organize your schools under them for Ed-Fi compliant reporting.
+            {t('organization.empty.description')}
           </p>
         </motion.div>
 
@@ -292,7 +294,7 @@ function OrgEmptyState({ onSetupSea }: { onSetupSea?: () => void }) {
               className="gap-2 bg-gradient-to-r from-[rgb(var(--state-info-fg))] to-[rgb(var(--action-primary-bg))] hover:from-[rgb(var(--state-info-fg))] hover:to-[rgb(var(--action-primary-bg-hover))] shadow-lg shadow-indigo-500/25"
             >
               <Landmark className="w-4 h-4" />
-              Set Up State Agency
+              {t('organization.actions.setUpStateAgency')}
             </Button>
           </motion.div>
         )}
@@ -306,6 +308,7 @@ function OrgEmptyState({ onSetupSea }: { onSetupSea?: () => void }) {
 // ============================================================================
 
 export default function OrganizationSettingsPage() {
+  const { t } = useTranslation('settings')
   const [activeTab, setActiveTab] = useState<TabId>('hierarchy')
   const canManage = usePermission('manage', 'education-organizations')
   const navigate = useNavigate()
@@ -341,7 +344,7 @@ export default function OrganizationSettingsPage() {
       queryClient.invalidateQueries({ queryKey: edOrgKeys.hierarchy() })
       queryClient.invalidateQueries({ queryKey: ['schools'] })
       queryClient.invalidateQueries({ queryKey: ['schools', schoolId] })
-      toast.success('School unassigned from district')
+      toast.success(t('organization.toasts.schoolUnassigned'))
     },
     onError: (error: Error) => {
       toast.error(extractApiErrorMessage(error))
@@ -398,14 +401,14 @@ export default function OrganizationSettingsPage() {
         case 'unassign-school':
           if (node.type === 'school') {
             // Confirm before unassigning
-            if (window.confirm(`Unassign "${node.name}" from its district?\n\nThe school will move to the unassigned schools list.`)) {
+            if (window.confirm(t('organization.confirm.unassignSchool', { name: node.name }))) {
               unassignSchoolMutation.mutate(node.id)
             }
           }
           break
       }
     },
-    [navigate, seaModal, leaModal, escModal, deleteModal, schoolReassignModal, unassignSchoolMutation]
+    [navigate, seaModal, leaModal, escModal, deleteModal, schoolReassignModal, unassignSchoolMutation, t]
   )
 
   // Extract all schools from hierarchy for bulk management
@@ -496,11 +499,11 @@ export default function OrganizationSettingsPage() {
       >
         {/* Header */}
         <SettingsPageHeader
-          title="Organization Structure"
+          title={t('organization.structure.title')}
           description={
             !hierarchyLoading && !hasNoData
-              ? `${stats.totalOrgs} organizations · ${stats.activeSchools} schools`
-              : 'Manage your education organization hierarchy'
+              ? t('organization.structure.summary', { orgCount: stats.totalOrgs, schoolCount: stats.activeSchools })
+              : t('organization.structure.description')
           }
           icon={Building2}
           action={
@@ -509,29 +512,29 @@ export default function OrganizationSettingsPage() {
                 {!sea ? (
                   <Button size="sm" variant="ghost" className="gap-1.5 rounded-md" onClick={seaModal.openCreate}>
                     <Landmark className="w-3.5 h-3.5" />
-                    Set Up SEA
+                    {t('organization.actions.setUpSea')}
                   </Button>
                 ) : (
                   <Button size="sm" variant="ghost" className="gap-1.5 rounded-md" onClick={() => seaModal.openEdit(null)}>
                     <Landmark className="w-3.5 h-3.5" />
-                    Edit SEA
+                    {t('organization.actions.editSea')}
                   </Button>
                 )}
                 <div className="w-px h-5 bg-[rgb(var(--border-primary))]" />
                 <Button size="sm" variant="ghost" className="gap-1.5 rounded-md" onClick={leaModal.openCreate}>
                   <Plus className="w-3.5 h-3.5" />
-                  District
+                  {t('organization.entities.district')}
                 </Button>
                 <Button size="sm" variant="ghost" className="gap-1.5 rounded-md" onClick={escModal.openCreate}>
                   <Plus className="w-3.5 h-3.5" />
-                  Service Center
+                  {t('organization.entities.serviceCenter')}
                 </Button>
                 {stats.activeSchools > 0 && (
                   <>
                     <div className="w-px h-5 bg-[rgb(var(--border-primary))]" />
                     <Button size="sm" variant="ghost" className="gap-1.5 rounded-md" onClick={() => setShowAllSchoolsManager(true)}>
                       <Network className="w-3.5 h-3.5" />
-                      Assignments
+                      {t('organization.actions.assignments')}
                     </Button>
                   </>
                 )}
@@ -552,9 +555,9 @@ export default function OrganizationSettingsPage() {
         {/* Tabs */}
         <motion.div variants={fadeInUp}>
           <div className="flex items-center border-b border-[rgb(var(--border-primary))]" role="tablist">
-            <TabButton id="hierarchy" label="Hierarchy" activeTab={activeTab} onSelect={setActiveTab} />
-            <TabButton id="networks" label="Networks" activeTab={activeTab} onSelect={setActiveTab} />
-            <TabButton id="details" label="Details" activeTab={activeTab} onSelect={setActiveTab} />
+            <TabButton id="hierarchy" label={t('organization.tabs.hierarchy')} activeTab={activeTab} onSelect={setActiveTab} />
+            <TabButton id="networks" label={t('organization.tabs.networks')} activeTab={activeTab} onSelect={setActiveTab} />
+            <TabButton id="details" label={t('organization.tabs.details')} activeTab={activeTab} onSelect={setActiveTab} />
           </div>
         </motion.div>
 
@@ -615,9 +618,9 @@ export default function OrganizationSettingsPage() {
                     </div>
                     <div>
                       <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))]">
-                        State Education Agency
+                        {t('organization.entities.stateEducationAgency')}
                       </h3>
-                      <p className="text-xs text-[rgb(var(--text-tertiary))]">Root organization</p>
+                      <p className="text-xs text-[rgb(var(--text-tertiary))]">{t('organization.details.rootOrganization')}</p>
                     </div>
                     {canManage && (
                       <Button
@@ -626,26 +629,26 @@ export default function OrganizationSettingsPage() {
                         className="ml-auto gap-1.5"
                         onClick={() => seaModal.openEdit(null)}
                       >
-                        Edit
+                        {t('organization.actions.edit')}
                       </Button>
                     )}
                   </div>
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
-                      <p className="text-[rgb(var(--text-tertiary))]">Name</p>
+                      <p className="text-[rgb(var(--text-tertiary))]">{t('organization.fields.name')}</p>
                       <p className="font-medium text-[rgb(var(--text-primary))]">{sea.nameOfInstitution}</p>
                     </div>
                     <div>
-                      <p className="text-[rgb(var(--text-tertiary))]">Ed-Fi ID</p>
+                      <p className="text-[rgb(var(--text-tertiary))]">{t('organization.fields.edFiId')}</p>
                       <p className="font-medium text-[rgb(var(--text-primary))] font-mono">{sea.stateEducationAgencyId}</p>
                     </div>
                     <div>
-                      <p className="text-[rgb(var(--text-tertiary))]">Status</p>
+                      <p className="text-[rgb(var(--text-tertiary))]">{t('organization.fields.status')}</p>
                       <p className="font-medium text-[rgb(var(--text-primary))]">{sea.operationalStatusDescriptor}</p>
                     </div>
                     {sea.webSite && (
                       <div>
-                        <p className="text-[rgb(var(--text-tertiary))]">Website</p>
+                        <p className="text-[rgb(var(--text-tertiary))]">{t('organization.fields.website')}</p>
                         <a
                           href={sea.webSite}
                           target="_blank"
@@ -661,13 +664,13 @@ export default function OrganizationSettingsPage() {
               ) : (
                 <SettingsEmptyState
                   icon={Landmark}
-                  title="No State Education Agency"
-                  description="Set up your SEA to establish the root of your organization hierarchy."
+                  title={t('organization.details.noSeaTitle')}
+                  description={t('organization.details.noSeaDescription')}
                   action={
                     canManage ? (
                       <Button size="sm" className="gap-1.5" onClick={seaModal.openCreate}>
                         <Plus className="w-4 h-4" />
-                        Set Up SEA
+                        {t('organization.actions.setUpSea')}
                       </Button>
                     ) : undefined
                   }

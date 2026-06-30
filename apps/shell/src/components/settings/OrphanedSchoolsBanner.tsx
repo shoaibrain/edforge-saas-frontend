@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@edforge/ui'
 import { usePermission } from '@edforge/abac'
+import { useTranslation } from '@edforge/i18n'
 import { cn } from '@/lib/utils'
 import type { HierarchyNode } from '@aibrains/shared-types'
 import { SchoolAssignmentManager } from './SchoolAssignmentManager'
@@ -26,6 +27,7 @@ export interface OrphanedSchoolsBannerProps {
 }
 
 export function OrphanedSchoolsBanner({ orphanedSchools }: OrphanedSchoolsBannerProps) {
+  const { t } = useTranslation('settings')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const canManage = usePermission('manage', 'education-organizations')
 
@@ -46,11 +48,10 @@ export function OrphanedSchoolsBanner({ orphanedSchools }: OrphanedSchoolsBanner
         </div>
         <div className="flex-1">
           <p className="text-sm font-medium text-amber-700 dark:text-amber-300">
-            {orphanedSchools.length} {orphanedSchools.length === 1 ? 'school is' : 'schools are'} not
-            assigned to a district
+            {t('organization.orphanedBanner.title', { count: orphanedSchools.length })}
           </p>
           <p className="text-xs text-amber-600/70 dark:text-amber-400/70 mt-0.5">
-            Assign schools to a Local Education Agency (LEA) for proper Ed-Fi reporting.
+            {t('organization.orphanedBanner.description')}
           </p>
         </div>
         {canManage && (
@@ -60,7 +61,7 @@ export function OrphanedSchoolsBanner({ orphanedSchools }: OrphanedSchoolsBanner
             className="gap-1.5 text-amber-700 dark:text-amber-300 hover:bg-amber-500/10"
             onClick={() => setIsModalOpen(true)}
           >
-            Assign Schools
+            {t('organization.actions.assignSchools')}
             <ArrowRight className="w-4 h-4" />
           </Button>
         )}

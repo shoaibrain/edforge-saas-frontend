@@ -9,6 +9,7 @@ import { useEffect } from 'react'
 import { useForm, FormProvider, zodResolver, TextField, SelectField } from '@edforge/forms'
 import { useFormDirtyGuard } from '@/hooks/useFormDirtyGuard'
 import { Modal, ModalFooter, Button } from '@edforge/ui'
+import { useTranslation } from '@edforge/i18n'
 import { Landmark, Info } from 'lucide-react'
 import {
   createStateEducationAgencySchema,
@@ -40,8 +41,13 @@ export interface SEASetupFormProps {
 // ============================================================================
 
 export function SEASetupForm({ open, onClose, existingSea }: SEASetupFormProps) {
+  const { t } = useTranslation('settings')
   const isEdit = !!existingSea
   const mutation = useCreateOrUpdateSea()
+  const operationalStatusOptions = OPERATIONAL_STATUS_DESCRIPTORS.map((option) => ({
+    ...option,
+    label: t(`organization.status.${option.value}`, { defaultValue: option.label }),
+  }))
 
   const methods = useForm<CreateStateEducationAgencyDto>({
     resolver: zodResolver(createStateEducationAgencySchema),
@@ -105,8 +111,8 @@ export function SEASetupForm({ open, onClose, existingSea }: SEASetupFormProps) 
     <Modal
       open={open}
       onClose={guardedClose}
-      title={isEdit ? 'Edit State Education Agency' : 'Set Up State Education Agency'}
-      description="Configure the root organization in your Ed-Fi hierarchy."
+      title={isEdit ? t('organization.forms.sea.editTitle') : t('organization.forms.sea.createTitle')}
+      description={t('organization.forms.sea.description')}
       size="2xl"
     >
       <FormProvider {...methods}>
@@ -115,7 +121,7 @@ export function SEASetupForm({ open, onClose, existingSea }: SEASetupFormProps) 
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-3">
               <Landmark className="w-4 h-4 text-[rgb(var(--state-info-fg))] " />
-              <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Identity</h3>
+              <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))]">{t('organization.form.identity')}</h3>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -128,8 +134,8 @@ export function SEASetupForm({ open, onClose, existingSea }: SEASetupFormProps) 
                 rules={{ valueAsNumber: true }}
                 label={
                   <>
-                    Ed-Fi ID
-                    <Tooltip content="The unique numeric code assigned by the state. If you don't have one, enter any positive integer as a placeholder." side="top">
+                    {t('organization.fields.edFiId')}
+                    <Tooltip content={t('organization.form.edFiIdHelp')} side="top">
                       <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
                     </Tooltip>
                   </>
@@ -137,7 +143,7 @@ export function SEASetupForm({ open, onClose, existingSea }: SEASetupFormProps) 
               />
               <TextField
                 name="nameOfInstitution"
-                label="Name"
+                label={t('organization.fields.name')}
                 required
                 placeholder="e.g., Texas Education Agency"
               />
@@ -146,12 +152,12 @@ export function SEASetupForm({ open, onClose, existingSea }: SEASetupFormProps) 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <TextField
                 name="shortNameOfInstitution"
-                label="Short Name"
+                label={t('organization.fields.shortName')}
                 placeholder="e.g., TEA"
               />
               <TextField
                 name="webSite"
-                label="Website"
+                label={t('organization.fields.website')}
                 type="url"
                 placeholder="https://tea.texas.gov"
               />
@@ -160,11 +166,11 @@ export function SEASetupForm({ open, onClose, existingSea }: SEASetupFormProps) 
             <SelectField
               name="operationalStatusDescriptor"
               className="w-48"
-              options={OPERATIONAL_STATUS_DESCRIPTORS}
+              options={operationalStatusOptions}
               label={
                 <>
-                  Operational Status
-                  <Tooltip content="Current operating status of this organization per Ed-Fi standards." side="top">
+                  {t('organization.fields.operationalStatus')}
+                  <Tooltip content={t('organization.form.operationalStatusHelp')} side="top">
                     <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
                   </Tooltip>
                 </>
@@ -200,10 +206,10 @@ export function SEASetupForm({ open, onClose, existingSea }: SEASetupFormProps) 
 
       <ModalFooter>
         <Button variant="outline" onClick={guardedClose} disabled={mutation.isPending}>
-          Cancel
+          {t('organization.actions.cancel')}
         </Button>
         <Button onClick={onSubmit} isLoading={mutation.isPending}>
-          {isEdit ? 'Update SEA' : 'Create SEA'}
+          {isEdit ? t('organization.forms.sea.updateAction') : t('organization.forms.sea.createAction')}
         </Button>
       </ModalFooter>
     </Modal>

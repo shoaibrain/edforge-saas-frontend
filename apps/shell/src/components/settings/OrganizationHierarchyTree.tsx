@@ -29,6 +29,7 @@ import {
   type LucideIcon,
 } from 'lucide-react'
 import { Button } from '@edforge/ui'
+import { useTranslation } from '@edforge/i18n'
 import { cn } from '@/lib/utils'
 import type { HierarchyNode } from '@aibrains/shared-types'
 import { SettingsSkeleton, SettingsEmptyState } from './SettingsShared'
@@ -45,31 +46,35 @@ export type TreeNodeAction = 'edit' | 'view-details' | 'add-child' | 'delete' | 
 
 const ORG_TYPE_CONFIG: Record<
   string,
-  { label: string; icon: LucideIcon; color: string; bgColor: string; borderColor: string }
+  { labelKey: string; fallbackLabel: string; icon: LucideIcon; color: string; bgColor: string; borderColor: string }
 > = {
   stateEducationAgency: {
-    label: 'SEA',
+    labelKey: 'organization.typeBadges.sea',
+    fallbackLabel: 'SEA',
     icon: Landmark,
     color: 'text-[rgb(var(--state-info-fg))] ',
     bgColor: 'bg-[rgb(var(--state-info-bg)/0.18)]',
     borderColor: 'border-[rgb(var(--state-info-border)/0.35)]',
   },
   localEducationAgency: {
-    label: 'LEA',
+    labelKey: 'organization.typeBadges.lea',
+    fallbackLabel: 'LEA',
     icon: Building2,
     color: 'text-[rgb(var(--action-secondary-fg))] ',
     bgColor: 'bg-[rgb(var(--action-primary-bg))]/10',
     borderColor: 'border-[rgb(var(--border-focus)/0.35)]',
   },
   educationServiceCenter: {
-    label: 'ESC',
+    labelKey: 'organization.typeBadges.esc',
+    fallbackLabel: 'ESC',
     icon: MapPin,
     color: 'text-amber-600 dark:text-amber-400',
     bgColor: 'bg-amber-500/10',
     borderColor: 'border-amber-500/20',
   },
   school: {
-    label: 'School',
+    labelKey: 'organization.typeBadges.school',
+    fallbackLabel: 'School',
     icon: School,
     color: 'text-[rgb(var(--state-info-fg))] ',
     bgColor: 'bg-[rgb(var(--state-info-bg)/0.18)]',
@@ -77,21 +82,21 @@ const ORG_TYPE_CONFIG: Record<
   },
 }
 
-const STATUS_CONFIG: Record<string, { dot: string; label: string }> = {
-  Active: { dot: 'bg-[rgb(var(--state-success-fg))]', label: 'Active' },
-  active: { dot: 'bg-[rgb(var(--state-success-fg))]', label: 'Active' },
-  Setup: { dot: 'bg-amber-500', label: 'Setup' },
-  setup: { dot: 'bg-amber-500', label: 'Setup' },
-  Inactive: { dot: 'bg-[rgb(var(--text-tertiary))]', label: 'Inactive' },
-  inactive: { dot: 'bg-[rgb(var(--text-tertiary))]', label: 'Inactive' },
-  Suspended: { dot: 'bg-[rgb(var(--state-warning-bg)/0.18)]0', label: 'Suspended' },
-  suspended: { dot: 'bg-[rgb(var(--state-warning-bg)/0.18)]0', label: 'Suspended' },
-  Closed: { dot: 'bg-[rgb(var(--state-danger-bg)/0.18)]0', label: 'Closed' },
-  closed: { dot: 'bg-[rgb(var(--state-danger-bg)/0.18)]0', label: 'Closed' },
-  Added: { dot: 'bg-[rgb(var(--state-info-bg)/0.18)]0', label: 'Added' },
-  added: { dot: 'bg-[rgb(var(--state-info-bg)/0.18)]0', label: 'Added' },
-  New: { dot: 'bg-violet-500', label: 'New' },
-  new: { dot: 'bg-violet-500', label: 'New' },
+const STATUS_CONFIG: Record<string, { dot: string; labelKey: string; fallbackLabel: string }> = {
+  Active: { dot: 'bg-[rgb(var(--state-success-fg))]', labelKey: 'organization.status.active', fallbackLabel: 'Active' },
+  active: { dot: 'bg-[rgb(var(--state-success-fg))]', labelKey: 'organization.status.active', fallbackLabel: 'Active' },
+  Setup: { dot: 'bg-amber-500', labelKey: 'organization.status.setup', fallbackLabel: 'Setup' },
+  setup: { dot: 'bg-amber-500', labelKey: 'organization.status.setup', fallbackLabel: 'Setup' },
+  Inactive: { dot: 'bg-[rgb(var(--text-tertiary))]', labelKey: 'organization.status.inactive', fallbackLabel: 'Inactive' },
+  inactive: { dot: 'bg-[rgb(var(--text-tertiary))]', labelKey: 'organization.status.inactive', fallbackLabel: 'Inactive' },
+  Suspended: { dot: 'bg-[rgb(var(--state-warning-bg)/0.18)]0', labelKey: 'organization.status.suspended', fallbackLabel: 'Suspended' },
+  suspended: { dot: 'bg-[rgb(var(--state-warning-bg)/0.18)]0', labelKey: 'organization.status.suspended', fallbackLabel: 'Suspended' },
+  Closed: { dot: 'bg-[rgb(var(--state-danger-bg)/0.18)]0', labelKey: 'organization.status.closed', fallbackLabel: 'Closed' },
+  closed: { dot: 'bg-[rgb(var(--state-danger-bg)/0.18)]0', labelKey: 'organization.status.closed', fallbackLabel: 'Closed' },
+  Added: { dot: 'bg-[rgb(var(--state-info-bg)/0.18)]0', labelKey: 'organization.status.added', fallbackLabel: 'Added' },
+  added: { dot: 'bg-[rgb(var(--state-info-bg)/0.18)]0', labelKey: 'organization.status.added', fallbackLabel: 'Added' },
+  New: { dot: 'bg-violet-500', labelKey: 'organization.status.new', fallbackLabel: 'New' },
+  new: { dot: 'bg-violet-500', labelKey: 'organization.status.new', fallbackLabel: 'New' },
 }
 
 const springTransition = { type: 'spring' as const, stiffness: 300, damping: 25 }
@@ -101,8 +106,10 @@ const springTransition = { type: 'spring' as const, stiffness: 300, damping: 25 
 // ============================================================================
 
 function TypeBadge({ type }: { type: string }) {
+  const { t } = useTranslation('settings')
   const config = ORG_TYPE_CONFIG[type] || {
-    label: type,
+    labelKey: '',
+    fallbackLabel: type,
     icon: Building2,
     color: 'text-[rgb(var(--text-secondary))] dark:text-[rgb(var(--text-tertiary))]',
     bgColor: 'bg-[rgb(var(--background-tertiary))]0/10',
@@ -120,7 +127,7 @@ function TypeBadge({ type }: { type: string }) {
       )}
     >
       <Icon className="w-3 h-3" />
-      {config.label}
+      {config.labelKey ? t(config.labelKey) : config.fallbackLabel}
     </span>
   )
 }
@@ -130,12 +137,14 @@ function TypeBadge({ type }: { type: string }) {
 // ============================================================================
 
 function StatusDot({ status }: { status: string }) {
-  const config = STATUS_CONFIG[status] || { dot: 'bg-[rgb(var(--text-tertiary))]', label: status }
+  const { t } = useTranslation('settings')
+  const config = STATUS_CONFIG[status] || { dot: 'bg-[rgb(var(--text-tertiary))]', labelKey: '', fallbackLabel: status }
+  const label = config.labelKey ? t(config.labelKey) : config.fallbackLabel
 
   return (
-    <span className="inline-flex items-center gap-1.5" title={config.label}>
+    <span className="inline-flex items-center gap-1.5" title={label}>
       <span className={cn('w-2 h-2 rounded-full', config.dot)} />
-      <span className="text-xs text-[rgb(var(--text-tertiary))]">{config.label}</span>
+      <span className="text-xs text-[rgb(var(--text-tertiary))]">{label}</span>
     </span>
   )
 }
@@ -149,7 +158,7 @@ function CountPill({ icon: Icon, count, label }: { icon: LucideIcon; count?: num
   return (
     <span
       className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs text-[rgb(var(--text-tertiary))] bg-[rgb(var(--background-tertiary))]"
-      title={`${count} ${label}`}
+      title={label}
     >
       <Icon className="w-3 h-3" />
       {count}
@@ -168,30 +177,31 @@ function TreeNodeActionMenu({
   node: HierarchyNode
   onAction: (action: TreeNodeAction, node: HierarchyNode) => void
 }) {
+  const { t } = useTranslation('settings')
   const actions: { action: TreeNodeAction; label: string; icon: LucideIcon; destructive?: boolean }[] = []
 
   // All types can view details
-  actions.push({ action: 'view-details', label: 'View Details', icon: Eye })
+  actions.push({ action: 'view-details', label: t('organization.tree.actions.viewDetails'), icon: Eye })
 
   // SEA, LEA, ESC can be edited (not schools — managed on their own page)
   if (node.type !== 'school') {
-    actions.push({ action: 'edit', label: 'Edit', icon: Pencil })
+    actions.push({ action: 'edit', label: t('organization.actions.edit'), icon: Pencil })
   }
 
   // Schools can change district or be unassigned
   if (node.type === 'school') {
-    actions.push({ action: 'change-district', label: 'Change District', icon: ArrowRightLeft })
-    actions.push({ action: 'unassign-school', label: 'Unassign from District', icon: X, destructive: true })
+    actions.push({ action: 'change-district', label: t('organization.tree.actions.changeDistrict'), icon: ArrowRightLeft })
+    actions.push({ action: 'unassign-school', label: t('organization.tree.actions.unassignFromDistrict'), icon: X, destructive: true })
   }
 
   // LEA can add schools
   if (node.type === 'localEducationAgency') {
-    actions.push({ action: 'add-child', label: 'Add School', icon: Plus })
+    actions.push({ action: 'add-child', label: t('organization.tree.actions.addSchool'), icon: Plus })
   }
 
   // LEA and ESC can be deleted (not SEA, not schools from here)
   if (node.type === 'localEducationAgency' || node.type === 'educationServiceCenter') {
-    actions.push({ action: 'delete', label: 'Delete', icon: Trash2, destructive: true })
+    actions.push({ action: 'delete', label: t('organization.actions.delete'), icon: Trash2, destructive: true })
   }
 
   return (
@@ -251,6 +261,7 @@ interface TreeNodeProps {
 }
 
 function TreeNode({ node, depth, expandedIds, onToggle, searchTerm, onNodeAction }: TreeNodeProps) {
+  const { t } = useTranslation('settings')
   const isExpanded = expandedIds.has(node.id)
   const hasChildren = node.children && node.children.length > 0
   const config = ORG_TYPE_CONFIG[node.type]
@@ -296,7 +307,7 @@ function TreeNode({ node, depth, expandedIds, onToggle, searchTerm, onNodeAction
         }}
         tabIndex={0}
         role="button"
-        aria-label={`${node.name} - ${config?.label || node.type}`}
+        aria-label={t('organization.tree.nodeAria', { name: node.name, type: config ? t(config.labelKey) : node.type })}
       >
         {/* Expand/Collapse Arrow */}
         <div className="w-5 h-5 flex items-center justify-center shrink-0">
@@ -332,9 +343,9 @@ function TreeNode({ node, depth, expandedIds, onToggle, searchTerm, onNodeAction
 
         {/* Count Pills */}
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          <CountPill icon={School} count={node.schoolCount} label="schools" />
-          <CountPill icon={GraduationCap} count={node.studentCount} label="students" />
-          <CountPill icon={Briefcase} count={node.staffCount} label="staff" />
+          <CountPill icon={School} count={node.schoolCount} label={t('organization.tree.counts.schools', { count: node.schoolCount ?? 0 })} />
+          <CountPill icon={GraduationCap} count={node.studentCount} label={t('organization.tree.counts.students', { count: node.studentCount ?? 0 })} />
+          <CountPill icon={Briefcase} count={node.staffCount} label={t('organization.tree.counts.staff', { count: node.staffCount ?? 0 })} />
         </div>
 
         {/* Action Menu */}
@@ -390,6 +401,7 @@ export function OrganizationHierarchyTree({
   isLoading,
   onNodeAction,
 }: OrganizationHierarchyTreeProps) {
+  const { t } = useTranslation('settings')
   const [searchTerm, setSearchTerm] = useState('')
   const [expandedIds, setExpandedIds] = useState<Set<string>>(() => {
     // Auto-expand top-level nodes (SEA + LEAs under SEA)
@@ -469,8 +481,8 @@ export function OrganizationHierarchyTree({
     return (
       <SettingsEmptyState
         icon={Building2}
-        title="No organization hierarchy"
-        description="Set up your State Education Agency to get started building your organizational structure."
+        title={t('organization.tree.emptyTitle')}
+        description={t('organization.tree.emptyDescription')}
       />
     )
   }
@@ -484,7 +496,7 @@ export function OrganizationHierarchyTree({
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[rgb(var(--text-tertiary))]" />
           <input
             type="text"
-            placeholder="Search organizations..."
+            placeholder={t('organization.tree.searchPlaceholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className={cn(
@@ -494,7 +506,7 @@ export function OrganizationHierarchyTree({
               'focus:outline-none focus:border-[rgb(var(--border-focus))] focus:ring-1 focus:ring-[rgb(var(--border-focus)/0.35)]',
               'transition-colors'
             )}
-            aria-label="Search organizations"
+            aria-label={t('organization.tree.searchAria')}
           />
         </div>
 
@@ -503,7 +515,7 @@ export function OrganizationHierarchyTree({
           variant="ghost"
           size="sm"
           onClick={isAllExpanded ? collapseAll : expandAll}
-          title={isAllExpanded ? 'Collapse All' : 'Expand All'}
+          title={isAllExpanded ? t('organization.tree.collapseAll') : t('organization.tree.expandAll')}
         >
           {isAllExpanded
             ? <ChevronsDownUp className="w-4 h-4" />
@@ -512,14 +524,14 @@ export function OrganizationHierarchyTree({
 
         {/* Count */}
         <span className="text-xs text-[rgb(var(--text-tertiary))]">
-          {totalNodes} {totalNodes === 1 ? 'organization' : 'organizations'}
+          {t('organization.tree.organizationCount', { count: totalNodes })}
         </span>
       </div>
 
       {/* Tree */}
       <div
         role="tree"
-        aria-label="Organization hierarchy"
+        aria-label={t('organization.tree.ariaLabel')}
         className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] p-2"
       >
         {/* SEA + Children */}
@@ -542,7 +554,7 @@ export function OrganizationHierarchyTree({
             )}
             <div className="px-3 py-1.5">
               <span className="text-xs font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))]">
-                Education Service Centers
+                {t('organization.entities.serviceCenters')}
               </span>
             </div>
             {educationServiceCenters.map((esc) => (
@@ -565,7 +577,7 @@ export function OrganizationHierarchyTree({
             <div className="my-2 mx-3 border-t border-[rgb(var(--border-primary))]" />
             <div className="px-3 py-1.5">
               <span className="text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400">
-                Unassigned Schools ({unassigned.length})
+                {t('organization.tree.unassignedSchools', { count: unassigned.length })}
               </span>
             </div>
             {unassigned.map((school) => (

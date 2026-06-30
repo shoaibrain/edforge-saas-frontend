@@ -1034,7 +1034,246 @@
   },
   "organization": {
     "title": "Organization",
-    "description": "Manage school and district settings"
+    "description": "Manage school and district settings",
+    "structure": {
+      "title": "Organization Structure",
+      "description": "Manage your education organization hierarchy",
+      "summary": "{{orgCount}} organizations · {{schoolCount}} schools"
+    },
+    "tabs": {
+      "hierarchy": "Hierarchy",
+      "networks": "Networks",
+      "details": "Details"
+    },
+    "entities": {
+      "stateEducationAgency": "State Education Agency",
+      "district": "District",
+      "serviceCenter": "Service Center",
+      "serviceCenters": "Education Service Centers"
+    },
+    "typeBadges": {
+      "sea": "SEA",
+      "lea": "LEA",
+      "esc": "ESC",
+      "school": "School"
+    },
+    "fields": {
+      "name": "Name",
+      "shortName": "Short Name",
+      "website": "Website",
+      "status": "Status",
+      "operationalStatus": "Operational Status",
+      "edFiId": "Ed-Fi ID",
+      "leaCategory": "LEA Category",
+      "charterStatus": "Charter Status",
+      "parentLea": "Parent LEA"
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "edit": "Edit",
+      "setUpSea": "Set Up SEA",
+      "editSea": "Edit SEA",
+      "setUpStateAgency": "Set Up State Agency",
+      "assignments": "Assignments",
+      "assignSchools": "Assign Schools",
+      "addCategory": "Add Category",
+      "addAddress": "Add Address",
+      "addPhone": "Add Phone",
+      "addCode": "Add Code"
+    },
+    "empty": {
+      "title": "Build your organization hierarchy",
+      "description": "Set up your State Education Agency, add districts (LEAs) and service centers (ESCs), then organize your schools under them for Ed-Fi compliant reporting."
+    },
+    "details": {
+      "rootOrganization": "Root organization",
+      "noSeaTitle": "No State Education Agency",
+      "noSeaDescription": "Set up your SEA to establish the root of your organization hierarchy."
+    },
+    "confirm": {
+      "unassignSchool": "Unassign \"{{name}}\" from its district?\n\nThe school will move to the unassigned schools list."
+    },
+    "toasts": {
+      "schoolUnassigned": "School unassigned from district"
+    },
+    "delete": {
+      "title": "Delete {{entity}}",
+      "description": "Are you sure you want to delete \"{{name}}\"?",
+      "irreversible": "This action cannot be undone.",
+      "schoolsBecomeUnassigned": "This district has {{count}} school that will become unassigned.",
+      "schoolsBecomeUnassigned_plural": "This district has {{count}} schools that will become unassigned.",
+      "typeToConfirm": "Type {{name}} to confirm:",
+      "confirmAction": "Delete {{entity}}"
+    },
+    "orphanedBanner": {
+      "title": "{{count}} school is not assigned to a district",
+      "title_plural": "{{count}} schools are not assigned to a district",
+      "description": "Assign schools to a Local Education Agency (LEA) for proper Ed-Fi reporting."
+    },
+    "tree": {
+      "emptyTitle": "No organization hierarchy",
+      "emptyDescription": "Set up your State Education Agency to get started building your organizational structure.",
+      "searchPlaceholder": "Search organizations...",
+      "searchAria": "Search organizations",
+      "expandAll": "Expand All",
+      "collapseAll": "Collapse All",
+      "organizationCount": "{{count}} organization",
+      "organizationCount_plural": "{{count}} organizations",
+      "ariaLabel": "Organization hierarchy",
+      "nodeAria": "{{name}} - {{type}}",
+      "unassignedSchools": "Unassigned Schools ({{count}})",
+      "actions": {
+        "viewDetails": "View Details",
+        "changeDistrict": "Change District",
+        "unassignFromDistrict": "Unassign from District",
+        "addSchool": "Add School"
+      },
+      "counts": {
+        "schools": "{{count}} school",
+        "schools_plural": "{{count}} schools",
+        "students": "{{count}} student",
+        "students_plural": "{{count}} students",
+        "staff": "{{count}} staff"
+      }
+    },
+    "forms": {
+      "sea": {
+        "createTitle": "Set Up State Education Agency",
+        "editTitle": "Edit State Education Agency",
+        "description": "Configure the root organization in your Ed-Fi hierarchy.",
+        "createAction": "Create SEA",
+        "updateAction": "Update SEA"
+      },
+      "lea": {
+        "createTitle": "Create District (LEA)",
+        "editTitle": "Edit District (LEA)",
+        "description": "Local Education Agencies manage schools and report to the state.",
+        "createAction": "Create District",
+        "updateAction": "Update District"
+      },
+      "esc": {
+        "createTitle": "Create Education Service Center",
+        "editTitle": "Edit Education Service Center",
+        "description": "Education Service Centers provide regional support to districts and schools.",
+        "createAction": "Create ESC",
+        "updateAction": "Update ESC"
+      }
+    },
+    "form": {
+      "identity": "Identity",
+      "basicInfo": "Basic Info",
+      "edFiIdHelp": "The unique numeric code assigned by the state. If you don't have one, enter any positive integer as a placeholder.",
+      "operationalStatusHelp": "Current operating status of this organization per Ed-Fi standards.",
+      "leaCategoryHelp": "The classification of this district. Independent is the most common for standard school districts.",
+      "charterStatusHelp": "Only applies to charter-type organizations.",
+      "parentLeaHelp": "Optional. Only needed if this district reports through another district, such as charter networks.",
+      "select": "Select...",
+      "none": "None",
+      "categories": "Categories",
+      "categoryHelp": "Ed-Fi organization category descriptor. Identifies the type of education organization.",
+      "categoryRequired": "At least one category is required.",
+      "categoryDescriptor": "Category Descriptor",
+      "selectCategory": "Select a category...",
+      "addresses": "Addresses",
+      "noAddresses": "No addresses added. Click Add Address to add one.",
+      "telephones": "Telephones",
+      "noTelephones": "No phone numbers added.",
+      "identificationCodes": "Identification Codes",
+      "noIdentificationCodes": "No identification codes added.",
+      "type": "Type",
+      "street": "Street",
+      "aptSuite": "Apt/Suite",
+      "city": "City",
+      "state": "State",
+      "selectState": "Select state...",
+      "postalCode": "Postal Code",
+      "number": "Number",
+      "system": "System",
+      "code": "Code"
+    },
+    "status": {
+      "Active": "Active",
+      "active": "Active",
+      "Added": "Added",
+      "added": "Added",
+      "ChangedAgency": "Changed Agency",
+      "Closed": "Closed",
+      "closed": "Closed",
+      "Inactive": "Inactive",
+      "inactive": "Inactive",
+      "New": "New",
+      "new": "New",
+      "Reopened": "Reopened",
+      "Future": "Future",
+      "setup": "Setup",
+      "suspended": "Suspended"
+    },
+    "descriptors": {
+      "educationOrganizationCategory": {
+        "Educator Preparation Provider": "Educator Preparation Provider",
+        "Education Organization Network": "Education Organization Network",
+        "Education Service Center": "Education Service Center",
+        "Local Education Agency": "Local Education Agency",
+        "Post Secondary Institution": "Post Secondary Institution",
+        "School": "School",
+        "State Education Agency": "State Education Agency",
+        "Other": "Other"
+      },
+      "leaCategory": {
+        "Independent": "Independent",
+        "CharterLEA": "Charter LEA",
+        "Intermediate": "Intermediate",
+        "SupervisoryUnion": "Supervisory Union",
+        "Other": "Other"
+      },
+      "charterStatus": {
+        "NotACharter": "Not a Charter School",
+        "SchoolCharter": "School Charter",
+        "CollegeUniversityCharter": "College/University Charter",
+        "OpenEnrollment": "Open Enrollment"
+      },
+      "addressType": {
+        "Physical": "Physical",
+        "Mailing": "Mailing",
+        "Shipping": "Shipping"
+      },
+      "telephoneType": {
+        "Main": "Main",
+        "Administrative": "Administrative",
+        "Fax": "Fax",
+        "Attendance": "Attendance"
+      }
+    },
+    "assignmentManager": {
+      "title": "Manage School Assignments",
+      "description": "Assign schools to districts (LEAs) for Ed-Fi reporting",
+      "searchPlaceholder": "Search schools...",
+      "filterAria": "Filter schools",
+      "bulkAssignAria": "Bulk assign selected schools",
+      "bulkAssignPlaceholder": "Bulk Assign To...",
+      "selectedCount": "{{count}} selected",
+      "noDistricts": "No districts available. Create a Local Education Agency first.",
+      "noMatches": "No schools match your filters.",
+      "unassigned": "Unassigned",
+      "changesReady": "{{selectedCount}} selected · {{changedCount}} changes ready",
+      "schoolsShown": "{{shown}} of {{total}} schools shown",
+      "applyChanges": "Apply Changes",
+      "applyChangesWithCount": "Apply Changes ({{count}})",
+      "filters": {
+        "allSchools": "All Schools",
+        "unassignedOnly": "Unassigned Only"
+      },
+      "table": {
+        "schoolName": "School Name",
+        "currentDistrict": "Current District",
+        "newAssignment": "New Assignment"
+      },
+      "toasts": {
+        "assigned": "Schools assigned successfully",
+        "noChanges": "No changes to apply"
+      }
+    }
   },
   "rbac": {
     "title": "Security Policies",
