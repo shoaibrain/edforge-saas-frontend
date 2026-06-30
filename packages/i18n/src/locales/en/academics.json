@@ -296,6 +296,21 @@
       "moveSection": "Move section",
       "archive": "Archive"
     },
+    "filters": {
+      "modes": {
+        "all": "All",
+        "active": "Active",
+        "atRisk": "At-risk",
+        "pending": "Pending"
+      },
+      "or": "or",
+      "searchPlaceholder": "Search by name or student ID...",
+      "gradeAria": "Grade",
+      "allGrades": "All Grades",
+      "statusAria": "Status",
+      "allStatus": "All Status",
+      "clear": "Clear"
+    },
     "actions": {
       "importIemis": "Import IEMIS",
       "importIemisAria": "Import from IEMIS",
@@ -1737,6 +1752,12 @@
       "type": {
         "title": "Enrollment Type",
         "description": "How the student is enrolling",
+        "labels": {
+          "new": "New Student",
+          "transfer": "Transfer",
+          "returning": "Returning Student",
+          "re_enrollment": "Re-enrollment"
+        },
         "newDescription": "First-time enrollment in this school",
         "transferDescription": "Transferring from another school",
         "returningDescription": "Previously enrolled and returning",
@@ -1764,7 +1785,22 @@
         "entryTypeHelp": "How the student is entering this school",
         "residencyStatus": "Residency Status",
         "selectResidencyStatus": "Select residency status",
-        "residencyHelp": "Student's residency relative to the school"
+        "residencyHelp": "Student's residency relative to the school",
+        "entryTypes": {
+          "nextYearSchool": "Next Year School",
+          "transferSameDistrict": "Transfer (Same District)",
+          "transferDifferentDistrict": "Transfer (Different District)",
+          "transferPrivateSchool": "Transfer (Private School)",
+          "reentrySameSchool": "Re-entry (Same School)",
+          "originalEntry": "Original Entry",
+          "transferInternational": "Transfer (International)"
+        },
+        "residencyStatuses": {
+          "adminUnitAndSchoolArea": "Resident — Admin Unit & School Area",
+          "adminUnitOnly": "Resident — Admin Unit Only",
+          "stateOnly": "Resident — State Only",
+          "notResident": "Not a Resident"
+        }
       },
       "settings": {
         "title": "Enrollment Settings",
@@ -1820,6 +1856,11 @@
         "phoneNumber": "Phone Number",
         "phoneType": "Phone Type",
         "selectType": "Select type",
+        "phoneTypes": {
+          "mobile": "Mobile",
+          "home": "Home",
+          "work": "Work"
+        },
         "physicalAddress": "Physical Address",
         "physicalAddressDescription": "Student's primary residential address",
         "mailingAddress": "Mailing Address",
@@ -1871,7 +1912,30 @@
         "demographicsDescription": "Ethnicity, language, and country of birth",
         "selectEthnicity": "Select ethnicity",
         "selectLanguage": "Select language",
-        "countryOfBirthPlaceholder": "Country of birth"
+        "countryOfBirthPlaceholder": "Country of birth",
+        "ethnicityOptions": {
+          "americanIndian": "American Indian / Alaska Native",
+          "asian": "Asian",
+          "black": "Black / African American",
+          "hispanic": "Hispanic / Latino",
+          "nativeHawaiian": "Native Hawaiian / Pacific Islander",
+          "white": "White",
+          "twoOrMore": "Two or More Races",
+          "preferNotToSay": "Prefer Not to Say"
+        },
+        "languageOptions": {
+          "english": "English",
+          "spanish": "Spanish",
+          "mandarin": "Mandarin Chinese",
+          "french": "French",
+          "arabic": "Arabic",
+          "hindi": "Hindi",
+          "portuguese": "Portuguese",
+          "vietnamese": "Vietnamese",
+          "korean": "Korean",
+          "tagalog": "Tagalog",
+          "other": "Other"
+        }
       },
       "review": {
         "edit": "Edit",

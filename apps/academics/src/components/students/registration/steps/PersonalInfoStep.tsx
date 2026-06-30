@@ -7,6 +7,7 @@
  * V2: Collapsible sections with icons, titles, and completion indicators.
  */
 
+import { useMemo } from 'react'
 import { FormProvider } from 'react-hook-form'
 import { User, CalendarDays } from 'lucide-react'
 import { TextField, SelectField, DateField } from '@edforge/forms'
@@ -37,6 +38,10 @@ export function PersonalInfoStep({
   const form = useWizardForm({ data, updateData, errors, clearError })
   const schoolId = useActiveSchoolId()
   const { options: filteredGradeOptions } = useSchoolEnabledGradeOptions(schoolId)
+  const genderOptions = useMemo(
+    () => GENDER_OPTIONS.map((option) => ({ value: option.value, label: t(`gender.${option.value}`) })),
+    [t],
+  )
 
   return (
     <FormProvider {...form}>
@@ -103,7 +108,7 @@ export function PersonalInfoStep({
             <SelectField
               name="gender"
               label={t('fields.gender')}
-              options={GENDER_OPTIONS}
+              options={genderOptions}
               placeholder={t('enrollmentModule.step.personal.selectGender')}
               required
             />

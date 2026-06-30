@@ -296,6 +296,21 @@
       "moveSection": "Section सार्नुहोस्",
       "archive": "Archive"
     },
+    "filters": {
+      "modes": {
+        "all": "सबै",
+        "active": "सक्रिय",
+        "atRisk": "जोखिममा",
+        "pending": "विचाराधीन"
+      },
+      "or": "वा",
+      "searchPlaceholder": "नाम वा विद्यार्थी ID बाट खोज्नुहोस्...",
+      "gradeAria": "ग्रेड",
+      "allGrades": "सबै ग्रेड",
+      "statusAria": "स्थिति",
+      "allStatus": "सबै स्थिति",
+      "clear": "हटाउनुहोस्"
+    },
     "actions": {
       "importIemis": "IEMIS Import",
       "importIemisAria": "IEMIS बाट import",
@@ -1737,6 +1752,12 @@
       "type": {
         "title": "भर्ना प्रकार",
         "description": "विद्यार्थी कसरी भर्ना हुँदैछ",
+        "labels": {
+          "new": "नयाँ विद्यार्थी",
+          "transfer": "स्थानान्तरण",
+          "returning": "फर्किएको विद्यार्थी",
+          "re_enrollment": "पुन: भर्ना"
+        },
         "newDescription": "यस विद्यालयमा पहिलो पटक भर्ना",
         "transferDescription": "अर्को विद्यालयबाट स्थानान्तरण",
         "returningDescription": "पहिले भर्ना भएको र फर्किएको",
@@ -1764,7 +1785,22 @@
         "entryTypeHelp": "विद्यार्थी यस विद्यालयमा कसरी प्रवेश गर्दैछ",
         "residencyStatus": "बसोबास स्थिति",
         "selectResidencyStatus": "बसोबास स्थिति छान्नुहोस्",
-        "residencyHelp": "विद्यालयसँग सम्बन्धित विद्यार्थीको बसोबास स्थिति"
+        "residencyHelp": "विद्यालयसँग सम्बन्धित विद्यार्थीको बसोबास स्थिति",
+        "entryTypes": {
+          "nextYearSchool": "अर्को वर्षको विद्यालय",
+          "transferSameDistrict": "स्थानान्तरण (उही जिल्ला)",
+          "transferDifferentDistrict": "स्थानान्तरण (फरक जिल्ला)",
+          "transferPrivateSchool": "स्थानान्तरण (निजी विद्यालय)",
+          "reentrySameSchool": "पुन: प्रवेश (उही विद्यालय)",
+          "originalEntry": "पहिलो प्रवेश",
+          "transferInternational": "स्थानान्तरण (अन्तर्राष्ट्रिय)"
+        },
+        "residencyStatuses": {
+          "adminUnitAndSchoolArea": "प्रशासनिक इकाइ र विद्यालय क्षेत्रको बासिन्दा",
+          "adminUnitOnly": "प्रशासनिक इकाइको मात्र बासिन्दा",
+          "stateOnly": "प्रदेशको मात्र बासिन्दा",
+          "notResident": "बासिन्दा होइन"
+        }
       },
       "settings": {
         "title": "भर्ना सेटिङहरू",
@@ -1820,6 +1856,11 @@
         "phoneNumber": "फोन नम्बर",
         "phoneType": "फोन प्रकार",
         "selectType": "प्रकार छान्नुहोस्",
+        "phoneTypes": {
+          "mobile": "मोबाइल",
+          "home": "घर",
+          "work": "कार्यालय"
+        },
         "physicalAddress": "भौतिक ठेगाना",
         "physicalAddressDescription": "विद्यार्थीको प्राथमिक बसोबास ठेगाना",
         "mailingAddress": "पत्राचार ठेगाना",
@@ -1871,7 +1912,30 @@
         "demographicsDescription": "जातीयता, भाषा र जन्म देश",
         "selectEthnicity": "जातीयता छान्नुहोस्",
         "selectLanguage": "भाषा छान्नुहोस्",
-        "countryOfBirthPlaceholder": "जन्म देश"
+        "countryOfBirthPlaceholder": "जन्म देश",
+        "ethnicityOptions": {
+          "americanIndian": "American Indian / Alaska Native",
+          "asian": "Asian",
+          "black": "Black / African American",
+          "hispanic": "Hispanic / Latino",
+          "nativeHawaiian": "Native Hawaiian / Pacific Islander",
+          "white": "White",
+          "twoOrMore": "Two or More Races",
+          "preferNotToSay": "भन्न चाहन्न"
+        },
+        "languageOptions": {
+          "english": "English",
+          "spanish": "Spanish",
+          "mandarin": "Mandarin Chinese",
+          "french": "French",
+          "arabic": "Arabic",
+          "hindi": "Hindi",
+          "portuguese": "Portuguese",
+          "vietnamese": "Vietnamese",
+          "korean": "Korean",
+          "tagalog": "Tagalog",
+          "other": "अन्य"
+        }
       },
       "review": {
         "edit": "सम्पादन गर्नुहोस्",

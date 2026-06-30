@@ -37,6 +37,23 @@ import {
 import { CollapsibleSection } from '../CollapsibleSection'
 import { useAcademicsI18n } from '../../../../lib/i18n'
 
+const ENTRY_TYPE_LABEL_KEYS: Record<string, string> = {
+  'Next year school': 'enrollmentModule.step.entry.entryTypes.nextYearSchool',
+  'Transfer from a public school in the same local education agency': 'enrollmentModule.step.entry.entryTypes.transferSameDistrict',
+  'Transfer from a public school in a different local education agency in the same state': 'enrollmentModule.step.entry.entryTypes.transferDifferentDistrict',
+  'Transfer from a private, non-religiously-affiliated school in the same state': 'enrollmentModule.step.entry.entryTypes.transferPrivateSchool',
+  'Re-entry from the same school with no interruption of schooling': 'enrollmentModule.step.entry.entryTypes.reentrySameSchool',
+  'Original entry into a United States school': 'enrollmentModule.step.entry.entryTypes.originalEntry',
+  'Transfer from a school outside of the country': 'enrollmentModule.step.entry.entryTypes.transferInternational',
+}
+
+const RESIDENCY_STATUS_LABEL_KEYS: Record<string, string> = {
+  'Resident of administrative unit and target school area': 'enrollmentModule.step.entry.residencyStatuses.adminUnitAndSchoolArea',
+  'Resident of administrative unit but not of target school area': 'enrollmentModule.step.entry.residencyStatuses.adminUnitOnly',
+  'Resident of this state but not of this administrative unit or school area': 'enrollmentModule.step.entry.residencyStatuses.stateOnly',
+  'Not a resident of this state': 'enrollmentModule.step.entry.residencyStatuses.notResident',
+}
+
 export function EnrollmentStep({
   data,
   updateData,
@@ -72,7 +89,7 @@ export function EnrollmentStep({
     () =>
       ENROLLMENT_TYPE_OPTIONS.map((o) => ({
         value: o.value,
-        label: o.label,
+        label: t(`enrollmentModule.step.type.labels.${o.value}`),
         description:
           o.value === 'new'
             ? t('enrollmentModule.step.type.newDescription')
@@ -82,6 +99,20 @@ export function EnrollmentStep({
                 ? t('enrollmentModule.step.type.returningDescription')
                 : t('enrollmentModule.step.type.reenrollmentDescription'),
       })),
+    [t],
+  )
+  const entryTypeOptions = useMemo(
+    () => ENTRY_TYPE_OPTIONS.map((option) => ({
+      value: option.value,
+      label: t(ENTRY_TYPE_LABEL_KEYS[option.value], { defaultValue: option.label }),
+    })),
+    [t],
+  )
+  const residencyStatusOptions = useMemo(
+    () => RESIDENCY_STATUS_OPTIONS.map((option) => ({
+      value: option.value,
+      label: t(RESIDENCY_STATUS_LABEL_KEYS[option.value], { defaultValue: option.label }),
+    })),
     [t],
   )
 
@@ -257,14 +288,14 @@ export function EnrollmentStep({
               name="enrollment.entryTypeDescriptor"
               label={t('enrollmentModule.step.entry.entryType')}
               placeholder={t('enrollmentModule.step.entry.selectEntryType')}
-              options={ENTRY_TYPE_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
+              options={entryTypeOptions}
               helperText={t('enrollmentModule.step.entry.entryTypeHelp')}
             />
             <SelectField
               name="enrollment.residencyStatusDescriptor"
               label={t('enrollmentModule.step.entry.residencyStatus')}
               placeholder={t('enrollmentModule.step.entry.selectResidencyStatus')}
-              options={RESIDENCY_STATUS_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
+              options={residencyStatusOptions}
               helperText={t('enrollmentModule.step.entry.residencyHelp')}
             />
           </div>

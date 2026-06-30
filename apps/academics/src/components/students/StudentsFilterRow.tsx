@@ -18,28 +18,29 @@ import {
   useStudentFilterActions,
   type StudentFilterMode,
 } from '../../stores/students.store'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 // ============================================================================
 // CONSTANTS
 // ============================================================================
 
-const MODE_CHIPS: { key: StudentFilterMode; label: string }[] = [
-  { key: 'all', label: 'All' },
-  { key: 'active', label: 'Active' },
-  { key: 'at-risk', label: 'At-risk' },
-  { key: 'pending', label: 'Pending' },
+const MODE_CHIPS: { key: StudentFilterMode; labelKey: string }[] = [
+  { key: 'all', labelKey: 'studentsModule.filters.modes.all' },
+  { key: 'active', labelKey: 'studentsModule.filters.modes.active' },
+  { key: 'at-risk', labelKey: 'studentsModule.filters.modes.atRisk' },
+  { key: 'pending', labelKey: 'studentsModule.filters.modes.pending' },
 ]
 
-// TODO(sprint-2 follow-up): Add `{ value: 'pending', label: 'Pending' }` here.
+// TODO(sprint-2 follow-up): Add the pending status once backend filtering supports it.
 // The StudentStatus enum (packages/shared-types/.../student.schema.ts) includes
 // 'pending' but this dropdown omits it. Deferred from Sprint 2 chip-fix scope.
-const STATUS_OPTIONS: { value: StudentStatus; label: string }[] = [
-  { value: 'active', label: 'Active' },
-  { value: 'inactive', label: 'Inactive' },
-  { value: 'graduated', label: 'Graduated' },
-  { value: 'transferred', label: 'Transferred' },
-  { value: 'withdrawn', label: 'Withdrawn' },
-  { value: 'suspended', label: 'Suspended' },
+const STATUS_OPTIONS: { value: StudentStatus; labelKey: string }[] = [
+  { value: 'active', labelKey: 'status.active' },
+  { value: 'inactive', labelKey: 'status.inactive' },
+  { value: 'graduated', labelKey: 'status.graduated' },
+  { value: 'transferred', labelKey: 'status.transferred' },
+  { value: 'withdrawn', labelKey: 'status.withdrawn' },
+  { value: 'suspended', labelKey: 'status.suspended' },
 ]
 
 // ============================================================================
@@ -55,6 +56,7 @@ interface StudentsFilterRowProps {
 }
 
 export function StudentsFilterRow({ schoolId }: StudentsFilterRowProps) {
+  const { t } = useAcademicsI18n()
   const filters = useStudentFilters()
   // Gate dropdown on profile-load — see EnrollmentTable comment.
   const { options: gradeOptions, isLoading: gradeOptionsLoading } =
@@ -101,12 +103,12 @@ export function StudentsFilterRow({ schoolId }: StudentsFilterRowProps) {
                 : 'bg-transparent text-[rgb(var(--text-tertiary))] border-[rgb(var(--border-primary))] hover:text-[rgb(var(--text-secondary))]'
             }`}
           >
-            {chip.label}
+            {t(chip.labelKey)}
           </button>
         )
       })}
 
-      <span className="text-xs mx-1 text-[rgb(var(--text-tertiary))]">or</span>
+      <span className="text-xs mx-1 text-[rgb(var(--text-tertiary))]">{t('studentsModule.filters.or')}</span>
 
       {/* Search input */}
       <Input
@@ -118,7 +120,7 @@ export function StudentsFilterRow({ schoolId }: StudentsFilterRowProps) {
             <button
               type="button"
               onClick={() => setLocalSearch('')}
-              aria-label="Clear search"
+              aria-label={t('dataTable.clearSearch')}
               className="text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))]"
             >
               <X className="w-3 h-3" />
@@ -127,30 +129,33 @@ export function StudentsFilterRow({ schoolId }: StudentsFilterRowProps) {
         }
         value={localSearch}
         onChange={(e) => setLocalSearch(e.target.value)}
-        placeholder="Search by name or student ID..."
+        placeholder={t('studentsModule.filters.searchPlaceholder')}
       />
 
       {/* Grade dropdown */}
       <Select
-        aria-label="Grade"
+        aria-label={t('studentsModule.filters.gradeAria')}
         size="sm"
         className="w-36"
         value={filters.gradeLevel ?? ''}
         onChange={(v) => setGradeLevel(v || null)}
         disabled={gradeOptionsLoading}
         loading={gradeOptionsLoading}
-        placeholder="All Grades"
-        options={gradeOptionsLoading ? [] : [{ value: '', label: 'All Grades' }, ...gradeOptions]}
+        placeholder={t('studentsModule.filters.allGrades')}
+        options={gradeOptionsLoading ? [] : [{ value: '', label: t('studentsModule.filters.allGrades') }, ...gradeOptions]}
       />
 
       {/* Status dropdown */}
       <Select
-        aria-label="Status"
+        aria-label={t('studentsModule.filters.statusAria')}
         size="sm"
         className="w-36"
         value={filters.status ?? ''}
         onChange={(v) => setStatus((v || null) as StudentStatus | null)}
-        options={[{ value: '', label: 'All Status' }, ...STATUS_OPTIONS]}
+        options={[
+          { value: '', label: t('studentsModule.filters.allStatus') },
+          ...STATUS_OPTIONS.map((status) => ({ value: status.value, label: t(status.labelKey) })),
+        ]}
       />
 
       {/* Clear */}
@@ -160,7 +165,7 @@ export function StudentsFilterRow({ schoolId }: StudentsFilterRowProps) {
           className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full text-[rgb(var(--accent-enrollment-text))] hover:opacity-80 transition-opacity"
         >
           <X className="w-3 h-3" />
-          Clear
+          {t('studentsModule.filters.clear')}
         </button>
       )}
     </div>
