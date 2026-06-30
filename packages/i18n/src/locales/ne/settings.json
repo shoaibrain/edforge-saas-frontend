@@ -1357,7 +1357,56 @@
       "newDistrictFallback": "नयाँ जिल्ला",
       "toasts": {
         "assigned": "{{schoolName}} {{districtName}} मा असाइन भयो",
-        "unassigned": "{{schoolName}} जिल्लाबाट हटाइयो"
+      "unassigned": "{{schoolName}} जिल्लाबाट हटाइयो"
+      }
+    },
+    "edfiExport": {
+      "title": "Ed-Fi निर्यात पूर्वावलोकन",
+      "description": "आफ्ना शिक्षा संगठनहरूका लागि Ed-Fi Data Standard JSON आउटपुट पूर्वावलोकन र प्रमाणीकरण गर्नुहोस्",
+      "previewEntityAria": "{{label}} पूर्वावलोकन गर्नुहोस्",
+      "selectEntityAria": "पूर्वावलोकन गर्न संस्था छान्नुहोस्",
+      "selectEntityPlaceholder": "पूर्वावलोकन गर्न संस्था छान्नुहोस्...",
+      "noEntities": "यस प्रकारका संस्था भेटिएनन्।",
+      "emptyPreview": "Ed-Fi JSON आउटपुट पूर्वावलोकन गर्न संस्था छान्नुहोस्",
+      "singletonSea": "एकल - प्रति टेनेन्ट एउटा SEA",
+      "noSea": "State Education Agency अझै कन्फिगर गरिएको छैन।",
+      "staffUnavailable": "कर्मचारी निर्यात पूर्वावलोकन People मोड्युलबाट उपलब्ध हुनेछ।",
+      "entities": {
+        "network": "संगठन नेटवर्क",
+        "staff": "कर्मचारी"
+      },
+      "actions": {
+        "copy": "कपी गर्नुहोस्",
+        "copyAria": "JSON क्लिपबोर्डमा कपी गर्नुहोस्",
+        "download": "डाउनलोड",
+        "downloadAria": "JSON फाइल डाउनलोड गर्नुहोस्"
+      },
+      "validation": {
+        "title": "प्रमाणीकरण",
+        "summary": "{{passCount}} पास, {{warnCount}} चेतावनी, {{failCount}} असफल",
+        "isSet": "{{field}} सेट गरिएको छ",
+        "isMissing": "{{field}} छुटेको छ",
+        "requiredMissing": "{{field}} आवश्यक छ तर छुटेको छ",
+        "optionalUnset": "{{field}} वैकल्पिक हो र सेट गरिएको छैन"
+      },
+      "toasts": {
+        "copied": "JSON क्लिपबोर्डमा कपी भयो"
+      }
+    },
+    "edfiPreview": {
+      "title": "Ed-Fi JSON पूर्वावलोकन",
+      "description": "रियल-टाइम Ed-Fi Data Standard आउटपुट",
+      "generateError": "पूर्वावलोकन बनाउन सकिएन",
+      "fieldsComplete": "{{filled}}/{{total}} फिल्ड",
+      "validation": {
+        "good": "राम्रो Ed-Fi अनुपालन",
+        "partial": "आंशिक अनुपालन - थप फिल्डहरू भर्नुहोस्",
+        "minimal": "न्यूनतम डाटा - पहिले आधारभूत फिल्डहरू भर्नुहोस्"
+      },
+      "actions": {
+        "copyJson": "JSON कपी गर्नुहोस्",
+        "copyAria": "Ed-Fi JSON क्लिपबोर्डमा कपी गर्नुहोस्",
+        "copied": "कपी भयो!"
       }
     },
     "assignmentManager": {
