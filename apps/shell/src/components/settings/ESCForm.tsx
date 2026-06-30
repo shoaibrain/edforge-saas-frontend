@@ -9,6 +9,7 @@ import { useEffect } from 'react'
 import { useForm, FormProvider, zodResolver, TextField, SelectField } from '@edforge/forms'
 import { useFormDirtyGuard } from '@/hooks/useFormDirtyGuard'
 import { Modal, ModalFooter, Button } from '@edforge/ui'
+import { useTranslation } from '@edforge/i18n'
 import { MapPin, Network, Info } from 'lucide-react'
 import {
   createEducationServiceCenterSchema,
@@ -45,6 +46,7 @@ export interface ESCFormProps {
 // ============================================================================
 
 export function ESCForm({ open, onClose, mode, editId }: ESCFormProps) {
+  const { t } = useTranslation('settings')
   const isEdit = mode === 'edit'
   const createMutation = useCreateEsc()
   const updateMutation = useUpdateEsc()
@@ -97,6 +99,10 @@ export function ESCForm({ open, onClose, mode, editId }: ESCFormProps) {
   }, [open, reset])
 
   const isPending = createMutation.isPending || updateMutation.isPending
+  const operationalStatusOptions = OPERATIONAL_STATUS_DESCRIPTORS.map((option) => ({
+    ...option,
+    label: t(`organization.status.${option.value}`, { defaultValue: option.label }),
+  }))
 
   const onSubmit = handleSubmit((data) => {
     const cleanData = {
@@ -124,8 +130,8 @@ export function ESCForm({ open, onClose, mode, editId }: ESCFormProps) {
     <Modal
       open={open}
       onClose={guardedClose}
-      title={isEdit ? 'Edit Education Service Center' : 'Create Education Service Center'}
-      description="Education Service Centers provide regional support to districts and schools."
+      title={isEdit ? t('organization.forms.esc.editTitle') : t('organization.forms.esc.createTitle')}
+      description={t('organization.forms.esc.description')}
       size="2xl"
     >
       <FormProvider {...methods}>
@@ -134,7 +140,7 @@ export function ESCForm({ open, onClose, mode, editId }: ESCFormProps) {
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-3">
               <MapPin className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-              <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Basic Info</h3>
+              <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))]">{t('organization.form.basicInfo')}</h3>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -147,8 +153,8 @@ export function ESCForm({ open, onClose, mode, editId }: ESCFormProps) {
                 rules={{ valueAsNumber: true }}
                 label={
                   <>
-                    Ed-Fi ID
-                    <Tooltip content="The unique numeric code assigned by the state. If you don't have one, enter any positive integer as a placeholder." side="top">
+                    {t('organization.fields.edFiId')}
+                    <Tooltip content={t('organization.form.edFiIdHelp')} side="top">
                       <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
                     </Tooltip>
                   </>
@@ -156,7 +162,7 @@ export function ESCForm({ open, onClose, mode, editId }: ESCFormProps) {
               />
               <TextField
                 name="nameOfInstitution"
-                label="Name"
+                label={t('organization.fields.name')}
                 required
                 placeholder="e.g., Region 13 ESC"
               />
@@ -165,12 +171,12 @@ export function ESCForm({ open, onClose, mode, editId }: ESCFormProps) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <TextField
                 name="shortNameOfInstitution"
-                label="Short Name"
+                label={t('organization.fields.shortName')}
                 placeholder="e.g., ESC 13"
               />
               <TextField
                 name="webSite"
-                label="Website"
+                label={t('organization.fields.website')}
                 type="url"
                 placeholder="https://www.esc13.net"
               />
@@ -179,11 +185,11 @@ export function ESCForm({ open, onClose, mode, editId }: ESCFormProps) {
             <SelectField
               name="operationalStatusDescriptor"
               className="w-48"
-              options={OPERATIONAL_STATUS_DESCRIPTORS}
+              options={operationalStatusOptions}
               label={
                 <>
-                  Operational Status
-                  <Tooltip content="Current operating status of this organization per Ed-Fi standards." side="top">
+                  {t('organization.fields.operationalStatus')}
+                  <Tooltip content={t('organization.form.operationalStatusHelp')} side="top">
                     <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
                   </Tooltip>
                 </>
@@ -197,13 +203,13 @@ export function ESCForm({ open, onClose, mode, editId }: ESCFormProps) {
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-3">
               <Network className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
-              <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Hierarchy</h3>
+              <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))]">{t('organization.tabs.hierarchy')}</h3>
             </div>
             <SelectField
               name="stateEducationAgencyId"
-              label="State Education Agency"
+              label={t('organization.entities.stateEducationAgency')}
               className="w-72"
-              placeholder="None"
+              placeholder={t('organization.form.none')}
               clearable
               emptyValue={undefined}
               options={sea ? [{ value: sea.id, label: sea.nameOfInstitution }] : []}
@@ -223,10 +229,10 @@ export function ESCForm({ open, onClose, mode, editId }: ESCFormProps) {
 
       <ModalFooter>
         <Button variant="outline" onClick={guardedClose} disabled={isPending}>
-          Cancel
+          {t('organization.actions.cancel')}
         </Button>
         <Button onClick={onSubmit} isLoading={isPending}>
-          {isEdit ? 'Update ESC' : 'Create ESC'}
+          {isEdit ? t('organization.forms.esc.updateAction') : t('organization.forms.esc.createAction')}
         </Button>
       </ModalFooter>
     </Modal>

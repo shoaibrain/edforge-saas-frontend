@@ -17,6 +17,7 @@ import {
   Filter,
 } from 'lucide-react'
 import { Button, Select } from '@edforge/ui'
+import { useTranslation } from '@edforge/i18n'
 import { useQueryClient, useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { extractApiErrorMessage } from '@edforge/api-client'
@@ -56,6 +57,7 @@ export function SchoolAssignmentManager({
   schools,
   mode = 'all',
 }: SchoolAssignmentManagerProps) {
+  const { t } = useTranslation('settings')
   const queryClient = useQueryClient()
   const { data: leasData } = useLocalEducationAgencies()
   const leas = leasData?.items || []
@@ -97,7 +99,7 @@ export function SchoolAssignmentManager({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: edOrgKeys.hierarchy() })
       queryClient.invalidateQueries({ queryKey: ['schools'] })
-      toast.success('Schools assigned successfully')
+      toast.success(t('organization.assignmentManager.toasts.assigned'))
       onClose()
     },
     onError: (error: Error) => {
@@ -166,7 +168,7 @@ export function SchoolAssignmentManager({
 
   const handleSubmit = () => {
     if (changedCount === 0) {
-      toast.error('No changes to apply')
+      toast.error(t('organization.assignmentManager.toasts.noChanges'))
       return
     }
     assignMutation.mutate(assignments)
@@ -207,10 +209,10 @@ export function SchoolAssignmentManager({
             </div>
             <div>
               <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
-                Manage School Assignments
+                {t('organization.assignmentManager.title')}
               </h2>
               <p className="text-sm text-[rgb(var(--text-tertiary))]">
-                Assign schools to districts (LEAs) for Ed-Fi reporting
+                {t('organization.assignmentManager.description')}
               </p>
             </div>
           </div>
@@ -229,7 +231,7 @@ export function SchoolAssignmentManager({
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[rgb(var(--text-tertiary))]" />
             <input
               type="text"
-              placeholder="Search schools..."
+              placeholder={t('organization.assignmentManager.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className={cn(
@@ -245,13 +247,13 @@ export function SchoolAssignmentManager({
           <div className="flex items-center gap-2">
             <Filter className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
             <Select
-              aria-label="Filter schools"
+              aria-label={t('organization.assignmentManager.filterAria')}
               className="w-44"
               value={filterType}
               onChange={(v) => setFilterType(v ?? 'all')}
               options={[
-                { value: 'all', label: 'All Schools' },
-                { value: 'unassigned', label: 'Unassigned Only' },
+                { value: 'all', label: t('organization.assignmentManager.filters.allSchools') },
+                { value: 'unassigned', label: t('organization.assignmentManager.filters.unassignedOnly') },
                 ...leas.map((lea) => ({ value: lea.id, label: lea.nameOfInstitution })),
               ]}
             />
@@ -261,13 +263,13 @@ export function SchoolAssignmentManager({
           {selectedCount > 0 && (
             <div className="flex items-center gap-2 ml-auto">
               <span className="text-xs text-[rgb(var(--text-tertiary))]">
-                {selectedCount} selected
+                {t('organization.assignmentManager.selectedCount', { count: selectedCount })}
               </span>
               <Select
-                aria-label="Bulk assign selected schools"
+                aria-label={t('organization.assignmentManager.bulkAssignAria')}
                 size="sm"
                 className="w-48"
-                placeholder="Bulk Assign To..."
+                placeholder={t('organization.assignmentManager.bulkAssignPlaceholder')}
                 value={null}
                 onChange={(v) => {
                   if (v) bulkAssign(v)
@@ -284,14 +286,14 @@ export function SchoolAssignmentManager({
             <div className="text-center py-12">
               <Building2 className="w-10 h-10 text-[rgb(var(--text-tertiary))] mx-auto mb-3" />
               <p className="text-sm text-[rgb(var(--text-secondary))]">
-                No districts available. Create a Local Education Agency first.
+                {t('organization.assignmentManager.noDistricts')}
               </p>
             </div>
           ) : filteredAssignments.length === 0 ? (
             <div className="text-center py-12">
               <School className="w-10 h-10 text-[rgb(var(--text-tertiary))] mx-auto mb-3" />
               <p className="text-sm text-[rgb(var(--text-secondary))]">
-                No schools match your filters.
+                {t('organization.assignmentManager.noMatches')}
               </p>
             </div>
           ) : (
@@ -307,13 +309,13 @@ export function SchoolAssignmentManager({
                     />
                   </th>
                   <th className="text-left p-3 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase tracking-wider">
-                    School Name
+                    {t('organization.assignmentManager.table.schoolName')}
                   </th>
                   <th className="text-left p-3 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase tracking-wider">
-                    Current District
+                    {t('organization.assignmentManager.table.currentDistrict')}
                   </th>
                   <th className="text-left p-3 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase tracking-wider">
-                    New Assignment
+                    {t('organization.assignmentManager.table.newAssignment')}
                   </th>
                   <th className="w-12"></th>
                 </tr>
@@ -351,7 +353,7 @@ export function SchoolAssignmentManager({
                       <td className="p-3">
                         <span className="text-sm text-[rgb(var(--text-secondary))]">
                           {currentLea?.nameOfInstitution || (
-                            <span className="text-amber-600 dark:text-amber-400">Unassigned</span>
+                            <span className="text-amber-600 dark:text-amber-400">{t('organization.assignmentManager.unassigned')}</span>
                           )}
                         </span>
                       </td>
@@ -359,7 +361,7 @@ export function SchoolAssignmentManager({
                         <Select
                           aria-label={`New district for ${assignment.schoolName}`}
                           size="sm"
-                          placeholder="None"
+                          placeholder={t('organization.form.none')}
                           clearable
                           value={assignment.newLeaId || null}
                           onChange={(v) => updateAssignment(assignment.schoolId, v)}
@@ -385,17 +387,17 @@ export function SchoolAssignmentManager({
           <div className="text-sm text-[rgb(var(--text-tertiary))]">
             {selectedCount > 0 ? (
               <span>
-                {selectedCount} selected • {changedCount} changes ready
+                {t('organization.assignmentManager.changesReady', { selectedCount, changedCount })}
               </span>
             ) : (
               <span>
-                {filteredAssignments.length} of {assignments.length} schools shown
+                {t('organization.assignmentManager.schoolsShown', { shown: filteredAssignments.length, total: assignments.length })}
               </span>
             )}
           </div>
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="sm" onClick={onClose} disabled={assignMutation.isPending}>
-              Cancel
+              {t('organization.actions.cancel')}
             </Button>
             <Button
               size="sm"
@@ -403,7 +405,7 @@ export function SchoolAssignmentManager({
               disabled={changedCount === 0 || assignMutation.isPending}
               isLoading={assignMutation.isPending}
             >
-              Apply Changes {changedCount > 0 && `(${changedCount})`}
+              {changedCount > 0 ? t('organization.assignmentManager.applyChangesWithCount', { count: changedCount }) : t('organization.assignmentManager.applyChanges')}
             </Button>
           </div>
         </div>

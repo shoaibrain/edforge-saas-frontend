@@ -8,6 +8,7 @@
 import { useFieldArray, useFormContext, TextField, SelectField } from '@edforge/forms'
 import { Plus, Trash2, Hash } from 'lucide-react'
 import { Button } from '@edforge/ui'
+import { useTranslation } from '@edforge/i18n'
 import { EDUCATION_ORGANIZATION_IDENTIFICATION_SYSTEM_DESCRIPTORS } from '@aibrains/shared-types'
 
 interface IdentificationCodeArraySectionProps {
@@ -15,6 +16,7 @@ interface IdentificationCodeArraySectionProps {
 }
 
 export function IdentificationCodeArraySection({ name = 'identificationCodes' }: IdentificationCodeArraySectionProps) {
+  const { t } = useTranslation('settings')
   const { control } = useFormContext()
   const { fields, append, remove } = useFieldArray({ control, name })
 
@@ -23,7 +25,7 @@ export function IdentificationCodeArraySection({ name = 'identificationCodes' }:
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Hash className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
-          <span className="text-sm font-medium text-[rgb(var(--text-primary))]">Identification Codes</span>
+          <span className="text-sm font-medium text-[rgb(var(--text-primary))]">{t('organization.form.identificationCodes')}</span>
         </div>
         <Button
           type="button"
@@ -38,13 +40,13 @@ export function IdentificationCodeArraySection({ name = 'identificationCodes' }:
           }
         >
           <Plus className="w-3.5 h-3.5" />
-          Add Code
+          {t('organization.actions.addCode')}
         </Button>
       </div>
 
       {fields.length === 0 && (
         <p className="text-xs text-[rgb(var(--text-tertiary))] py-3 text-center">
-          No identification codes added.
+          {t('organization.form.noIdentificationCodes')}
         </p>
       )}
 
@@ -55,13 +57,13 @@ export function IdentificationCodeArraySection({ name = 'identificationCodes' }:
         >
           <SelectField
             name={`${name}.${index}.educationOrganizationIdentificationSystemDescriptor`}
-            label="System"
+            label={t('organization.form.system')}
             options={EDUCATION_ORGANIZATION_IDENTIFICATION_SYSTEM_DESCRIPTORS}
             className="w-52 shrink-0"
           />
           <TextField
             name={`${name}.${index}.identificationCode`}
-            label="Code"
+            label={t('organization.form.code')}
             placeholder="e.g., 1234567"
             className="flex-1"
           />

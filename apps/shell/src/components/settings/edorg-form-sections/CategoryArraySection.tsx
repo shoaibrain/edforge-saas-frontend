@@ -13,6 +13,7 @@ import { useEffect } from 'react'
 import { useFieldArray, useFormContext, SelectField } from '@edforge/forms'
 import { Plus, Trash2, Tag, Info } from 'lucide-react'
 import { Button, Tooltip } from '@edforge/ui'
+import { useTranslation } from '@edforge/i18n'
 import {
   EDUCATION_ORGANIZATION_CATEGORY_DESCRIPTORS,
   ORG_TYPE_DEFAULT_CATEGORY,
@@ -25,8 +26,13 @@ interface CategoryArraySectionProps {
 }
 
 export function CategoryArraySection({ name = 'categories', orgType }: CategoryArraySectionProps) {
+  const { t } = useTranslation('settings')
   const { control, setValue, getValues } = useFormContext()
   const { fields, append, remove } = useFieldArray({ control, name })
+  const categoryOptions = EDUCATION_ORGANIZATION_CATEGORY_DESCRIPTORS.map((option) => ({
+    ...option,
+    label: t(`organization.descriptors.educationOrganizationCategory.${option.label}`, { defaultValue: option.label }),
+  }))
 
   // Auto-populate default category when orgType is provided and the first field is empty
   useEffect(() => {
@@ -47,9 +53,9 @@ export function CategoryArraySection({ name = 'categories', orgType }: CategoryA
         <div className="flex items-center gap-2">
           <Tag className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
           <span className="text-sm font-medium text-[rgb(var(--text-primary))]">
-            Categories <span className="text-[rgb(var(--state-danger-fg))]">*</span>
+            {t('organization.form.categories')} <span className="text-[rgb(var(--state-danger-fg))]">*</span>
           </span>
-          <Tooltip content="Ed-Fi organization category descriptor. Identifies the type of education organization." side="right">
+          <Tooltip content={t('organization.form.categoryHelp')} side="right">
             <Info className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))] cursor-help" />
           </Tooltip>
         </div>
@@ -63,13 +69,13 @@ export function CategoryArraySection({ name = 'categories', orgType }: CategoryA
           }
         >
           <Plus className="w-3.5 h-3.5" />
-          Add Category
+          {t('organization.actions.addCategory')}
         </Button>
       </div>
 
       {fields.length === 0 && (
         <p className="text-xs text-amber-600 dark:text-amber-400 py-2">
-          At least one category is required.
+          {t('organization.form.categoryRequired')}
         </p>
       )}
 
@@ -81,9 +87,9 @@ export function CategoryArraySection({ name = 'categories', orgType }: CategoryA
           <div className="flex-1">
             <SelectField
               name={`${name}.${index}.educationOrganizationCategoryDescriptor`}
-              label="Category Descriptor"
-              placeholder="Select a category..."
-              options={EDUCATION_ORGANIZATION_CATEGORY_DESCRIPTORS}
+              label={t('organization.form.categoryDescriptor')}
+              placeholder={t('organization.form.selectCategory')}
+              options={categoryOptions}
             />
           </div>
           {fields.length > 1 && (

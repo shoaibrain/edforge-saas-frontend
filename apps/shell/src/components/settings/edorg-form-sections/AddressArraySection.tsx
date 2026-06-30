@@ -8,6 +8,7 @@
 import { useFieldArray, useFormContext, TextField, SelectField } from '@edforge/forms'
 import { Plus, Trash2, MapPin } from 'lucide-react'
 import { Button } from '@edforge/ui'
+import { useTranslation } from '@edforge/i18n'
 import {
   ADDRESS_TYPE_DESCRIPTORS,
   STATE_ABBREVIATION_DESCRIPTORS,
@@ -20,15 +21,20 @@ interface AddressArraySectionProps {
 const STATE_OPTIONS = STATE_ABBREVIATION_DESCRIPTORS.map((st) => ({ value: st, label: st }))
 
 export function AddressArraySection({ name = 'addresses' }: AddressArraySectionProps) {
+  const { t } = useTranslation('settings')
   const { control } = useFormContext()
   const { fields, append, remove } = useFieldArray({ control, name })
+  const addressTypeOptions = ADDRESS_TYPE_DESCRIPTORS.map((option) => ({
+    ...option,
+    label: t(`organization.descriptors.addressType.${option.value}`, { defaultValue: option.label }),
+  }))
 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <MapPin className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
-          <span className="text-sm font-medium text-[rgb(var(--text-primary))]">Addresses</span>
+          <span className="text-sm font-medium text-[rgb(var(--text-primary))]">{t('organization.form.addresses')}</span>
         </div>
         <Button
           type="button"
@@ -46,13 +52,13 @@ export function AddressArraySection({ name = 'addresses' }: AddressArraySectionP
           }
         >
           <Plus className="w-3.5 h-3.5" />
-          Add Address
+          {t('organization.actions.addAddress')}
         </Button>
       </div>
 
       {fields.length === 0 && (
         <p className="text-xs text-[rgb(var(--text-tertiary))] py-3 text-center">
-          No addresses added. Click "Add Address" to add one.
+          {t('organization.form.noAddresses')}
         </p>
       )}
 
@@ -73,12 +79,12 @@ export function AddressArraySection({ name = 'addresses' }: AddressArraySectionP
           <div className="grid grid-cols-3 gap-3 pr-8">
             <SelectField
               name={`${name}.${index}.addressTypeDescriptor`}
-              label="Type"
-              options={ADDRESS_TYPE_DESCRIPTORS}
+              label={t('organization.form.type')}
+              options={addressTypeOptions}
             />
             <TextField
               name={`${name}.${index}.streetNumberName`}
-              label="Street"
+              label={t('organization.form.street')}
               placeholder="123 Main St"
               className="col-span-2"
             />
@@ -88,12 +94,12 @@ export function AddressArraySection({ name = 'addresses' }: AddressArraySectionP
           <div className="grid grid-cols-3 gap-3">
             <TextField
               name={`${name}.${index}.apartmentRoomSuiteNumber`}
-              label="Apt/Suite"
+              label={t('organization.form.aptSuite')}
               placeholder="Suite 100"
             />
             <TextField
               name={`${name}.${index}.city`}
-              label="City"
+              label={t('organization.form.city')}
               placeholder="Austin"
               className="col-span-2"
             />
@@ -103,13 +109,13 @@ export function AddressArraySection({ name = 'addresses' }: AddressArraySectionP
           <div className="grid grid-cols-2 gap-3">
             <SelectField
               name={`${name}.${index}.stateAbbreviationDescriptor`}
-              label="State"
-              placeholder="Select state..."
+              label={t('organization.form.state')}
+              placeholder={t('organization.form.selectState')}
               options={STATE_OPTIONS}
             />
             <TextField
               name={`${name}.${index}.postalCode`}
-              label="Postal Code"
+              label={t('organization.form.postalCode')}
               placeholder="78701"
             />
           </div>

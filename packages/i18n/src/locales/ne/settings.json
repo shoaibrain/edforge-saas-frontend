@@ -1034,7 +1034,246 @@
   },
   "organization": {
     "title": "संगठन",
-    "description": "विद्यालय र जिल्ला सेटिङ्हरू व्यवस्थापन गर्नुहोस्"
+    "description": "विद्यालय र जिल्ला सेटिङ्हरू व्यवस्थापन गर्नुहोस्",
+    "structure": {
+      "title": "संगठन संरचना",
+      "description": "शिक्षा संगठन पदानुक्रम व्यवस्थापन गर्नुहोस्",
+      "summary": "{{orgCount}} संगठन · {{schoolCount}} विद्यालय"
+    },
+    "tabs": {
+      "hierarchy": "पदानुक्रम",
+      "networks": "नेटवर्कहरू",
+      "details": "विवरण"
+    },
+    "entities": {
+      "stateEducationAgency": "राज्य शिक्षा निकाय",
+      "district": "जिल्ला",
+      "serviceCenter": "सेवा केन्द्र",
+      "serviceCenters": "शिक्षा सेवा केन्द्रहरू"
+    },
+    "typeBadges": {
+      "sea": "SEA",
+      "lea": "LEA",
+      "esc": "ESC",
+      "school": "विद्यालय"
+    },
+    "fields": {
+      "name": "नाम",
+      "shortName": "छोटो नाम",
+      "website": "वेबसाइट",
+      "status": "स्थिति",
+      "operationalStatus": "सञ्चालन स्थिति",
+      "edFiId": "Ed-Fi ID",
+      "leaCategory": "LEA श्रेणी",
+      "charterStatus": "चार्टर स्थिति",
+      "parentLea": "अभिभावक LEA"
+    },
+    "actions": {
+      "cancel": "रद्द गर्नुहोस्",
+      "delete": "मेटाउनुहोस्",
+      "edit": "सम्पादन गर्नुहोस्",
+      "setUpSea": "SEA सेटअप गर्नुहोस्",
+      "editSea": "SEA सम्पादन गर्नुहोस्",
+      "setUpStateAgency": "राज्य निकाय सेटअप गर्नुहोस्",
+      "assignments": "नियुक्तिहरू",
+      "assignSchools": "विद्यालय नियुक्त गर्नुहोस्",
+      "addCategory": "श्रेणी थप्नुहोस्",
+      "addAddress": "ठेगाना थप्नुहोस्",
+      "addPhone": "फोन थप्नुहोस्",
+      "addCode": "कोड थप्नुहोस्"
+    },
+    "empty": {
+      "title": "आफ्नो संगठन पदानुक्रम बनाउनुहोस्",
+      "description": "State Education Agency सेटअप गर्नुहोस्, जिल्ला (LEA) र सेवा केन्द्र (ESC) थप्नुहोस्, त्यसपछि Ed-Fi रिपोर्टिङका लागि विद्यालयहरू व्यवस्थित गर्नुहोस्।"
+    },
+    "details": {
+      "rootOrganization": "मूल संगठन",
+      "noSeaTitle": "राज्य शिक्षा निकाय छैन",
+      "noSeaDescription": "संगठन पदानुक्रमको मूल स्थापना गर्न SEA सेटअप गर्नुहोस्।"
+    },
+    "confirm": {
+      "unassignSchool": "\"{{name}}\" लाई यसको जिल्लाबाट हटाउने?\n\nविद्यालय असाइन नगरिएका विद्यालयहरूको सूचीमा सर्नेछ।"
+    },
+    "toasts": {
+      "schoolUnassigned": "विद्यालय जिल्लाबाट हटाइयो"
+    },
+    "delete": {
+      "title": "{{entity}} मेटाउनुहोस्",
+      "description": "के तपाईं \"{{name}}\" मेटाउन चाहनुहुन्छ?",
+      "irreversible": "यो कार्य फिर्ता गर्न सकिँदैन।",
+      "schoolsBecomeUnassigned": "यस जिल्लामा {{count}} विद्यालय छ जुन असाइन नगरिएको हुनेछ।",
+      "schoolsBecomeUnassigned_plural": "यस जिल्लामा {{count}} विद्यालयहरू छन् जुन असाइन नगरिएका हुनेछन्।",
+      "typeToConfirm": "पुष्टि गर्न {{name}} टाइप गर्नुहोस्:",
+      "confirmAction": "{{entity}} मेटाउनुहोस्"
+    },
+    "orphanedBanner": {
+      "title": "{{count}} विद्यालय जिल्लामा असाइन गरिएको छैन",
+      "title_plural": "{{count}} विद्यालयहरू जिल्लामा असाइन गरिएका छैनन्",
+      "description": "उचित Ed-Fi रिपोर्टिङका लागि विद्यालयहरूलाई Local Education Agency (LEA) मा असाइन गर्नुहोस्।"
+    },
+    "tree": {
+      "emptyTitle": "संगठन पदानुक्रम छैन",
+      "emptyDescription": "संगठन संरचना बनाउन सुरु गर्न State Education Agency सेटअप गर्नुहोस्।",
+      "searchPlaceholder": "संगठनहरू खोज्नुहोस्...",
+      "searchAria": "संगठनहरू खोज्नुहोस्",
+      "expandAll": "सबै विस्तार गर्नुहोस्",
+      "collapseAll": "सबै संकुचन गर्नुहोस्",
+      "organizationCount": "{{count}} संगठन",
+      "organizationCount_plural": "{{count}} संगठनहरू",
+      "ariaLabel": "संगठन पदानुक्रम",
+      "nodeAria": "{{name}} - {{type}}",
+      "unassignedSchools": "असाइन नगरिएका विद्यालयहरू ({{count}})",
+      "actions": {
+        "viewDetails": "विवरण हेर्नुहोस्",
+        "changeDistrict": "जिल्ला परिवर्तन गर्नुहोस्",
+        "unassignFromDistrict": "जिल्लाबाट हटाउनुहोस्",
+        "addSchool": "विद्यालय थप्नुहोस्"
+      },
+      "counts": {
+        "schools": "{{count}} विद्यालय",
+        "schools_plural": "{{count}} विद्यालयहरू",
+        "students": "{{count}} विद्यार्थी",
+        "students_plural": "{{count}} विद्यार्थीहरू",
+        "staff": "{{count}} कर्मचारी"
+      }
+    },
+    "forms": {
+      "sea": {
+        "createTitle": "राज्य शिक्षा निकाय सेटअप गर्नुहोस्",
+        "editTitle": "राज्य शिक्षा निकाय सम्पादन गर्नुहोस्",
+        "description": "Ed-Fi पदानुक्रममा मूल संगठन कन्फिगर गर्नुहोस्।",
+        "createAction": "SEA सिर्जना गर्नुहोस्",
+        "updateAction": "SEA अपडेट गर्नुहोस्"
+      },
+      "lea": {
+        "createTitle": "जिल्ला (LEA) सिर्जना गर्नुहोस्",
+        "editTitle": "जिल्ला (LEA) सम्पादन गर्नुहोस्",
+        "description": "Local Education Agencies ले विद्यालयहरू व्यवस्थापन गर्छन् र राज्यलाई रिपोर्ट गर्छन्।",
+        "createAction": "जिल्ला सिर्जना गर्नुहोस्",
+        "updateAction": "जिल्ला अपडेट गर्नुहोस्"
+      },
+      "esc": {
+        "createTitle": "शिक्षा सेवा केन्द्र सिर्जना गर्नुहोस्",
+        "editTitle": "शिक्षा सेवा केन्द्र सम्पादन गर्नुहोस्",
+        "description": "Education Service Centers ले जिल्ला र विद्यालयहरूलाई क्षेत्रीय समर्थन प्रदान गर्छन्।",
+        "createAction": "ESC सिर्जना गर्नुहोस्",
+        "updateAction": "ESC अपडेट गर्नुहोस्"
+      }
+    },
+    "form": {
+      "identity": "पहिचान",
+      "basicInfo": "आधारभूत जानकारी",
+      "edFiIdHelp": "राज्यले दिएको अद्वितीय संख्यात्मक कोड। नभए कुनै सकारात्मक पूर्णांक अस्थायी रूपमा प्रविष्ट गर्नुहोस्।",
+      "operationalStatusHelp": "Ed-Fi मापदण्डअनुसार यो संगठनको हालको सञ्चालन स्थिति।",
+      "leaCategoryHelp": "यो जिल्लाको वर्गीकरण। सामान्य विद्यालय जिल्लाका लागि Independent सबैभन्दा सामान्य हो।",
+      "charterStatusHelp": "चार्टर-प्रकारका संगठनहरूमा मात्र लागू हुन्छ।",
+      "parentLeaHelp": "वैकल्पिक। यो जिल्ला अर्को जिल्लामार्फत रिपोर्ट गर्दा मात्र आवश्यक हुन्छ, जस्तै चार्टर नेटवर्कहरू।",
+      "select": "छान्नुहोस्...",
+      "none": "कुनै छैन",
+      "categories": "श्रेणीहरू",
+      "categoryHelp": "Ed-Fi संगठन श्रेणी descriptor। शिक्षा संगठनको प्रकार पहिचान गर्छ।",
+      "categoryRequired": "कम्तीमा एउटा श्रेणी आवश्यक छ।",
+      "categoryDescriptor": "श्रेणी descriptor",
+      "selectCategory": "श्रेणी छान्नुहोस्...",
+      "addresses": "ठेगानाहरू",
+      "noAddresses": "ठेगाना थपिएको छैन। एउटा थप्न ठेगाना थप्नुहोस् क्लिक गर्नुहोस्।",
+      "telephones": "फोनहरू",
+      "noTelephones": "फोन नम्बर थपिएको छैन।",
+      "identificationCodes": "पहिचान कोडहरू",
+      "noIdentificationCodes": "पहिचान कोड थपिएको छैन।",
+      "type": "प्रकार",
+      "street": "सडक",
+      "aptSuite": "अपार्टमेन्ट/सुइट",
+      "city": "शहर",
+      "state": "राज्य/प्रदेश",
+      "selectState": "राज्य छान्नुहोस्...",
+      "postalCode": "हुलाक कोड",
+      "number": "नम्बर",
+      "system": "प्रणाली",
+      "code": "कोड"
+    },
+    "status": {
+      "Active": "सक्रिय",
+      "active": "सक्रिय",
+      "Added": "थपिएको",
+      "added": "थपिएको",
+      "ChangedAgency": "निकाय परिवर्तन",
+      "Closed": "बन्द",
+      "closed": "बन्द",
+      "Inactive": "निष्क्रिय",
+      "inactive": "निष्क्रिय",
+      "New": "नयाँ",
+      "new": "नयाँ",
+      "Reopened": "पुनः खोलिएको",
+      "Future": "भविष्य",
+      "setup": "सेटअप",
+      "suspended": "निलम्बित"
+    },
+    "descriptors": {
+      "educationOrganizationCategory": {
+        "Educator Preparation Provider": "शिक्षक तयारी प्रदायक",
+        "Education Organization Network": "शिक्षा संगठन नेटवर्क",
+        "Education Service Center": "शिक्षा सेवा केन्द्र",
+        "Local Education Agency": "स्थानीय शिक्षा निकाय",
+        "Post Secondary Institution": "उच्च माध्यमिकपछिको संस्था",
+        "School": "विद्यालय",
+        "State Education Agency": "राज्य शिक्षा निकाय",
+        "Other": "अन्य"
+      },
+      "leaCategory": {
+        "Independent": "स्वतन्त्र",
+        "CharterLEA": "चार्टर LEA",
+        "Intermediate": "मध्यवर्ती",
+        "SupervisoryUnion": "सुपरभाइजरी युनियन",
+        "Other": "अन्य"
+      },
+      "charterStatus": {
+        "NotACharter": "चार्टर होइन",
+        "SchoolCharter": "विद्यालय चार्टर",
+        "CollegeUniversityCharter": "कलेज/विश्वविद्यालय चार्टर",
+        "OpenEnrollment": "खुला भर्ना"
+      },
+      "addressType": {
+        "Physical": "भौतिक",
+        "Mailing": "पत्राचार",
+        "Shipping": "ढुवानी"
+      },
+      "telephoneType": {
+        "Main": "मुख्य",
+        "Administrative": "प्रशासनिक",
+        "Fax": "फ्याक्स",
+        "Attendance": "उपस्थिति"
+      }
+    },
+    "assignmentManager": {
+      "title": "विद्यालय नियुक्तिहरू व्यवस्थापन गर्नुहोस्",
+      "description": "Ed-Fi रिपोर्टिङका लागि विद्यालयहरू जिल्लाहरू (LEA) मा असाइन गर्नुहोस्",
+      "searchPlaceholder": "विद्यालय खोज्नुहोस्...",
+      "filterAria": "विद्यालय फिल्टर गर्नुहोस्",
+      "bulkAssignAria": "छानिएका विद्यालयहरू सामूहिक असाइन गर्नुहोस्",
+      "bulkAssignPlaceholder": "सामूहिक रूपमा असाइन...",
+      "selectedCount": "{{count}} चयनित",
+      "noDistricts": "जिल्ला उपलब्ध छैन। पहिले Local Education Agency सिर्जना गर्नुहोस्।",
+      "noMatches": "तपाईंको फिल्टरसँग मिल्ने विद्यालय छैन।",
+      "unassigned": "असाइन नगरिएको",
+      "changesReady": "{{selectedCount}} चयनित · {{changedCount}} परिवर्तन तयार",
+      "schoolsShown": "{{shown}} मध्ये {{total}} विद्यालय देखाइयो",
+      "applyChanges": "परिवर्तन लागू गर्नुहोस्",
+      "applyChangesWithCount": "परिवर्तन लागू गर्नुहोस् ({{count}})",
+      "filters": {
+        "allSchools": "सबै विद्यालयहरू",
+        "unassignedOnly": "असाइन नगरिएका मात्र"
+      },
+      "table": {
+        "schoolName": "विद्यालय नाम",
+        "currentDistrict": "हालको जिल्ला",
+        "newAssignment": "नयाँ नियुक्ति"
+      },
+      "toasts": {
+        "assigned": "विद्यालयहरू सफलतापूर्वक असाइन भए",
+        "noChanges": "लागू गर्न परिवर्तन छैन"
+      }
+    }
   },
   "rbac": {
     "title": "सुरक्षा नीतिहरू",

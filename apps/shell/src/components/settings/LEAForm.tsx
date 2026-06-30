@@ -10,6 +10,7 @@ import { useEffect } from 'react'
 import { useForm, useWatch, FormProvider, zodResolver, TextField, SelectField } from '@edforge/forms'
 import { useFormDirtyGuard } from '@/hooks/useFormDirtyGuard'
 import { Modal, ModalFooter, Button } from '@edforge/ui'
+import { useTranslation } from '@edforge/i18n'
 import { Building2, Network, Info } from 'lucide-react'
 import {
   createLocalEducationAgencySchema,
@@ -52,6 +53,7 @@ export interface LEAFormProps {
 // ============================================================================
 
 export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscId }: LEAFormProps) {
+  const { t } = useTranslation('settings')
   const isEdit = mode === 'edit'
   const createMutation = useCreateLea()
   const updateMutation = useUpdateLea()
@@ -93,6 +95,18 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
   // Watch LEA category to conditionally show charter status
   const leaCategory = useWatch({ control, name: 'leaCategoryDescriptor' })
   const showCharterField = leaCategory === 'CharterLEA'
+  const operationalStatusOptions = OPERATIONAL_STATUS_DESCRIPTORS.map((option) => ({
+    ...option,
+    label: t(`organization.status.${option.value}`, { defaultValue: option.label }),
+  }))
+  const leaCategoryOptions = LEA_CATEGORY_DESCRIPTORS.map((option) => ({
+    ...option,
+    label: t(`organization.descriptors.leaCategory.${option.value}`, { defaultValue: option.label }),
+  }))
+  const charterStatusOptions = CHARTER_STATUS_DESCRIPTORS.map((option) => ({
+    ...option,
+    label: t(`organization.descriptors.charterStatus.${option.value}`, { defaultValue: option.label }),
+  }))
 
   // Clear charter status when switching away from CharterLEA
   useEffect(() => {
@@ -161,8 +175,8 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
     <Modal
       open={open}
       onClose={guardedClose}
-      title={isEdit ? 'Edit District (LEA)' : 'Create District (LEA)'}
-      description="Local Education Agencies manage schools and report to the state."
+      title={isEdit ? t('organization.forms.lea.editTitle') : t('organization.forms.lea.createTitle')}
+      description={t('organization.forms.lea.description')}
       size="2xl"
     >
       <FormProvider {...methods}>
@@ -171,7 +185,7 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-3">
               <Building2 className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] " />
-              <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Basic Info</h3>
+              <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))]">{t('organization.form.basicInfo')}</h3>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -184,8 +198,8 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
                 rules={{ valueAsNumber: true }}
                 label={
                   <>
-                    Ed-Fi ID
-                    <Tooltip content="The unique numeric code assigned by the state. If you don't have one, enter any positive integer as a placeholder." side="top">
+                    {t('organization.fields.edFiId')}
+                    <Tooltip content={t('organization.form.edFiIdHelp')} side="top">
                       <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
                     </Tooltip>
                   </>
@@ -193,7 +207,7 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
               />
               <TextField
                 name="nameOfInstitution"
-                label="Name"
+                label={t('organization.fields.name')}
                 required
                 placeholder="e.g., Austin Independent School District"
               />
@@ -202,13 +216,13 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <TextField
                 name="shortNameOfInstitution"
-                label="Short Name"
+                label={t('organization.fields.shortName')}
                 placeholder="e.g., Austin ISD"
                 rules={{ setValueAs: (v) => (v === '' ? undefined : v) }}
               />
               <TextField
                 name="webSite"
-                label="Website"
+                label={t('organization.fields.website')}
                 type="url"
                 placeholder="https://www.austinisd.org"
                 rules={{ setValueAs: (v) => (v === '' ? undefined : v) }}
@@ -219,11 +233,11 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
               <SelectField
                 name="leaCategoryDescriptor"
                 required
-                options={LEA_CATEGORY_DESCRIPTORS}
+                options={leaCategoryOptions}
                 label={
                   <>
-                    LEA Category
-                    <Tooltip content="The classification of this district. 'Independent' is the most common for standard school districts." side="top">
+                    {t('organization.fields.leaCategory')}
+                    <Tooltip content={t('organization.form.leaCategoryHelp')} side="top">
                       <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
                     </Tooltip>
                   </>
@@ -231,11 +245,11 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
               />
               <SelectField
                 name="operationalStatusDescriptor"
-                options={OPERATIONAL_STATUS_DESCRIPTORS}
+                options={operationalStatusOptions}
                 label={
                   <>
-                    Operational Status
-                    <Tooltip content="Current operating status of this organization per Ed-Fi standards." side="top">
+                    {t('organization.fields.operationalStatus')}
+                    <Tooltip content={t('organization.form.operationalStatusHelp')} side="top">
                       <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
                     </Tooltip>
                   </>
@@ -244,14 +258,14 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
               {showCharterField && (
                 <SelectField
                   name="charterStatusDescriptor"
-                  placeholder="Select..."
+                  placeholder={t('organization.form.select')}
                   clearable
                   emptyValue={undefined}
-                  options={CHARTER_STATUS_DESCRIPTORS}
+                  options={charterStatusOptions}
                   label={
                     <>
-                      Charter Status
-                      <Tooltip content="Only applies to charter-type organizations." side="top">
+                      {t('organization.fields.charterStatus')}
+                      <Tooltip content={t('organization.form.charterStatusHelp')} side="top">
                         <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
                       </Tooltip>
                     </>
@@ -267,35 +281,35 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-3">
               <Network className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
-              <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Hierarchy</h3>
+              <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))]">{t('organization.tabs.hierarchy')}</h3>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <SelectField
                 name="stateEducationAgencyId"
-                label="State Education Agency"
-                placeholder="None"
+                label={t('organization.entities.stateEducationAgency')}
+                placeholder={t('organization.form.none')}
                 clearable
                 emptyValue={undefined}
                 options={sea ? [{ value: sea.id, label: sea.nameOfInstitution }] : []}
               />
               <SelectField
                 name="educationServiceCenterId"
-                label="Education Service Center"
-                placeholder="None"
+                label={t('organization.entities.serviceCenter')}
+                placeholder={t('organization.form.none')}
                 clearable
                 emptyValue={undefined}
                 options={escs.map((esc) => ({ value: esc.id, label: esc.nameOfInstitution }))}
               />
               <SelectField
                 name="parentLocalEducationAgencyId"
-                placeholder="None"
+                placeholder={t('organization.form.none')}
                 clearable
                 emptyValue={undefined}
                 options={parentLeaOptions.map((lea) => ({ value: lea.id, label: lea.nameOfInstitution }))}
                 label={
                   <>
-                    Parent LEA
-                    <Tooltip content="Optional. Only needed if this district reports through another district (e.g., charter networks)." side="top">
+                    {t('organization.fields.parentLea')}
+                    <Tooltip content={t('organization.form.parentLeaHelp')} side="top">
                       <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
                     </Tooltip>
                   </>
@@ -317,10 +331,10 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
 
       <ModalFooter>
         <Button variant="outline" onClick={guardedClose} disabled={isPending}>
-          Cancel
+          {t('organization.actions.cancel')}
         </Button>
         <Button onClick={onSubmit} isLoading={isPending}>
-          {isEdit ? 'Update District' : 'Create District'}
+          {isEdit ? t('organization.forms.lea.updateAction') : t('organization.forms.lea.createAction')}
         </Button>
       </ModalFooter>
     </Modal>
