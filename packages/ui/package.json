@@ -22,6 +22,10 @@
       "types": "./dist/components/states/index.d.ts",
       "import": "./dist/components/states/index.js"
     },
+    "./motion": {
+      "types": "./dist/components/motion/index.d.ts",
+      "import": "./dist/components/motion/index.js"
+    },
     "./components/*": {
       "types": "./dist/components/*.d.ts",
       "import": "./dist/components/*.js"

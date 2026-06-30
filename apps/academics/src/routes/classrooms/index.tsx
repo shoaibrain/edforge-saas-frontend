@@ -75,6 +75,7 @@ import { GradeOverview } from '../grades/overview'
 import { TabErrorBoundary } from '../../components/common/TabErrorBoundary'
 import { NoCurrentAcademicYearEmptyState } from '../../components/common'
 import { StatCard, WidgetErrorBoundaryV2, Button, Select, ContextBar } from '@edforge/ui'
+import { AnimatedIcon, type IconName } from '@edforge/ui/motion'
 import { useAttendanceOverview } from '../../hooks/useAttendance'
 import { useAcademicsI18n } from '../../lib/i18n'
 
@@ -92,6 +93,13 @@ const TABS: { id: ClassroomTabId; labelKey: string; icon: typeof School }[] = [
 ]
 
 const VALID_TABS = new Set<string>(TABS.map((t) => t.id))
+
+// Signature glyph per tab (clean counterparts only); unmapped tabs stay static.
+const TAB_SIGNATURE: Partial<Record<ClassroomTabId, IconName>> = {
+  overview: 'overview',
+  policies: 'settings',
+  attendance: 'attendance',
+}
 
 // ============================================================================
 // V2 CAPACITY COLOR (for KPI utilization tile)
@@ -782,6 +790,7 @@ export function ClassroomsModule() {
           >
             {TABS.map((tab) => {
               const isActive = activeTab === tab.id
+              const sig = TAB_SIGNATURE[tab.id]
               return (
                 <button
                   key={tab.id}
@@ -796,7 +805,13 @@ export function ClassroomsModule() {
                       : 'font-medium text-[rgb(var(--text-tertiary))] border-transparent hover:text-[rgb(var(--text-secondary))]'
                   }`}
                 >
-                  <tab.icon className={`w-4 h-4 ${isActive ? 'opacity-100' : 'opacity-70'}`} />
+                  <AnimatedIcon
+                    name={sig}
+                    icon={tab.icon}
+                    size={16}
+                    applyAccent={false}
+                    className={isActive ? 'opacity-100' : 'opacity-70'}
+                  />
                   {t(tab.labelKey)}
                   {tab.id === 'overview' && sectionCount !== undefined && (
                     <span

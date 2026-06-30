@@ -75,12 +75,13 @@ function SettingsOverviewContent({
 
   // Quick action items for the pill row
   const quickActions: QuickActionProps[] = [
-    { label: t('account.title'), icon: User, href: '/settings/account' },
-    { label: t('security.title'), icon: Shield, href: '/settings/security' },
-    { label: t('preferences.title'), icon: Palette, href: '/settings/preferences' },
-    { label: t('organization.title'), icon: Building2, href: '/settings/organization' },
-    { label: t('workspace.title'), icon: Settings, href: '/settings/workspace' },
+    { label: t('account.title'), icon: User, href: '/settings/account', signature: 'account' },
+    { label: t('security.title'), icon: Shield, href: '/settings/security', signature: 'security' },
+    { label: t('preferences.title'), icon: Palette, href: '/settings/preferences', signature: 'preferences' },
+    { label: t('organization.title'), icon: Building2, href: '/settings/organization', signature: 'organization' },
+    { label: t('workspace.title'), icon: Settings, href: '/settings/workspace', signature: 'workspace' },
     // Sprint M2 — branding read; M3 will toggle the same page into edit
+    // (Branding / Fee Structures / Payment Gateways have no bespoke glyph → generic motion.)
     { label: t('branding.title', { defaultValue: 'Branding' }), icon: Paintbrush, href: '/settings/branding' },
     { label: 'Fee Structures', icon: CreditCard, href: '/finance/configuration/fee-structures' },
     { label: 'Payment Gateways', icon: CreditCard, href: '/finance/configuration/payment-gateways' },

@@ -8,6 +8,7 @@
 import { useState, useEffect, useCallback, type ReactNode } from 'react'
 import { Link } from '@tanstack/react-router'
 import { motion, AnimatePresence } from 'framer-motion'
+import { AnimatedIcon, type IconName } from '@edforge/ui/motion'
 import {
   Save,
   Check,
@@ -535,16 +536,19 @@ export interface QuickActionProps {
   icon: LucideIcon
   href: string
   delay?: number
+  /** Signature glyph for this pill; falls back to the original icon + generic motion. */
+  signature?: IconName
 }
 
-export function QuickActionPill({ label, icon: Icon, href, delay = 0 }: QuickActionProps) {
+export function QuickActionPill({ label, icon: Icon, href, delay = 0, signature }: QuickActionProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: delay * 0.05, duration: 0.3 }}
     >
-      <Link to={href}>
+      {/* ef-motion on the focusable <a> drives the icon signature on hover + focus-visible. */}
+      <Link to={href} className="ef-motion block">
         <motion.div
           whileHover={{ scale: 1.02, y: -2 }}
           whileTap={{ scale: 0.98 }}
@@ -557,12 +561,13 @@ export function QuickActionPill({ label, icon: Icon, href, delay = 0 }: QuickAct
             'transition-colors cursor-pointer'
           )}
         >
-          <motion.div
-            whileHover={{ rotate: 5, scale: 1.1 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-          >
-            <Icon className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
-          </motion.div>
+          <AnimatedIcon
+            name={signature}
+            icon={Icon}
+            size={16}
+            applyAccent={false}
+            className="text-[rgb(var(--text-tertiary))]"
+          />
           <span className="text-sm font-medium text-[rgb(var(--text-secondary))]">{label}</span>
         </motion.div>
       </Link>
