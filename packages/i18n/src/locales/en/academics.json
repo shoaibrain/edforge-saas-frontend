@@ -1082,6 +1082,127 @@
   "moduleOverview": {
     "title": "{{title}} Overview",
     "retryLoading": "Retry loading",
+    "insight": {
+      "enrolledAcrossGrades": "{{students}} student enrolled across {{grades}} grades",
+      "enrolledAcrossGrades_plural": "{{students}} students enrolled across {{grades}} grades",
+      "attendanceToday": "{{value}}% attendance today",
+      "noAttendanceData": "no attendance data",
+      "atRiskStudents": "{{count}} at-risk student",
+      "atRiskStudents_plural": "{{count}} at-risk students",
+      "noAtRiskStudents": "no at-risk students"
+    },
+    "guards": {
+      "selectSchoolTitle": "Select a school",
+      "selectSchoolDescription": "Choose a school from the sidebar to view the academics overview.",
+      "noAcademicYearTitle": "No active academic year",
+      "noAcademicYearDescription": "Set up and activate an academic year in your school calendar to see overview data."
+    },
+    "actions": {
+      "enrollStudent": "Enroll Student",
+      "enrollStudentAria": "Enroll a student",
+      "takeAttendance": "Take Attendance",
+      "takeAttendanceAria": "Take attendance"
+    },
+    "filters": {
+      "last7Days": "Last 7 days",
+      "last30Days": "Last 30 days",
+      "thisSemester": "This semester",
+      "thisYear": "This year",
+      "or": "or",
+      "fromDate": "From date",
+      "toDate": "To date",
+      "allGrades": "All Grades",
+      "kindergarten": "Kindergarten",
+      "preK": "Pre-K",
+      "clear": "Clear",
+      "exportCsv": "Export CSV",
+      "exportCsvAria": "Export enrollments as CSV"
+    },
+    "kpis": {
+      "totalEnrolled": "Total Enrolled",
+      "recent": "+{{count}} recent",
+      "grades": "{{count}} grades",
+      "acrossGrades": "across {{count}} grades",
+      "thisAcademicYear": "this academic year",
+      "activeSections": "Active Sections",
+      "teachers": "{{count}} teachers",
+      "studentSectionRatio": "{{value}}:1 student-section ratio",
+      "activeClasses": "active classes",
+      "todayAttendance": "Today's Attendance",
+      "partialData": "Partial data",
+      "attendanceBreakdown": "{{present}} present · {{absent}} absent · {{late}} late",
+      "today": "today",
+      "atRiskStudents": "At-Risk Students",
+      "below80": "{{count}} below 80%",
+      "riskBreakdown": "{{critical}} critical · {{warning}} warning",
+      "below90Threshold": "below 90% threshold"
+    },
+    "needsAttention": {
+      "title": "Needs Attention"
+    },
+    "errors": {
+      "attendanceTrend": "Unable to load attendance trend",
+      "enrollmentChart": "Unable to load enrollment chart",
+      "atRiskStudents": "Unable to load at-risk students",
+      "staffRoster": "Unable to load staff roster"
+    },
+    "attendanceTrend": {
+      "title": "Attendance trend",
+      "subtitle": "30-day rolling average",
+      "actual": "Actual",
+      "target": "{{value}}% target",
+      "average": "Avg {{value}}%",
+      "tooltipPresent": "{{present}} of {{total}} present",
+      "srNoData": "No attendance trend data available.",
+      "srSummary": "Attendance rate ranged from {{min}}% to {{max}}% over the past 30 days, with an average of {{avg}}%, compared to the {{target}}% target.",
+      "empty": "No attendance data recorded yet",
+      "aria": "Attendance trend over 30 days",
+      "viewAttendance": "View Attendance"
+    },
+    "enrollmentChart": {
+      "title": "Enrollment by grade level",
+      "total": "{{total}} total",
+      "aria": "Enrollment by grade level, {{total}} total students",
+      "tooltip": "{{count}} student · {{percentage}}%",
+      "tooltip_plural": "{{count}} students · {{percentage}}%",
+      "empty": "No enrollment data",
+      "viewEnrollment": "View Enrollment"
+    },
+    "atRisk": {
+      "title": "At-risk student detail",
+      "total": "{{count}} at risk",
+      "empty": "No at-risk students",
+      "absent": "{{count}} absent",
+      "gradeAbsent": "{{grade}} · {{absent}}",
+      "progressLabel": "{{student}}: {{rate}}% attendance",
+      "viewAll": "View all {{count}} at-risk students"
+    },
+    "alerts": {
+      "criticalTitle": "{{count}} student below 80% attendance — immediate intervention needed",
+      "criticalTitle_plural": "{{count}} students below 80% attendance — immediate intervention needed",
+      "criticalSubtitle": "30-day period · {{total}} total at-risk",
+      "viewDetails": "View details",
+      "warningTitle": "{{count}} student below 90% attendance threshold",
+      "warningTitle_plural": "{{count}} students below 90% attendance threshold",
+      "warningSubtitle": "Attendance rate below school threshold",
+      "review": "Review",
+      "unrecordedTitle": "{{count}} student without attendance record today",
+      "unrecordedTitle_plural": "{{count}} students without attendance record today",
+      "unrecordedSubtitle": "Attendance has not been recorded for all students today"
+    },
+    "staffRoster": {
+      "title": "Staff roster",
+      "active": "{{count}} active",
+      "loadFailed": "Unable to load staff data",
+      "empty": "No staff members",
+      "unknown": "Unknown",
+      "staff": "Staff",
+      "general": "General",
+      "fullTime": "Full-time",
+      "contract": "Contract",
+      "teachers": "{{count}} teacher",
+      "teachers_plural": "{{count}} teachers"
+    },
     "options": {
       "title": "Page options",
       "showHideWidgets": "Show/hide widgets",

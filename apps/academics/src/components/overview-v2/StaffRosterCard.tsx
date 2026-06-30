@@ -6,6 +6,7 @@
  */
 
 import { useMemo, useState } from 'react'
+import { useTranslation } from '@edforge/i18n'
 import { getStaffAvatar } from '../../lib/avatar'
 import type { StaffResponseDto } from '../../services/staff.service'
 
@@ -15,21 +16,21 @@ function getInitials(staff: any): string {
   return (first + last).toUpperCase() || '?'
 }
 
-function getDisplayName(staff: any): string {
+function getDisplayName(staff: any, fallback: string): string {
   const parts = [staff.firstName, staff.lastSurname || staff.lastName].filter(Boolean)
-  return parts.join(' ') || staff.email || 'Unknown'
+  return parts.join(' ') || staff.email || fallback
 }
 
-function getRole(staff: any): string {
-  return staff.role || staff.staffRole || 'Staff'
+function getRole(staff: any, fallback: string): string {
+  return staff.role || staff.staffRole || fallback
 }
 
-function getDepartment(staff: any): string {
+function getDepartment(staff: any, fallback: string): string {
   const assignments = staff.schoolAssignments || []
   if (assignments.length > 0 && assignments[0].department) {
     return assignments[0].department
   }
-  return 'General'
+  return fallback
 }
 
 function getEmploymentType(staff: any): string {
@@ -44,9 +45,9 @@ function hashColor(name: string): string {
   return palette[Math.abs(hash) % palette.length]
 }
 
-function StaffAvatar({ staff }: { staff: any }) {
+function StaffAvatar({ staff, unknownLabel }: { staff: any; unknownLabel: string }) {
   const [imgError, setImgError] = useState(false)
-  const name = getDisplayName(staff)
+  const name = getDisplayName(staff, unknownLabel)
   const staffId = staff.staffId || staff.id || name
   const src = getStaffAvatar(staffId)
   const initials = getInitials(staff)
@@ -108,12 +109,17 @@ export function StaffRosterCard({
   isLoading,
   isError,
 }: StaffRosterCardProps) {
+  const { t } = useTranslation('academics')
+  const unknownLabel = t('moduleOverview.staffRoster.unknown')
+  const staffFallback = t('moduleOverview.staffRoster.staff')
+  const generalFallback = t('moduleOverview.staffRoster.general')
+
   // Department coverage
   const departments = useMemo(() => {
     const deptMap = new Map<string, number>()
     for (const s of staff) {
-      const dept = getDepartment(s)
-      const role = getRole(s)
+      const dept = getDepartment(s, generalFallback)
+      const role = getRole(s, staffFallback)
       if (role.toLowerCase() === 'teacher') {
         deptMap.set(dept, (deptMap.get(dept) || 0) + 1)
       }
@@ -121,7 +127,7 @@ export function StaffRosterCard({
     return Array.from(deptMap.entries())
       .map(([name, count]) => ({ name, count }))
       .sort((a, b) => b.count - a.count)
-  }, [staff])
+  }, [staff, generalFallback, staffFallback])
 
   const displayStaff = staff.slice(0, 5)
 
@@ -134,10 +140,10 @@ export function StaffRosterCard({
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-medium text-[rgb(var(--text-secondary))]">
-          Staff roster
+          {t('moduleOverview.staffRoster.title')}
         </h3>
         <span className="text-xs font-medium text-[rgb(var(--text-tertiary))]">
-          {activeCount} active
+          {t('moduleOverview.staffRoster.active', { count: activeCount })}
         </span>
       </div>
 
@@ -147,11 +153,11 @@ export function StaffRosterCard({
           <StaffSkeleton />
         ) : isError ? (
           <div className="text-sm py-4 text-center text-[rgb(var(--text-tertiary))]">
-            Unable to load staff data
+            {t('moduleOverview.staffRoster.loadFailed')}
           </div>
         ) : displayStaff.length === 0 ? (
           <div className="text-sm py-4 text-center text-[rgb(var(--text-tertiary))]">
-            No staff members
+            {t('moduleOverview.staffRoster.empty')}
           </div>
         ) : (
           <div className="space-y-2.5">
@@ -160,14 +166,14 @@ export function StaffRosterCard({
               const isFullTime = empType === 'full_time' || empType === 'full-time'
               return (
                 <div key={(s as any).staffId || index} className="flex items-center gap-3">
-                  <StaffAvatar staff={s} />
+                  <StaffAvatar staff={s} unknownLabel={unknownLabel} />
                   {/* Info */}
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium truncate text-[rgb(var(--text-secondary))]">
-                      {getDisplayName(s)}
+                      {getDisplayName(s, unknownLabel)}
                     </p>
                     <p className="text-xs truncate text-[rgb(var(--text-disabled))]">
-                      {getRole(s)} · {getDepartment(s)}
+                      {getRole(s, staffFallback)} · {getDepartment(s, generalFallback)}
                     </p>
                   </div>
                   {/* Badge */}
@@ -179,7 +185,7 @@ export function StaffRosterCard({
                       color: isFullTime ? '#1D9E75' : '#EF9F27',
                     }}
                   >
-                    {isFullTime ? 'Full-time' : 'Contract'}
+                    {isFullTime ? t('moduleOverview.staffRoster.fullTime') : t('moduleOverview.staffRoster.contract')}
                   </span>
                 </div>
               )
@@ -199,7 +205,7 @@ export function StaffRosterCard({
                   {dept.name}
                 </span>
                 <span className="text-xs font-medium text-[rgb(var(--accent-enrollment-text))]">
-                  {dept.count} teacher{dept.count !== 1 ? 's' : ''}
+                  {t('moduleOverview.staffRoster.teachers', { count: dept.count })}
                 </span>
               </div>
             ))}

@@ -7,6 +7,7 @@
 
 import { useMemo } from 'react'
 import { Loader2, Download, X } from 'lucide-react'
+import { useTranslation } from '@edforge/i18n'
 
 interface AcademicsFilterRowProps {
   fromDate: string
@@ -53,21 +54,20 @@ function getQuickRange(range: QuickRange): { from: string; to: string } {
   }
 }
 
-const QUICK_OPTIONS: { key: QuickRange; label: string }[] = [
-  { key: 'week', label: 'Last 7 days' },
-  { key: 'month', label: 'Last 30 days' },
-  { key: 'semester', label: 'This semester' },
-  { key: 'year', label: 'This year' },
+const QUICK_OPTIONS: { key: QuickRange; labelKey: string }[] = [
+  { key: 'week', labelKey: 'moduleOverview.filters.last7Days' },
+  { key: 'month', labelKey: 'moduleOverview.filters.last30Days' },
+  { key: 'semester', labelKey: 'moduleOverview.filters.thisSemester' },
+  { key: 'year', labelKey: 'moduleOverview.filters.thisYear' },
 ]
 
-function formatGradeLabel(grade: string): string {
+function formatGradeLabel(grade: string, t: (key: string, options?: Record<string, unknown>) => string): string {
   const lower = grade.toLowerCase()
-  if (lower === 'k' || lower === 'kindergarten' || lower === 'kg') return 'Kindergarten'
-  if (lower === 'pre-k' || lower === 'prek' || lower === 'pk') return 'Pre-K'
+  if (lower === 'k' || lower === 'kindergarten' || lower === 'kg') return t('moduleOverview.filters.kindergarten')
+  if (lower === 'pre-k' || lower === 'prek' || lower === 'pk') return t('moduleOverview.filters.preK')
   const num = parseInt(grade, 10)
   if (!isNaN(num)) {
-    const suffix = num === 1 ? 'st' : num === 2 ? 'nd' : num === 3 ? 'rd' : 'th'
-    return `Grade ${num}${suffix}`
+    return t('gradeLabel', { level: num })
   }
   return grade
 }
@@ -86,6 +86,8 @@ export function AcademicsFilterRow({
   onClear,
   onExport,
 }: AcademicsFilterRowProps) {
+  const { t } = useTranslation('academics')
+
   // Date/grade inputs read off the unified light theme. The former
   // rgba(255,255,255,0.0x) bg/border washed out to invisible, and
   // colorScheme:'dark' forced a dark native date-picker over the light app.
@@ -132,19 +134,19 @@ export function AcademicsFilterRow({
                   : 'bg-transparent border-[rgb(var(--border-primary)/0.4)] text-[rgb(var(--text-tertiary))]'
               }`}
             >
-              {opt.label}
+              {t(opt.labelKey)}
             </button>
           )
         })}
 
-        <span className="text-xs mx-1 text-[rgb(var(--text-disabled))]">or</span>
+        <span className="text-xs mx-1 text-[rgb(var(--text-disabled))]">{t('moduleOverview.filters.or')}</span>
 
         {/* Date inputs */}
         <input
           type="date"
           value={fromDate}
           onChange={(e) => onFromChange(e.target.value)}
-          aria-label="From date"
+          aria-label={t('moduleOverview.filters.fromDate')}
           className="px-2 py-1 text-xs border rounded-[7px] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-enrollment))]/30"
           style={inputStyle}
         />
@@ -153,7 +155,7 @@ export function AcademicsFilterRow({
           type="date"
           value={toDate}
           onChange={(e) => onToChange(e.target.value)}
-          aria-label="To date"
+          aria-label={t('moduleOverview.filters.toDate')}
           className="px-2 py-1 text-xs border rounded-[7px] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-enrollment))]/30"
           style={inputStyle}
         />
@@ -166,9 +168,9 @@ export function AcademicsFilterRow({
             className="px-2 py-1 text-xs border rounded-[7px] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-enrollment))]/30"
             style={inputStyle}
           >
-            <option value="">All Grades</option>
+            <option value="">{t('moduleOverview.filters.allGrades')}</option>
             {gradeLevels.map((grade) => (
-              <option key={grade} value={grade}>{formatGradeLabel(grade)}</option>
+              <option key={grade} value={grade}>{formatGradeLabel(grade, t)}</option>
             ))}
           </select>
         )}
@@ -180,7 +182,7 @@ export function AcademicsFilterRow({
             className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full transition-colors hover:opacity-80 text-[rgb(var(--accent-enrollment-text))]"
           >
             <X className="w-3 h-3" />
-            Clear
+            {t('moduleOverview.filters.clear')}
           </button>
         )}
 
@@ -189,11 +191,11 @@ export function AcademicsFilterRow({
           <button
             onClick={onExport}
             disabled={isExporting || !hasAcademicYear}
-            aria-label="Export enrollments as CSV"
+            aria-label={t('moduleOverview.filters.exportCsvAria')}
             className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-enrollment))]/40 bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
           >
             {isExporting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />}
-            Export CSV
+            {t('moduleOverview.filters.exportCsv')}
           </button>
         </div>
       </div>

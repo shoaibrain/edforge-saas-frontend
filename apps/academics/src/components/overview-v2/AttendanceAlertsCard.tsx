@@ -8,6 +8,7 @@
 import { useNavigate } from '@tanstack/react-router'
 import { AlertTriangle, AlertCircle, Info } from 'lucide-react'
 import { V2AlertItem } from '@edforge/ui'
+import { useTranslation } from '@edforge/i18n'
 import type { AcademicAlert } from '../../hooks/useAcademicsOverview'
 
 interface AttendanceAlertsCardProps {
@@ -43,6 +44,7 @@ export function AttendanceAlertsCard({
   isLoading,
 }: AttendanceAlertsCardProps) {
   const navigate = useNavigate()
+  const { t } = useTranslation('academics')
 
   if (!isLoading && alerts.length === 0 && !unrecordedCount) return null
 
@@ -61,12 +63,12 @@ export function AttendanceAlertsCard({
       {criticalCount > 0 && (
         <V2AlertItem
           severity="critical"
-          title={`${criticalCount} student${criticalCount !== 1 ? 's' : ''} below 80% attendance — immediate intervention needed`}
-          subtitle={`30-day period · ${totalCount} total at-risk`}
+          title={t('moduleOverview.alerts.criticalTitle', { count: criticalCount })}
+          subtitle={t('moduleOverview.alerts.criticalSubtitle', { total: totalCount })}
           count={criticalCount}
           icon={<AlertTriangle className="w-3.5 h-3.5" />}
           cta={{
-            label: 'View details',
+            label: t('moduleOverview.alerts.viewDetails'),
             onClick: () => navigate({ to: '/students' }),
           }}
         />
@@ -76,12 +78,12 @@ export function AttendanceAlertsCard({
       {warningCount > 0 && (
         <V2AlertItem
           severity="warning"
-          title={`${warningCount} student${warningCount !== 1 ? 's' : ''} below 90% attendance threshold`}
-          subtitle="Attendance rate below school threshold"
+          title={t('moduleOverview.alerts.warningTitle', { count: warningCount })}
+          subtitle={t('moduleOverview.alerts.warningSubtitle')}
           count={warningCount}
           icon={<AlertCircle className="w-3.5 h-3.5" />}
           cta={{
-            label: 'Review',
+            label: t('moduleOverview.alerts.review'),
             onClick: () => navigate({ to: '/students' }),
           }}
         />
@@ -91,8 +93,8 @@ export function AttendanceAlertsCard({
       {unrecordedCount != null && unrecordedCount > 0 && (
         <V2AlertItem
           severity="info"
-          title={`${unrecordedCount} student${unrecordedCount !== 1 ? 's' : ''} without attendance record today`}
-          subtitle="Attendance has not been recorded for all students today"
+          title={t('moduleOverview.alerts.unrecordedTitle', { count: unrecordedCount })}
+          subtitle={t('moduleOverview.alerts.unrecordedSubtitle')}
           count={unrecordedCount}
           icon={<Info className="w-3.5 h-3.5" />}
         />

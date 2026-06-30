@@ -19,6 +19,7 @@ import {
   Cell,
 } from 'recharts'
 import { useV2ChartColors } from '@edforge/ui'
+import { useTranslation } from '@edforge/i18n'
 import type { GradeLevelDistribution } from '../../hooks/useAcademicsOverview'
 
 const BAR_PALETTE = ['#1D9E75', '#378ADD', '#7F77DD', '#EF9F27', '#D85A30']
@@ -50,13 +51,18 @@ function ChartSkeleton() {
 }
 
 function CustomTooltip({ active, payload }: any) {
+  const { t } = useTranslation('academics')
+
   if (!active || !payload?.length) return null
   const d = payload[0].payload as GradeLevelDistribution
   return (
     <div className="rounded-lg border px-3 py-2 text-xs shadow-lg bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]">
       <div className="font-semibold">{d.displayLabel}</div>
       <div className="text-[rgb(var(--text-disabled))]">
-        {d.count} student{d.count !== 1 ? 's' : ''} · {d.percentage}%
+        {t('moduleOverview.enrollmentChart.tooltip', {
+          count: d.count,
+          percentage: d.percentage,
+        })}
       </div>
     </div>
   )
@@ -67,6 +73,7 @@ export function EnrollmentByGradeChart({
   total,
   isLoading,
 }: EnrollmentByGradeChartProps) {
+  const { t } = useTranslation('academics')
   const colors = useV2ChartColors()
 
   // Recharts needs a height proportional to data rows
@@ -81,17 +88,17 @@ export function EnrollmentByGradeChart({
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-medium text-[rgb(var(--text-secondary))]">
-          Enrollment by grade level
+          {t('moduleOverview.enrollmentChart.title')}
         </h3>
         <span className="text-xs font-semibold text-[rgb(var(--state-info-fg))]">
-          {total} total
+          {t('moduleOverview.enrollmentChart.total', { total })}
         </span>
       </div>
 
       {/* Chart */}
       <div
         className="flex-1 min-h-0"
-        aria-label={`Enrollment by grade level, ${total} total students`}
+        aria-label={t('moduleOverview.enrollmentChart.aria', { total })}
       >
         {isLoading ? (
           <ChartSkeleton />
@@ -101,7 +108,7 @@ export function EnrollmentByGradeChart({
             className="flex items-center justify-center text-sm text-[rgb(var(--text-tertiary))]"
             style={{ height: 120 }}
           >
-            No enrollment data
+            {t('moduleOverview.enrollmentChart.empty')}
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={chartHeight}>
@@ -158,7 +165,7 @@ export function EnrollmentByGradeChart({
           to="/students"
           className="inline-flex items-center gap-1.5 text-xs font-medium transition-opacity hover:opacity-80 text-[rgb(var(--accent-enrollment-text))]"
         >
-          View Enrollment
+          {t('moduleOverview.enrollmentChart.viewEnrollment')}
           <ArrowRight className="w-3 h-3" />
         </Link>
       </div>

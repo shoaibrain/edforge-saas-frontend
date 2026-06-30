@@ -1082,6 +1082,127 @@
   "moduleOverview": {
     "title": "{{title}} Overview",
     "retryLoading": "पुनः लोड गर्नुहोस्",
+    "insight": {
+      "enrolledAcrossGrades": "{{grades}} ग्रेडमा {{students}} विद्यार्थी भर्ना",
+      "enrolledAcrossGrades_plural": "{{grades}} ग्रेडमा {{students}} विद्यार्थी भर्ना",
+      "attendanceToday": "आज {{value}}% उपस्थिति",
+      "noAttendanceData": "उपस्थिति डाटा छैन",
+      "atRiskStudents": "{{count}} जोखिममा विद्यार्थी",
+      "atRiskStudents_plural": "{{count}} जोखिममा विद्यार्थी",
+      "noAtRiskStudents": "जोखिममा विद्यार्थी छैन"
+    },
+    "guards": {
+      "selectSchoolTitle": "विद्यालय छान्नुहोस्",
+      "selectSchoolDescription": "Academics overview हेर्न sidebar बाट विद्यालय छान्नुहोस्।",
+      "noAcademicYearTitle": "सक्रिय शैक्षिक वर्ष छैन",
+      "noAcademicYearDescription": "Overview data हेर्न school calendar मा academic year set र activate गर्नुहोस्।"
+    },
+    "actions": {
+      "enrollStudent": "विद्यार्थी भर्ना",
+      "enrollStudentAria": "विद्यार्थी भर्ना गर्नुहोस्",
+      "takeAttendance": "उपस्थिति लिनुहोस्",
+      "takeAttendanceAria": "उपस्थिति लिनुहोस्"
+    },
+    "filters": {
+      "last7Days": "पछिल्ला ७ दिन",
+      "last30Days": "पछिल्ला ३० दिन",
+      "thisSemester": "यो semester",
+      "thisYear": "यो वर्ष",
+      "or": "वा",
+      "fromDate": "सुरु मिति",
+      "toDate": "अन्त्य मिति",
+      "allGrades": "सबै ग्रेड",
+      "kindergarten": "Kindergarten",
+      "preK": "Pre-K",
+      "clear": "हटाउनुहोस्",
+      "exportCsv": "CSV Export",
+      "exportCsvAria": "भर्ना CSV export गर्नुहोस्"
+    },
+    "kpis": {
+      "totalEnrolled": "कुल भर्ना",
+      "recent": "+{{count}} हालै",
+      "grades": "{{count}} ग्रेड",
+      "acrossGrades": "{{count}} ग्रेडमा",
+      "thisAcademicYear": "यो शैक्षिक वर्ष",
+      "activeSections": "सक्रिय सेक्सनहरू",
+      "teachers": "{{count}} शिक्षक",
+      "studentSectionRatio": "{{value}}:1 विद्यार्थी-सेक्सन अनुपात",
+      "activeClasses": "सक्रिय कक्षाहरू",
+      "todayAttendance": "आजको उपस्थिति",
+      "partialData": "आंशिक डाटा",
+      "attendanceBreakdown": "{{present}} उपस्थित · {{absent}} अनुपस्थित · {{late}} ढिलो",
+      "today": "आज",
+      "atRiskStudents": "जोखिममा विद्यार्थी",
+      "below80": "{{count}} ८०% भन्दा कम",
+      "riskBreakdown": "{{critical}} गम्भीर · {{warning}} चेतावनी",
+      "below90Threshold": "९०% सीमाभन्दा कम"
+    },
+    "needsAttention": {
+      "title": "ध्यान आवश्यक"
+    },
+    "errors": {
+      "attendanceTrend": "उपस्थिति प्रवृत्ति लोड गर्न सकिएन",
+      "enrollmentChart": "भर्ना chart लोड गर्न सकिएन",
+      "atRiskStudents": "जोखिममा विद्यार्थी लोड गर्न सकिएन",
+      "staffRoster": "कर्मचारी सूची लोड गर्न सकिएन"
+    },
+    "attendanceTrend": {
+      "title": "उपस्थिति प्रवृत्ति",
+      "subtitle": "३०-दिन rolling average",
+      "actual": "Actual",
+      "target": "{{value}}% लक्ष्य",
+      "average": "Avg {{value}}%",
+      "tooltipPresent": "{{total}} मध्ये {{present}} उपस्थित",
+      "srNoData": "उपस्थिति प्रवृत्ति डाटा उपलब्ध छैन।",
+      "srSummary": "पछिल्ला ३० दिनमा उपस्थिति दर {{min}}% देखि {{max}}% सम्म थियो, औसत {{avg}}%, {{target}}% लक्ष्यसँग तुलना गरिएको।",
+      "empty": "अहिलेसम्म उपस्थिति डाटा रेकर्ड गरिएको छैन",
+      "aria": "३० दिनको उपस्थिति प्रवृत्ति",
+      "viewAttendance": "उपस्थिति हेर्नुहोस्"
+    },
+    "enrollmentChart": {
+      "title": "ग्रेड स्तर अनुसार भर्ना",
+      "total": "{{total}} कुल",
+      "aria": "ग्रेड स्तर अनुसार भर्ना, कुल {{total}} विद्यार्थी",
+      "tooltip": "{{count}} विद्यार्थी · {{percentage}}%",
+      "tooltip_plural": "{{count}} विद्यार्थी · {{percentage}}%",
+      "empty": "भर्ना डाटा छैन",
+      "viewEnrollment": "भर्ना हेर्नुहोस्"
+    },
+    "atRisk": {
+      "title": "जोखिममा विद्यार्थी विवरण",
+      "total": "{{count}} जोखिममा",
+      "empty": "जोखिममा विद्यार्थी छैन",
+      "absent": "{{count}} अनुपस्थित",
+      "gradeAbsent": "{{grade}} · {{absent}}",
+      "progressLabel": "{{student}}: {{rate}}% उपस्थिति",
+      "viewAll": "सबै {{count}} जोखिममा विद्यार्थी हेर्नुहोस्"
+    },
+    "alerts": {
+      "criticalTitle": "{{count}} विद्यार्थीको उपस्थिति ८०% भन्दा कम — तुरुन्त intervention आवश्यक",
+      "criticalTitle_plural": "{{count}} विद्यार्थीको उपस्थिति ८०% भन्दा कम — तुरुन्त intervention आवश्यक",
+      "criticalSubtitle": "३०-दिन अवधि · कुल {{total}} जोखिममा",
+      "viewDetails": "विवरण हेर्नुहोस्",
+      "warningTitle": "{{count}} विद्यार्थी ९०% उपस्थिति सीमाभन्दा कम",
+      "warningTitle_plural": "{{count}} विद्यार्थी ९०% उपस्थिति सीमाभन्दा कम",
+      "warningSubtitle": "उपस्थिति दर विद्यालय सीमाभन्दा कम",
+      "review": "Review",
+      "unrecordedTitle": "आज {{count}} विद्यार्थीको उपस्थिति रेकर्ड छैन",
+      "unrecordedTitle_plural": "आज {{count}} विद्यार्थीको उपस्थिति रेकर्ड छैन",
+      "unrecordedSubtitle": "आज सबै विद्यार्थीहरूको उपस्थिति रेकर्ड गरिएको छैन"
+    },
+    "staffRoster": {
+      "title": "कर्मचारी सूची",
+      "active": "{{count}} सक्रिय",
+      "loadFailed": "Staff data लोड गर्न सकिएन",
+      "empty": "Staff member छैन",
+      "unknown": "अज्ञात",
+      "staff": "कर्मचारी",
+      "general": "सामान्य",
+      "fullTime": "पूर्णकालीन",
+      "contract": "करार",
+      "teachers": "{{count}} शिक्षक",
+      "teachers_plural": "{{count}} शिक्षक"
+    },
     "options": {
       "title": "Page options",
       "showHideWidgets": "Widgets देखाउने/लुकाउने",

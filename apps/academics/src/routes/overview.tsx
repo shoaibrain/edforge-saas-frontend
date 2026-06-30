@@ -19,6 +19,7 @@ import {
   School,
 } from 'lucide-react'
 import { StatCard, WidgetErrorBoundaryV2, ContextBar, ContextBarSep, ContextBarYear } from '@edforge/ui'
+import { useTranslation } from '@edforge/i18n'
 import { getAttendanceColor } from '@edforge/types'
 import { useActiveSchoolId } from '../stores/app.store'
 import { useAcademicsOverviewV2 } from '../hooks/useAcademicsOverviewV2'
@@ -71,6 +72,8 @@ function AcademicsInsightStrip({
   atRiskCount: number
   isLoading: boolean
 }) {
+  const { t, i18n } = useTranslation('academics')
+
   if (isLoading) {
     return (
       <div className="h-5 w-3/5 rounded-lg v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
@@ -79,20 +82,28 @@ function AcademicsInsightStrip({
 
   if (totalEnrolled === 0) return null
 
+  const numberFormatter = new Intl.NumberFormat(i18n.language === 'ne' ? 'ne-NP' : 'en-US')
   const parts: string[] = [
-    `${totalEnrolled} student${totalEnrolled !== 1 ? 's' : ''} enrolled across ${gradeCount} grade${gradeCount !== 1 ? 's' : ''}`,
+    t('moduleOverview.insight.enrolledAcrossGrades', {
+      count: totalEnrolled,
+      students: numberFormatter.format(totalEnrolled),
+      grades: numberFormatter.format(gradeCount),
+    }),
   ]
 
   if (attendanceRate != null) {
-    parts.push(`${attendanceRate.toFixed(1)}% attendance today`)
+    parts.push(t('moduleOverview.insight.attendanceToday', { value: attendanceRate.toFixed(1) }))
   } else {
-    parts.push('no attendance data')
+    parts.push(t('moduleOverview.insight.noAttendanceData'))
   }
 
   if (atRiskCount > 0) {
-    parts.push(`${atRiskCount} at-risk student${atRiskCount !== 1 ? 's' : ''}`)
+    parts.push(t('moduleOverview.insight.atRiskStudents', {
+      count: atRiskCount,
+      value: numberFormatter.format(atRiskCount),
+    }))
   } else {
-    parts.push('no at-risk students')
+    parts.push(t('moduleOverview.insight.noAtRiskStudents'))
   }
 
   return (
@@ -107,15 +118,17 @@ function AcademicsInsightStrip({
 // ============================================================================
 
 function NoSchoolGuard() {
+  const { t } = useTranslation('academics')
+
   return (
     <div className="max-w-6xl mx-auto pt-16 pb-12">
       <Card className="p-8 border-border-secondary max-w-lg mx-auto text-center">
         <div className="inline-flex p-3 rounded-2xl bg-[rgb(var(--state-info-bg)/0.18)] mb-4">
           <School className="w-7 h-7 text-[rgb(var(--action-secondary-fg))] " />
         </div>
-        <h2 className="text-lg font-bold text-text-primary">Select a school</h2>
+        <h2 className="text-lg font-bold text-text-primary">{t('moduleOverview.guards.selectSchoolTitle')}</h2>
         <p className="text-sm text-text-secondary mt-1.5">
-          Choose a school from the sidebar to view the academics overview.
+          {t('moduleOverview.guards.selectSchoolDescription')}
         </p>
       </Card>
     </div>
@@ -123,15 +136,17 @@ function NoSchoolGuard() {
 }
 
 function NoAcademicYearGuard() {
+  const { t } = useTranslation('academics')
+
   return (
     <div className="max-w-6xl mx-auto pt-16 pb-12">
       <Card className="p-8 border-border-secondary max-w-lg mx-auto text-center">
         <div className="inline-flex p-3 rounded-2xl bg-amber-400/15 mb-4">
           <CalendarClock className="w-7 h-7 text-[rgb(var(--state-warning-fg))]" />
         </div>
-        <h2 className="text-lg font-bold text-text-primary">No active academic year</h2>
+        <h2 className="text-lg font-bold text-text-primary">{t('moduleOverview.guards.noAcademicYearTitle')}</h2>
         <p className="text-sm text-text-secondary mt-1.5 max-w-sm mx-auto">
-          Set up and activate an academic year in your school calendar to see overview data.
+          {t('moduleOverview.guards.noAcademicYearDescription')}
         </p>
       </Card>
     </div>
@@ -151,8 +166,11 @@ export function Overview() {
 function OverviewContent({ schoolId }: { schoolId: string }) {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const { t, i18n } = useTranslation('academics')
   const data = useAcademicsOverviewV2(schoolId)
   const { staggerContainer, fadeInUp } = useMotionVariants()
+  const locale = i18n.language === 'ne' ? 'ne-NP' : 'en-US'
+  const numberFormatter = useMemo(() => new Intl.NumberFormat(locale), [locale])
 
   const handleRefresh = useCallback(() => {
     queryClient.invalidateQueries({ queryKey: overviewKeys.all })
@@ -193,7 +211,7 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
                 ) : null}
                 {data.academicYear.name ? <ContextBarSep /> : null}
                 <span>
-                  {new Date().toLocaleDateString('en-US', {
+                  {new Date().toLocaleDateString(locale, {
                     weekday: 'long',
                     month: 'short',
                     day: 'numeric',
@@ -214,19 +232,19 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
               <>
                 <button
                   onClick={() => navigate({ to: '/students/enrollment', search: { tab: 'registration' } })}
-                  aria-label="Enroll a student"
+                  aria-label={t('moduleOverview.actions.enrollStudentAria')}
                   className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-[9px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-enrollment)/0.4)] bg-transparent border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
                 >
                   <UserPlus className="w-3.5 h-3.5" />
-                  Enroll Student
+                  {t('moduleOverview.actions.enrollStudent')}
                 </button>
                 <button
                   onClick={() => navigate({ to: '/classrooms', search: { tab: 'attendance' } })}
-                  aria-label="Take attendance"
+                  aria-label={t('moduleOverview.actions.takeAttendanceAria')}
                   className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-[9px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-enrollment)/0.4)] bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
                 >
                   <ClipboardCheck className="w-3.5 h-3.5" />
-                  Take Attendance
+                  {t('moduleOverview.actions.takeAttendance')}
                 </button>
               </>
             }
@@ -257,14 +275,14 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
           {/* Tile 1: Total Enrolled */}
           {data.canViewEnrollment && (
             <StatCard
-              label="Total Enrolled"
-              value={data.overview.totalEnrolled != null ? data.overview.totalEnrolled.toLocaleString() : '—'}
+              label={t('moduleOverview.kpis.totalEnrolled')}
+              value={data.overview.totalEnrolled != null ? numberFormatter.format(data.overview.totalEnrolled) : '—'}
               icon={Users}
               accentColor="rgb(var(--accent-enrollment)/0.12)"
               iconColor="rgb(var(--accent-enrollment))"
               barColor="rgb(var(--accent-enrollment))"
-              tag={data.overview.recentEnrollments && data.overview.recentEnrollments > 0 ? { text: `+${data.overview.recentEnrollments} recent`, color: 'rgb(var(--accent-enrollment))', bg: 'rgb(var(--accent-enrollment)/0.1)' } : data.enrollment.total > 0 ? { text: `${data.enrollment.data.length} grades`, color: 'rgb(var(--accent-enrollment))', bg: 'rgb(var(--accent-enrollment)/0.1)' } : undefined}
-              hint={data.enrollment.data.length > 0 ? `across ${data.enrollment.data.length} grades` : 'this academic year'}
+              tag={data.overview.recentEnrollments && data.overview.recentEnrollments > 0 ? { text: t('moduleOverview.kpis.recent', { count: numberFormatter.format(data.overview.recentEnrollments) }), color: 'rgb(var(--accent-enrollment))', bg: 'rgb(var(--accent-enrollment)/0.1)' } : data.enrollment.total > 0 ? { text: t('moduleOverview.kpis.grades', { count: numberFormatter.format(data.enrollment.data.length) }), color: 'rgb(var(--accent-enrollment))', bg: 'rgb(var(--accent-enrollment)/0.1)' } : undefined}
+              hint={data.enrollment.data.length > 0 ? t('moduleOverview.kpis.acrossGrades', { count: numberFormatter.format(data.enrollment.data.length) }) : t('moduleOverview.kpis.thisAcademicYear')}
               loading={data.overview.isLoading}
               error={data.overview.errors.length > 0}
               onRetry={handleRefresh}
@@ -273,16 +291,16 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
 
           {/* Tile 2: Active Sections */}
           <StatCard
-            label="Active Sections"
-            value={data.overview.activeSections != null ? data.overview.activeSections.toString() : '—'}
+            label={t('moduleOverview.kpis.activeSections')}
+            value={data.overview.activeSections != null ? numberFormatter.format(data.overview.activeSections) : '—'}
             icon={LayoutGrid}
             accentColor="rgb(var(--accent-academics)/0.12)"
             iconColor="rgb(var(--accent-academics))"
             barColor="rgb(var(--accent-academics))"
-            tag={data.teachers.teacherCount != null ? { text: `${data.teachers.teacherCount} teachers`, color: 'rgb(var(--accent-academics))', bg: 'rgb(var(--accent-academics)/0.1)' } : undefined}
+            tag={data.teachers.teacherCount != null ? { text: t('moduleOverview.kpis.teachers', { count: numberFormatter.format(data.teachers.teacherCount) }), color: 'rgb(var(--accent-academics))', bg: 'rgb(var(--accent-academics)/0.1)' } : undefined}
             hint={data.overview.activeSections != null && data.overview.totalEnrolled != null && data.overview.activeSections > 0
-              ? `${Math.round(data.overview.totalEnrolled / data.overview.activeSections)}:1 student-section ratio`
-              : 'active classes'}
+              ? t('moduleOverview.kpis.studentSectionRatio', { value: numberFormatter.format(Math.round(data.overview.totalEnrolled / data.overview.activeSections)) })
+              : t('moduleOverview.kpis.activeClasses')}
             loading={data.overview.isLoading}
             error={data.overview.errors.length > 0}
             onRetry={handleRefresh}
@@ -290,17 +308,21 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
 
           {/* Tile 3: Today's Attendance */}
           <StatCard
-            label="Today's Attendance"
+            label={t('moduleOverview.kpis.todayAttendance')}
             value={attendanceRate != null ? `${attendanceRate.toFixed(1)}%` : '—'}
             icon={ClipboardCheck}
             accentColor="rgb(var(--accent-attendance)/0.12)"
             iconColor="rgb(var(--accent-attendance))"
             barColor={attendanceColor || 'rgb(var(--accent-attendance))'}
             valueColor={attendanceColor}
-            tag={unrecordedCount ? { text: 'Partial data', color: 'rgb(var(--accent-attendance))', bg: 'rgb(var(--accent-attendance)/0.1)' } : undefined}
+            tag={unrecordedCount ? { text: t('moduleOverview.kpis.partialData'), color: 'rgb(var(--accent-attendance))', bg: 'rgb(var(--accent-attendance)/0.1)' } : undefined}
             hint={data.overview.todayAttendanceSummary
-              ? `${data.overview.todayAttendanceSummary.present} present · ${data.overview.todayAttendanceSummary.absent} absent · ${data.overview.todayAttendanceSummary.late} late`
-              : 'today'}
+              ? t('moduleOverview.kpis.attendanceBreakdown', {
+                  present: numberFormatter.format(data.overview.todayAttendanceSummary.present),
+                  absent: numberFormatter.format(data.overview.todayAttendanceSummary.absent),
+                  late: numberFormatter.format(data.overview.todayAttendanceSummary.late),
+                })
+              : t('moduleOverview.kpis.today')}
             loading={data.overview.isLoading}
             error={data.overview.errors.length > 0}
             onRetry={handleRefresh}
@@ -308,16 +330,19 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
 
           {/* Tile 4: At-Risk Students */}
           <StatCard
-            label="At-Risk Students"
-            value={data.alerts.totalCount.toString()}
+            label={t('moduleOverview.kpis.atRiskStudents')}
+            value={numberFormatter.format(data.alerts.totalCount)}
             icon={AlertTriangle}
             accentColor="rgb(var(--accent-finance)/0.12)"
             iconColor="rgb(var(--accent-finance))"
             barColor="rgb(var(--accent-finance))"
-            tag={data.alerts.criticalCount > 0 ? { text: `${data.alerts.criticalCount} below 80%`, color: 'rgb(var(--accent-finance))', bg: 'rgb(var(--accent-finance)/0.1)' } : undefined}
+            tag={data.alerts.criticalCount > 0 ? { text: t('moduleOverview.kpis.below80', { count: numberFormatter.format(data.alerts.criticalCount) }), color: 'rgb(var(--accent-finance))', bg: 'rgb(var(--accent-finance)/0.1)' } : undefined}
             hint={data.alerts.criticalCount > 0 || data.alerts.warningCount > 0
-              ? `${data.alerts.criticalCount} critical · ${data.alerts.warningCount} warning`
-              : 'below 90% threshold'}
+              ? t('moduleOverview.kpis.riskBreakdown', {
+                  critical: numberFormatter.format(data.alerts.criticalCount),
+                  warning: numberFormatter.format(data.alerts.warningCount),
+                })
+              : t('moduleOverview.kpis.below90Threshold')}
             loading={data.alerts.isLoading}
           />
         </motion.div>
@@ -326,7 +351,7 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
         {(data.alerts.isLoading || data.alerts.items.length > 0 || (unrecordedCount ?? 0) > 0) && (
           <motion.div variants={fadeInUp} className="space-y-2">
             <h2 className="text-sm font-semibold text-[rgb(var(--text-primary))]">
-              Needs Attention
+              {t('moduleOverview.needsAttention.title')}
             </h2>
             <AttendanceAlertsCard
               alerts={data.alerts.items}
@@ -339,7 +364,7 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
 
         {/* ---- Attendance Trend (full width) ---- */}
         <motion.div variants={fadeInUp}>
-          <WidgetErrorBoundaryV2 fallbackMessage="Unable to load attendance trend">
+          <WidgetErrorBoundaryV2 fallbackMessage={t('moduleOverview.errors.attendanceTrend')}>
             <AttendanceTrendChart
               chartData={data.trend.chartData}
               summary={data.trend.summary}
@@ -354,7 +379,7 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
           className="grid gap-4 grid-cols-1 md:grid-cols-2"
         >
           {data.canViewEnrollment && (
-            <WidgetErrorBoundaryV2 fallbackMessage="Unable to load enrollment chart">
+            <WidgetErrorBoundaryV2 fallbackMessage={t('moduleOverview.errors.enrollmentChart')}>
               <EnrollmentByGradeChart
                 data={data.enrollment.data}
                 total={data.enrollment.total}
@@ -363,7 +388,7 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
             </WidgetErrorBoundaryV2>
           )}
 
-          <WidgetErrorBoundaryV2 fallbackMessage="Unable to load at-risk students">
+          <WidgetErrorBoundaryV2 fallbackMessage={t('moduleOverview.errors.atRiskStudents')}>
             <AtRiskStudentsCard
               students={data.alerts.students}
               totalAtRisk={data.alerts.totalCount}
@@ -377,7 +402,7 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
           variants={fadeInUp}
           className="grid gap-4 grid-cols-1 md:grid-cols-2"
         >
-          <WidgetErrorBoundaryV2 fallbackMessage="Unable to load staff roster">
+          <WidgetErrorBoundaryV2 fallbackMessage={t('moduleOverview.errors.staffRoster')}>
             <StaffRosterCard
               staff={data.staff.items}
               activeCount={data.staff.activeCount}

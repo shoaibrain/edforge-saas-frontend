@@ -10,6 +10,7 @@ import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { ArrowRight } from 'lucide-react'
 import { AnimatedProgressBar } from '@edforge/ui'
+import { useTranslation } from '@edforge/i18n'
 import { getStudentAvatar } from '../../lib/avatar'
 import type { AttendanceAlert } from '../../hooks/useAcademicsOverview'
 
@@ -91,6 +92,7 @@ export function AtRiskStudentsCard({
   totalAtRisk,
   isLoading,
 }: AtRiskStudentsCardProps) {
+  const { t } = useTranslation('academics')
   const topStudents = students.slice(0, 5)
 
   return (
@@ -102,10 +104,10 @@ export function AtRiskStudentsCard({
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-medium text-[rgb(var(--text-secondary))]">
-          At-risk student detail
+          {t('moduleOverview.atRisk.title')}
         </h3>
         <span className="text-xs font-semibold text-[rgb(var(--state-danger-fg))]">
-          {totalAtRisk} at risk
+          {t('moduleOverview.atRisk.total', { count: totalAtRisk })}
         </span>
       </div>
 
@@ -115,12 +117,14 @@ export function AtRiskStudentsCard({
           <ListSkeleton />
         ) : totalAtRisk === 0 ? (
           <div className="flex items-center justify-center text-sm py-6 text-[rgb(var(--text-tertiary))]">
-            No at-risk students
+            {t('moduleOverview.atRisk.empty')}
           </div>
         ) : (
           <div className="space-y-2.5">
             {topStudents.map((student) => {
               const color = getRateColor(student.attendanceRate)
+              const gradeLabel = student.gradeLevel ? t('gradeLabel', { level: student.gradeLevel }) : ''
+              const absentLabel = t('moduleOverview.atRisk.absent', { count: student.absentDays })
               return (
                 <div key={student.studentId} className="flex items-center gap-3">
                   <StudentAvatar name={student.studentName} studentId={student.studentId} />
@@ -129,7 +133,7 @@ export function AtRiskStudentsCard({
                       {student.studentName}
                     </p>
                     <p className="text-xs mt-0.5 text-[rgb(var(--text-disabled))]">
-                      {student.gradeLevel ? `Grade ${student.gradeLevel}` : ''}{student.gradeLevel ? ' · ' : ''}{student.absentDays} absent
+                      {gradeLabel ? t('moduleOverview.atRisk.gradeAbsent', { grade: gradeLabel, absent: absentLabel }) : absentLabel}
                     </p>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
@@ -144,7 +148,10 @@ export function AtRiskStudentsCard({
                       <AnimatedProgressBar
                         percentage={student.attendanceRate}
                         color={color}
-                        label={`${student.studentName}: ${student.attendanceRate.toFixed(1)}% attendance`}
+                        label={t('moduleOverview.atRisk.progressLabel', {
+                          student: student.studentName,
+                          rate: student.attendanceRate.toFixed(1),
+                        })}
                       />
                     </div>
                   </div>
@@ -161,7 +168,7 @@ export function AtRiskStudentsCard({
           to="/students"
           className="inline-flex items-center gap-1.5 text-xs font-medium transition-opacity hover:opacity-80 text-[rgb(var(--accent-enrollment-text))]"
         >
-          View all {totalAtRisk} at-risk students
+          {t('moduleOverview.atRisk.viewAll', { count: totalAtRisk })}
           <ArrowRight className="w-3 h-3" />
         </Link>
       </div>

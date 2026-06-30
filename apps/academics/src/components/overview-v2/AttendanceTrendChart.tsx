@@ -19,6 +19,7 @@ import {
 } from 'recharts'
 import { ArrowRight } from 'lucide-react'
 import { useV2ChartColors } from '@edforge/ui'
+import { useTranslation } from '@edforge/i18n'
 import { useAppStore } from '../../stores/app.store'
 import type { AttendanceTrendPoint } from '../../hooks/useAcademicsOverview'
 
@@ -42,12 +43,16 @@ function TrendSkeleton() {
 }
 
 function ChartTooltip({ active, payload }: any) {
+  const { t, i18n } = useTranslation('academics')
+
   if (!active || !payload?.length) return null
   const point = payload[0].payload
+  const locale = i18n.language === 'ne' ? 'ne-NP' : 'en-US'
+
   return (
     <div className="rounded-md shadow-lg px-3 py-2 border text-xs bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary)/0.35)]">
       <p className="text-[rgb(var(--text-tertiary))]">
-        {new Date(point.date).toLocaleDateString('en-US', {
+        {new Date(point.date).toLocaleDateString(locale, {
           weekday: 'short',
           month: 'short',
           day: 'numeric',
@@ -57,7 +62,10 @@ function ChartTooltip({ active, payload }: any) {
         {point.rate.toFixed(1)}%
       </p>
       <p className="mt-0.5 text-[rgb(var(--text-tertiary))]">
-        {point.present} of {point.total} present
+        {t('moduleOverview.attendanceTrend.tooltipPresent', {
+          present: point.present,
+          total: point.total,
+        })}
       </p>
     </div>
   )
@@ -74,13 +82,19 @@ export function AttendanceTrendChart({
   summary,
   isLoading,
 }: AttendanceTrendChartProps) {
+  const { t } = useTranslation('academics')
   const resolvedTheme = useAppStore((s) => s.theme) === 'dark' ? 'dark' : 'light'
   const colors = useV2ChartColors(resolvedTheme as 'dark' | 'light')
 
   const srSummary = useMemo(() => {
-    if (!summary || chartData.length === 0) return 'No attendance trend data available.'
-    return `Attendance rate ranged from ${summary.min.toFixed(1)}% to ${summary.max.toFixed(1)}% over the past 30 days, with an average of ${summary.avg.toFixed(1)}%, compared to the ${THRESHOLD}% target.`
-  }, [summary, chartData])
+    if (!summary || chartData.length === 0) return t('moduleOverview.attendanceTrend.srNoData')
+    return t('moduleOverview.attendanceTrend.srSummary', {
+      min: summary.min.toFixed(1),
+      max: summary.max.toFixed(1),
+      avg: summary.avg.toFixed(1),
+      target: THRESHOLD,
+    })
+  }, [summary, chartData, t])
 
   return (
     <div
@@ -92,24 +106,24 @@ export function AttendanceTrendChart({
       <div className="flex items-center justify-between mb-4">
         <div>
           <h3 className="text-sm font-medium text-[rgb(var(--text-secondary))]">
-            Attendance trend
+            {t('moduleOverview.attendanceTrend.title')}
           </h3>
           <p className="text-xs mt-0.5 text-[rgb(var(--text-disabled))]">
-            30-day rolling average
+            {t('moduleOverview.attendanceTrend.subtitle')}
           </p>
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1.5">
             <div className="rounded-sm w-2 h-0.5 bg-[rgb(var(--accent-enrollment))]" />
-            <span className="text-xs text-[rgb(var(--text-disabled))]">Actual</span>
+            <span className="text-xs text-[rgb(var(--text-disabled))]">{t('moduleOverview.attendanceTrend.actual')}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <div style={{ width: 8, height: 0, borderTop: '1px dashed rgba(239, 159, 39, 0.6)' }} />
-            <span className="text-xs text-[rgb(var(--text-disabled))]">{THRESHOLD}% target</span>
+            <span className="text-xs text-[rgb(var(--text-disabled))]">{t('moduleOverview.attendanceTrend.target', { value: THRESHOLD })}</span>
           </div>
           {summary && (
             <span className="text-xs font-semibold text-[rgb(var(--accent-enrollment-text))]">
-              Avg {summary.avg.toFixed(1)}%
+              {t('moduleOverview.attendanceTrend.average', { value: summary.avg.toFixed(1) })}
             </span>
           )}
         </div>
@@ -125,12 +139,12 @@ export function AttendanceTrendChart({
             className="flex items-center justify-center text-sm text-[rgb(var(--text-tertiary))]"
             style={{ height: 160 }}
           >
-            No attendance data recorded yet
+            {t('moduleOverview.attendanceTrend.empty')}
           </div>
         ) : (
           <figure
             role="img"
-            aria-label="Attendance trend over 30 days"
+            aria-label={t('moduleOverview.attendanceTrend.aria')}
             aria-describedby="academics-v2-trend-desc"
           >
             <figcaption id="academics-v2-trend-desc" className="sr-only">
@@ -188,7 +202,7 @@ export function AttendanceTrendChart({
           search={{ tab: 'attendance' }}
           className="inline-flex items-center gap-1.5 text-xs font-medium transition-opacity hover:opacity-80 text-[rgb(var(--accent-enrollment-text))]"
         >
-          View Attendance
+          {t('moduleOverview.attendanceTrend.viewAttendance')}
           <ArrowRight className="w-3 h-3" />
         </Link>
       </div>
