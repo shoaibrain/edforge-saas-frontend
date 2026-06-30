@@ -179,6 +179,23 @@ export {
   useBulkSendStatements,
 } from './hooks/useAsyncBulkJob'
 
+// Sprint F.5/F.6 — bulk-PDF-export (F.3 worker + F.4 controller).
+// Frontend triggers via `useBulkInvoicePdfExport` then polls a single
+// FinanceJob row via `useFinanceJob(jobId)` for the modal's progress
+// bar. The polling URL is intentionally NOT school-scoped per the
+// D.3 backend 404-not-403 enumerability contract.
+export {
+  bulkInvoicePdfExport,
+  getFinanceJob,
+} from './services/bulk-pdf-export.service'
+export type {
+  BulkInvoicePdfExportAck,
+  BulkInvoicePdfExportDto,
+  FinanceJobRow,
+} from './services/bulk-pdf-export.service'
+export { useFinanceJob } from './hooks/useFinanceJob'
+export { useBulkInvoicePdfExport } from './hooks/useBulkInvoicePdfExport'
+
 // Pagination foundation (Sprint 0)
 export { useFinancePaginatedQuery } from './hooks/useFinancePaginatedQuery'
 export type {

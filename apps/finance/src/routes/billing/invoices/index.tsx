@@ -59,6 +59,7 @@ import { useFinanceSettings } from '../../../layouts/FinanceLayout'
 import { formatDateDual } from '../../../utils/format-date'
 import { StudentSearchInput } from '../../../components/billing/StudentSearchInput'
 import { BulkSendInvoiceReminderDrawer } from '../../../components/billing/BulkSendInvoiceReminderDrawer'
+import { BulkPdfExportModal } from '../../../components/billing/BulkPdfExportModal'
 import {
   FinancePageHeader,
   FinanceInfoBanner,
@@ -140,6 +141,8 @@ export default function InvoicesPage() {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const [showBulkIssueConfirm, setShowBulkIssueConfirm] = useState(false)
   const [bulkReminderTarget, setBulkReminderTarget] = useState<Invoice[] | null>(null)
+  // Sprint F.5 — bulk PDF export target (selected invoice IDs); null = modal closed.
+  const [bulkPdfExportTarget, setBulkPdfExportTarget] = useState<string[] | null>(null)
 
   // Cancel dialog state
   const [cancelTarget, setCancelTarget] = useState<{ id: string; invoiceNumber: string } | null>(null)
@@ -573,6 +576,19 @@ export default function InvoicesPage() {
             icon: <Clock className="w-4 h-4" />,
             onRun: (rows) => setBulkReminderTarget(rows),
           },
+          {
+            // Sprint F.5 — bulk PDF (ZIP) export.
+            // Selection set comes from row checkboxes (selected-all-filtered
+            // works because the data-table's `rowSelection` state is keyed
+            // by row id even across paged loads). The F.4 backend dedupes
+            // at the schema layer; we still pass an Array.from(new Set())
+            // here to keep "Download (N)" label honest.
+            id: 'pdf-export',
+            label: t('invoices.bulkPdfExport.menuLabel'),
+            icon: <Download className="w-4 h-4" />,
+            onRun: (rows) =>
+              setBulkPdfExportTarget(Array.from(new Set(rows.map((r) => r.id)))),
+          },
         ]}
         exportOptions={{ filename: 'invoices', formats: ['csv'] }}
         emptyState={{
@@ -603,6 +619,19 @@ export default function InvoicesPage() {
         onClose={() => setBulkReminderTarget(null)}
         onComplete={() => setRowSelection({})}
       />
+
+      {/* Sprint F.5 — Bulk PDF Export Modal */}
+      {bulkPdfExportTarget && (
+        <BulkPdfExportModal
+          open={!!bulkPdfExportTarget}
+          onClose={() => {
+            setBulkPdfExportTarget(null)
+            setRowSelection({})
+          }}
+          schoolId={schoolId ?? ''}
+          invoiceIds={bulkPdfExportTarget}
+        />
+      )}
 
       {/* Bulk Issue Confirmation Modal */}
       <AnimatePresence>
