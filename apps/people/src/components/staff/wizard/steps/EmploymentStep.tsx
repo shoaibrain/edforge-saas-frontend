@@ -9,18 +9,34 @@ import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Briefcase, GraduationCap, UserPlus } from 'lucide-react'
 import type { WizardStepProps } from '@edforge/wizard'
+import { useTranslation } from '@edforge/i18n'
 import {
   STAFF_ROLE_OPTIONS,
   EMPLOYMENT_TYPE_OPTIONS,
   GLOBAL_ROLE_OPTIONS,
   TEACHING_ROLES,
+  optionValueToI18nKey,
 } from '../staff-wizard.utils'
 import { AnimatedInput, AnimatedSelect, AnimatedCheckbox, SectionHeader } from './shared'
+import { getRoleI18nKey } from '../../StaffRoleBadge'
 
 export function EmploymentStep({ data, updateData, errors, clearError }: WizardStepProps) {
+  const { t } = useTranslation('people')
   const role = data.role as string
   const isTeachingRole = TEACHING_ROLES.includes(role)
   const createAccount = data.createUserAccount === true
+  const roleOptions = STAFF_ROLE_OPTIONS.map((option) => ({
+    ...option,
+    label: t(`roles.${getRoleI18nKey(option.value)}`, { defaultValue: option.label }),
+  }))
+  const employmentTypeOptions = EMPLOYMENT_TYPE_OPTIONS.map((option) => ({
+    ...option,
+    label: t(`choices.employmentType.${optionValueToI18nKey(option.value)}`, { defaultValue: option.label }),
+  }))
+  const globalRoleOptions = GLOBAL_ROLE_OPTIONS.map((option) => ({
+    ...option,
+    label: t(`quickAdd.roles.${option.value === 'TenantAdmin' ? 'tenantAdmin' : 'tenantUser'}`, { defaultValue: option.label }),
+  }))
 
   const handleChange = (field: string) => (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -34,14 +50,14 @@ export function EmploymentStep({ data, updateData, errors, clearError }: WizardS
       {/* Core Employment */}
       <div className="space-y-4">
         <SectionHeader
-          title="Employment Details"
-          description="Role and employment classification"
+          title={t('wizard.employment.details')}
+          description={t('wizard.employment.detailsDescription')}
           icon={<Briefcase className="w-4 h-4" />}
         />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <AnimatedSelect
-            label="Role"
+            label={t('fields.role')}
             required
             value={role || ''}
             onChange={(e) => {
@@ -49,21 +65,21 @@ export function EmploymentStep({ data, updateData, errors, clearError }: WizardS
               clearError('role')
             }}
             error={errors.role}
-            options={[{ value: '', label: 'Select a role...' }, ...STAFF_ROLE_OPTIONS]}
+            options={[{ value: '', label: t('wizard.placeholders.selectRole') }, ...roleOptions]}
           />
           <AnimatedSelect
-            label="Employment Type"
+            label={t('fields.employmentType')}
             required
             value={(data.employmentType as string) || 'full_time'}
             onChange={handleChange('employmentType')}
             error={errors.employmentType}
-            options={EMPLOYMENT_TYPE_OPTIONS}
+            options={employmentTypeOptions}
           />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <AnimatedInput
-            label="Hire Date"
+            label={t('fields.hireDate')}
             required
             type="date"
             value={(data.hireDate as string) || ''}
@@ -71,8 +87,8 @@ export function EmploymentStep({ data, updateData, errors, clearError }: WizardS
             error={errors.hireDate}
           />
           <AnimatedInput
-            label="Position Title"
-            placeholder="e.g., Senior Math Teacher"
+            label={t('fields.positionTitle')}
+            placeholder={t('wizard.placeholders.positionTitle')}
             value={(data.title as string) || ''}
             onChange={handleChange('title')}
           />
@@ -89,21 +105,21 @@ export function EmploymentStep({ data, updateData, errors, clearError }: WizardS
             className="space-y-4"
           >
             <SectionHeader
-              title="Teaching Qualifications"
-              description="Ed-Fi fields for instructional staff"
+              title={t('wizard.employment.teachingQualifications')}
+              description={t('wizard.employment.teachingQualificationsDescription')}
               icon={<GraduationCap className="w-4 h-4" />}
             />
 
             <AnimatedCheckbox
-              label="Highly Qualified Teacher (HQT)"
+              label={t('wizard.employment.highlyQualifiedTeacher')}
               checked={data.highlyQualifiedTeacher === true}
               onChange={(checked) => updateData({ highlyQualifiedTeacher: checked })}
-              helpText="As defined by NCLB/ESSA requirements"
+              helpText={t('wizard.employment.highlyQualifiedHelp')}
             />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <AnimatedInput
-                label="Years of Prior Teaching Experience"
+                label={t('wizard.employment.priorTeachingExperience')}
                 type="number"
                 min={0}
                 placeholder="0"
@@ -114,7 +130,7 @@ export function EmploymentStep({ data, updateData, errors, clearError }: WizardS
                 }}
               />
               <AnimatedInput
-                label="Years of Prior Professional Experience"
+                label={t('wizard.employment.priorProfessionalExperience')}
                 type="number"
                 min={0}
                 placeholder="0"
@@ -132,16 +148,16 @@ export function EmploymentStep({ data, updateData, errors, clearError }: WizardS
       {/* Account Setup */}
       <div className="space-y-4">
         <SectionHeader
-          title="User Account"
-          description="Optionally create a login account for this staff member"
+          title={t('wizard.employment.userAccount')}
+          description={t('wizard.employment.userAccountDescription')}
           icon={<UserPlus className="w-4 h-4" />}
         />
 
         <AnimatedCheckbox
-          label="Create user account for this staff member"
+          label={t('wizard.employment.createUserAccount')}
           checked={createAccount}
           onChange={(checked) => updateData({ createUserAccount: checked })}
-          helpText="Enables login access to EdForge. An email invitation will be sent."
+          helpText={t('wizard.employment.createUserAccountHelp')}
         />
 
         <AnimatePresence>
@@ -153,16 +169,15 @@ export function EmploymentStep({ data, updateData, errors, clearError }: WizardS
               className="space-y-4 pl-8 border-l-2 border-[rgb(var(--border-focus)/0.35)]"
             >
               <div className="p-3 rounded-lg bg-[rgb(var(--state-info-bg)/0.18)] text-sm text-[rgb(var(--state-info-fg))] ">
-                A Cognito account will be created with the email from Step 2
-                ({(data.email as string) || 'not set yet'}). A temporary password will be auto-generated.
+                {t('wizard.employment.cognitoNotice', { email: (data.email as string) || t('wizard.employment.emailNotSet') })}
               </div>
 
               <AnimatedSelect
-                label="Global Role"
+                label={t('quickAdd.systemRole')}
                 value={(data.globalRole as string) || 'TenantUser'}
                 onChange={handleChange('globalRole')}
-                options={GLOBAL_ROLE_OPTIONS}
-                helpText="TenantAdmin has full system access"
+                options={globalRoleOptions}
+                helpText={t('wizard.employment.globalRoleHelp')}
               />
             </motion.div>
           )}

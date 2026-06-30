@@ -10,10 +10,12 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Building2, Plus, X, AlertTriangle } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import type { WizardStepProps } from '@edforge/wizard'
+import { useTranslation } from '@edforge/i18n'
 import { apiGet } from '../../../../lib/api'
 import {
   STAFF_ROLE_OPTIONS,
 } from '../staff-wizard.utils'
+import { getRoleI18nKey } from '../../StaffRoleBadge'
 import { AnimatedInput, AnimatedSelect, SectionHeader } from './shared'
 
 // ============================================================================
@@ -99,14 +101,16 @@ function emptyAssignment(): AdditionalAssignment {
 function FteSlider({
   value,
   onChange,
+  label,
 }: {
   value: number
   onChange: (val: number) => void
+  label: string
 }) {
   return (
     <div className="space-y-1.5">
       <label className="block text-sm font-medium text-[rgb(var(--text-secondary))]">
-        Full-Time Equivalency (FTE)
+        {label}
       </label>
       <div className="flex items-center gap-4">
         <input
@@ -135,19 +139,25 @@ function AdditionalAssignmentDepartmentSelect({
   schoolId,
   value,
   onChange,
+  label,
+  loadingLabel,
+  placeholder,
 }: {
   schoolId: string
   value: string
   onChange: (val: string) => void
+  label: string
+  loadingLabel: string
+  placeholder: string
 }) {
   const { data: departments = [], isLoading } = useDepartments(schoolId || undefined)
   return (
     <AnimatedSelect
-      label="Department"
+      label={label}
       value={value}
       onChange={(e) => onChange(e.target.value)}
       options={[
-        { value: '', label: isLoading ? 'Loading...' : 'Select department...' },
+        { value: '', label: isLoading ? loadingLabel : placeholder },
         ...departments.map((d) => ({ value: d.id, label: `${d.name} (${d.code})` })),
       ]}
     />
@@ -155,6 +165,7 @@ function AdditionalAssignmentDepartmentSelect({
 }
 
 export function AssignmentStep({ data, updateData, errors, clearError }: WizardStepProps) {
+  const { t } = useTranslation('people')
   const { data: schools = [], isLoading: loadingSchools } = useSchools()
   const primarySchoolId = (data.primarySchoolId as string) || ''
   const { data: primaryDepartments = [], isLoading: loadingPrimaryDepts } = useDepartments(primarySchoolId || undefined)
@@ -176,7 +187,7 @@ export function AssignmentStep({ data, updateData, errors, clearError }: WizardS
   }
 
   const schoolOptions = [
-    { value: '', label: loadingSchools ? 'Loading schools...' : 'Select a school...' },
+    { value: '', label: loadingSchools ? t('wizard.assignment.loadingSchools') : t('wizard.assignment.selectSchool') },
     ...schools.map((s) => ({
       value: s.id,
       label: s.leaName ? `${s.name} (${s.leaName})` : s.name,
@@ -184,8 +195,11 @@ export function AssignmentStep({ data, updateData, errors, clearError }: WizardS
   ]
 
   const roleOptions = [
-    { value: '', label: 'Same as employment role' },
-    ...STAFF_ROLE_OPTIONS,
+    { value: '', label: t('wizard.assignment.sameAsEmploymentRole') },
+    ...STAFF_ROLE_OPTIONS.map((option) => ({
+      ...option,
+      label: t(`roles.${getRoleI18nKey(option.value)}`, { defaultValue: option.label }),
+    })),
   ]
 
   // Set defaults from employment step
@@ -218,13 +232,13 @@ export function AssignmentStep({ data, updateData, errors, clearError }: WizardS
       {/* Primary Assignment */}
       <div className="space-y-4">
         <SectionHeader
-          title="Primary School Assignment"
-          description="The staff member's main school placement"
+          title={t('wizard.assignment.primaryTitle')}
+          description={t('wizard.assignment.primaryDescription')}
           icon={<Building2 className="w-4 h-4" />}
         />
 
         <AnimatedSelect
-          label="Primary School"
+          label={t('fields.primarySchool')}
           required
           value={(data.primarySchoolId as string) || ''}
           onChange={(e) => {
@@ -237,14 +251,14 @@ export function AssignmentStep({ data, updateData, errors, clearError }: WizardS
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <AnimatedSelect
-            label="Role at School"
+            label={t('wizard.assignment.roleAtSchool')}
             value={effectiveRole}
             onChange={handleChange('primaryAssignmentRole')}
             options={roleOptions}
-            helpText="Defaults to employment role"
+            helpText={t('wizard.assignment.roleHelp')}
           />
           <AnimatedSelect
-            label="Department"
+            label={t('fields.department')}
             value={(data.primaryAssignmentDepartmentId as string) || ''}
             onChange={(e) => {
               const deptId = e.target.value
@@ -255,30 +269,31 @@ export function AssignmentStep({ data, updateData, errors, clearError }: WizardS
               })
             }}
             options={[
-              { value: '', label: loadingPrimaryDepts ? 'Loading...' : 'Select department...' },
+              { value: '', label: loadingPrimaryDepts ? t('common.loading') : t('wizard.placeholders.selectDepartment') },
               ...primaryDepartments.map((d) => ({ value: d.id, label: `${d.name} (${d.code})` })),
             ]}
           />
           <AnimatedInput
-            label="Begin Date"
+            label={t('fields.beginDate')}
             type="date"
             value={effectiveBeginDate}
             onChange={handleChange('primaryAssignmentBeginDate')}
-            helpText="Defaults to hire date"
+            helpText={t('wizard.assignment.beginDateHelp')}
           />
         </div>
 
         <FteSlider
           value={primaryFte}
           onChange={(val) => updateData({ primaryAssignmentFte: val })}
+          label={t('wizard.assignment.fte')}
         />
       </div>
 
       {/* Additional Assignments */}
       <div className="space-y-4">
         <SectionHeader
-          title="Additional Assignments"
-          description="Staff can be assigned to multiple schools"
+          title={t('wizard.assignment.additionalTitle')}
+          description={t('wizard.assignment.additionalDescription')}
         />
 
         <AnimatePresence>
@@ -292,7 +307,7 @@ export function AssignmentStep({ data, updateData, errors, clearError }: WizardS
             >
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-[rgb(var(--text-secondary))]">
-                  Assignment {index + 2}
+                  {t('wizard.assignment.assignmentNumber', { count: index + 2 })}
                 </span>
                 <button
                   type="button"
@@ -304,7 +319,7 @@ export function AssignmentStep({ data, updateData, errors, clearError }: WizardS
               </div>
 
               <AnimatedSelect
-                label="School"
+                label={t('wizard.assignment.school')}
                 value={assignment.schoolId || ''}
                 onChange={(e) => updateAdditionalAssignment(index, 'schoolId', e.target.value)}
                 options={schoolOptions}
@@ -312,13 +327,13 @@ export function AssignmentStep({ data, updateData, errors, clearError }: WizardS
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <AnimatedSelect
-                  label="Role"
+                  label={t('fields.role')}
                   value={assignment.role || ''}
                   onChange={(e) => updateAdditionalAssignment(index, 'role', e.target.value)}
                   options={roleOptions}
                 />
                 <AnimatedInput
-                  label="Begin Date"
+                  label={t('fields.beginDate')}
                   type="date"
                   value={assignment.beginDate || ''}
                   onChange={(e) => updateAdditionalAssignment(index, 'beginDate', e.target.value)}
@@ -327,12 +342,16 @@ export function AssignmentStep({ data, updateData, errors, clearError }: WizardS
                   schoolId={assignment.schoolId}
                   value={assignment.departmentId || ''}
                   onChange={(val) => updateAdditionalAssignment(index, 'departmentId', val)}
+                  label={t('fields.department')}
+                  loadingLabel={t('common.loading')}
+                  placeholder={t('wizard.placeholders.selectDepartment')}
                 />
               </div>
 
               <FteSlider
                 value={assignment.fullTimeEquivalency || 0.5}
                 onChange={(val) => updateAdditionalAssignment(index, 'fullTimeEquivalency', val)}
+                label={t('wizard.assignment.fte')}
               />
             </motion.div>
           ))}
@@ -344,7 +363,7 @@ export function AssignmentStep({ data, updateData, errors, clearError }: WizardS
           className="flex items-center gap-2 text-sm text-[rgb(var(--action-secondary-fg))]  hover:text-[rgb(var(--state-info-fg))] dark:hover:text-[rgb(var(--text-primary))] transition-colors"
         >
           <Plus className="w-4 h-4" />
-          Add Another School Assignment
+          {t('wizard.assignment.addAnother')}
         </button>
       </div>
 
@@ -358,7 +377,7 @@ export function AssignmentStep({ data, updateData, errors, clearError }: WizardS
         <div className="flex items-center gap-2">
           {isOvercommitted && <AlertTriangle className="w-4 h-4 text-rust-500" />}
           <span className="text-sm font-medium text-[rgb(var(--text-primary))]">
-            Total FTE
+            {t('wizard.assignment.totalFte')}
           </span>
         </div>
         <span
@@ -373,7 +392,7 @@ export function AssignmentStep({ data, updateData, errors, clearError }: WizardS
       </motion.div>
       {isOvercommitted && (
         <p className="text-xs text-rust-500">
-          Total FTE exceeds 1.0. This staff member may be overcommitted.
+          {t('wizard.assignment.overcommitted')}
         </p>
       )}
     </motion.div>

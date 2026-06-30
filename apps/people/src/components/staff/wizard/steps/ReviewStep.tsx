@@ -9,11 +9,11 @@ import { motion } from 'framer-motion'
 import { User, Mail, Briefcase, Building2, Pencil, UserPlus } from 'lucide-react'
 import type { WizardStepProps } from '@edforge/wizard'
 import { useWizard } from '@edforge/wizard'
+import { useTranslation } from '@edforge/i18n'
 import {
-  STAFF_ROLE_LABELS,
-  EMPLOYMENT_TYPE_LABELS,
-  GENDER_LABELS,
+  optionValueToI18nKey,
 } from '../staff-wizard.utils'
+import { getRoleI18nKey } from '../../StaffRoleBadge'
 
 // ============================================================================
 // SUMMARY CARD
@@ -28,6 +28,7 @@ interface SummaryCardProps {
 
 function SummaryCard({ title, icon, stepIndex, children }: SummaryCardProps) {
   const { goToStep } = useWizard()
+  const { t } = useTranslation('people')
 
   return (
     <div className="border border-[rgb(var(--border-secondary))] rounded-xl overflow-hidden">
@@ -42,7 +43,7 @@ function SummaryCard({ title, icon, stepIndex, children }: SummaryCardProps) {
           className="flex items-center gap-1 text-xs text-[rgb(var(--action-secondary-fg))]  hover:text-[rgb(var(--state-info-fg))] dark:hover:text-[rgb(var(--text-primary))] transition-colors"
         >
           <Pencil className="w-3 h-3" />
-          Edit
+          {t('wizard.review.edit')}
         </button>
       </div>
       <div className="p-4 space-y-2">{children}</div>
@@ -55,10 +56,11 @@ function SummaryCard({ title, icon, stepIndex, children }: SummaryCardProps) {
 // ============================================================================
 
 function DetailRow({ label, value }: { label: string; value?: string | number | boolean | null }) {
+  const { t } = useTranslation('people')
   const display = value === true
-    ? 'Yes'
+    ? t('common.yes')
     : value === false
-    ? 'No'
+    ? t('common.no')
     : value || '\u2014'
 
   return (
@@ -84,6 +86,7 @@ interface AdditionalAssignment {
 }
 
 export function ReviewStep({ data }: WizardStepProps) {
+  const { t } = useTranslation('people')
   const createAccount = data.createUserAccount === true
   const addresses = (data.addresses as Array<Record<string, string>>) || []
   const emergencyContacts = (data.emergencyContacts as Array<Record<string, string>>) || []
@@ -96,35 +99,43 @@ export function ReviewStep({ data }: WizardStepProps) {
     (sum, a) => sum + (a.fullTimeEquivalency || 0),
     0,
   )
+  const roleLabel = (value?: string) =>
+    value ? t(`roles.${getRoleI18nKey(value)}`, { defaultValue: value }) : undefined
+  const employmentTypeLabel = (value?: string) =>
+    value ? t(`choices.employmentType.${optionValueToI18nKey(value)}`, { defaultValue: value }) : undefined
+  const genderLabel = (value?: string) =>
+    value ? t(`choices.gender.${optionValueToI18nKey(value)}`, { defaultValue: value }) : undefined
+  const relationshipLabel = (value?: string) =>
+    value ? t(`choices.relationship.${optionValueToI18nKey(value)}`, { defaultValue: value }) : undefined
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-4">
       <div className="text-center pb-2">
         <h3 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
-          Review Staff Information
+          {t('wizard.review.title')}
         </h3>
         <p className="text-sm text-[rgb(var(--text-tertiary))]">
-          Please review all details before creating the staff record.
+          {t('wizard.review.description')}
         </p>
       </div>
 
       {/* Personal Info */}
-      <SummaryCard title="Personal Information" icon={<User className="w-4 h-4" />} stepIndex={0}>
-        <DetailRow label="Name" value={`${data.firstName || ''} ${data.middleName ? (data.middleName as string) + ' ' : ''}${data.lastSurname || ''}${data.generationCodeSuffix ? ' ' + (data.generationCodeSuffix as string) : ''}`} />
-        <DetailRow label="Staff ID" value={data.staffUniqueId as string} />
-        <DetailRow label="Date of Birth" value={data.birthDate as string} />
-        <DetailRow label="Gender" value={GENDER_LABELS[(data.gender as string) || ''] || (data.gender as string)} />
-        <DetailRow label="Hispanic/Latino" value={data.hispanicLatinoEthnicity as boolean} />
-        {(data.maidenName as string) && <DetailRow label="Maiden Name" value={data.maidenName as string} />}
+      <SummaryCard title={t('wizard.review.sections.personal')} icon={<User className="w-4 h-4" />} stepIndex={0}>
+        <DetailRow label={t('fields.name')} value={`${data.firstName || ''} ${data.middleName ? (data.middleName as string) + ' ' : ''}${data.lastSurname || ''}${data.generationCodeSuffix ? ' ' + (data.generationCodeSuffix as string) : ''}`} />
+        <DetailRow label={t('fields.staffId')} value={data.staffUniqueId as string} />
+        <DetailRow label={t('fields.dateOfBirth')} value={data.birthDate as string} />
+        <DetailRow label={t('fields.gender')} value={genderLabel(data.gender as string)} />
+        <DetailRow label={t('fields.hispanicLatino')} value={data.hispanicLatinoEthnicity as boolean} />
+        {(data.maidenName as string) && <DetailRow label={t('fields.maidenName')} value={data.maidenName as string} />}
       </SummaryCard>
 
       {/* Contact */}
-      <SummaryCard title="Contact Information" icon={<Mail className="w-4 h-4" />} stepIndex={1}>
-        <DetailRow label="Email" value={data.email as string} />
-        <DetailRow label="Phone" value={data.phone as string} />
+      <SummaryCard title={t('sections.contactInfo')} icon={<Mail className="w-4 h-4" />} stepIndex={1}>
+        <DetailRow label={t('fields.email')} value={data.email as string} />
+        <DetailRow label={t('fields.phone')} value={data.phone as string} />
         <DetailRow
-          label="Addresses"
-          value={filledAddresses.length > 0 ? `${filledAddresses.length} address(es)` : undefined}
+          label={t('wizard.contact.addresses')}
+          value={filledAddresses.length > 0 ? t('wizard.review.addressCount', { count: filledAddresses.length }) : undefined}
         />
         {filledAddresses.map((addr, i) => (
           <div key={i} className="pl-4 text-xs text-[rgb(var(--text-secondary))]">
@@ -132,42 +143,42 @@ export function ReviewStep({ data }: WizardStepProps) {
           </div>
         ))}
         <DetailRow
-          label="Emergency Contacts"
-          value={filledContacts.length > 0 ? `${filledContacts.length} contact(s)` : undefined}
+          label={t('wizard.contact.emergencyContacts')}
+          value={filledContacts.length > 0 ? t('wizard.review.contactCount', { count: filledContacts.length }) : undefined}
         />
         {filledContacts.map((c, i) => (
           <div key={i} className="pl-4 text-xs text-[rgb(var(--text-secondary))]">
-            {c.name} ({c.relationship}) — {c.phone}
+            {c.name} ({relationshipLabel(c.relationship)}) — {c.phone}
           </div>
         ))}
       </SummaryCard>
 
       {/* Employment */}
-      <SummaryCard title="Employment" icon={<Briefcase className="w-4 h-4" />} stepIndex={2}>
-        <DetailRow label="Role" value={STAFF_ROLE_LABELS[(data.role as string) || '']} />
-        <DetailRow label="Employment Type" value={EMPLOYMENT_TYPE_LABELS[(data.employmentType as string) || '']} />
-        <DetailRow label="Hire Date" value={data.hireDate as string} />
-        <DetailRow label="Title" value={data.title as string} />
+      <SummaryCard title={t('wizard.stepMeta.employment.title')} icon={<Briefcase className="w-4 h-4" />} stepIndex={2}>
+        <DetailRow label={t('fields.role')} value={roleLabel(data.role as string)} />
+        <DetailRow label={t('fields.employmentType')} value={employmentTypeLabel(data.employmentType as string)} />
+        <DetailRow label={t('fields.hireDate')} value={data.hireDate as string} />
+        <DetailRow label={t('fields.title')} value={data.title as string} />
         {data.highlyQualifiedTeacher !== undefined && (
-          <DetailRow label="Highly Qualified Teacher" value={data.highlyQualifiedTeacher as boolean} />
+          <DetailRow label={t('wizard.employment.highlyQualifiedTeacher')} value={data.highlyQualifiedTeacher as boolean} />
         )}
         {typeof data.yearsOfPriorTeachingExperience === 'number' && (
-          <DetailRow label="Teaching Experience (years)" value={data.yearsOfPriorTeachingExperience as number} />
+          <DetailRow label={t('wizard.employment.teachingExperienceYears')} value={data.yearsOfPriorTeachingExperience as number} />
         )}
         {typeof data.yearsOfPriorProfessionalExperience === 'number' && (
-          <DetailRow label="Professional Experience (years)" value={data.yearsOfPriorProfessionalExperience as number} />
+          <DetailRow label={t('wizard.employment.professionalExperienceYears')} value={data.yearsOfPriorProfessionalExperience as number} />
         )}
       </SummaryCard>
 
       {/* Assignment */}
-      <SummaryCard title="School Assignments" icon={<Building2 className="w-4 h-4" />} stepIndex={3}>
-        <DetailRow label="Primary School" value={data.primarySchoolId ? 'Assigned' : undefined} />
-        <DetailRow label="Department" value={data.departmentName as string} />
-        <DetailRow label="Primary FTE" value={primaryFte.toFixed(2)} />
+      <SummaryCard title={t('sections.schoolAssignments')} icon={<Building2 className="w-4 h-4" />} stepIndex={3}>
+        <DetailRow label={t('fields.primarySchool')} value={data.primarySchoolId ? t('wizard.review.assigned') : undefined} />
+        <DetailRow label={t('fields.department')} value={data.departmentName as string} />
+        <DetailRow label={t('wizard.assignment.primaryFte')} value={primaryFte.toFixed(2)} />
         {additionalAssignments.length > 0 && (
-          <DetailRow label="Additional Assignments" value={`${additionalAssignments.length}`} />
+          <DetailRow label={t('wizard.assignment.additionalTitle')} value={`${additionalAssignments.length}`} />
         )}
-        <DetailRow label="Total FTE" value={(primaryFte + additionalFteTotal).toFixed(2)} />
+        <DetailRow label={t('wizard.assignment.totalFte')} value={(primaryFte + additionalFteTotal).toFixed(2)} />
       </SummaryCard>
 
       {/* Account Creation */}
@@ -179,12 +190,12 @@ export function ReviewStep({ data }: WizardStepProps) {
         <UserPlus className={`w-5 h-5 ${createAccount ? 'text-[rgb(var(--action-secondary-fg))] ' : 'text-[rgb(var(--text-tertiary))]'}`} />
         <div>
           <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
-            {createAccount ? 'User account will be created' : 'No user account'}
+            {createAccount ? t('wizard.review.userAccountWillBeCreated') : t('wizard.review.noUserAccount')}
           </p>
           <p className="text-xs text-[rgb(var(--text-tertiary))]">
             {createAccount
-              ? `Login for ${data.email || 'email not set'} as ${data.globalRole || 'TenantUser'}`
-              : 'Staff record only — no login access'}
+              ? t('wizard.review.loginSummary', { email: data.email || t('wizard.employment.emailNotSet'), role: data.globalRole || 'TenantUser' })
+              : t('wizard.review.noLoginAccess')}
           </p>
         </div>
       </div>

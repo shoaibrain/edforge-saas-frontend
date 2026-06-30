@@ -77,7 +77,7 @@ function ActionsDropdown({
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className={`p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-secondary transition-colors ${focusRingInset}`}
-        aria-label="Actions"
+        aria-label={t('actions.actions')}
       >
         <MoreVertical className="w-5 h-5" />
       </button>
@@ -286,7 +286,7 @@ export function StaffDrawer({
                       type="button"
                       onClick={onClose}
                       className={`p-2 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-surface-secondary transition-colors ${focusRingInset}`}
-                      aria-label="Close drawer"
+                      aria-label={t('actions.closeDrawer')}
                     >
                       <X className="w-5 h-5" />
                     </button>

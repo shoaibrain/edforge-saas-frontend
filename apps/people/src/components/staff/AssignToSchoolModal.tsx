@@ -17,11 +17,13 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
 import { assignStaffToSchoolSchema, type AssignStaffToSchoolDto } from '@aibrains/shared-types'
 import { TextField, SelectField, DateField, CheckboxField } from '@edforge/forms'
+import { useTranslation } from '@edforge/i18n'
 import { Modal, ModalFooter, Button } from '../ui'
 import { useCreateAssignment } from '../../hooks'
 import { useSchools } from '../../hooks/useSchools'
 import { STAFF_ROLE_OPTIONS } from './wizard/staff-wizard.utils'
 import { useDepartments } from './wizard/steps/AssignmentStep'
+import { getRoleI18nKey } from './StaffRoleBadge'
 import { parseApiError } from '../../services/people.service'
 
 // ============================================================================
@@ -45,6 +47,7 @@ export function AssignToSchoolModal({
   staffId,
   staffName,
 }: AssignToSchoolModalProps) {
+  const { t } = useTranslation('people')
   const firstInputRef = useRef<HTMLSelectElement>(null)
   const { schools, isLoading: loadingSchools } = useSchools()
   const createAssignment = useCreateAssignment()
@@ -99,7 +102,7 @@ export function AssignToSchoolModal({
   const handleClose = () => {
     if (isDirty) {
       const confirmed = window.confirm(
-        'You have unsaved changes. Are you sure you want to close?'
+        t('common.unsavedCloseConfirm')
       )
       if (!confirmed) return
     }
@@ -109,7 +112,7 @@ export function AssignToSchoolModal({
   const onSubmit = handleSubmit(async (data) => {
     try {
       await createAssignment.mutateAsync({ staffId, data })
-      toast.success('School assignment created successfully')
+      toast.success(t('assignments.toasts.created'))
       onClose()
     } catch (error) {
       const parsed = parseApiError(error)
@@ -128,13 +131,17 @@ export function AssignToSchoolModal({
     value: d.id,
     label: `${d.name} (${d.code})`,
   }))
+  const roleOptions = STAFF_ROLE_OPTIONS.map((option) => ({
+    value: option.value,
+    label: t(`roles.${getRoleI18nKey(option.value)}`, { defaultValue: option.label }),
+  }))
 
   return (
     <Modal
       open={open}
       onClose={handleClose}
-      title="Assign to School"
-      description={`Create a new school assignment for ${staffName}`}
+      title={t('assignments.assignTitle')}
+      description={t('assignments.assignDescription', { name: staffName })}
       size="lg"
     >
       <FormProvider {...methods}>
@@ -143,10 +150,10 @@ export function AssignToSchoolModal({
           <SelectField
             ref={firstInputRef}
             name="schoolId"
-            label="School"
+            label={t('wizard.assignment.school')}
             required
             options={schoolOptions}
-            placeholder={loadingSchools ? 'Loading schools...' : 'Select a school...'}
+            placeholder={loadingSchools ? t('wizard.assignment.loadingSchools') : t('wizard.assignment.selectSchool')}
             disabled={isSubmitting || loadingSchools}
           />
 
@@ -154,17 +161,17 @@ export function AssignToSchoolModal({
           <div className="grid grid-cols-2 gap-4">
             <SelectField
               name="role"
-              label="Role"
+              label={t('fields.role')}
               required
-              options={STAFF_ROLE_OPTIONS.map((opt) => ({ value: opt.value, label: opt.label }))}
-              placeholder="Select role..."
+              options={roleOptions}
+              placeholder={t('wizard.placeholders.selectRole')}
               disabled={isSubmitting}
             />
             <SelectField
               name="departmentId"
-              label="Department"
+              label={t('fields.department')}
               options={departmentOptions}
-              placeholder={!selectedSchoolId ? 'Select a school first...' : loadingDepts ? 'Loading...' : 'Select department...'}
+              placeholder={!selectedSchoolId ? t('assignments.placeholders.selectSchoolFirst') : loadingDepts ? t('common.loading') : t('wizard.placeholders.selectDepartment')}
               disabled={isSubmitting || !selectedSchoolId || loadingDepts}
             />
           </div>
@@ -172,9 +179,9 @@ export function AssignToSchoolModal({
           {/* Position Title */}
           <TextField
             name="positionTitle"
-            label="Position Title"
+            label={t('fields.positionTitle')}
             type="text"
-            placeholder="e.g., Lead Teacher"
+            placeholder={t('assignments.placeholders.positionTitle')}
             disabled={isSubmitting}
           />
 
@@ -182,13 +189,13 @@ export function AssignToSchoolModal({
           <div className="grid grid-cols-2 gap-4">
             <DateField
               name="beginDate"
-              label="Begin Date"
+              label={t('fields.beginDate')}
               required
               disabled={isSubmitting}
             />
             <DateField
               name="endDate"
-              label="End Date"
+              label={t('fields.endDate')}
               disabled={isSubmitting}
             />
           </div>
@@ -196,7 +203,7 @@ export function AssignToSchoolModal({
           {/* FTE Slider */}
           <div className="space-y-1.5">
             <label className="block text-sm font-medium text-[rgb(var(--text-primary))]">
-              Full-Time Equivalency (FTE)
+              {t('wizard.assignment.fte')}
             </label>
             <div className="flex items-center gap-4">
               <input
@@ -219,7 +226,7 @@ export function AssignToSchoolModal({
           {/* Primary */}
           <CheckboxField
             name="isPrimary"
-            label="Set as primary assignment"
+            label={t('assignments.setPrimary')}
             disabled={isSubmitting}
           />
 
@@ -230,7 +237,7 @@ export function AssignToSchoolModal({
               onClick={handleClose}
               disabled={isSubmitting}
             >
-              Cancel
+              {t('actions.cancel')}
             </Button>
             <Button
               type="submit"
@@ -238,7 +245,7 @@ export function AssignToSchoolModal({
               disabled={isSubmitting || loadingSchools}
               className="min-w-36"
             >
-              Create Assignment
+              {t('assignments.createAssignment')}
             </Button>
           </ModalFooter>
         </form>

@@ -9,6 +9,7 @@ import { useEffect, useRef } from 'react'
 import { useForm, FormProvider } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
+import { useTranslation } from '@edforge/i18n'
 import {
   createCredentialSchema,
   type CreateCredentialDto,
@@ -81,6 +82,7 @@ export function CredentialModal({
   staffId,
   credential,
 }: CredentialModalProps) {
+  const { t } = useTranslation('people')
   const firstInputRef = useRef<HTMLInputElement>(null)
   const isEditing = !!credential
   const createCredential = useCreateCredential()
@@ -149,7 +151,7 @@ export function CredentialModal({
   const handleClose = () => {
     if (isDirty) {
       const confirmed = window.confirm(
-        'You have unsaved changes. Are you sure you want to close?'
+        t('common.unsavedCloseConfirm')
       )
       if (!confirmed) return
     }
@@ -164,10 +166,10 @@ export function CredentialModal({
           credentialId: credential.credentialId,
           data,
         })
-        toast.success('Credential updated successfully')
+        toast.success(t('credentials.toasts.updated'))
       } else {
         await createCredential.mutateAsync({ staffId, data })
-        toast.success('Credential added successfully')
+        toast.success(t('credentials.toasts.added'))
       }
       onClose()
     } catch (error) {
@@ -180,8 +182,8 @@ export function CredentialModal({
     <Modal
       open={open}
       onClose={handleClose}
-      title={isEditing ? 'Edit Credential' : 'Add Credential'}
-      description={isEditing ? 'Update credential information' : 'Add a new credential for this staff member'}
+      title={isEditing ? t('credentials.modal.editTitle') : t('credentials.modal.addTitle')}
+      description={isEditing ? t('credentials.modal.editDescription') : t('credentials.modal.addDescription')}
       size="lg"
     >
       <FormProvider {...methods}>
@@ -191,7 +193,7 @@ export function CredentialModal({
             <TextField
               ref={firstInputRef}
               name="name"
-              label="Name"
+              label={t('fields.name')}
               type="text"
               required
               placeholder="e.g., State Teaching License"
@@ -199,7 +201,7 @@ export function CredentialModal({
             />
             <TextField
               name="credentialIdentifier"
-              label="Credential ID"
+              label={t('credentials.fields.credentialId')}
               type="text"
               required
               placeholder="e.g., LIC-2024-12345"
@@ -211,16 +213,22 @@ export function CredentialModal({
           <div className="grid grid-cols-2 gap-4">
             <SelectField
               name="credentialTypeDescriptor"
-              label="Type"
+              label={t('drawer.type')}
               required
-              options={CREDENTIAL_TYPE_OPTIONS}
+              options={CREDENTIAL_TYPE_OPTIONS.map((option) => ({
+                ...option,
+                label: t(`credentials.types.${option.value}`, { defaultValue: option.label }),
+              }))}
               disabled={isSubmitting}
             />
             <SelectField
               name="credentialFieldDescriptor"
-              label="Field/Subject Area"
-              options={CREDENTIAL_FIELD_SELECT_OPTIONS}
-              placeholder="None"
+              label={t('credentials.fields.fieldSubjectArea')}
+              options={CREDENTIAL_FIELD_SELECT_OPTIONS.map((option) => ({
+                ...option,
+                label: option.value ? t(`credentials.fieldsBySubject.${option.value}`, { defaultValue: option.label }) : t('common.none'),
+              }))}
+              placeholder={t('common.none')}
               disabled={isSubmitting}
             />
           </div>
@@ -229,7 +237,7 @@ export function CredentialModal({
           <div className="grid grid-cols-2 gap-4">
             <TextField
               name="issuingOrganization"
-              label="Issuing Organization"
+              label={t('credentials.fields.issuingOrganization')}
               type="text"
               required
               placeholder="e.g., State Board of Education"
@@ -237,7 +245,7 @@ export function CredentialModal({
             />
             <TextField
               name="issuingState"
-              label="Issuing State"
+              label={t('credentials.fields.issuingState')}
               type="text"
               placeholder="e.g., Texas"
               disabled={isSubmitting}
@@ -248,13 +256,13 @@ export function CredentialModal({
           <div className="grid grid-cols-2 gap-4">
             <DateField
               name="issuanceDate"
-              label="Issuance Date"
+              label={t('credentials.fields.issuanceDate')}
               required
               disabled={isSubmitting}
             />
             <DateField
               name="expirationDate"
-              label="Expiration Date"
+              label={t('credentials.fields.expirationDate')}
               disabled={isSubmitting}
             />
           </div>
@@ -262,7 +270,7 @@ export function CredentialModal({
           {/* Description */}
           <TextareaField
             name="description"
-            label="Description"
+            label={t('credentials.fields.description')}
             rows={2}
             placeholder="Additional details about this credential..."
             disabled={isSubmitting}
@@ -271,7 +279,7 @@ export function CredentialModal({
           {/* Document URL */}
           <TextField
             name="documentUrl"
-            label="Document URL"
+            label={t('credentials.fields.documentUrl')}
             type="url"
             placeholder="https://..."
             disabled={isSubmitting}
@@ -282,13 +290,13 @@ export function CredentialModal({
             <div className="flex items-center pt-6">
               <CheckboxField
                 name="isRenewable"
-                label="Renewable credential"
+                label={t('credentials.fields.renewable')}
                 disabled={isSubmitting}
               />
             </div>
             <TextField
               name="renewalReminderDays"
-              label="Reminder Days Before Expiry"
+              label={t('credentials.fields.renewalReminderDays')}
               type="number"
               rules={{ valueAsNumber: true }}
               min={0}
@@ -304,7 +312,7 @@ export function CredentialModal({
               onClick={handleClose}
               disabled={isSubmitting}
             >
-              Cancel
+              {t('actions.cancel')}
             </Button>
             <Button
               type="submit"
@@ -312,7 +320,7 @@ export function CredentialModal({
               disabled={isSubmitting}
               className="min-w-36"
             >
-              {isEditing ? 'Save Changes' : 'Add Credential'}
+              {isEditing ? t('actions.saveChanges') : t('actions.addCredential')}
             </Button>
           </ModalFooter>
         </form>

@@ -12,6 +12,7 @@ import { useTranslation } from '@edforge/i18n'
 import { focusRingInset, IdentityCell, StatusBadge, TanstackDataTable, type ColumnDef, type StatusTone } from '@edforge/ui'
 import type { StaffResponseDto } from '@aibrains/shared-types'
 import { StaffRoleChip } from './StaffRoleChip'
+import { getStatusI18nKey } from './StaffStatusBadge'
 import { AccessChip } from './AccessChip'
 import { getStaffAvatar } from '../../lib/avatar'
 import { formatDate } from '../../lib/utils'
@@ -40,17 +41,9 @@ const EMPLOYMENT_TONE: Record<string, StatusTone> = {
   resigned: 'neutral',
 }
 
-function getEmploymentLabel(status?: string): string {
-  if (!status) return 'Full-time'
-  const labels: Record<string, string> = {
-    active: 'Full-time',
-    on_leave: 'On Leave',
-    suspended: 'Suspended',
-    terminated: 'Terminated',
-    retired: 'Retired',
-    resigned: 'Resigned',
-  }
-  return labels[status] || 'Full-time'
+function getEmploymentLabel(status: string | undefined, t: ReturnType<typeof useTranslation>['t']): string {
+  if (!status) return t('employmentTypes.fullTime')
+  return t(`employmentStatus.${getStatusI18nKey(status)}`, { defaultValue: status.replace('_', ' ') })
 }
 
 // ============================================================================
@@ -80,7 +73,7 @@ export function StaffTable({
               name={`${s.firstName} ${s.lastSurname}`}
               avatarSrc={getStaffAvatar(s.staffId)}
               secondary={s.email}
-              trailing={<StatusBadge tone={empTone}>{getEmploymentLabel(s.employmentStatus)}</StatusBadge>}
+              trailing={<StatusBadge tone={empTone}>{getEmploymentLabel(s.employmentStatus, t)}</StatusBadge>}
             />
           )
         },
@@ -100,7 +93,7 @@ export function StaffTable({
           const isActive = status === 'active'
           return (
             <StatusBadge tone={isActive ? 'success' : 'neutral'} dot>
-              {isActive ? 'Active' : status?.replace('_', ' ') || 'Unknown'}
+              {status ? t(`employmentStatus.${getStatusI18nKey(status)}`, { defaultValue: status.replace('_', ' ') }) : t('common.unknown')}
             </StatusBadge>
           )
         },
@@ -145,7 +138,7 @@ export function StaffTable({
           <div className="flex items-center justify-end gap-1">
             <ActionBtn
               icon={<Eye className="h-3.5 w-3.5" />}
-              title="View"
+              title={t('actions.view')}
               onClick={(e) => {
                 e.stopPropagation()
                 onViewStaff?.(row.original)
@@ -153,12 +146,12 @@ export function StaffTable({
             />
             <ActionBtn
               icon={<Pencil className="h-3.5 w-3.5" />}
-              title="Edit"
+              title={t('actions.edit')}
               onClick={(e) => e.stopPropagation()}
             />
             <ActionBtn
               icon={<MoreVertical className="h-3.5 w-3.5" />}
-              title="More"
+              title={t('actions.more')}
               onClick={(e) => e.stopPropagation()}
             />
           </div>

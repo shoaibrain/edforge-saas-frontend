@@ -41,6 +41,10 @@ export const EMPLOYMENT_TYPE_LABELS: Record<string, string> = Object.fromEntries
   EMPLOYMENT_TYPE_OPTIONS.map((o) => [o.value, o.label]),
 )
 
+export function optionValueToI18nKey(value: string): string {
+  return value.replace(/_([a-z])/g, (_, c: string) => c.toUpperCase())
+}
+
 export const GENDER_OPTIONS = [
   { value: '', label: 'Select...' },
   { value: 'male', label: 'Male' },

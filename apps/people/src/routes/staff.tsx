@@ -215,7 +215,14 @@ export default function StaffPage() {
   // CSV export
   const handleExportCsv = () => {
     if (staffMembers.length === 0) return
-    const headers = ['Name', 'Email', 'Role', 'Status', 'Phone', 'Hire Date']
+    const headers = [
+      t('export.headers.name'),
+      t('export.headers.email'),
+      t('export.headers.role'),
+      t('export.headers.status'),
+      t('export.headers.phone'),
+      t('export.headers.hireDate'),
+    ]
     const rows = staffMembers.map((s) => [
       `${s.firstName} ${s.lastSurname}`,
       s.email || '',
@@ -288,13 +295,13 @@ export default function StaffPage() {
           className={`inline-flex h-9 items-center gap-1.5 rounded-l-lg border-r border-[rgb(var(--background-primary)/0.18)] bg-[rgb(var(--action-primary-bg))] px-3.5 text-xs font-medium text-[rgb(var(--text-inverted))] transition-colors hover:bg-[rgb(var(--state-info-fg))] ${focusRing}`}
         >
           <UserPlus className="h-3.5 w-3.5" />
-          Add Staff Member
+          {t('staffDirectory.addStaff')}
         </button>
         <button
           type="button"
           onClick={() => setAddDropdownOpen(!addDropdownOpen)}
           className={`inline-flex h-9 w-8 items-center justify-center rounded-r-lg bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--text-inverted))] transition-colors hover:bg-[rgb(var(--state-info-fg))] ${focusRing}`}
-          aria-label="More add options"
+          aria-label={t('actions.moreAddOptions')}
         >
           <ChevronDown className="h-3 w-3" />
         </button>
@@ -309,7 +316,7 @@ export default function StaffPage() {
             }}
             className={`w-full px-3 py-2 text-left text-xs text-text-secondary transition-colors hover:bg-surface-secondary ${focusRingInset}`}
           >
-            Quick add user account
+            {t('quickAdd.menuLabel')}
           </button>
         </div>
       )}
@@ -320,7 +327,7 @@ export default function StaffPage() {
     <Container size="full" padding="lg" className="overflow-auto py-6">
       {/* Context Bar (operating context, not a page title — the shell breadcrumb
           carries "People › Staff") */}
-      <h1 className="sr-only">Staff Directory</h1>
+      <h1 className="sr-only">{t('staffDirectory.title')}</h1>
       <ContextBar
         className="mb-2"
         meta={
@@ -339,19 +346,19 @@ export default function StaffPage() {
       {/* CONTEXT BANNER */}
       <Text variant="caption" className="mb-5">
         <em className="font-medium not-italic text-[rgb(var(--accent-coral-text))]">
-          {totalLoaded} active staff member{totalLoaded !== 1 ? 's' : ''}
+          {t('staffDirectory.summary.activeStaff', { count: totalLoaded })}
         </em>
         {' · '}
         <span className="font-medium text-[rgb(var(--state-success-fg))]">
-          {teacherCount} teacher{teacherCount !== 1 ? 's' : ''}
+          {t('staffDirectory.summary.teachers', { count: teacherCount })}
         </span>
         {' · '}
         <span className="font-medium text-[rgb(var(--state-info-fg))]">
-          {principalCount} principal{principalCount !== 1 ? 's' : ''}
+          {t('staffDirectory.summary.principals', { count: principalCount })}
         </span>
         {' · '}
         <span className="font-medium text-[rgb(var(--action-primary-bg))]">
-          {accessCount} with system access enabled
+          {t('staffDirectory.summary.systemAccess', { count: accessCount })}
         </span>
       </Text>
 
@@ -359,29 +366,29 @@ export default function StaffPage() {
       <WidgetErrorBoundaryV2>
         <div className="grid grid-cols-4 gap-2.5 mb-4">
           <StatCard
-            label="Total Staff"
+            label={t('stats.totalStaff')}
             value={isLoading ? '—' : totalLoaded.toString()}
             icon={Users}
             accentColor="rgba(216,90,48,0.10)"
             iconColor="#D85A30"
             barColor="#D85A30"
             valueColor="#D85A30"
-            tag={{ text: 'all active', color: '#D85A30', bg: 'rgba(216,90,48,0.10)' }}
+            tag={{ text: t('stats.tags.allActive'), color: '#D85A30', bg: 'rgba(216,90,48,0.10)' }}
             loading={isLoading}
           />
           <StatCard
-            label="Teachers"
+            label={t('stats.teachers')}
             value={isLoading ? '—' : teacherCount.toString()}
             icon={BookOpen}
             accentColor="rgba(29,158,117,0.10)"
             iconColor="#1D9E75"
             barColor="#1D9E75"
             valueColor="#1D9E75"
-            tag={{ text: 'active', color: '#1D9E75', bg: 'rgba(29,158,117,0.10)' }}
+            tag={{ text: t('stats.tags.active'), color: '#1D9E75', bg: 'rgba(29,158,117,0.10)' }}
             loading={isLoading}
           />
           <StatCard
-            label="Support Staff"
+            label={t('stats.supportStaff')}
             value={isLoading ? '—' : supportCount.toString()}
             icon={Briefcase}
             accentColor={supportCount > 0 ? 'rgba(55,138,221,0.10)' : 'rgba(255,255,255,0.06)'}
@@ -389,21 +396,21 @@ export default function StaffPage() {
             barColor={supportCount > 0 ? '#378ADD' : 'rgb(var(--text-disabled))'}
             valueColor={supportCount > 0 ? '#378ADD' : 'rgb(var(--text-tertiary))'}
             tag={{
-              text: supportCount > 0 ? 'active' : 'none yet',
+              text: supportCount > 0 ? t('stats.tags.active') : t('stats.tags.noneYet'),
               color: supportCount > 0 ? '#378ADD' : 'rgb(var(--text-tertiary))',
               bg: supportCount > 0 ? 'rgba(55,138,221,0.10)' : 'rgba(255,255,255,0.05)',
             }}
             loading={isLoading}
           />
           <StatCard
-            label="System Access"
+            label={t('stats.systemAccess')}
             value={isLoading ? '—' : accessCount.toString()}
             icon={Lock}
             accentColor="rgba(55,138,221,0.10)"
             iconColor="#378ADD"
             barColor="#378ADD"
             valueColor="#378ADD"
-            tag={{ text: `${noAccessCount} no access`, color: '#378ADD', bg: 'rgba(55,138,221,0.10)' }}
+            tag={{ text: t('stats.tags.noAccess', { count: noAccessCount }), color: '#378ADD', bg: 'rgba(55,138,221,0.10)' }}
             loading={isLoading}
           />
         </div>
@@ -418,7 +425,7 @@ export default function StaffPage() {
             onClick={() => handleQuickFilter(chip)}
             className={`inline-flex h-8 items-center whitespace-nowrap rounded-lg border px-3 text-xs font-medium transition-colors ${focusRingInset} ${quickFilter === chip ? 'border-[rgb(var(--action-primary-bg)/0.35)] bg-[rgb(var(--action-primary-bg)/0.10)] text-[rgb(var(--action-primary-bg))]' : 'border-border-secondary bg-surface-secondary text-text-tertiary hover:bg-surface-tertiary hover:text-text-primary'}`}
           >
-            {chip === 'all' ? 'All' : chip === 'teacher' ? 'Teachers' : chip === 'principal' ? 'Principal' : 'Support'}
+            {t(`quickFilters.${chip}`)}
           </button>
         ))}
 
@@ -429,9 +436,9 @@ export default function StaffPage() {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by name or email..."
+            placeholder={t('staffDirectory.searchPlaceholder')}
             prefix={<Search className="h-3.5 w-3.5" />}
-            aria-label="Search staff by name or email"
+            aria-label={t('staffDirectory.searchAria')}
           />
         </div>
 
@@ -439,14 +446,14 @@ export default function StaffPage() {
         <div className="w-44">
           <Select
             size="sm"
-            aria-label="Filter by role"
+            aria-label={t('filters.roleAria')}
             options={roleOptions}
             value={filters.role ?? null}
             onChange={(value) => {
               updateFilter('role', (value as StaffRole) || undefined)
               setQuickFilter('all')
             }}
-            placeholder="All Roles"
+            placeholder={t('filters.allRoles')}
             clearable
           />
         </div>
@@ -455,11 +462,11 @@ export default function StaffPage() {
         <div className="w-44">
           <Select
             size="sm"
-            aria-label="Filter by department"
+            aria-label={t('filters.departmentAria')}
             options={[]}
             value={null}
             onChange={() => {}}
-            placeholder="All Departments"
+            placeholder={t('filters.allDepartments')}
             disabled
           />
         </div>
@@ -472,7 +479,7 @@ export default function StaffPage() {
           className={`ml-auto inline-flex h-8 items-center gap-1.5 whitespace-nowrap rounded-lg border border-border-secondary bg-surface-secondary px-3 text-xs text-text-tertiary transition-colors hover:bg-surface-tertiary hover:text-text-primary disabled:cursor-not-allowed disabled:opacity-50 ${focusRingInset}`}
         >
           <Download className="h-3.5 w-3.5" />
-          Export CSV
+          {t('filters.exportCsv')}
         </button>
       </Inline>
 

@@ -10,6 +10,7 @@ import { useForm, FormProvider } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { motion } from 'framer-motion'
 import { toast } from 'sonner'
+import { useTranslation } from '@edforge/i18n'
 import {
   History,
   Plus,
@@ -26,6 +27,7 @@ import { TextField, SelectField, DateField, TextareaField } from '@edforge/forms
 import { Modal, ModalFooter, Button } from '../ui'
 import { useStaffEmploymentHistory, useUpdateEmploymentStatus } from '../../hooks'
 import { StaffStatusBadge } from './StaffStatusBadge'
+import { optionValueToI18nKey } from './wizard/staff-wizard.utils'
 import { parseApiError } from '../../services/people.service'
 import { formatDate } from '../../lib/utils'
 
@@ -83,6 +85,7 @@ function UpdateStatusModal({
   staffId: string
   currentStatus: string
 }) {
+  const { t } = useTranslation('people')
   const updateStatus = useUpdateEmploymentStatus()
 
   const methods = useForm<UpdateEmploymentStatusDto>({
@@ -103,7 +106,7 @@ function UpdateStatusModal({
 
   const handleClose = () => {
     if (isDirty) {
-      const confirmed = window.confirm('You have unsaved changes. Are you sure you want to close?')
+      const confirmed = window.confirm(t('common.unsavedCloseConfirm'))
       if (!confirmed) return
     }
     reset()
@@ -113,7 +116,7 @@ function UpdateStatusModal({
   const onSubmit = handleSubmit(async (data) => {
     try {
       await updateStatus.mutateAsync({ staffId, data })
-      toast.success('Employment status updated successfully')
+      toast.success(t('employmentHistory.toasts.updated'))
       reset()
       onClose()
     } catch (error) {
@@ -128,8 +131,10 @@ function UpdateStatusModal({
     <Modal
       open={open}
       onClose={handleClose}
-      title="Update Employment Status"
-      description={`Current status: ${currentStatus.replace('_', ' ')}`}
+      title={t('employmentHistory.updateTitle')}
+      description={t('employmentHistory.currentStatus', {
+        status: t(`employmentStatus.${optionValueToI18nKey(currentStatus)}`, { defaultValue: currentStatus.replace('_', ' ') }),
+      })}
       size="md"
     >
       <FormProvider {...methods}>
@@ -137,17 +142,20 @@ function UpdateStatusModal({
           {/* New Status */}
           <SelectField
             name="employmentStatus"
-            label="New Status"
+            label={t('employmentHistory.fields.newStatus')}
             required
-            options={statusOptions}
-            placeholder="Select status..."
+            options={statusOptions.map((option) => ({
+              ...option,
+              label: t(`employmentStatus.${optionValueToI18nKey(option.value)}`, { defaultValue: option.label }),
+            }))}
+            placeholder={t('employmentHistory.placeholders.selectStatus')}
             disabled={isSubmitting}
           />
 
           {/* Effective Date */}
           <DateField
             name="effectiveDate"
-            label="Effective Date"
+            label={t('employmentHistory.fields.effectiveDate')}
             required
             disabled={isSubmitting}
           />
@@ -155,27 +163,27 @@ function UpdateStatusModal({
           {/* Reason */}
           <TextField
             name="reason"
-            label="Reason"
+            label={t('leave.table.reason')}
             type="text"
-            placeholder="e.g., End of contract, Promotion, Medical leave"
+            placeholder={t('employmentHistory.placeholders.reason')}
             disabled={isSubmitting}
           />
 
           {/* Notes */}
           <TextareaField
             name="notes"
-            label="Notes"
+            label={t('employmentHistory.fields.notes')}
             rows={3}
-            placeholder="Additional details..."
+            placeholder={t('common.additionalDetails')}
             disabled={isSubmitting}
           />
 
           <ModalFooter>
             <Button type="button" variant="outline" onClick={handleClose} disabled={isSubmitting}>
-              Cancel
+              {t('actions.cancel')}
             </Button>
             <Button type="submit" isLoading={isSubmitting} disabled={isSubmitting} className="min-w-36">
-              Update Status
+              {t('actions.updateStatus')}
             </Button>
           </ModalFooter>
         </form>
@@ -189,6 +197,7 @@ function UpdateStatusModal({
 // ============================================================================
 
 function TimelineEntry({ entry, isLast }: { entry: EmploymentHistoryResponseDto; isLast: boolean }) {
+  const { t } = useTranslation('people')
   const dotColor = STATUS_TIMELINE_COLORS[entry.newStatus] || 'bg-[rgb(var(--text-tertiary))]'
 
   return (
@@ -215,7 +224,7 @@ function TimelineEntry({ entry, isLast }: { entry: EmploymentHistoryResponseDto;
           <div className="mt-3 space-y-1.5">
             {entry.reason && (
               <p className="text-sm text-[rgb(var(--text-secondary))]">
-                <span className="font-medium">Reason:</span> {entry.reason}
+                <span className="font-medium">{t('employmentHistory.fields.reasonLabel')}</span> {entry.reason}
               </p>
             )}
             {entry.notes && (
@@ -227,7 +236,7 @@ function TimelineEntry({ entry, isLast }: { entry: EmploymentHistoryResponseDto;
           <div className="flex items-center gap-4 mt-3 text-xs text-[rgb(var(--text-tertiary))]">
             <span className="flex items-center gap-1">
               <Calendar className="w-3 h-3" />
-              Effective {formatDate(entry.effectiveDate)}
+              {t('employmentHistory.effective', { date: formatDate(entry.effectiveDate) })}
             </span>
             {entry.changedByName && (
               <span className="flex items-center gap-1">
@@ -235,7 +244,7 @@ function TimelineEntry({ entry, isLast }: { entry: EmploymentHistoryResponseDto;
                 {entry.changedByName}
               </span>
             )}
-            <span>Recorded {new Date(entry.createdAt).toLocaleDateString()}</span>
+            <span>{t('employmentHistory.recorded', { date: new Date(entry.createdAt).toLocaleDateString() })}</span>
           </div>
         </div>
       </div>
@@ -254,6 +263,7 @@ export function EmploymentHistory({
   staffId: string
   currentStatus: string
 }) {
+  const { t } = useTranslation('people')
   const { data: history, isLoading } = useStaffEmploymentHistory(staffId)
   const [modalOpen, setModalOpen] = useState(false)
 
@@ -267,9 +277,9 @@ export function EmploymentHistory({
       {/* Header */}
       <motion.div variants={fadeInUp} className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-[rgb(var(--text-primary))]">Employment History</h3>
+          <h3 className="text-lg font-semibold text-[rgb(var(--text-primary))]">{t('tabs.employmentHistory')}</h3>
           <p className="text-sm text-[rgb(var(--text-tertiary))] mt-1">
-            Track employment status changes over time
+            {t('employmentHistory.description')}
           </p>
         </div>
         <button
@@ -277,7 +287,7 @@ export function EmploymentHistory({
           className="flex items-center gap-2 px-3.5 py-2 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors text-sm font-medium"
         >
           <Plus className="w-4 h-4" />
-          Update Status
+          {t('actions.updateStatus')}
         </button>
       </motion.div>
 
@@ -295,9 +305,9 @@ export function EmploymentHistory({
         ) : !history || history.length === 0 ? (
           <div className="text-center py-16 bg-[rgb(var(--background-secondary))] rounded-xl border-2 border-dashed border-[rgb(var(--border-secondary))]">
             <History className="w-12 h-12 mx-auto mb-4 text-[rgb(var(--text-tertiary))] opacity-40" />
-            <h4 className="font-medium text-[rgb(var(--text-secondary))] mb-2">No Employment History</h4>
+            <h4 className="font-medium text-[rgb(var(--text-secondary))] mb-2">{t('employmentHistory.emptyTitle')}</h4>
             <p className="text-sm text-[rgb(var(--text-tertiary))] max-w-sm mx-auto">
-              No employment status changes have been recorded yet. Click &quot;Update Status&quot; to record a change.
+              {t('employmentHistory.emptyDescription')}
             </p>
           </div>
         ) : (

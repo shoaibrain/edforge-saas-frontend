@@ -11,11 +11,13 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { Loader2, Save } from 'lucide-react'
+import { useTranslation } from '@edforge/i18n'
 import { updateStaffSchema, type UpdateStaffDto, type StaffResponseDto } from '@aibrains/shared-types'
 import { Modal, ModalFooter, Button } from '../ui'
 import { TextField, SelectField, DateField } from '@edforge/forms'
 import { staffService } from '../../services/staff.service'
 import { useDepartments } from './wizard/steps/AssignmentStep'
+import { optionValueToI18nKey } from './wizard/staff-wizard.utils'
 import { parseApiError } from '../../services/people.service'
 
 export interface EditStaffModalProps {
@@ -89,6 +91,7 @@ const NATIONALITY_OPTIONS = [
 const emptyToUndefined = { setValueAs: (v: string) => (v === '' ? undefined : v) }
 
 export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
+  const { t } = useTranslation('people')
   const queryClient = useQueryClient()
   const { data: departments = [], isLoading: loadingDepts } = useDepartments(staff?.primarySchoolId || undefined)
 
@@ -128,7 +131,7 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
   const handleClose = () => {
     if (isDirty) {
       const confirmed = window.confirm(
-        'You have unsaved changes. Are you sure you want to close?'
+        t('common.unsavedCloseConfirm')
       )
       if (!confirmed) return
     }
@@ -137,11 +140,11 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
 
   const updateMutation = useMutation({
     mutationFn: (data: UpdateStaffDto) => {
-      if (!staff) throw new Error('No staff member to update')
+      if (!staff) throw new Error(t('editStaff.errors.noStaff'))
       return staffService.updateStaff(staff.staffId, data)
     },
     onSuccess: () => {
-      toast.success('Staff member updated successfully')
+      toast.success(t('editStaff.toasts.updated'))
       queryClient.invalidateQueries({ queryKey: ['staff'] })
       onClose()
     },
@@ -178,8 +181,8 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
     <Modal
       open={open}
       onClose={handleClose}
-      title="Edit Staff Member"
-      description={`Update information for ${staff.firstName} ${staff.lastSurname}`}
+      title={t('editStaff.title')}
+      description={t('editStaff.description', { name: `${staff.firstName} ${staff.lastSurname}` })}
       size="2xl"
     >
       <FormProvider {...methods}>
@@ -187,13 +190,13 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
           {/* Email (read-only) */}
           <div>
             <label className="block text-sm font-medium text-text-primary mb-1.5">
-              Email Address
+              {t('fields.emailAddress')}
             </label>
             <div className="px-3 py-2 rounded-lg border border-border-secondary bg-surface-tertiary text-text-secondary">
               {staff.email}
             </div>
             <p className="mt-1 text-xs text-text-tertiary">
-              Email address cannot be changed
+              {t('editStaff.emailReadOnly')}
             </p>
           </div>
 
@@ -201,7 +204,7 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <TextField
               name="firstName"
-              label="First Name"
+              label={t('fields.firstName')}
               type="text"
               placeholder="John"
               required
@@ -210,7 +213,7 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
             />
             <TextField
               name="lastSurname"
-              label="Last Name"
+              label={t('fields.lastName')}
               type="text"
               placeholder="Doe"
               required
@@ -218,7 +221,7 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
             />
             <TextField
               name="phone"
-              label="Phone Number"
+              label={t('fields.phoneNumber')}
               type="tel"
               placeholder="+1 (555) 123-4567"
               disabled={isSubmitting}
@@ -229,14 +232,17 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
           <div className="grid grid-cols-2 gap-4">
             <SelectField
               name="role"
-              label="Role"
-              options={ROLE_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
+              label={t('fields.role')}
+              options={ROLE_OPTIONS.map((o) => ({ value: o.value, label: t(`roles.${o.value.replace(/_([a-z])/g, (_, c) => c.toUpperCase())}`, { defaultValue: o.label }) }))}
               disabled={isSubmitting}
             />
             <SelectField
               name="employmentStatus"
-              label="Employment Status"
-              options={EMPLOYMENT_STATUS_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
+              label={t('filters.employmentStatus')}
+              options={EMPLOYMENT_STATUS_OPTIONS.map((o) => ({
+                value: o.value,
+                label: t(`employmentStatus.${optionValueToI18nKey(o.value)}`, { defaultValue: o.label }),
+              }))}
               disabled={isSubmitting}
             />
           </div>
@@ -245,14 +251,14 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
           <div className="grid grid-cols-2 gap-4">
             <SelectField
               name="departmentId"
-              label="Department"
-              placeholder={loadingDepts ? 'Loading...' : 'Select department...'}
+              label={t('fields.department')}
+              placeholder={loadingDepts ? t('common.loading') : t('editStaff.placeholders.selectDepartment')}
               options={departments.map((d) => ({ value: d.id, label: `${d.name} (${d.code})` }))}
               disabled={isSubmitting || loadingDepts}
             />
             <TextField
               name="title"
-              label="Title"
+              label={t('fields.title')}
               type="text"
               placeholder="Senior Teacher"
               disabled={isSubmitting}
@@ -262,27 +268,27 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
           {/* IEMIS Identity (Sprint B.9) — Nepal CEHRD register fields */}
           <div className="pt-4 border-t border-border-secondary">
             <h3 className="text-sm font-semibold text-text-primary mb-1">
-              IEMIS / CEHRD Identity
+              {t('editStaff.iemis.title')}
             </h3>
             <p className="text-xs text-text-tertiary mb-4">
-              Optional — populate to support CEHRD Flash-II Staff register exports.
+              {t('editStaff.iemis.description')}
             </p>
 
             {/* Row 1 — IEMIS Staff ID + Nationality */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <TextField
                 name="emisStaffId"
-                label="IEMIS Staff ID"
+                label={t('editStaff.iemis.staffId')}
                 type="text"
                 placeholder="16-digit CEHRD ID"
                 maxLength={16}
                 disabled={isSubmitting}
                 rules={emptyToUndefined}
-                helperText="CEHRD-issued 16-digit identifier (V1 placeholder format)."
+                helperText={t('editStaff.iemis.staffIdHelp')}
               />
               <div>
                 <label htmlFor="nationality" className="block text-sm font-medium text-text-primary mb-1.5">
-                  Nationality
+                  {t('editStaff.iemis.nationality')}
                 </label>
                 <select
                   // allow-native-form-control: setValueAs (empty → undefined) keeps the optional alpha-3 check from firing on a cleared field; the Controller-based SelectField cannot apply setValueAs
@@ -291,7 +297,7 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
                   className={nativeSelectClass(!!errors.nationality)}
                   disabled={isSubmitting}
                 >
-                  <option value="">Select…</option>
+                  <option value="">{t('common.select')}</option>
                   {NATIONALITY_OPTIONS.map((o) => (
                     <option key={o.value} value={o.value}>{o.label}</option>
                   ))}
@@ -306,7 +312,7 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
               <div>
                 <label htmlFor="maritalStatus" className="block text-sm font-medium text-text-primary mb-1.5">
-                  Marital Status
+                  {t('editStaff.iemis.maritalStatus')}
                 </label>
                 <select
                   // allow-native-form-control: setValueAs (empty → undefined) keeps the optional enum check from firing on a cleared field; the Controller-based SelectField cannot apply setValueAs
@@ -315,9 +321,9 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
                   className={nativeSelectClass(!!errors.maritalStatus)}
                   disabled={isSubmitting}
                 >
-                  <option value="">Select…</option>
+                  <option value="">{t('common.select')}</option>
                   {MARITAL_STATUS_OPTIONS.map((o) => (
-                    <option key={o.value} value={o.value}>{o.label}</option>
+                    <option key={o.value} value={o.value}>{t(`editStaff.iemis.maritalStatusOptions.${o.value}`, { defaultValue: o.label })}</option>
                   ))}
                 </select>
                 {errors.maritalStatus && (
@@ -326,7 +332,7 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
               </div>
               <div>
                 <label htmlFor="appointmentType" className="block text-sm font-medium text-text-primary mb-1.5">
-                  Appointment Type
+                  {t('editStaff.iemis.appointmentType')}
                 </label>
                 <select
                   // allow-native-form-control: setValueAs (empty → undefined) keeps the optional enum check from firing on a cleared field; the Controller-based SelectField cannot apply setValueAs
@@ -335,9 +341,9 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
                   className={nativeSelectClass(!!errors.appointmentType)}
                   disabled={isSubmitting}
                 >
-                  <option value="">Select…</option>
+                  <option value="">{t('common.select')}</option>
                   {APPOINTMENT_TYPE_OPTIONS.map((o) => (
-                    <option key={o.value} value={o.value}>{o.label}</option>
+                    <option key={o.value} value={o.value}>{t(`editStaff.iemis.appointmentTypeOptions.${o.value}`, { defaultValue: o.label })}</option>
                   ))}
                 </select>
                 {errors.appointmentType && (
@@ -346,17 +352,17 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
               </div>
               <DateField
                 name="appointmentDate"
-                label="Appointment Date"
+                label={t('editStaff.iemis.appointmentDate')}
                 disabled={isSubmitting}
                 rules={emptyToUndefined}
-                helperText="Per CEHRD register."
+                helperText={t('editStaff.iemis.appointmentDateHelp')}
               />
             </div>
           </div>
 
           {isDirty && (
             <p className="text-sm text-amber-600 dark:text-amber-400">
-              You have unsaved changes
+              {t('common.unsavedChanges')}
             </p>
           )}
 
@@ -367,7 +373,7 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
               onClick={handleClose}
               disabled={isSubmitting}
             >
-              Cancel
+              {t('actions.cancel')}
             </Button>
             <Button
               type="submit"
@@ -377,12 +383,12 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Saving...
+                  {t('actions.saving')}
                 </>
               ) : (
                 <>
                   <Save className="w-4 h-4 mr-2" />
-                  Save Changes
+                  {t('actions.saveChanges')}
                 </>
               )}
             </Button>

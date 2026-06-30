@@ -10,6 +10,7 @@
 import { useState, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { toast } from 'sonner'
+import { useTranslation } from '@edforge/i18n'
 import {
   CalendarDays,
   Plus,
@@ -115,10 +116,9 @@ const staggerChildren = {
 // HELPERS
 // ============================================================================
 
-function formatDuration(request: LeaveRequestResponseDto): string {
-  if (request.totalDays === 1) return '1 day'
-  if (request.totalDays) return `${request.totalDays} days`
-  if (request.totalHours) return `${request.totalHours} hours`
+function formatDuration(request: LeaveRequestResponseDto, t: ReturnType<typeof useTranslation>['t']): string {
+  if (request.totalDays) return t('leave.duration.days', { count: request.totalDays })
+  if (request.totalHours) return t('leave.duration.hours', { count: request.totalHours })
   return '—'
 }
 
@@ -137,6 +137,7 @@ export function LeaveManagement({
   staffId: string
   staffName: string
 }) {
+  const { t } = useTranslation('people')
   const { data: requests, isLoading } = useStaffLeaveRequests(staffId)
   const approveLeave = useApproveLeave()
   const rejectLeave = useRejectLeave()
@@ -160,39 +161,39 @@ export function LeaveManagement({
     setActionLoading(leaveId)
     try {
       await approveLeave.mutateAsync({ staffId, leaveId, data: {} })
-      toast.success('Leave request approved')
+      toast.success(t('leave.toasts.approved'))
     } catch {
-      toast.error('Failed to approve leave request')
+      toast.error(t('leave.toasts.approveFailed'))
     } finally {
       setActionLoading(null)
     }
   }
 
   const handleReject = async (leaveId: string) => {
-    const reason = window.prompt('Please enter a rejection reason:')
+    const reason = window.prompt(t('leave.prompts.rejectionReason'))
     if (!reason) return
 
     setActionLoading(leaveId)
     try {
       await rejectLeave.mutateAsync({ staffId, leaveId, data: { rejectionReason: reason } })
-      toast.success('Leave request rejected')
+      toast.success(t('leave.toasts.rejected'))
     } catch {
-      toast.error('Failed to reject leave request')
+      toast.error(t('leave.toasts.rejectFailed'))
     } finally {
       setActionLoading(null)
     }
   }
 
   const handleCancel = async (leaveId: string) => {
-    const reason = window.prompt('Please enter a cancellation reason:')
+    const reason = window.prompt(t('leave.prompts.cancellationReason'))
     if (!reason) return
 
     setActionLoading(leaveId)
     try {
       await cancelLeave.mutateAsync({ staffId, leaveId, data: { cancellationReason: reason } })
-      toast.success('Leave request cancelled')
+      toast.success(t('leave.toasts.cancelled'))
     } catch {
-      toast.error('Failed to cancel leave request')
+      toast.error(t('leave.toasts.cancelFailed'))
     } finally {
       setActionLoading(null)
     }
@@ -203,27 +204,27 @@ export function LeaveManagement({
     for (const r of rows) seen.add(r.status)
     return Array.from(seen)
       .sort()
-      .map((s) => ({ value: s, label: formatStatusLabel(s) }))
-  }, [rows])
+      .map((s) => ({ value: s, label: t(`leave.status.${s}`, { defaultValue: formatStatusLabel(s) }) }))
+  }, [rows, t])
 
   const typeOptions = useMemo(() => {
     const seen = new Set<string>()
     for (const r of rows) seen.add(r.leaveType)
     return Array.from(seen)
       .sort()
-      .map((t) => ({ value: t, label: LEAVE_TYPE_LABELS[t] ?? t }))
-  }, [rows])
+      .map((type) => ({ value: type, label: t(`leave.types.${type}`, { defaultValue: LEAVE_TYPE_LABELS[type] ?? type }) }))
+  }, [rows, t])
 
   const facets = useMemo<FacetedFilterConfig[]>(
     () => [
       ...(statusOptions.length > 0
-        ? [{ columnId: 'status', title: 'Status', options: statusOptions }]
+        ? [{ columnId: 'status', title: t('tableHeaders.status'), options: statusOptions }]
         : []),
       ...(typeOptions.length > 0
-        ? [{ columnId: 'leaveType', title: 'Type', options: typeOptions }]
+        ? [{ columnId: 'leaveType', title: t('drawer.type'), options: typeOptions }]
         : []),
     ],
-    [statusOptions, typeOptions],
+    [statusOptions, typeOptions, t],
   )
 
   const columns: ColumnDef<LeaveRequestResponseDto, unknown>[] = useMemo(
@@ -231,12 +232,12 @@ export function LeaveManagement({
       {
         id: 'leaveType',
         accessorKey: 'leaveType',
-        header: 'Type',
+        header: t('drawer.type'),
         cell: ({ row }) => {
-          const t = row.original.leaveType
+          const leaveType = row.original.leaveType
           return (
-            <StatusBadge tone={leaveTypeTone(t)} size="sm">
-              {LEAVE_TYPE_LABELS[t] ?? t}
+            <StatusBadge tone={leaveTypeTone(leaveType)} size="sm">
+              {t(`leave.types.${row.original.leaveType}`, { defaultValue: LEAVE_TYPE_LABELS[row.original.leaveType] ?? row.original.leaveType })}
             </StatusBadge>
           )
         },
@@ -248,7 +249,7 @@ export function LeaveManagement({
       {
         id: 'dates',
         accessorFn: (r) => r.startDate,
-        header: 'Dates',
+        header: t('leave.table.dates'),
         cell: ({ row }) => {
           const r = row.original
           return (
@@ -263,22 +264,22 @@ export function LeaveManagement({
       {
         id: 'duration',
         accessorFn: (r) => r.totalDays ?? r.totalHours ?? 0,
-        header: 'Duration',
+        header: t('leave.table.duration'),
         cell: ({ row }) => (
           <span className="text-xs text-[rgb(var(--text-secondary))] tabular-nums">
-            {formatDuration(row.original)}
+            {formatDuration(row.original, t)}
           </span>
         ),
       },
       {
         id: 'status',
         accessorKey: 'status',
-        header: 'Status',
+        header: t('tableHeaders.status'),
         cell: ({ row }) => {
           const s = row.original.status
           return (
             <StatusBadge tone={leaveStatusTone(s)} size="sm" dot>
-              {formatStatusLabel(s)}
+              {t(`leave.status.${s}`, { defaultValue: formatStatusLabel(s) })}
             </StatusBadge>
           )
         },
@@ -290,7 +291,7 @@ export function LeaveManagement({
       {
         id: 'reason',
         accessorKey: 'reason',
-        header: 'Reason',
+        header: t('leave.table.reason'),
         enableSorting: false,
         cell: ({ row }) => (
           <span className="text-xs text-[rgb(var(--text-tertiary))] truncate inline-block max-w-[28ch]">
@@ -300,7 +301,7 @@ export function LeaveManagement({
       },
       {
         id: 'actions',
-        header: () => <span className="sr-only">Actions</span>,
+        header: () => <span className="sr-only">{t('actions.actions')}</span>,
         enableSorting: false,
         cell: ({ row }) => {
           const r = row.original
@@ -319,8 +320,8 @@ export function LeaveManagement({
                     type="button"
                     onClick={(e) => { e.stopPropagation(); void handleApprove(r.leaveId) }}
                     className="p-1.5 rounded-md hover:bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--state-success-fg))] transition-colors"
-                    title="Approve"
-                    aria-label="Approve"
+                    title={t('leave.actions.approve')}
+                    aria-label={t('leave.actions.approve')}
                   >
                     <Check className="w-4 h-4" />
                   </button>
@@ -328,8 +329,8 @@ export function LeaveManagement({
                     type="button"
                     onClick={(e) => { e.stopPropagation(); void handleReject(r.leaveId) }}
                     className="p-1.5 rounded-md hover:bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--state-danger-fg))] transition-colors"
-                    title="Reject"
-                    aria-label="Reject"
+                    title={t('leave.actions.reject')}
+                    aria-label={t('leave.actions.reject')}
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -340,8 +341,8 @@ export function LeaveManagement({
                   type="button"
                   onClick={(e) => { e.stopPropagation(); void handleCancel(r.leaveId) }}
                   className="p-1.5 rounded-md hover:bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] transition-colors"
-                  title="Cancel"
-                  aria-label="Cancel"
+                  title={t('actions.cancel')}
+                  aria-label={t('actions.cancel')}
                 >
                   <Ban className="w-4 h-4" />
                 </button>
@@ -351,7 +352,7 @@ export function LeaveManagement({
         },
       },
     ],
-    [actionLoading],
+    [actionLoading, t],
   )
 
   return (
@@ -364,9 +365,9 @@ export function LeaveManagement({
       {/* Header */}
       <motion.div variants={fadeInUp} className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-[rgb(var(--text-primary))]">Leave Management</h3>
+          <h3 className="text-lg font-semibold text-[rgb(var(--text-primary))]">{t('leave.title')}</h3>
           <p className="text-sm text-[rgb(var(--text-tertiary))] mt-1">
-            View and manage leave requests
+            {t('leave.description')}
           </p>
         </div>
         <button
@@ -374,7 +375,7 @@ export function LeaveManagement({
           className="flex items-center gap-2 px-3.5 py-2 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors text-sm font-medium"
         >
           <Plus className="w-4 h-4" />
-          Request Leave
+          {t('leave.actions.request')}
         </button>
       </motion.div>
 
@@ -387,7 +388,7 @@ export function LeaveManagement({
                 <CalendarDays className="w-4 h-4 text-[rgb(var(--state-info-fg))]" />
               </div>
               <div>
-                <p className="text-xs text-[rgb(var(--text-tertiary))]">Total Requests</p>
+                <p className="text-xs text-[rgb(var(--text-tertiary))]">{t('leave.summary.totalRequests')}</p>
                 <p className="text-lg font-bold text-[rgb(var(--text-primary))]">{leaveSummary.totalRequests}</p>
               </div>
             </div>
@@ -398,7 +399,7 @@ export function LeaveManagement({
                 <CalendarCheck2 className="w-4 h-4 text-[rgb(var(--state-success-fg))]" />
               </div>
               <div>
-                <p className="text-xs text-[rgb(var(--text-tertiary))]">Days Used</p>
+                <p className="text-xs text-[rgb(var(--text-tertiary))]">{t('leave.summary.daysUsed')}</p>
                 <p className="text-lg font-bold text-[rgb(var(--text-primary))]">{leaveSummary.totalUsed}</p>
               </div>
             </div>
@@ -409,7 +410,7 @@ export function LeaveManagement({
                 <Hourglass className="w-4 h-4 text-[rgb(var(--state-warning-fg))]" />
               </div>
               <div>
-                <p className="text-xs text-[rgb(var(--text-tertiary))]">Pending Requests</p>
+                <p className="text-xs text-[rgb(var(--text-tertiary))]">{t('leave.summary.pendingRequests')}</p>
                 <p className="text-lg font-bold text-[rgb(var(--text-primary))]">{leaveSummary.pendingCount}</p>
               </div>
             </div>
@@ -420,7 +421,7 @@ export function LeaveManagement({
                 <CalendarX2 className="w-4 h-4 text-[rgb(var(--state-danger-fg))]" />
               </div>
               <div>
-                <p className="text-xs text-[rgb(var(--text-tertiary))]">Days Pending</p>
+                <p className="text-xs text-[rgb(var(--text-tertiary))]">{t('leave.summary.daysPending')}</p>
                 <p className="text-lg font-bold text-[rgb(var(--text-primary))]">{leaveSummary.totalPending}</p>
               </div>
             </div>
@@ -441,13 +442,13 @@ export function LeaveManagement({
           pagination={{ pageSize: 10 }}
           pageSizes={[10, 20, 50]}
           defaultSort={[{ id: 'dates', desc: true }]}
-          searchPlaceholder="Search reason…"
+          searchPlaceholder={t('leave.searchPlaceholder')}
           facets={facets}
           exportOptions={{ filename: `leave-${staffId}`, formats: ['csv'] }}
           emptyState={{
             icon: <CalendarDays className="w-10 h-10" />,
-            title: 'No leave requests',
-            description: 'No leave requests have been submitted yet. Click "Request Leave" to create one.',
+            title: t('leave.emptyTitle'),
+            description: t('leave.emptyDescription'),
           }}
         />
       </motion.div>
