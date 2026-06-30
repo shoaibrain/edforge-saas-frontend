@@ -12,6 +12,7 @@ import { Button, Modal, ModalFooter, Select } from '@edforge/ui'
 import { useQueryClient, useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { extractApiErrorMessage } from '@edforge/api-client'
+import { useTranslation } from '@edforge/i18n'
 import { apiPatch } from '@/lib/api'
 import { useLocalEducationAgencies, edOrgKeys } from '@/hooks/useEducationOrgs'
 
@@ -40,6 +41,7 @@ export function QuickSchoolReassign({
   currentLeaId,
   currentLeaName,
 }: QuickSchoolReassignProps) {
+  const { t } = useTranslation('settings')
   const queryClient = useQueryClient()
   const { data: leasData } = useLocalEducationAgencies()
   const leas = leasData?.items || []
@@ -66,9 +68,14 @@ export function QuickSchoolReassign({
 
       if (leaId) {
         const newLea = leas.find((l) => l.id === leaId)
-        toast.success(`${schoolName} assigned to ${newLea?.nameOfInstitution || 'new district'}`)
+        toast.success(
+          t('organization.quickReassign.toasts.assigned', {
+            schoolName,
+            districtName: newLea?.nameOfInstitution || t('organization.quickReassign.newDistrictFallback'),
+          }),
+        )
       } else {
-        toast.success(`${schoolName} unassigned from district`)
+        toast.success(t('organization.quickReassign.toasts.unassigned', { schoolName }))
       }
       onClose()
     },
@@ -79,7 +86,7 @@ export function QuickSchoolReassign({
 
   const handleSubmit = () => {
     const newLeaId = selectedLeaId || null
-    
+
     // If no change, just close
     if (newLeaId === (currentLeaId || null)) {
       onClose()
@@ -96,8 +103,8 @@ export function QuickSchoolReassign({
     <Modal
       open={open}
       onClose={onClose}
-      title="Change School District"
-      description={`Reassign "${schoolName}" to a different district`}
+      title={t('organization.quickReassign.title')}
+      description={t('organization.quickReassign.description', { schoolName })}
       size="md"
     >
       <div className="space-y-4 py-2">
@@ -109,11 +116,9 @@ export function QuickSchoolReassign({
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs text-[rgb(var(--text-tertiary))] uppercase tracking-wider font-medium">
-                Current District
+                {t('organization.quickReassign.currentDistrict')}
               </p>
-              <p className="text-sm font-medium text-[rgb(var(--text-primary))] truncate">
-                {currentLeaName}
-              </p>
+              <p className="text-sm font-medium text-[rgb(var(--text-primary))] truncate">{currentLeaName}</p>
             </div>
           </div>
         )}
@@ -125,7 +130,7 @@ export function QuickSchoolReassign({
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-amber-700 dark:text-amber-300">
-                Not currently assigned to any district
+                {t('organization.quickReassign.notAssigned')}
               </p>
             </div>
           </div>
@@ -134,31 +139,30 @@ export function QuickSchoolReassign({
         {/* LEA Selection */}
         <div>
           <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-2">
-            New District Assignment
+            {t('organization.quickReassign.newAssignment')}
           </label>
-          
+
           {leas.length === 0 ? (
             <div className="text-center py-6">
               <Building2 className="w-8 h-8 text-[rgb(var(--text-tertiary))] mx-auto mb-2" />
-              <p className="text-sm text-[rgb(var(--text-secondary))]">
-                No districts available. Create a Local Education Agency first.
-              </p>
+              <p className="text-sm text-[rgb(var(--text-secondary))]">{t('organization.quickReassign.noDistricts')}</p>
             </div>
           ) : (
             <Select
-              aria-label="New District Assignment"
-              options={leas.map((lea) => ({ value: lea.id, label: lea.nameOfInstitution }))}
+              aria-label={t('organization.quickReassign.newAssignment')}
+              options={leas.map((lea) => ({
+                value: lea.id,
+                label: lea.nameOfInstitution,
+              }))}
               value={selectedLeaId || null}
               onChange={(v) => setSelectedLeaId(v ?? '')}
-              placeholder="None (Unassign)"
+              placeholder={t('organization.quickReassign.noneUnassign')}
               clearable
               disabled={isPending}
             />
           )}
 
-          <p className="mt-1.5 text-xs text-[rgb(var(--text-tertiary))]">
-            Select "None" to remove district assignment
-          </p>
+          <p className="mt-1.5 text-xs text-[rgb(var(--text-tertiary))]">{t('organization.quickReassign.noneHelp')}</p>
         </div>
 
         {/* Change Preview */}
@@ -174,8 +178,12 @@ export function QuickSchoolReassign({
                 <ArrowRight className="w-4 h-4 text-[rgb(var(--action-secondary-fg))]  shrink-0" />
                 <p className="text-xs text-[rgb(var(--state-info-fg))] ">
                   {selectedLeaId
-                    ? `Will be assigned to ${leas.find((l) => l.id === selectedLeaId)?.nameOfInstitution}`
-                    : 'Will be unassigned from any district'}
+                    ? t('organization.quickReassign.previewAssigned', {
+                        districtName:
+                          leas.find((l) => l.id === selectedLeaId)?.nameOfInstitution ||
+                          t('organization.quickReassign.newDistrictFallback'),
+                      })
+                    : t('organization.quickReassign.previewUnassigned')}
                 </p>
               </div>
             </motion.div>
@@ -185,14 +193,10 @@ export function QuickSchoolReassign({
 
       <ModalFooter>
         <Button variant="ghost" onClick={onClose} disabled={isPending}>
-          Cancel
+          {t('organization.actions.cancel')}
         </Button>
-        <Button
-          onClick={handleSubmit}
-          disabled={!hasChanges || isPending || leas.length === 0}
-          isLoading={isPending}
-        >
-          {hasChanges ? 'Save Changes' : 'No Changes'}
+        <Button onClick={handleSubmit} disabled={!hasChanges || isPending || leas.length === 0} isLoading={isPending}>
+          {hasChanges ? t('organization.quickReassign.saveChanges') : t('organization.quickReassign.noChanges')}
         </Button>
       </ModalFooter>
     </Modal>

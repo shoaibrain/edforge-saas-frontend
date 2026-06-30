@@ -9,6 +9,7 @@ import { useEffect } from 'react'
 import { useForm, FormProvider, zodResolver, TextField, SelectField } from '@edforge/forms'
 import { useFormDirtyGuard } from '@/hooks/useFormDirtyGuard'
 import { Modal, ModalFooter, Button } from '@edforge/ui'
+import { useTranslation } from '@edforge/i18n'
 import { Info } from 'lucide-react'
 import { Tooltip } from '@edforge/ui'
 import {
@@ -17,11 +18,7 @@ import {
   OPERATIONAL_STATUS_DESCRIPTORS,
   NETWORK_PURPOSE_DESCRIPTORS,
 } from '@aibrains/shared-types'
-import {
-  useCreateNetwork,
-  useUpdateNetwork,
-  useNetwork,
-} from '@/hooks/useEducationOrgs'
+import { useCreateNetwork, useUpdateNetwork, useNetwork } from '@/hooks/useEducationOrgs'
 import {
   CategoryArraySection,
   AddressArraySection,
@@ -45,6 +42,7 @@ export interface OrgNetworkFormProps {
 // ============================================================================
 
 export function OrgNetworkForm({ open, onClose, mode, editId }: OrgNetworkFormProps) {
+  const { t } = useTranslation('settings')
   const isEdit = mode === 'edit'
   const createMutation = useCreateNetwork()
   const updateMutation = useUpdateNetwork()
@@ -67,7 +65,11 @@ export function OrgNetworkForm({ open, onClose, mode, editId }: OrgNetworkFormPr
     },
   })
 
-  const { handleSubmit, reset, formState: { isDirty } } = methods
+  const {
+    handleSubmit,
+    reset,
+    formState: { isDirty },
+  } = methods
   const { guardedClose } = useFormDirtyGuard({ isDirty, onClose })
 
   // Populate form for edit mode
@@ -80,9 +82,10 @@ export function OrgNetworkForm({ open, onClose, mode, editId }: OrgNetworkFormPr
         webSite: existingNetwork.webSite || '',
         networkPurposeDescriptor: existingNetwork.networkPurposeDescriptor,
         operationalStatusDescriptor: existingNetwork.operationalStatusDescriptor,
-        categories: existingNetwork.categories.length > 0
-          ? existingNetwork.categories
-          : [{ educationOrganizationCategoryDescriptor: '' }],
+        categories:
+          existingNetwork.categories.length > 0
+            ? existingNetwork.categories
+            : [{ educationOrganizationCategoryDescriptor: '' }],
         addresses: existingNetwork.addresses || [],
         telephones: existingNetwork.telephones || [],
         identificationCodes: existingNetwork.identificationCodes || [],
@@ -96,6 +99,18 @@ export function OrgNetworkForm({ open, onClose, mode, editId }: OrgNetworkFormPr
   }, [open, reset])
 
   const isPending = createMutation.isPending || updateMutation.isPending
+  const operationalStatusOptions = OPERATIONAL_STATUS_DESCRIPTORS.map((option) => ({
+    ...option,
+    label: t(`organization.status.${option.value}`, {
+      defaultValue: option.label,
+    }),
+  }))
+  const networkPurposeOptions = NETWORK_PURPOSE_DESCRIPTORS.map((option) => ({
+    ...option,
+    label: t(`organization.descriptors.networkPurpose.${option.value}`, {
+      defaultValue: option.label,
+    }),
+  }))
 
   const onSubmit = handleSubmit((data) => {
     const cleanData = {
@@ -109,10 +124,7 @@ export function OrgNetworkForm({ open, onClose, mode, editId }: OrgNetworkFormPr
 
     if (isEdit && existingNetwork) {
       const { educationOrganizationNetworkId: _, ...updateData } = cleanData
-      updateMutation.mutate(
-        { id: existingNetwork.id, data: updateData },
-        { onSuccess: () => onClose() }
-      )
+      updateMutation.mutate({ id: existingNetwork.id, data: updateData }, { onSuccess: () => onClose() })
     } else {
       createMutation.mutate(cleanData, { onSuccess: () => onClose() })
     }
@@ -122,8 +134,8 @@ export function OrgNetworkForm({ open, onClose, mode, editId }: OrgNetworkFormPr
     <Modal
       open={open}
       onClose={guardedClose}
-      title={isEdit ? 'Edit Network' : 'Create Network'}
-      description="Education Organization Networks group organizations for reporting, collaboration, or governance."
+      title={isEdit ? t('organization.networkForm.editTitle') : t('organization.networkForm.createTitle')}
+      description={t('organization.networkForm.description')}
       size="2xl"
     >
       <FormProvider {...methods}>
@@ -140,8 +152,8 @@ export function OrgNetworkForm({ open, onClose, mode, editId }: OrgNetworkFormPr
                 rules={{ valueAsNumber: true }}
                 label={
                   <>
-                    Ed-Fi ID
-                    <Tooltip content="The unique numeric code for this network. If you don't have one, enter any positive integer as a placeholder." side="top">
+                    {t('organization.fields.edFiId')}
+                    <Tooltip content={t('organization.networkForm.edFiIdHelp')} side="top">
                       <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
                     </Tooltip>
                   </>
@@ -149,7 +161,7 @@ export function OrgNetworkForm({ open, onClose, mode, editId }: OrgNetworkFormPr
               />
               <TextField
                 name="nameOfInstitution"
-                label="Name"
+                label={t('organization.fields.name')}
                 required
                 placeholder="e.g., Metro Area STEM Collaborative"
               />
@@ -158,12 +170,12 @@ export function OrgNetworkForm({ open, onClose, mode, editId }: OrgNetworkFormPr
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <TextField
                 name="shortNameOfInstitution"
-                label="Short Name"
+                label={t('organization.fields.shortName')}
                 placeholder="e.g., Metro STEM"
               />
               <TextField
                 name="webSite"
-                label="Website"
+                label={t('organization.fields.website')}
                 type="url"
                 placeholder="https://www.example.org"
               />
@@ -173,11 +185,11 @@ export function OrgNetworkForm({ open, onClose, mode, editId }: OrgNetworkFormPr
               <SelectField
                 name="networkPurposeDescriptor"
                 required
-                options={NETWORK_PURPOSE_DESCRIPTORS}
+                options={networkPurposeOptions}
                 label={
                   <>
-                    Network Purpose
-                    <Tooltip content="The primary purpose of this network grouping per Ed-Fi standards." side="top">
+                    {t('organization.networkForm.networkPurpose')}
+                    <Tooltip content={t('organization.networkForm.networkPurposeHelp')} side="top">
                       <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
                     </Tooltip>
                   </>
@@ -185,11 +197,11 @@ export function OrgNetworkForm({ open, onClose, mode, editId }: OrgNetworkFormPr
               />
               <SelectField
                 name="operationalStatusDescriptor"
-                options={OPERATIONAL_STATUS_DESCRIPTORS}
+                options={operationalStatusOptions}
                 label={
                   <>
-                    Operational Status
-                    <Tooltip content="Current operating status of this network per Ed-Fi standards." side="top">
+                    {t('organization.fields.operationalStatus')}
+                    <Tooltip content={t('organization.networkForm.operationalStatusHelp')} side="top">
                       <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
                     </Tooltip>
                   </>
@@ -211,10 +223,10 @@ export function OrgNetworkForm({ open, onClose, mode, editId }: OrgNetworkFormPr
 
       <ModalFooter>
         <Button variant="outline" onClick={guardedClose} disabled={isPending}>
-          Cancel
+          {t('organization.actions.cancel')}
         </Button>
         <Button onClick={onSubmit} isLoading={isPending}>
-          {isEdit ? 'Update Network' : 'Create Network'}
+          {isEdit ? t('organization.networkForm.updateAction') : t('organization.networkForm.createAction')}
         </Button>
       </ModalFooter>
     </Modal>
