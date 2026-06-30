@@ -8,16 +8,9 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import {
-  Landmark,
-  Building2,
-  School,
-  CheckCircle2,
-  ChevronRight,
-  X,
-  Sparkles,
-} from 'lucide-react'
+import { Landmark, Building2, School, CheckCircle2, ChevronRight, X, Sparkles } from 'lucide-react'
 import { usePermission } from '@edforge/abac'
+import { useTranslation } from '@edforge/i18n'
 import { useStateEducationAgency, useLocalEducationAgencies } from '@/hooks/useEducationOrgs'
 
 // ============================================================================
@@ -76,6 +69,7 @@ function StepCard({
   isActive: boolean
   onClick?: () => void
 }) {
+  const { t } = useTranslation('settings')
   const Icon = step.icon
 
   return (
@@ -85,34 +79,23 @@ function StepCard({
       disabled={step.isComplete || !onClick}
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: stepNumber * 0.1, type: 'spring', stiffness: 300, damping: 25 }}
-      className={`relative w-full text-left p-5 rounded-xl border transition-all group ${
-        step.isComplete
-          ? 'border-[rgb(var(--state-success-border)/0.35)] bg-[rgb(var(--state-success-fg))]/5'
-          : isActive
-          ? 'border-[rgb(var(--border-focus)/0.40)] bg-[rgb(var(--action-primary-bg))]/5 shadow-lg shadow-teal-500/10 ring-1 ring-[rgb(var(--border-focus))]/20'
-          : 'border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] opacity-60'
-      }`}
+      transition={{
+        delay: stepNumber * 0.1,
+        type: 'spring',
+        stiffness: 300,
+        damping: 25,
+      }}
+      className={`relative w-full text-left p-5 rounded-xl border transition-all group ${step.isComplete ? 'border-[rgb(var(--state-success-border)/0.35)] bg-[rgb(var(--state-success-fg))]/5' : isActive ? 'border-[rgb(var(--border-focus)/0.40)] bg-[rgb(var(--action-primary-bg))]/5 shadow-lg shadow-teal-500/10 ring-1 ring-[rgb(var(--border-focus))]/20' : 'border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] opacity-60'}`}
     >
       <div className="flex items-start gap-4">
         {/* Step number / check */}
         <div
-          className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center ${
-            step.isComplete
-              ? 'bg-[rgb(var(--state-success-fg))]/15'
-              : isActive
-              ? step.color
-              : 'bg-[rgb(var(--background-tertiary))]'
-          }`}
+          className={`shrink-0 w-10 h-10 rounded-xl flex items-center justify-center ${step.isComplete ? 'bg-[rgb(var(--state-success-fg))]/15' : isActive ? step.color : 'bg-[rgb(var(--background-tertiary))]'}`}
         >
           {step.isComplete ? (
             <CheckCircle2 className="w-5 h-5 text-[rgb(var(--state-success-fg))]" />
           ) : (
-            <Icon
-              className={`w-5 h-5 ${
-                isActive ? 'text-current' : 'text-[rgb(var(--text-tertiary))]'
-              }`}
-            />
+            <Icon className={`w-5 h-5 ${isActive ? 'text-current' : 'text-[rgb(var(--text-tertiary))]'}`} />
           )}
         </div>
 
@@ -120,20 +103,18 @@ function StepCard({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase tracking-wider">
-              Step {stepNumber + 1}
+              {t('organization.onboarding.stepLabel', {
+                number: stepNumber + 1,
+              })}
             </span>
             {step.isComplete && (
               <span className="text-xs font-medium text-[rgb(var(--state-success-fg))] ">
-                Complete
+                {t('organization.onboarding.complete')}
               </span>
             )}
           </div>
-          <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))] mb-0.5">
-            {step.label}
-          </h3>
-          <p className="text-xs text-[rgb(var(--text-tertiary))] leading-relaxed">
-            {step.description}
-          </p>
+          <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))] mb-0.5">{step.label}</h3>
+          <p className="text-xs text-[rgb(var(--text-tertiary))] leading-relaxed">{step.description}</p>
         </div>
 
         {/* Arrow */}
@@ -149,11 +130,8 @@ function StepCard({
 // MAIN COMPONENT
 // ============================================================================
 
-export function OrgSetupOnboarding({
-  onSetupSea,
-  onCreateLea,
-  onAddSchool,
-}: OrgSetupOnboardingProps) {
+export function OrgSetupOnboarding({ onSetupSea, onCreateLea, onAddSchool }: OrgSetupOnboardingProps) {
+  const { t } = useTranslation('settings')
   const canManage = usePermission('manage', 'education-organizations')
   const [dismissed, setDismissed] = useState(isOnboardingDismissed)
 
@@ -167,27 +145,24 @@ export function OrgSetupOnboarding({
   const steps: OnboardingStep[] = [
     {
       id: 'sea',
-      label: 'Set Up State Education Agency',
-      description:
-        'Create your SEA — the root of your organization hierarchy. This represents your state education department.',
+      label: t('organization.onboarding.steps.sea.label'),
+      description: t('organization.onboarding.steps.sea.description'),
       icon: Landmark,
       color: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ',
       isComplete: hasSea,
     },
     {
       id: 'lea',
-      label: 'Create Your First District',
-      description:
-        'Add a Local Education Agency (LEA) — your school district. Districts organize schools for administration and reporting.',
+      label: t('organization.onboarding.steps.lea.label'),
+      description: t('organization.onboarding.steps.lea.description'),
       icon: Building2,
       color: 'bg-[rgb(var(--action-primary-bg))]/15 text-[rgb(var(--action-secondary-fg))] ',
       isComplete: hasLeas,
     },
     {
       id: 'schools',
-      label: 'Add Schools',
-      description:
-        'Assign schools to your district. Schools are where students enroll and staff teach.',
+      label: t('organization.onboarding.steps.schools.label'),
+      description: t('organization.onboarding.steps.schools.description'),
       icon: School,
       color: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ',
       isComplete: false, // We don't track this in the onboarding — becomes irrelevant
@@ -256,18 +231,16 @@ export function OrgSetupOnboarding({
             </div>
             <div>
               <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))] tracking-tight">
-                Get Started
+                {t('organization.onboarding.title')}
               </h2>
-              <p className="text-sm text-[rgb(var(--text-tertiary))]">
-                Set up your organization structure in three easy steps
-              </p>
+              <p className="text-sm text-[rgb(var(--text-tertiary))]">{t('organization.onboarding.description')}</p>
             </div>
           </div>
           <button
             type="button"
             onClick={handleDismiss}
             className="p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary))] transition-colors"
-            aria-label="Dismiss onboarding"
+            aria-label={t('organization.onboarding.dismissAria')}
           >
             <X className="w-4 h-4" />
           </button>
@@ -277,11 +250,14 @@ export function OrgSetupOnboarding({
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-medium text-[rgb(var(--text-tertiary))]">
-              {steps.filter((s) => s.isComplete).length} of {steps.length} steps complete
+              {t('organization.onboarding.progress', {
+                complete: steps.filter((s) => s.isComplete).length,
+                total: steps.length,
+              })}
             </span>
             {allComplete && (
               <span className="text-xs font-medium text-[rgb(var(--state-success-fg))] ">
-                All done!
+                {t('organization.onboarding.allDone')}
               </span>
             )}
           </div>
@@ -291,7 +267,7 @@ export function OrgSetupOnboarding({
             aria-valuenow={steps.filter((s) => s.isComplete).length}
             aria-valuemin={0}
             aria-valuemax={steps.length}
-            aria-label="Onboarding progress"
+            aria-label={t('organization.onboarding.progressAria')}
           >
             <motion.div
               className="h-full rounded-full bg-gradient-to-r from-[rgb(var(--state-info-fg))] to-[rgb(var(--action-primary-bg))]"
@@ -325,7 +301,7 @@ export function OrgSetupOnboarding({
               onClick={handleDismiss}
               className="text-xs text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] transition-colors"
             >
-              Skip onboarding — I know what I'm doing
+              {t('organization.onboarding.skip')}
             </button>
           </div>
         )}

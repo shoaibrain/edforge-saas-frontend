@@ -23,6 +23,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@edforge/ui'
 import { usePermission } from '@edforge/abac'
+import { useTranslation } from '@edforge/i18n'
 import {
   useStateEducationAgency,
   useLocalEducationAgency,
@@ -44,24 +45,33 @@ import type { HierarchyNode } from '@aibrains/shared-types'
 type OrgType = 'sea' | 'lea' | 'esc'
 type DetailTab = 'overview' | 'schools' | 'children' | 'accountability'
 
-const ORG_TYPE_META: Record<OrgType, { label: string; fullLabel: string; icon: LucideIcon; color: string; bgColor: string }> = {
+const ORG_TYPE_META: Record<
+  OrgType,
+  {
+    labelKey: string
+    fullLabelKey: string
+    icon: LucideIcon
+    color: string
+    bgColor: string
+  }
+> = {
   sea: {
-    label: 'SEA',
-    fullLabel: 'State Education Agency',
+    labelKey: 'organization.typeBadges.sea',
+    fullLabelKey: 'organization.entities.stateEducationAgency',
     icon: Landmark,
     color: 'text-[rgb(var(--state-info-fg))] ',
     bgColor: 'bg-[rgb(var(--state-info-bg)/0.18)]',
   },
   lea: {
-    label: 'LEA',
-    fullLabel: 'Local Education Agency',
+    labelKey: 'organization.typeBadges.lea',
+    fullLabelKey: 'organization.entities.localEducationAgency',
     icon: Building2,
     color: 'text-[rgb(var(--action-secondary-fg))] ',
     bgColor: 'bg-[rgb(var(--action-primary-bg))]/10',
   },
   esc: {
-    label: 'ESC',
-    fullLabel: 'Education Service Center',
+    labelKey: 'organization.typeBadges.esc',
+    fullLabelKey: 'organization.entities.educationServiceCenter',
     icon: MapPin,
     color: 'text-amber-600 dark:text-amber-400',
     bgColor: 'bg-amber-500/10',
@@ -72,15 +82,7 @@ const ORG_TYPE_META: Record<OrgType, { label: string; fullLabel: string; icon: L
 // INFO CARD
 // ============================================================================
 
-function InfoCard({
-  title,
-  icon: Icon,
-  children,
-}: {
-  title: string
-  icon: LucideIcon
-  children: React.ReactNode
-}) {
+function InfoCard({ title, icon: Icon, children }: { title: string; icon: LucideIcon; children: React.ReactNode }) {
   return (
     <div className="p-5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]">
       <div className="flex items-center gap-2 mb-4">
@@ -107,15 +109,18 @@ function FieldRow({ label, value }: { label: string; value?: string | number | n
 // ============================================================================
 
 function ChildOrgItem({ node, onNavigate }: { node: HierarchyNode; onNavigate: (node: HierarchyNode) => void }) {
+  const { t } = useTranslation('settings')
   const typeColors: Record<string, string> = {
-    localEducationAgency: 'bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--action-secondary-fg))]  border-[rgb(var(--border-focus)/0.35)]',
+    localEducationAgency:
+      'bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--action-secondary-fg))]  border-[rgb(var(--border-focus)/0.35)]',
     educationServiceCenter: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
-    school: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]  border-[rgb(var(--state-info-border)/0.35)]',
+    school:
+      'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]  border-[rgb(var(--state-info-border)/0.35)]',
   }
-  const typeLabels: Record<string, string> = {
-    localEducationAgency: 'LEA',
-    educationServiceCenter: 'ESC',
-    school: 'School',
+  const typeLabelKeys: Record<string, string> = {
+    localEducationAgency: 'organization.typeBadges.lea',
+    educationServiceCenter: 'organization.typeBadges.esc',
+    school: 'organization.typeBadges.school',
   }
 
   return (
@@ -123,14 +128,18 @@ function ChildOrgItem({ node, onNavigate }: { node: HierarchyNode; onNavigate: (
       onClick={() => onNavigate(node)}
       className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-[rgb(var(--background-tertiary))] transition-colors text-left"
     >
-      <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold uppercase tracking-wider border ${typeColors[node.type] || ''}`}>
-        {typeLabels[node.type] || node.type}
+      <span
+        className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold uppercase tracking-wider border ${typeColors[node.type] || ''}`}
+      >
+        {typeLabelKeys[node.type] ? t(typeLabelKeys[node.type]) : node.type}
       </span>
       <span className="text-sm font-medium text-[rgb(var(--text-primary))] truncate flex-1">{node.name}</span>
       {node.edfiId !== undefined && (
         <span className="text-xs text-[rgb(var(--text-tertiary))] font-mono">#{node.edfiId}</span>
       )}
-      <span className={`w-2 h-2 rounded-full ${node.status === 'Active' ? 'bg-[rgb(var(--state-success-fg))]' : 'bg-[rgb(var(--text-tertiary))]'}`} />
+      <span
+        className={`w-2 h-2 rounded-full ${node.status === 'Active' ? 'bg-[rgb(var(--state-success-fg))]' : 'bg-[rgb(var(--text-tertiary))]'}`}
+      />
     </button>
   )
 }
@@ -155,11 +164,7 @@ function TabButton({
     <button
       type="button"
       onClick={() => onSelect(id)}
-      className={`relative px-4 py-2 text-sm font-medium transition-colors ${
-        isActive
-          ? 'text-[rgb(var(--action-secondary-fg))] '
-          : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))]'
-      }`}
+      className={`relative px-4 py-2 text-sm font-medium transition-colors ${isActive ? 'text-[rgb(var(--action-secondary-fg))] ' : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))]'}`}
       role="tab"
       aria-selected={isActive}
     >
@@ -180,8 +185,12 @@ function TabButton({
 // ============================================================================
 
 export default function EducationOrgDetailPage() {
+  const { t } = useTranslation('settings')
   const navigate = useNavigate()
-  const params = useParams({ strict: false }) as { orgType?: string; orgId?: string }
+  const params = useParams({ strict: false }) as {
+    orgType?: string
+    orgId?: string
+  }
   const orgType = params.orgType as OrgType | undefined
   const orgId = params.orgId || ''
 
@@ -205,11 +214,11 @@ export default function EducationOrgDetailPage() {
       <div className="max-w-4xl mx-auto px-6 py-8">
         <SettingsEmptyState
           icon={Building2}
-          title="Organization not found"
-          description="The organization type is invalid."
+          title={t('organization.detail.notFoundTitle')}
+          description={t('organization.detail.invalidTypeDescription')}
           action={
             <Button size="sm" onClick={() => navigate({ to: '/settings/organization' })}>
-              Back to Organizations
+              {t('organization.detail.backToOrganizations')}
             </Button>
           }
         />
@@ -235,11 +244,11 @@ export default function EducationOrgDetailPage() {
       <div className="max-w-4xl mx-auto px-6 py-8">
         <SettingsEmptyState
           icon={Building2}
-          title="Organization not found"
-          description="The requested organization could not be found."
+          title={t('organization.detail.notFoundTitle')}
+          description={t('organization.detail.missingDescription')}
           action={
             <Button size="sm" onClick={() => navigate({ to: '/settings/organization' })}>
-              Back to Organizations
+              {t('organization.detail.backToOrganizations')}
             </Button>
           }
         />
@@ -248,12 +257,16 @@ export default function EducationOrgDetailPage() {
   }
 
   const name = orgData.nameOfInstitution
-  const edfiId = orgType === 'sea'
-    ? (orgData as typeof sea & object).stateEducationAgencyId
-    : orgType === 'lea'
-    ? (orgData as typeof lea & object).localEducationAgencyId
-    : (orgData as typeof esc & object).educationServiceCenterId
+  const edfiId =
+    orgType === 'sea'
+      ? (orgData as typeof sea & object).stateEducationAgencyId
+      : orgType === 'lea'
+        ? (orgData as typeof lea & object).localEducationAgencyId
+        : (orgData as typeof esc & object).educationServiceCenterId
   const status = orgData.operationalStatusDescriptor || 'Active'
+  const statusLabel = t(`organization.status.${status}`, {
+    defaultValue: status,
+  })
   const addresses = orgData.addresses || []
   const telephones = orgData.telephones || []
   const identificationCodes = orgData.identificationCodes || []
@@ -283,7 +296,10 @@ export default function EducationOrgDetailPage() {
           break
         }
         const found = findNode(escNode, orgId)
-        if (found) { hierarchyNode = found; break }
+        if (found) {
+          hierarchyNode = found
+          break
+        }
       }
     }
   }
@@ -309,260 +325,264 @@ export default function EducationOrgDetailPage() {
 
   const handleChildNavigate = (node: HierarchyNode) => {
     if (node.type === 'school') {
-      navigate({ to: '/settings/organization/schools/$schoolId', params: { schoolId: node.id }, search: { tab: undefined } })
+      navigate({
+        to: '/settings/organization/schools/$schoolId',
+        params: { schoolId: node.id },
+        search: { tab: undefined },
+      })
     } else {
-      const childType = node.type === 'localEducationAgency' ? 'lea' : node.type === 'educationServiceCenter' ? 'esc' : 'sea'
-      navigate({ to: `/settings/organization/${childType}/${node.id}` as string })
+      const childType =
+        node.type === 'localEducationAgency' ? 'lea' : node.type === 'educationServiceCenter' ? 'esc' : 'sea'
+      navigate({
+        to: `/settings/organization/${childType}/${node.id}` as string,
+      })
     }
   }
 
   // Determine which tabs to show
-  const tabs: { id: DetailTab; label: string }[] = [{ id: 'overview', label: 'Overview' }]
+  const tabs: { id: DetailTab; label: string }[] = [{ id: 'overview', label: t('organization.detail.tabs.overview') }]
   if (orgType === 'lea' && schools.length > 0) {
-    tabs.push({ id: 'schools', label: `Schools (${schools.length})` })
+    tabs.push({
+      id: 'schools',
+      label: t('organization.detail.tabs.schools', { count: schools.length }),
+    })
   }
   if ((orgType === 'sea' && seaDirectChildren.length > 0) || (orgType !== 'sea' && nonSchoolChildren.length > 0)) {
-    tabs.push({ id: 'children', label: 'Child Organizations' })
+    tabs.push({
+      id: 'children',
+      label: t('organization.detail.tabs.children'),
+    })
   }
 
   const MetaIcon = meta.icon
 
   return (
     <ErrorBoundary>
-    <div className="max-w-4xl mx-auto px-6 py-8 space-y-6">
-      {/* Back Button */}
-      <button
-        onClick={() => navigate({ to: '/settings/organization' })}
-        className="inline-flex items-center gap-1.5 text-sm text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] transition-colors"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        Back to Organizations
-      </button>
-
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex items-start gap-4"
-      >
-        <div className={`p-3 rounded-xl ${meta.bgColor}`}>
-          <MetaIcon className={`w-6 h-6 ${meta.color}`} />
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold uppercase tracking-wider border ${meta.bgColor} ${meta.color}`}>
-              {meta.label}
-            </span>
-            <span className="text-xs text-[rgb(var(--text-tertiary))] font-mono">#{edfiId}</span>
-            <span className="inline-flex items-center gap-1.5">
-              <span className={`w-2 h-2 rounded-full ${status === 'Active' ? 'bg-[rgb(var(--state-success-fg))]' : 'bg-[rgb(var(--text-tertiary))]'}`} />
-              <span className="text-xs text-[rgb(var(--text-tertiary))]">{status}</span>
-            </span>
-          </div>
-          <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))] tracking-tight truncate">{name}</h1>
-          <p className="text-sm text-[rgb(var(--text-tertiary))] mt-0.5">{meta.fullLabel}</p>
-        </div>
-        {canManage && (
-          <Button size="sm" variant="ghost" className="gap-1.5 shrink-0" onClick={handleEdit}>
-            <Pencil className="w-4 h-4" />
-            Edit
-          </Button>
-        )}
-      </motion.div>
-
-      {/* Tabs */}
-      {tabs.length > 1 && (
-        <div className="flex items-center border-b border-[rgb(var(--border-primary))]" role="tablist">
-          {tabs.map((tab) => (
-            <TabButton key={tab.id} id={tab.id} label={tab.label} activeTab={activeTab} onSelect={setActiveTab} />
-          ))}
-        </div>
-      )}
-
-      {/* Tab Content */}
-      {activeTab === 'overview' && (
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="space-y-4"
+      <div className="max-w-4xl mx-auto px-6 py-8 space-y-6">
+        {/* Back Button */}
+        <button
+          onClick={() => navigate({ to: '/settings/organization' })}
+          className="inline-flex items-center gap-1.5 text-sm text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] transition-colors"
         >
-          {/* Identity */}
-          <InfoCard title="Identity" icon={Building2}>
-            <div className="grid grid-cols-2 gap-4">
-              <FieldRow label="Name" value={name} />
-              <FieldRow label="Short Name" value={orgData.shortNameOfInstitution} />
-              <FieldRow label="Ed-Fi ID" value={edfiId} />
-              <FieldRow label="Operational Status" value={status} />
-              {orgData.webSite && (
-                <div>
-                  <p className="text-xs text-[rgb(var(--text-tertiary))] mb-0.5">Website</p>
-                  <a
-                    href={orgData.webSite}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm font-medium text-[rgb(var(--action-secondary-fg))]  hover:underline inline-flex items-center gap-1"
-                  >
-                    <Globe className="w-3.5 h-3.5" />
-                    {orgData.webSite}
-                  </a>
-                </div>
-              )}
-              {orgType === 'lea' && (orgData as typeof lea & object).leaCategoryDescriptor && (
-                <FieldRow label="LEA Category" value={(orgData as typeof lea & object).leaCategoryDescriptor} />
-              )}
-              {orgType === 'lea' && (orgData as typeof lea & object).charterStatusDescriptor && (
-                <FieldRow label="Charter Status" value={(orgData as typeof lea & object).charterStatusDescriptor} />
-              )}
+          <ArrowLeft className="w-4 h-4" />
+          {t('organization.detail.backToOrganizations')}
+        </button>
+
+        {/* Header */}
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="flex items-start gap-4">
+          <div className={`p-3 rounded-xl ${meta.bgColor}`}>
+            <MetaIcon className={`w-6 h-6 ${meta.color}`} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <span
+                className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold uppercase tracking-wider border ${meta.bgColor} ${meta.color}`}
+              >
+                {t(meta.labelKey)}
+              </span>
+              <span className="text-xs text-[rgb(var(--text-tertiary))] font-mono">#{edfiId}</span>
+              <span className="inline-flex items-center gap-1.5">
+                <span
+                  className={`w-2 h-2 rounded-full ${status === 'Active' ? 'bg-[rgb(var(--state-success-fg))]' : 'bg-[rgb(var(--text-tertiary))]'}`}
+                />
+                <span className="text-xs text-[rgb(var(--text-tertiary))]">{statusLabel}</span>
+              </span>
             </div>
-          </InfoCard>
-
-          {/* Categories */}
-          {categories.length > 0 && (
-            <InfoCard title="Categories" icon={Hash}>
-              <div className="flex flex-wrap gap-2">
-                {categories.map((cat, i) => (
-                  <span
-                    key={i}
-                    className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))] border border-[rgb(var(--border-primary))]"
-                  >
-                    {cat.educationOrganizationCategoryDescriptor}
-                  </span>
-                ))}
-              </div>
-            </InfoCard>
-          )}
-
-          {/* Addresses */}
-          {addresses.length > 0 && (
-            <InfoCard title="Addresses" icon={MapPin}>
-              <div className="space-y-3">
-                {addresses.map((addr, i) => (
-                  <div key={i} className="p-3 rounded-lg bg-[rgb(var(--background-tertiary))]">
-                    <p className="text-xs font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))] mb-1">
-                      {addr.addressTypeDescriptor}
-                    </p>
-                    <p className="text-sm text-[rgb(var(--text-primary))]">
-                      {addr.streetNumberName}
-                      {addr.apartmentRoomSuiteNumber && `, ${addr.apartmentRoomSuiteNumber}`}
-                    </p>
-                    <p className="text-sm text-[rgb(var(--text-primary))]">
-                      {addr.city}, {addr.stateAbbreviationDescriptor} {addr.postalCode}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </InfoCard>
-          )}
-
-          {/* Telephones */}
-          {telephones.length > 0 && (
-            <InfoCard title="Telephones" icon={Phone}>
-              <div className="grid grid-cols-2 gap-3">
-                {telephones.map((tel, i) => (
-                  <div key={i} className="p-3 rounded-lg bg-[rgb(var(--background-tertiary))]">
-                    <p className="text-xs font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))] mb-1">
-                      {tel.institutionTelephoneNumberTypeDescriptor}
-                    </p>
-                    <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{tel.telephoneNumber}</p>
-                  </div>
-                ))}
-              </div>
-            </InfoCard>
-          )}
-
-          {/* Identification Codes */}
-          {identificationCodes.length > 0 && (
-            <InfoCard title="Identification Codes" icon={Hash}>
-              <div className="grid grid-cols-2 gap-3">
-                {identificationCodes.map((code, i) => (
-                  <div key={i} className="p-3 rounded-lg bg-[rgb(var(--background-tertiary))]">
-                    <p className="text-xs font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))] mb-1">
-                      {code.educationOrganizationIdentificationSystemDescriptor}
-                    </p>
-                    <p className="text-sm font-mono font-medium text-[rgb(var(--text-primary))]">{code.identificationCode}</p>
-                  </div>
-                ))}
-              </div>
-            </InfoCard>
-          )}
-
-          {/* Hierarchy (LEA only) */}
-          {orgType === 'lea' && (
-            <InfoCard title="Hierarchy" icon={Network}>
-              <div className="grid grid-cols-2 gap-4">
-                {(orgData as typeof lea & object).stateEducationAgencyId && (
-                  <FieldRow label="State Education Agency" value={sea?.nameOfInstitution || (orgData as typeof lea & object).stateEducationAgencyId} />
-                )}
-                {(orgData as typeof lea & object).educationServiceCenterId && (
-                  <FieldRow label="Education Service Center" value={(orgData as typeof lea & object).educationServiceCenterId} />
-                )}
-                {(orgData as typeof lea & object).parentLocalEducationAgencyId && (
-                  <FieldRow label="Parent LEA" value={(orgData as typeof lea & object).parentLocalEducationAgencyId} />
-                )}
-              </div>
-            </InfoCard>
-          )}
-        </motion.div>
-      )}
-
-      {/* Schools Tab (LEA only) */}
-      {activeTab === 'schools' && (
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] divide-y divide-[rgb(var(--border-primary))]">
-            {schools.length > 0 ? (
-              schools.map((s) => <ChildOrgItem key={s.id} node={s} onNavigate={handleChildNavigate} />)
-            ) : (
-              <div className="p-8 text-center">
-                <School className="w-8 h-8 text-[rgb(var(--text-tertiary))] mx-auto mb-2" />
-                <p className="text-sm text-[rgb(var(--text-tertiary))]">No schools assigned to this district.</p>
-              </div>
-            )}
+            <h1 className="text-2xl font-bold text-[rgb(var(--text-primary))] tracking-tight truncate">{name}</h1>
+            <p className="text-sm text-[rgb(var(--text-tertiary))] mt-0.5">{t(meta.fullLabelKey)}</p>
           </div>
+          {canManage && (
+            <Button size="sm" variant="ghost" className="gap-1.5 shrink-0" onClick={handleEdit}>
+              <Pencil className="w-4 h-4" />
+              {t('organization.actions.edit')}
+            </Button>
+          )}
         </motion.div>
-      )}
 
-      {/* Child Orgs Tab */}
-      {activeTab === 'children' && (
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] divide-y divide-[rgb(var(--border-primary))]">
-            {(orgType === 'sea' ? seaDirectChildren : nonSchoolChildren).map((child) => (
-              <ChildOrgItem key={child.id} node={child} onNavigate={handleChildNavigate} />
+        {/* Tabs */}
+        {tabs.length > 1 && (
+          <div className="flex items-center border-b border-[rgb(var(--border-primary))]" role="tablist">
+            {tabs.map((tab) => (
+              <TabButton key={tab.id} id={tab.id} label={tab.label} activeTab={activeTab} onSelect={setActiveTab} />
             ))}
           </div>
-        </motion.div>
-      )}
+        )}
 
-      {/* Edit Form Modals */}
-      {orgType === 'sea' && (
-        <SEASetupForm
-          open={seaModal.isOpen}
-          onClose={seaModal.close}
-          existingSea={sea}
-        />
-      )}
-      {orgType === 'lea' && (
-        <LEAForm
-          open={leaModal.isOpen}
-          onClose={leaModal.close}
-          mode="edit"
-          editId={orgId}
-        />
-      )}
-      {orgType === 'esc' && (
-        <ESCForm
-          open={escModal.isOpen}
-          onClose={escModal.close}
-          mode="edit"
-          editId={orgId}
-        />
-      )}
-    </div>
+        {/* Tab Content */}
+        {activeTab === 'overview' && (
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+            {/* Identity */}
+            <InfoCard title={t('organization.form.identity')} icon={Building2}>
+              <div className="grid grid-cols-2 gap-4">
+                <FieldRow label={t('organization.fields.name')} value={name} />
+                <FieldRow label={t('organization.fields.shortName')} value={orgData.shortNameOfInstitution} />
+                <FieldRow label={t('organization.fields.edFiId')} value={edfiId} />
+                <FieldRow label={t('organization.fields.operationalStatus')} value={statusLabel} />
+                {orgData.webSite && (
+                  <div>
+                    <p className="text-xs text-[rgb(var(--text-tertiary))] mb-0.5">
+                      {t('organization.fields.website')}
+                    </p>
+                    <a
+                      href={orgData.webSite}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm font-medium text-[rgb(var(--action-secondary-fg))]  hover:underline inline-flex items-center gap-1"
+                    >
+                      <Globe className="w-3.5 h-3.5" />
+                      {orgData.webSite}
+                    </a>
+                  </div>
+                )}
+                {orgType === 'lea' && (orgData as typeof lea & object).leaCategoryDescriptor && (
+                  <FieldRow
+                    label={t('organization.fields.leaCategory')}
+                    value={(orgData as typeof lea & object).leaCategoryDescriptor}
+                  />
+                )}
+                {orgType === 'lea' && (orgData as typeof lea & object).charterStatusDescriptor && (
+                  <FieldRow
+                    label={t('organization.fields.charterStatus')}
+                    value={(orgData as typeof lea & object).charterStatusDescriptor}
+                  />
+                )}
+              </div>
+            </InfoCard>
+
+            {/* Categories */}
+            {categories.length > 0 && (
+              <InfoCard title={t('organization.form.categories')} icon={Hash}>
+                <div className="flex flex-wrap gap-2">
+                  {categories.map((cat, i) => (
+                    <span
+                      key={i}
+                      className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))] border border-[rgb(var(--border-primary))]"
+                    >
+                      {cat.educationOrganizationCategoryDescriptor}
+                    </span>
+                  ))}
+                </div>
+              </InfoCard>
+            )}
+
+            {/* Addresses */}
+            {addresses.length > 0 && (
+              <InfoCard title={t('organization.form.addresses')} icon={MapPin}>
+                <div className="space-y-3">
+                  {addresses.map((addr, i) => (
+                    <div key={i} className="p-3 rounded-lg bg-[rgb(var(--background-tertiary))]">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))] mb-1">
+                        {addr.addressTypeDescriptor}
+                      </p>
+                      <p className="text-sm text-[rgb(var(--text-primary))]">
+                        {addr.streetNumberName}
+                        {addr.apartmentRoomSuiteNumber && `, ${addr.apartmentRoomSuiteNumber}`}
+                      </p>
+                      <p className="text-sm text-[rgb(var(--text-primary))]">
+                        {addr.city}, {addr.stateAbbreviationDescriptor} {addr.postalCode}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </InfoCard>
+            )}
+
+            {/* Telephones */}
+            {telephones.length > 0 && (
+              <InfoCard title={t('organization.form.telephones')} icon={Phone}>
+                <div className="grid grid-cols-2 gap-3">
+                  {telephones.map((tel, i) => (
+                    <div key={i} className="p-3 rounded-lg bg-[rgb(var(--background-tertiary))]">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))] mb-1">
+                        {tel.institutionTelephoneNumberTypeDescriptor}
+                      </p>
+                      <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{tel.telephoneNumber}</p>
+                    </div>
+                  ))}
+                </div>
+              </InfoCard>
+            )}
+
+            {/* Identification Codes */}
+            {identificationCodes.length > 0 && (
+              <InfoCard title={t('organization.form.identificationCodes')} icon={Hash}>
+                <div className="grid grid-cols-2 gap-3">
+                  {identificationCodes.map((code, i) => (
+                    <div key={i} className="p-3 rounded-lg bg-[rgb(var(--background-tertiary))]">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))] mb-1">
+                        {code.educationOrganizationIdentificationSystemDescriptor}
+                      </p>
+                      <p className="text-sm font-mono font-medium text-[rgb(var(--text-primary))]">
+                        {code.identificationCode}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </InfoCard>
+            )}
+
+            {/* Hierarchy (LEA only) */}
+            {orgType === 'lea' && (
+              <InfoCard title={t('organization.tabs.hierarchy')} icon={Network}>
+                <div className="grid grid-cols-2 gap-4">
+                  {(orgData as typeof lea & object).stateEducationAgencyId && (
+                    <FieldRow
+                      label={t('organization.entities.stateEducationAgency')}
+                      value={sea?.nameOfInstitution || (orgData as typeof lea & object).stateEducationAgencyId}
+                    />
+                  )}
+                  {(orgData as typeof lea & object).educationServiceCenterId && (
+                    <FieldRow
+                      label={t('organization.entities.educationServiceCenter')}
+                      value={(orgData as typeof lea & object).educationServiceCenterId}
+                    />
+                  )}
+                  {(orgData as typeof lea & object).parentLocalEducationAgencyId && (
+                    <FieldRow
+                      label={t('organization.fields.parentLea')}
+                      value={(orgData as typeof lea & object).parentLocalEducationAgencyId}
+                    />
+                  )}
+                </div>
+              </InfoCard>
+            )}
+          </motion.div>
+        )}
+
+        {/* Schools Tab (LEA only) */}
+        {activeTab === 'schools' && (
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+            <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] divide-y divide-[rgb(var(--border-primary))]">
+              {schools.length > 0 ? (
+                schools.map((s) => <ChildOrgItem key={s.id} node={s} onNavigate={handleChildNavigate} />)
+              ) : (
+                <div className="p-8 text-center">
+                  <School className="w-8 h-8 text-[rgb(var(--text-tertiary))] mx-auto mb-2" />
+                  <p className="text-sm text-[rgb(var(--text-tertiary))]">
+                    {t('organization.detail.noSchoolsAssigned')}
+                  </p>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+
+        {/* Child Orgs Tab */}
+        {activeTab === 'children' && (
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+            <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] divide-y divide-[rgb(var(--border-primary))]">
+              {(orgType === 'sea' ? seaDirectChildren : nonSchoolChildren).map((child) => (
+                <ChildOrgItem key={child.id} node={child} onNavigate={handleChildNavigate} />
+              ))}
+            </div>
+          </motion.div>
+        )}
+
+        {/* Edit Form Modals */}
+        {orgType === 'sea' && <SEASetupForm open={seaModal.isOpen} onClose={seaModal.close} existingSea={sea} />}
+        {orgType === 'lea' && <LEAForm open={leaModal.isOpen} onClose={leaModal.close} mode="edit" editId={orgId} />}
+        {orgType === 'esc' && <ESCForm open={escModal.isOpen} onClose={escModal.close} mode="edit" editId={orgId} />}
+      </div>
     </ErrorBoundary>
   )
 }

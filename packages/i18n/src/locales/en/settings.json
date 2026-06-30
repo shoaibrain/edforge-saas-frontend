@@ -1047,6 +1047,8 @@
     },
     "entities": {
       "stateEducationAgency": "State Education Agency",
+      "localEducationAgency": "Local Education Agency",
+      "educationServiceCenter": "Education Service Center",
       "district": "District",
       "serviceCenter": "Service Center",
       "serviceCenters": "Education Service Centers"
@@ -1090,6 +1092,18 @@
       "rootOrganization": "Root organization",
       "noSeaTitle": "No State Education Agency",
       "noSeaDescription": "Set up your SEA to establish the root of your organization hierarchy."
+    },
+    "detail": {
+      "backToOrganizations": "Back to Organizations",
+      "notFoundTitle": "Organization not found",
+      "invalidTypeDescription": "The organization type is invalid.",
+      "missingDescription": "The requested organization could not be found.",
+      "noSchoolsAssigned": "No schools assigned to this district.",
+      "tabs": {
+        "overview": "Overview",
+        "schools": "Schools ({{count}})",
+        "children": "Child Organizations"
+      }
     },
     "confirm": {
       "unassignSchool": "Unassign \"{{name}}\" from its district?\n\nThe school will move to the unassigned schools list."
@@ -1243,6 +1257,107 @@
         "Administrative": "Administrative",
         "Fax": "Fax",
         "Attendance": "Attendance"
+      },
+      "networkPurpose": {
+        "Collaborative": "Collaborative",
+        "Disciplinary": "Disciplinary",
+        "Governance": "Governance",
+        "Shared Services": "Shared Services",
+        "Other": "Other"
+      }
+    },
+    "networkForm": {
+      "createTitle": "Create Network",
+      "editTitle": "Edit Network",
+      "description": "Education Organization Networks group organizations for reporting, collaboration, or governance.",
+      "edFiIdHelp": "The unique numeric code for this network. If you don't have one, enter any positive integer as a placeholder.",
+      "networkPurpose": "Network Purpose",
+      "networkPurposeHelp": "The primary purpose of this network grouping per Ed-Fi standards.",
+      "operationalStatusHelp": "Current operating status of this network per Ed-Fi standards.",
+      "createAction": "Create Network",
+      "updateAction": "Update Network"
+    },
+    "networks": {
+      "title": "Organization Networks",
+      "actions": {
+        "create": "Create Network",
+        "editAria": "Edit {{name}}",
+        "deleteAria": "Delete {{name}}"
+      },
+      "table": {
+        "networkName": "Network Name",
+        "purpose": "Purpose"
+      },
+      "empty": {
+        "title": "No networks yet",
+        "description": "Create a network to group organizations for reporting or collaboration."
+      },
+      "members": {
+        "title": "Members ({{count}})",
+        "addMember": "Add Member",
+        "type": "Type",
+        "districtOption": "District (LEA)",
+        "serviceCenterOption": "Service Center (ESC)",
+        "organization": "Organization",
+        "selectOrganization": "Select an organization...",
+        "add": "Add",
+        "cancelAddAria": "Cancel adding member",
+        "empty": "No members yet. Add organizations to this network.",
+        "since": "Since {{date}}",
+        "removeAria": "Remove {{name}} from network",
+        "collapseAria": "Collapse members",
+        "expandAria": "Expand members",
+        "membersOf": "Members of {{name}}"
+      },
+      "delete": {
+        "title": "Delete Network",
+        "description": "Are you sure you want to delete \"{{name}}\"?",
+        "memberAssociationsRemoved": "All member associations will also be removed.",
+        "confirm": "Delete Network"
+      }
+    },
+    "onboarding": {
+      "title": "Get Started",
+      "description": "Set up your organization structure in three easy steps",
+      "dismissAria": "Dismiss onboarding",
+      "stepLabel": "Step {{number}}",
+      "complete": "Complete",
+      "progress": "{{complete}} of {{total}} steps complete",
+      "allDone": "All done!",
+      "progressAria": "Onboarding progress",
+      "skip": "Skip onboarding - I know what I'm doing",
+      "steps": {
+        "sea": {
+          "label": "Set Up State Education Agency",
+          "description": "Create your SEA - the root of your organization hierarchy. This represents your state education department."
+        },
+        "lea": {
+          "label": "Create Your First District",
+          "description": "Add a Local Education Agency (LEA) - your school district. Districts organize schools for administration and reporting."
+        },
+        "schools": {
+          "label": "Add Schools",
+          "description": "Assign schools to your district. Schools are where students enroll and staff teach."
+        }
+      }
+    },
+    "quickReassign": {
+      "title": "Change School District",
+      "description": "Reassign \"{{schoolName}}\" to a different district",
+      "currentDistrict": "Current District",
+      "notAssigned": "Not currently assigned to any district",
+      "newAssignment": "New District Assignment",
+      "noDistricts": "No districts available. Create a Local Education Agency first.",
+      "noneUnassign": "None (Unassign)",
+      "noneHelp": "Select \"None\" to remove district assignment",
+      "previewAssigned": "Will be assigned to {{districtName}}",
+      "previewUnassigned": "Will be unassigned from any district",
+      "saveChanges": "Save Changes",
+      "noChanges": "No Changes",
+      "newDistrictFallback": "new district",
+      "toasts": {
+        "assigned": "{{schoolName}} assigned to {{districtName}}",
+        "unassigned": "{{schoolName}} unassigned from district"
       }
     },
     "assignmentManager": {

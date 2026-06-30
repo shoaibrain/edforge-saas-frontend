@@ -21,10 +21,8 @@ import {
 } from 'lucide-react'
 import { Button, Modal, ModalFooter, Select, TanstackDataTable, createActionsColumn, type ColumnDef } from '@edforge/ui'
 import { usePermission } from '@edforge/abac'
-import type {
-  NetworkResponseDto,
-  NetworkAssociationResponseDto,
-} from '@aibrains/shared-types'
+import { useTranslation } from '@edforge/i18n'
+import type { NetworkResponseDto, NetworkAssociationResponseDto } from '@aibrains/shared-types'
 import {
   useNetworks,
   useDeleteNetwork,
@@ -42,18 +40,23 @@ import { OrgNetworkForm } from './OrgNetworkForm'
 // ============================================================================
 
 const purposeColors: Record<string, string> = {
-  Collaborative: 'bg-[rgb(var(--state-info-bg)/0.18)]0/10 text-[rgb(var(--state-info-fg))] dark:text-[rgb(var(--state-info-fg))]',
-  Disciplinary: 'bg-[rgb(var(--state-danger-bg)/0.18)]0/10 text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]',
+  Collaborative:
+    'bg-[rgb(var(--state-info-bg)/0.18)]0/10 text-[rgb(var(--state-info-fg))] dark:text-[rgb(var(--state-info-fg))]',
+  Disciplinary:
+    'bg-[rgb(var(--state-danger-bg)/0.18)]0/10 text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]',
   Governance: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ',
   'Shared Services': 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
   Other: 'bg-[rgb(var(--background-tertiary))]0/10 text-[rgb(var(--text-secondary))] ',
 }
 
 function PurposeBadge({ purpose }: { purpose: string }) {
+  const { t } = useTranslation('settings')
   const color = purposeColors[purpose] || purposeColors.Other
   return (
     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${color}`}>
-      {purpose}
+      {t(`organization.descriptors.networkPurpose.${purpose}`, {
+        defaultValue: purpose,
+      })}
     </span>
   )
 }
@@ -63,17 +66,16 @@ function PurposeBadge({ purpose }: { purpose: string }) {
 // ============================================================================
 
 function StatusBadge({ status }: { status: string }) {
+  const { t } = useTranslation('settings')
   const isActive = status === 'Active'
   return (
     <span
-      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
-        isActive
-          ? 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] '
-          : 'bg-[rgb(var(--background-tertiary))]0/10 text-[rgb(var(--text-secondary))] '
-      }`}
+      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${isActive ? 'bg-[rgb(var(--state-success-bg)/0.18)] text-[rgb(var(--state-success-fg))] ' : 'bg-[rgb(var(--background-tertiary))]0/10 text-[rgb(var(--text-secondary))] '}`}
     >
-      <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-[rgb(var(--state-success-fg))]' : 'bg-[rgb(var(--text-tertiary))]'}`} />
-      {status}
+      <span
+        className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-[rgb(var(--state-success-fg))]' : 'bg-[rgb(var(--text-tertiary))]'}`}
+      />
+      {t(`organization.status.${status}`, { defaultValue: status })}
     </span>
   )
 }
@@ -83,6 +85,7 @@ function StatusBadge({ status }: { status: string }) {
 // ============================================================================
 
 function MemberPanel({ network }: { network: NetworkResponseDto }) {
+  const { t } = useTranslation('settings')
   const { data: membersData, isLoading } = useNetworkMembers(network.id)
   const addMemberMutation = useAddNetworkMember()
   const removeMemberMutation = useRemoveNetworkMember()
@@ -93,7 +96,9 @@ function MemberPanel({ network }: { network: NetworkResponseDto }) {
 
   const [showAddForm, setShowAddForm] = useState(false)
   const [selectedOrgId, setSelectedOrgId] = useState('')
-  const [selectedOrgType, setSelectedOrgType] = useState<'localEducationAgency' | 'educationServiceCenter'>('localEducationAgency')
+  const [selectedOrgType, setSelectedOrgType] = useState<'localEducationAgency' | 'educationServiceCenter'>(
+    'localEducationAgency',
+  )
 
   const members = membersData?.items || []
 
@@ -119,7 +124,7 @@ function MemberPanel({ network }: { network: NetworkResponseDto }) {
           setShowAddForm(false)
           setSelectedOrgId('')
         },
-      }
+      },
     )
   }
 
@@ -133,7 +138,9 @@ function MemberPanel({ network }: { network: NetworkResponseDto }) {
         <div className="flex items-center gap-2">
           <Users className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
           <span className="text-sm font-medium text-[rgb(var(--text-primary))]">
-            Members ({members.length})
+            {t('organization.networks.members.title', {
+              count: members.length,
+            })}
           </span>
         </div>
         {canManage && !showAddForm && (
@@ -145,7 +152,7 @@ function MemberPanel({ network }: { network: NetworkResponseDto }) {
             onClick={() => setShowAddForm(true)}
           >
             <UserPlus className="w-3.5 h-3.5" />
-            Add Member
+            {t('organization.networks.members.addMember')}
           </Button>
         )}
       </div>
@@ -160,30 +167,40 @@ function MemberPanel({ network }: { network: NetworkResponseDto }) {
             className="flex flex-col sm:flex-row sm:items-end gap-3 p-3 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]"
           >
             <Select
-              label="Type"
+              label={t('organization.networks.members.type')}
               className="sm:w-48"
               value={selectedOrgType}
               onChange={(v) => {
-                setSelectedOrgType(
-                  (v ?? 'localEducationAgency') as 'localEducationAgency' | 'educationServiceCenter'
-                )
+                setSelectedOrgType((v ?? 'localEducationAgency') as 'localEducationAgency' | 'educationServiceCenter')
                 setSelectedOrgId('')
               }}
               options={[
-                { value: 'localEducationAgency', label: 'District (LEA)' },
-                { value: 'educationServiceCenter', label: 'Service Center (ESC)' },
+                {
+                  value: 'localEducationAgency',
+                  label: t('organization.networks.members.districtOption'),
+                },
+                {
+                  value: 'educationServiceCenter',
+                  label: t('organization.networks.members.serviceCenterOption'),
+                },
               ]}
             />
             <Select
-              label="Organization"
+              label={t('organization.networks.members.organization')}
               className="flex-1"
-              placeholder="Select an organization..."
+              placeholder={t('organization.networks.members.selectOrganization')}
               value={selectedOrgId || null}
               onChange={(v) => setSelectedOrgId(v ?? '')}
               options={
                 selectedOrgType === 'localEducationAgency'
-                  ? leaOptions.map((l) => ({ value: l.id, label: l.nameOfInstitution }))
-                  : escOptions.map((e) => ({ value: e.id, label: e.nameOfInstitution }))
+                  ? leaOptions.map((l) => ({
+                      value: l.id,
+                      label: l.nameOfInstitution,
+                    }))
+                  : escOptions.map((e) => ({
+                      value: e.id,
+                      label: e.nameOfInstitution,
+                    }))
               }
             />
             <Button
@@ -192,12 +209,12 @@ function MemberPanel({ network }: { network: NetworkResponseDto }) {
               disabled={!selectedOrgId || addMemberMutation.isPending}
               isLoading={addMemberMutation.isPending}
             >
-              Add
+              {t('organization.networks.members.add')}
             </Button>
             <Button
               size="sm"
               variant="ghost"
-              aria-label="Cancel adding member"
+              aria-label={t('organization.networks.members.cancelAddAria')}
               onClick={() => {
                 setShowAddForm(false)
                 setSelectedOrgId('')
@@ -217,9 +234,7 @@ function MemberPanel({ network }: { network: NetworkResponseDto }) {
           ))}
         </div>
       ) : members.length === 0 ? (
-        <p className="text-sm text-[rgb(var(--text-tertiary))] py-2">
-          No members yet. Add organizations to this network.
-        </p>
+        <p className="text-sm text-[rgb(var(--text-tertiary))] py-2">{t('organization.networks.members.empty')}</p>
       ) : (
         <div className="space-y-1">
           {members.map((member) => (
@@ -228,14 +243,14 @@ function MemberPanel({ network }: { network: NetworkResponseDto }) {
               className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[rgb(var(--background-tertiary))] transition-colors"
             >
               <div className="flex items-center gap-3">
-                <span className="text-sm font-medium text-[rgb(var(--text-primary))]">
-                  {member.memberName}
-                </span>
+                <span className="text-sm font-medium text-[rgb(var(--text-primary))]">{member.memberName}</span>
                 <span className="text-xs text-[rgb(var(--text-tertiary))] capitalize">
                   {member.memberType === 'localEducationAgency' ? 'LEA' : 'ESC'}
                 </span>
                 <span className="text-xs text-[rgb(var(--text-tertiary))]">
-                  Since {member.beginDate}
+                  {t('organization.networks.members.since', {
+                    date: member.beginDate,
+                  })}
                 </span>
               </div>
               {canManage && (
@@ -243,7 +258,9 @@ function MemberPanel({ network }: { network: NetworkResponseDto }) {
                   type="button"
                   onClick={() => handleRemoveMember(member)}
                   disabled={removeMemberMutation.isPending}
-                  aria-label={`Remove ${member.memberName} from network`}
+                  aria-label={t('organization.networks.members.removeAria', {
+                    name: member.memberName,
+                  })}
                   className="p-1 rounded text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--state-danger-bg)/0.18)]0/10 transition-colors"
                 >
                   <X className="w-3.5 h-3.5" />
@@ -270,6 +287,7 @@ function DeleteNetworkModal({
   onClose: () => void
   network: NetworkResponseDto | null
 }) {
+  const { t } = useTranslation('settings')
   const deleteMutation = useDeleteNetwork()
 
   if (!network) return null
@@ -284,8 +302,10 @@ function DeleteNetworkModal({
     <Modal
       open={open}
       onClose={onClose}
-      title="Delete Network"
-      description={`Are you sure you want to delete "${network.nameOfInstitution}"?`}
+      title={t('organization.networks.delete.title')}
+      description={t('organization.networks.delete.description', {
+        name: network.nameOfInstitution,
+      })}
       size="md"
     >
       <div className="py-2">
@@ -293,10 +313,10 @@ function DeleteNetworkModal({
           <AlertTriangle className="w-5 h-5 text-[rgb(var(--state-danger-fg))] shrink-0 mt-0.5" />
           <div className="text-sm">
             <p className="font-medium text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]">
-              This action cannot be undone.
+              {t('organization.delete.irreversible')}
             </p>
             <p className="mt-1 text-[rgb(var(--text-secondary))]">
-              All member associations will also be removed.
+              {t('organization.networks.delete.memberAssociationsRemoved')}
             </p>
           </div>
         </div>
@@ -304,14 +324,10 @@ function DeleteNetworkModal({
 
       <ModalFooter>
         <Button variant="outline" onClick={onClose} disabled={deleteMutation.isPending}>
-          Cancel
+          {t('organization.actions.cancel')}
         </Button>
-        <Button
-          variant="danger"
-          onClick={handleDelete}
-          isLoading={deleteMutation.isPending}
-        >
-          Delete Network
+        <Button variant="danger" onClick={handleDelete} isLoading={deleteMutation.isPending}>
+          {t('organization.networks.delete.confirm')}
         </Button>
       </ModalFooter>
     </Modal>
@@ -323,6 +339,7 @@ function DeleteNetworkModal({
 // ============================================================================
 
 export function OrgNetworkManager() {
+  const { t } = useTranslation('settings')
   const canManage = usePermission('manage', 'education-organizations')
   const { data: networksData, isLoading } = useNetworks()
   const formModal = useModalState<{ id: string }>()
@@ -350,7 +367,11 @@ export function OrgNetworkManager() {
               e.stopPropagation()
               toggleExpanded(item.id)
             }}
-            aria-label={expandedId === item.id ? 'Collapse members' : 'Expand members'}
+            aria-label={
+              expandedId === item.id
+                ? t('organization.networks.members.collapseAria')
+                : t('organization.networks.members.expandAria')
+            }
             aria-expanded={expandedId === item.id}
             className="p-1 rounded hover:bg-[rgb(var(--background-tertiary))] transition-colors"
           >
@@ -365,19 +386,15 @@ export function OrgNetworkManager() {
     },
     {
       accessorKey: 'nameOfInstitution',
-      header: 'Network Name',
+      header: t('organization.networks.table.networkName'),
       enableSorting: true,
       cell: ({ row }) => {
         const item = row.original
         return (
           <div>
-            <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
-              {item.nameOfInstitution}
-            </p>
+            <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{item.nameOfInstitution}</p>
             {item.shortNameOfInstitution && (
-              <p className="text-xs text-[rgb(var(--text-tertiary))]">
-                {item.shortNameOfInstitution}
-              </p>
+              <p className="text-xs text-[rgb(var(--text-tertiary))]">{item.shortNameOfInstitution}</p>
             )}
           </div>
         )
@@ -385,19 +402,19 @@ export function OrgNetworkManager() {
     },
     {
       accessorKey: 'networkPurposeDescriptor',
-      header: 'Purpose',
+      header: t('organization.networks.table.purpose'),
       enableSorting: true,
       cell: ({ row }) => <PurposeBadge purpose={row.original.networkPurposeDescriptor} />,
     },
     {
       accessorKey: 'operationalStatusDescriptor',
-      header: 'Status',
+      header: t('organization.fields.status'),
       enableSorting: true,
       cell: ({ row }) => <StatusBadge status={row.original.operationalStatusDescriptor} />,
     },
     {
       accessorKey: 'educationOrganizationNetworkId',
-      header: 'Ed-Fi ID',
+      header: t('organization.fields.edFiId'),
       enableSorting: false,
       cell: ({ row }) => (
         <span className="text-sm font-mono text-[rgb(var(--text-secondary))]">
@@ -418,7 +435,9 @@ export function OrgNetworkManager() {
                       e.stopPropagation()
                       formModal.openEdit({ id: item.id })
                     }}
-                    aria-label={`Edit ${item.nameOfInstitution}`}
+                    aria-label={t('organization.networks.actions.editAria', {
+                      name: item.nameOfInstitution,
+                    })}
                     className="p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--action-secondary-fg))] hover:bg-[rgb(var(--action-primary-bg))]/10 transition-colors"
                   >
                     <Pencil className="w-3.5 h-3.5" />
@@ -429,7 +448,9 @@ export function OrgNetworkManager() {
                       e.stopPropagation()
                       deleteModal.openDelete(item)
                     }}
-                    aria-label={`Delete ${item.nameOfInstitution}`}
+                    aria-label={t('organization.networks.actions.deleteAria', {
+                      name: item.nameOfInstitution,
+                    })}
                     className="p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--state-danger-bg)/0.18)]0/10 transition-colors"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -448,17 +469,13 @@ export function OrgNetworkManager() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Network className="w-5 h-5 text-[rgb(var(--text-tertiary))]" />
-          <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))]">
-            Organization Networks
-          </h3>
-          <span className="text-xs text-[rgb(var(--text-tertiary))]">
-            ({networks.length})
-          </span>
+          <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))]">{t('organization.networks.title')}</h3>
+          <span className="text-xs text-[rgb(var(--text-tertiary))]">({networks.length})</span>
         </div>
         {canManage && (
           <Button size="sm" className="gap-1.5" onClick={formModal.openCreate}>
             <Plus className="w-4 h-4" />
-            Create Network
+            {t('organization.networks.actions.create')}
           </Button>
         )}
       </div>
@@ -475,10 +492,13 @@ export function OrgNetworkManager() {
         maxHeight="calc(100vh - 15rem)"
         emptyState={{
           icon: <Network className="w-10 h-10" />,
-          title: 'No networks yet',
-          description: 'Create a network to group organizations for reporting or collaboration.',
+          title: t('organization.networks.empty.title'),
+          description: t('organization.networks.empty.description'),
           action: canManage
-            ? { label: 'Create Network', onClick: formModal.openCreate }
+            ? {
+                label: t('organization.networks.actions.create'),
+                onClick: formModal.openCreate,
+              }
             : undefined,
         }}
         onRowClick={(item) => toggleExpanded(item.id)}
@@ -497,7 +517,9 @@ export function OrgNetworkManager() {
           >
             <div className="px-4 pt-3 pb-1 border-b border-[rgb(var(--border-primary))]">
               <p className="text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase tracking-wider">
-                Members of {networks.find((n) => n.id === expandedId)?.nameOfInstitution}
+                {t('organization.networks.members.membersOf', {
+                  name: networks.find((n) => n.id === expandedId)?.nameOfInstitution,
+                })}
               </p>
             </div>
             <MemberPanel network={networks.find((n) => n.id === expandedId)!} />
@@ -514,11 +536,7 @@ export function OrgNetworkManager() {
       />
 
       {/* Delete Confirmation */}
-      <DeleteNetworkModal
-        open={deleteModal.mode === 'delete'}
-        onClose={deleteModal.close}
-        network={deleteModal.data}
-      />
+      <DeleteNetworkModal open={deleteModal.mode === 'delete'} onClose={deleteModal.close} network={deleteModal.data} />
     </div>
   )
 }

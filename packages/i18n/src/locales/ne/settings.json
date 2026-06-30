@@ -1047,6 +1047,8 @@
     },
     "entities": {
       "stateEducationAgency": "राज्य शिक्षा निकाय",
+      "localEducationAgency": "स्थानीय शिक्षा निकाय",
+      "educationServiceCenter": "शिक्षा सेवा केन्द्र",
       "district": "जिल्ला",
       "serviceCenter": "सेवा केन्द्र",
       "serviceCenters": "शिक्षा सेवा केन्द्रहरू"
@@ -1090,6 +1092,18 @@
       "rootOrganization": "मूल संगठन",
       "noSeaTitle": "राज्य शिक्षा निकाय छैन",
       "noSeaDescription": "संगठन पदानुक्रमको मूल स्थापना गर्न SEA सेटअप गर्नुहोस्।"
+    },
+    "detail": {
+      "backToOrganizations": "संगठनहरूमा फर्कनुहोस्",
+      "notFoundTitle": "संगठन भेटिएन",
+      "invalidTypeDescription": "संगठन प्रकार अमान्य छ।",
+      "missingDescription": "अनुरोध गरिएको संगठन भेटिएन।",
+      "noSchoolsAssigned": "यस जिल्लामा विद्यालय असाइन गरिएको छैन।",
+      "tabs": {
+        "overview": "अवलोकन",
+        "schools": "विद्यालयहरू ({{count}})",
+        "children": "बाल संगठनहरू"
+      }
     },
     "confirm": {
       "unassignSchool": "\"{{name}}\" लाई यसको जिल्लाबाट हटाउने?\n\nविद्यालय असाइन नगरिएका विद्यालयहरूको सूचीमा सर्नेछ।"
@@ -1243,6 +1257,107 @@
         "Administrative": "प्रशासनिक",
         "Fax": "फ्याक्स",
         "Attendance": "उपस्थिति"
+      },
+      "networkPurpose": {
+        "Collaborative": "सहकार्य",
+        "Disciplinary": "अनुशासन",
+        "Governance": "शासन",
+        "Shared Services": "साझा सेवाहरू",
+        "Other": "अन्य"
+      }
+    },
+    "networkForm": {
+      "createTitle": "नेटवर्क सिर्जना गर्नुहोस्",
+      "editTitle": "नेटवर्क सम्पादन गर्नुहोस्",
+      "description": "Education Organization Networks ले रिपोर्टिङ, सहकार्य वा शासनका लागि संगठनहरू समूहबद्ध गर्छन्।",
+      "edFiIdHelp": "यस नेटवर्कको अद्वितीय संख्यात्मक कोड। नभए कुनै सकारात्मक पूर्णांक अस्थायी रूपमा प्रविष्ट गर्नुहोस्।",
+      "networkPurpose": "नेटवर्क उद्देश्य",
+      "networkPurposeHelp": "Ed-Fi मापदण्डअनुसार यो नेटवर्क समूहको मुख्य उद्देश्य।",
+      "operationalStatusHelp": "Ed-Fi मापदण्डअनुसार यो नेटवर्कको हालको सञ्चालन स्थिति।",
+      "createAction": "नेटवर्क सिर्जना गर्नुहोस्",
+      "updateAction": "नेटवर्क अपडेट गर्नुहोस्"
+    },
+    "networks": {
+      "title": "संगठन नेटवर्कहरू",
+      "actions": {
+        "create": "नेटवर्क सिर्जना गर्नुहोस्",
+        "editAria": "{{name}} सम्पादन गर्नुहोस्",
+        "deleteAria": "{{name}} मेटाउनुहोस्"
+      },
+      "table": {
+        "networkName": "नेटवर्क नाम",
+        "purpose": "उद्देश्य"
+      },
+      "empty": {
+        "title": "अहिलेसम्म नेटवर्क छैन",
+        "description": "रिपोर्टिङ वा सहकार्यका लागि संगठनहरू समूहबद्ध गर्न नेटवर्क सिर्जना गर्नुहोस्।"
+      },
+      "members": {
+        "title": "सदस्यहरू ({{count}})",
+        "addMember": "सदस्य थप्नुहोस्",
+        "type": "प्रकार",
+        "districtOption": "जिल्ला (LEA)",
+        "serviceCenterOption": "सेवा केन्द्र (ESC)",
+        "organization": "संगठन",
+        "selectOrganization": "संगठन छान्नुहोस्...",
+        "add": "थप्नुहोस्",
+        "cancelAddAria": "सदस्य थप्ने कार्य रद्द गर्नुहोस्",
+        "empty": "अहिलेसम्म सदस्य छैन। यो नेटवर्कमा संगठनहरू थप्नुहोस्।",
+        "since": "{{date}} देखि",
+        "removeAria": "{{name}} लाई नेटवर्कबाट हटाउनुहोस्",
+        "collapseAria": "सदस्यहरू संकुचन गर्नुहोस्",
+        "expandAria": "सदस्यहरू विस्तार गर्नुहोस्",
+        "membersOf": "{{name}} का सदस्यहरू"
+      },
+      "delete": {
+        "title": "नेटवर्क मेटाउनुहोस्",
+        "description": "के तपाईं \"{{name}}\" मेटाउन चाहनुहुन्छ?",
+        "memberAssociationsRemoved": "सबै सदस्य सम्बन्धहरू पनि हटाइनेछन्।",
+        "confirm": "नेटवर्क मेटाउनुहोस्"
+      }
+    },
+    "onboarding": {
+      "title": "सुरु गर्नुहोस्",
+      "description": "तीन सजिला चरणमा आफ्नो संगठन संरचना सेटअप गर्नुहोस्",
+      "dismissAria": "अनबोर्डिङ बन्द गर्नुहोस्",
+      "stepLabel": "चरण {{number}}",
+      "complete": "पूरा",
+      "progress": "{{total}} मध्ये {{complete}} चरण पूरा",
+      "allDone": "सबै सकियो!",
+      "progressAria": "अनबोर्डिङ प्रगति",
+      "skip": "अनबोर्डिङ छोड्नुहोस् - म आफैं गर्न सक्छु",
+      "steps": {
+        "sea": {
+          "label": "राज्य शिक्षा निकाय सेटअप गर्नुहोस्",
+          "description": "आफ्नो SEA सिर्जना गर्नुहोस् - संगठन पदानुक्रमको मूल। यसले राज्य शिक्षा विभागलाई प्रतिनिधित्व गर्छ।"
+        },
+        "lea": {
+          "label": "पहिलो जिल्ला सिर्जना गर्नुहोस्",
+          "description": "Local Education Agency (LEA) थप्नुहोस् - तपाईंको विद्यालय जिल्ला। जिल्लाले प्रशासन र रिपोर्टिङका लागि विद्यालयहरू व्यवस्थित गर्छ।"
+        },
+        "schools": {
+          "label": "विद्यालयहरू थप्नुहोस्",
+          "description": "विद्यालयहरूलाई आफ्नो जिल्लामा असाइन गर्नुहोस्। विद्यालयहरूमा विद्यार्थी भर्ना हुन्छन् र कर्मचारीले पढाउँछन्।"
+        }
+      }
+    },
+    "quickReassign": {
+      "title": "विद्यालय जिल्ला परिवर्तन गर्नुहोस्",
+      "description": "\"{{schoolName}}\" लाई अर्को जिल्लामा पुनः असाइन गर्नुहोस्",
+      "currentDistrict": "हालको जिल्ला",
+      "notAssigned": "हाल कुनै जिल्लामा असाइन गरिएको छैन",
+      "newAssignment": "नयाँ जिल्ला नियुक्ति",
+      "noDistricts": "जिल्ला उपलब्ध छैन। पहिले Local Education Agency सिर्जना गर्नुहोस्।",
+      "noneUnassign": "कुनै छैन (हटाउनुहोस्)",
+      "noneHelp": "जिल्ला नियुक्ति हटाउन \"कुनै छैन\" छान्नुहोस्",
+      "previewAssigned": "{{districtName}} मा असाइन हुनेछ",
+      "previewUnassigned": "कुनै पनि जिल्लाबाट हटाइनेछ",
+      "saveChanges": "परिवर्तन सेभ गर्नुहोस्",
+      "noChanges": "परिवर्तन छैन",
+      "newDistrictFallback": "नयाँ जिल्ला",
+      "toasts": {
+        "assigned": "{{schoolName}} {{districtName}} मा असाइन भयो",
+        "unassigned": "{{schoolName}} जिल्लाबाट हटाइयो"
       }
     },
     "assignmentManager": {
