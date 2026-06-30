@@ -11,10 +11,12 @@
 import { useEffect, useRef, type ReactNode } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { Building2 } from 'lucide-react'
+import { useTranslation } from '@edforge/i18n'
 import { onSchoolChange, getSchoolContext } from '@edforge/config/school-context-channel'
 import { useAppStore } from '../stores/app.store'
 
 export function PeopleLayout({ children }: { children: ReactNode }) {
+    const { t } = useTranslation('people')
     const navigate = useNavigate()
     const prevSchoolRef = useRef<string | null>(null)
 
@@ -55,17 +57,17 @@ export function PeopleLayout({ children }: { children: ReactNode }) {
             </div>
             <div>
               <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
-                No schools configured
+                {t('layout.noSchool.title')}
               </h2>
               <p className="text-sm text-[rgb(var(--text-secondary))] mt-1">
-                Set up your organization in Settings → Organization before using People.
+                {t('layout.noSchool.description')}
               </p>
             </div>
             <button
               onClick={() => { window.location.href = '/settings' }}
               className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
             >
-              Go to Settings
+              {t('layout.noSchool.action')}
             </button>
           </div>
         </div>

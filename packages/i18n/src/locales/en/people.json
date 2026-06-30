@@ -5,7 +5,53 @@
     "title": "Staff Directory",
     "description": "Manage your organization's staff members and their access",
     "searchPlaceholder": "Search by name or email...",
-    "addStaff": "Add Staff Member"
+    "searchAria": "Search staff by name or email",
+    "addStaff": "Add Staff Member",
+    "summary": {
+      "activeStaff": "{{count}} active staff member",
+      "activeStaff_plural": "{{count}} active staff members",
+      "teachers": "{{count}} teacher",
+      "teachers_plural": "{{count}} teachers",
+      "principals": "{{count}} principal",
+      "principals_plural": "{{count}} principals",
+      "systemAccess": "{{count}} with system access enabled"
+    }
+  },
+  "layout": {
+    "noSchool": {
+      "title": "No schools configured",
+      "description": "Set up your organization in Settings → Organization before using People.",
+      "action": "Go to Settings"
+    }
+  },
+  "overview": {
+    "stats": {
+      "thisMonth": "{{count}} this month",
+      "fullTimeContract": "full-time / contract",
+      "noneOnboarded": "none onboarded"
+    },
+    "roster": {
+      "title": "Staff Roster",
+      "viewDirectory": "View directory",
+      "loading": "Loading staff...",
+      "empty": "No staff records yet"
+    },
+    "breakdown": {
+      "title": "Employment Breakdown",
+      "employmentType": "Employment type",
+      "contract": "Contract",
+      "partTime": "Part-time",
+      "byDepartment": "By department",
+      "noDepartments": "No departments assigned"
+    },
+    "activity": {
+      "title": "Recent Activity",
+      "accountCreated": "User account created for {{name}}",
+      "onboardedNoAccess": "{{name}} onboarded as {{role}} without system access",
+      "staffFallback": "staff",
+      "empty": "No recent staff activity"
+    },
+    "directoryShortcutDescription": "Search, filter, and manage complete staff profiles."
   },
   "quickAccess": {
     "addNew": "Add New Person",
@@ -24,7 +70,14 @@
     "activeTeachers": "Active Teachers",
     "teachers": "Teachers",
     "supportStaff": "Support Staff",
-    "administrators": "Administrators"
+    "administrators": "Administrators",
+    "systemAccess": "System Access",
+    "tags": {
+      "allActive": "all active",
+      "active": "active",
+      "noneYet": "none yet",
+      "noAccess": "{{count}} no access"
+    }
   },
   "tableHeaders": {
     "staff": "Staff",
@@ -75,11 +128,35 @@
     "address": "Address",
     "city": "City",
     "state": "State",
+    "province": "Province",
+    "district": "District",
+    "municipality": "Municipality / Rural Municipality / VDC",
+    "wardNumber": "Ward Number",
+    "street": "Street",
+    "streetToleHouse": "Street / Tole / House",
+    "zipCode": "ZIP Code",
+    "country": "Country",
     "postalCode": "Postal Code",
     "department": "Department",
     "positionTitle": "Position Title",
     "fte": "FTE",
-    "isPrimary": "Is Primary"
+    "isPrimary": "Is Primary",
+    "name": "Name",
+    "fullName": "Full Name",
+    "emailAddress": "Email Address",
+    "phoneNumber": "Phone Number",
+    "phoneNumberWithCode": "Phone Number {{code}}",
+    "phoneWithCode": "Phone {{code}}",
+    "role": "Role",
+    "addressType": "Address Type",
+    "relationship": "Relationship",
+    "dateOfBirth": "Date of Birth",
+    "gender": "Gender",
+    "hispanicLatino": "Hispanic/Latino",
+    "hispanicLatinoEthnicity": "Hispanic/Latino Ethnicity",
+    "beginDate": "Begin Date",
+    "startDate": "Start Date",
+    "endDate": "End Date"
   },
   "employmentStatus": {
     "active": "Active",
@@ -88,6 +165,9 @@
     "terminated": "Terminated",
     "retired": "Retired",
     "resigned": "Resigned"
+  },
+  "employmentTypes": {
+    "fullTime": "Full-time"
   },
   "roles": {
     "teacher": "Teacher",
@@ -102,7 +182,47 @@
     "substitute": "Substitute",
     "contractor": "Contractor"
   },
+  "choices": {
+    "gender": {
+      "male": "Male",
+      "female": "Female",
+      "nonBinary": "Non-Binary",
+      "preferNotToSay": "Prefer Not to Say"
+    },
+    "addressType": {
+      "home": "Home",
+      "mailing": "Mailing",
+      "work": "Work",
+      "temporary": "Temporary"
+    },
+    "relationship": {
+      "spouse": "Spouse",
+      "parent": "Parent",
+      "sibling": "Sibling",
+      "child": "Child",
+      "friend": "Friend",
+      "other": "Other"
+    },
+    "employmentType": {
+      "fullTime": "Full Time",
+      "partTime": "Part Time",
+      "contract": "Contract",
+      "temporary": "Temporary",
+      "volunteer": "Volunteer"
+    }
+  },
   "wizard": {
+    "header": {
+      "title": "Add Staff Member",
+      "description": "Complete the wizard to create a new staff record"
+    },
+    "stepMeta": {
+      "personal": { "title": "Personal Info", "description": "Name, ID, and demographics" },
+      "contact": { "title": "Contact", "description": "Email, phone, addresses, and emergency contacts" },
+      "employment": { "title": "Employment", "description": "Role, type, department, and account setup" },
+      "assignment": { "title": "Assignment", "description": "Primary school and additional assignments" },
+      "review": { "title": "Review & Create", "description": "Confirm details and create staff record" }
+    },
     "steps": {
       "personalInfo": "Personal Info",
       "personalInfoDescription": "Name, ID, and demographics",
@@ -118,7 +238,108 @@
     "employmentDetails": "Employment Details",
     "teachingQualifications": "Teaching Qualifications",
     "reviewSubmit": "Review & Submit",
-    "edit": "Edit"
+    "edit": "Edit",
+    "submit": "Create Staff Member",
+    "validation": {
+      "fixFields": "Please fix {{count}} field(s) to continue"
+    },
+    "toasts": {
+      "created": "Staff member created successfully",
+      "createdWithUser": "Staff member and user account created successfully",
+      "additionalAssignmentFailed": "Could not create additional assignment. You can add it from the staff profile.",
+      "createFailed": "Failed to create staff member"
+    },
+    "placeholders": {
+      "firstName": "e.g., John",
+      "lastName": "e.g., Smith",
+      "middleName": "e.g., Michael",
+      "maidenName": "e.g., Johnson",
+      "staffUniqueId": "e.g., JS4821",
+      "email": "john.smith@school.edu",
+      "streetToleHouse": "e.g., Tole-12, Bishal Bazar",
+      "selectProvince": "Select province",
+      "selectDistrict": "Select district",
+      "pickProvinceFirst": "Pick province first",
+      "municipality": "e.g., Kathmandu Metropolitan City",
+      "wardNumber": "e.g., 12",
+      "postalCodeNp": "e.g., 44600",
+      "nepal": "Nepal",
+      "selectRole": "Select a role...",
+      "positionTitle": "e.g., Senior Math Teacher",
+      "selectDepartment": "Select department..."
+    },
+    "help": {
+      "staffUniqueId": "Employee number or state ID. Auto-generated from name, but you can override.",
+      "edfiComplianceField": "Ed-Fi compliance field"
+    },
+    "contact": {
+      "primaryContact": "Primary Contact",
+      "primaryContactDescription": "Email is used for login and notifications",
+      "addresses": "Addresses",
+      "addressesDescription": "Add home, work, or mailing addresses",
+      "addAddress": "Add Address",
+      "removeAddress": "Remove address",
+      "emergencyContacts": "Emergency Contacts",
+      "emergencyContactsDescription": "People to contact in case of emergency",
+      "contactNumber": "Contact {{count}}",
+      "removeContact": "Remove contact",
+      "addEmergencyContact": "Add Emergency Contact"
+    },
+    "employment": {
+      "details": "Employment Details",
+      "detailsDescription": "Role and employment classification",
+      "teachingQualifications": "Teaching Qualifications",
+      "teachingQualificationsDescription": "Ed-Fi fields for instructional staff",
+      "highlyQualifiedTeacher": "Highly Qualified Teacher (HQT)",
+      "highlyQualifiedHelp": "As defined by NCLB/ESSA requirements",
+      "priorTeachingExperience": "Years of Prior Teaching Experience",
+      "priorProfessionalExperience": "Years of Prior Professional Experience",
+      "teachingExperienceYears": "Teaching Experience (years)",
+      "professionalExperienceYears": "Professional Experience (years)",
+      "userAccount": "User Account",
+      "userAccountDescription": "Optionally create a login account for this staff member",
+      "createUserAccount": "Create user account for this staff member",
+      "createUserAccountHelp": "Enables login access to EdForge. An email invitation will be sent.",
+      "cognitoNotice": "A Cognito account will be created with the email from Step 2 ({{email}}). A temporary password will be auto-generated.",
+      "emailNotSet": "not set yet",
+      "globalRoleHelp": "TenantAdmin has full system access"
+    },
+    "assignment": {
+      "primaryTitle": "Primary School Assignment",
+      "primaryDescription": "The staff member's main school placement",
+      "loadingSchools": "Loading schools...",
+      "selectSchool": "Select a school...",
+      "sameAsEmploymentRole": "Same as employment role",
+      "roleAtSchool": "Role at School",
+      "roleHelp": "Defaults to employment role",
+      "beginDateHelp": "Defaults to hire date",
+      "fte": "Full-Time Equivalency (FTE)",
+      "primaryFte": "Primary FTE",
+      "additionalTitle": "Additional Assignments",
+      "additionalDescription": "Staff can be assigned to multiple schools",
+      "assignmentNumber": "Assignment {{count}}",
+      "school": "School",
+      "addAnother": "Add Another School Assignment",
+      "totalFte": "Total FTE",
+      "overcommitted": "Total FTE exceeds 1.0. This staff member may be overcommitted."
+    },
+    "review": {
+      "title": "Review Staff Information",
+      "description": "Please review all details before creating the staff record.",
+      "edit": "Edit",
+      "sections": {
+        "personal": "Personal Information"
+      },
+      "addressCount": "{{count}} address",
+      "addressCount_plural": "{{count}} addresses",
+      "contactCount": "{{count}} contact",
+      "contactCount_plural": "{{count}} contacts",
+      "assigned": "Assigned",
+      "userAccountWillBeCreated": "User account will be created",
+      "noUserAccount": "No user account",
+      "loginSummary": "Login for {{email}} as {{role}}",
+      "noLoginAccess": "Staff record only — no login access"
+    }
   },
   "tabs": {
     "overview": "Overview",
@@ -126,8 +347,10 @@
     "assignments": "Assignments",
     "credentials": "Credentials",
     "employmentHistory": "Employment History",
+    "employment-history": "History",
     "leave": "Leave",
-    "security": "Security"
+    "security": "Security",
+    "trainings": "Trainings"
   },
   "delete": {
     "title": "Delete Staff Member",
@@ -142,9 +365,29 @@
     "cancel": "Cancel",
     "save": "Save",
     "saving": "Saving...",
+    "saveChanges": "Save Changes",
+    "view": "View",
+    "edit": "Edit",
+    "more": "More",
+    "actions": "Actions",
+    "closeDrawer": "Close drawer",
+    "copyToClipboard": "Copy to clipboard",
+    "moreAddOptions": "More add options",
     "updateStatus": "Update Status",
     "assignToSchool": "Assign to School",
     "addCredential": "Add Credential"
+  },
+  "common": {
+    "unknown": "Unknown",
+    "unassigned": "Unassigned",
+    "loading": "Loading...",
+    "select": "Select…",
+    "none": "None",
+    "yes": "Yes",
+    "no": "No",
+    "unsavedChanges": "You have unsaved changes",
+    "unsavedCloseConfirm": "You have unsaved changes. Are you sure you want to close?",
+    "additionalDetails": "Additional details..."
   },
   "widgets": {
     "showHide": "Show/hide widgets",
@@ -161,11 +404,311 @@
     "exportCsv": "Export CSV",
     "role": "Role",
     "employmentStatus": "Employment Status",
-    "department": "Department"
+    "department": "Department",
+    "allDepartments": "All Departments",
+    "roleAria": "Filter by role",
+    "departmentAria": "Filter by department"
   },
   "quickAdd": {
     "title": "Quick Add User",
-    "description": "Create user account only"
+    "description": "Create user account only",
+    "menuLabel": "Quick add user account",
+    "avatarHint": "A DiceBear avatar will be auto-generated from the staff member's name after creation.",
+    "systemRole": "System Role",
+    "createUser": "Create user",
+    "sections": {
+      "identity": "Identity",
+      "accessRole": "Access & Role"
+    },
+    "roles": {
+      "tenantUser": "Tenant User",
+      "tenantAdmin": "Tenant Admin"
+    },
+    "roleHelp": {
+      "admin": "— full access to all features.",
+      "user": "— school-scoped access based on assigned roles."
+    },
+    "toasts": {
+      "created": "User created successfully"
+    }
+  },
+  "quickFilters": {
+    "all": "All",
+    "teacher": "Teachers",
+    "principal": "Principal",
+    "support": "Support"
+  },
+  "export": {
+    "headers": {
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "status": "Status",
+      "phone": "Phone",
+      "hireDate": "Hire Date"
+    }
+  },
+  "editStaff": {
+    "title": "Edit Staff Member",
+    "description": "Update information for {{name}}",
+    "emailReadOnly": "Email address cannot be changed",
+    "errors": {
+      "noStaff": "No staff member to update"
+    },
+    "toasts": {
+      "updated": "Staff member updated successfully"
+    },
+    "placeholders": {
+      "selectDepartment": "Select department..."
+    },
+    "iemis": {
+      "title": "IEMIS / CEHRD Identity",
+      "description": "Optional — populate to support CEHRD Flash-II Staff register exports.",
+      "staffId": "IEMIS Staff ID",
+      "staffIdHelp": "CEHRD-issued 16-digit identifier (V1 placeholder format).",
+      "nationality": "Nationality",
+      "maritalStatus": "Marital Status",
+      "appointmentType": "Appointment Type",
+      "appointmentDate": "Appointment Date",
+      "appointmentDateHelp": "Per CEHRD register.",
+      "maritalStatusOptions": {
+        "single": "Single",
+        "married": "Married",
+        "divorced": "Divorced",
+        "widowed": "Widowed",
+        "other": "Other",
+        "prefer_not_to_say": "Prefer not to say"
+      },
+      "appointmentTypeOptions": {
+        "permanent": "Permanent",
+        "temporary": "Temporary",
+        "contract": "Contract",
+        "honorary": "Honorary",
+        "volunteer": "Volunteer"
+      }
+    }
+  },
+  "credentials": {
+    "description": "Teaching licenses, certifications, and professional credentials",
+    "emptyTitle": "No Credentials",
+    "emptyDescription": "No credentials have been added for this staff member yet.",
+    "addFirst": "Add First Credential",
+    "deleteConfirm": "Are you sure you want to delete this credential? This action cannot be undone.",
+    "noExpiration": "No expiration",
+    "expired": "Expired",
+    "daysRemaining": "{{count}} day remaining",
+    "daysRemaining_plural": "{{count}} days remaining",
+    "expiresOn": "Expires {{date}}",
+    "issued": "Issued {{date}}",
+    "document": "Document",
+    "grades": "Grades:",
+    "edit": "Edit credential",
+    "delete": "Delete credential",
+    "toasts": {
+      "added": "Credential added successfully",
+      "updated": "Credential updated successfully",
+      "deleted": "Credential deleted successfully",
+      "deleteFailed": "Failed to delete credential"
+    },
+    "modal": {
+      "addTitle": "Add Credential",
+      "editTitle": "Edit Credential",
+      "addDescription": "Add a new credential for this staff member",
+      "editDescription": "Update credential information"
+    },
+    "fields": {
+      "credentialId": "Credential ID",
+      "fieldSubjectArea": "Field/Subject Area",
+      "issuingOrganization": "Issuing Organization",
+      "issuingState": "Issuing State",
+      "issuanceDate": "Issuance Date",
+      "expirationDate": "Expiration Date",
+      "description": "Description",
+      "documentUrl": "Document URL",
+      "renewable": "Renewable credential",
+      "renewalReminderDays": "Reminder Days Before Expiry"
+    },
+    "types": {
+      "certification": "Certification",
+      "license": "License",
+      "endorsement": "Endorsement",
+      "degree": "Degree",
+      "registration": "Registration",
+      "permit": "Permit",
+      "clearance": "Clearance",
+      "training": "Training",
+      "other": "Other"
+    },
+    "fieldsBySubject": {
+      "elementary_education": "Elementary Education",
+      "secondary_education": "Secondary Education",
+      "special_education": "Special Education",
+      "early_childhood": "Early Childhood",
+      "mathematics": "Mathematics",
+      "science": "Science",
+      "english_language_arts": "English Language Arts",
+      "social_studies": "Social Studies",
+      "foreign_language": "Foreign Language",
+      "physical_education": "Physical Education",
+      "music": "Music",
+      "art": "Art",
+      "technology": "Technology",
+      "counseling": "Counseling",
+      "administration": "Administration",
+      "library_media": "Library Media",
+      "other": "Other"
+    }
+  },
+  "leave": {
+    "title": "Leave Management",
+    "description": "View and manage leave requests",
+    "searchPlaceholder": "Search reason…",
+    "emptyTitle": "No leave requests",
+    "emptyDescription": "No leave requests have been submitted yet. Click \"Request Leave\" to create one.",
+    "actions": {
+      "request": "Request Leave",
+      "submitRequest": "Submit Request",
+      "approve": "Approve",
+      "reject": "Reject"
+    },
+    "summary": {
+      "totalRequests": "Total Requests",
+      "daysUsed": "Days Used",
+      "pendingRequests": "Pending Requests",
+      "daysPending": "Days Pending"
+    },
+    "table": {
+      "dates": "Dates",
+      "duration": "Duration",
+      "reason": "Reason"
+    },
+    "fields": {
+      "leaveType": "Leave Type",
+      "durationType": "Duration Type",
+      "hours": "Hours"
+    },
+    "modal": {
+      "description": "Create a leave request for {{name}}",
+      "emergencyContact": "Emergency Contact During Leave"
+    },
+    "placeholders": {
+      "selectLeaveType": "Select leave type...",
+      "reason": "Brief reason for leave...",
+      "contactName": "Contact name",
+      "phoneNumber": "Phone number"
+    },
+    "prompts": {
+      "rejectionReason": "Please enter a rejection reason:",
+      "cancellationReason": "Please enter a cancellation reason:"
+    },
+    "toasts": {
+      "created": "Leave request created successfully",
+      "approved": "Leave request approved",
+      "approveFailed": "Failed to approve leave request",
+      "rejected": "Leave request rejected",
+      "rejectFailed": "Failed to reject leave request",
+      "cancelled": "Leave request cancelled",
+      "cancelFailed": "Failed to cancel leave request"
+    },
+    "duration": {
+      "days": "{{count}} day",
+      "days_plural": "{{count}} days",
+      "hours": "{{count}} hour",
+      "hours_plural": "{{count}} hours"
+    },
+    "status": {
+      "approved": "Approved",
+      "completed": "Completed",
+      "rejected": "Rejected",
+      "pending": "Pending",
+      "in_progress": "In Progress",
+      "cancelled": "Cancelled"
+    },
+    "types": {
+      "annual": "Annual",
+      "sick": "Sick",
+      "personal": "Personal",
+      "bereavement": "Bereavement",
+      "maternity": "Maternity",
+      "paternity": "Paternity",
+      "family_medical": "FMLA",
+      "jury_duty": "Jury Duty",
+      "military": "Military",
+      "professional_development": "Prof. Dev.",
+      "sabbatical": "Sabbatical",
+      "unpaid": "Unpaid",
+      "other": "Other"
+    },
+    "typesFull": {
+      "annual": "Annual / PTO",
+      "sick": "Sick Leave",
+      "personal": "Personal Day",
+      "bereavement": "Bereavement",
+      "maternity": "Maternity",
+      "paternity": "Paternity",
+      "family_medical": "Family Medical (FMLA)",
+      "jury_duty": "Jury Duty",
+      "military": "Military",
+      "professional_development": "Professional Development",
+      "sabbatical": "Sabbatical",
+      "unpaid": "Unpaid Leave",
+      "other": "Other"
+    },
+    "durationTypes": {
+      "full_day": "Full Day",
+      "half_day_am": "Half Day (AM)",
+      "half_day_pm": "Half Day (PM)",
+      "hours": "Hours"
+    }
+  },
+  "employmentHistory": {
+    "description": "Track employment status changes over time",
+    "updateTitle": "Update Employment Status",
+    "currentStatus": "Current status: {{status}}",
+    "emptyTitle": "No Employment History",
+    "emptyDescription": "No employment status changes have been recorded yet. Click \"Update Status\" to record a change.",
+    "effective": "Effective {{date}}",
+    "recorded": "Recorded {{date}}",
+    "fields": {
+      "newStatus": "New Status",
+      "effectiveDate": "Effective Date",
+      "notes": "Notes",
+      "reasonLabel": "Reason:"
+    },
+    "placeholders": {
+      "selectStatus": "Select status...",
+      "reason": "e.g., End of contract, Promotion, Medical leave"
+    },
+    "toasts": {
+      "updated": "Employment status updated successfully"
+    }
+  },
+  "assignments": {
+    "assignTitle": "Assign to School",
+    "assignDescription": "Create a new school assignment for {{name}}",
+    "editTitle": "Edit Assignment",
+    "editDescription": "Update assignment at {{school}}",
+    "schoolFallback": "school",
+    "setPrimary": "Set as primary assignment",
+    "createAssignment": "Create Assignment",
+    "ongoingHelp": "Leave blank for ongoing",
+    "placeholders": {
+      "selectSchoolFirst": "Select a school first...",
+      "positionTitle": "e.g., Lead Teacher"
+    },
+    "toasts": {
+      "created": "School assignment created successfully",
+      "updated": "Assignment updated successfully"
+    }
+  },
+  "detail": {
+    "notFound": {
+      "title": "Staff Member Not Found",
+      "description": "The requested staff member could not be found."
+    },
+    "backToDirectory": "Back to Staff Directory",
+    "unknownStaff": "Unknown Staff",
+    "sectionsAria": "Staff detail sections"
   },
   "error": {
     "failedToLoad": "Failed to load staff",

@@ -13,6 +13,7 @@ import { useParams, Link } from '@tanstack/react-router'
 import { useQuery, useQueries } from '@tanstack/react-query'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
+import { useTranslation } from '@edforge/i18n'
 import { Tabs } from '@edforge/ui'
 import { AnimatedIcon, type IconName } from '@edforge/ui/motion'
 import {
@@ -161,6 +162,7 @@ const TAB_SIGNATURE: Partial<Record<StaffTab, IconName>> = {
 // ============================================================================
 
 function CopyButton({ text }: { text: string }) {
+    const { t } = useTranslation('people')
     const [copied, setCopied] = useState(false)
 
     const handleCopy = async () => {
@@ -174,7 +176,7 @@ function CopyButton({ text }: { text: string }) {
             type="button"
             onClick={handleCopy}
             className="p-1.5 rounded-lg hover:bg-[rgb(var(--background-tertiary))] transition-colors"
-            title="Copy to clipboard"
+            title={t('actions.copyToClipboard')}
         >
             <AnimatePresence mode="wait">
                 {copied ? (
@@ -213,6 +215,7 @@ function DeviceIcon({ deviceType }: { deviceType: string }) {
 }
 
 function StaffActionsDropdown({ onAssignToSchool }: { onAssignToSchool: () => void }) {
+    const { t } = useTranslation('people')
     const [open, setOpen] = useState(false)
     const ref = useRef<HTMLDivElement>(null)
 
@@ -232,7 +235,7 @@ function StaffActionsDropdown({ onAssignToSchool }: { onAssignToSchool: () => vo
             <button
                 onClick={() => setOpen(!open)}
                 className="p-2 rounded-lg hover:bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
-                title="Actions"
+                title={t('actions.actions')}
             >
                 <MoreVertical className="w-5 h-5" />
             </button>
@@ -246,7 +249,7 @@ function StaffActionsDropdown({ onAssignToSchool }: { onAssignToSchool: () => vo
                         className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-secondary))] hover:text-[rgb(var(--text-primary))] transition-colors"
                     >
                         <Plus className="w-4 h-4" />
-                        Assign to School
+                        {t('actions.assignToSchool')}
                     </button>
                 </div>
             )}
@@ -1485,6 +1488,7 @@ function SecurityTab({
 // ============================================================================
 
 export default function StaffDetailPage() {
+    const { t } = useTranslation('people')
     const { staffId } = useParams({ from: '/staff/$staffId' })
     const [activeTab, setActiveTab] = useState<StaffTab>('overview')
     const [isAssignModalOpen, setIsAssignModalOpen] = useState(false)
@@ -1547,23 +1551,23 @@ export default function StaffDetailPage() {
             <div className="min-h-full flex items-center justify-center">
                 <div className="text-center py-16">
                     <User className="w-12 h-12 mx-auto mb-4 text-[rgb(var(--text-tertiary))] opacity-40" />
-                    <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))] mb-2">Staff Member Not Found</h2>
+                    <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))] mb-2">{t('detail.notFound.title')}</h2>
                     <p className="text-sm text-[rgb(var(--text-tertiary))]">
-                        The requested staff member could not be found.
+                        {t('detail.notFound.description')}
                     </p>
                     <Link
                         to="/staff"
                         className="inline-flex items-center gap-2 mt-6 px-4 py-2 text-sm font-medium text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--state-info-fg))] transition-colors"
                     >
                         <ArrowLeft className="w-4 h-4" />
-                        Back to Staff Directory
+                        {t('detail.backToDirectory')}
                     </Link>
                 </div>
             </div>
         )
     }
 
-    const displayName = [staff.firstName, staff.lastSurname].filter(Boolean).join(' ') || 'Unknown Staff'
+    const displayName = [staff.firstName, staff.lastSurname].filter(Boolean).join(' ') || t('detail.unknownStaff')
     const avatarUrl = getStaffAvatar(staff.staffId)
     const statusDotColor = staff.employmentStatus === 'active' ? 'bg-[rgb(var(--state-success-fg))]'
         : staff.employmentStatus === 'on_leave' ? 'bg-amber-500'
@@ -1616,14 +1620,14 @@ export default function StaffDetailPage() {
                                 label: (
                                     <span className="flex items-center gap-2">
                                         <AnimatedIcon name={sig} icon={Icon} size={16} applyAccent={false} />
-                                        {tab.label}
+                                        {t(`tabs.${tab.id}`, { defaultValue: tab.label })}
                                     </span>
                                 ),
                             }
                         })}
                         value={activeTab}
                         onChange={(v) => setActiveTab(v as StaffTab)}
-                        aria-label="Staff detail sections"
+                        aria-label={t('detail.sectionsAria')}
                     />
                 </div>
 

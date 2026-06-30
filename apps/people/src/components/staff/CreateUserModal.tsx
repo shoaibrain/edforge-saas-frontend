@@ -13,6 +13,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { UserPlus } from 'lucide-react'
+import { useTranslation } from '@edforge/i18n'
 import { createUserSchema, type CreateUserDto } from '@aibrains/shared-types'
 import { Modal, ModalFooter, Button } from '../ui'
 import { TextField, SelectField } from '@edforge/forms'
@@ -45,6 +46,7 @@ function getAvatarGradient(firstLetter: string): string[] {
 // ============================================================================
 
 export function CreateUserModal({ open, onClose }: CreateUserModalProps) {
+  const { t } = useTranslation('people')
   const queryClient = useQueryClient()
 
   const methods = useForm<CreateUserDto>({
@@ -79,7 +81,7 @@ export function CreateUserModal({ open, onClose }: CreateUserModalProps) {
   const createMutation = useMutation({
     mutationFn: (data: CreateUserDto) => peopleService.createUser(data),
     onSuccess: () => {
-      toast.success('User created successfully')
+      toast.success(t('quickAdd.toasts.created'))
       queryClient.invalidateQueries({ queryKey: ['users'] })
       queryClient.invalidateQueries({ queryKey: ['staff'] })
       onClose()
@@ -104,8 +106,8 @@ export function CreateUserModal({ open, onClose }: CreateUserModalProps) {
     <Modal
       open={open}
       onClose={onClose}
-      title="Add staff member"
-      description="Create a new user account for your organization"
+      title={t('quickAdd.title')}
+      description={t('quickAdd.description')}
       size="md"
     >
       <FormProvider {...methods}>
@@ -123,19 +125,19 @@ export function CreateUserModal({ open, onClose }: CreateUserModalProps) {
               {firstName?.[0]?.toUpperCase() || '?'}
             </div>
             <span className="text-xs text-[rgb(var(--text-tertiary))] leading-normal">
-              A DiceBear avatar will be auto-generated from the staff member's name after creation.
+              {t('quickAdd.avatarHint')}
             </span>
           </div>
 
           {/* GROUP 1: Identity */}
           <div className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))]">
-            Identity
+            {t('quickAdd.sections.identity')}
           </div>
 
           {/* Email */}
           <TextField
             name="email"
-            label="Email Address"
+            label={t('fields.emailAddress')}
             type="email"
             placeholder="user@example.com"
             required
@@ -147,7 +149,7 @@ export function CreateUserModal({ open, onClose }: CreateUserModalProps) {
           <div className="grid grid-cols-2 gap-2.5">
             <TextField
               name="firstName"
-              label="First Name"
+              label={t('fields.firstName')}
               type="text"
               placeholder="John"
               required
@@ -155,7 +157,7 @@ export function CreateUserModal({ open, onClose }: CreateUserModalProps) {
             />
             <TextField
               name="lastName"
-              label="Last Name"
+              label={t('fields.lastName')}
               type="text"
               placeholder="Doe"
               required
@@ -166,7 +168,7 @@ export function CreateUserModal({ open, onClose }: CreateUserModalProps) {
           {/* Phone */}
           <TextField
             name="phone"
-            label="Phone Number"
+            label={t('fields.phoneNumber')}
             type="tel"
             placeholder="+1 (555) 123-4567"
             disabled={isSubmitting}
@@ -174,24 +176,24 @@ export function CreateUserModal({ open, onClose }: CreateUserModalProps) {
 
           {/* GROUP 2: Access & Role */}
           <div className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))] mt-1">
-            Access &amp; Role
+            {t('quickAdd.sections.accessRole')}
           </div>
 
           {/* Role */}
           <SelectField
             name="globalRole"
-            label="System Role"
+            label={t('quickAdd.systemRole')}
             options={[
-              { value: 'TenantUser', label: 'Tenant User' },
-              { value: 'TenantAdmin', label: 'Tenant Admin' },
+              { value: 'TenantUser', label: t('quickAdd.roles.tenantUser') },
+              { value: 'TenantAdmin', label: t('quickAdd.roles.tenantAdmin') },
             ]}
             disabled={isSubmitting}
           />
 
           {/* Role helper */}
           <div className="bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))] rounded-lg p-3 text-xs text-[rgb(var(--text-tertiary))] leading-normal">
-            <span className="text-[rgb(var(--text-secondary))]">Tenant Admin</span> — full access to all features.{' '}
-            <span className="text-[rgb(var(--text-secondary))]">Tenant User</span> — school-scoped access based on assigned roles.
+            <span className="text-[rgb(var(--text-secondary))]">{t('quickAdd.roles.tenantAdmin')}</span> {t('quickAdd.roleHelp.admin')}{' '}
+            <span className="text-[rgb(var(--text-secondary))]">{t('quickAdd.roles.tenantUser')}</span> {t('quickAdd.roleHelp.user')}
           </div>
 
           {/* FOOTER */}
@@ -202,11 +204,11 @@ export function CreateUserModal({ open, onClose }: CreateUserModalProps) {
               onClick={onClose}
               disabled={isSubmitting}
             >
-              Cancel
+              {t('actions.cancel')}
             </Button>
             <Button type="submit" isLoading={isSubmitting}>
               <UserPlus className="w-4 h-4 mr-2" />
-              Create user
+              {t('quickAdd.createUser')}
             </Button>
           </ModalFooter>
         </form>

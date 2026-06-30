@@ -9,6 +9,7 @@ import { useEffect, useRef } from 'react'
 import { useForm, FormProvider } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
+import { useTranslation } from '@edforge/i18n'
 import { createLeaveRequestSchema, type CreateLeaveRequestDto } from '@aibrains/shared-types'
 import { TextField, SelectField, DateField, TextareaField } from '@edforge/forms'
 import { Modal, ModalFooter, Button } from '../ui'
@@ -63,6 +64,7 @@ export function CreateLeaveModal({
   staffId,
   staffName,
 }: CreateLeaveModalProps) {
+  const { t } = useTranslation('people')
   const firstInputRef = useRef<HTMLSelectElement>(null)
   const createLeave = useCreateLeaveRequest()
 
@@ -110,7 +112,7 @@ export function CreateLeaveModal({
 
   const handleClose = () => {
     if (isDirty) {
-      const confirmed = window.confirm('You have unsaved changes. Are you sure you want to close?')
+      const confirmed = window.confirm(t('common.unsavedCloseConfirm'))
       if (!confirmed) return
     }
     onClose()
@@ -119,7 +121,7 @@ export function CreateLeaveModal({
   const onSubmit = handleSubmit(async (data) => {
     try {
       await createLeave.mutateAsync({ staffId, data })
-      toast.success('Leave request created successfully')
+      toast.success(t('leave.toasts.created'))
       onClose()
     } catch (error) {
       const parsed = parseApiError(error)
@@ -131,8 +133,8 @@ export function CreateLeaveModal({
     <Modal
       open={open}
       onClose={handleClose}
-      title="Request Leave"
-      description={`Create a leave request for ${staffName}`}
+      title={t('leave.actions.request')}
+      description={t('leave.modal.description', { name: staffName })}
       size="lg"
     >
       <FormProvider {...methods}>
@@ -141,10 +143,13 @@ export function CreateLeaveModal({
           <SelectField
             ref={firstInputRef}
             name="leaveType"
-            label="Leave Type"
+            label={t('leave.fields.leaveType')}
             required
-            options={LEAVE_TYPE_OPTIONS}
-            placeholder="Select leave type..."
+            options={LEAVE_TYPE_OPTIONS.map((option) => ({
+              ...option,
+              label: t(`leave.typesFull.${option.value}`, { defaultValue: option.label }),
+            }))}
+            placeholder={t('leave.placeholders.selectLeaveType')}
             disabled={isSubmitting}
           />
 
@@ -152,13 +157,13 @@ export function CreateLeaveModal({
           <div className="grid grid-cols-2 gap-4">
             <DateField
               name="startDate"
-              label="Start Date"
+              label={t('fields.startDate')}
               required
               disabled={isSubmitting}
             />
             <DateField
               name="endDate"
-              label="End Date"
+              label={t('fields.endDate')}
               required
               disabled={isSubmitting}
             />
@@ -168,14 +173,17 @@ export function CreateLeaveModal({
           <div className="grid grid-cols-2 gap-4">
             <SelectField
               name="durationType"
-              label="Duration Type"
-              options={DURATION_TYPE_OPTIONS}
+              label={t('leave.fields.durationType')}
+              options={DURATION_TYPE_OPTIONS.map((option) => ({
+                ...option,
+                label: t(`leave.durationTypes.${option.value}`, { defaultValue: option.label }),
+              }))}
               disabled={isSubmitting}
             />
             {durationType === 'hours' && (
               <TextField
                 name="hours"
-                label="Hours"
+                label={t('leave.fields.hours')}
                 type="number"
                 step={0.5}
                 min={0.5}
@@ -190,37 +198,37 @@ export function CreateLeaveModal({
           {/* Reason */}
           <TextField
             name="reason"
-            label="Reason"
+            label={t('leave.table.reason')}
             type="text"
-            placeholder="Brief reason for leave..."
+            placeholder={t('leave.placeholders.reason')}
             disabled={isSubmitting}
           />
 
           {/* Notes */}
           <TextareaField
             name="notes"
-            label="Notes"
+            label={t('employmentHistory.fields.notes')}
             rows={2}
-            placeholder="Additional details..."
+            placeholder={t('common.additionalDetails')}
             disabled={isSubmitting}
           />
 
           {/* Emergency Contact */}
           <div className="border-t border-[rgb(var(--border-secondary))] pt-4">
-            <h4 className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))] mb-3">Emergency Contact During Leave</h4>
+            <h4 className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))] mb-3">{t('leave.modal.emergencyContact')}</h4>
             <div className="grid grid-cols-2 gap-4">
               <TextField
                 name="emergencyContact.name"
-                label="Name"
+                label={t('fields.name')}
                 type="text"
-                placeholder="Contact name"
+                placeholder={t('leave.placeholders.contactName')}
                 disabled={isSubmitting}
               />
               <TextField
                 name="emergencyContact.phone"
-                label="Phone"
+                label={t('fields.phone')}
                 type="tel"
-                placeholder="Phone number"
+                placeholder={t('leave.placeholders.phoneNumber')}
                 disabled={isSubmitting}
               />
             </div>
@@ -228,10 +236,10 @@ export function CreateLeaveModal({
 
           <ModalFooter>
             <Button type="button" variant="outline" onClick={handleClose} disabled={isSubmitting}>
-              Cancel
+              {t('actions.cancel')}
             </Button>
             <Button type="submit" isLoading={isSubmitting} disabled={isSubmitting} className="min-w-40">
-              Submit Request
+              {t('leave.actions.submitRequest')}
             </Button>
           </ModalFooter>
         </form>

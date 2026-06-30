@@ -8,6 +8,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { toast } from 'sonner'
+import { useTranslation } from '@edforge/i18n'
 import {
   Award,
   Plus,
@@ -77,16 +78,15 @@ function getExpirationColor(credential: CredentialResponseDto): string {
   return 'text-[rgb(var(--state-success-fg))]'
 }
 
-function getExpirationLabel(credential: CredentialResponseDto): string {
-  if (!credential.expirationDate) return 'No expiration'
-  if (credential.isExpired) return 'Expired'
+function getExpirationLabel(credential: CredentialResponseDto, t: ReturnType<typeof useTranslation>['t']): string {
+  if (!credential.expirationDate) return t('credentials.noExpiration')
+  if (credential.isExpired) return t('credentials.expired')
   if (credential.daysUntilExpiration !== undefined && credential.daysUntilExpiration !== null) {
-    if (credential.daysUntilExpiration <= 0) return 'Expired'
-    if (credential.daysUntilExpiration === 1) return '1 day remaining'
-    if (credential.daysUntilExpiration <= 90) return `${credential.daysUntilExpiration} days remaining`
-    return `Expires ${formatDate(credential.expirationDate)}`
+    if (credential.daysUntilExpiration <= 0) return t('credentials.expired')
+    if (credential.daysUntilExpiration <= 90) return t('credentials.daysRemaining', { count: credential.daysUntilExpiration })
+    return t('credentials.expiresOn', { date: formatDate(credential.expirationDate) })
   }
-  return `Expires ${formatDate(credential.expirationDate)}`
+  return t('credentials.expiresOn', { date: formatDate(credential.expirationDate) })
 }
 
 function formatCredentialType(type: string): string {
@@ -102,6 +102,7 @@ function formatFieldDescriptor(field: string): string {
 // ============================================================================
 
 export function CredentialsSection({ staffId }: { staffId: string }) {
+  const { t } = useTranslation('people')
   const { data: credentials, isLoading } = useStaffCredentials(staffId)
   const deleteCredential = useDeleteCredential()
   const [modalOpen, setModalOpen] = useState(false)
@@ -120,16 +121,16 @@ export function CredentialsSection({ staffId }: { staffId: string }) {
 
   const handleDelete = async (credentialId: string) => {
     const confirmed = window.confirm(
-      'Are you sure you want to delete this credential? This action cannot be undone.'
+      t('credentials.deleteConfirm')
     )
     if (!confirmed) return
 
     setDeletingId(credentialId)
     try {
       await deleteCredential.mutateAsync({ staffId, credentialId })
-      toast.success('Credential deleted successfully')
+      toast.success(t('credentials.toasts.deleted'))
     } catch {
-      toast.error('Failed to delete credential')
+      toast.error(t('credentials.toasts.deleteFailed'))
     } finally {
       setDeletingId(null)
     }
@@ -145,9 +146,9 @@ export function CredentialsSection({ staffId }: { staffId: string }) {
       {/* Header */}
       <motion.div variants={fadeInUp} className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-[rgb(var(--text-primary))]">Credentials</h3>
+          <h3 className="text-lg font-semibold text-[rgb(var(--text-primary))]">{t('tabs.credentials')}</h3>
           <p className="text-sm text-[rgb(var(--text-tertiary))] mt-1">
-            Teaching licenses, certifications, and professional credentials
+            {t('credentials.description')}
           </p>
         </div>
         <button
@@ -155,7 +156,7 @@ export function CredentialsSection({ staffId }: { staffId: string }) {
           className="flex items-center gap-2 px-3.5 py-2 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] rounded-lg hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors text-sm font-medium"
         >
           <Plus className="w-4 h-4" />
-          Add Credential
+          {t('actions.addCredential')}
         </button>
       </motion.div>
 
@@ -170,16 +171,16 @@ export function CredentialsSection({ staffId }: { staffId: string }) {
         ) : !credentials || credentials.length === 0 ? (
           <div className="text-center py-16 bg-[rgb(var(--background-secondary))] rounded-xl border-2 border-dashed border-[rgb(var(--border-secondary))]">
             <Award className="w-12 h-12 mx-auto mb-4 text-[rgb(var(--text-tertiary))] opacity-40" />
-            <h4 className="font-medium text-[rgb(var(--text-secondary))] mb-2">No Credentials</h4>
+            <h4 className="font-medium text-[rgb(var(--text-secondary))] mb-2">{t('credentials.emptyTitle')}</h4>
             <p className="text-sm text-[rgb(var(--text-tertiary))] max-w-sm mx-auto">
-              No credentials have been added for this staff member yet.
+              {t('credentials.emptyDescription')}
             </p>
             <button
               onClick={handleAdd}
               className="mt-4 inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-[rgb(var(--action-secondary-fg))] hover:text-[rgb(var(--text-primary))] transition-colors"
             >
               <Plus className="w-4 h-4" />
-              Add First Credential
+              {t('credentials.addFirst')}
             </button>
           </div>
         ) : (
@@ -228,7 +229,7 @@ export function CredentialsSection({ staffId }: { staffId: string }) {
                           <FileText className="w-3 h-3" />
                           {credential.issuingOrganization}
                         </span>
-                        <span>Issued {formatDate(credential.issuanceDate)}</span>
+                        <span>{t('credentials.issued', { date: formatDate(credential.issuanceDate) })}</span>
                         {credential.expirationDate && (
                           <span className={`flex items-center gap-1 ${getExpirationColor(credential)}`}>
                             {credential.isExpired ? (
@@ -236,7 +237,7 @@ export function CredentialsSection({ staffId }: { staffId: string }) {
                             ) : (
                               <Clock className="w-3 h-3" />
                             )}
-                            {getExpirationLabel(credential)}
+                            {getExpirationLabel(credential, t)}
                           </span>
                         )}
                         {credential.documentUrl && (
@@ -247,7 +248,7 @@ export function CredentialsSection({ staffId }: { staffId: string }) {
                             className="flex items-center gap-1 text-[rgb(var(--action-secondary-fg))] hover:underline"
                           >
                             <ExternalLink className="w-3 h-3" />
-                            Document
+                            {t('credentials.document')}
                           </a>
                         )}
                       </div>
@@ -255,7 +256,7 @@ export function CredentialsSection({ staffId }: { staffId: string }) {
                       {/* Grade Levels */}
                       {credential.gradeLevels && credential.gradeLevels.length > 0 && (
                         <div className="flex items-center gap-1.5 mt-2 flex-wrap">
-                          <span className="text-xs text-[rgb(var(--text-tertiary))]">Grades:</span>
+                          <span className="text-xs text-[rgb(var(--text-tertiary))]">{t('credentials.grades')}</span>
                           {credential.gradeLevels.map((grade) => (
                             <span
                               key={grade}
@@ -274,14 +275,14 @@ export function CredentialsSection({ staffId }: { staffId: string }) {
                     <button
                       onClick={() => handleEdit(credential)}
                       className="p-2 rounded-lg hover:bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
-                      title="Edit credential"
+                      title={t('credentials.edit')}
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDelete(credential.credentialId)}
                       className="p-2 rounded-lg hover:bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--state-danger-fg))] transition-colors"
-                      title="Delete credential"
+                      title={t('credentials.delete')}
                       disabled={deletingId === credential.credentialId}
                     >
                       {deletingId === credential.credentialId ? (

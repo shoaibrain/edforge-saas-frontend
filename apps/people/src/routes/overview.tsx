@@ -27,6 +27,7 @@ import {
   Text,
   WidgetErrorBoundaryV2,
 } from '@edforge/ui'
+import { useTranslation } from '@edforge/i18n'
 import type { StaffResponseDto } from '@aibrains/shared-types'
 
 import { useStaffList } from '../hooks'
@@ -34,6 +35,7 @@ import { useModalState } from '../hooks'
 import { useActiveSchoolId } from '../stores/app.store'
 import { getStaffAvatar } from '../lib/avatar'
 import { StaffRoleChip } from '../components/staff/StaffRoleChip'
+import { getRoleI18nKey } from '../components/staff/StaffRoleBadge'
 import { CreateUserModal } from '../components/staff'
 
 // ============================================================================
@@ -51,6 +53,7 @@ function formatDate(d?: string | Date | null): string {
 // ============================================================================
 
 export function Overview() {
+  const { t } = useTranslation('people')
   const navigate = useNavigate()
   const schoolId = useActiveSchoolId()
   const modal = useModalState()
@@ -82,7 +85,7 @@ export function Overview() {
     // Department breakdown
     const deptMap = new Map<string, number>()
     for (const s of staff) {
-      const dept = s.departmentName || 'Unassigned'
+      const dept = s.departmentName || t('common.unassigned')
       deptMap.set(dept, (deptMap.get(dept) || 0) + 1)
     }
     const departments = Array.from(deptMap.entries())
@@ -100,7 +103,7 @@ export function Overview() {
       partTime,
       departments,
     }
-  }, [staff])
+  }, [staff, t])
 
   // Activity feed — derive from staff creation dates
   const activityFeed = useMemo(() => {
@@ -113,17 +116,24 @@ export function Overview() {
       .slice(0, 5)
       .map((s) => ({
         id: s.staffId,
-        text: `${s.firstName} ${s.lastSurname} ${s.userId ? 'account created and system access enabled' : `onboarded as ${s.role?.replace('_', ' ') || 'staff'} — no system access`}`,
+        text: s.userId
+          ? t('overview.activity.accountCreated', { name: `${s.firstName} ${s.lastSurname}` })
+          : t('overview.activity.onboardedNoAccess', {
+              name: `${s.firstName} ${s.lastSurname}`,
+              role: s.role
+                ? t(`roles.${getRoleI18nKey(s.role)}`, { defaultValue: s.role })
+                : t('overview.activity.staffFallback'),
+            }),
         time: formatDate(s.createdAt),
         color: s.userId ? '#1D9E75' : '#7F77DD',
       }))
-  }, [staff])
+  }, [staff, t])
 
   return (
     <Container size="full" padding="lg" className="overflow-auto py-6">
       {/* Context Bar (operating context, not a page title — the shell breadcrumb
           carries "People") */}
-      <h1 className="sr-only">People</h1>
+      <h1 className="sr-only">{t('title')}</h1>
       <ContextBar
         className="mb-2"
         meta={
@@ -144,7 +154,7 @@ export function Overview() {
             className={`inline-flex h-9 items-center gap-1.5 rounded-lg border border-border-secondary bg-surface-secondary px-3.5 text-xs font-medium text-text-secondary transition-colors hover:bg-surface-tertiary hover:text-text-primary ${focusRingInset}`}
           >
             <Users className="h-3.5 w-3.5" />
-            Staff Directory
+            {t('staffDirectory.title')}
           </button>
           <button
             type="button"
@@ -152,7 +162,7 @@ export function Overview() {
             className={`inline-flex h-9 items-center gap-1.5 rounded-lg bg-[rgb(var(--action-primary-bg))] px-3.5 text-xs font-medium text-[rgb(var(--text-inverted))] transition-colors hover:bg-[rgb(var(--state-info-fg))] ${focusRing}`}
           >
             <UserPlus className="h-3.5 w-3.5" />
-            Add Staff Member
+            {t('staffDirectory.addStaff')}
           </button>
           </Inline>
         )}
@@ -161,19 +171,19 @@ export function Overview() {
       {/* CONTEXT BANNER */}
       <Text variant="caption" className="mb-5">
         <em className="font-medium not-italic text-[rgb(var(--action-secondary-fg))]">
-          {stats.total} staff member{stats.total !== 1 ? 's' : ''}
+          {t('staffDirectory.summary.activeStaff', { count: stats.total })}
         </em>
         {' · '}
         <span className="font-medium text-[rgb(var(--state-success-fg))]">
-          {stats.teachers} teacher{stats.teachers !== 1 ? 's' : ''}
+          {t('staffDirectory.summary.teachers', { count: stats.teachers })}
         </span>
         {' · '}
         <span className="font-medium text-[rgb(var(--state-info-fg))]">
-          {stats.principals} principal{stats.principals !== 1 ? 's' : ''}
+          {t('staffDirectory.summary.principals', { count: stats.principals })}
         </span>
         {' · '}
         <span className="font-medium text-[rgb(var(--action-primary-bg))]">
-          {stats.withAccess} with system access enabled
+          {t('staffDirectory.summary.systemAccess', { count: stats.withAccess })}
         </span>
       </Text>
 
@@ -181,29 +191,29 @@ export function Overview() {
       <WidgetErrorBoundaryV2>
         <div className="mb-4 grid grid-cols-4 gap-2.5">
           <StatCard
-            label="Total Staff"
+            label={t('stats.totalStaff')}
             value={isLoading ? '—' : stats.total.toString()}
             icon={Users}
             accentColor="rgba(216,90,48,0.10)"
             iconColor="#D85A30"
             barColor="#D85A30"
             valueColor="#D85A30"
-            tag={{ text: '+1 this month', color: '#D85A30', bg: 'rgba(216,90,48,0.10)' }}
+            tag={{ text: t('overview.stats.thisMonth', { count: 1 }), color: '#D85A30', bg: 'rgba(216,90,48,0.10)' }}
             loading={isLoading}
           />
           <StatCard
-            label="Active Teachers"
+            label={t('stats.activeTeachers')}
             value={isLoading ? '—' : stats.teachers.toString()}
             icon={BookOpen}
             accentColor="rgba(29,158,117,0.10)"
             iconColor="#1D9E75"
             barColor="#1D9E75"
             valueColor="#1D9E75"
-            tag={{ text: 'full-time + contract', color: '#1D9E75', bg: 'rgba(29,158,117,0.10)' }}
+            tag={{ text: t('overview.stats.fullTimeContract'), color: '#1D9E75', bg: 'rgba(29,158,117,0.10)' }}
             loading={isLoading}
           />
           <StatCard
-            label="Support Staff"
+            label={t('stats.supportStaff')}
             value={isLoading ? '—' : stats.support.toString()}
             icon={Briefcase}
             accentColor={stats.support > 0 ? 'rgba(55,138,221,0.10)' : 'rgba(255,255,255,0.06)'}
@@ -211,14 +221,14 @@ export function Overview() {
             barColor={stats.support > 0 ? '#378ADD' : 'rgb(var(--text-disabled))'}
             valueColor={stats.support > 0 ? '#378ADD' : 'rgb(var(--text-tertiary))'}
             tag={{
-              text: stats.support > 0 ? 'active' : 'none onboarded',
+              text: stats.support > 0 ? t('stats.tags.active') : t('overview.stats.noneOnboarded'),
               color: stats.support > 0 ? '#378ADD' : 'rgb(var(--text-tertiary))',
               bg: stats.support > 0 ? 'rgba(55,138,221,0.10)' : 'rgba(255,255,255,0.05)',
             }}
             loading={isLoading}
           />
           <StatCard
-            label="System Access"
+            label={t('stats.systemAccess')}
             value={isLoading ? '—' : stats.withAccess.toString()}
             icon={Lock}
             accentColor="rgba(55,138,221,0.10)"
@@ -226,7 +236,7 @@ export function Overview() {
             barColor="#378ADD"
             valueColor="#378ADD"
             tag={{
-              text: `${stats.noAccess} no access`,
+              text: t('stats.tags.noAccess', { count: stats.noAccess }),
               color: '#378ADD',
               bg: 'rgba(55,138,221,0.10)',
             }}
@@ -244,14 +254,14 @@ export function Overview() {
               <div className="flex h-5 w-5 items-center justify-center rounded bg-[rgb(var(--action-secondary-fg))]/10">
                 <Users className="h-3 w-3 text-[rgb(var(--action-secondary-fg))]" />
               </div>
-              Staff roster
+              {t('overview.roster.title')}
             </div>
             <button
               type="button"
               onClick={() => navigate({ to: '/staff' as string })}
               className="flex cursor-pointer items-center gap-1 text-xs font-medium text-[rgb(var(--action-secondary-fg))]"
             >
-              View directory{' '}
+              {t('overview.roster.viewDirectory')}{' '}
               <ChevronRight className="h-2.5 w-2.5" />
             </button>
           </div>
@@ -259,13 +269,13 @@ export function Overview() {
             {isLoading ? (
               <div className="py-5 text-center">
                 <span className="text-xs text-[rgb(var(--text-tertiary))]">
-                  Loading staff...
+                  {t('overview.roster.loading')}
                 </span>
               </div>
             ) : staff.length === 0 ? (
               <div className="py-5 text-center">
                 <span className="text-xs text-[rgb(var(--text-tertiary))]">
-                  No staff members yet
+                  {t('overview.roster.empty')}
                 </span>
               </div>
             ) : (
@@ -283,27 +293,27 @@ export function Overview() {
               <div className="flex h-5 w-5 items-center justify-center rounded bg-[rgb(var(--state-info-fg))]/10">
                 <BarChart3 className="h-3 w-3 text-[rgb(var(--state-info-fg))]" />
               </div>
-              Employment breakdown
+              {t('overview.breakdown.title')}
             </div>
           </div>
           <div className="px-3.5 py-2.5">
             <div className="mb-2 text-xs font-bold uppercase tracking-wide text-[rgb(var(--text-disabled))]">
-              Employment type
+              {t('overview.breakdown.employmentType')}
             </div>
             <BarRow
-              label="Full-time"
+              label={t('employmentTypes.fullTime')}
               value={stats.fullTime}
               total={stats.total}
               color="#D85A30"
             />
             <BarRow
-              label="Contract"
+              label={t('overview.breakdown.contract')}
               value={stats.contract}
               total={stats.total}
               color="#EF9F27"
             />
             <BarRow
-              label="Part-time"
+              label={t('overview.breakdown.partTime')}
               value={stats.partTime}
               total={stats.total}
               color="#378ADD"
@@ -312,11 +322,11 @@ export function Overview() {
             <div className="my-2.5 h-px bg-[rgb(var(--border-primary))]" />
 
             <div className="mb-2 text-xs font-bold uppercase tracking-wide text-[rgb(var(--text-disabled))]">
-              By department
+              {t('overview.breakdown.byDepartment')}
             </div>
             {stats.departments.length === 0 ? (
               <div className="text-xs text-[rgb(var(--text-tertiary))]">
-                No departments assigned
+                {t('overview.breakdown.noDepartments')}
               </div>
             ) : (
               stats.departments.slice(0, 4).map(([dept, count]) => (
@@ -343,7 +353,7 @@ export function Overview() {
               <Clock className="h-3 w-3 text-[rgb(var(--state-warning-fg))]" />
             </div>
             <span className="text-xs font-semibold text-[rgb(var(--text-primary))]">
-              Recent activity
+              {t('overview.activity.title')}
             </span>
           </div>
           <div className="px-3.5 pb-2.5 pt-1">
@@ -356,7 +366,7 @@ export function Overview() {
                   >
                     <div className="mt-1 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[rgb(var(--text-tertiary))]" />
                     <span className="text-xs text-[rgb(var(--text-tertiary))]">
-                      No recent activity
+                      {t('overview.activity.empty')}
                     </span>
                   </div>
                 ))}
@@ -399,10 +409,10 @@ export function Overview() {
             <ChevronRight className="h-3.5 w-3.5 text-[rgb(var(--text-disabled))]" />
           </div>
           <div className="text-xs font-semibold text-[rgb(var(--text-primary))]">
-            Staff Directory
+            {t('staffDirectory.title')}
           </div>
           <div className="text-xs leading-normal text-[rgb(var(--text-tertiary))]">
-            View, search and manage all staff members, roles and system access.
+            {t('overview.directoryShortcutDescription')}
           </div>
         </button>
       </div>
@@ -421,6 +431,11 @@ export function Overview() {
 // ============================================================================
 
 function StaffRow({ staff: s }: { staff: StaffResponseDto }) {
+  const { t } = useTranslation('people')
+  const roleLabel = s.role
+    ? t(`roles.${getRoleI18nKey(s.role)}`, { defaultValue: s.role })
+    : t('overview.activity.staffFallback')
+
   return (
     <div className="flex items-center gap-2.5 border-b border-[rgb(var(--border-primary))] py-2">
       <img
@@ -434,14 +449,14 @@ function StaffRow({ staff: s }: { staff: StaffResponseDto }) {
           {s.firstName} {s.lastSurname}
         </div>
         <div className="text-xs text-[rgb(var(--text-disabled))]">
-          {s.role?.replace('_', ' ')} · {s.email}
+          {roleLabel} · {s.email}
         </div>
       </div>
       <div className="flex items-center gap-1.5">
         <StaffRoleChip role={s.role} />
         <div
           className={`h-1.5 w-1.5 rounded-full ${s.userId ? 'bg-[rgb(var(--state-success-fg))]' : 'bg-[rgb(var(--text-tertiary))]'}`}
-          title={s.userId ? 'System Access Active' : 'No System Access'}
+          title={s.userId ? t('systemAccess.active') : t('systemAccess.noAccess')}
         />
       </div>
     </div>

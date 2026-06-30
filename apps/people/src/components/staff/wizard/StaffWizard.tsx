@@ -13,6 +13,7 @@ import { ArrowLeft, User, Mail, Briefcase, Building2, CheckCircle2 } from 'lucid
 import { useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
+import { useTranslation } from '@edforge/i18n'
 import { WizardContainer } from '@edforge/wizard'
 import type { WizardStep } from '@edforge/wizard'
 import { staffService } from '../../../services/staff.service'
@@ -88,6 +89,7 @@ const STAFF_WIZARD_STEPS: WizardStep[] = [
 // ============================================================================
 
 function StaffWizardHeader({ onCancel }: { onCancel: () => void }) {
+  const { t } = useTranslation('people')
   return (
     <header className="sticky top-0 z-20 bg-[rgb(var(--background-primary))] border-b border-[rgb(var(--border-primary))]">
       <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -100,10 +102,10 @@ function StaffWizardHeader({ onCancel }: { onCancel: () => void }) {
           </button>
           <div>
             <h1 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
-              Add Staff Member
+              {t('wizard.header.title')}
             </h1>
             <p className="text-sm text-[rgb(var(--text-tertiary))]">
-              Complete the wizard to create a new staff record
+              {t('wizard.header.description')}
             </p>
           </div>
         </div>
@@ -123,8 +125,17 @@ interface StaffWizardProps {
 }
 
 export function StaffWizard({ onCancel, onSuccess, initialSchoolId }: StaffWizardProps) {
+  const { t } = useTranslation('people')
   const queryClient = useQueryClient()
   const navigate = useNavigate()
+  const steps = useMemo<WizardStep[]>(
+    () => STAFF_WIZARD_STEPS.map((step) => ({
+      ...step,
+      title: t(`wizard.stepMeta.${step.id}.title`, { defaultValue: step.title }),
+      description: t(`wizard.stepMeta.${step.id}.description`, { defaultValue: step.description }),
+    })),
+    [t],
+  )
 
   const initialData = useMemo(
     () => ({
@@ -138,8 +149,8 @@ export function StaffWizard({ onCancel, onSuccess, initialSchoolId }: StaffWizar
   const handleValidationError = useCallback((errors: Record<string, string>) => {
     const fields = Object.keys(errors)
     const firstError = errors[fields[0]]
-    toast.error(fields.length === 1 ? firstError : `Please fix ${fields.length} field(s) to continue`)
-  }, [])
+    toast.error(fields.length === 1 ? firstError : t('wizard.validation.fixFields', { count: fields.length }))
+  }, [t])
 
   const handleSubmit = async (data: Record<string, unknown>) => {
     try {
@@ -151,11 +162,11 @@ export function StaffWizard({ onCancel, onSuccess, initialSchoolId }: StaffWizar
       if (createAccount) {
         const result = await staffService.createStaffWithUser(dto as any)
         staffId = result.staff.staffId
-        toast.success('Staff member and user account created successfully')
+        toast.success(t('wizard.toasts.createdWithUser'))
       } else {
         const result = await staffService.createStaff(dto as any)
         staffId = result.staffId
-        toast.success('Staff member created successfully')
+        toast.success(t('wizard.toasts.created'))
       }
 
       // Create additional school assignments
@@ -171,7 +182,7 @@ export function StaffWizard({ onCancel, onSuccess, initialSchoolId }: StaffWizar
             isPrimary: false,
           })
         } catch {
-          toast.warning(`Could not create additional assignment. You can add it from the staff profile.`)
+          toast.warning(t('wizard.toasts.additionalAssignmentFailed'))
         }
       }
 
@@ -188,7 +199,7 @@ export function StaffWizard({ onCancel, onSuccess, initialSchoolId }: StaffWizar
       const message =
         error?.response?.data?.message ||
         error?.message ||
-        'Failed to create staff member'
+        t('wizard.toasts.createFailed')
       toast.error(message)
       throw error // re-throw so WizardContext.finally resets isSubmitting
     }
@@ -196,14 +207,14 @@ export function StaffWizard({ onCancel, onSuccess, initialSchoolId }: StaffWizar
 
   return (
     <WizardContainer
-      steps={STAFF_WIZARD_STEPS}
+      steps={steps}
       initialData={initialData}
       onSubmit={handleSubmit}
       onCancel={onCancel}
       onValidationError={handleValidationError}
       header={<StaffWizardHeader onCancel={onCancel} />}
       footerVariant="inline"
-      submitText="Create Staff Member"
+      submitText={t('wizard.submit')}
     />
   )
 }

@@ -22,6 +22,7 @@ import { motion } from 'framer-motion'
 import { Mail, Phone, MapPin, AlertTriangle, Plus, X } from 'lucide-react'
 import type { WizardStepProps } from '@edforge/wizard'
 import { useTenantContext, isNepalShape } from '@edforge/forms'
+import { useTranslation } from '@edforge/i18n'
 import {
   NEPAL_PROVINCES,
   NEPAL_DISTRICTS,
@@ -30,6 +31,7 @@ import {
 import {
   ADDRESS_TYPE_OPTIONS,
   RELATIONSHIP_OPTIONS,
+  optionValueToI18nKey,
 } from '../staff-wizard.utils'
 import { AnimatedInput, AnimatedSelect, SectionHeader } from './shared'
 
@@ -91,8 +93,17 @@ function emptyEmergencyContact(): EmergencyContact {
 // ============================================================================
 
 export function ContactStep({ data, updateData, errors, clearError }: WizardStepProps) {
+  const { t } = useTranslation('people')
   const addresses = (data.addresses as StaffAddress[]) || []
   const emergencyContacts = (data.emergencyContacts as EmergencyContact[]) || []
+  const addressTypeOptions = ADDRESS_TYPE_OPTIONS.map((option) => ({
+    ...option,
+    label: t(`choices.addressType.${optionValueToI18nKey(option.value)}`, { defaultValue: option.label }),
+  }))
+  const relationshipOptions = RELATIONSHIP_OPTIONS.map((option) => ({
+    ...option,
+    label: t(`choices.relationship.${optionValueToI18nKey(option.value)}`, { defaultValue: option.label }),
+  }))
 
   // Sprint A.12: read tenant archetype + country once + subscribe to changes.
   const { archetype, country } = useTenantContext()
@@ -151,16 +162,16 @@ export function ContactStep({ data, updateData, errors, clearError }: WizardStep
       {/* Primary Contact */}
       <div className="space-y-4">
         <SectionHeader
-          title="Primary Contact"
-          description="Email is used for login and notifications"
+          title={t('wizard.contact.primaryContact')}
+          description={t('wizard.contact.primaryContactDescription')}
           icon={<Mail className="w-4 h-4" />}
         />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <AnimatedInput
-            label="Email Address"
+            label={t('fields.emailAddress')}
             required
             type="email"
-            placeholder="john.smith@school.edu"
+            placeholder={t('wizard.placeholders.email')}
             autoComplete="email"
             value={(data.email as string) || ''}
             onChange={handleChange('email')}
@@ -168,7 +179,7 @@ export function ContactStep({ data, updateData, errors, clearError }: WizardStep
             icon={<Mail className="w-4 h-4" />}
           />
           <AnimatedInput
-            label={`Phone Number ${phoneFmt.dialCode}`}
+            label={t('fields.phoneNumberWithCode', { code: phoneFmt.dialCode })}
             type="tel"
             placeholder={phoneFmt.placeholder}
             autoComplete="tel"
@@ -182,8 +193,8 @@ export function ContactStep({ data, updateData, errors, clearError }: WizardStep
       {/* Addresses */}
       <div className="space-y-4">
         <SectionHeader
-          title="Addresses"
-          description="Add home, work, or mailing addresses"
+          title={t('wizard.contact.addresses')}
+          description={t('wizard.contact.addressesDescription')}
           icon={<MapPin className="w-4 h-4" />}
         />
 
@@ -197,16 +208,16 @@ export function ContactStep({ data, updateData, errors, clearError }: WizardStep
           >
             <div className="flex items-center justify-between">
               <AnimatedSelect
-                label="Address Type"
+                label={t('fields.addressType')}
                 value={addr.addressTypeDescriptor || 'home'}
                 onChange={(e) => updateAddress(index, 'addressTypeDescriptor', e.target.value)}
-                options={ADDRESS_TYPE_OPTIONS}
+                options={addressTypeOptions}
               />
               <button
                 type="button"
                 onClick={() => removeAddress(index)}
                 className="p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--state-danger-bg)/0.18)] dark:hover:bg-[rgb(var(--state-danger-bg)/0.18)] transition-colors"
-                title="Remove address"
+                title={t('wizard.contact.removeAddress')}
               >
                 <X className="w-4 h-4" />
               </button>
@@ -216,14 +227,14 @@ export function ContactStep({ data, updateData, errors, clearError }: WizardStep
                  GENERIC tenants in Nepal. Province → District cascading. */
               <>
                 <AnimatedInput
-                  label="Street / Tole / House"
-                  placeholder="e.g., Tole-12, Bishal Bazar"
+                  label={t('fields.streetToleHouse')}
+                  placeholder={t('wizard.placeholders.streetToleHouse')}
                   value={addr.streetNumberName || ''}
                   onChange={(e) => updateAddress(index, 'streetNumberName', e.target.value)}
                 />
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <AnimatedSelect
-                    label="Province"
+                    label={t('fields.province')}
                     value={addr.province || ''}
                     onChange={(e) => {
                       // When province changes, clear stale district that
@@ -236,45 +247,45 @@ export function ContactStep({ data, updateData, errors, clearError }: WizardStep
                       }
                       updateData({ addresses: updated })
                     }}
-                    options={[{ value: '', label: 'Select province' }, ...PROVINCE_OPTIONS]}
+                    options={[{ value: '', label: t('wizard.placeholders.selectProvince') }, ...PROVINCE_OPTIONS]}
                   />
                   <AnimatedSelect
-                    label="District"
+                    label={t('fields.district')}
                     value={addr.district || ''}
                     onChange={(e) => updateAddress(index, 'district', e.target.value)}
                     options={[
                       {
                         value: '',
-                        label: addr.province ? 'Select district' : 'Pick province first',
+                        label: addr.province ? t('wizard.placeholders.selectDistrict') : t('wizard.placeholders.pickProvinceFirst'),
                       },
                       ...districtOptionsFor(addr.province),
                     ]}
                   />
                 </div>
                 <AnimatedInput
-                  label="Municipality / Rural Municipality / VDC"
-                  placeholder="e.g., Kathmandu Metropolitan City"
+                  label={t('fields.municipality')}
+                  placeholder={t('wizard.placeholders.municipality')}
                   value={addr.municipality || ''}
                   onChange={(e) => updateAddress(index, 'municipality', e.target.value)}
                 />
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   <AnimatedInput
-                    label="Ward Number"
-                    placeholder="e.g., 12"
+                    label={t('fields.wardNumber')}
+                    placeholder={t('wizard.placeholders.wardNumber')}
                     maxLength={10}
                     value={addr.wardNumber || ''}
                     onChange={(e) => updateAddress(index, 'wardNumber', e.target.value)}
                   />
                   <AnimatedInput
-                    label="Postal Code"
-                    placeholder="e.g., 44600"
+                    label={t('fields.postalCode')}
+                    placeholder={t('wizard.placeholders.postalCodeNp')}
                     value={addr.postalCode || ''}
                     onChange={(e) => updateAddress(index, 'postalCode', e.target.value)}
                   />
                   <AnimatedInput
-                    label="Country"
-                    placeholder="Nepal"
-                    value="Nepal"
+                    label={t('fields.country')}
+                    placeholder={t('wizard.placeholders.nepal')}
+                    value={t('wizard.placeholders.nepal')}
                     disabled
                     onChange={() => {
                       /* locked to NPL — set on emptyAddress + persisted in updateData */
@@ -286,20 +297,20 @@ export function ContactStep({ data, updateData, errors, clearError }: WizardStep
               /* US/generic-shaped fieldset (existing behavior — GENERIC tenants) */
               <>
                 <AnimatedInput
-                  label="Street"
+                    label={t('fields.street')}
                   placeholder="123 Main Street"
                   value={addr.streetNumberName || ''}
                   onChange={(e) => updateAddress(index, 'streetNumberName', e.target.value)}
                 />
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   <AnimatedInput
-                    label="City"
+                    label={t('fields.city')}
                     placeholder="Springfield"
                     value={addr.city || ''}
                     onChange={(e) => updateAddress(index, 'city', e.target.value)}
                   />
                   <AnimatedInput
-                    label="State"
+                    label={t('fields.state')}
                     placeholder="IL"
                     maxLength={2}
                     value={addr.stateAbbreviationDescriptor || ''}
@@ -309,13 +320,13 @@ export function ContactStep({ data, updateData, errors, clearError }: WizardStep
                     className="uppercase"
                   />
                   <AnimatedInput
-                    label="ZIP Code"
+                    label={t('fields.zipCode')}
                     placeholder="62704"
                     value={addr.postalCode || ''}
                     onChange={(e) => updateAddress(index, 'postalCode', e.target.value)}
                   />
                   <AnimatedInput
-                    label="Country"
+                    label={t('fields.country')}
                     placeholder="US"
                     value={addr.country || 'US'}
                     onChange={(e) => updateAddress(index, 'country', e.target.value)}
@@ -332,15 +343,15 @@ export function ContactStep({ data, updateData, errors, clearError }: WizardStep
           className="flex items-center gap-2 text-sm text-[rgb(var(--action-secondary-fg))]  hover:text-[rgb(var(--state-info-fg))] dark:hover:text-[rgb(var(--text-primary))] transition-colors"
         >
           <Plus className="w-4 h-4" />
-          Add Address
+          {t('wizard.contact.addAddress')}
         </button>
       </div>
 
       {/* Emergency Contacts */}
       <div className="space-y-4">
         <SectionHeader
-          title="Emergency Contacts"
-          description="People to contact in case of emergency"
+          title={t('wizard.contact.emergencyContacts')}
+          description={t('wizard.contact.emergencyContactsDescription')}
           icon={<AlertTriangle className="w-4 h-4" />}
         />
 
@@ -354,41 +365,41 @@ export function ContactStep({ data, updateData, errors, clearError }: WizardStep
           >
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-[rgb(var(--text-secondary))]">
-                Contact {index + 1}
+                {t('wizard.contact.contactNumber', { count: index + 1 })}
               </span>
               <button
                 type="button"
                 onClick={() => removeEmergencyContact(index)}
                 className="p-1.5 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--state-danger-fg))] hover:bg-[rgb(var(--state-danger-bg)/0.18)] dark:hover:bg-[rgb(var(--state-danger-bg)/0.18)] transition-colors"
-                title="Remove contact"
+                title={t('wizard.contact.removeContact')}
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <AnimatedInput
-                label="Full Name"
+                label={t('fields.fullName')}
                 placeholder="Jane Smith"
                 value={contact.name || ''}
                 onChange={(e) => updateEmergencyContact(index, 'name', e.target.value)}
               />
               <AnimatedSelect
-                label="Relationship"
+                label={t('fields.relationship')}
                 value={contact.relationship || 'spouse'}
                 onChange={(e) => updateEmergencyContact(index, 'relationship', e.target.value)}
-                options={RELATIONSHIP_OPTIONS}
+                options={relationshipOptions}
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <AnimatedInput
-                label={`Phone ${phoneFmt.dialCode}`}
+                label={t('fields.phoneWithCode', { code: phoneFmt.dialCode })}
                 type="tel"
                 placeholder={phoneFmt.placeholder}
                 value={contact.phone || ''}
                 onChange={(e) => updateEmergencyContact(index, 'phone', e.target.value)}
               />
               <AnimatedInput
-                label="Email"
+                label={t('fields.email')}
                 type="email"
                 placeholder="jane.smith@email.com"
                 value={contact.email || ''}
@@ -404,7 +415,7 @@ export function ContactStep({ data, updateData, errors, clearError }: WizardStep
           className="flex items-center gap-2 text-sm text-[rgb(var(--action-secondary-fg))]  hover:text-[rgb(var(--state-info-fg))] dark:hover:text-[rgb(var(--text-primary))] transition-colors"
         >
           <Plus className="w-4 h-4" />
-          Add Emergency Contact
+          {t('wizard.contact.addEmergencyContact')}
         </button>
       </div>
     </motion.div>
