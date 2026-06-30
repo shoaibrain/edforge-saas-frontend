@@ -5,7 +5,7 @@
  * Rendered as an expandable card with all guardian fields.
  */
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -33,6 +33,17 @@ export function GuardianForm({ index, onRemove, canRemove }: GuardianFormProps) 
   const { t, formatNumber } = useAcademicsI18n()
   const [isExpanded, setIsExpanded] = useState(true)
   const prefix = `guardians.${index}`
+  const relationshipOptions = useMemo(
+    () => RELATIONSHIP_OPTIONS.map((option) => ({
+      value: option.value,
+      label: t(`relationships.${option.value === 'guardian' ? 'legalGuardian' : option.value}`),
+    })),
+    [t],
+  )
+  const phoneTypeOptions = useMemo(
+    () => PHONE_TYPE_OPTIONS.map((option) => ({ value: option.value, label: t(`enrollmentModule.step.contact.phoneTypes.${option.value}`) })),
+    [t],
+  )
 
   // Watch portal access to conditionally require email
   const { watch } = useFormContext()
@@ -108,7 +119,7 @@ export function GuardianForm({ index, onRemove, canRemove }: GuardianFormProps) 
                 <SelectField
                   name={`${prefix}.relationship`}
                   label={t('enrollmentModule.step.guardians.relationship')}
-                  options={RELATIONSHIP_OPTIONS}
+                  options={relationshipOptions}
                   placeholder={t('enrollmentModule.step.guardians.select')}
                   required
                 />
@@ -132,7 +143,7 @@ export function GuardianForm({ index, onRemove, canRemove }: GuardianFormProps) 
                 <SelectField
                   name={`${prefix}.phoneType`}
                   label={t('enrollmentModule.step.contact.phoneType')}
-                  options={PHONE_TYPE_OPTIONS}
+                  options={phoneTypeOptions}
                   placeholder={t('enrollmentModule.step.guardians.select')}
                 />
               </div>

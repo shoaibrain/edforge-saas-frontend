@@ -19,6 +19,7 @@ import {
   GENDER_OPTIONS,
   GRADE_LEVEL_OPTIONS,
   RELATIONSHIP_OPTIONS,
+  PHONE_TYPE_OPTIONS,
   ENROLLMENT_TYPE_OPTIONS,
 } from '../../../../schemas/student.form'
 import {
@@ -29,6 +30,48 @@ import { useAcademicYears } from '../../../../hooks/useSchool'
 import { useActiveSchoolId } from '../../../../stores/app.store'
 import type { GuardianFormData } from '../../../../schemas/student.form'
 import { useAcademicsI18n } from '../../../../lib/i18n'
+
+const ENTRY_TYPE_LABEL_KEYS: Record<string, string> = {
+  'Next year school': 'enrollmentModule.step.entry.entryTypes.nextYearSchool',
+  'Transfer from a public school in the same local education agency': 'enrollmentModule.step.entry.entryTypes.transferSameDistrict',
+  'Transfer from a public school in a different local education agency in the same state': 'enrollmentModule.step.entry.entryTypes.transferDifferentDistrict',
+  'Transfer from a private, non-religiously-affiliated school in the same state': 'enrollmentModule.step.entry.entryTypes.transferPrivateSchool',
+  'Re-entry from the same school with no interruption of schooling': 'enrollmentModule.step.entry.entryTypes.reentrySameSchool',
+  'Original entry into a United States school': 'enrollmentModule.step.entry.entryTypes.originalEntry',
+  'Transfer from a school outside of the country': 'enrollmentModule.step.entry.entryTypes.transferInternational',
+}
+
+const RESIDENCY_STATUS_LABEL_KEYS: Record<string, string> = {
+  'Resident of administrative unit and target school area': 'enrollmentModule.step.entry.residencyStatuses.adminUnitAndSchoolArea',
+  'Resident of administrative unit but not of target school area': 'enrollmentModule.step.entry.residencyStatuses.adminUnitOnly',
+  'Resident of this state but not of this administrative unit or school area': 'enrollmentModule.step.entry.residencyStatuses.stateOnly',
+  'Not a resident of this state': 'enrollmentModule.step.entry.residencyStatuses.notResident',
+}
+
+const ETHNICITY_LABEL_KEYS: Record<string, string> = {
+  american_indian: 'enrollmentModule.step.medical.ethnicityOptions.americanIndian',
+  asian: 'enrollmentModule.step.medical.ethnicityOptions.asian',
+  black: 'enrollmentModule.step.medical.ethnicityOptions.black',
+  hispanic: 'enrollmentModule.step.medical.ethnicityOptions.hispanic',
+  native_hawaiian: 'enrollmentModule.step.medical.ethnicityOptions.nativeHawaiian',
+  white: 'enrollmentModule.step.medical.ethnicityOptions.white',
+  two_or_more: 'enrollmentModule.step.medical.ethnicityOptions.twoOrMore',
+  prefer_not_to_say: 'enrollmentModule.step.medical.ethnicityOptions.preferNotToSay',
+}
+
+const LANGUAGE_LABEL_KEYS: Record<string, string> = {
+  English: 'enrollmentModule.step.medical.languageOptions.english',
+  Spanish: 'enrollmentModule.step.medical.languageOptions.spanish',
+  Mandarin: 'enrollmentModule.step.medical.languageOptions.mandarin',
+  French: 'enrollmentModule.step.medical.languageOptions.french',
+  Arabic: 'enrollmentModule.step.medical.languageOptions.arabic',
+  Hindi: 'enrollmentModule.step.medical.languageOptions.hindi',
+  Portuguese: 'enrollmentModule.step.medical.languageOptions.portuguese',
+  Vietnamese: 'enrollmentModule.step.medical.languageOptions.vietnamese',
+  Korean: 'enrollmentModule.step.medical.languageOptions.korean',
+  Tagalog: 'enrollmentModule.step.medical.languageOptions.tagalog',
+  Other: 'enrollmentModule.step.medical.languageOptions.other',
+}
 
 // ============================================================================
 // HELPERS
@@ -115,6 +158,59 @@ function TagList({ tags }: { tags: string[] }) {
 export function ReviewStep({ data }: WizardStepProps) {
   const { t, formatDate } = useAcademicsI18n()
   const { goToStep, isSubmitting } = useWizard()
+  const genderOptions = useMemo(
+    () => GENDER_OPTIONS.map((option) => ({ value: option.value, label: t(`gender.${option.value}`) })),
+    [t],
+  )
+  const relationshipOptions = useMemo(
+    () => RELATIONSHIP_OPTIONS.map((option) => ({
+      value: option.value,
+      label: t(`relationships.${option.value === 'guardian' ? 'legalGuardian' : option.value}`),
+    })),
+    [t],
+  )
+  const phoneTypeOptions = useMemo(
+    () => PHONE_TYPE_OPTIONS.map((option) => ({
+      value: option.value,
+      label: t(`enrollmentModule.step.contact.phoneTypes.${option.value}`),
+    })),
+    [t],
+  )
+  const enrollmentTypeOptions = useMemo(
+    () => ENROLLMENT_TYPE_OPTIONS.map((option) => ({
+      value: option.value,
+      label: t(`enrollmentModule.step.type.labels.${option.value}`),
+    })),
+    [t],
+  )
+  const entryTypeOptions = useMemo(
+    () => ENTRY_TYPE_OPTIONS.map((option) => ({
+      value: option.value,
+      label: t(ENTRY_TYPE_LABEL_KEYS[option.value], { defaultValue: option.label }),
+    })),
+    [t],
+  )
+  const residencyStatusOptions = useMemo(
+    () => RESIDENCY_STATUS_OPTIONS.map((option) => ({
+      value: option.value,
+      label: t(RESIDENCY_STATUS_LABEL_KEYS[option.value], { defaultValue: option.label }),
+    })),
+    [t],
+  )
+  const ethnicityOptions = useMemo(
+    () => Object.entries(ETHNICITY_LABEL_KEYS).map(([value, labelKey]) => ({
+      value,
+      label: t(labelKey),
+    })),
+    [t],
+  )
+  const languageOptions = useMemo(
+    () => Object.entries(LANGUAGE_LABEL_KEYS).map(([value, labelKey]) => ({
+      value,
+      label: t(labelKey),
+    })),
+    [t],
+  )
 
   const contactInfo = (data.contactInfo as Record<string, unknown> | undefined) ?? {}
   const address = (contactInfo.address as Record<string, unknown> | undefined) ?? {}
@@ -183,7 +279,7 @@ export function ReviewStep({ data }: WizardStepProps) {
                 <CheckCircle2 className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] shrink-0 mt-0.5" />
                 <span className="text-sm text-[rgb(var(--text-secondary))]">
                   {t('enrollmentModule.step.review.enrollmentTypeDate', {
-                    type: labelFor(enrollment.enrollmentType as string, ENROLLMENT_TYPE_OPTIONS),
+                    type: labelFor(enrollment.enrollmentType as string, enrollmentTypeOptions),
                     date: formatDate(enrollment.enrollmentDate as string, { year: 'numeric', month: 'long', day: 'numeric' }),
                   })}
                 </span>
@@ -218,7 +314,7 @@ export function ReviewStep({ data }: WizardStepProps) {
           <DataField label={t('enrollmentModule.step.personal.preferredName')} value={display(data.preferredName)} />
           <DataField label={t('enrollmentModule.step.personal.suffix')} value={display(data.suffix)} />
           <DataField label={t('fields.dateOfBirth')} value={formatDate(data.dateOfBirth as string, { year: 'numeric', month: 'long', day: 'numeric' })} />
-          <DataField label={t('fields.gender')} value={labelFor(data.gender as string, GENDER_OPTIONS)} />
+          <DataField label={t('fields.gender')} value={labelFor(data.gender as string, genderOptions)} />
           <DataField
             label={t('fields.gradeLevel')}
             value={labelFor(data.currentGradeLevel as string, GRADE_LEVEL_OPTIONS)}
@@ -232,7 +328,7 @@ export function ReviewStep({ data }: WizardStepProps) {
         <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-1">
           <DataField label={t('fields.email')} value={display(contactInfo.email)} />
           <DataField label={t('fields.phone')} value={display(contactInfo.phone)} />
-          <DataField label={t('enrollmentModule.step.contact.phoneType')} value={display(contactInfo.phoneType)} />
+          <DataField label={t('enrollmentModule.step.contact.phoneType')} value={labelFor(contactInfo.phoneType as string, phoneTypeOptions)} />
         </div>
         <DataField label={t('enrollmentModule.step.contact.physicalAddress')} value={formatAddress(address)} />
         {Boolean(contactInfo.useMailingAddress) && (
@@ -257,7 +353,7 @@ export function ReviewStep({ data }: WizardStepProps) {
                     {display(g.firstName)} {display(g.lastName)}
                   </span>
                   <span className="text-xs px-1.5 py-0.5 rounded bg-[rgb(var(--background-primary))] text-[rgb(var(--text-secondary))]">
-                    {labelFor(g.relationship, RELATIONSHIP_OPTIONS)}
+                    {labelFor(g.relationship, relationshipOptions)}
                   </span>
                   {g.isPrimary && (
                     <span className="text-xs px-1.5 py-0.5 rounded bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--text-secondary))] font-medium">
@@ -296,9 +392,9 @@ export function ReviewStep({ data }: WizardStepProps) {
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-1">
           <DataField label={t('enrollmentModule.step.review.physician')} value={display(medicalInfo.physicianName)} />
-          <DataField label={t('fields.ethnicity')} value={display(data.ethnicity)} />
-          <DataField label={t('fields.primaryLanguage')} value={display(data.primaryLanguage)} />
-          <DataField label={t('fields.homeLanguage')} value={display(data.homeLanguage)} />
+          <DataField label={t('fields.ethnicity')} value={labelFor(data.ethnicity as string, ethnicityOptions)} />
+          <DataField label={t('fields.primaryLanguage')} value={labelFor(data.primaryLanguage as string, languageOptions)} />
+          <DataField label={t('fields.homeLanguage')} value={labelFor(data.homeLanguage as string, languageOptions)} />
           <DataField label={t('fields.countryOfBirth')} value={display(data.countryOfBirth)} />
         </div>
       </div>
@@ -309,7 +405,7 @@ export function ReviewStep({ data }: WizardStepProps) {
         <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-1">
           <DataField
             label={t('enrollmentModule.step.type.title')}
-            value={labelFor(enrollment.enrollmentType as string, ENROLLMENT_TYPE_OPTIONS)}
+            value={labelFor(enrollment.enrollmentType as string, enrollmentTypeOptions)}
           />
           <DataField
             label={t('enrollmentModule.step.details.enrollmentDate')}
@@ -320,11 +416,11 @@ export function ReviewStep({ data }: WizardStepProps) {
           {/* Ed-Fi Descriptor Fields */}
           <DataField
             label={t('enrollmentModule.step.entry.entryType')}
-            value={labelFor(enrollment.entryTypeDescriptor as string, ENTRY_TYPE_OPTIONS)}
+            value={labelFor(enrollment.entryTypeDescriptor as string, entryTypeOptions)}
           />
           <DataField
             label={t('enrollmentModule.step.entry.residencyStatus')}
-            value={labelFor(enrollment.residencyStatusDescriptor as string, RESIDENCY_STATUS_OPTIONS)}
+            value={labelFor(enrollment.residencyStatusDescriptor as string, residencyStatusOptions)}
           />
           <DataField
             label={t('enrollmentModule.step.settings.primarySchool')}

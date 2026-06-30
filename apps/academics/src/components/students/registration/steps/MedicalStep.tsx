@@ -8,7 +8,7 @@
  * Collapsible sections with icons, titles, and completion indicators.
  */
 
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { FormProvider } from 'react-hook-form'
 import { Heart, Stethoscope, Globe, Info } from 'lucide-react'
 import { TextField, SelectField } from '@edforge/forms'
@@ -19,28 +19,28 @@ import { CollapsibleSection } from '../CollapsibleSection'
 import { useAcademicsI18n } from '../../../../lib/i18n'
 
 const ETHNICITY_OPTIONS = [
-  { value: 'american_indian', label: 'American Indian / Alaska Native' },
-  { value: 'asian', label: 'Asian' },
-  { value: 'black', label: 'Black / African American' },
-  { value: 'hispanic', label: 'Hispanic / Latino' },
-  { value: 'native_hawaiian', label: 'Native Hawaiian / Pacific Islander' },
-  { value: 'white', label: 'White' },
-  { value: 'two_or_more', label: 'Two or More Races' },
-  { value: 'prefer_not_to_say', label: 'Prefer Not to Say' },
+  { value: 'american_indian', labelKey: 'enrollmentModule.step.medical.ethnicityOptions.americanIndian' },
+  { value: 'asian', labelKey: 'enrollmentModule.step.medical.ethnicityOptions.asian' },
+  { value: 'black', labelKey: 'enrollmentModule.step.medical.ethnicityOptions.black' },
+  { value: 'hispanic', labelKey: 'enrollmentModule.step.medical.ethnicityOptions.hispanic' },
+  { value: 'native_hawaiian', labelKey: 'enrollmentModule.step.medical.ethnicityOptions.nativeHawaiian' },
+  { value: 'white', labelKey: 'enrollmentModule.step.medical.ethnicityOptions.white' },
+  { value: 'two_or_more', labelKey: 'enrollmentModule.step.medical.ethnicityOptions.twoOrMore' },
+  { value: 'prefer_not_to_say', labelKey: 'enrollmentModule.step.medical.ethnicityOptions.preferNotToSay' },
 ]
 
 const LANGUAGE_OPTIONS = [
-  { value: 'English', label: 'English' },
-  { value: 'Spanish', label: 'Spanish' },
-  { value: 'Mandarin', label: 'Mandarin Chinese' },
-  { value: 'French', label: 'French' },
-  { value: 'Arabic', label: 'Arabic' },
-  { value: 'Hindi', label: 'Hindi' },
-  { value: 'Portuguese', label: 'Portuguese' },
-  { value: 'Vietnamese', label: 'Vietnamese' },
-  { value: 'Korean', label: 'Korean' },
-  { value: 'Tagalog', label: 'Tagalog' },
-  { value: 'Other', label: 'Other' },
+  { value: 'English', labelKey: 'enrollmentModule.step.medical.languageOptions.english' },
+  { value: 'Spanish', labelKey: 'enrollmentModule.step.medical.languageOptions.spanish' },
+  { value: 'Mandarin', labelKey: 'enrollmentModule.step.medical.languageOptions.mandarin' },
+  { value: 'French', labelKey: 'enrollmentModule.step.medical.languageOptions.french' },
+  { value: 'Arabic', labelKey: 'enrollmentModule.step.medical.languageOptions.arabic' },
+  { value: 'Hindi', labelKey: 'enrollmentModule.step.medical.languageOptions.hindi' },
+  { value: 'Portuguese', labelKey: 'enrollmentModule.step.medical.languageOptions.portuguese' },
+  { value: 'Vietnamese', labelKey: 'enrollmentModule.step.medical.languageOptions.vietnamese' },
+  { value: 'Korean', labelKey: 'enrollmentModule.step.medical.languageOptions.korean' },
+  { value: 'Tagalog', labelKey: 'enrollmentModule.step.medical.languageOptions.tagalog' },
+  { value: 'Other', labelKey: 'enrollmentModule.step.medical.languageOptions.other' },
 ]
 
 export function MedicalStep({
@@ -51,6 +51,14 @@ export function MedicalStep({
 }: WizardStepProps) {
   const { t } = useAcademicsI18n()
   const form = useWizardForm({ data, updateData, errors, clearError })
+  const ethnicityOptions = useMemo(
+    () => ETHNICITY_OPTIONS.map((option) => ({ value: option.value, label: t(option.labelKey) })),
+    [t],
+  )
+  const languageOptions = useMemo(
+    () => LANGUAGE_OPTIONS.map((option) => ({ value: option.value, label: t(option.labelKey) })),
+    [t],
+  )
 
   const getTagArray = useCallback(
     (path: string): string[] => {
@@ -191,19 +199,19 @@ export function MedicalStep({
             <SelectField
               name="ethnicity"
               label={t('fields.ethnicity')}
-              options={ETHNICITY_OPTIONS}
+              options={ethnicityOptions}
               placeholder={t('enrollmentModule.step.medical.selectEthnicity')}
             />
             <SelectField
               name="primaryLanguage"
               label={t('fields.primaryLanguage')}
-              options={LANGUAGE_OPTIONS}
+              options={languageOptions}
               placeholder={t('enrollmentModule.step.medical.selectLanguage')}
             />
             <SelectField
               name="homeLanguage"
               label={t('fields.homeLanguage')}
-              options={LANGUAGE_OPTIONS}
+              options={languageOptions}
               placeholder={t('enrollmentModule.step.medical.selectLanguage')}
             />
             <TextField

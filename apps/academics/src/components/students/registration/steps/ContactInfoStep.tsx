@@ -16,6 +16,7 @@
  * existing US-shaped form unchanged.
  */
 
+import { useMemo } from 'react'
 import { FormProvider } from 'react-hook-form'
 import { Phone, MapPin, Mail } from 'lucide-react'
 import {
@@ -42,6 +43,10 @@ export function ContactInfoStep({
   const form = useWizardForm({ data, updateData, errors, clearError })
   const useMailingAddress = form.watch('contactInfo.useMailingAddress')
   const { archetype, country } = useTenantContext()
+  const phoneTypeOptions = useMemo(
+    () => PHONE_TYPE_OPTIONS.map((option) => ({ value: option.value, label: t(`enrollmentModule.step.contact.phoneTypes.${option.value}`) })),
+    [t],
+  )
 
   return (
     <FormProvider {...form}>
@@ -72,7 +77,7 @@ export function ContactInfoStep({
             <SelectField
               name="contactInfo.phoneType"
               label={t('enrollmentModule.step.contact.phoneType')}
-              options={PHONE_TYPE_OPTIONS}
+              options={phoneTypeOptions}
               placeholder={t('enrollmentModule.step.contact.selectType')}
             />
           </div>
