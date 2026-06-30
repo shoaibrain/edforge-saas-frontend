@@ -26,6 +26,7 @@ import {
 } from 'lucide-react'
 import { Menu, MenuButton, MenuItems, MenuItem, Transition } from '@headlessui/react'
 import { toast } from 'sonner'
+import { useTranslation } from '@edforge/i18n'
 import { useAuthStore } from '@/stores/auth.store'
 import { can } from '@edforge/abac'
 import { tenantService } from '@/services/tenant.service'
@@ -71,7 +72,6 @@ const SCHOOL_STATUS_CONFIG: Record<SchoolStatus, {
   bg: string
   borderColor: string
   dot: string
-  label: string
 }> = {
   setup: {
     icon: Settings,
@@ -79,7 +79,6 @@ const SCHOOL_STATUS_CONFIG: Record<SchoolStatus, {
     bg: 'bg-[rgba(239,159,39,0.1)]',
     borderColor: 'border-[rgba(239,159,39,0.2)]',
     dot: 'bg-[#EF9F27]',
-    label: 'Setup Mode',
   },
   active: {
     icon: CheckCircle2,
@@ -87,7 +86,6 @@ const SCHOOL_STATUS_CONFIG: Record<SchoolStatus, {
     bg: 'bg-[rgba(29,158,117,0.1)]',
     borderColor: 'border-[rgba(29,158,117,0.2)]',
     dot: 'bg-[#1D9E75]',
-    label: 'Active',
   },
   inactive: {
     icon: XCircle,
@@ -95,7 +93,6 @@ const SCHOOL_STATUS_CONFIG: Record<SchoolStatus, {
     bg: 'bg-[rgba(255,255,255,0.06)]',
     borderColor: 'border-[rgba(255,255,255,0.08)]',
     dot: 'bg-[rgb(var(--text-tertiary))]',
-    label: 'Inactive',
   },
   suspended: {
     icon: PauseCircle,
@@ -103,7 +100,6 @@ const SCHOOL_STATUS_CONFIG: Record<SchoolStatus, {
     bg: 'bg-[rgb(var(--state-warning-bg)/0.18)]0/10',
     borderColor: 'border-[rgb(var(--state-warning-border)/0.35)]',
     dot: 'bg-[rgb(var(--state-warning-bg)/0.18)]0',
-    label: 'Suspended',
   },
   closed: {
     icon: Lock,
@@ -111,18 +107,17 @@ const SCHOOL_STATUS_CONFIG: Record<SchoolStatus, {
     bg: 'bg-[rgb(var(--state-danger-bg)/0.18)]0/10',
     borderColor: 'border-[rgb(var(--state-danger-border)/0.35)]',
     dot: 'bg-[rgb(var(--state-danger-bg)/0.18)]0',
-    label: 'Closed',
   },
 }
 
-const STATUS_ACTIONS: Record<SchoolStatus, { label: string; targetStatus: SchoolStatus; color: string }[]> = {
-  setup: [{ label: 'Activate School', targetStatus: 'active', color: 'text-[#1D9E75]' }],
+const STATUS_ACTIONS: Record<SchoolStatus, { labelKey: string; targetStatus: SchoolStatus; color: string }[]> = {
+  setup: [{ labelKey: 'schoolDetail.statusActions.activate', targetStatus: 'active', color: 'text-[#1D9E75]' }],
   active: [
-    { label: 'Suspend School', targetStatus: 'suspended', color: 'text-[rgb(var(--state-warning-fg))]' },
-    { label: 'Deactivate School', targetStatus: 'inactive', color: 'text-[rgb(var(--state-danger-fg))]' },
+    { labelKey: 'schoolDetail.statusActions.suspend', targetStatus: 'suspended', color: 'text-[rgb(var(--state-warning-fg))]' },
+    { labelKey: 'schoolDetail.statusActions.deactivate', targetStatus: 'inactive', color: 'text-[rgb(var(--state-danger-fg))]' },
   ],
-  suspended: [{ label: 'Reactivate School', targetStatus: 'active', color: 'text-[#1D9E75]' }],
-  inactive: [{ label: 'Reactivate School', targetStatus: 'active', color: 'text-[#1D9E75]' }],
+  suspended: [{ labelKey: 'schoolDetail.statusActions.reactivate', targetStatus: 'active', color: 'text-[#1D9E75]' }],
+  inactive: [{ labelKey: 'schoolDetail.statusActions.reactivate', targetStatus: 'active', color: 'text-[#1D9E75]' }],
   closed: [],
 }
 
@@ -132,13 +127,13 @@ const STATUS_ACTIONS: Record<SchoolStatus, { label: string; targetStatus: School
 
 type SchoolTab = 'config' | 'academic-setup' | 'attendance' | 'structure' | 'grade-levels' | 'audit-log'
 
-const TABS: { id: SchoolTab; label: string }[] = [
-  { id: 'config', label: 'Configuration' },
-  { id: 'academic-setup', label: 'Academic Setup' },
-  { id: 'attendance', label: 'Attendance' },
-  { id: 'structure', label: 'Structure' },
-  { id: 'grade-levels', label: 'Grade Levels' },
-  { id: 'audit-log', label: 'Audit Log' },
+const TABS: { id: SchoolTab; labelKey: string }[] = [
+  { id: 'config', labelKey: 'schoolDetail.tabs.configuration' },
+  { id: 'academic-setup', labelKey: 'schoolDetail.tabs.academicSetup' },
+  { id: 'attendance', labelKey: 'schoolDetail.tabs.attendance' },
+  { id: 'structure', labelKey: 'schoolDetail.tabs.structure' },
+  { id: 'grade-levels', labelKey: 'schoolDetail.tabs.gradeLevels' },
+  { id: 'audit-log', labelKey: 'schoolDetail.tabs.auditLog' },
 ]
 
 // These tab ids map 1:1 onto purpose-built signature glyphs (replaces the old emojis).
@@ -225,6 +220,7 @@ interface DeleteSchoolModalProps {
 }
 
 function DeleteSchoolModal({ school, isOpen, onClose, onConfirm, isDeleting }: DeleteSchoolModalProps) {
+  const { t } = useTranslation('settings')
   const [confirmText, setConfirmText] = useState('')
 
   if (!isOpen) return null
@@ -245,7 +241,7 @@ function DeleteSchoolModal({ school, isOpen, onClose, onConfirm, isDeleting }: D
             <div className="p-2 rounded-full bg-rust-500/10">
               <AlertTriangle className="w-5 h-5 text-rust-500" />
             </div>
-            <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">Delete School</h2>
+            <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">{t('schoolDetail.delete.title')}</h2>
           </div>
           <button
             onClick={onClose}
@@ -259,32 +255,36 @@ function DeleteSchoolModal({ school, isOpen, onClose, onConfirm, isDeleting }: D
           {school.status === 'setup' ? (
             <>
               <p className="text-sm text-[rgb(var(--text-secondary))]">
-                This will <strong className="text-[rgb(var(--text-primary))]">permanently remove</strong> the school and all associated data. This cannot be undone.
+                {t('schoolDetail.delete.setupPrefix')}{' '}
+                <strong className="text-[rgb(var(--text-primary))]">{t('schoolDetail.delete.permanentlyRemove')}</strong>{' '}
+                {t('schoolDetail.delete.setupSuffix')}
               </p>
               <ul className="space-y-2 text-sm text-[rgb(var(--text-secondary))]">
                 <li className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-rust-500" />
-                  School entity and configuration will be permanently deleted
+                  {t('schoolDetail.delete.setupBullet')}
                 </li>
               </ul>
             </>
           ) : (
             <>
               <p className="text-sm text-[rgb(var(--text-secondary))]">
-                This will <strong className="text-[rgb(var(--text-primary))]">deactivate</strong> the school. It can be reactivated later by an administrator.
+                {t('schoolDetail.delete.activePrefix')}{' '}
+                <strong className="text-[rgb(var(--text-primary))]">{t('schoolDetail.delete.deactivateWord')}</strong>{' '}
+                {t('schoolDetail.delete.activeSuffix')}
               </p>
               <ul className="space-y-2 text-sm text-[rgb(var(--text-secondary))]">
                 <li className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                  School will be set to Inactive status
+                  {t('schoolDetail.delete.inactiveBullet')}
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                  Academic operations will be suspended
+                  {t('schoolDetail.delete.operationsBullet')}
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-[#1D9E75]" />
-                  Can be reactivated from the school detail page
+                  {t('schoolDetail.delete.reactivateBullet')}
                 </li>
               </ul>
             </>
@@ -292,7 +292,9 @@ function DeleteSchoolModal({ school, isOpen, onClose, onConfirm, isDeleting }: D
 
           <div className="pt-2">
             <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-2">
-              Type <strong className="text-[rgb(var(--text-primary))]">{school.name}</strong> to confirm
+              {t('schoolDetail.delete.confirmTypePrefix')}{' '}
+              <strong className="text-[rgb(var(--text-primary))]">{school.name}</strong>{' '}
+              {t('schoolDetail.delete.confirmTypeSuffix')}
             </label>
             <input
               type="text"
@@ -306,7 +308,7 @@ function DeleteSchoolModal({ school, isOpen, onClose, onConfirm, isDeleting }: D
 
         <div className="flex items-center justify-end gap-3 p-6 border-t border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]">
           <Button variant="ghost" onClick={onClose} disabled={isDeleting}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button
             variant="danger"
@@ -315,7 +317,7 @@ function DeleteSchoolModal({ school, isOpen, onClose, onConfirm, isDeleting }: D
             isLoading={isDeleting}
           >
             <Trash2 className="w-4 h-4 mr-1.5" />
-            Delete School
+            {t('schoolDetail.delete.title')}
           </Button>
         </div>
       </motion.div>
@@ -351,6 +353,7 @@ interface SetupBannerProps {
 }
 
 function SetupProgressBanner({ tasks, completedCount, totalCount, onTaskClick, onActivate, isActivating }: SetupBannerProps) {
+  const { t } = useTranslation('settings')
   const progressPercent = totalCount > 0 ? (completedCount / totalCount) * 100 : 0
 
   return (
@@ -361,10 +364,10 @@ function SetupProgressBanner({ tasks, completedCount, totalCount, onTaskClick, o
         </div>
         <div className="flex-1 min-w-0">
           <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))] mb-0.5">
-            Complete school setup before activating
+            {t('schoolDetail.setupBanner.title')}
           </h3>
           <p className="text-xs text-[rgb(var(--text-tertiary))] mb-3 leading-relaxed">
-            Configure your school's academic structure so EdForge can track attendance, grades, and scheduling correctly.
+            {t('schoolDetail.setupBanner.description')}
           </p>
 
           {/* Progress bar */}
@@ -376,7 +379,7 @@ function SetupProgressBanner({ tasks, completedCount, totalCount, onTaskClick, o
               />
             </div>
             <p className="text-xs text-[rgb(var(--text-tertiary))]">
-              {completedCount} of {totalCount} setup tasks complete
+              {t('schoolDetail.setupBanner.progress', { completed: completedCount, total: totalCount })}
             </p>
           </div>
 
@@ -408,7 +411,7 @@ function SetupProgressBanner({ tasks, completedCount, totalCount, onTaskClick, o
           disabled={isActivating}
           className="flex-shrink-0 self-center bg-[#1D9E75] text-[rgb(var(--action-primary-fg))] text-xs font-medium px-3.5 py-2 rounded-lg flex items-center gap-1.5 hover:opacity-90 transition-opacity disabled:opacity-50 whitespace-nowrap"
         >
-          ✓ Activate School <ArrowRight className="w-3.5 h-3.5" />
+          {t('schoolDetail.setupBanner.activate')} <ArrowRight className="w-3.5 h-3.5" />
         </button>
       </div>
     </div>
@@ -420,6 +423,7 @@ function SetupProgressBanner({ tasks, completedCount, totalCount, onTaskClick, o
 // ============================================================================
 
 export default function SchoolDetailPage() {
+  const { t } = useTranslation('settings')
   const user = useAuthStore((s) => s.user)
   const navigate = useNavigate()
   const queryClient = useQueryClient()
@@ -463,11 +467,11 @@ export default function SchoolDetailPage() {
       queryClient.invalidateQueries({ queryKey: ['schools'] })
       queryClient.removeQueries({ queryKey: ['school', schoolId] })
       queryClient.invalidateQueries({ queryKey: edOrgKeys.hierarchy() })
-      toast.success('School deleted successfully')
+      toast.success(t('schoolDetail.toasts.deleted'))
       navigate({ to: '/settings/organization' })
     },
     onError: (error: any) => {
-      const message = error?.response?.data?.message || error?.message || 'Failed to delete school'
+      const message = error?.response?.data?.message || error?.message || t('schoolDetail.toasts.deleteFailed')
       toast.error(message)
     },
   })
@@ -481,12 +485,12 @@ export default function SchoolDetailPage() {
       queryClient.invalidateQueries({ queryKey: edOrgKeys.hierarchy() })
       toast.success(
         updatedSchool.status === 'active'
-          ? 'School activated successfully'
-          : `School status updated to ${updatedSchool.status}`
+          ? t('schoolDetail.toasts.activated')
+          : t('schoolDetail.toasts.statusUpdated', { status: updatedSchool.status })
       )
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.message || error?.message || 'Failed to update school status')
+      toast.error(error?.response?.data?.message || error?.message || t('schoolDetail.toasts.statusFailed'))
     },
   })
 
@@ -529,14 +533,14 @@ export default function SchoolDetailPage() {
   }
 
   if (!hasPermission) {
-    return <AccessDenied message="You don't have permission to view this school's settings." />
+    return <AccessDenied message={t('schoolDetail.accessDenied.message')} />
   }
 
   if (!displaySchool) {
     return (
       <div className="mx-auto px-6 py-6">
         <div className="text-center text-[rgb(var(--text-tertiary))]">
-          School not found or could not be loaded.
+          {t('schoolDetail.notFound')}
         </div>
       </div>
     )
@@ -566,12 +570,12 @@ export default function SchoolDetailPage() {
                 <IemisCodeBadge code={displaySchool.emisSchoolCode} />
                 {/* Type chip */}
                 <span className="text-xs font-medium px-2 py-0.5 rounded-md border border-[rgba(255,255,255,0.09)] text-[rgb(var(--text-tertiary))]">
-                  {SCHOOL_TYPE_LABELS[displaySchool.type || ''] || displaySchool.type || 'School'}
+                  {SCHOOL_TYPE_LABELS[displaySchool.type || ''] || displaySchool.type || t('schoolDetail.schoolFallback')}
                 </span>
                 {/* Status chip */}
                 <span className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-full border ${statusCfg.bg} ${statusCfg.color} ${statusCfg.borderColor}`}>
                   <span className={`w-1.5 h-1.5 rounded-full ${statusCfg.dot}`} />
-                  {statusCfg.label}
+                  {t(`schoolDetail.status.${displaySchool.status}`)}
                 </span>
               </div>
             </div>
@@ -603,7 +607,7 @@ export default function SchoolDetailPage() {
                               className={`flex items-center w-full px-3 py-2.5 text-sm ${action.color} ${active ? 'bg-[rgb(var(--background-secondary))]' : ''} disabled:opacity-50`}
                             >
                               <Power className="w-4 h-4 mr-2.5" />
-                              {action.label}
+                              {t(action.labelKey)}
                             </button>
                           )}
                         </MenuItem>
@@ -619,7 +623,7 @@ export default function SchoolDetailPage() {
                               className={`flex items-center w-full px-3 py-2.5 text-sm text-[rgb(var(--state-danger-fg))] ${active ? 'bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/10' : ''}`}
                             >
                               <Trash2 className="w-4 h-4 mr-2.5" />
-                              {displaySchool.status === 'setup' ? 'Delete School' : 'Deactivate School'}
+                              {displaySchool.status === 'setup' ? t('schoolDetail.delete.title') : t('schoolDetail.statusActions.deactivate')}
                             </button>
                           )}
                         </MenuItem>
@@ -654,7 +658,7 @@ export default function SchoolDetailPage() {
 
         {/* ── Tab Bar ── */}
         <div className="border-b border-[rgba(255,255,255,0.06)]">
-          <div className="flex gap-0.5 overflow-x-auto -mb-px" role="tablist" aria-label="School detail sections">
+          <div className="flex gap-0.5 overflow-x-auto -mb-px" role="tablist" aria-label={t('schoolDetail.tabs.ariaLabel')}>
             {TABS.map((tab) => {
               const isActive = activeTab === tab.id
               // Badge logic
@@ -682,7 +686,7 @@ export default function SchoolDetailPage() {
                   `}
                 >
                   <AnimatedIcon name={TAB_SIGNATURE[tab.id]} size={16} applyAccent={false} />
-                  {tab.label}
+                  {t(tab.labelKey)}
                   {badge && (
                     <span className={`
                       text-xs font-semibold px-1.5 py-px rounded-full border
@@ -691,7 +695,7 @@ export default function SchoolDetailPage() {
                         : 'bg-[rgba(29,158,117,0.1)] text-[#1D9E75] border-[rgba(29,158,117,0.2)]'
                       }
                     `}>
-                      {badge.count} pending
+                      {t('schoolDetail.tabs.pending', { count: badge.count })}
                     </span>
                   )}
                 </button>
@@ -754,6 +758,8 @@ export default function SchoolDetailPage() {
 // ============================================================================
 
 function AccessDenied({ message }: { message: string }) {
+  const { t } = useTranslation('settings')
+
   return (
     <div className="max-w-3xl mx-auto px-6 py-8">
       <motion.div
@@ -764,7 +770,7 @@ function AccessDenied({ message }: { message: string }) {
         <div className="p-4 rounded-full bg-rust-500/10 inline-flex mb-6">
           <Building2 className="w-10 h-10 text-rust-500" />
         </div>
-        <h2 className="text-2xl font-bold text-[rgb(var(--text-primary))] mb-3">Access Denied</h2>
+        <h2 className="text-2xl font-bold text-[rgb(var(--text-primary))] mb-3">{t('schoolDetail.accessDenied.title')}</h2>
         <p className="text-[rgb(var(--text-tertiary))] max-w-md mx-auto">{message}</p>
       </motion.div>
     </div>

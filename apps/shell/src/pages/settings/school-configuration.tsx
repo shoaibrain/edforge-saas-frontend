@@ -17,6 +17,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { toast } from 'sonner'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from '@edforge/i18n'
 import {
   Building2,
   MapPin,
@@ -142,8 +143,17 @@ interface SchoolConfigurationPageProps {
 }
 
 export default function SchoolConfigurationPage({ schoolId, school }: SchoolConfigurationPageProps) {
+  const { t } = useTranslation('settings')
   useAuthStore((s) => s.user)
   const queryClient = useQueryClient()
+  const schoolTypeOptions = SCHOOL_TYPE_OPTIONS.map((option) => ({
+    ...option,
+    label: t(`schoolConfiguration.schoolTypes.${option.value}`, { defaultValue: option.label }),
+  }))
+  const termStructureOptions = TERM_STRUCTURE_OPTIONS.map((option) => ({
+    ...option,
+    label: t(`schoolConfiguration.termStructures.${option.value}`, { defaultValue: option.label }),
+  }))
 
   // Fetch configuration from API
   const { data: apiConfig, isLoading } = useQuery({
@@ -354,9 +364,9 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
 
       setOriginalState(formState)
       setIsDirty(false)
-      toast.success('Configuration saved successfully')
+      toast.success(t('schoolConfiguration.toasts.saved'))
     } catch (err: any) {
-      toast.error(err.message || 'Failed to save changes')
+      toast.error(err.message || t('schoolConfiguration.toasts.saveFailed'))
     }
   }
 
@@ -404,11 +414,10 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
           <AlertCircle className="w-5 h-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
           <div>
             <p className="text-sm font-medium text-amber-700 dark:text-amber-400">
-              Active Academic Year
+              {t('schoolConfiguration.lockBanner.title')}
             </p>
             <p className="text-sm text-amber-600 dark:text-amber-400/80 mt-0.5">
-              Some settings are locked while an academic year is active. Schedule, term structure, and grading fields
-              cannot be changed until the current academic year is completed or archived.
+              {t('schoolConfiguration.lockBanner.description')}
             </p>
           </div>
         </div>
@@ -416,11 +425,11 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
 
       {/* Identity Section */}
       <Section
-        title="School Identity"
-        description="Basic school information"
+        title={t('schoolConfiguration.sections.identity.title')}
+        description={t('schoolConfiguration.sections.identity.description')}
         icon={Building2}
       >
-        <SettingsFieldRow label="Display Name" description="Full name of the school">
+        <SettingsFieldRow label={t('schoolConfiguration.fields.displayName.label')} description={t('schoolConfiguration.fields.displayName.description')}>
           <input
             type="text"
             value={formState.displayName}
@@ -429,22 +438,22 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
           />
         </SettingsFieldRow>
 
-        <SettingsFieldRow label="School Type" description="Level of education" inline>
+        <SettingsFieldRow label={t('schoolConfiguration.fields.schoolType.label')} description={t('schoolConfiguration.fields.schoolType.description')} inline>
           <Select
-            aria-label="School Type"
+            aria-label={t('schoolConfiguration.fields.schoolType.label')}
             className="min-w-52"
             value={formState.schoolType}
             onChange={(v) => { if (v) updateField('schoolType', v) }}
-            options={SCHOOL_TYPE_OPTIONS}
+            options={schoolTypeOptions}
           />
         </SettingsFieldRow>
 
-        <SettingsFieldRow label="Website" description="School's public website">
+        <SettingsFieldRow label={t('schoolConfiguration.fields.website.label')} description={t('schoolConfiguration.fields.website.description')}>
           <input
             type="url"
             value={formState.website}
             onChange={(e) => updateField('website', e.target.value)}
-            placeholder="https://www.school.edu"
+            placeholder={t('schoolConfiguration.fields.website.placeholder')}
             className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all"
           />
         </SettingsFieldRow>
@@ -452,8 +461,8 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
 
       {/* Location & Contact Section */}
       <Section
-        title="Location & Contact"
-        description="Physical address and contact information"
+        title={t('schoolConfiguration.sections.location.title')}
+        description={t('schoolConfiguration.sections.location.description')}
         icon={MapPin}
       >
         {/* Render country-adaptive address fields from country config */}
@@ -470,7 +479,7 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
                   aria-label={field.label}
                   className="w-full"
                   clearable
-                  placeholder={field.placeholder || `Select ${field.label}`}
+                  placeholder={field.placeholder || t('schoolConfiguration.fields.selectField', { field: field.label })}
                   value={formState.address[field.key] || null}
                   onChange={(v) => updateField('address', { ...formState.address, [field.key]: v ?? '' })}
                   options={field.options.map((opt) => ({ value: opt.value, label: opt.label }))}
@@ -488,20 +497,20 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
           ));
         })()}
 
-        <SettingsFieldRow label="Phone & Email">
+        <SettingsFieldRow label={t('schoolConfiguration.fields.phoneEmail.label')}>
           <div className="grid grid-cols-2 gap-3">
             <input
               type="tel"
               value={formState.phone}
               onChange={(e) => updateField('phone', e.target.value)}
-              placeholder="Phone number"
+              placeholder={t('schoolConfiguration.fields.phoneEmail.phonePlaceholder')}
               className="px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all"
             />
             <input
               type="email"
               value={formState.email}
               onChange={(e) => updateField('email', e.target.value)}
-              placeholder="Email address"
+              placeholder={t('schoolConfiguration.fields.phoneEmail.emailPlaceholder')}
               className="px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all"
             />
           </div>
@@ -510,20 +519,20 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
 
       {/* Schedule & Operations Section */}
       <Section
-        title="Schedule & Operations"
-        description="School days and operating hours"
+        title={t('schoolConfiguration.sections.schedule.title')}
+        description={t('schoolConfiguration.sections.schedule.description')}
         icon={Clock}
       >
         <SettingsFieldRow label={
           <span className="flex items-center gap-1.5">
-            School Days
+            {t('schoolConfiguration.fields.schoolDays.label')}
             {isFieldLocked('schoolDays', hasActiveAcademicYear) && (
-              <span title="Locked during active academic year">
+              <span title={t('schoolConfiguration.lockedTooltip')}>
                 <Lock className="w-3.5 h-3.5 text-amber-500" />
               </span>
             )}
           </span>
-        } description="Days when school is in session">
+        } description={t('schoolConfiguration.fields.schoolDays.description')}>
           <SchoolDaysSelector
             selected={formState.schoolDays}
             onChange={(days) => updateField('schoolDays', days)}
@@ -533,14 +542,14 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
 
         <SettingsFieldRow label={
           <span className="flex items-center gap-1.5">
-            School Hours
+            {t('schoolConfiguration.fields.schoolHours.label')}
             {isFieldLocked('startTime', hasActiveAcademicYear) && (
-              <span title="Locked during active academic year">
+              <span title={t('schoolConfiguration.lockedTooltip')}>
                 <Lock className="w-3.5 h-3.5 text-amber-500" />
               </span>
             )}
           </span>
-        } description="Daily start and end times">
+        } description={t('schoolConfiguration.fields.schoolHours.description')}>
           <TimeRangePicker
             startTime={formState.startTime}
             endTime={formState.endTime}
@@ -554,14 +563,14 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
 
         <SettingsFieldRow label={
           <span className="flex items-center gap-1.5">
-            Period Duration
+            {t('schoolConfiguration.fields.periodDuration.label')}
             {isFieldLocked('periodDuration', hasActiveAcademicYear) && (
-              <span title="Locked during active academic year">
+              <span title={t('schoolConfiguration.lockedTooltip')}>
                 <Lock className="w-3.5 h-3.5 text-amber-500" />
               </span>
             )}
           </span>
-        } description="Length of each class period" inline>
+        } description={t('schoolConfiguration.fields.periodDuration.description')} inline>
           <div className="flex items-center gap-2">
             <input
               type="number"
@@ -572,48 +581,48 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
               disabled={isFieldLocked('periodDuration', hasActiveAcademicYear)}
               className={`w-20 px-3 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all ${isFieldLocked('periodDuration', hasActiveAcademicYear) ? 'opacity-50 cursor-not-allowed' : ''}`}
             />
-            <span className="text-sm text-[rgb(var(--text-tertiary))]">minutes</span>
+            <span className="text-sm text-[rgb(var(--text-tertiary))]">{t('schoolConfiguration.fields.periodDuration.unit')}</span>
           </div>
         </SettingsFieldRow>
       </Section>
 
       {/* Academic Settings Section */}
       <Section
-        title="Academic Settings"
-        description="Grading and term structure"
+        title={t('schoolConfiguration.sections.academic.title')}
+        description={t('schoolConfiguration.sections.academic.description')}
         icon={GraduationCap}
       >
         <SettingsFieldRow label={
           <span className="flex items-center gap-1.5">
-            Term Structure
+            {t('schoolConfiguration.fields.termStructure.label')}
             {isFieldLocked('academicCalendarType', hasActiveAcademicYear) && (
-              <span title="Locked during active academic year">
+              <span title={t('schoolConfiguration.lockedTooltip')}>
                 <Lock className="w-3.5 h-3.5 text-amber-500" />
               </span>
             )}
           </span>
-        } description="How the academic year is divided" inline>
+        } description={t('schoolConfiguration.fields.termStructure.description')} inline>
           <Select
-            aria-label="Term Structure"
+            aria-label={t('schoolConfiguration.fields.termStructure.label')}
             className="min-w-52"
             value={formState.termStructure}
             onChange={(v) => { if (v) updateField('termStructure', v) }}
             disabled={isFieldLocked('academicCalendarType', hasActiveAcademicYear)}
-            options={TERM_STRUCTURE_OPTIONS}
+            options={termStructureOptions}
           />
         </SettingsFieldRow>
 
-        <SettingsFieldRow label="Grading Scale" description="Grading policies are managed in the Grades & Assessments module">
+        <SettingsFieldRow label={t('schoolConfiguration.fields.gradingScale.label')} description={t('schoolConfiguration.fields.gradingScale.description')}>
           <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] p-4">
             <p className="text-sm text-[rgb(var(--text-secondary))] mb-3">
-              Grading scales, category weights, and calculation rules are configured through Grading Policies in the Grades & Assessments module.
+              {t('schoolConfiguration.fields.gradingScale.help')}
             </p>
             <a
               href="/academics/classrooms?tab=gradebook"
               className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-[rgb(var(--action-secondary-fg))]  bg-[rgb(var(--state-info-bg)/0.18)] dark:bg-[rgb(var(--action-primary-bg))]/10 hover:bg-[rgb(var(--state-info-bg)/0.18)] dark:hover:bg-[rgb(var(--action-primary-bg))]/20 rounded-lg transition-colors"
             >
               <GraduationCap className="w-4 h-4" />
-              Manage Grading Policies
+              {t('schoolConfiguration.fields.gradingScale.action')}
             </a>
           </div>
         </SettingsFieldRow>
@@ -621,8 +630,8 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
 
       {/* Features Section */}
       <Section
-        title="Enabled Features"
-        description="Control which modules are active for this school"
+        title={t('schoolConfiguration.sections.features.title')}
+        description={t('schoolConfiguration.sections.features.description')}
         icon={Layers}
       >
         <div className="py-2">
@@ -635,11 +644,11 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
 
       {/* Notifications Section */}
       <Section
-        title="Notifications"
-        description="Configure how notifications are delivered"
+        title={t('schoolConfiguration.sections.notifications.title')}
+        description={t('schoolConfiguration.sections.notifications.description')}
         icon={Bell}
       >
-        <SettingsFieldRow label="Enable Notifications" description="Master toggle for all notifications" inline>
+        <SettingsFieldRow label={t('schoolConfiguration.fields.notificationsEnabled.label')} description={t('schoolConfiguration.fields.notificationsEnabled.description')} inline>
           <ToggleSwitch
             checked={formState.notificationsEnabled}
             onChange={(checked) => updateField('notificationsEnabled', checked)}
@@ -648,14 +657,14 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
 
         {formState.notificationsEnabled && (
           <>
-            <SettingsFieldRow label="Email Notifications" description="Send notifications via email" inline>
+            <SettingsFieldRow label={t('schoolConfiguration.fields.emailNotifications.label')} description={t('schoolConfiguration.fields.emailNotifications.description')} inline>
               <ToggleSwitch
                 checked={formState.emailNotifications}
                 onChange={(checked) => updateField('emailNotifications', checked)}
               />
             </SettingsFieldRow>
 
-            <SettingsFieldRow label="SMS Notifications" description="Send notifications via text message" inline>
+            <SettingsFieldRow label={t('schoolConfiguration.fields.smsNotifications.label')} description={t('schoolConfiguration.fields.smsNotifications.description')} inline>
               <ToggleSwitch
                 checked={formState.smsNotifications}
                 onChange={(checked) => updateField('smsNotifications', checked)}
@@ -667,11 +676,11 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
 
       {/* Attendance Section */}
       <Section
-        title="Attendance Settings"
-        description="Attendance tracking configuration"
+        title={t('schoolConfiguration.sections.attendance.title')}
+        description={t('schoolConfiguration.sections.attendance.description')}
         icon={ClipboardCheck}
       >
-        <SettingsFieldRow label="Attendance Required" description="Is attendance tracking mandatory for this school?" inline>
+        <SettingsFieldRow label={t('schoolConfiguration.fields.attendanceRequired.label')} description={t('schoolConfiguration.fields.attendanceRequired.description')} inline>
           <ToggleSwitch
             checked={formState.attendanceRequired}
             onChange={(checked) => updateField('attendanceRequired', checked)}
@@ -684,8 +693,8 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
         <AlertTriangle className="w-5 h-5 text-[rgb(var(--state-info-fg))]  flex-shrink-0 mt-0.5" />
         <div>
           <p className="text-sm text-[rgb(var(--state-info-fg))] ">
-            <strong>Inheriting from Workspace:</strong> Some settings are inherited from your organization's workspace settings.
-            Changes here will override the workspace defaults for this school only.
+            <strong>{t('schoolConfiguration.inheritance.title')}</strong>{' '}
+            {t('schoolConfiguration.inheritance.description')}
           </p>
         </div>
       </div>

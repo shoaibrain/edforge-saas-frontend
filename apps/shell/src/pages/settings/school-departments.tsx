@@ -9,6 +9,7 @@ import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { useTranslation } from '@edforge/i18n'
 import {
   Users,
   Plus,
@@ -46,6 +47,7 @@ function DepartmentFormModal({
   onSubmit,
   isLoading,
 }: DepartmentFormModalProps) {
+  const { t } = useTranslation('settings')
   const [name, setName] = useState(department?.name || '')
   const [code, setCode] = useState(department?.code || '')
   const [description, setDescription] = useState(department?.description || '')
@@ -87,10 +89,10 @@ function DepartmentFormModal({
         <div className="flex items-center justify-between p-6 border-b border-[rgb(var(--border-primary))]">
           <div>
             <h3 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
-              {mode === 'create' ? 'Create Department' : 'Edit Department'}
+              {mode === 'create' ? t('schoolDepartments.form.createTitle') : t('schoolDepartments.form.editTitle')}
             </h3>
             <p className="text-sm text-[rgb(var(--text-tertiary))] mt-1">
-              {mode === 'create' ? 'Add a new department to this school' : 'Update department details'}
+              {mode === 'create' ? t('schoolDepartments.form.createDescription') : t('schoolDepartments.form.editDescription')}
             </p>
           </div>
           <button
@@ -105,14 +107,14 @@ function DepartmentFormModal({
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">
-              Department Name <span className="text-rust-500">*</span>
+              {t('schoolDepartments.form.name')} <span className="text-rust-500">*</span>
             </label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all"
-              placeholder="e.g., Science"
+              placeholder={t('schoolDepartments.form.namePlaceholder')}
               required
               minLength={2}
               maxLength={100}
@@ -121,7 +123,7 @@ function DepartmentFormModal({
 
           <div>
             <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">
-              Code <span className="text-rust-500">*</span>
+              {t('schoolDepartments.form.code')} <span className="text-rust-500">*</span>
             </label>
             <input
               type="text"
@@ -129,21 +131,21 @@ function DepartmentFormModal({
               onChange={(e) => setCode(e.target.value.toUpperCase())}
               disabled={mode === 'edit'}
               className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] font-mono focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              placeholder="e.g., SCI"
+              placeholder={t('schoolDepartments.form.codePlaceholder')}
               required
               minLength={2}
               maxLength={10}
             />
             {mode === 'create' && (
               <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
-                2-10 characters. Cannot be changed after creation.
+                {t('schoolDepartments.form.codeHint')}
               </p>
             )}
           </div>
 
           <div>
             <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1.5">
-              Description <span className="text-[rgb(var(--text-tertiary))] font-normal">(optional)</span>
+              {t('schoolDepartments.form.description')} <span className="text-[rgb(var(--text-tertiary))] font-normal">({t('common.optional')})</span>
             </label>
             <textarea
               value={description}
@@ -151,17 +153,17 @@ function DepartmentFormModal({
               className="w-full px-3.5 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all resize-none"
               rows={3}
               maxLength={500}
-              placeholder="Brief description of the department"
+              placeholder={t('schoolDepartments.form.descriptionPlaceholder')}
             />
           </div>
 
           {/* Footer */}
           <div className="flex justify-end gap-3 pt-4">
             <Button variant="outline" type="button" onClick={onClose}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button variant={'outline'} type="submit" isLoading={isLoading}>
-              {mode === 'create' ? 'Create Department' : 'Save Changes'}
+              {mode === 'create' ? t('schoolDepartments.actions.create') : t('common.saveChanges')}
             </Button>
           </div>
         </form>
@@ -183,6 +185,7 @@ interface DeleteConfirmModalProps {
 }
 
 function DeleteConfirmModal({ isOpen, department, onClose, onConfirm, isDeleting }: DeleteConfirmModalProps) {
+  const { t } = useTranslation('settings')
   if (!isOpen || !department) return null
 
   return (
@@ -198,20 +201,20 @@ function DeleteConfirmModal({ isOpen, department, onClose, onConfirm, isDeleting
           <div className="p-2 rounded-full bg-rust-500/10">
             <AlertTriangle className="w-5 h-5 text-rust-500" />
           </div>
-          <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">Delete Department</h2>
+          <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">{t('schoolDepartments.delete.title')}</h2>
         </div>
 
         <p className="text-sm text-[rgb(var(--text-secondary))] mb-6">
-          Are you sure you want to delete <strong>"{department.name}"</strong>? This action cannot be undone.
+          {t('schoolDepartments.delete.descriptionPrefix')} <strong>"{department.name}"</strong>? {t('schoolDepartments.delete.descriptionSuffix')}
         </p>
 
         <div className="flex justify-end gap-3">
           <Button variant="ghost" onClick={onClose} disabled={isDeleting}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button variant="danger" onClick={onConfirm} isLoading={isDeleting}>
             <Trash2 className="w-4 h-4 mr-1.5" />
-            Delete
+            {t('common.delete')}
           </Button>
         </div>
       </motion.div>
@@ -224,18 +227,19 @@ function DeleteConfirmModal({ isOpen, department, onClose, onConfirm, isDeleting
 // ============================================================================
 
 function ScopeBadge({ scope }: { scope: 'tenant' | 'school' }) {
+  const { t } = useTranslation('settings')
   if (scope === 'tenant') {
     return (
       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ">
         <Globe className="w-3 h-3" />
-        Organization
+        {t('schoolDepartments.scope.organization')}
       </span>
     )
   }
   return (
     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--state-info-fg))] ">
       <Building2 className="w-3 h-3" />
-      School
+      {t('schoolDepartments.scope.school')}
     </span>
   )
 }
@@ -249,6 +253,7 @@ interface SchoolDepartmentsPageProps {
 }
 
 export default function SchoolDepartmentsPage({ schoolId }: SchoolDepartmentsPageProps) {
+  const { t } = useTranslation('settings')
   const queryClient = useQueryClient()
 
   const [searchQuery, setSearchQuery] = useState('')
@@ -301,17 +306,17 @@ export default function SchoolDepartmentsPage({ schoolId }: SchoolDepartmentsPag
 
   const scopeFacet: FacetedFilterConfig = {
     columnId: 'scope',
-    title: 'Scope',
+    title: t('schoolDepartments.table.scope'),
     options: [
-      { value: 'tenant', label: 'Organization' },
-      { value: 'school', label: 'School' },
+      { value: 'tenant', label: t('schoolDepartments.scope.organization') },
+      { value: 'school', label: t('schoolDepartments.scope.school') },
     ],
   }
 
   const departmentBulkActions: BulkAction<Department>[] = [
     {
       id: 'delete',
-      label: 'Delete selected',
+      label: t('schoolDepartments.actions.deleteSelected'),
       icon: <Trash2 className="w-4 h-4" />,
       tone: 'critical',
       onRun: (rows) => setBulkDeleteTarget(rows),
@@ -323,7 +328,7 @@ export default function SchoolDepartmentsPage({ schoolId }: SchoolDepartmentsPag
     createSelectColumn<Department>(),
     {
       accessorKey: 'code',
-      header: 'Code',
+      header: t('schoolDepartments.table.code'),
       size: 100,
       cell: ({ row }) => (
         <span className="font-mono text-sm text-[rgb(var(--text-secondary))]">{row.original.code}</span>
@@ -331,7 +336,7 @@ export default function SchoolDepartmentsPage({ schoolId }: SchoolDepartmentsPag
     },
     {
       accessorKey: 'name',
-      header: 'Name',
+      header: t('schoolDepartments.table.name'),
       cell: ({ row }) => {
         const dept = row.original
         return (
@@ -348,14 +353,14 @@ export default function SchoolDepartmentsPage({ schoolId }: SchoolDepartmentsPag
     },
     {
       accessorKey: 'scope',
-      header: 'Scope',
+      header: t('schoolDepartments.table.scope'),
       filterFn: 'arrIncludesSome',
       cell: ({ row }) => <ScopeBadge scope={row.original.scope} />,
     },
     {
       id: 'headName',
       accessorFn: (dept) => dept.headName ?? '',
-      header: 'Department Head',
+      header: t('schoolDepartments.table.departmentHead'),
       cell: ({ row }) => {
         const dept = row.original
         return dept.headName ? (
@@ -374,35 +379,35 @@ export default function SchoolDepartmentsPage({ schoolId }: SchoolDepartmentsPag
           <button
             onClick={() => setModalState({ mode: 'edit', department: row.original })}
             className="p-2 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-tertiary))] transition-colors"
-            title="Edit department"
+            title={t('schoolDepartments.actions.edit')}
           >
             <Edit className="w-4 h-4" />
           </button>
           <button
             onClick={() => setModalState({ mode: 'delete', department: row.original })}
             className="p-2 rounded-lg text-[rgb(var(--text-tertiary))] hover:text-rust-500 hover:bg-rust-500/10 transition-colors"
-            title="Delete department"
+            title={t('schoolDepartments.actions.delete')}
           >
             <Trash2 className="w-4 h-4" />
           </button>
         </div>
       ),
     }),
-  ], [])
+  ], [t])
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">Departments</h2>
+          <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">{t('schoolDepartments.title')}</h2>
           <p className="text-sm text-[rgb(var(--text-tertiary))]">
-            Manage academic and administrative departments
+            {t('schoolDepartments.description')}
           </p>
         </div>
         <Button variant={'outline'} onClick={() => setModalState({ mode: 'create', department: null })}>
           <Plus className="w-4 h-4 mr-1.5" />
-          Add Department
+          {t('schoolDepartments.actions.add')}
         </Button>
       </div>
 
@@ -414,7 +419,7 @@ export default function SchoolDepartmentsPage({ schoolId }: SchoolDepartmentsPag
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[rgb(var(--text-tertiary))]" />
           <input
             type="text"
-            placeholder="Search departments..."
+            placeholder={t('schoolDepartments.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all"
@@ -441,12 +446,12 @@ export default function SchoolDepartmentsPage({ schoolId }: SchoolDepartmentsPag
         maxHeight="calc(100vh - 15rem)"
         emptyState={{
           icon: <Users className="w-10 h-10" />,
-          title: searchQuery ? `No departments match "${searchQuery}"` : 'No departments found',
+          title: searchQuery ? t('schoolDepartments.empty.noMatches', { query: searchQuery }) : t('schoolDepartments.empty.title'),
           description: searchQuery
-            ? 'Try adjusting your search or filter'
-            : 'Create your first department to organize your school',
+            ? t('schoolDepartments.empty.adjustSearch')
+            : t('schoolDepartments.empty.description'),
           action: !searchQuery ? {
-            label: 'Create Department',
+            label: t('schoolDepartments.actions.create'),
             onClick: () => setModalState({ mode: 'create', department: null }),
           } : undefined,
         }}
@@ -498,9 +503,9 @@ export default function SchoolDepartmentsPage({ schoolId }: SchoolDepartmentsPag
               const failures = results.filter((r) => r.status === 'rejected').length
               setBulkDeleteTarget(null)
               if (failures === 0) {
-                toast.success(`Deleted ${results.length} department${results.length === 1 ? '' : 's'}`)
+                toast.success(t('schoolDepartments.bulkDelete.success', { count: results.length }))
               } else {
-                toast.error(`Deleted ${results.length - failures}; ${failures} failed`)
+                toast.error(t('schoolDepartments.bulkDelete.partial', { deleted: results.length - failures, failed: failures }))
               }
             }}
             isDeleting={deleteMutation.isPending}
@@ -526,6 +531,7 @@ function BulkDeleteConfirmModal({
   onConfirm: () => void
   isDeleting: boolean
 }) {
+  const { t } = useTranslation('settings')
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-[rgb(var(--background-overlay)/0.50)] backdrop-blur-sm" onClick={onClose} />
@@ -540,12 +546,12 @@ function BulkDeleteConfirmModal({
             <AlertTriangle className="w-5 h-5 text-rust-500" />
           </div>
           <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
-            Delete {departments.length} Departments
+            {t('schoolDepartments.bulkDelete.title', { count: departments.length })}
           </h2>
         </div>
 
         <p className="text-sm text-[rgb(var(--text-secondary))] mb-4">
-          You're about to permanently delete the following departments. This cannot be undone.
+          {t('schoolDepartments.bulkDelete.description')}
         </p>
         <ul className="mb-6 max-h-40 overflow-y-auto rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] p-2 space-y-1">
           {departments.map((d) => (
@@ -558,11 +564,11 @@ function BulkDeleteConfirmModal({
 
         <div className="flex justify-end gap-3">
           <Button variant="ghost" onClick={onClose} disabled={isDeleting}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button variant="danger" onClick={onConfirm} isLoading={isDeleting}>
             <Trash2 className="w-4 h-4 mr-1.5" />
-            Delete {departments.length}
+            {t('schoolDepartments.bulkDelete.confirm', { count: departments.length })}
           </Button>
         </div>
       </motion.div>

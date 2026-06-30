@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button, Drawer, DrawerFooter, Select } from '@edforge/ui'
+import { useTranslation } from '@edforge/i18n'
 import {
   useLocations,
   useCreateLocation,
@@ -47,6 +48,14 @@ const LOCATION_TYPE_OPTIONS = [
   { value: 'office', label: 'Office' },
   { value: 'other', label: 'Other' },
 ]
+
+function useLocationTypeOptions() {
+  const { t } = useTranslation('settings')
+  return LOCATION_TYPE_OPTIONS.map((option) => ({
+    ...option,
+    label: t(`schoolRooms.types.${option.value}`, { defaultValue: option.label }),
+  }))
+}
 
 const LOCATION_TYPE_ICONS: Record<string, string> = {
   classroom: 'bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--action-secondary-fg))]',
@@ -103,6 +112,8 @@ interface SchoolRoomsPageProps {
 }
 
 export default function SchoolRoomsPage({ schoolId }: SchoolRoomsPageProps) {
+  const { t } = useTranslation('settings')
+  const locationTypeOptions = useLocationTypeOptions()
   const [showForm, setShowForm] = useState(false)
   const [editingRoom, setEditingRoom] = useState<LocationResponseDto | null>(null)
   const [form, setForm] = useState<RoomFormState>(EMPTY_FORM)
@@ -148,7 +159,7 @@ export default function SchoolRoomsPage({ schoolId }: SchoolRoomsPageProps) {
 
   const handleSave = () => {
     if (!form.roomNumber.trim()) {
-      toast.error('Room number is required')
+      toast.error(t('schoolRooms.validation.roomNumberRequired'))
       return
     }
 
@@ -215,16 +226,16 @@ export default function SchoolRoomsPage({ schoolId }: SchoolRoomsPageProps) {
             <MapPin className="w-5 h-5 text-[rgb(var(--state-success-fg))]" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">Rooms & Locations</h2>
+            <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">{t('schoolRooms.title')}</h2>
             <p className="text-sm text-[rgb(var(--text-tertiary))]">
-              {locations.length} room{locations.length !== 1 ? 's' : ''} · {activeCount} active
+              {t('schoolRooms.summary', { count: locations.length, active: activeCount })}
             </p>
           </div>
         </div>
 
         <Button variant="outline" size="sm" onClick={openCreate}>
           <Plus className="w-4 h-4 mr-1.5" />
-          Add Room
+          {t('schoolRooms.actions.add')}
         </Button>
       </div>
 
@@ -236,7 +247,7 @@ export default function SchoolRoomsPage({ schoolId }: SchoolRoomsPageProps) {
               key={type}
               className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${LOCATION_TYPE_ICONS[type] || 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))]'}`}
             >
-              {LOCATION_TYPE_OPTIONS.find(t => t.value === type)?.label || type}: {count}
+              {locationTypeOptions.find((option) => option.value === type)?.label || type}: {count}
             </span>
           ))}
         </div>
@@ -250,7 +261,7 @@ export default function SchoolRoomsPage({ schoolId }: SchoolRoomsPageProps) {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search rooms..."
+            placeholder={t('schoolRooms.searchPlaceholder')}
             className="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
           />
         </div>
@@ -260,12 +271,12 @@ export default function SchoolRoomsPage({ schoolId }: SchoolRoomsPageProps) {
       {locations.length === 0 ? (
         <SettingsEmptyState
           icon={MapPin}
-          title="No rooms configured"
-          description="Add physical rooms and locations for scheduling."
+          title={t('schoolRooms.empty.title')}
+          description={t('schoolRooms.empty.description')}
           action={
             <Button variant="primary" size="sm" onClick={openCreate}>
               <Plus className="w-4 h-4 mr-1.5" />
-              Add Room
+              {t('schoolRooms.actions.add')}
             </Button>
           }
         />
@@ -273,13 +284,13 @@ export default function SchoolRoomsPage({ schoolId }: SchoolRoomsPageProps) {
         <div className="border border-[rgb(var(--border-primary))] rounded-xl overflow-hidden">
           {/* Table header */}
           <div className="grid grid-cols-12 gap-2 px-4 py-2.5 bg-[rgb(var(--background-secondary))] text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase tracking-wider">
-            <div className="col-span-2">Room</div>
-            <div className="col-span-2">Building</div>
-            <div className="col-span-2">Type</div>
-            <div className="col-span-1">Floor</div>
-            <div className="col-span-2">Capacity</div>
-            <div className="col-span-1">Status</div>
-            <div className="col-span-2 text-right">Actions</div>
+            <div className="col-span-2">{t('schoolRooms.table.room')}</div>
+            <div className="col-span-2">{t('schoolRooms.table.building')}</div>
+            <div className="col-span-2">{t('schoolRooms.table.type')}</div>
+            <div className="col-span-1">{t('schoolRooms.table.floor')}</div>
+            <div className="col-span-2">{t('schoolRooms.table.capacity')}</div>
+            <div className="col-span-1">{t('schoolRooms.table.status')}</div>
+            <div className="col-span-2 text-right">{t('schoolRooms.table.actions')}</div>
           </div>
 
           {/* Table body */}
@@ -298,19 +309,19 @@ export default function SchoolRoomsPage({ schoolId }: SchoolRoomsPageProps) {
                 </div>
                 <div className="col-span-2">
                   <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${LOCATION_TYPE_ICONS[loc.locationType] || 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-secondary))]'}`}>
-                    {LOCATION_TYPE_OPTIONS.find(t => t.value === loc.locationType)?.label || loc.locationType}
+                    {locationTypeOptions.find((option) => option.value === loc.locationType)?.label || loc.locationType}
                   </span>
                 </div>
                 <div className="col-span-1 text-sm text-[rgb(var(--text-secondary))]">
                   {loc.floorNumber != null ? loc.floorNumber : '-'}
                 </div>
                 <div className="col-span-2 text-sm text-[rgb(var(--text-secondary))]">
-                  {loc.capacity != null ? `${loc.capacity} seats` : '-'}
+                  {loc.capacity != null ? t('schoolRooms.capacitySeats', { count: loc.capacity }) : '-'}
                 </div>
                 <div className="col-span-1">
                   <span className={`inline-flex items-center gap-1 text-xs font-medium ${loc.isActive ? 'text-[rgb(var(--action-secondary-fg))]' : 'text-[rgb(var(--text-tertiary))]'}`}>
                     <span className={`w-1.5 h-1.5 rounded-full ${loc.isActive ? 'bg-[rgb(var(--action-primary-bg))]' : 'bg-[rgb(var(--text-tertiary))]'}`} />
-                    {loc.isActive ? 'Active' : 'Inactive'}
+                    {loc.isActive ? t('schoolRooms.status.active') : t('schoolRooms.status.inactive')}
                   </span>
                 </div>
                 <div className="col-span-2 flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -333,7 +344,7 @@ export default function SchoolRoomsPage({ schoolId }: SchoolRoomsPageProps) {
 
           {filteredLocations.length === 0 && searchQuery && (
             <div className="px-4 py-8 text-center text-sm text-[rgb(var(--text-tertiary))]">
-              No rooms matching "{searchQuery}"
+              {t('schoolRooms.empty.noMatches', { query: searchQuery })}
             </div>
           )}
         </div>
@@ -343,33 +354,33 @@ export default function SchoolRoomsPage({ schoolId }: SchoolRoomsPageProps) {
       <Drawer
         open={showForm}
         onClose={closeForm}
-        title={editingRoom ? 'Edit Room' : 'Add Room'}
-        description={editingRoom ? 'Update room details' : 'Add a new room or location'}
+        title={editingRoom ? t('schoolRooms.drawer.editTitle') : t('schoolRooms.drawer.addTitle')}
+        description={editingRoom ? t('schoolRooms.drawer.editDescription') : t('schoolRooms.drawer.addDescription')}
         size="sm"
       >
         <div className="space-y-5">
           {/* Room Number */}
           <div>
             <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">
-              Room Number <span className="text-[rgb(var(--state-danger-fg))]">*</span>
+              {t('schoolRooms.form.roomNumber')} <span className="text-[rgb(var(--state-danger-fg))]">*</span>
             </label>
             <input
               type="text"
               value={form.roomNumber}
               onChange={(e) => setForm(f => ({ ...f, roomNumber: e.target.value }))}
-              placeholder="e.g., 101, A-205"
+              placeholder={t('schoolRooms.form.roomNumberPlaceholder')}
               className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
             />
           </div>
 
           {/* Building */}
           <div>
-            <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">Building Name</label>
+            <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('schoolRooms.form.buildingName')}</label>
             <input
               type="text"
               value={form.buildingName}
               onChange={(e) => setForm(f => ({ ...f, buildingName: e.target.value }))}
-              placeholder="e.g., Main Building"
+              placeholder={t('schoolRooms.form.buildingPlaceholder')}
               className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
             />
           </div>
@@ -377,24 +388,24 @@ export default function SchoolRoomsPage({ schoolId }: SchoolRoomsPageProps) {
           {/* Floor + Capacity */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">Floor</label>
+              <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('schoolRooms.form.floor')}</label>
               <input
                 type="number"
                 value={form.floorNumber}
                 onChange={(e) => setForm(f => ({ ...f, floorNumber: e.target.value }))}
-                placeholder="e.g., 1"
+                placeholder={t('schoolRooms.form.floorPlaceholder')}
                 className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">Capacity</label>
+              <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('schoolRooms.form.capacity')}</label>
               <input
                 type="number"
                 min={1}
                 max={500}
                 value={form.capacity}
                 onChange={(e) => setForm(f => ({ ...f, capacity: e.target.value }))}
-                placeholder="e.g., 30"
+                placeholder={t('schoolRooms.form.capacityPlaceholder')}
                 className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
               />
             </div>
@@ -402,10 +413,10 @@ export default function SchoolRoomsPage({ schoolId }: SchoolRoomsPageProps) {
 
           {/* Location Type */}
           <Select
-            label="Room Type"
+            label={t('schoolRooms.form.roomType')}
             value={form.locationType}
             onChange={(v) => { if (v) setForm(f => ({ ...f, locationType: v })) }}
-            options={LOCATION_TYPE_OPTIONS}
+            options={locationTypeOptions}
           />
 
           {/* Active toggle */}
@@ -416,23 +427,23 @@ export default function SchoolRoomsPage({ schoolId }: SchoolRoomsPageProps) {
               onChange={(e) => setForm(f => ({ ...f, isActive: e.target.checked }))}
               className="rounded border-[rgb(var(--border-primary))]"
             />
-            <span className="text-[rgb(var(--text-secondary))]">Active (available for scheduling)</span>
+            <span className="text-[rgb(var(--text-secondary))]">{t('schoolRooms.form.active')}</span>
           </label>
 
           {/* Description */}
           <div>
-            <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">Description</label>
+            <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('schoolRooms.form.description')}</label>
             <input
               type="text"
               value={form.description}
               onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))}
-              placeholder="Optional notes"
+              placeholder={t('schoolRooms.form.descriptionPlaceholder')}
               className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
             />
           </div>
 
           <DrawerFooter>
-            <Button variant="ghost" size="sm" onClick={closeForm}>Cancel</Button>
+            <Button variant="ghost" size="sm" onClick={closeForm}>{t('common.cancel')}</Button>
             <Button
               variant="outline"
               size="sm"
@@ -440,7 +451,7 @@ export default function SchoolRoomsPage({ schoolId }: SchoolRoomsPageProps) {
               disabled={createMutation.isPending || updateMutation.isPending}
               isLoading={createMutation.isPending || updateMutation.isPending}
             >
-              {editingRoom ? 'Update' : 'Create'}
+              {editingRoom ? t('common.update') : t('common.create')}
             </Button>
           </DrawerFooter>
         </div>
@@ -466,13 +477,13 @@ export default function SchoolRoomsPage({ schoolId }: SchoolRoomsPageProps) {
                 <div className="p-2 rounded-full bg-[rgb(var(--state-danger-bg)/0.18)]0/10">
                   <AlertCircle className="w-5 h-5 text-[rgb(var(--state-danger-fg))]" />
                 </div>
-                <h3 className="font-semibold text-[rgb(var(--text-primary))]">Delete Room</h3>
+                <h3 className="font-semibold text-[rgb(var(--text-primary))]">{t('schoolRooms.delete.title')}</h3>
               </div>
               <p className="text-sm text-[rgb(var(--text-secondary))]">
-                Are you sure? Sections assigned to this room will lose their location assignment.
+                {t('schoolRooms.delete.description')}
               </p>
               <div className="flex justify-end gap-2">
-                <Button variant="ghost" size="sm" onClick={() => setShowDeleteConfirm(null)}>Cancel</Button>
+                <Button variant="ghost" size="sm" onClick={() => setShowDeleteConfirm(null)}>{t('common.cancel')}</Button>
                 <Button
                   variant="danger"
                   size="sm"
@@ -480,7 +491,7 @@ export default function SchoolRoomsPage({ schoolId }: SchoolRoomsPageProps) {
                   disabled={deleteMutation.isPending}
                   isLoading={deleteMutation.isPending}
                 >
-                  Delete
+                  {t('common.delete')}
                 </Button>
               </div>
             </motion.div>

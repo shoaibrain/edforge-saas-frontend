@@ -1,6 +1,16 @@
 {
   "title": "सेटिङ्हरू",
   "subtitle": "तपाईंको खाता, प्राथमिकताहरू, र विद्यालय कन्फिगरेसन व्यवस्थापन गर्नुहोस्",
+  "overview": {
+    "actions": {
+      "branding": "ब्रान्डिङ",
+      "feeStructures": "शुल्क संरचनाहरू",
+      "paymentGateways": "भुक्तानी गेटवेहरू"
+    },
+    "fallbackName": "तपाईंको नाम",
+    "fallbackEmail": "your@email.com",
+    "searchComingSoon": "सेटिङ्हरू खोज्नुहोस् (छिट्टै आउँदै)"
+  },
   "account": {
     "title": "खाता",
     "description": "तपाईंको प्रोफाइल जानकारी व्यवस्थापन गर्नुहोस्",
@@ -24,7 +34,47 @@
     "uploadAvatar": "फोटो अपलोड गर्नुहोस्",
     "avatarHint": "JPG, PNG वा GIF। अधिकतम ५MB।",
     "saved": "खाता सफलतापूर्वक अपडेट भयो",
-    "saveFailed": "खाता अपडेट गर्न असफल भयो"
+    "saveFailed": "खाता अपडेट गर्न असफल भयो",
+    "profileUpdated": "प्रोफाइल सफलतापूर्वक अपडेट भयो",
+    "profileUpdateFailed": "प्रोफाइल अपडेट गर्न असफल भयो",
+    "fallbackUser": "प्रयोगकर्ता",
+    "accountDetails": "खाता विवरण",
+    "sections": {
+      "personalDescription": "तपाईंको नाम र पहिचान",
+      "contactTitle": "सम्पर्क जानकारी",
+      "contactDescription": "इमेल र फोन विवरण",
+      "addressDescription": "तपाईंको पत्राचार ठेगाना"
+    },
+    "details": {
+      "userId": "प्रयोगकर्ता ID",
+      "created": "सिर्जना गरिएको",
+      "lastLogin": "अन्तिम लग इन",
+      "mfa": "MFA"
+    },
+    "mfa": {
+      "enabled": "सक्षम",
+      "notEnabled": "सक्षम छैन"
+    },
+    "form": {
+      "firstNamePlaceholder": "पहिलो नाम लेख्नुहोस्",
+      "lastNamePlaceholder": "थर लेख्नुहोस्",
+      "displayNamePlaceholder": "तपाईंलाई कसरी बोलाइयोस्",
+      "displayNameHelp": "अरूलाई तपाईंको नाम यसरी देखिन्छ",
+      "emailPlaceholder": "email@example.com",
+      "emailHelp": "इमेल परिवर्तन गर्न समर्थन टोलीलाई सम्पर्क गर्नुहोस्",
+      "phonePlaceholder": "+९७७ ९८००००००००",
+      "phoneHelp": "देश कोड सहित लेख्नुहोस्",
+      "streetPlaceholder": "मुख्य सडक १२३",
+      "street2Placeholder": "अपार्टमेन्ट, सुइट आदि (वैकल्पिक)",
+      "cityPlaceholder": "काठमाडौं",
+      "postalCodePlaceholder": "४४६००",
+      "selectCountry": "देश छान्नुहोस्",
+      "selectState": "प्रदेश छान्नुहोस्"
+    },
+    "error": {
+      "loadTitle": "प्रोफाइल लोड गर्न असफल",
+      "loadDescription": "प्रोफाइल लोड गर्न असफल भयो"
+    }
   },
   "security": {
     "title": "सुरक्षा",
@@ -47,7 +97,40 @@
     "loginHistory": "लग इन इतिहास",
     "lastLogin": "अन्तिम लग इन",
     "securityScore": "सुरक्षा स्कोर",
-    "recommendations": "सुझावहरू"
+    "recommendations": "सुझावहरू",
+    "password": "पासवर्ड",
+    "changePasswordDescription": "हालको पासवर्ड लेखेर नयाँ पासवर्ड छान्नुहोस्।",
+    "currentPasswordPlaceholder": "हालको पासवर्ड लेख्नुहोस्",
+    "newPasswordPlaceholder": "नयाँ पासवर्ड लेख्नुहोस्",
+    "confirmPasswordPlaceholder": "नयाँ पासवर्ड पुष्टि गर्नुहोस्",
+    "showPassword": "पासवर्ड देखाउनुहोस्",
+    "hidePassword": "पासवर्ड लुकाउनुहोस्",
+    "activeSessionsCount": "{{count}} सक्रिय सत्र",
+    "activeSessionsCount_plural": "{{count}} सक्रिय सत्रहरू",
+    "passwordRequirements": {
+      "minLength": "कम्तीमा ८ अक्षर",
+      "uppercase": "ठूलो अक्षर",
+      "lowercase": "सानो अक्षर",
+      "number": "अङ्क",
+      "special": "विशेष चिन्ह"
+    },
+    "passwordStrength": {
+      "weak": "कमजोर",
+      "fair": "ठिकै",
+      "good": "राम्रो",
+      "strong": "बलियो"
+    },
+    "passwordLastChanged": {
+      "never": "कहिल्यै परिवर्तन गरिएको छैन",
+      "today": "आज परिवर्तन गरिएको",
+      "yesterday": "हिजो परिवर्तन गरिएको",
+      "daysAgo": "{{count}} दिन अघि परिवर्तन गरिएको"
+    },
+    "overview": {
+      "title": "सुरक्षा अवलोकन",
+      "description": "तपाईंको खाता सुरक्षाको छोटो सारांश।",
+      "loadFailed": "सुरक्षा अवलोकन लोड गर्न सकिएन।"
+    }
   },
   "preferences": {
     "title": "प्राथमिकताहरू",
@@ -81,6 +164,97 @@
   "workspace": {
     "title": "कार्यक्षेत्र",
     "description": "कार्यक्षेत्र सेटिङ्हरू व्यवस्थापन गर्नुहोस्",
+    "pageDescription": "सबै विद्यालयमा लागू हुने संगठन-व्यापी कन्फिगरेसन",
+    "saved": "कार्यक्षेत्र सेटिङ्हरू सेभ भयो",
+    "saveFailed": "सेटिङ्हरू सेभ गर्न असफल भयो",
+    "tenantInfo": {
+      "title": "टेनेन्ट जानकारी",
+      "description": "पढ्ने मात्र — प्रोभिजनिङमा सेट गरिएको र परिवर्तन गर्न सकिँदैन।",
+      "name": "नाम",
+      "archetype": "आर्केटाइप",
+      "country": "देश",
+      "tier": "टियर",
+      "created": "सिर्जना गरिएको"
+    },
+    "accessDenied": {
+      "title": "पहुँच अस्वीकृत",
+      "message": "तपाईंसँग कार्यक्षेत्र सेटिङ्हरू हेर्ने अनुमति छैन।"
+    },
+    "error": {
+      "loadTitle": "सेटिङ्हरू लोड गर्न असफल",
+      "loadDescription": "कार्यक्षेत्र सेटिङ्हरू लोड गर्न सकिएन। कृपया फेरि प्रयास गर्नुहोस्।"
+    },
+    "localization": {
+      "title": "स्थानीयकरण",
+      "description": "भाषा, समय क्षेत्र, र मिति/समय ढाँचा"
+    },
+    "financeCalendar": {
+      "title": "वित्त र पात्रो",
+      "description": "मुद्रा, पात्रो प्रणाली, र अङ्क ढाँचा"
+    },
+    "fields": {
+      "defaultTimezone": {
+        "label": "पूर्वनिर्धारित समय क्षेत्र",
+        "description": "तालिका र समय-मोहरका लागि संगठनको मुख्य समय क्षेत्र"
+      },
+      "defaultLanguage": {
+        "label": "पूर्वनिर्धारित भाषा",
+        "description": "नयाँ प्रयोगकर्ता र प्रणाली सञ्चारका लागि मुख्य भाषा"
+      },
+      "dateFormat": {
+        "label": "मिति ढाँचा",
+        "description": "प्लेटफर्मभर मिति कसरी देखाउने"
+      },
+      "timeFormat": {
+        "label": "समय ढाँचा",
+        "description": "१२ वा २४ घण्टाको घडी"
+      },
+      "weekStartsOn": {
+        "label": "हप्ता सुरु हुने दिन",
+        "description": "पात्रोमा हप्ताको पहिलो दिन"
+      },
+      "defaultCurrency": {
+        "label": "पूर्वनिर्धारित मुद्रा",
+        "description": "इनभ्वाइस, भुक्तानी, र वित्तीय प्रतिवेदनमा प्रयोग हुने मुद्रा"
+      },
+      "calendarSystem": {
+        "label": "पात्रो प्रणाली",
+        "description": "मिति प्रदर्शनका लागि मुख्य पात्रो प्रणाली"
+      },
+      "dualDate": {
+        "label": "बिक्रम सम्बत् मिति देखाउनुहोस्",
+        "description": "वित्त र शैक्षिक मोड्युलहरूमा ग्रेगोरियनसँगै वि.सं. मिति देखाउनुहोस्"
+      },
+      "numberFormat": {
+        "label": "अङ्क ढाँचा",
+        "description": "वित्तीय प्रदर्शनमा अङ्क कसरी समूहबद्ध गर्ने"
+      }
+    },
+    "locking": {
+      "locked": "लक गरिएको",
+      "lockedPrefix": "लक गरिएको।",
+      "lockedDefaultReason": "शैक्षिक वर्ष सक्रिय हुँदा भण्डारण गरिएको डाटालाई असर गर्ने क्षेत्रीय सेटिङ्हरू स्थिर हुन्छन्।",
+      "displayFieldsEditable": "प्रदर्शन मात्रका फिल्डहरू (भाषा, मिति/समय ढाँचा, अङ्क समूह) सम्पादनयोग्य रहन्छन्।",
+      "blockedBy": "रोक्ने",
+      "headsUpPrefix": "ध्यान दिनुहोस् —",
+      "headsUpDescription": "भण्डारण गरिएको डाटालाई असर गर्ने फिल्डहरू (मुद्रा, पात्रो प्रणाली, समय क्षेत्र, हप्ता सुरु हुने दिन) शैक्षिक वर्ष सक्रिय हुँदा पढ्ने मात्र हुन्छन्, जसले प्रतिवेदन, इनभ्वाइस, र अडिट ट्रेलमा एकरूपता जोगाउँछ। प्रदर्शन मात्रका फिल्डहरू सधैं सम्पादनयोग्य रहन्छन्।",
+      "tooltipMultiple": "{{count}} सक्रिय शैक्षिक वर्षहरू विद्यालयहरूमा",
+      "howItWorksTitle": "लक कसरी काम गर्छ",
+      "tenantInfoLabel": "टेनेन्ट जानकारी",
+      "tenantInfoDescription": "माथिका फिल्डहरू स्थायी रूपमा लक हुन्छन् — प्रोभिजनिङमा एकपटक सेट गरिन्छ।",
+      "dataIntegrityLabel": "क्षेत्रीय सेटिङ्हरू — डाटा-अखंडता फिल्डहरू",
+      "dataIntegrityDescription": "(मुद्रा, पात्रो प्रणाली, समय क्षेत्र, हप्ता सुरु हुने दिन) कुनै शैक्षिक वर्ष सक्रिय हुँदा स्वतः लक हुन्छन्।",
+      "displayOnlyLabel": "क्षेत्रीय सेटिङ्हरू — प्रदर्शन मात्रका फिल्डहरू",
+      "displayOnlyDescription": "(भाषा, मिति/समय ढाँचा, अङ्क ढाँचा, बिक्रम सम्बत् टगल) सधैं सम्पादनयोग्य रहन्छन् — परिवर्तनले भण्डारण गरिएको डाटा नछोई प्रदर्शन मात्र फेरि रेन्डर गर्छ।",
+      "brandingPoliciesLabel": "ब्रान्डिङ र नीतिहरू",
+      "brandingPoliciesDescription": "(छिट्टै आउँदै) शैक्षिक वर्षको अवस्थाबाट स्वतन्त्र रूपमा सधैं सम्पादनयोग्य रहन्छन्।",
+      "schoolOverrideNote": "विद्यालयहरूले यी पूर्वनिर्धारितहरूलाई आफ्नो School Configuration मा ओभरराइड गर्न सक्छन्।"
+    },
+    "permissions": {
+      "title": "अनुमतिहरू",
+      "prefix": "यी सेटिङ्हरू परिमार्जन गर्न",
+      "suffix": "भूमिका भएका प्रयोगकर्ताले मात्र सक्छन्। प्रत्येक परिवर्तन तपाईंको प्रयोगकर्ता ID र समय-मोहरसहित अडिट-लग हुन्छ।"
+    },
     "governanceProfile": {
       "title": "शासन प्रोफाइल",
       "subtitle": "तपाईंको शासन निकायले लक गर्ने क्षेत्रीय पूर्वनिर्धारितहरू। प्रोभिजनिङमा सेट गरिएको, सम्पूर्ण टेनेन्टमा लागू।",
@@ -98,6 +272,764 @@
         "gregorian": "ग्रेगोरियन",
         "bikram_sambat": "विक्रम सम्बत् (बि.सं.)"
       }
+    }
+  },
+  "common": {
+    "cancel": "रद्द गर्नुहोस्",
+    "change": "परिवर्तन गर्नुहोस्",
+    "create": "सिर्जना गर्नुहोस्",
+    "delete": "हटाउनुहोस्",
+    "edit": "सम्पादन",
+    "retry": "फेरि प्रयास गर्नुहोस्",
+    "save": "सेभ गर्नुहोस्",
+    "close": "बन्द गर्नुहोस्",
+    "update": "अपडेट गर्नुहोस्",
+    "tryAgain": "फेरि प्रयास गर्नुहोस्",
+    "saveChanges": "परिवर्तनहरू सेभ गर्नुहोस्",
+    "optional": "वैकल्पिक"
+  },
+  "schoolRooms": {
+    "title": "कोठा र स्थानहरू",
+    "summary": "{{count}} कोठा · {{active}} सक्रिय",
+    "summary_plural": "{{count}} कोठाहरू · {{active}} सक्रिय",
+    "actions": {
+      "add": "कोठा थप्नुहोस्"
+    },
+    "types": {
+      "classroom": "कक्षा कोठा",
+      "lab": "ल्याब",
+      "gym": "जिम्नेसियम",
+      "auditorium": "अडिटोरियम",
+      "library": "पुस्तकालय",
+      "office": "कार्यालय",
+      "other": "अन्य"
+    },
+    "searchPlaceholder": "कोठा खोज्नुहोस्...",
+    "capacitySeats": "{{count}} सीट",
+    "capacitySeats_plural": "{{count}} सीटहरू",
+    "status": {
+      "active": "सक्रिय",
+      "inactive": "निष्क्रिय"
+    },
+    "table": {
+      "room": "कोठा",
+      "building": "भवन",
+      "type": "प्रकार",
+      "floor": "तला",
+      "capacity": "क्षमता",
+      "status": "स्थिति",
+      "actions": "कार्यहरू"
+    },
+    "empty": {
+      "title": "कोठा कन्फिगर गरिएको छैन",
+      "description": "तालिकाका लागि भौतिक कोठा र स्थानहरू थप्नुहोस्।",
+      "noMatches": "\"{{query}}\" सँग मिल्ने कोठा छैन"
+    },
+    "drawer": {
+      "addTitle": "कोठा थप्नुहोस्",
+      "editTitle": "कोठा सम्पादन गर्नुहोस्",
+      "addDescription": "नयाँ कोठा वा स्थान थप्नुहोस्",
+      "editDescription": "कोठाको विवरण अपडेट गर्नुहोस्"
+    },
+    "form": {
+      "roomNumber": "कोठा नम्बर",
+      "roomNumberPlaceholder": "जस्तै, 101, A-205",
+      "buildingName": "भवनको नाम",
+      "buildingPlaceholder": "जस्तै, मुख्य भवन",
+      "floor": "तला",
+      "floorPlaceholder": "जस्तै, 1",
+      "capacity": "क्षमता",
+      "capacityPlaceholder": "जस्तै, 30",
+      "roomType": "कोठाको प्रकार",
+      "active": "सक्रिय (तालिकाका लागि उपलब्ध)",
+      "description": "विवरण",
+      "descriptionPlaceholder": "वैकल्पिक नोटहरू"
+    },
+    "validation": {
+      "roomNumberRequired": "कोठा नम्बर आवश्यक छ"
+    },
+    "delete": {
+      "title": "कोठा हटाउनुहोस्",
+      "description": "के तपाईं निश्चित हुनुहुन्छ? यो कोठामा तोकिएका सेक्सनहरूको स्थान हट्नेछ।"
+    }
+  },
+  "schoolDepartments": {
+    "title": "विभागहरू",
+    "description": "शैक्षिक र प्रशासनिक विभागहरू व्यवस्थापन गर्नुहोस्",
+    "searchPlaceholder": "विभाग खोज्नुहोस्...",
+    "scope": {
+      "organization": "संगठन",
+      "school": "विद्यालय"
+    },
+    "actions": {
+      "add": "विभाग थप्नुहोस्",
+      "create": "विभाग सिर्जना गर्नुहोस्",
+      "edit": "विभाग सम्पादन गर्नुहोस्",
+      "delete": "विभाग हटाउनुहोस्",
+      "deleteSelected": "चयन गरिएका हटाउनुहोस्"
+    },
+    "table": {
+      "code": "कोड",
+      "name": "नाम",
+      "scope": "स्कोप",
+      "departmentHead": "विभाग प्रमुख"
+    },
+    "form": {
+      "createTitle": "विभाग सिर्जना गर्नुहोस्",
+      "editTitle": "विभाग सम्पादन गर्नुहोस्",
+      "createDescription": "यस विद्यालयमा नयाँ विभाग थप्नुहोस्",
+      "editDescription": "विभाग विवरण अपडेट गर्नुहोस्",
+      "name": "विभागको नाम",
+      "namePlaceholder": "जस्तै, Science",
+      "code": "कोड",
+      "codePlaceholder": "जस्तै, SCI",
+      "codeHint": "२-१० अक्षर। सिर्जना भएपछि परिवर्तन गर्न सकिँदैन।",
+      "description": "विवरण",
+      "descriptionPlaceholder": "विभागको छोटो विवरण"
+    },
+    "empty": {
+      "title": "विभाग भेटिएन",
+      "noMatches": "\"{{query}}\" सँग मिल्ने विभाग छैन",
+      "description": "विद्यालय व्यवस्थित गर्न पहिलो विभाग सिर्जना गर्नुहोस्",
+      "adjustSearch": "खोज वा फिल्टर परिवर्तन गरेर हेर्नुहोस्"
+    },
+    "delete": {
+      "title": "विभाग हटाउनुहोस्",
+      "descriptionPrefix": "के तपाईं हटाउन निश्चित हुनुहुन्छ",
+      "descriptionSuffix": "यो कार्य फिर्ता गर्न सकिँदैन।"
+    },
+    "bulkDelete": {
+      "title": "{{count}} विभाग हटाउनुहोस्",
+      "title_plural": "{{count}} विभागहरू हटाउनुहोस्",
+      "description": "तपाईं तलका विभागहरू स्थायी रूपमा हटाउन लाग्दै हुनुहुन्छ। यो फिर्ता गर्न सकिँदैन।",
+      "confirm": "{{count}} हटाउनुहोस्",
+      "success": "{{count}} विभाग हटाइयो",
+      "success_plural": "{{count}} विभागहरू हटाइयो",
+      "partial": "{{deleted}} हटाइयो; {{failed}} असफल"
+    }
+  },
+  "schoolDetail": {
+    "schoolFallback": "विद्यालय",
+    "notFound": "विद्यालय भेटिएन वा लोड गर्न सकिएन।",
+    "status": {
+      "setup": "सेटअप मोड",
+      "active": "सक्रिय",
+      "inactive": "निष्क्रिय",
+      "suspended": "निलम्बित",
+      "closed": "बन्द"
+    },
+    "statusActions": {
+      "activate": "विद्यालय सक्रिय गर्नुहोस्",
+      "suspend": "विद्यालय निलम्बन गर्नुहोस्",
+      "deactivate": "विद्यालय निष्क्रिय गर्नुहोस्",
+      "reactivate": "विद्यालय पुनः सक्रिय गर्नुहोस्"
+    },
+    "tabs": {
+      "ariaLabel": "विद्यालय विवरण खण्डहरू",
+      "configuration": "कन्फिगरेसन",
+      "academicSetup": "शैक्षिक सेटअप",
+      "attendance": "उपस्थिति",
+      "structure": "संरचना",
+      "gradeLevels": "कक्षा तहहरू",
+      "auditLog": "अडिट लग",
+      "pending": "{{count}} बाँकी"
+    },
+    "setupBanner": {
+      "title": "सक्रिय गर्नु अघि विद्यालय सेटअप पूरा गर्नुहोस्",
+      "description": "उपस्थिति, ग्रेड, र तालिका सही रूपमा ट्र्याक गर्न EdForge लाई विद्यालयको शैक्षिक संरचना चाहिन्छ।",
+      "progress": "{{completed}} मध्ये {{total}} सेटअप कार्य पूरा",
+      "activate": "✓ विद्यालय सक्रिय गर्नुहोस्"
+    },
+    "delete": {
+      "title": "विद्यालय हटाउनुहोस्",
+      "setupPrefix": "यसले",
+      "permanentlyRemove": "स्थायी रूपमा हटाउँछ",
+      "setupSuffix": "विद्यालय र सबै सम्बन्धित डाटा। यो फिर्ता गर्न सकिँदैन।",
+      "setupBullet": "विद्यालय इकाई र कन्फिगरेसन स्थायी रूपमा हटाइनेछ",
+      "activePrefix": "यसले",
+      "deactivateWord": "निष्क्रिय गर्छ",
+      "activeSuffix": "विद्यालयलाई। प्रशासकले पछि फेरि सक्रिय गर्न सक्छ।",
+      "inactiveBullet": "विद्यालय निष्क्रिय स्थितिमा सेट हुनेछ",
+      "operationsBullet": "शैक्षिक सञ्चालन निलम्बित हुनेछ",
+      "reactivateBullet": "विद्यालय विवरण पृष्ठबाट फेरि सक्रिय गर्न सकिन्छ",
+      "confirmTypePrefix": "पुष्टि गर्न",
+      "confirmTypeSuffix": "टाइप गर्नुहोस्"
+    },
+    "accessDenied": {
+      "title": "पहुँच अस्वीकृत",
+      "message": "तपाईंसँग यस विद्यालयको सेटिङ्हरू हेर्ने अनुमति छैन।"
+    },
+    "toasts": {
+      "deleted": "विद्यालय सफलतापूर्वक हटाइयो",
+      "deleteFailed": "विद्यालय हटाउन असफल भयो",
+      "activated": "विद्यालय सफलतापूर्वक सक्रिय भयो",
+      "statusUpdated": "विद्यालय स्थिति {{status}} मा अपडेट भयो",
+      "statusFailed": "विद्यालय स्थिति अपडेट गर्न असफल भयो"
+    }
+  },
+  "schoolConfiguration": {
+    "lockedTooltip": "सक्रिय शैक्षिक वर्षमा लक गरिएको",
+    "lockBanner": {
+      "title": "सक्रिय शैक्षिक वर्ष",
+      "description": "शैक्षिक वर्ष सक्रिय हुँदा केही सेटिङ्हरू लक हुन्छन्। तालिका, टर्म संरचना, र ग्रेडिङ फिल्डहरू हालको शैक्षिक वर्ष पूरा वा अभिलेख नभएसम्म परिवर्तन गर्न सकिँदैन।"
+    },
+    "toasts": {
+      "saved": "कन्फिगरेसन सफलतापूर्वक सेभ भयो",
+      "saveFailed": "परिवर्तनहरू सेभ गर्न असफल भयो"
+    },
+    "sections": {
+      "identity": {
+        "title": "विद्यालय पहिचान",
+        "description": "आधारभूत विद्यालय जानकारी"
+      },
+      "location": {
+        "title": "स्थान र सम्पर्क",
+        "description": "भौतिक ठेगाना र सम्पर्क जानकारी"
+      },
+      "schedule": {
+        "title": "तालिका र सञ्चालन",
+        "description": "विद्यालय दिन र सञ्चालन समय"
+      },
+      "academic": {
+        "title": "शैक्षिक सेटिङ्हरू",
+        "description": "ग्रेडिङ र टर्म संरचना"
+      },
+      "features": {
+        "title": "सक्षम सुविधाहरू",
+        "description": "यस विद्यालयका लागि कुन मोड्युल सक्रिय छन् नियन्त्रण गर्नुहोस्"
+      },
+      "notifications": {
+        "title": "सूचनाहरू",
+        "description": "सूचनाहरू कसरी पठाउने कन्फिगर गर्नुहोस्"
+      },
+      "attendance": {
+        "title": "उपस्थिति सेटिङ्हरू",
+        "description": "उपस्थिति ट्र्याकिङ कन्फिगरेसन"
+      }
+    },
+    "fields": {
+      "displayName": {
+        "label": "प्रदर्शन नाम",
+        "description": "विद्यालयको पूरा नाम"
+      },
+      "schoolType": {
+        "label": "विद्यालय प्रकार",
+        "description": "शिक्षाको तह"
+      },
+      "website": {
+        "label": "वेबसाइट",
+        "description": "विद्यालयको सार्वजनिक वेबसाइट",
+        "placeholder": "https://www.school.edu"
+      },
+      "selectField": "{{field}} छान्नुहोस्",
+      "phoneEmail": {
+        "label": "फोन र इमेल",
+        "phonePlaceholder": "फोन नम्बर",
+        "emailPlaceholder": "इमेल ठेगाना"
+      },
+      "schoolDays": {
+        "label": "विद्यालय दिनहरू",
+        "description": "विद्यालय सञ्चालन हुने दिनहरू"
+      },
+      "schoolHours": {
+        "label": "विद्यालय समय",
+        "description": "दैनिक सुरु र अन्त्य समय"
+      },
+      "periodDuration": {
+        "label": "पीरियड अवधि",
+        "description": "प्रत्येक कक्षा पीरियडको लम्बाइ",
+        "unit": "मिनेट"
+      },
+      "termStructure": {
+        "label": "टर्म संरचना",
+        "description": "शैक्षिक वर्ष कसरी विभाजन हुन्छ"
+      },
+      "gradingScale": {
+        "label": "ग्रेडिङ स्केल",
+        "description": "ग्रेडिङ नीतिहरू Grades & Assessments मोड्युलमा व्यवस्थापन हुन्छन्",
+        "help": "ग्रेडिङ स्केल, श्रेणी तौल, र गणना नियमहरू Grades & Assessments मोड्युलको Grading Policies मार्फत कन्फिगर गरिन्छ।",
+        "action": "ग्रेडिङ नीतिहरू व्यवस्थापन गर्नुहोस्"
+      },
+      "notificationsEnabled": {
+        "label": "सूचनाहरू सक्षम गर्नुहोस्",
+        "description": "सबै सूचनाका लागि मुख्य टगल"
+      },
+      "emailNotifications": {
+        "label": "इमेल सूचनाहरू",
+        "description": "इमेलमार्फत सूचनाहरू पठाउनुहोस्"
+      },
+      "smsNotifications": {
+        "label": "SMS सूचनाहरू",
+        "description": "टेक्स्ट सन्देशमार्फत सूचनाहरू पठाउनुहोस्"
+      },
+      "attendanceRequired": {
+        "label": "उपस्थिति आवश्यक",
+        "description": "यस विद्यालयका लागि उपस्थिति ट्र्याकिङ अनिवार्य हो?"
+      }
+    },
+    "schoolTypes": {
+      "elementary": "प्राथमिक विद्यालय",
+      "middle": "मिडल विद्यालय",
+      "high": "माध्यमिक विद्यालय",
+      "k12": "कक्षा K-12 विद्यालय",
+      "charter": "चार्टर विद्यालय",
+      "private": "निजी विद्यालय",
+      "vocational": "व्यावसायिक विद्यालय",
+      "special_education": "विशेष शिक्षा"
+    },
+    "termStructures": {
+      "semester": "सेमेस्टर (२ टर्म)",
+      "trimester": "ट्राइमेस्टर (३ टर्म)",
+      "quarter": "क्वार्टर (४ टर्म)",
+      "year": "पूरा वर्ष (१ टर्म)"
+    },
+    "inheritance": {
+      "title": "कार्यक्षेत्रबाट प्राप्त:",
+      "description": "केही सेटिङ्हरू तपाईंको संगठनको कार्यक्षेत्र सेटिङ्हरूबाट प्राप्त हुन्छन्। यहाँका परिवर्तनहरूले यो विद्यालयका लागि मात्र कार्यक्षेत्र पूर्वनिर्धारितहरू ओभरराइड गर्छन्।"
+    }
+  },
+  "schoolCalendar": {
+    "title": "विद्यालय पात्रो",
+    "subtitle": "{{year}} पात्रो व्यवस्थापन",
+    "academicYearFallback": "शैक्षिक वर्ष",
+    "noAcademicYear": "शैक्षिक वर्ष भेटिएन। कृपया पहिले Academic Years ट्याबमा शैक्षिक वर्ष सिर्जना गर्नुहोस्।",
+    "actions": {
+      "sessions": "सत्रहरू",
+      "generate": "उत्पन्न गर्नुहोस्"
+    },
+    "toasts": {
+      "generated": "{{totalDays}} दिन उत्पन्न भयो ({{instructionalDays}} शिक्षण)"
+    },
+    "noSchedule": {
+      "label": "तालिका छैन",
+      "description": "बेल तालिका तोकिएको छैन"
+    },
+    "labels": {
+      "calendarDate": "पात्रो मिति",
+      "weekend": "साप्ताहिक बिदा",
+      "holiday": "बिदा",
+      "instructionalDay": "शिक्षण दिन",
+      "nonInstructional": "गैर-शिक्षण"
+    },
+    "stats": {
+      "daysElapsed": "{{total}} मध्ये {{passed}} दिन बित्यो",
+      "totalDays": "{{count}} कुल दिन",
+      "instructionalDays": "शिक्षण दिनहरू",
+      "instructionalProgress": "{{completed}} पूरा, {{remaining}} बाँकी",
+      "holidays": "बिदाहरू",
+      "noHolidays": "बिदा तालिकाबद्ध छैन",
+      "scheduledHolidays": "तालिकाबद्ध बिदाहरू",
+      "nonInstructional": "गैर-शिक्षण",
+      "teacherOnlyDays": "{{count}} शिक्षक-मात्र दिन समावेश"
+    },
+    "drawer": {
+      "weekendHolidayOverlap": "{{holiday}} यो {{day}} मा परेको छ — बिदा होइन, साप्ताहिक बिदाका रूपमा गणना हुन्छ",
+      "dayNumber": "दिन {{day}}",
+      "instructionalDayNumber": "शिक्षण दिन #{{day}}",
+      "bellScheduleValue": "बेल तालिका: {{schedule}}",
+      "eventType": "घटना प्रकार",
+      "otherAdvanced": "अन्य (उन्नत)…",
+      "rawEventType": "कच्चा घटना प्रकार",
+      "selectPlaceholder": "छान्नुहोस्...",
+      "description": "विवरण",
+      "descriptionPlaceholder": "वैकल्पिक विवरण (जस्तै, दशैं बिदा)",
+      "bellSchedule": "बेल तालिका",
+      "assignBellSchedule": "बेल तालिका तोक्नुहोस्..."
+    },
+    "generate": {
+      "title": "पात्रो उत्पन्न गर्नुहोस्",
+      "subtitle": "{{year}} का लागि मितिहरू स्वतः उत्पन्न गर्नुहोस्",
+      "dateRangePrefix": "यसले पात्रो मितिहरू उत्पन्न गर्नेछ",
+      "dateRangeMiddle": "देखि",
+      "instructionalNote": "कार्यदिनहरू शिक्षण दिनका रूपमा चिन्हित हुनेछन्। साप्ताहिक बिदाहरू स्वतः चिन्हित हुनेछन्।",
+      "replaceWarning": "यस वर्षका विद्यमान मितिहरू प्रतिस्थापन हुनेछन्।"
+    },
+    "sessions": {
+      "title": "शैक्षिक सत्रहरू",
+      "description": "{{year}} का सेमेस्टर र टर्महरू",
+      "thisYear": "यस वर्ष"
+    },
+    "filters": {
+      "all": "सबै",
+      "none": "कुनै पनि होइन"
+    }
+  },
+  "academicSetup": {
+    "navigation": {
+      "title": "सेटअप चरणहरू",
+      "description": "यी चरणहरू क्रमैसँग पूरा गर्नुहोस्। प्रत्येक चरण अघिल्लो चरणमा आधारित हुन्छ — सत्र सेटअप गर्नुअघि शैक्षिक वर्ष, र पात्रो बनाउनुअघि सत्र चाहिन्छ।"
+    },
+    "steps": {
+      "years": "शैक्षिक वर्षहरू",
+      "sessions": "सत्र र टर्महरू",
+      "calendar": "पात्रो",
+      "bellSchedule": "बेल तालिका"
+    },
+    "fields": {
+      "startDate": "सुरु मिति",
+      "endDate": "अन्त्य मिति",
+      "yearName": "वर्षको नाम",
+      "sessionName": "सत्रको नाम",
+      "termDescriptor": "टर्म विवरण",
+      "beginDate": "सुरु मिति"
+    },
+    "actions": {
+      "creating": "सिर्जना हुँदै...",
+      "saving": "सेभ हुँदै...",
+      "activating": "सक्रिय हुँदै...",
+      "applying": "लागू हुँदै…",
+      "generating": "बन्दै...",
+      "createAcademicYear": "शैक्षिक वर्ष सिर्जना गर्नुहोस्",
+      "newAcademicYear": "नयाँ शैक्षिक वर्ष",
+      "activateYear": "वर्ष सक्रिय गर्नुहोस्",
+      "activate": "सक्रिय गर्नुहोस्",
+      "setAsCurrent": "हालको बनाउनुहोस्",
+      "addSession": "सत्र थप्नुहोस्",
+      "applyTemplate": "टेम्प्लेट लागू गर्नुहोस्",
+      "createSession": "सत्र सिर्जना गर्नुहोस्",
+      "use": "प्रयोग गर्नुहोस्"
+    },
+    "toasts": {
+      "currentSet": "शैक्षिक वर्ष हालको रूपमा सेट भयो",
+      "currentSetFailed": "शैक्षिक वर्ष हालको बनाउन असफल भयो",
+      "missingYearId": "वर्ष अपडेट गर्न सकिएन: yearId छैन"
+    },
+    "confirmCurrent": {
+      "replacing": "\"{{year}}\" लाई हालको शैक्षिक वर्ष बनाउने? \"{{current}}\" अब हालको रूपमा चिनिने छैन।",
+      "default": "\"{{year}}\" लाई हालको शैक्षिक वर्ष बनाउने? ड्यासबोर्ड, हाजिरी, र ग्रेड यस वर्षमा आधारित हुनेछन्।"
+    },
+    "status": {
+      "planning": "योजना",
+      "active": "सक्रिय",
+      "completed": "अभिलेखित"
+    },
+    "badges": {
+      "current": "हालको",
+      "notCurrent": "हालको होइन"
+    },
+    "yearModal": {
+      "createTitle": "शैक्षिक वर्ष सिर्जना गर्नुहोस्",
+      "editTitle": "शैक्षिक वर्ष सम्पादन गर्नुहोस्",
+      "viewTitle": "शैक्षिक वर्ष हेर्नुहोस्",
+      "bsPlaceholder": "जस्तै, २०८२-२०८३",
+      "adPlaceholder": "जस्तै, 2025-2026",
+      "planningNoticePrefix": "शैक्षिक वर्ष सत्र बिना \"योजना\" अवस्थामा सिर्जना हुनेछ। अर्को चरण",
+      "planningNoticeSuffix": "खोलेर टर्महरू परिभाषित गर्नुहोस् — टेम्प्लेट छान्नुहोस् वा छुट्टाछुट्टै बनाउनुहोस्, त्यसपछि वर्ष सक्रिय गर्नुहोस्।",
+      "lockedNotice": "यो शैक्षिक वर्ष {{status}} छ र परिवर्तन गर्न सकिँदैन। डाटा अखण्डता कायम राख्न मितिहरू लक छन्।",
+      "activationLocksNotice": "यो वर्ष सक्रिय भएपछि मितिहरू लक हुनेछन् र परिवर्तन गर्न सकिने छैन।"
+    },
+    "activate": {
+      "title": "शैक्षिक वर्ष सक्रिय गर्नुहोस्",
+      "intro": "तपाईं सक्रिय गर्न लाग्नुभएको छ",
+      "actionLeadIn": "यस कार्यले:",
+      "lockDates": "सुरु र अन्त्य मिति स्थायी रूपमा लक गर्नेछ",
+      "deactivateCurrent": "हाल सक्रिय कुनै पनि शैक्षिक वर्ष निष्क्रिय गर्नेछ",
+      "cannotReverse": "\"योजना\" अवस्थामा फर्काउन सकिने छैन"
+    },
+    "years": {
+      "title": "शैक्षिक वर्षहरू",
+      "description": "सबै शैक्षिक डाटाका समय सीमाहरू परिभाषित गर्नुहोस्।",
+      "driftTitle": "\"{{year}}\" सक्रिय छ तर कुनै वर्ष हालको रूपमा तोकिएको छैन।",
+      "driftDescription": "ड्यासबोर्ड, हाजिरी, र ग्रेडका लागि हालको वर्ष चाहिन्छ।",
+      "emptyTitle": "अहिलेसम्म कुनै शैक्षिक वर्ष छैन",
+      "emptyDescription": "विद्यालयको शैक्षिक संरचना सेटअप सुरु गर्न पहिलो शैक्षिक वर्ष सिर्जना गर्नुहोस्।",
+      "datesNotSet": "मितिहरू सेट गरिएको छैन",
+      "currentTooltip": "यो वर्षले ड्यासबोर्ड, हाजिरी, र ग्रेडलाई आधार दिन्छ।",
+      "notCurrentTooltip": "यो वर्ष सक्रिय छ तर हालको रूपमा तोकिएको छैन। सुधार गर्न 'हालको बनाउनुहोस्' प्रयोग गर्नुहोस्।",
+      "setCurrentTooltip": "हालको शैक्षिक वर्षको रूपमा तोक्नुहोस्",
+      "nextStep": "अर्को चरण: ग्रेडिङ अवधि परिभाषित गर्न यस शैक्षिक वर्षमा सत्रहरू (सेमेस्टर/ट्राइमेस्टर) थप्नुहोस्।",
+      "integrityNote": "शैक्षिक वर्षहरू सिर्जना भएपछि मेटाउन सकिँदैन। यसले ऐतिहासिक डाटा अखण्डता जोगाउँछ। पूरा भएका वर्षहरूलाई सक्रिय दृश्यबाट लुकाउन अभिलेखित गर्नुहोस्।"
+    },
+    "sessions": {
+      "title": "सत्र र टर्महरू",
+      "descriptionPrefix": "भित्र सेमेस्टर, ट्राइमेस्टर, वा क्वार्टर परिभाषित गर्नुहोस्",
+      "edfiPrefix": "सत्रहरूले ग्रेडिङ अवधि परिभाषित गर्छन् (जस्तै, \"पहिलो सेमेस्टर\", \"Q1\")। प्रत्येक सत्र Ed-Fi मा म्याप हुन्छ",
+      "edfiSuffix": "विद्यार्थीहरूले प्रत्येक सत्रका लागि रिपोर्ट कार्ड पाउँछन्।",
+      "templateApplied": "PABSON ४-टर्म टेम्प्लेट लागू भयो — ४ सत्र सिर्जना गरियो",
+      "templateApplyFailed": "टेम्प्लेट लागू गर्न असफल भयो",
+      "templateApplyStopped": "टेम्प्लेट लागू रोकियो: {{message}}",
+      "createFailed": "सत्र सिर्जना गर्न असफल भयो",
+      "pabsonTemplate": {
+        "title": "PABSON ४-टर्म टेम्प्लेट",
+        "description": "एक क्लिकले वि.सं. पात्रोसँग मिल्ने मानक PABSON ४-क्वार्टर संरचना बनाउँछ। पछि नाम वा मिति सम्पादन गर्न सकिन्छ। तपाईंको विद्यालयको फरक ताल भए यो छोड्नुहोस्।"
+      },
+      "cardTitle": "{{year}} सत्रहरू",
+      "configuredCount": "{{count}} सत्र कन्फिगर गरिएको",
+      "newSession": "नयाँ सत्र",
+      "sessionNamePlaceholder": "जस्तै, पहिलो सेमेस्टर",
+      "termDescriptorPlaceholder": "टर्म विवरण छान्नुहोस्...",
+      "emptyTitle": "अहिलेसम्म कुनै सत्र छैन",
+      "emptyDescription": "माथि पहिलो सत्र सिर्जना गर्नुहोस् — जस्तै, अप्रिलदेखि सेप्टेम्बरसम्म \"पहिलो सेमेस्टर\"। सत्रहरूले रिपोर्ट कार्ड कहिले बन्ने हो परिभाषित गर्छन्।",
+      "nepalSuggestionsTitle": "नेपालका विद्यालयका लागि सुझाव (सेमेस्टर प्रणाली):",
+      "firstSemester": "पहिलो सेमेस्टर",
+      "firstSemesterDetail": "बैशाख – आश्विन  (अप्रिल – अक्टोबर)",
+      "secondSemester": "दोस्रो सेमेस्टर",
+      "secondSemesterDetail": "कार्तिक – चैत्र  (अक्टोबर – मार्च)",
+      "sessionFallback": "सत्र"
+    },
+    "termDescriptors": {
+      "fall_semester": "फल सेमेस्टर",
+      "spring_semester": "स्प्रिङ सेमेस्टर",
+      "year_round": "पूरा वर्ष",
+      "summer": "समर",
+      "first_quarter": "पहिलो क्वार्टर",
+      "second_quarter": "दोस्रो क्वार्टर",
+      "third_quarter": "तेस्रो क्वार्टर",
+      "fourth_quarter": "चौथो क्वार्टर"
+    },
+    "examWindow": {
+      "saved": "परीक्षा अवधि सेभ भयो",
+      "savedWithWarnings": "परीक्षा अवधि {{count}} बिदा ओभरल्याप चेतावनीसहित सेभ भयो",
+      "saveFailed": "परीक्षा अवधि सेभ गर्न असफल भयो। फेरि प्रयास गर्नुहोस्।",
+      "notSet": "सेट गरिएको छैन",
+      "tooltip": "परीक्षा अवधि — पात्रोसँग स्वतः सिंक हुन्छ",
+      "summary": "परीक्षा: {{range}}",
+      "edit": "परीक्षा अवधि सम्पादन गर्नुहोस्",
+      "set": "परीक्षा अवधि सेट गर्नुहोस्",
+      "rangeHelp": "परीक्षा मितिहरू सत्रको मिति दायराभित्र हुनुपर्छ ({{start}} – {{end}})। सेभ गर्दा पात्रोमा सुन्तला परीक्षा-अवधि मार्कर स्वतः बन्छ।",
+      "startDate": "परीक्षा सुरु मिति",
+      "endDate": "परीक्षा अन्त्य मिति",
+      "saveDates": "परीक्षा मिति सेभ गर्नुहोस्",
+      "warningTitle": "ध्यान दिनुहोस् — यस परीक्षा अवधिमा {{count}} मिति बिदासँग ओभरल्याप हुन्छ:",
+      "warningTitle_plural": "ध्यान दिनुहोस् — यस परीक्षा अवधिमा {{count}} मितिहरू बिदासँग ओभरल्याप हुन्छन्:",
+      "warningDescription": "जस्तै छ सेभ गरियो। माथि मिति मिलाउनुहोस् वा बिदाबाहिर परीक्षा अवधि राखेर चेतावनी हटाउनुहोस्।"
+    },
+    "calendar": {
+      "resetTooltip": "पात्रो रिसेट गर्न Configuration → Danger Zone प्रयोग गर्नुहोस्",
+      "generated": "पात्रो बन्यो · {{count}} दिन",
+      "scheduledCount": "{{count}} अनुसूचित",
+      "generateDescription": "विद्यालयको स्थानीय सेटिङ र तालिका कन्फिगरेसनको आधारमा यस शैक्षिक वर्षका शिक्षण र गैर-शिक्षण दिनहरू स्वतः बनाउनुहोस्।",
+      "detectedNepal": "पत्ता लागेको स्थानीयता: नेपाल (NP) · शनिबार बिदा · {{count}} सार्वजनिक बिदा लोड गरियो",
+      "detectedInternational": "पत्ता लागेको स्थानीयता: अन्तर्राष्ट्रिय · ग्रेगोरियन पात्रो",
+      "countryLocale": "देश / स्थानीयता",
+      "weekends": "साप्ताहिक बिदा",
+      "schoolDays": "विद्यालय दिनहरू",
+      "previewLabel": "पूर्वावलोकन:",
+      "previewRangePrefix": "मितिहरू बनाइनेछ",
+      "previewInstructional": "✓ सक्रिय दिनहरू → शिक्षण दिन",
+      "previewWeekends": "✓ साप्ताहिक बिदा → गैर-शिक्षण (साप्ताहिक बिदा)",
+      "previewHolidays": "✓ {{locale}} सार्वजनिक बिदा पात्रोबाट {{count}} राष्ट्रिय बिदा लागू हुनेछ",
+      "previewNoHolidayCalendar": "⚠ स्थानीय बिदा पात्रो उपलब्ध छैन — बनाइसकेपछि बिदा हातैले थप्न सकिन्छ",
+      "confirmIntro": "{{year}} का लागि पात्रो मितिहरू बनाइनेछ",
+      "confirmInstructional": "✓ सक्रिय दिनहरू शिक्षण दिनका रूपमा चिनिनेछन्",
+      "confirmWeekends": "✓ साप्ताहिक बिदा गैर-शिक्षण दिनका रूपमा चिनिनेछन्",
+      "confirmHolidays": "✓ {{count}} सार्वजनिक बिदा लागू हुनेछ",
+      "confirmSessionCounts": "✓ सत्रका शिक्षण दिन गणना स्वतः अपडेट हुनेछ",
+      "confirmGenerate": "पुष्टि गरी बनाउनुहोस्",
+      "dayTypes": "दिनका प्रकार:",
+      "localeNames": {
+        "nepal": "नेपाल",
+        "locale": "स्थानीय"
+      },
+      "localeOptions": {
+        "nepal": "नेपाल (NP)",
+        "unitedStates": "संयुक्त राज्य अमेरिका (US)",
+        "india": "भारत (IN)",
+        "custom": "अनुकूलन"
+      },
+      "weekendOptions": {
+        "saturday": "शनिबार मात्र (नेपाल पूर्वनिर्धारित)",
+        "saturdaySunday": "शनिबार र आइतबार",
+        "fridaySaturday": "शुक्रबार र शनिबार",
+        "sunday": "आइतबार मात्र"
+      }
+    },
+    "bellSchedule": {
+      "description": "प्रत्येक प्रकारको विद्यालय दिनका लागि कक्षा अवधि र समय खण्डहरू परिभाषित गर्नुहोस्।",
+      "useTemplate": "टेम्प्लेट प्रयोग गर्नुहोस्",
+      "collapse": "▲ बन्द गर्नुहोस्",
+      "expand": "▼ विस्तार गर्नुहोस्",
+      "scheduleNamePlaceholder": "जस्तै, \"Regular Day\", \"Early Release\"",
+      "createHint": "खाली तालिका सिर्जना गरेर त्यसमा अवधि थप्नुहोस्। वा माथिको टेम्प्लेट प्रयोग गरी तयार अवधिबाट सुरु गर्नुहोस्।",
+      "createSchedule": "तालिका सिर्जना गर्नुहोस्",
+      "templateHint": "तयार तालिकाहरू — लागू गरेपछि सम्पादन गर्नुहोस्",
+      "applied": "✓ लागू भयो",
+      "noDefaultTitle": "प्रयोगयोग्य पूर्वनिर्धारित बेल तालिका छैन।",
+      "noDefaultDescription": "वास्तविक (बहु-अवधि) तालिका विद्यालयको पूर्वनिर्धारित नभएसम्म सक्रियता अस्वीकार हुनेछ। प्रयोग गर्नुहोस्",
+      "placeholderTooltip": "यो पूर्वनिर्धारित तालिकामा एक मात्र अवधि छ। शैक्षिक वर्ष सक्रिय गर्नुअघि वास्तविक तालिका सेट गर्नुहोस्।",
+      "placeholderChip": "प्लेसहोल्डर — AY सक्रिय गर्नुअघि वास्तविक तालिका सेट गर्नुहोस्",
+      "emptyTitle": "अहिलेसम्म बेल तालिका छैन",
+      "emptyDescription": "माथिको टेम्प्लेट लागू गर्नुहोस् वा प्रत्येक प्रकारको विद्यालय दिन कसरी संरचित हुन्छ परिभाषित गर्न पहिलो तालिका सिर्जना गर्नुहोस्।",
+      "createFirstSchedule": "+ पहिलो तालिका सिर्जना गर्नुहोस्",
+      "templates": {
+        "nepal": {
+          "name": "नेपाल मानक (आइत–शुक्र)",
+          "description": "९ अवधि · बिहान १०:०० – दिउँसो ३:४५ · सभा, खाजा, विश्राम सहित"
+        },
+        "nepalExam": {
+          "name": "PABSON परीक्षा दिन",
+          "description": "२ परीक्षा ब्लक · बिहान १०:०० – अपराह्न ४:०० · बिहान र दिउँसो परीक्षा"
+        },
+        "elementary": {
+          "name": "Elementary Schedule (US)",
+          "description": "९ अवधि · बिहान ८:०० – दिउँसो २:०० · होमरूम, विश्राम, खाजा सहित"
+        },
+        "highSchool": {
+          "name": "High School Schedule (US)",
+          "description": "९ अवधि · बिहान ७:३० – दिउँसो ३:०५ · एड्भाइजरी र खाजा सहित"
+        }
+      }
+    }
+  },
+  "schoolBellSchedule": {
+    "title": "बेल तालिका",
+    "description": "प्रत्येक प्रकारको विद्यालय दिन कसरी संरचित हुन्छ परिभाषित गर्नुहोस्",
+    "actions": {
+      "startFromTemplate": "टेम्प्लेटबाट सुरु गर्नुहोस्",
+      "newSchedule": "नयाँ तालिका",
+      "addPeriod": "अवधि थप्नुहोस्",
+      "setAsDefault": "पूर्वनिर्धारित बनाउनुहोस्",
+      "createFromExisting": "अहिलेकोबाट सिर्जना गर्नुहोस्",
+      "addFirstPeriod": "पहिलो अवधि थप्नुहोस्",
+      "createFirstSchedule": "पहिलो तालिका सिर्जना गर्नुहोस्"
+    },
+    "validation": {
+      "periodNameRequired": "अवधिको नाम आवश्यक छ",
+      "endAfterStart": "अन्त्य समय सुरु समयपछि हुनुपर्छ",
+      "scheduleNameRequired": "तालिकाको नाम आवश्यक छ",
+      "effectiveDateRequired": "लागू मिति आवश्यक छ"
+    },
+    "toasts": {
+      "templateFailed": "टेम्प्लेट लागू गर्न असफल भयो",
+      "createdFromExisting": "अहिलेका अवधिबाट तालिका सिर्जना भयो"
+    },
+    "badges": {
+      "academic": "शैक्षिक",
+      "default": "पूर्वनिर्धारित",
+      "inactive": "निष्क्रिय"
+    },
+    "examples": {
+      "regularDay": "Regular Day"
+    },
+    "howItWorks": {
+      "title": "बेल तालिकाले कसरी काम गर्छ",
+      "scheduleEqualsDay": "बेल तालिका = पूरा दिन",
+      "periodsInsideSchedule": "= तालिकाभित्रका समय खण्डहरू (अवधि)",
+      "steps": {
+        "create": {
+          "label": "तालिका सिर्जना गर्नुहोस्",
+          "sub": "\"Regular Day\", \"Early Release\""
+        },
+        "periods": {
+          "label": "त्यसमा अवधि थप्नुहोस्",
+          "sub": "कक्षा समय, खाजा, होमरूम"
+        },
+        "calendar": {
+          "label": "पात्रोमा असाइन गर्नुहोस्",
+          "sub": "कुन दिनमा कुन तालिका प्रयोग हुन्छ"
+        }
+      }
+    },
+    "summary": {
+      "effective": "{{date}} देखि लागू",
+      "periodCount": "{{count}} अवधि",
+      "periodCount_plural": "{{count}} अवधिहरू",
+      "instructionalTime": "{{duration}} शिक्षण",
+      "otherTime": "{{duration}} अन्य"
+    },
+    "migration": {
+      "title": "तपाईंसँग {{count}} कक्षा अवधि छ",
+      "title_plural": "तपाईंसँग {{count}} कक्षा अवधिहरू छन्",
+      "description": "ती अवधिहरूलाई नाम भएको तालिकामा व्यवस्थित गर्न बेल तालिका सिर्जना गर्नुहोस् (जस्तै, Regular Day, Early Release)।"
+    },
+    "empty": {
+      "noPeriodsTitle": "अहिलेसम्म अवधि छैन",
+      "getStartedTitle": "बेल तालिकाबाट सुरु गर्नुहोस्",
+      "noPeriodsDescription": "\"{{schedule}}\" तालिकामा अझै समय खण्ड छैन। यस प्रकारको विद्यालय दिनमा कक्षा, खाजा, र गतिविधि कहिले हुन्छ परिभाषित गर्न अवधि थप्नुहोस्।",
+      "getStartedDescription": "बेल तालिकाले विद्यालय दिन कसरी संरचित हुन्छ परिभाषित गर्छ। तालिका सिर्जना गरेर सुरु गर्नुहोस् (जस्तै \"Regular Day\"), त्यसपछि अवधि थप्नुहोस् (जस्तै \"Period 1: 8:00–8:50\", \"Lunch: 11:30–12:00\")। फरक दिनका लागि धेरै तालिका बनाउन सकिन्छ।",
+      "selectScheduleDescription": "अवधि हेर्न र व्यवस्थापन गर्न माथिबाट तालिका छान्नुहोस्, वा नयाँ तालिका सिर्जना गर्नुहोस्।",
+      "tip": "सुझाव: धेरै विद्यालयमा होमरूम, कक्षा, खाजा, र पासिङ समय सहित ६–९ अवधि हुन्छन्।"
+    },
+    "list": {
+      "gap": "{{minutes}} मिनेट अन्तर",
+      "duration": "{{minutes}} मिनेट"
+    },
+    "periodForm": {
+      "editTitle": "अवधि सम्पादन गर्नुहोस्",
+      "addTitle": "अवधि थप्नुहोस्",
+      "editInSchedule": "\"{{schedule}}\" मा समय खण्ड सम्पादन गर्नुहोस्।",
+      "addInSchedule": "\"{{schedule}}\" मा समय खण्ड थप्नुहोस्।",
+      "editStandalone": "कक्षा अवधिको समय खण्ड सम्पादन गर्नुहोस्।",
+      "addStandalone": "कक्षा अवधिको समय खण्ड थप्नुहोस्।",
+      "periodName": "अवधिको नाम",
+      "periodNamePlaceholder": "जस्तै, Period 1, Homeroom, Lunch",
+      "startTime": "सुरु समय",
+      "endTime": "अन्त्य समय",
+      "durationPreview": "अवधि: {{minutes}} मिनेट",
+      "periodType": "अवधि प्रकार",
+      "periodTypePlaceholder": "अवधि प्रकार छान्नुहोस्",
+      "sortOrder": "क्रम",
+      "academic": "शैक्षिक (शिक्षण घण्टामा गणना हुन्छ)",
+      "description": "विवरण",
+      "descriptionPlaceholder": "वैकल्पिक विवरण",
+      "whatIsPeriodTitle": "अवधि के हो?",
+      "whatIsPeriodPrefix": "अवधि भनेको",
+      "singleTimeSlot": "एक समय खण्ड",
+      "whatIsPeriodSuffix": "हो जुन बेल तालिकाभित्र हुन्छ — विद्यालय दिनको एक ब्लक। \"शैक्षिक\" अवधिहरू (कक्षा, ल्याब) आवश्यक शिक्षण घण्टामा गणना हुन्छन्। गैर-शैक्षिक अवधिहरू (खाजा, विश्राम, पासिङ समय) गणना हुँदैनन्।"
+    },
+    "templates": {
+      "title": "टेम्प्लेटबाट सुरु गर्नुहोस्",
+      "existingWarning": "यसले अहिलेका तालिकासँगै नयाँ बेल तालिका सिर्जना गर्नेछ।",
+      "elementary": {
+        "title": "प्राथमिक तालिका",
+        "description": "९ अवधि · बिहान ८:०० - दिउँसो २:०० · होमरूम, विश्राम, खाजा सहित"
+      },
+      "highSchool": {
+        "title": "माध्यमिक तालिका",
+        "description": "९ अवधि · बिहान ७:३० - दिउँसो ३:०५ · एड्भाइजरी र खाजा सहित"
+      }
+    },
+    "deletePeriod": {
+      "title": "अवधि मेटाउनुहोस्",
+      "scheduleDescription": "के तपाईं यो अवधि तालिकाबाट हटाउन चाहनुहुन्छ?",
+      "standaloneDescription": "के तपाईं यो कक्षा अवधि मेटाउन चाहनुहुन्छ? यसलाई प्रयोग गर्ने सेक्सनहरूले अवधि असाइनमेन्ट गुमाउनेछन्।"
+    },
+    "scheduleForm": {
+      "editTitle": "तालिका सम्पादन गर्नुहोस्",
+      "newTitle": "नयाँ बेल तालिका",
+      "editDescription": "यस तालिकाका सेटिङ अपडेट गर्नुहोस्।",
+      "newDescription": "विद्यालय दिनको प्रकारलाई नाम दिनुहोस्, त्यसपछि अवधि थप्नुहोस्।",
+      "scheduleName": "तालिकाको नाम",
+      "scheduleNamePlaceholder": "जस्तै, Regular Day",
+      "dayType": "दिनको प्रकार",
+      "dayTypePlaceholder": "दिनको प्रकार छान्नुहोस्",
+      "alternateDayName": "वैकल्पिक दिनको नाम",
+      "alternateDayNamePlaceholder": "जस्तै, A Day, B Day",
+      "effectiveDate": "लागू मिति",
+      "endDate": "अन्त्य मिति",
+      "setAsDefault": "पूर्वनिर्धारित तालिका बनाउनुहोस्",
+      "description": "विवरण",
+      "descriptionPlaceholder": "वैकल्पिक विवरण",
+      "whatIsScheduleTitle": "बेल तालिका के हो?",
+      "whatIsSchedulePrefix": "बेल तालिका विद्यालयको",
+      "dailyTimetable": "दैनिक समयतालिका",
+      "whatIsScheduleSuffix": "हो जुन दिनको प्रकारका लागि हुन्छ। यसलाई बनाएपछि व्यक्तिगत समय खण्डहरू (अवधि) थपिन्छ:",
+      "exampleScheduleHint": "← यो बेल तालिका हो"
+    },
+    "deleteSchedule": {
+      "title": "तालिका मेटाउनुहोस्",
+      "description": "यसले बेल तालिका र यसका सबै अवधि कन्फिगरेसन हटाउनेछ। यस तालिकालाई प्रयोग गर्ने पात्रो मितिहरू फेरि असाइन गर्नुपर्नेछ।"
+    },
+    "periodTypes": {
+      "instructional": { "label": "शिक्षण", "description": "नियमित कक्षा अवधि" },
+      "homeroom": { "label": "होमरूम", "description": "बिहानी चेक-इन" },
+      "lunch": { "label": "खाजा", "description": "खाजा समय" },
+      "recess": { "label": "विश्राम", "description": "बाहिरी विश्राम" },
+      "passing": { "label": "पासिङ", "description": "कक्षाबीचको समय" },
+      "advisory": { "label": "एड्भाइजरी", "description": "विद्यार्थी परामर्श" },
+      "assembly": { "label": "सभा", "description": "विद्यालय सभा" },
+      "study_hall": { "label": "अध्ययन समय", "description": "निगरानीसहित अध्ययन" },
+      "extracurricular": { "label": "अतिरिक्त क्रियाकलाप", "description": "विद्यालयपछिको गतिविधि" },
+      "break": { "label": "ब्रेक", "description": "छोटो विश्राम" }
+    },
+    "dayTypes": {
+      "regular": { "label": "नियमित", "description": "मानक विद्यालय दिन" },
+      "early_release": { "label": "छिटो बिदा", "description": "छोटो अपराह्न" },
+      "late_start": { "label": "ढिलो सुरु", "description": "बिहान ढिलो सुरु" },
+      "assembly": { "label": "सभा", "description": "सभा तालिका" },
+      "testing": { "label": "परीक्षा", "description": "परीक्षा दिन तालिका" },
+      "half_day": { "label": "आधा दिन", "description": "आधा दिन तालिका" },
+      "special": { "label": "विशेष", "description": "विशेष तालिका" }
     }
   },
   "organization": {

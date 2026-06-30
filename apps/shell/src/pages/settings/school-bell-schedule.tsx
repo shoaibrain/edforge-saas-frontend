@@ -21,6 +21,7 @@ import {
   ChevronUp,
 } from 'lucide-react'
 import { toast } from 'sonner'
+import { useTranslation } from '@edforge/i18n'
 import { Button, Drawer, DrawerFooter, Dropdown } from '@edforge/ui'
 import type { DropdownOption } from '@edforge/ui'
 import {
@@ -411,6 +412,7 @@ interface SchoolBellSchedulePageProps {
 }
 
 export default function SchoolBellSchedulePage({ schoolId }: SchoolBellSchedulePageProps) {
+  const { t } = useTranslation('settings')
   const [showHowItWorks, setShowHowItWorks] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [editingPeriod, setEditingPeriod] = useState<DisplayPeriod | null>(null)
@@ -440,6 +442,24 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
   const standalonePeriods = periodsData?.items || []
   const bellSchedules = schedulesData?.items || []
   const selectedSchedule = bellSchedules.find(s => s.bellScheduleId === selectedScheduleId) || null
+  const periodTypeDropdownOptions = PERIOD_TYPE_DROPDOWN_OPTIONS.map((option) => ({
+    ...option,
+    label: t(`schoolBellSchedule.periodTypes.${option.id}.label`, { defaultValue: option.label }),
+    description: t(`schoolBellSchedule.periodTypes.${option.id}.description`, { defaultValue: option.description }),
+  }))
+  const dayTypeOptions = DAY_TYPE_OPTIONS.map((option) => ({
+    ...option,
+    label: t(`schoolBellSchedule.dayTypes.${option.id}.label`, { defaultValue: option.label }),
+    description: t(`schoolBellSchedule.dayTypes.${option.id}.description`, { defaultValue: option.description }),
+  }))
+  const getPeriodTypeLabel = (type: string) =>
+    t(`schoolBellSchedule.periodTypes.${type}.label`, {
+      defaultValue: PERIOD_TYPE_OPTIONS.find((option) => option.value === type)?.label || type,
+    })
+  const getDayTypeLabel = (type: string) =>
+    t(`schoolBellSchedule.dayTypes.${type}.label`, {
+      defaultValue: DAY_TYPE_OPTIONS.find((option) => option.id === type)?.label || type,
+    })
 
   // Unified display periods: from selected schedule or standalone
   const displayPeriods: DisplayPeriod[] = selectedSchedule
@@ -486,11 +506,11 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
   const handleSave = () => {
     // Validate
     if (!form.classPeriodName.trim()) {
-      toast.error('Period name is required')
+      toast.error(t('schoolBellSchedule.validation.periodNameRequired'))
       return
     }
     if (form.startTime >= form.endTime) {
-      toast.error('End time must be after start time')
+      toast.error(t('schoolBellSchedule.validation.endAfterStart'))
       return
     }
 
@@ -602,7 +622,7 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
         }
       )
     } catch {
-      toast.error('Failed to apply template')
+      toast.error(t('schoolBellSchedule.toasts.templateFailed'))
     } finally {
       setIsApplyingPreset(false)
     }
@@ -636,7 +656,7 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
           if (data?.bellScheduleId) {
             setSelectedScheduleId(data.bellScheduleId)
           }
-          toast.success('Created schedule from existing periods')
+          toast.success(t('schoolBellSchedule.toasts.createdFromExisting'))
         },
       }
     )
@@ -663,11 +683,11 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
 
   const handleScheduleSave = () => {
     if (!scheduleForm.bellScheduleName.trim()) {
-      toast.error('Schedule name is required')
+      toast.error(t('schoolBellSchedule.validation.scheduleNameRequired'))
       return
     }
     if (!scheduleForm.effectiveDate) {
-      toast.error('Effective date is required')
+      toast.error(t('schoolBellSchedule.validation.effectiveDateRequired'))
       return
     }
 
@@ -744,9 +764,9 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
             <Clock className="w-5 h-5 text-[rgb(var(--state-info-fg))]" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">Bell Schedule</h2>
+            <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">{t('schoolBellSchedule.title')}</h2>
             <p className="text-sm text-[rgb(var(--text-tertiary))]">
-              Define how each type of school day is structured
+              {t('schoolBellSchedule.description')}
             </p>
           </div>
         </div>
@@ -754,17 +774,17 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
         <div className="flex items-center gap-2">
           {bellSchedules.length === 0 && standalonePeriods.length === 0 && (
             <Button variant="outline" size="sm" onClick={() => setShowPresets(true)}>
-              Start from Template
+              {t('schoolBellSchedule.actions.startFromTemplate')}
             </Button>
           )}
           <Button variant="outline" size="sm" onClick={openScheduleCreate}>
             <Plus className="w-4 h-4 mr-1.5" />
-            New Schedule
+            {t('schoolBellSchedule.actions.newSchedule')}
           </Button>
           {(selectedSchedule || standalonePeriods.length > 0) && (
             <Button variant="outline" size="sm" onClick={openCreate}>
               <Plus className="w-4 h-4 mr-1.5" />
-              Add Period
+              {t('schoolBellSchedule.actions.addPeriod')}
             </Button>
           )}
         </div>
@@ -777,7 +797,7 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
           className="w-full flex items-center gap-2 px-4 py-2.5 text-left hover:bg-[rgb(var(--background-secondary))] transition-colors"
         >
           <Info className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] flex-shrink-0" />
-          <span className="text-sm font-medium text-[rgb(var(--text-secondary))] flex-1">How bell schedules work</span>
+          <span className="text-sm font-medium text-[rgb(var(--text-secondary))] flex-1">{t('schoolBellSchedule.howItWorks.title')}</span>
           {showHowItWorks
             ? <ChevronUp className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
             : <ChevronDown className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
@@ -797,8 +817,8 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
                 <div className="p-3 rounded-lg bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] text-xs font-mono text-[rgb(var(--text-tertiary))] leading-relaxed">
                   <div className="flex items-center gap-1.5 mb-2">
                     <CalendarDays className="w-3.5 h-3.5 text-[rgb(var(--action-secondary-fg))] flex-shrink-0" />
-                    <span className="text-xs font-sans font-medium text-[rgb(var(--text-primary))]">Regular Day</span>
-                    <span className="text-xs font-sans px-1.5 py-0.5 rounded bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--action-secondary-fg))]">bell schedule = the whole day</span>
+                    <span className="text-xs font-sans font-medium text-[rgb(var(--text-primary))]">{t('schoolBellSchedule.examples.regularDay')}</span>
+                    <span className="text-xs font-sans px-1.5 py-0.5 rounded bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--action-secondary-fg))]">{t('schoolBellSchedule.howItWorks.scheduleEqualsDay')}</span>
                   </div>
                   <div className="pl-4 border-l-2 border-[rgb(var(--border-focus)/0.35)] ml-1.5 space-y-0.5">
                     <div className="flex items-center gap-1.5">
@@ -808,12 +828,12 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
                     <div className="flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-[rgb(var(--action-primary-bg))] flex-shrink-0" />
                       <span>Period 1 &nbsp;&nbsp;&nbsp;8:15 – 9:00</span>
-                      <span className="text-xs font-sans px-1 rounded bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--action-secondary-fg))]">academic</span>
+                      <span className="text-xs font-sans px-1 rounded bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--action-secondary-fg))]">{t('schoolBellSchedule.badges.academic')}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-[rgb(var(--action-primary-bg))] flex-shrink-0" />
                       <span>Period 2 &nbsp;&nbsp;&nbsp;9:05 – 9:50</span>
-                      <span className="text-xs font-sans px-1 rounded bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--action-secondary-fg))]">academic</span>
+                      <span className="text-xs font-sans px-1 rounded bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--action-secondary-fg))]">{t('schoolBellSchedule.badges.academic')}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-amber-500 flex-shrink-0" />
@@ -822,20 +842,20 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
                     <div className="flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-[rgb(var(--action-primary-bg))] flex-shrink-0" />
                       <span>Period 5 &nbsp;&nbsp;&nbsp;1:00 – 1:50</span>
-                      <span className="text-xs font-sans px-1 rounded bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--action-secondary-fg))]">academic</span>
+                      <span className="text-xs font-sans px-1 rounded bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--action-secondary-fg))]">{t('schoolBellSchedule.badges.academic')}</span>
                     </div>
                   </div>
                   <div className="mt-2 pt-2 border-t border-[rgb(var(--border-primary))] text-[rgb(var(--text-tertiary))] font-sans text-xs">
-                    <span className="w-2 h-2 rounded-full bg-[rgb(var(--action-primary-bg))] inline-block mr-1" /> = time slots (periods) inside the schedule
+                    <span className="w-2 h-2 rounded-full bg-[rgb(var(--action-primary-bg))] inline-block mr-1" /> {t('schoolBellSchedule.howItWorks.periodsInsideSchedule')}
                   </div>
                 </div>
 
                 {/* Step-by-step */}
                 <div className="grid grid-cols-3 gap-2 text-center">
                   {[
-                    { step: '1', label: 'Create a schedule', sub: '"Regular Day", "Early Release"' },
-                    { step: '2', label: 'Add periods to it', sub: 'Class times, lunch, homeroom' },
-                    { step: '3', label: 'Assign to calendar', sub: 'Which days use which schedule' },
+                    { step: '1', label: t('schoolBellSchedule.howItWorks.steps.create.label'), sub: t('schoolBellSchedule.howItWorks.steps.create.sub') },
+                    { step: '2', label: t('schoolBellSchedule.howItWorks.steps.periods.label'), sub: t('schoolBellSchedule.howItWorks.steps.periods.sub') },
+                    { step: '3', label: t('schoolBellSchedule.howItWorks.steps.calendar.label'), sub: t('schoolBellSchedule.howItWorks.steps.calendar.sub') },
                   ].map(s => (
                     <div key={s.step} className="p-2 rounded-lg bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))]">
                       <div className="w-5 h-5 rounded-full bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--action-secondary-fg))] text-xs font-bold flex items-center justify-center mx-auto mb-1">{s.step}</div>
@@ -865,7 +885,7 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
             >
               {schedule.bellScheduleName}
               <span className={`text-xs px-1.5 py-0.5 rounded font-medium ${DAY_TYPE_COLORS[schedule.dayType] || 'bg-[rgb(var(--background-tertiary))]0/10 text-[rgb(var(--text-secondary))]'}`}>
-                {DAY_TYPE_OPTIONS.find(d => d.id === schedule.dayType)?.label || schedule.dayType}
+                {getDayTypeLabel(schedule.dayType)}
               </span>
               {schedule.isDefault && (
                 <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
@@ -877,7 +897,7 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
             className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-secondary))] transition-colors whitespace-nowrap"
           >
             <Plus className="w-3.5 h-3.5" />
-            New Schedule
+            {t('schoolBellSchedule.actions.newSchedule')}
           </button>
         </div>
       )}
@@ -897,12 +917,12 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
                 )}
                 {selectedSchedule.isDefault && (
                   <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-amber-500/10 text-amber-600 border border-amber-500/20">
-                    Default
+                    {t('schoolBellSchedule.badges.default')}
                   </span>
                 )}
                 {!selectedSchedule.isActive && (
                   <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-[rgb(var(--state-danger-bg)/0.18)]0/10 text-[rgb(var(--state-danger-fg))] border border-[rgb(var(--state-danger-border)/0.35)]">
-                    Inactive
+                    {t('schoolBellSchedule.badges.inactive')}
                   </span>
                 )}
               </div>
@@ -910,7 +930,7 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
                 {!selectedSchedule.isDefault && (
                   <button
                     onClick={() => handleSetDefault(selectedSchedule.bellScheduleId)}
-                    title="Set as default"
+                    title={t('schoolBellSchedule.actions.setAsDefault')}
                     className="p-1.5 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-500/10 text-[rgb(var(--text-tertiary))] hover:text-amber-600 transition-colors"
                   >
                     <Star className="w-3.5 h-3.5" />
@@ -935,10 +955,10 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
             <div className="flex items-center flex-wrap gap-x-3 gap-y-1 mt-2 text-xs text-[rgb(var(--text-tertiary))]">
               <span className="flex items-center gap-1">
                 <CalendarDays className="w-3 h-3" />
-                Effective {selectedSchedule.effectiveDate}{selectedSchedule.endDate ? ` – ${selectedSchedule.endDate}` : ''}
+                {t('schoolBellSchedule.summary.effective', { date: selectedSchedule.effectiveDate })}{selectedSchedule.endDate ? ` - ${selectedSchedule.endDate}` : ''}
               </span>
               <span className="w-px h-3 bg-[rgb(var(--border-primary))]" />
-              <span>{selectedSchedule.periodCount} {selectedSchedule.periodCount === 1 ? 'period' : 'periods'}</span>
+              <span>{t('schoolBellSchedule.summary.periodCount', { count: selectedSchedule.periodCount })}</span>
               {displayPeriods.length > 0 && (() => {
                 const stats = computeScheduleStats(displayPeriods)
                 if (!stats) return null
@@ -947,11 +967,11 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
                     <span className="w-px h-3 bg-[rgb(var(--border-primary))]" />
                     <span>{stats.daySpan}</span>
                     <span className="w-px h-3 bg-[rgb(var(--border-primary))]" />
-                    <span className="text-[rgb(var(--action-secondary-fg))] font-medium">{stats.instructionalTime} instructional</span>
+                    <span className="text-[rgb(var(--action-secondary-fg))] font-medium">{t('schoolBellSchedule.summary.instructionalTime', { duration: stats.instructionalTime })}</span>
                     {stats.nonInstructionalTime !== '0m' && (
                       <>
                         <span className="w-px h-3 bg-[rgb(var(--border-primary))]" />
-                        <span>{stats.nonInstructionalTime} other</span>
+                        <span>{t('schoolBellSchedule.summary.otherTime', { duration: stats.nonInstructionalTime })}</span>
                       </>
                     )}
                   </>
@@ -971,7 +991,7 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
                 ).map(t => (
                   <span key={t.value} className="flex items-center gap-1 text-xs">
                     <span className={`w-1.5 h-1.5 rounded-full ${PERIOD_TYPE_COLORS[t.value] || 'bg-[rgb(var(--text-tertiary))]'}`} />
-                    <span className="text-[rgb(var(--text-tertiary))]">{t.label}</span>
+                    <span className="text-[rgb(var(--text-tertiary))]">{getPeriodTypeLabel(t.value)}</span>
                   </span>
                 ))}
               </div>
@@ -986,10 +1006,10 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
           <div className="flex items-center justify-between gap-4">
             <div>
               <div className="text-sm font-medium text-[rgb(var(--text-primary))]">
-                You have {standalonePeriods.length} class period{standalonePeriods.length !== 1 ? 's' : ''}
+                {t('schoolBellSchedule.migration.title', { count: standalonePeriods.length })}
               </div>
               <div className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">
-                Create a bell schedule to organize them into a named schedule (e.g., Regular Day, Early Release).
+                {t('schoolBellSchedule.migration.description')}
               </div>
             </div>
             <Button
@@ -999,7 +1019,7 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
               disabled={createScheduleMutation.isPending}
               isLoading={createScheduleMutation.isPending}
             >
-              Create from Existing
+              {t('schoolBellSchedule.actions.createFromExisting')}
             </Button>
           </div>
         </div>
@@ -1009,36 +1029,36 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
       {displayPeriods.length === 0 ? (
         <SettingsEmptyState
           icon={Clock}
-          title={selectedSchedule ? 'No Periods Yet' : 'Get Started with Bell Schedules'}
+          title={selectedSchedule ? t('schoolBellSchedule.empty.noPeriodsTitle') : t('schoolBellSchedule.empty.getStartedTitle')}
           description={selectedSchedule
-            ? `The "${selectedSchedule.bellScheduleName}" schedule doesn't have any time blocks yet. Add periods to define when each class, lunch, and activity happens during this type of school day.`
+            ? t('schoolBellSchedule.empty.noPeriodsDescription', { schedule: selectedSchedule.bellScheduleName })
             : bellSchedules.length === 0
-              ? 'Bell schedules define how your school day is structured. Start by creating a schedule (like "Regular Day"), then add periods to it (like "Period 1: 8:00–8:50", "Lunch: 11:30–12:00"). You can create multiple schedules for different day types.'
-              : 'Select a schedule above to view and manage its periods, or create a new schedule.'
+              ? t('schoolBellSchedule.empty.getStartedDescription')
+              : t('schoolBellSchedule.empty.selectScheduleDescription')
           }
           action={
             <div className="flex flex-col items-center gap-3">
               <div className="flex gap-2">
                 {!selectedSchedule && bellSchedules.length === 0 && (
                   <Button variant="outline" size="sm" onClick={() => setShowPresets(true)}>
-                    Start from Template
+                    {t('schoolBellSchedule.actions.startFromTemplate')}
                   </Button>
                 )}
                 {selectedSchedule ? (
                   <Button variant="outline" size="sm" onClick={openCreate}>
                     <Plus className="w-4 h-4 mr-1.5" />
-                    Add First Period
+                    {t('schoolBellSchedule.actions.addFirstPeriod')}
                   </Button>
                 ) : bellSchedules.length === 0 ? (
                   <Button variant="outline" size="sm" onClick={openScheduleCreate}>
                     <Plus className="w-4 h-4 mr-1.5" />
-                    Create First Schedule
+                    {t('schoolBellSchedule.actions.createFirstSchedule')}
                   </Button>
                 ) : null}
               </div>
               {selectedSchedule && (
                 <p className="text-xs text-[rgb(var(--text-tertiary))]">
-                  Tip: Most schools have 6–9 periods including homeroom, classes, lunch, and passing time.
+                  {t('schoolBellSchedule.empty.tip')}
                 </p>
               )}
             </div>
@@ -1065,7 +1085,7 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
                   <div className="flex items-center gap-2 px-5 py-1 bg-amber-500/5">
                     <div className="flex-1 border-t border-dashed border-amber-300/40" />
                     <span className="text-xs font-medium text-amber-500 whitespace-nowrap">
-                      {gapMinutes}m gap
+                      {t('schoolBellSchedule.list.gap', { minutes: gapMinutes })}
                     </span>
                     <div className="flex-1 border-t border-dashed border-amber-300/40" />
                   </div>
@@ -1097,14 +1117,14 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
                       </span>
                       {period.isAcademic && (
                         <span className="px-1.5 py-0.5 text-xs font-medium rounded bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--action-secondary-fg))]">
-                          Academic
+                          {t('schoolBellSchedule.badges.academic')}
                         </span>
                       )}
                     </div>
                     <div className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">
-                      {period.durationMinutes} min
+                      {t('schoolBellSchedule.list.duration', { minutes: period.durationMinutes })}
                       <span className="mx-1">·</span>
-                      {PERIOD_TYPE_OPTIONS.find(t => t.value === period.periodType)?.label || period.periodType}
+                      {getPeriodTypeLabel(period.periodType)}
                     </div>
                   </div>
 
@@ -1134,11 +1154,11 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
       <Drawer
         open={showForm}
         onClose={closeForm}
-        title={editingPeriod ? 'Edit Period' : 'Add Period'}
+        title={editingPeriod ? t('schoolBellSchedule.periodForm.editTitle') : t('schoolBellSchedule.periodForm.addTitle')}
         description={
           selectedSchedule
-            ? `${editingPeriod ? 'Edit' : 'Add'} a time slot in "${selectedSchedule.bellScheduleName}".`
-            : `${editingPeriod ? 'Edit' : 'Add'} a class period time slot.`
+            ? t(editingPeriod ? 'schoolBellSchedule.periodForm.editInSchedule' : 'schoolBellSchedule.periodForm.addInSchedule', { schedule: selectedSchedule.bellScheduleName })
+            : t(editingPeriod ? 'schoolBellSchedule.periodForm.editStandalone' : 'schoolBellSchedule.periodForm.addStandalone')
         }
         size="sm"
       >
@@ -1146,13 +1166,13 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
           {/* Name */}
           <div>
             <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">
-              Period Name <span className="text-[rgb(var(--state-danger-fg))]">*</span>
+              {t('schoolBellSchedule.periodForm.periodName')} <span className="text-[rgb(var(--state-danger-fg))]">*</span>
             </label>
             <input
               type="text"
               value={form.classPeriodName}
               onChange={(e) => setForm(f => ({ ...f, classPeriodName: e.target.value }))}
-              placeholder="e.g., Period 1, Homeroom, Lunch"
+              placeholder={t('schoolBellSchedule.periodForm.periodNamePlaceholder')}
               className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
             />
           </div>
@@ -1161,7 +1181,7 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">
-                Start Time <span className="text-[rgb(var(--state-danger-fg))]">*</span>
+                {t('schoolBellSchedule.periodForm.startTime')} <span className="text-[rgb(var(--state-danger-fg))]">*</span>
               </label>
               <input
                 type="time"
@@ -1172,7 +1192,7 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
             </div>
             <div>
               <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">
-                End Time <span className="text-[rgb(var(--state-danger-fg))]">*</span>
+                {t('schoolBellSchedule.periodForm.endTime')} <span className="text-[rgb(var(--state-danger-fg))]">*</span>
               </label>
               <input
                 type="time"
@@ -1186,15 +1206,15 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
           {/* Duration preview */}
           {form.startTime && form.endTime && form.startTime < form.endTime && (
             <div className="text-xs text-[rgb(var(--text-tertiary))] bg-[rgb(var(--background-secondary))] rounded-lg px-3 py-2">
-              Duration: {minutesSinceMidnight(form.endTime) - minutesSinceMidnight(form.startTime)} minutes
+              {t('schoolBellSchedule.periodForm.durationPreview', { minutes: minutesSinceMidnight(form.endTime) - minutesSinceMidnight(form.startTime) })}
             </div>
           )}
 
           {/* Period Type */}
           <div>
-            <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">Period Type</label>
+            <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('schoolBellSchedule.periodForm.periodType')}</label>
             <Dropdown
-              options={PERIOD_TYPE_DROPDOWN_OPTIONS}
+              options={periodTypeDropdownOptions}
               value={form.periodType}
               onChange={(type) => {
                 setForm(f => ({
@@ -1203,14 +1223,14 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
                   isAcademic: type === 'instructional',
                 }))
               }}
-              placeholder="Select period type"
+              placeholder={t('schoolBellSchedule.periodForm.periodTypePlaceholder')}
               buttonClassName="rounded-xl py-2.5"
             />
           </div>
 
           {/* Sort Order */}
           <div>
-            <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">Sort Order</label>
+            <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('schoolBellSchedule.periodForm.sortOrder')}</label>
             <input
               type="number"
               min={0}
@@ -1229,33 +1249,33 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
               onChange={(e) => setForm(f => ({ ...f, isAcademic: e.target.checked }))}
               className="rounded border-[rgb(var(--border-primary))]"
             />
-            <span className="text-[rgb(var(--text-secondary))]">Academic (counts toward instructional hours)</span>
+            <span className="text-[rgb(var(--text-secondary))]">{t('schoolBellSchedule.periodForm.academic')}</span>
           </label>
 
           {/* Description */}
           <div>
-            <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">Description</label>
+            <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('schoolBellSchedule.periodForm.description')}</label>
             <input
               type="text"
               value={form.description}
               onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))}
-              placeholder="Optional description"
+              placeholder={t('schoolBellSchedule.periodForm.descriptionPlaceholder')}
               className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
             />
           </div>
 
           {/* Concept footer */}
           <div className="rounded-lg bg-[rgb(var(--background-secondary))]/50 px-3 py-2.5 space-y-1">
-            <p className="text-xs uppercase tracking-wider font-medium text-[rgb(var(--text-tertiary))]">What is a period?</p>
+            <p className="text-xs uppercase tracking-wider font-medium text-[rgb(var(--text-tertiary))]">{t('schoolBellSchedule.periodForm.whatIsPeriodTitle')}</p>
             <p className="text-xs text-[rgb(var(--text-tertiary))] leading-relaxed">
-              A period is a <strong className="text-[rgb(var(--text-secondary))]">single time slot</strong> inside
-              a bell schedule — one block in the school day. "Academic" periods (classes, labs)
-              count toward required instructional hours. Non-academic periods (lunch, recess, passing time) do not.
+              {t('schoolBellSchedule.periodForm.whatIsPeriodPrefix')}{' '}
+              <strong className="text-[rgb(var(--text-secondary))]">{t('schoolBellSchedule.periodForm.singleTimeSlot')}</strong>{' '}
+              {t('schoolBellSchedule.periodForm.whatIsPeriodSuffix')}
             </p>
           </div>
 
           <DrawerFooter>
-            <Button variant="outline" size="sm" onClick={closeForm}>Cancel</Button>
+            <Button variant="outline" size="sm" onClick={closeForm}>{t('common.cancel')}</Button>
             <Button
               variant="outline"
               size="sm"
@@ -1263,7 +1283,7 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
               disabled={createMutation.isPending || updateMutation.isPending || updateScheduleMutation.isPending}
               isLoading={createMutation.isPending || updateMutation.isPending || updateScheduleMutation.isPending}
             >
-              {editingPeriod ? 'Update' : 'Create'}
+              {editingPeriod ? t('common.update') : t('common.create')}
             </Button>
           </DrawerFooter>
         </div>
@@ -1286,23 +1306,23 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
               className="relative w-full max-w-md bg-[rgb(var(--background-primary))] rounded-2xl shadow-xl overflow-hidden"
             >
               <div className="flex items-center justify-between p-6 border-b border-[rgb(var(--border-primary))]">
-                <h3 className="font-semibold text-[rgb(var(--text-primary))]">Start from Template</h3>
+                <h3 className="font-semibold text-[rgb(var(--text-primary))]">{t('schoolBellSchedule.templates.title')}</h3>
                 <button onClick={() => setShowPresets(false)} className="p-1.5 rounded-lg hover:bg-[rgb(var(--background-secondary))]">
                   <X className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
                 </button>
               </div>
               <div className="p-6 space-y-3">
                 {bellSchedules.length > 0 && (
-                  <SettingsAlert type="warning" message="This will create a new bell schedule alongside your existing ones." />
+                  <SettingsAlert type="warning" message={t('schoolBellSchedule.templates.existingWarning')} />
                 )}
                 <button
                   onClick={() => applyPreset('elementary')}
                   disabled={isApplyingPreset || createScheduleMutation.isPending}
                   className="w-full text-left p-4 rounded-xl border border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-focus)/0.35)] hover:bg-[rgb(var(--action-primary-bg))]/5 transition-colors disabled:opacity-50"
                 >
-                  <div className="font-medium text-sm text-[rgb(var(--text-primary))]">Elementary Schedule</div>
+                  <div className="font-medium text-sm text-[rgb(var(--text-primary))]">{t('schoolBellSchedule.templates.elementary.title')}</div>
                   <div className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
-                    9 periods · 8:00 AM - 2:00 PM · Includes homeroom, recess, lunch
+                    {t('schoolBellSchedule.templates.elementary.description')}
                   </div>
                 </button>
                 <button
@@ -1310,9 +1330,9 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
                   disabled={isApplyingPreset || createScheduleMutation.isPending}
                   className="w-full text-left p-4 rounded-xl border border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-focus)/0.35)] hover:bg-[rgb(var(--action-primary-bg))]/5 transition-colors disabled:opacity-50"
                 >
-                  <div className="font-medium text-sm text-[rgb(var(--text-primary))]">High School Schedule</div>
+                  <div className="font-medium text-sm text-[rgb(var(--text-primary))]">{t('schoolBellSchedule.templates.highSchool.title')}</div>
                   <div className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
-                    9 periods · 7:30 AM - 3:05 PM · Includes advisory and lunch
+                    {t('schoolBellSchedule.templates.highSchool.description')}
                   </div>
                 </button>
               </div>
@@ -1341,16 +1361,16 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
                 <div className="p-2 rounded-full bg-[rgb(var(--state-danger-bg)/0.18)]0/10">
                   <AlertCircle className="w-5 h-5 text-[rgb(var(--state-danger-fg))]" />
                 </div>
-                <h3 className="font-semibold text-[rgb(var(--text-primary))]">Delete Period</h3>
+                <h3 className="font-semibold text-[rgb(var(--text-primary))]">{t('schoolBellSchedule.deletePeriod.title')}</h3>
               </div>
               <p className="text-sm text-[rgb(var(--text-secondary))]">
                 {selectedSchedule
-                  ? 'Are you sure you want to remove this period from the schedule?'
-                  : 'Are you sure you want to delete this class period? Sections referencing it will lose their period assignment.'
+                  ? t('schoolBellSchedule.deletePeriod.scheduleDescription')
+                  : t('schoolBellSchedule.deletePeriod.standaloneDescription')
                 }
               </p>
               <div className="flex justify-end gap-2">
-                <Button variant="ghost" size="sm" onClick={() => setShowDeleteConfirm(null)}>Cancel</Button>
+                <Button variant="ghost" size="sm" onClick={() => setShowDeleteConfirm(null)}>{t('common.cancel')}</Button>
                 <Button
                   variant="danger"
                   size="sm"
@@ -1358,7 +1378,7 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
                   disabled={deleteMutation.isPending || updateScheduleMutation.isPending}
                   isLoading={deleteMutation.isPending || updateScheduleMutation.isPending}
                 >
-                  Delete
+                  {t('common.delete')}
                 </Button>
               </div>
             </motion.div>
@@ -1370,10 +1390,10 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
       <Drawer
         open={showScheduleForm}
         onClose={closeScheduleForm}
-        title={editingSchedule ? 'Edit Schedule' : 'New Bell Schedule'}
+        title={editingSchedule ? t('schoolBellSchedule.scheduleForm.editTitle') : t('schoolBellSchedule.scheduleForm.newTitle')}
         description={editingSchedule
-          ? 'Update this schedule\'s settings.'
-          : 'Name your school day type, then add periods to it.'
+          ? t('schoolBellSchedule.scheduleForm.editDescription')
+          : t('schoolBellSchedule.scheduleForm.newDescription')
         }
         size="sm"
       >
@@ -1381,25 +1401,25 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
           {/* Schedule Name */}
           <div>
             <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">
-              Schedule Name <span className="text-[rgb(var(--state-danger-fg))]">*</span>
+              {t('schoolBellSchedule.scheduleForm.scheduleName')} <span className="text-[rgb(var(--state-danger-fg))]">*</span>
             </label>
             <input
               type="text"
               value={scheduleForm.bellScheduleName}
               onChange={(e) => setScheduleForm(f => ({ ...f, bellScheduleName: e.target.value }))}
-              placeholder="e.g., Regular Day"
+              placeholder={t('schoolBellSchedule.scheduleForm.scheduleNamePlaceholder')}
               className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
             />
           </div>
 
           {/* Day Type */}
           <div>
-            <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">Day Type</label>
+            <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('schoolBellSchedule.scheduleForm.dayType')}</label>
             <Dropdown
-              options={DAY_TYPE_OPTIONS}
+              options={dayTypeOptions}
               value={scheduleForm.dayType}
               onChange={(type) => setScheduleForm(f => ({ ...f, dayType: type }))}
-              placeholder="Select day type"
+              placeholder={t('schoolBellSchedule.scheduleForm.dayTypePlaceholder')}
               buttonClassName="rounded-xl py-2.5"
             />
           </div>
@@ -1407,13 +1427,13 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
           {/* Alternate Day Name */}
           <div>
             <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">
-              Alternate Day Name
+              {t('schoolBellSchedule.scheduleForm.alternateDayName')}
             </label>
             <input
               type="text"
               value={scheduleForm.alternateDayName}
               onChange={(e) => setScheduleForm(f => ({ ...f, alternateDayName: e.target.value }))}
-              placeholder="e.g., A Day, B Day"
+              placeholder={t('schoolBellSchedule.scheduleForm.alternateDayNamePlaceholder')}
               className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
             />
           </div>
@@ -1422,7 +1442,7 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">
-                Effective Date <span className="text-[rgb(var(--state-danger-fg))]">*</span>
+                {t('schoolBellSchedule.scheduleForm.effectiveDate')} <span className="text-[rgb(var(--state-danger-fg))]">*</span>
               </label>
               <input
                 type="date"
@@ -1433,7 +1453,7 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
             </div>
             <div>
               <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">
-                End Date
+                {t('schoolBellSchedule.scheduleForm.endDate')}
               </label>
               <input
                 type="date"
@@ -1452,33 +1472,34 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
               onChange={(e) => setScheduleForm(f => ({ ...f, isDefault: e.target.checked }))}
               className="rounded border-[rgb(var(--border-primary))]"
             />
-            <span className="text-[rgb(var(--text-secondary))]">Set as default schedule</span>
+            <span className="text-[rgb(var(--text-secondary))]">{t('schoolBellSchedule.scheduleForm.setAsDefault')}</span>
           </label>
 
           {/* Description */}
           <div>
-            <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">Description</label>
+            <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('schoolBellSchedule.scheduleForm.description')}</label>
             <input
               type="text"
               value={scheduleForm.description}
               onChange={(e) => setScheduleForm(f => ({ ...f, description: e.target.value }))}
-              placeholder="Optional description"
+              placeholder={t('schoolBellSchedule.scheduleForm.descriptionPlaceholder')}
               className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
             />
           </div>
 
           {/* Concept footer */}
           <div className="rounded-lg bg-[rgb(var(--background-secondary))]/50 px-3 py-2.5 space-y-1.5">
-            <p className="text-xs uppercase tracking-wider font-medium text-[rgb(var(--text-tertiary))]">What is a bell schedule?</p>
+            <p className="text-xs uppercase tracking-wider font-medium text-[rgb(var(--text-tertiary))]">{t('schoolBellSchedule.scheduleForm.whatIsScheduleTitle')}</p>
             <p className="text-xs text-[rgb(var(--text-tertiary))] leading-relaxed">
-              A bell schedule is your school's <strong className="text-[rgb(var(--text-secondary))]">daily timetable</strong> for a type of day.
-              After creating it, you add individual time slots (periods) to it:
+              {t('schoolBellSchedule.scheduleForm.whatIsSchedulePrefix')}{' '}
+              <strong className="text-[rgb(var(--text-secondary))]">{t('schoolBellSchedule.scheduleForm.dailyTimetable')}</strong>{' '}
+              {t('schoolBellSchedule.scheduleForm.whatIsScheduleSuffix')}
             </p>
             <div className="text-xs text-[rgb(var(--text-tertiary))] font-mono leading-relaxed pl-1">
               <div className="flex items-center gap-1.5">
                 <CalendarDays className="w-3 h-3 text-[rgb(var(--action-secondary-fg))] flex-shrink-0" />
-                <span className="text-[rgb(var(--text-secondary))]">Regular Day</span>
-                <span className="text-[rgb(var(--text-tertiary))]">← this is a bell schedule</span>
+                <span className="text-[rgb(var(--text-secondary))]">{t('schoolBellSchedule.examples.regularDay')}</span>
+                <span className="text-[rgb(var(--text-tertiary))]">{t('schoolBellSchedule.scheduleForm.exampleScheduleHint')}</span>
               </div>
               <div className="pl-4 border-l border-[rgb(var(--border-primary))] ml-1.5 mt-1 space-y-0.5">
                 <div>├ Period 1 &nbsp;8:00 – 8:50</div>
@@ -1490,7 +1511,7 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
           </div>
 
           <DrawerFooter>
-            <Button variant="ghost" size="sm" onClick={closeScheduleForm}>Cancel</Button>
+            <Button variant="ghost" size="sm" onClick={closeScheduleForm}>{t('common.cancel')}</Button>
             <Button
               variant="outline"
               size="sm"
@@ -1498,7 +1519,7 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
               disabled={createScheduleMutation.isPending || updateScheduleMutation.isPending}
               isLoading={createScheduleMutation.isPending || updateScheduleMutation.isPending}
             >
-              {editingSchedule ? 'Update' : 'Create'}
+              {editingSchedule ? t('common.update') : t('common.create')}
             </Button>
           </DrawerFooter>
         </div>
@@ -1524,13 +1545,13 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
                 <div className="p-2 rounded-full bg-[rgb(var(--state-danger-bg)/0.18)]0/10">
                   <AlertCircle className="w-5 h-5 text-[rgb(var(--state-danger-fg))]" />
                 </div>
-                <h3 className="font-semibold text-[rgb(var(--text-primary))]">Delete Schedule</h3>
+                <h3 className="font-semibold text-[rgb(var(--text-primary))]">{t('schoolBellSchedule.deleteSchedule.title')}</h3>
               </div>
               <p className="text-sm text-[rgb(var(--text-secondary))]">
-                This will remove the bell schedule and all its period configurations. Calendar dates referencing this schedule will need to be reassigned.
+                {t('schoolBellSchedule.deleteSchedule.description')}
               </p>
               <div className="flex justify-end gap-2">
-                <Button variant="ghost" size="sm" onClick={() => setShowScheduleDeleteConfirm(null)}>Cancel</Button>
+                <Button variant="ghost" size="sm" onClick={() => setShowScheduleDeleteConfirm(null)}>{t('common.cancel')}</Button>
                 <Button
                   variant="danger"
                   size="sm"
@@ -1538,7 +1559,7 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
                   disabled={deleteScheduleMutation.isPending}
                   isLoading={deleteScheduleMutation.isPending}
                 >
-                  Delete
+                  {t('common.delete')}
                 </Button>
               </div>
             </motion.div>
