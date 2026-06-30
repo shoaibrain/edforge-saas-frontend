@@ -20,6 +20,7 @@ import {
   X,
 } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from '@edforge/i18n'
 import { toast } from 'sonner'
 import axios from 'axios'
 import { Button, Modal, ModalFooter } from '@edforge/ui'
@@ -43,14 +44,15 @@ import { usersService, type SecurityOverview } from '@/services/users.service'
 // ============================================================================
 
 const PASSWORD_REQUIREMENTS = [
-  { label: 'At least 8 characters', test: (p: string) => p.length >= 8 },
-  { label: 'Uppercase letter', test: (p: string) => /[A-Z]/.test(p) },
-  { label: 'Lowercase letter', test: (p: string) => /[a-z]/.test(p) },
-  { label: 'Number', test: (p: string) => /[0-9]/.test(p) },
-  { label: 'Special character', test: (p: string) => /[^A-Za-z0-9]/.test(p) },
+  { labelKey: 'security.passwordRequirements.minLength', test: (p: string) => p.length >= 8 },
+  { labelKey: 'security.passwordRequirements.uppercase', test: (p: string) => /[A-Z]/.test(p) },
+  { labelKey: 'security.passwordRequirements.lowercase', test: (p: string) => /[a-z]/.test(p) },
+  { labelKey: 'security.passwordRequirements.number', test: (p: string) => /[0-9]/.test(p) },
+  { labelKey: 'security.passwordRequirements.special', test: (p: string) => /[^A-Za-z0-9]/.test(p) },
 ] as const
 
 function PasswordRequirements({ password }: { password: string }) {
+  const { t } = useTranslation('settings')
   if (!password) return null
 
   return (
@@ -58,7 +60,7 @@ function PasswordRequirements({ password }: { password: string }) {
       {PASSWORD_REQUIREMENTS.map((req) => {
         const met = req.test(password)
         return (
-          <div key={req.label} className="flex items-center gap-2 text-xs">
+          <div key={req.labelKey} className="flex items-center gap-2 text-xs">
             {met ? (
               <Check className="w-3.5 h-3.5 text-[rgb(var(--state-success-fg))]" />
             ) : (
@@ -71,7 +73,7 @@ function PasswordRequirements({ password }: { password: string }) {
                   : 'text-[rgb(var(--text-tertiary))]'
               }
             >
-              {req.label}
+              {t(req.labelKey)}
             </span>
           </div>
         )
@@ -85,7 +87,8 @@ function PasswordRequirements({ password }: { password: string }) {
 // ============================================================================
 
 function PasswordStrengthIndicator({ password }: { password: string }) {
-  const getStrength = (pwd: string): { score: number; label: string; color: string } => {
+  const { t } = useTranslation('settings')
+  const getStrength = (pwd: string): { score: number; labelKey: string; color: string } => {
     let score = 0
     if (pwd.length >= 8) score++
     if (pwd.length >= 12) score++
@@ -94,10 +97,10 @@ function PasswordStrengthIndicator({ password }: { password: string }) {
     if (/[0-9]/.test(pwd)) score++
     if (/[^A-Za-z0-9]/.test(pwd)) score++
 
-    if (score <= 2) return { score: 1, label: 'Weak', color: 'bg-[rgb(var(--state-danger-bg)/0.18)]0' }
-    if (score <= 4) return { score: 2, label: 'Fair', color: 'bg-amber-500' }
-    if (score <= 5) return { score: 3, label: 'Good', color: 'bg-[rgb(var(--state-success-fg))]' }
-    return { score: 4, label: 'Strong', color: 'bg-[rgb(var(--action-primary-bg))]' }
+    if (score <= 2) return { score: 1, labelKey: 'security.passwordStrength.weak', color: 'bg-[rgb(var(--state-danger-bg)/0.18)]0' }
+    if (score <= 4) return { score: 2, labelKey: 'security.passwordStrength.fair', color: 'bg-amber-500' }
+    if (score <= 5) return { score: 3, labelKey: 'security.passwordStrength.good', color: 'bg-[rgb(var(--state-success-fg))]' }
+    return { score: 4, labelKey: 'security.passwordStrength.strong', color: 'bg-[rgb(var(--action-primary-bg))]' }
   }
 
   const strength = getStrength(password)
@@ -121,7 +124,7 @@ function PasswordStrengthIndicator({ password }: { password: string }) {
           strength.score <= 1 ? 'text-[rgb(var(--state-danger-fg))]' : strength.score <= 2 ? 'text-amber-500' : 'text-[rgb(var(--state-success-fg))]'
         }`}
       >
-        {strength.label}
+        {t(strength.labelKey)}
       </p>
     </div>
   )
@@ -144,13 +147,14 @@ function PasswordVisibilityToggle({
   visible: boolean
   onToggle: () => void
 }) {
+  const { t } = useTranslation('settings')
   const Icon = visible ? EyeOff : Eye
   return (
     <button
       type="button"
       onClick={onToggle}
       className="p-0.5 text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
-      aria-label={visible ? 'Hide password' : 'Show password'}
+      aria-label={visible ? t('security.hidePassword') : t('security.showPassword')}
     >
       <Icon className="w-4 h-4" />
     </button>
@@ -158,6 +162,7 @@ function PasswordVisibilityToggle({
 }
 
 function PasswordChangeModal({ isOpen, onClose, onSuccess }: PasswordChangeModalProps) {
+  const { t } = useTranslation('settings')
   const user = useAuthStore((s) => s.user)
   const [showPasswords, setShowPasswords] = useState({
     current: false,
@@ -202,7 +207,7 @@ function PasswordChangeModal({ isOpen, onClose, onSuccess }: PasswordChangeModal
       onClose()
     },
     onError: (err) => {
-      let message = 'Failed to change password'
+      let message = t('security.passwordChangeFailed')
       if (axios.isAxiosError(err) && err.response?.data) {
         const data = err.response.data as Record<string, unknown>
         if (typeof data.message === 'string') {
@@ -236,8 +241,8 @@ function PasswordChangeModal({ isOpen, onClose, onSuccess }: PasswordChangeModal
     <Modal
       open={isOpen}
       onClose={handleClose}
-      title="Change Password"
-      description="Enter your current password and choose a new one."
+      title={t('security.changePassword')}
+      description={t('security.changePasswordDescription')}
       size="md"
     >
       {/* Inline error banner */}
@@ -256,9 +261,9 @@ function PasswordChangeModal({ isOpen, onClose, onSuccess }: PasswordChangeModal
         <form id="password-change-form" onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <TextField
             name="currentPassword"
-            label="Current Password"
+            label={t('security.currentPassword')}
             type={showPasswords.current ? 'text' : 'password'}
-            placeholder="Enter current password"
+            placeholder={t('security.currentPasswordPlaceholder')}
             suffix={
               <PasswordVisibilityToggle
                 visible={showPasswords.current}
@@ -270,9 +275,9 @@ function PasswordChangeModal({ isOpen, onClose, onSuccess }: PasswordChangeModal
           <div>
             <TextField
               name="newPassword"
-              label="New Password"
+              label={t('security.newPassword')}
               type={showPasswords.new ? 'text' : 'password'}
-              placeholder="Enter new password"
+              placeholder={t('security.newPasswordPlaceholder')}
               suffix={
                 <PasswordVisibilityToggle
                   visible={showPasswords.new}
@@ -286,9 +291,9 @@ function PasswordChangeModal({ isOpen, onClose, onSuccess }: PasswordChangeModal
 
           <TextField
             name="confirmPassword"
-            label="Confirm New Password"
+            label={t('security.confirmPassword')}
             type={showPasswords.confirm ? 'text' : 'password'}
-            placeholder="Confirm new password"
+            placeholder={t('security.confirmPasswordPlaceholder')}
             suffix={
               <PasswordVisibilityToggle
                 visible={showPasswords.confirm}
@@ -301,7 +306,7 @@ function PasswordChangeModal({ isOpen, onClose, onSuccess }: PasswordChangeModal
 
       <ModalFooter>
         <Button type="button" variant="outline" onClick={handleClose} disabled={isSubmitting}>
-          Cancel
+          {t('common.cancel')}
         </Button>
         <Button
           type="submit"
@@ -309,7 +314,7 @@ function PasswordChangeModal({ isOpen, onClose, onSuccess }: PasswordChangeModal
           isLoading={isSubmitting}
           disabled={isSubmitting}
         >
-          Change Password
+          {t('security.changePassword')}
         </Button>
       </ModalFooter>
     </Modal>
@@ -348,12 +353,15 @@ function StatusItem({
   )
 }
 
-function getPasswordLastChangedText(passwordLastChanged?: string | null): string {
-  if (!passwordLastChanged) return 'Never changed'
+function getPasswordLastChangedText(
+  passwordLastChanged: string | null | undefined,
+  t: (key: string, options?: Record<string, unknown>) => string,
+): string {
+  if (!passwordLastChanged) return t('security.passwordLastChanged.never')
   const daysSince = Math.floor((Date.now() - new Date(passwordLastChanged).getTime()) / (1000 * 60 * 60 * 24))
-  if (daysSince === 0) return 'Changed today'
-  if (daysSince === 1) return 'Changed yesterday'
-  return `Changed ${daysSince} days ago`
+  if (daysSince === 0) return t('security.passwordLastChanged.today')
+  if (daysSince === 1) return t('security.passwordLastChanged.yesterday')
+  return t('security.passwordLastChanged.daysAgo', { count: daysSince })
 }
 
 function SecurityOverviewCard({
@@ -363,6 +371,7 @@ function SecurityOverviewCard({
   overview?: SecurityOverview
   onRetry: () => void
 }) {
+  const { t } = useTranslation('settings')
   if (!overview) {
     return (
       <motion.div
@@ -371,14 +380,14 @@ function SecurityOverviewCard({
       >
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Security Overview</h2>
+            <h2 className="text-sm font-semibold text-[rgb(var(--text-primary))]">{t('security.overview.title')}</h2>
             <p className="text-sm text-[rgb(var(--text-tertiary))] mt-1">
-              Unable to load security overview.
+              {t('security.overview.loadFailed')}
             </p>
           </div>
           <Button variant="outline" size="sm" onClick={onRetry}>
             <RotateCcw className="w-4 h-4 mr-2" />
-            Retry
+            {t('common.retry')}
           </Button>
         </div>
       </motion.div>
@@ -389,7 +398,7 @@ function SecurityOverviewCard({
     ? Math.floor((Date.now() - new Date(overview.passwordLastChanged).getTime()) / (1000 * 60 * 60 * 24))
     : null
   const passwordTone = daysSincePasswordChange !== null && daysSincePasswordChange < 90 ? 'good' : 'warn'
-  const passwordText = getPasswordLastChangedText(overview.passwordLastChanged)
+  const passwordText = getPasswordLastChangedText(overview.passwordLastChanged, t)
 
   return (
     <motion.div
@@ -397,17 +406,17 @@ function SecurityOverviewCard({
       className="p-5 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] space-y-4"
     >
       <div>
-        <h2 className="text-sm font-semibold text-[rgb(var(--text-primary))]">Security Overview</h2>
+        <h2 className="text-sm font-semibold text-[rgb(var(--text-primary))]">{t('security.overview.title')}</h2>
         <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
-          Quick summary of your account security.
+          {t('security.overview.description')}
         </p>
       </div>
 
       <div className="space-y-2">
-        <StatusItem label="Password" value={passwordText} tone={passwordTone} />
+        <StatusItem label={t('security.password')} value={passwordText} tone={passwordTone} />
         <StatusItem
-          label="Sessions"
-          value={`${overview.activeSessions} active session${overview.activeSessions === 1 ? '' : 's'}`}
+          label={t('security.sessions')}
+          value={t('security.activeSessionsCount', { count: overview.activeSessions })}
           tone="neutral"
         />
       </div>
@@ -421,7 +430,7 @@ function SecurityOverviewCard({
           <div className="pt-2 border-t border-[rgb(var(--border-secondary))]">
             <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
               <AlertTriangle className="w-4 h-4" />
-              <span className="text-xs font-semibold">Recommendations</span>
+              <span className="text-xs font-semibold">{t('security.recommendations')}</span>
             </div>
             <ul className="mt-2 space-y-1 text-sm text-[rgb(var(--text-secondary))]">
               {filteredRecs.map((rec, i) => (
@@ -444,8 +453,8 @@ function SecurityOverviewCard({
 
 type SecurityTab = 'password'
 
-const SECURITY_TABS: Array<{ id: SecurityTab; label: string }> = [
-  { id: 'password', label: 'Password' },
+const SECURITY_TABS: Array<{ id: SecurityTab; labelKey: string }> = [
+  { id: 'password', labelKey: 'security.password' },
 ]
 
 function SecurityTabs({
@@ -455,6 +464,7 @@ function SecurityTabs({
   activeTab: SecurityTab
   onChange: (tab: SecurityTab) => void
 }) {
+  const { t } = useTranslation('settings')
   return (
     <div className="border-b border-[rgb(var(--border-primary))] overflow-x-auto">
       <div className="flex gap-6 min-w-max">
@@ -471,7 +481,7 @@ function SecurityTabs({
                   : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))]'
               }`}
             >
-              {tab.label}
+              {t(tab.labelKey)}
               {isActive && (
                 <motion.div
                   layoutId="security-tab-underline"
@@ -491,6 +501,7 @@ function SecurityTabs({
 // ============================================================================
 
 export default function SecurityPage() {
+  const { t } = useTranslation('settings')
   const user = useAuthStore((s) => s.user)
   const queryClient = useQueryClient()
   const [showPasswordModal, setShowPasswordModal] = useState(false)
@@ -509,7 +520,7 @@ export default function SecurityPage() {
   })
 
   const handlePasswordSuccess = () => {
-    toast.success('Password changed successfully')
+    toast.success(t('security.passwordChanged'))
 
     // Optimistic update — show "Changed today" immediately even if
     // backend is slow to update the passwordLastChanged timestamp.
@@ -536,8 +547,8 @@ export default function SecurityPage() {
     <div className="max-w-3xl mx-auto px-6 py-8">
       <motion.div initial="hidden" animate="visible" variants={staggerChildren} className="space-y-8">
         <SettingsPageHeader
-          title="Security"
-          description="Manage your account security and authentication"
+          title={t('security.title')}
+          description={t('security.description')}
         />
 
         <SecurityOverviewCard
@@ -560,11 +571,11 @@ export default function SecurityPage() {
               >
                 <SettingsRow
                   icon={Key}
-                  title="Password"
-                  description={getPasswordLastChangedText(securityOverview?.passwordLastChanged)}
+                  title={t('security.password')}
+                  description={getPasswordLastChangedText(securityOverview?.passwordLastChanged, t)}
                   action={
                     <Button variant="outline" size="sm" onClick={() => setShowPasswordModal(true)}>
-                      Change
+                      {t('common.change')}
                     </Button>
                   }
                 />

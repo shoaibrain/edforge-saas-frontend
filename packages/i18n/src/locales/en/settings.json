@@ -1,6 +1,16 @@
 {
   "title": "Settings",
   "subtitle": "Manage your account, preferences, and school configuration",
+  "overview": {
+    "actions": {
+      "branding": "Branding",
+      "feeStructures": "Fee Structures",
+      "paymentGateways": "Payment Gateways"
+    },
+    "fallbackName": "Your Name",
+    "fallbackEmail": "your@email.com",
+    "searchComingSoon": "Search settings (coming soon)"
+  },
   "account": {
     "title": "Account",
     "description": "Manage your profile information",
@@ -24,7 +34,47 @@
     "uploadAvatar": "Upload Photo",
     "avatarHint": "JPG, PNG or GIF. Max 5MB.",
     "saved": "Account updated successfully",
-    "saveFailed": "Failed to update account"
+    "saveFailed": "Failed to update account",
+    "profileUpdated": "Profile updated successfully",
+    "profileUpdateFailed": "Failed to update profile",
+    "fallbackUser": "User",
+    "accountDetails": "Account Details",
+    "sections": {
+      "personalDescription": "Your name and identity",
+      "contactTitle": "Contact Information",
+      "contactDescription": "Email and phone details",
+      "addressDescription": "Your mailing address"
+    },
+    "details": {
+      "userId": "User ID",
+      "created": "Created",
+      "lastLogin": "Last login",
+      "mfa": "MFA"
+    },
+    "mfa": {
+      "enabled": "Enabled",
+      "notEnabled": "Not enabled"
+    },
+    "form": {
+      "firstNamePlaceholder": "Enter first name",
+      "lastNamePlaceholder": "Enter last name",
+      "displayNamePlaceholder": "How you want to be called",
+      "displayNameHelp": "This is how your name appears to others",
+      "emailPlaceholder": "email@example.com",
+      "emailHelp": "Contact support to change your email",
+      "phonePlaceholder": "+1 555-123-4567",
+      "phoneHelp": "Include country code",
+      "streetPlaceholder": "123 Main Street",
+      "street2Placeholder": "Apt 4B (optional)",
+      "cityPlaceholder": "San Francisco",
+      "postalCodePlaceholder": "94102",
+      "selectCountry": "Select country",
+      "selectState": "Select state"
+    },
+    "error": {
+      "loadTitle": "Failed to Load Profile",
+      "loadDescription": "Failed to load profile"
+    }
   },
   "security": {
     "title": "Security",
@@ -47,7 +97,40 @@
     "loginHistory": "Login History",
     "lastLogin": "Last Login",
     "securityScore": "Security Score",
-    "recommendations": "Recommendations"
+    "recommendations": "Recommendations",
+    "password": "Password",
+    "changePasswordDescription": "Enter your current password and choose a new one.",
+    "currentPasswordPlaceholder": "Enter current password",
+    "newPasswordPlaceholder": "Enter new password",
+    "confirmPasswordPlaceholder": "Confirm new password",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "activeSessionsCount": "{{count}} active session",
+    "activeSessionsCount_plural": "{{count}} active sessions",
+    "passwordRequirements": {
+      "minLength": "At least 8 characters",
+      "uppercase": "Uppercase letter",
+      "lowercase": "Lowercase letter",
+      "number": "Number",
+      "special": "Special character"
+    },
+    "passwordStrength": {
+      "weak": "Weak",
+      "fair": "Fair",
+      "good": "Good",
+      "strong": "Strong"
+    },
+    "passwordLastChanged": {
+      "never": "Never changed",
+      "today": "Changed today",
+      "yesterday": "Changed yesterday",
+      "daysAgo": "Changed {{count}} days ago"
+    },
+    "overview": {
+      "title": "Security Overview",
+      "description": "Quick summary of your account security.",
+      "loadFailed": "Unable to load security overview."
+    }
   },
   "preferences": {
     "title": "Preferences",
@@ -81,6 +164,97 @@
   "workspace": {
     "title": "Workspace",
     "description": "Manage workspace settings",
+    "pageDescription": "Organization-wide configuration that applies to all schools",
+    "saved": "Workspace settings saved",
+    "saveFailed": "Failed to save settings",
+    "tenantInfo": {
+      "title": "Tenant Info",
+      "description": "Read-only — set at provisioning and cannot be changed.",
+      "name": "Name",
+      "archetype": "Archetype",
+      "country": "Country",
+      "tier": "Tier",
+      "created": "Created"
+    },
+    "accessDenied": {
+      "title": "Access Denied",
+      "message": "You don't have permission to view workspace settings."
+    },
+    "error": {
+      "loadTitle": "Failed to Load Settings",
+      "loadDescription": "Unable to load workspace settings. Please try again."
+    },
+    "localization": {
+      "title": "Localization",
+      "description": "Language, timezone, and date/time formatting"
+    },
+    "financeCalendar": {
+      "title": "Finance & Calendar",
+      "description": "Currency, calendar system, and number formatting"
+    },
+    "fields": {
+      "defaultTimezone": {
+        "label": "Default Timezone",
+        "description": "Organization's primary timezone for scheduling and timestamps"
+      },
+      "defaultLanguage": {
+        "label": "Default Language",
+        "description": "Primary language for new users and system communications"
+      },
+      "dateFormat": {
+        "label": "Date Format",
+        "description": "How dates are displayed across the platform"
+      },
+      "timeFormat": {
+        "label": "Time Format",
+        "description": "12 or 24 hour clock"
+      },
+      "weekStartsOn": {
+        "label": "Week Starts On",
+        "description": "First day of the week in calendars"
+      },
+      "defaultCurrency": {
+        "label": "Default Currency",
+        "description": "Currency used for invoices, payments, and financial reports"
+      },
+      "calendarSystem": {
+        "label": "Calendar System",
+        "description": "Primary calendar system for date display"
+      },
+      "dualDate": {
+        "label": "Show Bikram Sambat Dates",
+        "description": "Display BS dates alongside Gregorian dates in finance and academic modules"
+      },
+      "numberFormat": {
+        "label": "Number Format",
+        "description": "How numbers are grouped in financial displays"
+      }
+    },
+    "locking": {
+      "locked": "Locked",
+      "lockedPrefix": "Locked.",
+      "lockedDefaultReason": "Regional settings that affect stored data are frozen while an academic year is active.",
+      "displayFieldsEditable": "Display-only fields (language, date/time format, number grouping) remain editable.",
+      "blockedBy": "Blocked by",
+      "headsUpPrefix": "Heads up —",
+      "headsUpDescription": "Fields that affect stored data (currency, calendar system, timezone, week start) become read-only when an academic year is active, to preserve consistency across reports, invoices, and audit trails. Display-only fields remain editable throughout.",
+      "tooltipMultiple": "{{count}} active academic years across schools",
+      "howItWorksTitle": "How locking works",
+      "tenantInfoLabel": "Tenant Info",
+      "tenantInfoDescription": "fields above are permanently locked — set once at provisioning.",
+      "dataIntegrityLabel": "Regional Settings — data-integrity fields",
+      "dataIntegrityDescription": "(currency, calendar system, timezone, week start) lock automatically when any academic year is active.",
+      "displayOnlyLabel": "Regional Settings — display-only fields",
+      "displayOnlyDescription": "(language, date/time format, number format, Bikram Sambat toggle) stay editable throughout — changing them re-renders without touching stored data.",
+      "brandingPoliciesLabel": "Branding & Policies",
+      "brandingPoliciesDescription": "(coming soon) remain editable at any time, independent of academic-year state.",
+      "schoolOverrideNote": "Schools can override these defaults in their individual School Configuration."
+    },
+    "permissions": {
+      "title": "Permissions",
+      "prefix": "Only users with the",
+      "suffix": "role can modify these settings. Every change is audit-logged with your user ID and a timestamp."
+    },
     "governanceProfile": {
       "title": "Governance Profile",
       "subtitle": "Regional defaults your governance body locks. Set at provisioning, applied tenant-wide.",
@@ -98,6 +272,764 @@
         "gregorian": "Gregorian",
         "bikram_sambat": "Bikram Sambat (BS)"
       }
+    }
+  },
+  "common": {
+    "cancel": "Cancel",
+    "change": "Change",
+    "create": "Create",
+    "delete": "Delete",
+    "edit": "Edit",
+    "retry": "Retry",
+    "save": "Save",
+    "close": "Close",
+    "update": "Update",
+    "tryAgain": "Try Again",
+    "saveChanges": "Save Changes",
+    "optional": "optional"
+  },
+  "schoolRooms": {
+    "title": "Rooms & Locations",
+    "summary": "{{count}} room · {{active}} active",
+    "summary_plural": "{{count}} rooms · {{active}} active",
+    "actions": {
+      "add": "Add Room"
+    },
+    "types": {
+      "classroom": "Classroom",
+      "lab": "Lab",
+      "gym": "Gymnasium",
+      "auditorium": "Auditorium",
+      "library": "Library",
+      "office": "Office",
+      "other": "Other"
+    },
+    "searchPlaceholder": "Search rooms...",
+    "capacitySeats": "{{count}} seat",
+    "capacitySeats_plural": "{{count}} seats",
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "table": {
+      "room": "Room",
+      "building": "Building",
+      "type": "Type",
+      "floor": "Floor",
+      "capacity": "Capacity",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "empty": {
+      "title": "No rooms configured",
+      "description": "Add physical rooms and locations for scheduling.",
+      "noMatches": "No rooms matching \"{{query}}\""
+    },
+    "drawer": {
+      "addTitle": "Add Room",
+      "editTitle": "Edit Room",
+      "addDescription": "Add a new room or location",
+      "editDescription": "Update room details"
+    },
+    "form": {
+      "roomNumber": "Room Number",
+      "roomNumberPlaceholder": "e.g., 101, A-205",
+      "buildingName": "Building Name",
+      "buildingPlaceholder": "e.g., Main Building",
+      "floor": "Floor",
+      "floorPlaceholder": "e.g., 1",
+      "capacity": "Capacity",
+      "capacityPlaceholder": "e.g., 30",
+      "roomType": "Room Type",
+      "active": "Active (available for scheduling)",
+      "description": "Description",
+      "descriptionPlaceholder": "Optional notes"
+    },
+    "validation": {
+      "roomNumberRequired": "Room number is required"
+    },
+    "delete": {
+      "title": "Delete Room",
+      "description": "Are you sure? Sections assigned to this room will lose their location assignment."
+    }
+  },
+  "schoolDepartments": {
+    "title": "Departments",
+    "description": "Manage academic and administrative departments",
+    "searchPlaceholder": "Search departments...",
+    "scope": {
+      "organization": "Organization",
+      "school": "School"
+    },
+    "actions": {
+      "add": "Add Department",
+      "create": "Create Department",
+      "edit": "Edit department",
+      "delete": "Delete department",
+      "deleteSelected": "Delete selected"
+    },
+    "table": {
+      "code": "Code",
+      "name": "Name",
+      "scope": "Scope",
+      "departmentHead": "Department Head"
+    },
+    "form": {
+      "createTitle": "Create Department",
+      "editTitle": "Edit Department",
+      "createDescription": "Add a new department to this school",
+      "editDescription": "Update department details",
+      "name": "Department Name",
+      "namePlaceholder": "e.g., Science",
+      "code": "Code",
+      "codePlaceholder": "e.g., SCI",
+      "codeHint": "2-10 characters. Cannot be changed after creation.",
+      "description": "Description",
+      "descriptionPlaceholder": "Brief description of the department"
+    },
+    "empty": {
+      "title": "No departments found",
+      "noMatches": "No departments match \"{{query}}\"",
+      "description": "Create your first department to organize your school",
+      "adjustSearch": "Try adjusting your search or filter"
+    },
+    "delete": {
+      "title": "Delete Department",
+      "descriptionPrefix": "Are you sure you want to delete",
+      "descriptionSuffix": "This action cannot be undone."
+    },
+    "bulkDelete": {
+      "title": "Delete {{count}} Department",
+      "title_plural": "Delete {{count}} Departments",
+      "description": "You're about to permanently delete the following departments. This cannot be undone.",
+      "confirm": "Delete {{count}}",
+      "success": "Deleted {{count}} department",
+      "success_plural": "Deleted {{count}} departments",
+      "partial": "Deleted {{deleted}}; {{failed}} failed"
+    }
+  },
+  "schoolDetail": {
+    "schoolFallback": "School",
+    "notFound": "School not found or could not be loaded.",
+    "status": {
+      "setup": "Setup Mode",
+      "active": "Active",
+      "inactive": "Inactive",
+      "suspended": "Suspended",
+      "closed": "Closed"
+    },
+    "statusActions": {
+      "activate": "Activate School",
+      "suspend": "Suspend School",
+      "deactivate": "Deactivate School",
+      "reactivate": "Reactivate School"
+    },
+    "tabs": {
+      "ariaLabel": "School detail sections",
+      "configuration": "Configuration",
+      "academicSetup": "Academic Setup",
+      "attendance": "Attendance",
+      "structure": "Structure",
+      "gradeLevels": "Grade Levels",
+      "auditLog": "Audit Log",
+      "pending": "{{count}} pending"
+    },
+    "setupBanner": {
+      "title": "Complete school setup before activating",
+      "description": "Configure your school's academic structure so EdForge can track attendance, grades, and scheduling correctly.",
+      "progress": "{{completed}} of {{total}} setup tasks complete",
+      "activate": "✓ Activate School"
+    },
+    "delete": {
+      "title": "Delete School",
+      "setupPrefix": "This will",
+      "permanentlyRemove": "permanently remove",
+      "setupSuffix": "the school and all associated data. This cannot be undone.",
+      "setupBullet": "School entity and configuration will be permanently deleted",
+      "activePrefix": "This will",
+      "deactivateWord": "deactivate",
+      "activeSuffix": "the school. It can be reactivated later by an administrator.",
+      "inactiveBullet": "School will be set to Inactive status",
+      "operationsBullet": "Academic operations will be suspended",
+      "reactivateBullet": "Can be reactivated from the school detail page",
+      "confirmTypePrefix": "Type",
+      "confirmTypeSuffix": "to confirm"
+    },
+    "accessDenied": {
+      "title": "Access Denied",
+      "message": "You don't have permission to view this school's settings."
+    },
+    "toasts": {
+      "deleted": "School deleted successfully",
+      "deleteFailed": "Failed to delete school",
+      "activated": "School activated successfully",
+      "statusUpdated": "School status updated to {{status}}",
+      "statusFailed": "Failed to update school status"
+    }
+  },
+  "schoolConfiguration": {
+    "lockedTooltip": "Locked during active academic year",
+    "lockBanner": {
+      "title": "Active Academic Year",
+      "description": "Some settings are locked while an academic year is active. Schedule, term structure, and grading fields cannot be changed until the current academic year is completed or archived."
+    },
+    "toasts": {
+      "saved": "Configuration saved successfully",
+      "saveFailed": "Failed to save changes"
+    },
+    "sections": {
+      "identity": {
+        "title": "School Identity",
+        "description": "Basic school information"
+      },
+      "location": {
+        "title": "Location & Contact",
+        "description": "Physical address and contact information"
+      },
+      "schedule": {
+        "title": "Schedule & Operations",
+        "description": "School days and operating hours"
+      },
+      "academic": {
+        "title": "Academic Settings",
+        "description": "Grading and term structure"
+      },
+      "features": {
+        "title": "Enabled Features",
+        "description": "Control which modules are active for this school"
+      },
+      "notifications": {
+        "title": "Notifications",
+        "description": "Configure how notifications are delivered"
+      },
+      "attendance": {
+        "title": "Attendance Settings",
+        "description": "Attendance tracking configuration"
+      }
+    },
+    "fields": {
+      "displayName": {
+        "label": "Display Name",
+        "description": "Full name of the school"
+      },
+      "schoolType": {
+        "label": "School Type",
+        "description": "Level of education"
+      },
+      "website": {
+        "label": "Website",
+        "description": "School's public website",
+        "placeholder": "https://www.school.edu"
+      },
+      "selectField": "Select {{field}}",
+      "phoneEmail": {
+        "label": "Phone & Email",
+        "phonePlaceholder": "Phone number",
+        "emailPlaceholder": "Email address"
+      },
+      "schoolDays": {
+        "label": "School Days",
+        "description": "Days when school is in session"
+      },
+      "schoolHours": {
+        "label": "School Hours",
+        "description": "Daily start and end times"
+      },
+      "periodDuration": {
+        "label": "Period Duration",
+        "description": "Length of each class period",
+        "unit": "minutes"
+      },
+      "termStructure": {
+        "label": "Term Structure",
+        "description": "How the academic year is divided"
+      },
+      "gradingScale": {
+        "label": "Grading Scale",
+        "description": "Grading policies are managed in the Grades & Assessments module",
+        "help": "Grading scales, category weights, and calculation rules are configured through Grading Policies in the Grades & Assessments module.",
+        "action": "Manage Grading Policies"
+      },
+      "notificationsEnabled": {
+        "label": "Enable Notifications",
+        "description": "Master toggle for all notifications"
+      },
+      "emailNotifications": {
+        "label": "Email Notifications",
+        "description": "Send notifications via email"
+      },
+      "smsNotifications": {
+        "label": "SMS Notifications",
+        "description": "Send notifications via text message"
+      },
+      "attendanceRequired": {
+        "label": "Attendance Required",
+        "description": "Is attendance tracking mandatory for this school?"
+      }
+    },
+    "schoolTypes": {
+      "elementary": "Elementary School",
+      "middle": "Middle School",
+      "high": "High School",
+      "k12": "K-12 School",
+      "charter": "Charter School",
+      "private": "Private School",
+      "vocational": "Vocational School",
+      "special_education": "Special Education"
+    },
+    "termStructures": {
+      "semester": "Semester (2 terms)",
+      "trimester": "Trimester (3 terms)",
+      "quarter": "Quarter (4 terms)",
+      "year": "Full Year (1 term)"
+    },
+    "inheritance": {
+      "title": "Inheriting from Workspace:",
+      "description": "Some settings are inherited from your organization's workspace settings. Changes here will override the workspace defaults for this school only."
+    }
+  },
+  "schoolCalendar": {
+    "title": "School Calendar",
+    "subtitle": "{{year}} Calendar Management",
+    "academicYearFallback": "Academic Year",
+    "noAcademicYear": "No academic year found. Please create an academic year first in the Academic Years tab.",
+    "actions": {
+      "sessions": "Sessions",
+      "generate": "Generate"
+    },
+    "toasts": {
+      "generated": "Generated {{totalDays}} days ({{instructionalDays}} instructional)"
+    },
+    "noSchedule": {
+      "label": "No Schedule",
+      "description": "No bell schedule assigned"
+    },
+    "labels": {
+      "calendarDate": "Calendar Date",
+      "weekend": "Weekend",
+      "holiday": "Holiday",
+      "instructionalDay": "Instructional Day",
+      "nonInstructional": "Non-Instructional"
+    },
+    "stats": {
+      "daysElapsed": "{{passed}} of {{total}} days elapsed",
+      "totalDays": "{{count}} total days",
+      "instructionalDays": "Instructional Days",
+      "instructionalProgress": "{{completed}} completed, {{remaining}} remaining",
+      "holidays": "Holidays",
+      "noHolidays": "No holidays scheduled",
+      "scheduledHolidays": "Scheduled holidays",
+      "nonInstructional": "Non-Instructional",
+      "teacherOnlyDays": "Includes {{count}} teacher-only days"
+    },
+    "drawer": {
+      "weekendHolidayOverlap": "{{holiday}} falls on this {{day}} — counted as weekend, not holiday",
+      "dayNumber": "Day {{day}}",
+      "instructionalDayNumber": "Instructional Day #{{day}}",
+      "bellScheduleValue": "Bell Schedule: {{schedule}}",
+      "eventType": "Event Type",
+      "otherAdvanced": "Other (advanced)…",
+      "rawEventType": "Raw Event Type",
+      "selectPlaceholder": "Select...",
+      "description": "Description",
+      "descriptionPlaceholder": "Optional description (e.g., Dashain Holiday)",
+      "bellSchedule": "Bell Schedule",
+      "assignBellSchedule": "Assign bell schedule..."
+    },
+    "generate": {
+      "title": "Generate Calendar",
+      "subtitle": "Auto-generate dates for {{year}}",
+      "dateRangePrefix": "This will generate calendar dates from",
+      "dateRangeMiddle": "to",
+      "instructionalNote": "Weekdays will be marked as instructional days. Weekends will be marked automatically.",
+      "replaceWarning": "Existing dates for this year will be replaced."
+    },
+    "sessions": {
+      "title": "Academic Sessions",
+      "description": "Semesters and terms for {{year}}",
+      "thisYear": "this year"
+    },
+    "filters": {
+      "all": "All",
+      "none": "None"
+    }
+  },
+  "academicSetup": {
+    "navigation": {
+      "title": "Setup Steps",
+      "description": "Complete these steps in order. Each builds on the previous — you need an academic year before setting up sessions, and sessions before generating a calendar."
+    },
+    "steps": {
+      "years": "Academic Years",
+      "sessions": "Sessions & Terms",
+      "calendar": "Calendar",
+      "bellSchedule": "Bell Schedule"
+    },
+    "fields": {
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "yearName": "Year Name",
+      "sessionName": "Session Name",
+      "termDescriptor": "Term Descriptor",
+      "beginDate": "Begin Date"
+    },
+    "actions": {
+      "creating": "Creating...",
+      "saving": "Saving...",
+      "activating": "Activating...",
+      "applying": "Applying…",
+      "generating": "Generating...",
+      "createAcademicYear": "Create Academic Year",
+      "newAcademicYear": "New Academic Year",
+      "activateYear": "Activate Year",
+      "activate": "Activate",
+      "setAsCurrent": "Set as Current",
+      "addSession": "Add Session",
+      "applyTemplate": "Apply template",
+      "createSession": "Create Session",
+      "use": "Use"
+    },
+    "toasts": {
+      "currentSet": "Academic year set as current",
+      "currentSetFailed": "Failed to set academic year as current",
+      "missingYearId": "Unable to update year: missing yearId"
+    },
+    "confirmCurrent": {
+      "replacing": "Make \"{{year}}\" the current academic year? \"{{current}}\" will no longer be marked current.",
+      "default": "Make \"{{year}}\" the current academic year? Dashboards, attendance, and grades will anchor on this year."
+    },
+    "status": {
+      "planning": "Planning",
+      "active": "Active",
+      "completed": "Archived"
+    },
+    "badges": {
+      "current": "Current",
+      "notCurrent": "Not current"
+    },
+    "yearModal": {
+      "createTitle": "Create Academic Year",
+      "editTitle": "Edit Academic Year",
+      "viewTitle": "View Academic Year",
+      "bsPlaceholder": "e.g., 2082-2083",
+      "adPlaceholder": "e.g., 2025-2026",
+      "planningNoticePrefix": "The academic year will be created in \"Planning\" status with no sessions yet. Open the next step",
+      "planningNoticeSuffix": "to define your terms — pick a template or create them individually, then activate the year.",
+      "lockedNotice": "This academic year is {{status}} and cannot be modified. Dates are locked to maintain data integrity.",
+      "activationLocksNotice": "Once this year is activated, dates will be locked and cannot be changed."
+    },
+    "activate": {
+      "title": "Activate Academic Year",
+      "intro": "You are about to activate",
+      "actionLeadIn": "This action:",
+      "lockDates": "Will lock the start and end dates permanently",
+      "deactivateCurrent": "Will deactivate any currently active academic year",
+      "cannotReverse": "Cannot be reversed back to \"Planning\""
+    },
+    "years": {
+      "title": "Academic Years",
+      "description": "Define the temporal boundaries for all academic data.",
+      "driftTitle": "\"{{year}}\" is active but no year is designated as current.",
+      "driftDescription": "Dashboards, attendance, and grades depend on a designated current year.",
+      "emptyTitle": "No academic years yet",
+      "emptyDescription": "Create your first academic year to begin setting up your school's academic structure.",
+      "datesNotSet": "Dates not set",
+      "currentTooltip": "This year anchors dashboards, attendance, and grades.",
+      "notCurrentTooltip": "This year is active but no year is designated as current. Use 'Set as Current' to fix.",
+      "setCurrentTooltip": "Designate as the current academic year",
+      "nextStep": "Next step: Add sessions (semesters/trimesters) to this academic year to define grading periods.",
+      "integrityNote": "Academic years cannot be deleted once created. This preserves historical data integrity. Mark completed years as archived to hide them from active views."
+    },
+    "sessions": {
+      "title": "Sessions & Terms",
+      "descriptionPrefix": "Define semesters, trimesters, or quarters within",
+      "edfiPrefix": "Sessions define grading periods (e.g., \"First Semester\", \"Q1\"). Each session maps to Ed-Fi",
+      "edfiSuffix": "Students receive report cards per session.",
+      "templateApplied": "PABSON 4-term template applied — 4 sessions created",
+      "templateApplyFailed": "Template apply failed",
+      "templateApplyStopped": "Template apply stopped: {{message}}",
+      "createFailed": "Failed to create session",
+      "pabsonTemplate": {
+        "title": "PABSON 4-term template",
+        "description": "One click creates the standard PABSON 4-quarter structure aligned to the BS calendar. You can edit names or dates afterward. Skip this if your school uses a different rhythm."
+      },
+      "cardTitle": "{{year}} Sessions",
+      "configuredCount": "{{count}} sessions configured",
+      "newSession": "New Session",
+      "sessionNamePlaceholder": "e.g., First Semester",
+      "termDescriptorPlaceholder": "Select term descriptor...",
+      "emptyTitle": "No sessions yet",
+      "emptyDescription": "Create your first session above — e.g., \"First Semester\" covering April through September. Sessions define when report cards are generated.",
+      "nepalSuggestionsTitle": "Suggested for Nepal schools (Semester system):",
+      "firstSemester": "First Semester",
+      "firstSemesterDetail": "Baishakh – Ashwin  (Apr – Oct)",
+      "secondSemester": "Second Semester",
+      "secondSemesterDetail": "Kartik – Chaitra  (Oct – Mar)",
+      "sessionFallback": "Session"
+    },
+    "termDescriptors": {
+      "fall_semester": "Fall Semester",
+      "spring_semester": "Spring Semester",
+      "year_round": "Year Round",
+      "summer": "Summer",
+      "first_quarter": "First Quarter",
+      "second_quarter": "Second Quarter",
+      "third_quarter": "Third Quarter",
+      "fourth_quarter": "Fourth Quarter"
+    },
+    "examWindow": {
+      "saved": "Exam window saved",
+      "savedWithWarnings": "Exam window saved with {{count}} holiday overlap warning(s)",
+      "saveFailed": "Failed to save exam window. Try again.",
+      "notSet": "Not set",
+      "tooltip": "Exam window — auto-syncs to the calendar",
+      "summary": "Exam: {{range}}",
+      "edit": "Edit exam window",
+      "set": "Set exam window",
+      "rangeHelp": "Exam dates must be inside the session range ({{start}} – {{end}}). Saving auto-generates orange exam-window markers on the calendar.",
+      "startDate": "Exam Start Date",
+      "endDate": "Exam End Date",
+      "saveDates": "Save exam dates",
+      "warningTitle": "Heads up — {{count}} date in this exam window overlaps a holiday:",
+      "warningTitle_plural": "Heads up — {{count}} dates in this exam window overlap a holiday:",
+      "warningDescription": "Saved as-is. Adjust dates above or clear the warning by setting the exam window outside the holidays."
+    },
+    "calendar": {
+      "resetTooltip": "To reset the calendar, use Configuration → Danger Zone",
+      "generated": "Calendar generated · {{count}} days",
+      "scheduledCount": "{{count}} scheduled",
+      "generateDescription": "Auto-generate instructional and non-instructional days for this academic year based on your school's locale and schedule configuration.",
+      "detectedNepal": "Detected locale: Nepal (NP) · Saturday weekend · {{count}} public holidays loaded",
+      "detectedInternational": "Detected locale: International · Gregorian calendar",
+      "countryLocale": "Country / Locale",
+      "weekends": "Weekends",
+      "schoolDays": "School Days",
+      "previewLabel": "Preview:",
+      "previewRangePrefix": "Will generate dates from",
+      "previewInstructional": "✓ Active days → Instructional days",
+      "previewWeekends": "✓ Weekend days → Non-instructional (weekend)",
+      "previewHolidays": "✓ {{count}} national holidays from {{locale}} public holiday calendar will be applied",
+      "previewNoHolidayCalendar": "⚠ No locale holiday calendar available — holidays can be added manually after generation",
+      "confirmIntro": "This will generate calendar dates for {{year}} from",
+      "confirmInstructional": "✓ Active days will be marked as instructional",
+      "confirmWeekends": "✓ Weekend days will be marked as non-instructional",
+      "confirmHolidays": "✓ {{count}} public holidays will be applied",
+      "confirmSessionCounts": "✓ Session instructional day counts will be updated automatically",
+      "confirmGenerate": "Confirm & Generate",
+      "dayTypes": "Day types:",
+      "localeNames": {
+        "nepal": "Nepal",
+        "locale": "locale"
+      },
+      "localeOptions": {
+        "nepal": "Nepal (NP)",
+        "unitedStates": "United States (US)",
+        "india": "India (IN)",
+        "custom": "Custom"
+      },
+      "weekendOptions": {
+        "saturday": "Saturday only (Nepal default)",
+        "saturdaySunday": "Saturday & Sunday",
+        "fridaySaturday": "Friday & Saturday",
+        "sunday": "Sunday only"
+      }
+    },
+    "bellSchedule": {
+      "description": "Define class periods and time slots for each type of school day.",
+      "useTemplate": "Use Template",
+      "collapse": "▲ Collapse",
+      "expand": "▼ Expand",
+      "scheduleNamePlaceholder": "e.g., \"Regular Day\", \"Early Release\"",
+      "createHint": "Create an empty schedule, then add periods to it. Or use a template above to start with pre-built periods.",
+      "createSchedule": "Create Schedule",
+      "templateHint": "Pre-built schedules — edit after applying",
+      "applied": "✓ Applied",
+      "noDefaultTitle": "No usable default bell schedule.",
+      "noDefaultDescription": "Activation will be refused until a real (multi-period) schedule is marked as the school's default. Use",
+      "placeholderTooltip": "This default schedule has only one period. Set a real schedule before activating the academic year.",
+      "placeholderChip": "Placeholder — set a real schedule before activating AY",
+      "emptyTitle": "No bell schedules yet",
+      "emptyDescription": "Apply a template above or create your first schedule to define how each type of school day is structured.",
+      "createFirstSchedule": "+ Create First Schedule",
+      "templates": {
+        "nepal": {
+          "name": "Nepal Standard (Sun–Fri)",
+          "description": "9 periods · 10:00 AM – 3:45 PM · Includes assembly, lunch, recess"
+        },
+        "nepalExam": {
+          "name": "PABSON Exam Day",
+          "description": "2 exam blocks · 10:00 AM – 4:00 PM · Morning & afternoon exams"
+        },
+        "elementary": {
+          "name": "Elementary Schedule (US)",
+          "description": "9 periods · 8:00 AM – 2:00 PM · Includes homeroom, recess, lunch"
+        },
+        "highSchool": {
+          "name": "High School Schedule (US)",
+          "description": "9 periods · 7:30 AM – 3:05 PM · Includes advisory and lunch"
+        }
+      }
+    }
+  },
+  "schoolBellSchedule": {
+    "title": "Bell Schedule",
+    "description": "Define how each type of school day is structured",
+    "actions": {
+      "startFromTemplate": "Start from Template",
+      "newSchedule": "New Schedule",
+      "addPeriod": "Add Period",
+      "setAsDefault": "Set as default",
+      "createFromExisting": "Create from Existing",
+      "addFirstPeriod": "Add First Period",
+      "createFirstSchedule": "Create First Schedule"
+    },
+    "validation": {
+      "periodNameRequired": "Period name is required",
+      "endAfterStart": "End time must be after start time",
+      "scheduleNameRequired": "Schedule name is required",
+      "effectiveDateRequired": "Effective date is required"
+    },
+    "toasts": {
+      "templateFailed": "Failed to apply template",
+      "createdFromExisting": "Created schedule from existing periods"
+    },
+    "badges": {
+      "academic": "academic",
+      "default": "Default",
+      "inactive": "Inactive"
+    },
+    "examples": {
+      "regularDay": "Regular Day"
+    },
+    "howItWorks": {
+      "title": "How bell schedules work",
+      "scheduleEqualsDay": "bell schedule = the whole day",
+      "periodsInsideSchedule": "= time slots (periods) inside the schedule",
+      "steps": {
+        "create": {
+          "label": "Create a schedule",
+          "sub": "\"Regular Day\", \"Early Release\""
+        },
+        "periods": {
+          "label": "Add periods to it",
+          "sub": "Class times, lunch, homeroom"
+        },
+        "calendar": {
+          "label": "Assign to calendar",
+          "sub": "Which days use which schedule"
+        }
+      }
+    },
+    "summary": {
+      "effective": "Effective {{date}}",
+      "periodCount": "{{count}} period",
+      "periodCount_plural": "{{count}} periods",
+      "instructionalTime": "{{duration}} instructional",
+      "otherTime": "{{duration}} other"
+    },
+    "migration": {
+      "title": "You have {{count}} class period",
+      "title_plural": "You have {{count}} class periods",
+      "description": "Create a bell schedule to organize them into a named schedule (e.g., Regular Day, Early Release)."
+    },
+    "empty": {
+      "noPeriodsTitle": "No Periods Yet",
+      "getStartedTitle": "Get Started with Bell Schedules",
+      "noPeriodsDescription": "The \"{{schedule}}\" schedule doesn't have any time blocks yet. Add periods to define when each class, lunch, and activity happens during this type of school day.",
+      "getStartedDescription": "Bell schedules define how your school day is structured. Start by creating a schedule (like \"Regular Day\"), then add periods to it (like \"Period 1: 8:00–8:50\", \"Lunch: 11:30–12:00\"). You can create multiple schedules for different day types.",
+      "selectScheduleDescription": "Select a schedule above to view and manage its periods, or create a new schedule.",
+      "tip": "Tip: Most schools have 6–9 periods including homeroom, classes, lunch, and passing time."
+    },
+    "list": {
+      "gap": "{{minutes}}m gap",
+      "duration": "{{minutes}} min"
+    },
+    "periodForm": {
+      "editTitle": "Edit Period",
+      "addTitle": "Add Period",
+      "editInSchedule": "Edit a time slot in \"{{schedule}}\".",
+      "addInSchedule": "Add a time slot in \"{{schedule}}\".",
+      "editStandalone": "Edit a class period time slot.",
+      "addStandalone": "Add a class period time slot.",
+      "periodName": "Period Name",
+      "periodNamePlaceholder": "e.g., Period 1, Homeroom, Lunch",
+      "startTime": "Start Time",
+      "endTime": "End Time",
+      "durationPreview": "Duration: {{minutes}} minutes",
+      "periodType": "Period Type",
+      "periodTypePlaceholder": "Select period type",
+      "sortOrder": "Sort Order",
+      "academic": "Academic (counts toward instructional hours)",
+      "description": "Description",
+      "descriptionPlaceholder": "Optional description",
+      "whatIsPeriodTitle": "What is a period?",
+      "whatIsPeriodPrefix": "A period is a",
+      "singleTimeSlot": "single time slot",
+      "whatIsPeriodSuffix": "inside a bell schedule — one block in the school day. \"Academic\" periods (classes, labs) count toward required instructional hours. Non-academic periods (lunch, recess, passing time) do not."
+    },
+    "templates": {
+      "title": "Start from Template",
+      "existingWarning": "This will create a new bell schedule alongside your existing ones.",
+      "elementary": {
+        "title": "Elementary Schedule",
+        "description": "9 periods · 8:00 AM - 2:00 PM · Includes homeroom, recess, lunch"
+      },
+      "highSchool": {
+        "title": "High School Schedule",
+        "description": "9 periods · 7:30 AM - 3:05 PM · Includes advisory and lunch"
+      }
+    },
+    "deletePeriod": {
+      "title": "Delete Period",
+      "scheduleDescription": "Are you sure you want to remove this period from the schedule?",
+      "standaloneDescription": "Are you sure you want to delete this class period? Sections referencing it will lose their period assignment."
+    },
+    "scheduleForm": {
+      "editTitle": "Edit Schedule",
+      "newTitle": "New Bell Schedule",
+      "editDescription": "Update this schedule's settings.",
+      "newDescription": "Name your school day type, then add periods to it.",
+      "scheduleName": "Schedule Name",
+      "scheduleNamePlaceholder": "e.g., Regular Day",
+      "dayType": "Day Type",
+      "dayTypePlaceholder": "Select day type",
+      "alternateDayName": "Alternate Day Name",
+      "alternateDayNamePlaceholder": "e.g., A Day, B Day",
+      "effectiveDate": "Effective Date",
+      "endDate": "End Date",
+      "setAsDefault": "Set as default schedule",
+      "description": "Description",
+      "descriptionPlaceholder": "Optional description",
+      "whatIsScheduleTitle": "What is a bell schedule?",
+      "whatIsSchedulePrefix": "A bell schedule is your school's",
+      "dailyTimetable": "daily timetable",
+      "whatIsScheduleSuffix": "for a type of day. After creating it, you add individual time slots (periods) to it:",
+      "exampleScheduleHint": "← this is a bell schedule"
+    },
+    "deleteSchedule": {
+      "title": "Delete Schedule",
+      "description": "This will remove the bell schedule and all its period configurations. Calendar dates referencing this schedule will need to be reassigned."
+    },
+    "periodTypes": {
+      "instructional": { "label": "Instructional", "description": "Regular class period" },
+      "homeroom": { "label": "Homeroom", "description": "Morning check-in" },
+      "lunch": { "label": "Lunch", "description": "Lunch break" },
+      "recess": { "label": "Recess", "description": "Outdoor break" },
+      "passing": { "label": "Passing", "description": "Between classes" },
+      "advisory": { "label": "Advisory", "description": "Student advisory" },
+      "assembly": { "label": "Assembly", "description": "School assembly" },
+      "study_hall": { "label": "Study Hall", "description": "Supervised study" },
+      "extracurricular": { "label": "Extracurricular", "description": "After-school activity" },
+      "break": { "label": "Break", "description": "Short break" }
+    },
+    "dayTypes": {
+      "regular": { "label": "Regular", "description": "Standard school day" },
+      "early_release": { "label": "Early Release", "description": "Shortened afternoon" },
+      "late_start": { "label": "Late Start", "description": "Delayed morning start" },
+      "assembly": { "label": "Assembly", "description": "Assembly schedule" },
+      "testing": { "label": "Testing", "description": "Testing day schedule" },
+      "half_day": { "label": "Half Day", "description": "Half day schedule" },
+      "special": { "label": "Special", "description": "Special schedule" }
     }
   },
   "organization": {

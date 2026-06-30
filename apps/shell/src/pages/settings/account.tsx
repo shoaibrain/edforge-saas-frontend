@@ -12,6 +12,7 @@ import { motion } from 'framer-motion'
 import { toast } from 'sonner'
 import { Mail, User, MapPin, Phone, type LucideIcon } from 'lucide-react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from '@edforge/i18n'
 import {
   Button,
   PageShell,
@@ -151,6 +152,8 @@ function AccountPageSkeleton() {
 // ============================================================================
 
 function AccountPageError({ error, onRetry }: { error: string; onRetry: () => void }) {
+  const { t } = useTranslation('settings')
+
   return (
     <PageShell as="div" variant="settings" className="max-w-6xl">
       <motion.div
@@ -162,13 +165,13 @@ function AccountPageError({ error, onRetry }: { error: string; onRetry: () => vo
           <User className="w-8 h-8 text-[rgb(var(--state-danger-fg))]" />
         </div>
         <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))] mb-2">
-          Failed to Load Profile
+          {t('account.error.loadTitle')}
         </h2>
         <p className="text-sm text-[rgb(var(--text-tertiary))] text-center mb-6 max-w-sm">
           {error}
         </p>
         <Button variant="outline" onClick={onRetry}>
-          Try Again
+          {t('common.tryAgain')}
         </Button>
       </motion.div>
     </PageShell>
@@ -180,6 +183,7 @@ function AccountPageError({ error, onRetry }: { error: string; onRetry: () => vo
 // ============================================================================
 
 export default function AccountPage() {
+  const { t } = useTranslation('settings')
   const user = useAuthStore((s) => s.user)
   const queryClient = useQueryClient()
 
@@ -203,10 +207,10 @@ export default function AccountPage() {
     mutationFn: (data: UpdateUserDto) => usersService.updateUser(user!.id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user', user?.id] })
-      toast.success('Profile updated successfully')
+      toast.success(t('account.profileUpdated'))
     },
     onError: (err: Error) => {
-      toast.error(err.message || 'Failed to update profile')
+      toast.error(err.message || t('account.profileUpdateFailed'))
     },
   })
 
@@ -301,7 +305,7 @@ export default function AccountPage() {
   const avatarUrl =
     userProfile?.avatarUrl ||
     getUserAvatar(
-      userProfile ? `${userProfile.firstName} ${userProfile.lastName}` : user?.name || 'User'
+      userProfile ? `${userProfile.firstName} ${userProfile.lastName}` : user?.name || t('account.fallbackUser')
     )
 
   const displayName =
@@ -309,9 +313,16 @@ export default function AccountPage() {
     (userProfile ? `${userProfile.firstName} ${userProfile.lastName}`.trim() : '') ||
     userProfile?.email ||
     user?.name ||
-    'User'
+    t('account.fallbackUser')
 
-  const displayRole = userProfile?.globalRole || user?.globalRole || 'User'
+  const displayRole = userProfile?.globalRole || user?.globalRole || t('account.fallbackUser')
+
+  const countryOptions = COUNTRY_OPTIONS.map((option) =>
+    option.value === '' ? { ...option, label: t('account.form.selectCountry') } : option
+  )
+  const stateOptions = US_STATE_OPTIONS.map((option) =>
+    option.value === '' ? { ...option, label: t('account.form.selectState') } : option
+  )
 
   // Map domain status -> semantic StatusBadge tone.
   const statusTone =
@@ -330,7 +341,7 @@ export default function AccountPage() {
   if (isError && !userProfile) {
     return (
       <AccountPageError
-        error={error instanceof Error ? error.message : 'Failed to load profile'}
+        error={error instanceof Error ? error.message : t('account.error.loadDescription')}
         onRetry={() => refetch()}
       />
     )
@@ -340,13 +351,13 @@ export default function AccountPage() {
   const accountDetailItems: DescriptionListItem[] = userProfile
     ? [
         {
-          label: 'User ID',
+          label: t('account.details.userId'),
           value: userProfile.userId,
           copyable: userProfile.userId,
           mono: true,
         },
         {
-          label: 'Created',
+          label: t('account.details.created'),
           value: new Date(userProfile.createdAt).toLocaleDateString(undefined, {
             year: 'numeric',
             month: 'long',
@@ -356,16 +367,16 @@ export default function AccountPage() {
         ...(userProfile.lastLoginAt
           ? [
               {
-                label: 'Last login',
+                label: t('account.details.lastLogin'),
                 value: new Date(userProfile.lastLoginAt).toLocaleString(),
               },
             ]
           : []),
         {
-          label: 'MFA',
+          label: t('account.details.mfa'),
           value: (
             <StatusBadge tone={userProfile.mfaEnabled ? 'success' : 'neutral'} dot>
-              {userProfile.mfaEnabled ? 'Enabled' : 'Not enabled'}
+              {userProfile.mfaEnabled ? t('account.mfa.enabled') : t('account.mfa.notEnabled')}
             </StatusBadge>
           ),
         },
@@ -415,7 +426,7 @@ export default function AccountPage() {
 
                     {userProfile && (
                       <div className="space-y-2 border-t border-[rgb(var(--border-tertiary))] pt-4">
-                        <Text variant="label">Account Details</Text>
+                        <Text variant="label">{t('account.accountDetails')}</Text>
                         <DescriptionList layout="stacked" items={accountDetailItems} />
                       </div>
                     )}
@@ -426,78 +437,78 @@ export default function AccountPage() {
               {/* Editable canvas */}
               <motion.div variants={fadeInUp} className="lg:col-span-2 space-y-6">
                 <SectionCard
-                  title={<SectionTitle icon={User}>Personal Information</SectionTitle>}
-                  description="Your name and identity"
+                  title={<SectionTitle icon={User}>{t('account.personalInfo')}</SectionTitle>}
+                  description={t('account.sections.personalDescription')}
                   contentClassName="space-y-4"
                 >
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <TextField name="firstName" label="First Name" placeholder="Enter first name" required />
-                    <TextField name="lastName" label="Last Name" placeholder="Enter last name" required />
+                    <TextField name="firstName" label={t('account.firstName')} placeholder={t('account.form.firstNamePlaceholder')} required />
+                    <TextField name="lastName" label={t('account.lastName')} placeholder={t('account.form.lastNamePlaceholder')} required />
                   </div>
                   <TextField
                     name="displayName"
-                    label="Display Name"
-                    placeholder="How you want to be called"
-                    helperText="This is how your name appears to others"
+                    label={t('account.displayName')}
+                    placeholder={t('account.form.displayNamePlaceholder')}
+                    helperText={t('account.form.displayNameHelp')}
                   />
                 </SectionCard>
 
                 <SectionCard
-                  title={<SectionTitle icon={Mail}>Contact Information</SectionTitle>}
-                  description="Email and phone details"
+                  title={<SectionTitle icon={Mail}>{t('account.sections.contactTitle')}</SectionTitle>}
+                  description={t('account.sections.contactDescription')}
                   contentClassName="space-y-4"
                 >
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <TextField
                       name="email"
-                      label="Email"
+                      label={t('account.email')}
                       type="email"
-                      placeholder="email@example.com"
+                      placeholder={t('account.form.emailPlaceholder')}
                       icon={Mail}
                       disabled
-                      helperText="Contact support to change your email"
+                      helperText={t('account.form.emailHelp')}
                     />
                     <TextField
                       name="phone"
-                      label="Phone Number"
+                      label={t('account.phone')}
                       type="tel"
-                      placeholder="+1 555-123-4567"
+                      placeholder={t('account.form.phonePlaceholder')}
                       icon={Phone}
-                      helperText="Include country code"
+                      helperText={t('account.form.phoneHelp')}
                     />
                   </div>
                 </SectionCard>
 
                 <SectionCard
-                  title={<SectionTitle icon={MapPin}>Address</SectionTitle>}
-                  description="Your mailing address"
+                  title={<SectionTitle icon={MapPin}>{t('account.address')}</SectionTitle>}
+                  description={t('account.sections.addressDescription')}
                   className="overflow-visible"
                   contentClassName="space-y-4"
                 >
                   <TextField
                     name="address.street"
-                    label="Street Address"
-                    placeholder="123 Main Street"
+                    label={t('account.street')}
+                    placeholder={t('account.form.streetPlaceholder')}
                     icon={MapPin}
                   />
                   <TextField
                     name="address.street2"
-                    label="Apartment, Suite, etc."
-                    placeholder="Apt 4B (optional)"
+                    label={t('account.street2')}
+                    placeholder={t('account.form.street2Placeholder')}
                   />
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <TextField name="address.city" label="City" placeholder="San Francisco" />
+                    <TextField name="address.city" label={t('account.city')} placeholder={t('account.form.cityPlaceholder')} />
                     <SelectField
                       name="address.state"
-                      label="State / Province"
-                      options={US_STATE_OPTIONS}
+                      label={t('account.state')}
+                      options={stateOptions}
                     />
-                    <TextField name="address.postalCode" label="Postal Code" placeholder="94102" />
+                    <TextField name="address.postalCode" label={t('account.postalCode')} placeholder={t('account.form.postalCodePlaceholder')} />
                   </div>
                   <SelectField
                     name="address.country"
-                    label="Country"
-                    options={COUNTRY_OPTIONS}
+                    label={t('account.country')}
+                    options={countryOptions}
                     className="max-w-xs"
                   />
                 </SectionCard>

@@ -82,9 +82,9 @@ function SettingsOverviewContent({
     { label: t('workspace.title'), icon: Settings, href: '/settings/workspace', signature: 'workspace' },
     // Sprint M2 — branding read; M3 will toggle the same page into edit
     // (Branding / Fee Structures / Payment Gateways have no bespoke glyph → generic motion.)
-    { label: t('branding.title', { defaultValue: 'Branding' }), icon: Paintbrush, href: '/settings/branding' },
-    { label: 'Fee Structures', icon: CreditCard, href: '/finance/configuration/fee-structures' },
-    { label: 'Payment Gateways', icon: CreditCard, href: '/finance/configuration/payment-gateways' },
+    { label: t('overview.actions.branding'), icon: Paintbrush, href: '/settings/branding' },
+    { label: t('overview.actions.feeStructures'), icon: CreditCard, href: '/finance/configuration/fee-structures' },
+    { label: t('overview.actions.paymentGateways'), icon: CreditCard, href: '/finance/configuration/payment-gateways' },
   ]
 
   return (
@@ -112,7 +112,7 @@ function SettingsOverviewContent({
           transition={{ delay: 0.1 }}
           className="text-2xl font-bold text-[rgb(var(--text-primary))]"
         >
-          {userName || 'Your Name'}
+          {userName || t('overview.fallbackName')}
         </motion.h1>
         <motion.p
           initial={{ opacity: 0 }}
@@ -120,7 +120,7 @@ function SettingsOverviewContent({
           transition={{ delay: 0.15 }}
           className="text-sm text-[rgb(var(--text-tertiary))] mt-1"
         >
-          {userEmail || 'your@email.com'}
+          {userEmail || t('overview.fallbackEmail')}
         </motion.p>
 
         {/* Role Badge */}
@@ -131,7 +131,7 @@ function SettingsOverviewContent({
           className="mt-3"
         >
           <span className="px-3 py-1 text-xs font-medium rounded-full bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--action-secondary-fg))]  border border-[rgb(var(--border-focus)/0.35)]">
-            {userRole || 'User'}
+            {userRole || t('account.fallbackUser')}
           </span>
         </motion.div>
       </motion.div>
@@ -149,7 +149,7 @@ function SettingsOverviewContent({
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[rgb(var(--text-tertiary))]" />
           <input
             type="text"
-            placeholder="Search settings (coming soon)"
+            placeholder={t('overview.searchComingSoon')}
             disabled
             aria-disabled="true"
             className="w-full pl-12 pr-4 py-3.5 rounded-full border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] opacity-60 cursor-not-allowed"

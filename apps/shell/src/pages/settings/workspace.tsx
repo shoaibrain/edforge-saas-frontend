@@ -15,6 +15,7 @@ import { Navigate } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
 import { toast } from 'sonner'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from '@edforge/i18n'
 import {
   Globe,
   Shield,
@@ -268,6 +269,7 @@ function TenantInfoCard({
   tier,
   createdAt,
 }: TenantInfoCardProps) {
+  const { t } = useTranslation('settings')
   const createdAtDisplay = createdAt
     ? new Date(createdAt).toLocaleDateString(undefined, {
         year: 'numeric',
@@ -277,13 +279,13 @@ function TenantInfoCard({
     : null
 
   const items: DescriptionListItem[] = [
-    ...(tenantName ? [{ label: 'Name', value: tenantName }] : []),
+    ...(tenantName ? [{ label: t('workspace.tenantInfo.name'), value: tenantName }] : []),
     ...(archetype
-      ? [{ label: 'Archetype', value: <StatusBadge tone="info">{archetype}</StatusBadge> }]
+      ? [{ label: t('workspace.tenantInfo.archetype'), value: <StatusBadge tone="info">{archetype}</StatusBadge> }]
       : []),
-    ...(country ? [{ label: 'Country', value: country }] : []),
-    ...(tier ? [{ label: 'Tier', value: <StatusBadge tone="neutral">{tier}</StatusBadge> }] : []),
-    ...(createdAtDisplay ? [{ label: 'Created', value: createdAtDisplay }] : []),
+    ...(country ? [{ label: t('workspace.tenantInfo.country'), value: country }] : []),
+    ...(tier ? [{ label: t('workspace.tenantInfo.tier'), value: <StatusBadge tone="neutral">{tier}</StatusBadge> }] : []),
+    ...(createdAtDisplay ? [{ label: t('workspace.tenantInfo.created'), value: createdAtDisplay }] : []),
   ]
 
   return (
@@ -296,10 +298,10 @@ function TenantInfoCard({
             </span>
             <div className="min-w-0">
               <Heading level={2} variant="subsection">
-                Tenant Info
+                {t('workspace.tenantInfo.title')}
               </Heading>
               <Text variant="caption">
-                Read-only — set at provisioning and cannot be changed.
+                {t('workspace.tenantInfo.description')}
               </Text>
             </div>
           </div>
@@ -315,6 +317,8 @@ function TenantInfoCard({
 // ============================================================================
 
 function AccessDenied({ message }: { message: string }) {
+  const { t } = useTranslation('settings')
+
   return (
     <PageShell as="div" variant="settings" className="max-w-6xl">
       <motion.div
@@ -325,7 +329,7 @@ function AccessDenied({ message }: { message: string }) {
         <div className="p-4 rounded-full bg-rust-500/10 inline-flex mb-4">
           <Shield className="w-8 h-8 text-rust-500" />
         </div>
-        <h2 className="text-xl font-semibold text-[rgb(var(--text-primary))] mb-2">Access Denied</h2>
+        <h2 className="text-xl font-semibold text-[rgb(var(--text-primary))] mb-2">{t('workspace.accessDenied.title')}</h2>
         <p className="text-[rgb(var(--text-tertiary))]">{message}</p>
       </motion.div>
     </PageShell>
@@ -340,15 +344,19 @@ function AccessDenied({ message }: { message: string }) {
  * Compose a tooltip detail string from the lockHolders list. Used by each
  * locked field's tooltip so the admin learns which school+year to close.
  */
-function formatLockHoldersDetail(heldBy: WorkspaceLockHolder[]): string | undefined {
+function formatLockHoldersDetail(
+  heldBy: WorkspaceLockHolder[],
+  t: (key: string, options?: Record<string, unknown>) => string,
+): string | undefined {
   if (!heldBy.length) return undefined
   if (heldBy.length === 1) {
     return `${heldBy[0].schoolName} · ${heldBy[0].yearName}`
   }
-  return `${heldBy.length} active academic years across schools`
+  return t('workspace.locking.tooltipMultiple', { count: heldBy.length })
 }
 
 export default function WorkspaceSettingsPage() {
+  const { t } = useTranslation('settings')
   // All hooks MUST be called before any conditional returns
   const user = useAuthStore((s) => s.user)
   const activeSchoolId = useAppStore((s) => s.activeSchoolId)
@@ -394,7 +402,7 @@ export default function WorkspaceSettingsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workspaceSettings', user?.tenantId] })
       originalStateRef.current = formState
-      toast.success('Workspace settings saved')
+      toast.success(t('workspace.saved'))
     },
     onError: (err: Error & { response?: { data?: unknown } }) => {
       // Backend (Sprint B.5) returns 403
@@ -416,7 +424,7 @@ export default function WorkspaceSettingsPage() {
         }
         return
       }
-      toast.error(payload?.message || err.message || 'Failed to save settings')
+      toast.error(payload?.message || err.message || t('workspace.saveFailed'))
     },
   })
 
@@ -519,7 +527,7 @@ export default function WorkspaceSettingsPage() {
   })
 
   if (!hasPermission) {
-    return <AccessDenied message="You don't have permission to view workspace settings." />
+    return <AccessDenied message={t('workspace.accessDenied.message')} />
   }
 
   // Loading state
@@ -536,8 +544,8 @@ export default function WorkspaceSettingsPage() {
     return (
       <PageShell as="div" variant="settings" className="max-w-6xl">
         <SettingsPageHeader
-          title="Workspace Settings"
-          description="Organization-wide configuration that applies to all schools"
+          title={t('workspace.title')}
+          description={t('workspace.pageDescription')}
           icon={Building2}
         />
         <div className="mt-8 flex flex-col items-center justify-center py-12">
@@ -545,14 +553,14 @@ export default function WorkspaceSettingsPage() {
             <AlertTriangle className="w-8 h-8 text-[rgb(var(--state-danger-fg))]" />
           </div>
           <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))] mb-2">
-            Failed to Load Settings
+            {t('workspace.error.loadTitle')}
           </h2>
           <p className="text-sm text-[rgb(var(--text-tertiary))] text-center mb-6 max-w-sm">
-            {error instanceof Error ? error.message : 'Unable to load workspace settings. Please try again.'}
+            {error instanceof Error ? error.message : t('workspace.error.loadDescription')}
           </p>
           <Button variant="outline" onClick={() => refetch()}>
             <RefreshCw className="w-4 h-4 mr-2" />
-            Retry
+            {t('common.retry')}
           </Button>
         </div>
       </PageShell>
@@ -581,8 +589,8 @@ export default function WorkspaceSettingsPage() {
       <span className="inline-flex items-center gap-2">
         {text}
         <FieldLockIcon
-          reason={lock.reason ?? 'Locked'}
-          detail={formatLockHoldersDetail(lock.heldBy)}
+          reason={lock.reason ?? t('workspace.locking.locked')}
+          detail={formatLockHoldersDetail(lock.heldBy, t)}
         />
       </span>
     )
@@ -626,16 +634,17 @@ export default function WorkspaceSettingsPage() {
             {isLocked ? (
               <>
                 <p>
-                  <strong className="font-semibold">Locked.</strong>{' '}
+                  <strong className="font-semibold">{t('workspace.locking.lockedPrefix')}</strong>{' '}
                   {displaySettings.lockReason ||
-                    'Regional settings that affect stored data are frozen while an academic year is active.'}{' '}
-                  Display-only fields (language, date/time format, number grouping) remain editable.
+                    t('workspace.locking.lockedDefaultReason')}{' '}
+                  {t('workspace.locking.displayFieldsEditable')}
                 </p>
                 {lockHolders.length > 0 && (
                   <ul className="mt-2 space-y-0.5 text-xs opacity-90">
                     {lockHolders.map((h) => (
                       <li key={`${h.schoolId}#${h.yearId}`}>
-                        Blocked by <strong className="font-semibold">{h.schoolName}</strong>
+                        {t('workspace.locking.blockedBy')}{' '}
+                        <strong className="font-semibold">{h.schoolName}</strong>
                         {' · '}
                         <span>{h.yearName}</span>
                       </li>
@@ -645,21 +654,18 @@ export default function WorkspaceSettingsPage() {
               </>
             ) : (
               <p>
-                <strong className="font-semibold">Heads up —</strong> fields that
-                affect stored data (currency, calendar system, timezone, week start)
-                become read-only when an academic year is active, to preserve
-                consistency across reports, invoices, and audit trails. Display-only
-                fields remain editable throughout.
+                <strong className="font-semibold">{t('workspace.locking.headsUpPrefix')}</strong>{' '}
+                {t('workspace.locking.headsUpDescription')}
               </p>
             )}
           </InlineAlert>
 
             <SectionCard
-              title={<SectionTitle icon={Globe}>Localization</SectionTitle>}
-              description="Language, timezone, and date/time formatting"
+              title={<SectionTitle icon={Globe}>{t('workspace.localization.title')}</SectionTitle>}
+              description={t('workspace.localization.description')}
               contentClassName="py-2"
             >
-          <SettingsFieldRow label={renderLabel('Default Timezone', lkTimezone)} description="Organization's primary timezone for scheduling and timestamps" inline>
+          <SettingsFieldRow label={renderLabel(t('workspace.fields.defaultTimezone.label'), lkTimezone)} description={t('workspace.fields.defaultTimezone.description')} inline>
             <WorkspaceSelect
               value={displaySettings.regional.defaultTimezone}
               onChange={(value) => updateField('regional', 'defaultTimezone', value)}
@@ -668,7 +674,7 @@ export default function WorkspaceSettingsPage() {
             />
           </SettingsFieldRow>
 
-          <SettingsFieldRow label={renderLabel('Default Language', lkLocale)} description="Primary language for new users and system communications" inline>
+          <SettingsFieldRow label={renderLabel(t('workspace.fields.defaultLanguage.label'), lkLocale)} description={t('workspace.fields.defaultLanguage.description')} inline>
             <WorkspaceSelect
               value={displaySettings.regional.defaultLocale}
               onChange={(value) => updateField('regional', 'defaultLocale', value)}
@@ -677,7 +683,7 @@ export default function WorkspaceSettingsPage() {
             />
           </SettingsFieldRow>
 
-          <SettingsFieldRow label={renderLabel('Date Format', lkDateFormat)} description="How dates are displayed across the platform" inline>
+          <SettingsFieldRow label={renderLabel(t('workspace.fields.dateFormat.label'), lkDateFormat)} description={t('workspace.fields.dateFormat.description')} inline>
             <WorkspaceSelect
               value={displaySettings.regional.defaultDateFormat}
               onChange={(value) => updateField('regional', 'defaultDateFormat', value)}
@@ -686,7 +692,7 @@ export default function WorkspaceSettingsPage() {
             />
           </SettingsFieldRow>
 
-          <SettingsFieldRow label={renderLabel('Time Format', lkTimeFormat)} description="12 or 24 hour clock" inline>
+          <SettingsFieldRow label={renderLabel(t('workspace.fields.timeFormat.label'), lkTimeFormat)} description={t('workspace.fields.timeFormat.description')} inline>
             <WorkspaceSelect
               value={displaySettings.regional.defaultTimeFormat}
               onChange={(value) => updateField('regional', 'defaultTimeFormat', value)}
@@ -695,7 +701,7 @@ export default function WorkspaceSettingsPage() {
             />
           </SettingsFieldRow>
 
-          <SettingsFieldRow label={renderLabel('Week Starts On', lkWeekStartsOn)} description="First day of the week in calendars" inline>
+          <SettingsFieldRow label={renderLabel(t('workspace.fields.weekStartsOn.label'), lkWeekStartsOn)} description={t('workspace.fields.weekStartsOn.description')} inline>
             <WorkspaceSelect
               value={displaySettings.regional.defaultWeekStartsOn}
               onChange={(value) => updateField('regional', 'defaultWeekStartsOn', value)}
@@ -706,11 +712,11 @@ export default function WorkspaceSettingsPage() {
             </SectionCard>
 
             <SectionCard
-              title={<SectionTitle icon={Coins}>Finance &amp; Calendar</SectionTitle>}
-              description="Currency, calendar system, and number formatting"
+              title={<SectionTitle icon={Coins}>{t('workspace.financeCalendar.title')}</SectionTitle>}
+              description={t('workspace.financeCalendar.description')}
               contentClassName="py-2"
             >
-          <SettingsFieldRow label={renderLabel('Default Currency', lkCurrency)} description="Currency used for invoices, payments, and financial reports" inline>
+          <SettingsFieldRow label={renderLabel(t('workspace.fields.defaultCurrency.label'), lkCurrency)} description={t('workspace.fields.defaultCurrency.description')} inline>
             <WorkspaceSelect
               value={displaySettings.regional.defaultCurrency}
               onChange={(value) => updateField('regional', 'defaultCurrency', value)}
@@ -719,7 +725,7 @@ export default function WorkspaceSettingsPage() {
             />
           </SettingsFieldRow>
 
-          <SettingsFieldRow label={renderLabel('Calendar System', lkCalendarSystem)} description="Primary calendar system for date display" inline>
+          <SettingsFieldRow label={renderLabel(t('workspace.fields.calendarSystem.label'), lkCalendarSystem)} description={t('workspace.fields.calendarSystem.description')} inline>
             <WorkspaceSelect
               value={displaySettings.regional.defaultCalendarSystem}
               onChange={(value) => updateField('regional', 'defaultCalendarSystem', value)}
@@ -729,7 +735,7 @@ export default function WorkspaceSettingsPage() {
           </SettingsFieldRow>
 
           {displaySettings.regional.defaultCalendarSystem === 'bikram_sambat' && (
-            <SettingsFieldRow label={renderLabel('Show Bikram Sambat Dates', lkDualDate)} description="Display BS dates alongside Gregorian dates in finance and academic modules" inline>
+            <SettingsFieldRow label={renderLabel(t('workspace.fields.dualDate.label'), lkDualDate)} description={t('workspace.fields.dualDate.description')} inline>
               <Switch
                 checked={displaySettings.regional.enableDualDateDisplay}
                 onChange={(checked) => updateField('regional', 'enableDualDateDisplay', checked)}
@@ -738,7 +744,7 @@ export default function WorkspaceSettingsPage() {
             </SettingsFieldRow>
           )}
 
-          <SettingsFieldRow label={renderLabel('Number Format', lkNumberFormat)} description="How numbers are grouped in financial displays" inline>
+          <SettingsFieldRow label={renderLabel(t('workspace.fields.numberFormat.label'), lkNumberFormat)} description={t('workspace.fields.numberFormat.description')} inline>
             <WorkspaceSelect
               value={displaySettings.regional.defaultNumberFormat}
               onChange={(value) => updateField('regional', 'defaultNumberFormat', value)}
@@ -757,36 +763,36 @@ export default function WorkspaceSettingsPage() {
             <Info className="w-4 h-4 text-[rgb(var(--text-tertiary))] flex-shrink-0 mt-0.5" />
             <div className="flex-1">
               <p className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))] mb-1.5">
-                How locking works
+                {t('workspace.locking.howItWorksTitle')}
               </p>
               <ul className="space-y-1 text-sm text-[rgb(var(--text-secondary))]">
                 <li>
                   <strong className="font-medium text-[rgb(var(--text-primary))]">
-                    Tenant Info
+                    {t('workspace.locking.tenantInfoLabel')}
                   </strong>{' '}
-                  fields above are permanently locked — set once at provisioning.
+                  {t('workspace.locking.tenantInfoDescription')}
                 </li>
                 <li>
                   <strong className="font-medium text-[rgb(var(--text-primary))]">
-                    Regional Settings — data-integrity fields
+                    {t('workspace.locking.dataIntegrityLabel')}
                   </strong>{' '}
-                  (currency, calendar system, timezone, week start) lock automatically when any academic year is active.
+                  {t('workspace.locking.dataIntegrityDescription')}
                 </li>
                 <li>
                   <strong className="font-medium text-[rgb(var(--text-primary))]">
-                    Regional Settings — display-only fields
+                    {t('workspace.locking.displayOnlyLabel')}
                   </strong>{' '}
-                  (language, date/time format, number format, Bikram Sambat toggle) stay editable throughout — changing them re-renders without touching stored data.
+                  {t('workspace.locking.displayOnlyDescription')}
                 </li>
                 <li>
                   <strong className="font-medium text-[rgb(var(--text-primary))]">
-                    Branding &amp; Policies
+                    {t('workspace.locking.brandingPoliciesLabel')}
                   </strong>{' '}
-                  (coming soon) remain editable at any time, independent of academic-year state.
+                  {t('workspace.locking.brandingPoliciesDescription')}
                 </li>
               </ul>
               <p className="text-xs text-[rgb(var(--text-tertiary))] mt-2">
-                Schools can override these defaults in their individual School Configuration.
+                {t('workspace.locking.schoolOverrideNote')}
               </p>
             </div>
           </div>
@@ -795,11 +801,12 @@ export default function WorkspaceSettingsPage() {
             <ShieldCheck className="w-4 h-4 text-[rgb(var(--text-tertiary))] flex-shrink-0 mt-0.5" />
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-[rgb(var(--text-tertiary))] mb-1.5">
-                Permissions
+                {t('workspace.permissions.title')}
               </p>
               <p className="text-sm text-[rgb(var(--text-secondary))]">
-                Only users with the <strong className="font-medium text-[rgb(var(--text-primary))]">Tenant Admin</strong> role can modify these
-                settings. Every change is audit-logged with your user ID and a timestamp.
+                {t('workspace.permissions.prefix')}{' '}
+                <strong className="font-medium text-[rgb(var(--text-primary))]">Tenant Admin</strong>{' '}
+                {t('workspace.permissions.suffix')}
               </p>
             </div>
           </div>

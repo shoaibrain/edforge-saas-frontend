@@ -72,16 +72,19 @@ const EVENT_TYPE_OPTIONS = OPERATOR_SELECTABLE_TYPES.map(t => ({
 
 const DAY_NAMES_EN = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
-function getDrawerTitle(cd: CalendarDateResponseDto | null): string {
-  if (!cd) return 'Calendar Date'
-  if (cd.isWeekend) return 'Weekend'
+function getDrawerTitle(
+  cd: CalendarDateResponseDto | null,
+  t: (key: string, options?: Record<string, unknown>) => string,
+): string {
+  if (!cd) return t('schoolCalendar.labels.calendarDate')
+  if (cd.isWeekend) return t('schoolCalendar.labels.weekend')
   const evt = cd.calendarEvents?.[0]
   if (evt?.description) return evt.description
-  if (cd.isHoliday) return 'Holiday'
-  if (cd.isInstructionalDay) return 'Instructional Day'
+  if (cd.isHoliday) return t('schoolCalendar.labels.holiday')
+  if (cd.isInstructionalDay) return t('schoolCalendar.labels.instructionalDay')
   const evtType = evt?.eventType
   if (evtType) return getEventTypeLabel(evtType)
-  return 'Calendar Date'
+  return t('schoolCalendar.labels.calendarDate')
 }
 
 function formatDrawerDate(dateStr: string, calendarSystem: string, locale: string): string {
@@ -96,12 +99,12 @@ function formatDrawerDate(dateStr: string, calendarSystem: string, locale: strin
       const bs = adToBS(date)
       const bsMonth = bsMonthNames[bs.month - 1] || ''
       const bsPrimary = `${dayOfWeek}, ${bsMonth} ${bs.day}, ${bs.year} BS`
-      const adSecondary = date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+      const adSecondary = date.toLocaleDateString(isNepali ? 'ne-NP' : 'en-US', { month: 'long', day: 'numeric', year: 'numeric' })
       return `${bsPrimary} — ${adSecondary}`
     } catch { /* ignore conversion errors */ }
   }
 
-  const formatted = date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+  const formatted = date.toLocaleDateString(isNepali ? 'ne-NP' : 'en-US', { month: 'long', day: 'numeric', year: 'numeric' })
   return `${dayOfWeek}, ${formatted}`
 }
 
@@ -118,7 +121,7 @@ interface SchoolCalendarPageProps {
 // ============================================================================
 
 export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps) {
-  const { i18n } = useTranslation()
+  const { t, i18n } = useTranslation('settings')
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [showGenerator, setShowGenerator] = useState(false)
   const [showSessions, setShowSessions] = useState(false)
@@ -193,7 +196,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
   const bellScheduleOptions: DropdownOption[] = useMemo(() => {
     const items = schedulesData?.items || []
     return [
-      { id: '__none__', label: 'No Schedule', description: 'No bell schedule assigned' },
+      { id: '__none__', label: t('schoolCalendar.noSchedule.label'), description: t('schoolCalendar.noSchedule.description') },
       ...items
         .filter((s: any) => s.isActive)
         .map((s: any) => ({
@@ -202,7 +205,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
           description: s.dayType.replace(/_/g, ' '),
         })),
     ]
-  }, [schedulesData])
+  }, [schedulesData, t])
 
   const getScheduleName = (id: string | null): string | undefined => {
     if (!id || id === '__none__') return undefined
@@ -306,7 +309,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
       },
       {
         onSuccess: (result) => {
-          toast.success(`Generated ${result.totalDays} days (${result.instructionalDays} instructional)`)
+          toast.success(t('schoolCalendar.toasts.generated', { totalDays: result.totalDays, instructionalDays: result.instructionalDays }))
           setShowGenerator(false)
         },
       }
@@ -315,7 +318,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
 
   if (!academicYearId) {
     return (
-      <SettingsAlert type="info" message="No academic year found. Please create an academic year first in the Academic Years tab." />
+      <SettingsAlert type="info" message={t('schoolCalendar.noAcademicYear')} />
     )
   }
 
@@ -328,9 +331,9 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
             <CalendarDays className="w-5 h-5 text-[rgb(var(--action-secondary-fg))]" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">School Calendar</h2>
+            <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">{t('schoolCalendar.title')}</h2>
             <p className="text-sm text-[rgb(var(--text-tertiary))]">
-              {activeYear?.name || 'Academic Year'} Calendar Management
+              {t('schoolCalendar.subtitle', { year: activeYear?.name || t('schoolCalendar.academicYearFallback') })}
             </p>
           </div>
         </div>
@@ -342,7 +345,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
             onClick={() => setShowSessions(!showSessions)}
           >
             <Layers className="w-4 h-4 mr-1.5" />
-            Sessions
+            {t('schoolCalendar.actions.sessions')}
           </Button>
           <Button
             variant="outline"
@@ -350,7 +353,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
             onClick={() => setShowGenerator(true)}
           >
             <Wand2 className="w-4 h-4 mr-1.5" />
-            Generate
+            {t('schoolCalendar.actions.generate')}
           </Button>
         </div>
       </div>
@@ -364,19 +367,19 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
         >
           {/* Academic Year Progress */}
           <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-4 py-3 border-l-4 border-l-teal-500">
-            <div className="text-sm font-semibold text-[rgb(var(--text-primary))] truncate">{activeYear?.name || 'Academic Year'}</div>
+            <div className="text-sm font-semibold text-[rgb(var(--text-primary))] truncate">{activeYear?.name || t('schoolCalendar.academicYearFallback')}</div>
             {stats.progressPercentage != null ? (
               <>
                 <div className="mt-1.5 w-full h-1.5 rounded-full bg-[rgb(var(--border-primary))]">
                   <div className="h-full rounded-full bg-[rgb(var(--action-primary-bg))] transition-all" style={{ width: `${Math.min(stats.progressPercentage, 100)}%` }} />
                 </div>
                 <div className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
-                  {stats.daysPassed ?? 0} of {stats.totalDays ?? 0} days elapsed
+                  {t('schoolCalendar.stats.daysElapsed', { passed: stats.daysPassed ?? 0, total: stats.totalDays ?? 0 })}
                 </div>
               </>
             ) : (
               <div className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
-                {stats.totalDays ?? 0} total days
+                {t('schoolCalendar.stats.totalDays', { count: stats.totalDays ?? 0 })}
               </div>
             )}
           </div>
@@ -384,10 +387,10 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
           {/* Instructional Days */}
           <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-4 py-3 border-l-4 border-l-emerald-500">
             <div className="text-2xl font-bold text-[rgb(var(--state-success-fg))] ">{stats.instructionalDays ?? 0}</div>
-            <div className="text-xs font-medium text-[rgb(var(--text-secondary))]">Instructional Days</div>
+            <div className="text-xs font-medium text-[rgb(var(--text-secondary))]">{t('schoolCalendar.stats.instructionalDays')}</div>
             {stats.instructionalDaysRemaining != null && (
               <div className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">
-                {stats.instructionalDaysPassed ?? 0} completed, {stats.instructionalDaysRemaining} remaining
+                {t('schoolCalendar.stats.instructionalProgress', { completed: stats.instructionalDaysPassed ?? 0, remaining: stats.instructionalDaysRemaining })}
               </div>
             )}
           </div>
@@ -395,19 +398,19 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
           {/* Holidays */}
           <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-4 py-3 border-l-4 border-l-red-500">
             <div className="text-2xl font-bold text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]">{stats.holidays ?? 0}</div>
-            <div className="text-xs font-medium text-[rgb(var(--text-secondary))]">Holidays</div>
+            <div className="text-xs font-medium text-[rgb(var(--text-secondary))]">{t('schoolCalendar.stats.holidays')}</div>
             <div className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">
-              {(stats.holidays ?? 0) === 0 ? 'No holidays scheduled' : 'Scheduled holidays'}
+              {(stats.holidays ?? 0) === 0 ? t('schoolCalendar.stats.noHolidays') : t('schoolCalendar.stats.scheduledHolidays')}
             </div>
           </div>
 
           {/* Non-Instructional */}
           <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-4 py-3 border-l-4 border-l-slate-400">
             <div className="text-2xl font-bold text-[rgb(var(--text-secondary))]">{stats.nonInstructionalDays ?? 0}</div>
-            <div className="text-xs font-medium text-[rgb(var(--text-secondary))]">Non-Instructional</div>
+            <div className="text-xs font-medium text-[rgb(var(--text-secondary))]">{t('schoolCalendar.stats.nonInstructional')}</div>
             {(stats.teacherOnlyDays ?? 0) > 0 && (
               <div className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">
-                Includes {stats.teacherOnlyDays} teacher-only days
+                {t('schoolCalendar.stats.teacherOnlyDays', { count: stats.teacherOnlyDays })}
               </div>
             )}
           </div>
@@ -433,7 +436,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
       <Drawer
         open={!!selectedDate}
         onClose={() => setSelectedDate(null)}
-        title={getDrawerTitle(editCalendarDate)}
+        title={getDrawerTitle(editCalendarDate, t)}
         description={selectedDate ? formatDrawerDate(selectedDate, calendarSystem, i18n.language) : ''}
         size="sm"
       >
@@ -470,14 +473,14 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
                             : 'bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-secondary))]'
                   }`}>
                     {isWeekendWithHoliday
-                      ? 'Weekend'
+                      ? t('schoolCalendar.labels.weekend')
                       : editCalendarDate.isWeekend
-                        ? 'Weekend'
+                        ? t('schoolCalendar.labels.weekend')
                         : evt?.eventType
                           ? getEventTypeLabel(evt.eventType)
                           : editCalendarDate.isInstructionalDay
-                            ? 'Instructional Day'
-                            : 'Non-Instructional'}
+                            ? t('schoolCalendar.labels.instructionalDay')
+                            : t('schoolCalendar.labels.nonInstructional')}
                   </span>
                 </div>
 
@@ -489,7 +492,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
                 {/* Weekend + Holiday overlap explanation */}
                 {isWeekendWithHoliday && holidayName && (
                   <p className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
-                    {holidayName} falls on this {editCalendarDate.dayOfWeek} — counted as weekend, not holiday
+                    {t('schoolCalendar.drawer.weekendHolidayOverlap', { holiday: holidayName, day: editCalendarDate.dayOfWeek })}
                   </p>
                 )}
 
@@ -497,10 +500,10 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
                 {editCalendarDate.isInstructionalDay && !editCalendarDate.isWeekend && (
                   <div className="flex items-center gap-3 text-xs text-[rgb(var(--text-tertiary))] mt-1.5">
                     {editCalendarDate.dayNumber != null && (
-                      <span>Day {editCalendarDate.dayNumber}</span>
+                      <span>{t('schoolCalendar.drawer.dayNumber', { day: editCalendarDate.dayNumber })}</span>
                     )}
                     {editCalendarDate.instructionalDayNumber != null && (
-                      <span>Instructional Day #{editCalendarDate.instructionalDayNumber}</span>
+                      <span>{t('schoolCalendar.drawer.instructionalDayNumber', { day: editCalendarDate.instructionalDayNumber })}</span>
                     )}
                   </div>
                 )}
@@ -508,7 +511,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
                 {/* Bell schedule */}
                 {editCalendarDate.bellScheduleName && (
                   <div className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
-                    Bell Schedule: {editCalendarDate.bellScheduleName}
+                    {t('schoolCalendar.drawer.bellScheduleValue', { schedule: editCalendarDate.bellScheduleName })}
                   </div>
                 )}
               </div>
@@ -522,7 +525,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
             </div>
             <div className="relative flex justify-center">
               <span className="px-2 text-xs font-medium uppercase tracking-wider text-[rgb(var(--text-tertiary))] bg-[rgb(var(--background-primary))]">
-                Edit
+                {t('common.edit')}
               </span>
             </div>
           </div>
@@ -532,7 +535,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
                 Mirrors the active DateEditPanel in AcademicSetupTab.tsx.
                 "Other" reveals the raw eventType picker as an escape hatch. */}
             <Select
-              label="Event Type"
+              label={t('schoolCalendar.drawer.eventType')}
               value={editCuratedKey}
               onChange={(v) => {
                 const newKey = (v ?? '') as CuratedSingleDayKey
@@ -548,7 +551,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
               }}
               options={[
                 ...CURATED_OPTIONS_FOR_DROPDOWN.map(opt => ({ value: opt.key, label: opt.label })),
-                { value: 'other', label: 'Other (advanced)…' },
+                { value: 'other', label: t('schoolCalendar.drawer.otherAdvanced') },
               ]}
             />
             {editCuratedKey !== 'other' && (
@@ -563,8 +566,8 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
           {editCuratedKey === 'other' && (
             <div>
               <Select
-                label="Raw Event Type"
-                placeholder="Select..."
+                label={t('schoolCalendar.drawer.rawEventType')}
+                placeholder={t('schoolCalendar.drawer.selectPlaceholder')}
                 value={editEventType || null}
                 onChange={(v) => {
                   setEditEventType(v ?? '')
@@ -575,19 +578,19 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
             </div>
           )}
           <div>
-            <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">Description</label>
+            <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('schoolCalendar.drawer.description')}</label>
             <input
               type="text"
               value={editDescription}
               onChange={(e) => setEditDescription(e.target.value)}
-              placeholder="Optional description (e.g., Dashain Holiday)"
+              placeholder={t('schoolCalendar.drawer.descriptionPlaceholder')}
               className="w-full text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-primary))] px-3 py-2.5"
             />
           </div>
 
           {/* Instructional toggle */}
           <div className="flex items-center justify-between rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3 py-2.5">
-            <span className="text-sm text-[rgb(var(--text-secondary))]">Instructional Day</span>
+            <span className="text-sm text-[rgb(var(--text-secondary))]">{t('schoolCalendar.labels.instructionalDay')}</span>
             <button
               type="button"
               role="switch"
@@ -608,19 +611,19 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
           {/* Bell Schedule */}
           {bellScheduleOptions.length > 1 && (
             <div>
-              <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">Bell Schedule</label>
+              <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1.5">{t('schoolCalendar.drawer.bellSchedule')}</label>
               <Dropdown
                 options={bellScheduleOptions}
                 value={editBellScheduleId}
                 onChange={(id) => setEditBellScheduleId(id)}
-                placeholder="Assign bell schedule..."
+                placeholder={t('schoolCalendar.drawer.assignBellSchedule')}
                 buttonClassName="rounded-xl py-2.5"
               />
             </div>
           )}
 
           <DrawerFooter>
-            <Button variant="ghost" size="sm" onClick={() => setSelectedDate(null)}>Cancel</Button>
+            <Button variant="ghost" size="sm" onClick={() => setSelectedDate(null)}>{t('common.cancel')}</Button>
             <Button
               variant="primary"
               size="sm"
@@ -629,7 +632,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
               isLoading={updateDate.isPending}
             >
               <Save className="w-4 h-4 mr-1.5" />
-              Save
+              {t('common.save')}
             </Button>
           </DrawerFooter>
         </div>
@@ -656,21 +659,21 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
                   <Wand2 className="w-5 h-5 text-[rgb(var(--action-secondary-fg))]" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-[rgb(var(--text-primary))]">Generate Calendar</h3>
+                  <h3 className="font-semibold text-[rgb(var(--text-primary))]">{t('schoolCalendar.generate.title')}</h3>
                   <p className="text-sm text-[rgb(var(--text-tertiary))]">
-                    Auto-generate dates for {activeYear?.name}
+                    {t('schoolCalendar.generate.subtitle', { year: activeYear?.name })}
                   </p>
                 </div>
               </div>
 
               <div className="text-sm text-[rgb(var(--text-secondary))] space-y-2">
-                <p>This will generate calendar dates from <strong>{activeYear?.startDate}</strong> to <strong>{activeYear?.endDate}</strong>.</p>
-                <p>Weekdays will be marked as instructional days. Weekends will be marked automatically.</p>
-                <p className="text-amber-600 dark:text-amber-400">Existing dates for this year will be replaced.</p>
+                <p>{t('schoolCalendar.generate.dateRangePrefix')} <strong>{activeYear?.startDate}</strong> {t('schoolCalendar.generate.dateRangeMiddle')} <strong>{activeYear?.endDate}</strong>.</p>
+                <p>{t('schoolCalendar.generate.instructionalNote')}</p>
+                <p className="text-amber-600 dark:text-amber-400">{t('schoolCalendar.generate.replaceWarning')}</p>
               </div>
 
               <div className="flex justify-end gap-2 pt-2">
-                <Button variant="outline" onClick={() => setShowGenerator(false)}>Cancel</Button>
+                <Button variant="outline" onClick={() => setShowGenerator(false)}>{t('common.cancel')}</Button>
                 <Button
                   variant="outline"
                   onClick={handleGenerate}
@@ -678,7 +681,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
                   isLoading={generateCalendar.isPending}
                 >
                   <Wand2 className="w-4 h-4 mr-1.5" />
-                  Generate Calendar
+                  {t('schoolCalendar.generate.title')}
                 </Button>
               </div>
             </motion.div>
@@ -690,8 +693,8 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
       <Drawer
         open={showSessions && !!activeYear}
         onClose={() => setShowSessions(false)}
-        title="Academic Sessions"
-        description={`Semesters and terms for ${activeYear?.name || 'this year'}`}
+        title={t('schoolCalendar.sessions.title')}
+        description={t('schoolCalendar.sessions.description', { year: activeYear?.name || t('schoolCalendar.sessions.thisYear') })}
         size="lg"
       >
         {activeYear && (
@@ -714,7 +717,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
               : 'border-[rgb(var(--border-primary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))]'
           }`}
         >
-          {allTypesActive ? 'All' : 'None'}
+          {allTypesActive ? t('schoolCalendar.filters.all') : t('schoolCalendar.filters.none')}
         </button>
         {LEGEND_ITEMS.map(item => {
           const isActive = activeTypes.has(item.type)
