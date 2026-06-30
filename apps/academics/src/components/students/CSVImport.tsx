@@ -13,7 +13,7 @@
  * - V2 footer layout
  */
 
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useMemo, useRef } from 'react'
 import {
   Upload,
   FileText,
@@ -27,6 +27,7 @@ import {
   ArrowRight,
 } from 'lucide-react'
 import { useImportStudentsCsv } from '../../hooks/useStudents'
+import { useAcademicsI18n } from '../../lib/i18n'
 import type { CsvImportResult } from '../../services/academics.service'
 import { useActiveSchoolId } from '../../stores/app.store'
 
@@ -85,7 +86,26 @@ interface ParsedRow {
   errors: string[]
 }
 
-function parseCSV(text: string): { headers: string[]; rows: ParsedRow[] } {
+interface RowValidationMessages {
+  missingFirstName: string
+  missingLastName: string
+  missingBirthDate: string
+  missingGender: string
+  missingGradeLevel: string
+}
+
+const DEFAULT_ROW_VALIDATION_MESSAGES: RowValidationMessages = {
+  missingFirstName: 'Missing first name',
+  missingLastName: 'Missing last name',
+  missingBirthDate: 'Missing birth date',
+  missingGender: 'Missing gender',
+  missingGradeLevel: 'Missing grade level',
+}
+
+function parseCSV(
+  text: string,
+  messages: RowValidationMessages = DEFAULT_ROW_VALIDATION_MESSAGES
+): { headers: string[]; rows: ParsedRow[] } {
   const lines = text.trim().split('\n').map((l) => l.trim()).filter(Boolean)
   if (lines.length < 2) {
     return { headers: [], rows: [] }
@@ -115,11 +135,11 @@ function parseCSV(text: string): { headers: string[]; rows: ParsedRow[] } {
       if (GENDER_MAP[g]) data.gender = GENDER_MAP[g]
     }
 
-    if (!data.firstName) errors.push('Missing first name')
-    if (!data.lastName) errors.push('Missing last name')
-    if (!data.birthDate && !data.dateOfBirth) errors.push('Missing birth date')
-    if (!data.gender) errors.push('Missing gender')
-    if (!data.gradeLevel && !data.currentGradeLevel) errors.push('Missing grade level')
+    if (!data.firstName) errors.push(messages.missingFirstName)
+    if (!data.lastName) errors.push(messages.missingLastName)
+    if (!data.birthDate && !data.dateOfBirth) errors.push(messages.missingBirthDate)
+    if (!data.gender) errors.push(messages.missingGender)
+    if (!data.gradeLevel && !data.currentGradeLevel) errors.push(messages.missingGradeLevel)
 
     rows.push({ rowNum: i, data, errors })
   }
@@ -145,6 +165,7 @@ type ImportPhase = 'upload' | 'preview' | 'importing' | 'results'
 export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
   const schoolId = useActiveSchoolId()
   const importMutation = useImportStudentsCsv()
+  const { t, formatNumber, formatCount } = useAcademicsI18n()
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const [phase, setPhase] = useState<ImportPhase>('upload')
@@ -157,19 +178,29 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
   const [isDragOver, setIsDragOver] = useState(false)
   const [fileError, setFileError] = useState<string | null>(null)
   const [rowLimitError, setRowLimitError] = useState<string | null>(null)
+  const rowValidationMessages = useMemo<RowValidationMessages>(
+    () => ({
+      missingFirstName: t('studentsModule.csvImport.rowErrors.missingFirstName'),
+      missingLastName: t('studentsModule.csvImport.rowErrors.missingLastName'),
+      missingBirthDate: t('studentsModule.csvImport.rowErrors.missingBirthDate'),
+      missingGender: t('studentsModule.csvImport.rowErrors.missingGender'),
+      missingGradeLevel: t('studentsModule.csvImport.rowErrors.missingGradeLevel'),
+    }),
+    [t]
+  )
 
   const processFile = useCallback((file: File) => {
     setFileError(null)
     setRowLimitError(null)
 
     if (!file.name.endsWith('.csv')) {
-      setFileError('Only .csv files are supported.')
+      setFileError(t('studentsModule.csvImport.errors.unsupportedFile'))
       return
     }
 
     if (file.size > MAX_FILE_SIZE_BYTES) {
       const sizeMB = (file.size / (1024 * 1024)).toFixed(1)
-      setFileError(`File size exceeds 2MB limit (${sizeMB}MB). Please reduce the file.`)
+      setFileError(t('studentsModule.csvImport.errors.fileTooLarge', { size: sizeMB }))
       return
     }
 
@@ -177,10 +208,13 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
     const reader = new FileReader()
     reader.onload = (event) => {
       const text = event.target?.result as string
-      const parsed = parseCSV(text)
+      const parsed = parseCSV(text, rowValidationMessages)
       if (parsed.rows.length > MAX_ROWS) {
         setRowLimitError(
-          `Maximum ${MAX_ROWS} students per import. Your file has ${parsed.rows.length} rows. Please split into smaller files.`
+          t('studentsModule.csvImport.errors.rowLimit', {
+            max: formatNumber(MAX_ROWS),
+            rows: formatNumber(parsed.rows.length),
+          })
         )
       } else {
         setRowLimitError(null)
@@ -189,7 +223,7 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
       setPhase('preview')
     }
     reader.readAsText(file)
-  }, [])
+  }, [formatNumber, rowValidationMessages, t])
 
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -237,6 +271,22 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
 
   const validRows = parsedData.rows.filter((r) => r.errors.length === 0)
   const invalidRows = parsedData.rows.filter((r) => r.errors.length > 0)
+  const validRowCount = formatNumber(validRows.length)
+  const invalidRowCount = formatNumber(invalidRows.length)
+  const importedCount = importResult ? formatNumber(importResult.imported) : formatNumber(0)
+  const skippedCount = importResult ? formatNumber(importResult.skipped) : formatNumber(0)
+  const errorCount = importResult ? formatNumber(importResult.errors.length) : formatNumber(0)
+  const modalSubtitle =
+    phase === 'upload'
+      ? t('studentsModule.csvImport.subtitle.upload')
+      : phase === 'preview'
+        ? t('studentsModule.csvImport.subtitle.preview', {
+            valid: validRowCount,
+            invalid: invalidRowCount,
+          })
+        : phase === 'importing'
+          ? t('studentsModule.csvImport.subtitle.importing')
+          : t('studentsModule.csvImport.subtitle.results')
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgb(var(--background-overlay)/0.50)]">
@@ -273,13 +323,10 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                 className="font-semibold"
                 style={{ fontSize: 14, color: 'rgb(var(--text-primary))' }}
               >
-                Import Students
+                {t('studentsModule.csvImport.title')}
               </h2>
               <p style={{ fontSize: 11, color: 'rgb(var(--text-tertiary))' }}>
-                {phase === 'upload' && 'Upload a CSV file to bulk import students'}
-                {phase === 'preview' && `${validRows.length} valid, ${invalidRows.length} with errors`}
-                {phase === 'importing' && 'Importing students...'}
-                {phase === 'results' && 'Import complete'}
+                {modalSubtitle}
               </p>
             </div>
           </div>
@@ -287,6 +334,7 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
             type="button"
             onClick={onClose}
             disabled={phase === 'importing'}
+            aria-label={t('studentsModule.csvImport.actions.close')}
             className="flex items-center justify-center transition-colors hover:opacity-80 disabled:opacity-30 disabled:cursor-not-allowed"
             style={{
               width: 26,
@@ -334,11 +382,13 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                   <Upload className="w-5 h-5" style={{ color: '#1D9E75' }} />
                 </div>
                 <p style={{ fontSize: 13, fontWeight: 500, color: 'rgb(var(--text-secondary))' }}>
-                  Drag and drop a CSV file
+                  {t('studentsModule.csvImport.dropzone.title')}
                 </p>
                 <p style={{ fontSize: 11, color: 'rgb(var(--text-tertiary))', marginTop: 4 }}>
-                  or{' '}
-                  <span style={{ color: '#1D9E75', cursor: 'pointer' }}>click to browse</span>
+                  {t('studentsModule.csvImport.dropzone.or')}{' '}
+                  <span style={{ color: '#1D9E75', cursor: 'pointer' }}>
+                    {t('studentsModule.csvImport.dropzone.browse')}
+                  </span>
                 </p>
                 <input
                   ref={fileInputRef}
@@ -386,10 +436,10 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p style={{ fontSize: 12, fontWeight: 500, color: 'rgb(var(--text-secondary))' }}>
-                    CSV Template
+                    {t('studentsModule.csvImport.template.title')}
                   </p>
                   <p style={{ fontSize: 10, color: 'rgb(var(--text-tertiary))' }}>
-                    Download with required columns
+                    {t('studentsModule.csvImport.template.description')}
                   </p>
                 </div>
                 <button
@@ -398,7 +448,7 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                   className="flex items-center gap-1 transition-colors hover:opacity-80"
                   style={{ fontSize: 11, fontWeight: 500, color: '#1D9E75' }}
                 >
-                  Download
+                  {t('studentsModule.csvImport.actions.download')}
                   <ArrowRight className="w-3 h-3" />
                 </button>
               </div>
@@ -416,7 +466,7 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                       color: '#3a4055',
                     }}
                   >
-                    Required
+                    {t('studentsModule.csvImport.columns.required')}
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {REQUIRED_COLUMNS.map((col) => (
@@ -449,7 +499,7 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                       color: '#3a4055',
                     }}
                   >
-                    Optional
+                    {t('studentsModule.csvImport.columns.optional')}
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {OPTIONAL_COLUMNS.map((col) => (
@@ -486,7 +536,7 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                     {fileName}
                   </span>
                   <span style={{ fontSize: 10, color: 'rgb(var(--text-tertiary))' }}>
-                    ({parsedData.rows.length} rows)
+                    ({formatCount('studentsModule.csvImport.preview.rows', parsedData.rows.length)})
                   </span>
                 </div>
                 <button
@@ -496,7 +546,7 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                   style={{ fontSize: 10, color: 'rgb(var(--text-tertiary))' }}
                 >
                   <Trash2 className="w-3 h-3" />
-                  Remove
+                  {t('studentsModule.csvImport.actions.remove')}
                 </button>
               </div>
 
@@ -526,17 +576,20 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                   <div className="flex items-center gap-2 mb-2">
                     <AlertCircle className="w-3.5 h-3.5" style={{ color: '#E24B4A' }} />
                     <span style={{ fontSize: 11, fontWeight: 500, color: '#E24B4A' }}>
-                      {invalidRows.length} row{invalidRows.length !== 1 ? 's' : ''} with errors (will be skipped)
+                      {formatCount('studentsModule.csvImport.preview.invalidRows', invalidRows.length)}
                     </span>
                   </div>
                   <ul className="space-y-0.5 ml-5" style={{ fontSize: 10, color: '#E24B4A' }}>
                     {invalidRows.slice(0, 5).map((row) => (
                       <li key={row.rowNum}>
-                        Row {row.rowNum}: {row.errors.join(', ')}
+                        {t('studentsModule.csvImport.preview.rowError', {
+                          row: formatNumber(row.rowNum),
+                          errors: row.errors.join(', '),
+                        })}
                       </li>
                     ))}
                     {invalidRows.length > 5 && (
-                      <li>...and {invalidRows.length - 5} more</li>
+                      <li>{formatCount('studentsModule.csvImport.preview.andMore', invalidRows.length - 5)}</li>
                     )}
                   </ul>
                 </div>
@@ -564,7 +617,7 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                         </th>
                       ))}
                       <th className="px-3 py-2 text-left" style={{ fontSize: 10, fontWeight: 500, color: 'rgb(var(--text-tertiary))', textTransform: 'uppercase' }}>
-                        Status
+                        {t('studentsModule.csvImport.preview.status')}
                       </th>
                     </tr>
                   </thead>
@@ -589,12 +642,12 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                             {hasErrors ? (
                               <span className="inline-flex items-center gap-1" style={{ fontSize: 10, color: '#E24B4A' }}>
                                 <AlertCircle className="w-3 h-3" />
-                                Error
+                                {t('studentsModule.csvImport.preview.error')}
                               </span>
                             ) : (
                               <span className="inline-flex items-center gap-1" style={{ fontSize: 10, color: '#1D9E75' }}>
                                 <CheckCircle2 className="w-3 h-3" />
-                                Valid
+                                {t('studentsModule.csvImport.preview.valid')}
                               </span>
                             )}
                           </td>
@@ -612,10 +665,10 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
             <div className="flex flex-col items-center justify-center py-12">
               <Loader2 className="w-8 h-8 animate-spin mb-3" style={{ color: '#1D9E75' }} />
               <p style={{ fontSize: 12, fontWeight: 500, color: 'rgb(var(--text-primary))' }}>
-                Importing {validRows.length} students...
+                {formatCount('studentsModule.csvImport.importing.title', validRows.length)}
               </p>
               <p style={{ fontSize: 10, color: 'rgb(var(--text-tertiary))', marginTop: 4 }}>
-                Please do not close this window.
+                {t('studentsModule.csvImport.importing.keepOpen')}
               </p>
             </div>
           )}
@@ -634,9 +687,9 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                   }}
                 >
                   <p style={{ fontSize: 20, fontWeight: 700, color: '#1D9E75' }}>
-                    {importResult.imported}
+                    {importedCount}
                   </p>
-                  <p style={{ fontSize: 10, color: 'rgb(var(--text-tertiary))' }}>Imported</p>
+                  <p style={{ fontSize: 10, color: 'rgb(var(--text-tertiary))' }}>{t('studentsModule.csvImport.results.imported')}</p>
                 </div>
                 <div
                   className="text-center py-3 px-2"
@@ -647,9 +700,9 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                   }}
                 >
                   <p style={{ fontSize: 20, fontWeight: 700, color: '#EF9F27' }}>
-                    {importResult.skipped}
+                    {skippedCount}
                   </p>
-                  <p style={{ fontSize: 10, color: 'rgb(var(--text-tertiary))' }}>Skipped</p>
+                  <p style={{ fontSize: 10, color: 'rgb(var(--text-tertiary))' }}>{t('studentsModule.csvImport.results.skipped')}</p>
                 </div>
                 <div
                   className="text-center py-3 px-2"
@@ -660,9 +713,9 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                   }}
                 >
                   <p style={{ fontSize: 20, fontWeight: 700, color: '#E24B4A' }}>
-                    {importResult.errors.length}
+                    {errorCount}
                   </p>
-                  <p style={{ fontSize: 10, color: 'rgb(var(--text-tertiary))' }}>Errors</p>
+                  <p style={{ fontSize: 10, color: 'rgb(var(--text-tertiary))' }}>{t('studentsModule.csvImport.results.errors')}</p>
                 </div>
               </div>
 
@@ -677,7 +730,9 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                 >
                   <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#1D9E75' }} />
                   <span style={{ fontSize: 11, color: '#1D9E75' }}>
-                    {importResult.imported} student{importResult.imported !== 1 ? 's' : ''} imported as <strong>Pending</strong>. Visit the Pending tab to review and enroll them.
+                    {formatCount('studentsModule.csvImport.results.pendingNoticeStart', importResult.imported)}{' '}
+                    <strong>{t('status.pending')}</strong>
+                    {t('studentsModule.csvImport.results.pendingNoticeEnd')}
                   </span>
                 </div>
               )}
@@ -694,17 +749,21 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                   <div className="flex items-center gap-2 mb-2">
                     <AlertTriangle className="w-3.5 h-3.5" style={{ color: '#EF9F27' }} />
                     <span style={{ fontSize: 11, fontWeight: 500, color: '#EF9F27' }}>
-                      Duplicate matches found
+                      {t('studentsModule.csvImport.results.duplicatesTitle')}
                     </span>
                   </div>
                   <ul className="space-y-0.5 ml-5" style={{ fontSize: 10, color: 'rgb(var(--text-secondary))' }}>
                     {importResult.duplicates.slice(0, 10).map((d) => (
                       <li key={d.row}>
-                        Row {d.row}: matched {d.matches.map((m) => `${m.firstName} ${m.lastName}`).join(', ')} ({d.matches[0]?.confidence} confidence)
+                        {t('studentsModule.csvImport.results.duplicateRow', {
+                          row: formatNumber(d.row),
+                          matches: d.matches.map((m) => `${m.firstName} ${m.lastName}`).join(', '),
+                          confidence: d.matches[0]?.confidence ?? t('studentsModule.csvImport.results.unknownConfidence'),
+                        })}
                       </li>
                     ))}
                     {importResult.duplicates.length > 10 && (
-                      <li>...and {importResult.duplicates.length - 10} more</li>
+                      <li>{formatCount('studentsModule.csvImport.preview.andMore', importResult.duplicates.length - 10)}</li>
                     )}
                   </ul>
                 </div>
@@ -722,17 +781,21 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                   <div className="flex items-center gap-2 mb-2">
                     <AlertCircle className="w-3.5 h-3.5" style={{ color: '#E24B4A' }} />
                     <span style={{ fontSize: 11, fontWeight: 500, color: '#E24B4A' }}>
-                      Import errors
+                      {t('studentsModule.csvImport.results.errorsTitle')}
                     </span>
                   </div>
                   <ul className="space-y-0.5 ml-5" style={{ fontSize: 10, color: '#E24B4A' }}>
                     {importResult.errors.slice(0, 10).map((err, i) => (
                       <li key={i}>
-                        Row {err.row}: {err.field} - {err.message}
+                        {t('studentsModule.csvImport.results.errorRow', {
+                          row: formatNumber(err.row),
+                          field: err.field,
+                          message: err.message,
+                        })}
                       </li>
                     ))}
                     {importResult.errors.length > 10 && (
-                      <li>...and {importResult.errors.length - 10} more</li>
+                      <li>{formatCount('studentsModule.csvImport.preview.andMore', importResult.errors.length - 10)}</li>
                     )}
                   </ul>
                 </div>
@@ -752,7 +815,7 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
               <>
                 <Info className="w-3 h-3" style={{ color: '#3a4055' }} />
                 <span style={{ fontSize: 10, color: '#3a4055' }}>
-                  .csv only · Max 200 rows · Max 2MB
+                  {t('studentsModule.csvImport.footer.constraints', { maxRows: formatNumber(MAX_ROWS) })}
                 </span>
               </>
             )}
@@ -764,10 +827,12 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                   className="transition-colors hover:opacity-80 text-left"
                   style={{ fontSize: 11, color: 'rgb(var(--text-tertiary))' }}
                 >
-                  Upload different file
+                  {t('studentsModule.csvImport.actions.uploadDifferent')}
                 </button>
                 <span style={{ fontSize: 9, color: '#3a4055' }}>
-                  Imports create <strong>Pending</strong> enrollments
+                  {t('studentsModule.csvImport.footer.pendingStart')}{' '}
+                  <strong>{t('status.pending')}</strong>{' '}
+                  {t('studentsModule.csvImport.footer.pendingEnd')}
                 </span>
               </div>
             )}
@@ -788,7 +853,7 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                   fontWeight: 500,
                 }}
               >
-                Go to Pending
+                {t('studentsModule.csvImport.actions.goToPending')}
                 <ArrowRight className="w-3 h-3" />
               </button>
             ) : (
@@ -804,10 +869,10 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                     padding: '7px 14px',
                     fontSize: 12,
                     color: '#7a8099',
-                  }}
-                >
-                  <X className="w-3 h-3" />
-                  Cancel
+                }}
+              >
+                <X className="w-3 h-3" />
+                  {t('studentsModule.csvImport.actions.cancel')}
                 </button>
                 {phase === 'preview' && (
                   <button
@@ -824,7 +889,7 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                     }}
                   >
                     <Upload className="w-3 h-3" />
-                    Import as Pending ({validRows.length})
+                    {t('studentsModule.csvImport.actions.importAsPending', { count: validRowCount })}
                   </button>
                 )}
               </>

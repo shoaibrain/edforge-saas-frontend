@@ -366,6 +366,84 @@
       "viewFullProfile": "View Full Profile",
       "viewFullProfileAria": "View full profile for {{student}}",
       "bsPrefix": "BS {{date}}"
+    },
+    "csvImport": {
+      "title": "Import Students",
+      "subtitle": {
+        "upload": "Upload a CSV file to bulk import students",
+        "preview": "{{valid}} valid, {{invalid}} with errors",
+        "importing": "Importing students...",
+        "results": "Import complete"
+      },
+      "actions": {
+        "close": "Close import dialog",
+        "download": "Download",
+        "remove": "Remove",
+        "uploadDifferent": "Upload different file",
+        "goToPending": "Go to Pending",
+        "cancel": "Cancel",
+        "importAsPending": "Import as Pending ({{count}})"
+      },
+      "dropzone": {
+        "title": "Drag and drop a CSV file",
+        "or": "or",
+        "browse": "click to browse"
+      },
+      "template": {
+        "title": "CSV Template",
+        "description": "Download with required columns"
+      },
+      "columns": {
+        "required": "Required",
+        "optional": "Optional"
+      },
+      "errors": {
+        "unsupportedFile": "Only .csv files are supported.",
+        "fileTooLarge": "File size exceeds 2MB limit ({{size}}MB). Please reduce the file.",
+        "rowLimit": "Maximum {{max}} students per import. Your file has {{rows}} rows. Please split into smaller files."
+      },
+      "rowErrors": {
+        "missingFirstName": "Missing first name",
+        "missingLastName": "Missing last name",
+        "missingBirthDate": "Missing birth date",
+        "missingGender": "Missing gender",
+        "missingGradeLevel": "Missing grade level"
+      },
+      "preview": {
+        "rows": "{{value}} row",
+        "rows_plural": "{{value}} rows",
+        "invalidRows": "{{value}} row with errors (will be skipped)",
+        "invalidRows_plural": "{{value}} rows with errors (will be skipped)",
+        "rowError": "Row {{row}}: {{errors}}",
+        "andMore": "...and {{value}} more",
+        "andMore_plural": "...and {{value}} more",
+        "status": "Status",
+        "error": "Error",
+        "valid": "Valid"
+      },
+      "importing": {
+        "title": "Importing {{value}} student...",
+        "title_plural": "Importing {{value}} students...",
+        "keepOpen": "Please do not close this window."
+      },
+      "results": {
+        "imported": "Imported",
+        "skipped": "Skipped",
+        "errors": "Errors",
+        "pendingNoticeStart": "{{value}} student imported as",
+        "pendingNoticeStart_plural": "{{value}} students imported as",
+        "pendingNoticeEnd": ". Visit the Pending tab to review and enroll them.",
+        "duplicatesTitle": "Duplicate matches found",
+        "duplicateRow": "Row {{row}}: matched {{matches}} ({{confidence}} confidence)",
+        "unknownConfidence": "unknown",
+        "errorsTitle": "Import errors",
+        "errorRow": "Row {{row}}: {{field}} - {{message}}"
+      },
+      "footer": {
+        "constraints": ".csv only · Max {{maxRows}} rows · Max 2MB",
+        "pendingStart": "Imports create",
+        "pendingEnd": "enrollments"
+      }
     }
   },
   "privacy": {
