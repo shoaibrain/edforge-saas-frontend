@@ -722,7 +722,12 @@ export default function PaymentsPage() {
   const [voidTarget, setVoidTarget] = useState<Payment | null>(null)
   const [refundTarget, setRefundTarget] = useState<Payment | null>(null)
 
-  const { options: gradeOptions } = useSchoolGradeOptions(schoolId ?? null)
+  // Sprint B-tail: list page opts into the Unknown-grade chip so operators
+  // can audit rows the A.5 backfill flagged `gradeLevelResolutionStatus:
+  // 'unresolved'` (absent from GSI14; invisible to regular grade chips).
+  const { options: gradeOptions } = useSchoolGradeOptions(schoolId ?? null, {
+    includeUnknownOption: true,
+  })
 
   const { data: payments, isLoading } = useSchoolPayments(schoolId ?? '', {
     ...(statusFilter && { status: statusFilter }),

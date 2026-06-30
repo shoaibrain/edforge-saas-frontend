@@ -56,4 +56,26 @@ describe('grade filter route shapes (Sprint B.6)', () => {
     expect(params).not.toHaveProperty('gradeLevel')
     expect(params).toMatchObject({ status: 'completed' })
   })
+
+  // Sprint B-tail (PR-equivalent of issue #343 follow-on) — the literal
+  // `__UNRESOLVED__` sentinel is the discriminator the backend's
+  // `listBySchoolAndGrade` honors as "rows whose gradeLevel snapshot is
+  // unresolved" (those are sparse on GSI14 and invisible to the regular
+  // grade chips). The frontend `useSchoolGradeOptions({includeUnknownOption})`
+  // injects this exact string into the chip dropdown — these two tests
+  // pin the verbatim forwarding so a service-layer rename/escape can't
+  // silently break the operator-facing Unknown chip.
+  it('getInvoices forwards the __UNRESOLVED__ gradeLevel literal verbatim (Unknown chip)', async () => {
+    await getInvoices(SCHOOL, { gradeLevel: '__UNRESOLVED__' })
+    expect(mockApiGet).toHaveBeenCalledWith(`/finance/schools/${SCHOOL}/invoices`, {
+      gradeLevel: '__UNRESOLVED__',
+    })
+  })
+
+  it('getSchoolPayments forwards the __UNRESOLVED__ gradeLevel literal verbatim (Unknown chip)', async () => {
+    await getSchoolPayments(SCHOOL, { gradeLevel: '__UNRESOLVED__' })
+    expect(mockApiGet).toHaveBeenCalledWith(`/finance/schools/${SCHOOL}/payments`, {
+      gradeLevel: '__UNRESOLVED__',
+    })
+  })
 })

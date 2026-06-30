@@ -144,7 +144,12 @@ export default function InvoicesPage() {
   // Cancel dialog state
   const [cancelTarget, setCancelTarget] = useState<{ id: string; invoiceNumber: string } | null>(null)
 
-  const { options: gradeOptions } = useSchoolGradeOptions(schoolId ?? null)
+  // Sprint B-tail: list page opts into the Unknown-grade chip so operators
+  // can audit rows the A.5 backfill flagged `gradeLevelResolutionStatus:
+  // 'unresolved'` (absent from GSI14; invisible to regular grade chips).
+  const { options: gradeOptions } = useSchoolGradeOptions(schoolId ?? null, {
+    includeUnknownOption: true,
+  })
 
   const invoiceFilters = useMemo(
     () => ({
