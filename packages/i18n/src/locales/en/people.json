@@ -689,6 +689,22 @@
     "editTitle": "Edit Assignment",
     "editDescription": "Update assignment at {{school}}",
     "schoolFallback": "school",
+    "unknownSchool": "Unknown School",
+    "noActiveAssignments": "No active assignments",
+    "totalFte": "Total FTE",
+    "fteValue": "FTE {{value}}",
+    "primary": "Primary",
+    "ended": "Ended",
+    "remove": "Remove",
+    "removeConfirm": "Are you sure you want to remove this assignment? This action cannot be undone.",
+    "overcommitted": "Overcommitted — exceeds 1.0",
+    "emptyTitle": "No Assignments",
+    "emptyDescription": "Use the actions menu to assign this staff member to a school.",
+    "teachingSections": "Teaching Sections",
+    "sectionsCount": "{{count}} section",
+    "sectionsCount_plural": "{{count}} sections",
+    "studentsCount": "{{count}} student",
+    "studentsCount_plural": "{{count}} students",
     "setPrimary": "Set as primary assignment",
     "createAssignment": "Create Assignment",
     "ongoingHelp": "Leave blank for ongoing",
@@ -698,7 +714,9 @@
     },
     "toasts": {
       "created": "School assignment created successfully",
-      "updated": "Assignment updated successfully"
+      "updated": "Assignment updated successfully",
+      "removed": "Assignment removed successfully",
+      "removeFailed": "Failed to remove assignment"
     }
   },
   "detail": {
@@ -708,7 +726,33 @@
     },
     "backToDirectory": "Back to Staff Directory",
     "unknownStaff": "Unknown Staff",
-    "sectionsAria": "Staff detail sections"
+    "sectionsAria": "Staff detail sections",
+    "overview": {
+      "stats": {
+        "sections": "Sections",
+        "students": "Students",
+        "capacity": "Capacity",
+        "avgGrade": "Avg Grade"
+      },
+      "sectionPerformance": "Section Performance",
+      "noTeachingSectionsTitle": "No Teaching Sections",
+      "noTeachingSectionsDescription": "This staff member is not assigned as a teacher to any sections.",
+      "staffingRatio": "Staffing Ratio",
+      "staff": "Staff",
+      "students": "Students",
+      "ratio": "Ratio",
+      "atSchool": "At {{school}}",
+      "noPrimarySchoolAssigned": "No primary school assigned",
+      "table": {
+        "course": "Course",
+        "enrolled": "Enrolled",
+        "avgGrade": "Avg Grade",
+        "attendancePercent": "Att %",
+        "section": "Section",
+        "period": "Period",
+        "room": "Room"
+      }
+    }
   },
   "error": {
     "failedToLoad": "Failed to load staff",

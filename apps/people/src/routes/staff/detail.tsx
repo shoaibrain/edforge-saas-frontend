@@ -58,7 +58,6 @@ import { peopleService } from '../../services/people.service'
 import type { SecurityOverview, UserSession } from '../../services/people.service'
 import {
     StaffStatusBadge,
-    getRoleLabel,
     AssignToSchoolModal,
     EditAssignmentModal,
     CredentialsSection,
@@ -66,6 +65,7 @@ import {
     EmploymentHistory,
     LeaveManagement,
 } from '../../components/staff'
+import { getRoleI18nKey } from '../../components/staff/StaffRoleBadge'
 import { useSchools } from '../../hooks/useSchools'
 import { apiGet } from '../../lib/api'
 import { useRemoveAssignment } from '../../hooks'
@@ -323,8 +323,10 @@ function LoadingSkeleton() {
 // ============================================================================
 
 function ProfileTab({ staff, security, schoolMap }: { staff: StaffResponseDto; security?: SecurityOverview; schoolMap: Map<string, string> }) {
+    const { t } = useTranslation('people')
     const [showSensitive, setShowSensitive] = useState(false)
     const mask = (value: string | undefined | null) => (!showSensitive && value ? '••••••••' : (value || '—'))
+    const roleLabel = (role: string) => t(`roles.${getRoleI18nKey(role)}`, { defaultValue: role })
     const addresses = staff.addresses ?? []
     // These fields are stored by the backend but not yet on StaffResponseDto
     const staffAny = staff as Record<string, unknown>
@@ -421,7 +423,7 @@ function ProfileTab({ staff, security, schoolMap }: { staff: StaffResponseDto; s
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div className="space-y-1">
                             <span className="text-xs text-[rgb(var(--text-tertiary))]">Role</span>
-                            <p className="text-sm text-[rgb(var(--text-primary))] font-medium">{getRoleLabel(staff.role)}</p>
+                            <p className="text-sm text-[rgb(var(--text-primary))] font-medium">{roleLabel(staff.role)}</p>
                         </div>
                         <div className="space-y-1">
                             <span className="text-xs text-[rgb(var(--text-tertiary))]">Employment Status</span>
@@ -742,7 +744,9 @@ function OverviewTab({
     sectionsLoading: boolean
     schoolMap: Map<string, string>
 }) {
+    const { t } = useTranslation('people')
     const primarySchoolId = staff.primarySchoolId
+    const roleLabel = (role: string) => t(`roles.${getRoleI18nKey(role)}`, { defaultValue: role })
 
     // Current academic year for enrollment queries
     const { data: currentYear } = useCurrentAcademicYear(primarySchoolId)
@@ -851,25 +855,25 @@ function OverviewTab({
             {/* Stat Cards */}
             <motion.div variants={fadeInUp} className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="p-4 rounded-xl border border-[rgb(var(--border-secondary))] bg-[rgb(var(--background-secondary))]">
-                    <p className="text-xs text-[rgb(var(--text-tertiary))] uppercase tracking-wider font-medium">Sections</p>
+                    <p className="text-xs text-[rgb(var(--text-tertiary))] uppercase tracking-wider font-medium">{t('detail.overview.stats.sections')}</p>
                     <p className="text-2xl font-bold text-[rgb(var(--text-primary))] mt-1">
                         {sectionsLoading ? '—' : totalSections}
                     </p>
                 </div>
                 <div className="p-4 rounded-xl border border-[rgb(var(--border-secondary))] bg-[rgb(var(--background-secondary))]">
-                    <p className="text-xs text-[rgb(var(--text-tertiary))] uppercase tracking-wider font-medium">Students</p>
+                    <p className="text-xs text-[rgb(var(--text-tertiary))] uppercase tracking-wider font-medium">{t('detail.overview.stats.students')}</p>
                     <p className="text-2xl font-bold text-[rgb(var(--text-primary))] mt-1">
                         {sectionsLoading ? '—' : totalStudents}
                     </p>
                 </div>
                 <div className="p-4 rounded-xl border border-[rgb(var(--border-secondary))] bg-[rgb(var(--background-secondary))]">
-                    <p className="text-xs text-[rgb(var(--text-tertiary))] uppercase tracking-wider font-medium">Capacity</p>
+                    <p className="text-xs text-[rgb(var(--text-tertiary))] uppercase tracking-wider font-medium">{t('detail.overview.stats.capacity')}</p>
                     <p className="text-2xl font-bold text-[rgb(var(--text-primary))] mt-1">
                         {sectionsLoading ? '—' : `${capacityPercent}%`}
                     </p>
                 </div>
                 <div className="p-4 rounded-xl border border-[rgb(var(--border-secondary))] bg-[rgb(var(--background-secondary))]">
-                    <p className="text-xs text-[rgb(var(--text-tertiary))] uppercase tracking-wider font-medium">Avg Grade</p>
+                    <p className="text-xs text-[rgb(var(--text-tertiary))] uppercase tracking-wider font-medium">{t('detail.overview.stats.avgGrade')}</p>
                     <p className="text-2xl font-bold text-[rgb(var(--text-primary))] mt-1">
                         {overallLetter ? `${overallLetter} (${overallAvg})` : '—'}
                     </p>
@@ -884,27 +888,27 @@ function OverviewTab({
                     <motion.div variants={fadeInUp} className="rounded-xl border border-[rgb(var(--border-secondary))] p-5">
                         <h3 className="text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider mb-3 flex items-center gap-2">
                             <Briefcase className="w-3.5 h-3.5" />
-                            School Assignments
+                            {t('sections.schoolAssignments')}
                         </h3>
                         {activeAssignments.length === 0 ? (
-                            <p className="text-sm text-[rgb(var(--text-tertiary))]">No active assignments</p>
+                            <p className="text-sm text-[rgb(var(--text-tertiary))]">{t('assignments.noActiveAssignments')}</p>
                         ) : (
                             <div className="space-y-2">
                                 {activeAssignments.map(a => (
                                     <div key={a.assignmentId} className="flex items-center justify-between p-2.5 rounded-lg bg-[rgb(var(--background-tertiary))]">
                                         <div className="min-w-0">
                                             <p className="text-sm font-medium text-[rgb(var(--text-primary))] truncate">
-                                                {schoolMap.get(a.schoolId) || a.schoolName || 'Unknown School'}
+                                                {schoolMap.get(a.schoolId) || a.schoolName || t('assignments.unknownSchool')}
                                             </p>
                                             <p className="text-xs text-[rgb(var(--text-tertiary))]">
-                                                {getRoleLabel(a.role)}
-                                                {typeof a.fullTimeEquivalency === 'number' && ` · FTE ${a.fullTimeEquivalency.toFixed(2)}`}
+                                                {roleLabel(a.role)}
+                                                {typeof a.fullTimeEquivalency === 'number' && ` · ${t('assignments.fteValue', { value: a.fullTimeEquivalency.toFixed(2) })}`}
                                                 {a.beginDate && ` · ${formatDate(a.beginDate)}`}
                                             </p>
                                         </div>
                                         {a.isPrimary && (
                                             <span className="text-xs font-medium px-1.5 py-0.5 rounded bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--action-secondary-fg))]  flex-shrink-0">
-                                                Primary
+                                                {t('assignments.primary')}
                                             </span>
                                         )}
                                     </div>
@@ -919,17 +923,17 @@ function OverviewTab({
                             <div className="p-5 pb-3">
                                 <h3 className="text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider flex items-center gap-2">
                                     <BookOpen className="w-3.5 h-3.5" />
-                                    Section Performance
+                                    {t('detail.overview.sectionPerformance')}
                                 </h3>
                             </div>
                             <div className="overflow-x-auto">
                                 <table className="w-full">
                                     <thead>
                                         <tr className="bg-[rgb(var(--background-tertiary))]">
-                                            <th className="px-5 py-2.5 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Course</th>
-                                            <th className="px-5 py-2.5 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Enrolled</th>
-                                            <th className="px-5 py-2.5 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Avg Grade</th>
-                                            <th className="px-5 py-2.5 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Att %</th>
+                                            <th className="px-5 py-2.5 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">{t('detail.overview.table.course')}</th>
+                                            <th className="px-5 py-2.5 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">{t('detail.overview.table.enrolled')}</th>
+                                            <th className="px-5 py-2.5 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">{t('detail.overview.table.avgGrade')}</th>
+                                            <th className="px-5 py-2.5 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">{t('detail.overview.table.attendancePercent')}</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-[rgb(var(--border-secondary))]">
@@ -981,9 +985,9 @@ function OverviewTab({
                     {!isTeachingStaff && !sectionsLoading && (
                         <motion.div variants={fadeInUp} className="text-center py-12 bg-[rgb(var(--background-secondary))] rounded-xl border-2 border-dashed border-[rgb(var(--border-secondary))]">
                             <BookOpen className="w-10 h-10 mx-auto mb-3 text-[rgb(var(--text-tertiary))] opacity-40" />
-                            <h4 className="text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">No Teaching Sections</h4>
+                            <h4 className="text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">{t('detail.overview.noTeachingSectionsTitle')}</h4>
                             <p className="text-xs text-[rgb(var(--text-tertiary))] max-w-xs mx-auto">
-                                This staff member is not assigned as a teacher to any sections.
+                                {t('detail.overview.noTeachingSectionsDescription')}
                             </p>
                         </motion.div>
                     )}
@@ -994,21 +998,21 @@ function OverviewTab({
                     <motion.div variants={fadeInUp} className="rounded-xl border border-[rgb(var(--border-secondary))] p-5">
                         <h3 className="text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider mb-4 flex items-center gap-2">
                             <Users className="w-3.5 h-3.5" />
-                            Staffing Ratio
+                            {t('detail.overview.staffingRatio')}
                         </h3>
                         {primarySchoolId ? (
                             <div className="space-y-3">
                                 <div className="flex items-center justify-between">
-                                    <span className="text-sm text-[rgb(var(--text-secondary))]">Staff</span>
+                                    <span className="text-sm text-[rgb(var(--text-secondary))]">{t('detail.overview.staff')}</span>
                                     <span className="text-sm font-medium text-[rgb(var(--text-primary))]">{staffCount || '—'}</span>
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <span className="text-sm text-[rgb(var(--text-secondary))]">Students</span>
+                                    <span className="text-sm text-[rgb(var(--text-secondary))]">{t('detail.overview.students')}</span>
                                     <span className="text-sm font-medium text-[rgb(var(--text-primary))]">{studentCount || '—'}</span>
                                 </div>
                                 <div className="pt-3 border-t border-[rgb(var(--border-secondary))]">
                                     <div className="flex items-center justify-between">
-                                        <span className="text-sm font-medium text-[rgb(var(--text-secondary))]">Ratio</span>
+                                        <span className="text-sm font-medium text-[rgb(var(--text-secondary))]">{t('detail.overview.ratio')}</span>
                                         <span className="text-lg font-bold text-[rgb(var(--text-primary))]">
                                             {staffingRatio !== null ? `1:${staffingRatio}` : '—'}
                                         </span>
@@ -1016,12 +1020,12 @@ function OverviewTab({
                                 </div>
                                 {schoolMap.get(primarySchoolId) && (
                                     <p className="text-xs text-[rgb(var(--text-tertiary))] pt-2">
-                                        At {schoolMap.get(primarySchoolId)}
+                                        {t('detail.overview.atSchool', { school: schoolMap.get(primarySchoolId) })}
                                     </p>
                                 )}
                             </div>
                         ) : (
-                            <p className="text-sm text-[rgb(var(--text-tertiary))]">No primary school assigned</p>
+                            <p className="text-sm text-[rgb(var(--text-tertiary))]">{t('detail.overview.noPrimarySchoolAssigned')}</p>
                         )}
                     </motion.div>
                 </div>
@@ -1045,22 +1049,23 @@ function AssignmentsTab({
     sections: SectionData[] | undefined
     sectionsLoading: boolean
 }) {
+    const { t } = useTranslation('people')
     const removeAssignment = useRemoveAssignment()
     const [removingId, setRemovingId] = useState<string | null>(null)
     const [editingAssignment, setEditingAssignment] = useState<StaffAssignmentResponseDto | null>(null)
 
     const handleRemoveAssignment = async (assignmentId: string) => {
         const confirmed = window.confirm(
-            'Are you sure you want to remove this assignment? This action cannot be undone.'
+            t('assignments.removeConfirm')
         )
         if (!confirmed) return
 
         setRemovingId(assignmentId)
         try {
             await removeAssignment.mutateAsync({ staffId, assignmentId })
-            toast.success('Assignment removed successfully')
+            toast.success(t('assignments.toasts.removed'))
         } catch {
-            toast.error('Failed to remove assignment')
+            toast.error(t('assignments.toasts.removeFailed'))
         } finally {
             setRemovingId(null)
         }
@@ -1070,6 +1075,7 @@ function AssignmentsTab({
     const activeAssignments = assignments?.filter(a => !a.endDate || new Date(a.endDate) >= new Date()) ?? []
     const totalFTE = activeAssignments.reduce((sum, a) => sum + (a.fullTimeEquivalency ?? 0), 0)
     const hasAssignments = assignments && assignments.length > 0
+    const roleLabel = (role: string) => t(`roles.${getRoleI18nKey(role)}`, { defaultValue: role })
 
     return (
         <motion.div
@@ -1080,14 +1086,14 @@ function AssignmentsTab({
         >
             {/* Section Label */}
             <motion.div variants={fadeInUp}>
-                <h3 className="text-sm font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">School Assignments</h3>
+                <h3 className="text-sm font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">{t('sections.schoolAssignments')}</h3>
             </motion.div>
 
             {/* FTE Indicator */}
             {hasAssignments && activeAssignments.some(a => typeof a.fullTimeEquivalency === 'number') && (
                 <motion.div variants={fadeInUp} className="rounded-lg border border-[rgb(var(--border-secondary))] p-3">
                     <div className="flex items-center justify-between mb-1.5">
-                        <span className="text-xs font-medium text-[rgb(var(--text-tertiary))]">Total FTE</span>
+                        <span className="text-xs font-medium text-[rgb(var(--text-tertiary))]">{t('assignments.totalFte')}</span>
                         <span className={`text-xs font-bold ${totalFTE > 1 ? 'text-[rgb(var(--state-danger-fg))] ' : 'text-[rgb(var(--text-primary))]'}`}>
                             {totalFTE.toFixed(2)}
                         </span>
@@ -1101,7 +1107,7 @@ function AssignmentsTab({
                     {totalFTE > 1 && (
                         <p className="text-xs text-[rgb(var(--state-danger-fg))]  mt-1 flex items-center gap-1">
                             <AlertTriangle className="w-3 h-3" />
-                            Overcommitted — exceeds 1.0
+                            {t('assignments.overcommitted')}
                         </p>
                     )}
                 </motion.div>
@@ -1118,15 +1124,15 @@ function AssignmentsTab({
                 ) : !hasAssignments ? (
                     <div className="text-center py-12 bg-[rgb(var(--background-secondary))] rounded-lg border-2 border-dashed border-[rgb(var(--border-secondary))]">
                         <School className="w-10 h-10 mx-auto mb-3 text-[rgb(var(--text-tertiary))] opacity-40" />
-                        <h4 className="text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">No Assignments</h4>
+                        <h4 className="text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">{t('assignments.emptyTitle')}</h4>
                         <p className="text-xs text-[rgb(var(--text-tertiary))] max-w-xs mx-auto">
-                            Use the actions menu to assign this staff member to a school.
+                            {t('assignments.emptyDescription')}
                         </p>
                     </div>
                 ) : (
                     <div className="grid gap-2">
                         {assignments.map((assignment) => {
-                            const schoolName = schoolMap.get(assignment.schoolId) || assignment.schoolName || 'Unknown School'
+                            const schoolName = schoolMap.get(assignment.schoolId) || assignment.schoolName || t('assignments.unknownSchool')
                             const hasEnded = assignment.endDate && new Date(assignment.endDate) < new Date()
                             const isRemoving = removingId === assignment.assignmentId
 
@@ -1143,17 +1149,17 @@ function AssignmentsTab({
                                             </h4>
                                             {hasEnded && (
                                                 <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]  flex-shrink-0">
-                                                    Ended
+                                                    {t('assignments.ended')}
                                                 </span>
                                             )}
                                             {assignment.isPrimary && (
                                                 <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--action-secondary-fg))]  flex-shrink-0">
-                                                    Primary
+                                                    {t('assignments.primary')}
                                                 </span>
                                             )}
                                         </div>
                                         <div className="flex items-center gap-1.5 mt-0.5 flex-wrap text-xs text-[rgb(var(--text-tertiary))]">
-                                            <span className="font-medium text-[rgb(var(--text-secondary))]">{getRoleLabel(assignment.role)}</span>
+                                            <span className="font-medium text-[rgb(var(--text-secondary))]">{roleLabel(assignment.role)}</span>
                                             {assignment.departmentName && (
                                                 <>
                                                     <span className="text-[rgb(var(--border-secondary))]">&middot;</span>
@@ -1163,7 +1169,7 @@ function AssignmentsTab({
                                             {typeof assignment.fullTimeEquivalency === 'number' && (
                                                 <>
                                                     <span className="text-[rgb(var(--border-secondary))]">&middot;</span>
-                                                    <span className="text-[rgb(var(--state-info-fg))] ">FTE {assignment.fullTimeEquivalency.toFixed(2)}</span>
+                                                    <span className="text-[rgb(var(--state-info-fg))] ">{t('assignments.fteValue', { value: assignment.fullTimeEquivalency.toFixed(2) })}</span>
                                                 </>
                                             )}
                                             <span className="text-[rgb(var(--border-secondary))]">&middot;</span>
@@ -1177,7 +1183,7 @@ function AssignmentsTab({
                                         <button
                                             onClick={() => setEditingAssignment(assignment)}
                                             className="p-1.5 rounded-md hover:bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
-                                            title="Edit"
+                                            title={t('actions.edit')}
                                             disabled={isRemoving}
                                         >
                                             <Edit2 className="w-3.5 h-3.5" />
@@ -1185,7 +1191,7 @@ function AssignmentsTab({
                                         <button
                                             onClick={() => handleRemoveAssignment(assignment.assignmentId)}
                                             className="p-1.5 rounded-md hover:bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--state-danger-fg))] transition-colors"
-                                            title="Remove"
+                                            title={t('assignments.remove')}
                                             disabled={isRemoving}
                                         >
                                             {isRemoving ? (
@@ -1222,11 +1228,11 @@ function AssignmentsTab({
             ) : sections && sections.length > 0 ? (
                 <motion.div variants={fadeInUp} className="mt-6 space-y-3">
                     <div className="flex items-center justify-between">
-                        <h3 className="text-sm font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Teaching Sections</h3>
+                        <h3 className="text-sm font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">{t('assignments.teachingSections')}</h3>
                         <div className="flex items-center gap-3 text-xs text-[rgb(var(--text-tertiary))]">
-                            <span><strong className="text-[rgb(var(--text-primary))] font-semibold">{sections.length}</strong> sections</span>
+                            <span>{t('assignments.sectionsCount', { count: sections.length })}</span>
                             <span className="text-[rgb(var(--border-secondary))]">&middot;</span>
-                            <span><strong className="text-[rgb(var(--text-primary))] font-semibold">{sections.reduce((sum, s) => sum + (s.currentEnrollment ?? 0), 0)}</strong> students</span>
+                            <span>{t('assignments.studentsCount', { count: sections.reduce((sum, s) => sum + (s.currentEnrollment ?? 0), 0) })}</span>
                         </div>
                     </div>
 
@@ -1249,11 +1255,11 @@ function AssignmentsTab({
                                 <table className="w-full">
                                     <thead>
                                         <tr className="bg-[rgb(var(--background-tertiary))]">
-                                            <th className="px-3 py-2 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Course</th>
-                                            <th className="px-3 py-2 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Section</th>
-                                            <th className="px-3 py-2 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Period</th>
-                                            <th className="px-3 py-2 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Room</th>
-                                            <th className="px-3 py-2 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Enrolled</th>
+                                            <th className="px-3 py-2 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">{t('detail.overview.table.course')}</th>
+                                            <th className="px-3 py-2 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">{t('detail.overview.table.section')}</th>
+                                            <th className="px-3 py-2 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">{t('detail.overview.table.period')}</th>
+                                            <th className="px-3 py-2 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">{t('detail.overview.table.room')}</th>
+                                            <th className="px-3 py-2 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">{t('detail.overview.table.enrolled')}</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-[rgb(var(--border-secondary))]">
@@ -1569,6 +1575,7 @@ export default function StaffDetailPage() {
 
     const displayName = [staff.firstName, staff.lastSurname].filter(Boolean).join(' ') || t('detail.unknownStaff')
     const avatarUrl = getStaffAvatar(staff.staffId)
+    const roleLabel = (role: string) => t(`roles.${getRoleI18nKey(role)}`, { defaultValue: role })
     const statusDotColor = staff.employmentStatus === 'active' ? 'bg-[rgb(var(--state-success-fg))]'
         : staff.employmentStatus === 'on_leave' ? 'bg-amber-500'
         : 'bg-[rgb(var(--text-tertiary))]'
@@ -1599,7 +1606,7 @@ export default function StaffDetailPage() {
                                 <span className="text-[rgb(var(--text-tertiary))] truncate">{staff.email}</span>
                                 <span className="w-1 h-1 rounded-full bg-[rgb(var(--text-tertiary))]" />
                                 <span className="font-medium text-[rgb(var(--action-secondary-fg))] ">
-                                    {getRoleLabel(staff.role)}
+                                    {roleLabel(staff.role)}
                                 </span>
                                 <span className="w-1 h-1 rounded-full bg-[rgb(var(--text-tertiary))]" />
                                 <StaffStatusBadge status={staff.employmentStatus} />

@@ -689,6 +689,22 @@
     "editTitle": "नियुक्ति सम्पादन गर्नुहोस्",
     "editDescription": "{{school}} मा नियुक्ति अपडेट गर्नुहोस्",
     "schoolFallback": "विद्यालय",
+    "unknownSchool": "अज्ञात विद्यालय",
+    "noActiveAssignments": "सक्रिय नियुक्ति छैन",
+    "totalFte": "कुल FTE",
+    "fteValue": "FTE {{value}}",
+    "primary": "प्राथमिक",
+    "ended": "समाप्त",
+    "remove": "हटाउनुहोस्",
+    "removeConfirm": "के तपाईं यो नियुक्ति हटाउन चाहनुहुन्छ? यो कार्य फिर्ता गर्न सकिँदैन।",
+    "overcommitted": "अत्यधिक प्रतिबद्ध — 1.0 भन्दा बढी",
+    "emptyTitle": "नियुक्ति छैन",
+    "emptyDescription": "यस कर्मचारीलाई विद्यालयमा नियुक्त गर्न कार्य मेनु प्रयोग गर्नुहोस्।",
+    "teachingSections": "शिक्षण सेक्सनहरू",
+    "sectionsCount": "{{count}} सेक्सन",
+    "sectionsCount_plural": "{{count}} सेक्सनहरू",
+    "studentsCount": "{{count}} विद्यार्थी",
+    "studentsCount_plural": "{{count}} विद्यार्थीहरू",
     "setPrimary": "प्राथमिक नियुक्तिको रूपमा सेट गर्नुहोस्",
     "createAssignment": "नियुक्ति सिर्जना गर्नुहोस्",
     "ongoingHelp": "जारी भए खाली छोड्नुहोस्",
@@ -698,7 +714,9 @@
     },
     "toasts": {
       "created": "विद्यालय नियुक्ति सफलतापूर्वक सिर्जना भयो",
-      "updated": "नियुक्ति सफलतापूर्वक अपडेट भयो"
+      "updated": "नियुक्ति सफलतापूर्वक अपडेट भयो",
+      "removed": "नियुक्ति सफलतापूर्वक हटाइयो",
+      "removeFailed": "नियुक्ति हटाउन असफल भयो"
     }
   },
   "detail": {
@@ -708,7 +726,33 @@
     },
     "backToDirectory": "कर्मचारी निर्देशिकामा फर्कनुहोस्",
     "unknownStaff": "अज्ञात कर्मचारी",
-    "sectionsAria": "कर्मचारी विवरण सेक्सनहरू"
+    "sectionsAria": "कर्मचारी विवरण सेक्सनहरू",
+    "overview": {
+      "stats": {
+        "sections": "सेक्सनहरू",
+        "students": "विद्यार्थीहरू",
+        "capacity": "क्षमता",
+        "avgGrade": "औसत ग्रेड"
+      },
+      "sectionPerformance": "सेक्सन प्रदर्शन",
+      "noTeachingSectionsTitle": "शिक्षण सेक्सन छैन",
+      "noTeachingSectionsDescription": "यो कर्मचारी कुनै पनि सेक्सनमा शिक्षकको रूपमा नियुक्त गरिएको छैन।",
+      "staffingRatio": "कर्मचारी अनुपात",
+      "staff": "कर्मचारी",
+      "students": "विद्यार्थीहरू",
+      "ratio": "अनुपात",
+      "atSchool": "{{school}} मा",
+      "noPrimarySchoolAssigned": "प्राथमिक विद्यालय तोकिएको छैन",
+      "table": {
+        "course": "कोर्स",
+        "enrolled": "भर्ना",
+        "avgGrade": "औसत ग्रेड",
+        "attendancePercent": "उपस्थिति %",
+        "section": "सेक्सन",
+        "period": "पिरियड",
+        "room": "कोठा"
+      }
+    }
   },
   "error": {
     "failedToLoad": "कर्मचारी लोड गर्न असफल",
