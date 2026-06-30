@@ -350,6 +350,22 @@
     "profiles": {
       "title": "Student Profiles",
       "description": "Detailed student profiles and records - monolith बाट migrated content राखिनेछ।"
+    },
+    "quickProfile": {
+      "close": "बन्द गर्नुहोस्",
+      "atRiskBanner": "जोखिममा · {{rate}}% उपस्थिति (३०-दिन)",
+      "grade": "ग्रेड",
+      "gpa": "GPA",
+      "attendance": "उपस्थिति",
+      "enrollment": "भर्ना",
+      "gradeLevel": "ग्रेड स्तर",
+      "enrolled": "भर्ना मिति",
+      "academicYear": "शैक्षिक वर्ष",
+      "gradeValue": "ग्रेड {{grade}}",
+      "privacyNote": "जनसांख्यिकी, सम्पर्क जानकारी र अभिभावक विवरण पूरा प्रोफाइल पृष्ठमा छन्।",
+      "viewFullProfile": "पूरा प्रोफाइल हेर्नुहोस्",
+      "viewFullProfileAria": "{{student}} को पूरा प्रोफाइल हेर्नुहोस्",
+      "bsPrefix": "वि.सं. {{date}}"
     }
   },
   "privacy": {
