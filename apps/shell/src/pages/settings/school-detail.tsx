@@ -35,6 +35,7 @@ import { edOrgKeys } from '@/hooks/useEducationOrgs'
 // instead of duplicating the gate logic client-side.
 import type { School as SchoolType, SchoolStatus } from '@edforge/types'
 import { Button } from '@edforge/ui'
+import { AnimatedIcon, type IconName } from '@edforge/ui/motion'
 
 // V2 Tab components
 import ConfigurationTab from './tabs/ConfigurationTab'
@@ -131,14 +132,24 @@ const STATUS_ACTIONS: Record<SchoolStatus, { label: string; targetStatus: School
 
 type SchoolTab = 'config' | 'academic-setup' | 'attendance' | 'structure' | 'grade-levels' | 'audit-log'
 
-const TABS: { id: SchoolTab; label: string; emoji: string }[] = [
-  { id: 'config', label: 'Configuration', emoji: '⚙️' },
-  { id: 'academic-setup', label: 'Academic Setup', emoji: '📅' },
-  { id: 'attendance', label: 'Attendance', emoji: '🟢' },
-  { id: 'structure', label: 'Structure', emoji: '🏛️' },
-  { id: 'grade-levels', label: 'Grade Levels', emoji: '🎯' },
-  { id: 'audit-log', label: 'Audit Log', emoji: '🛡️' },
+const TABS: { id: SchoolTab; label: string }[] = [
+  { id: 'config', label: 'Configuration' },
+  { id: 'academic-setup', label: 'Academic Setup' },
+  { id: 'attendance', label: 'Attendance' },
+  { id: 'structure', label: 'Structure' },
+  { id: 'grade-levels', label: 'Grade Levels' },
+  { id: 'audit-log', label: 'Audit Log' },
 ]
+
+// These tab ids map 1:1 onto purpose-built signature glyphs (replaces the old emojis).
+const TAB_SIGNATURE: Record<SchoolTab, IconName> = {
+  config: 'configuration',
+  'academic-setup': 'academicsetup',
+  attendance: 'attendance',
+  structure: 'structure',
+  'grade-levels': 'gradelevels',
+  'audit-log': 'auditlog',
+}
 
 const VALID_TABS = new Set<string>(['config', 'academic-setup', 'attendance', 'structure', 'grade-levels', 'audit-log'])
 
@@ -643,7 +654,7 @@ export default function SchoolDetailPage() {
 
         {/* ── Tab Bar ── */}
         <div className="border-b border-[rgba(255,255,255,0.06)]">
-          <div className="flex gap-0.5 overflow-x-auto -mb-px">
+          <div className="flex gap-0.5 overflow-x-auto -mb-px" role="tablist" aria-label="School detail sections">
             {TABS.map((tab) => {
               const isActive = activeTab === tab.id
               // Badge logic
@@ -657,8 +668,11 @@ export default function SchoolDetailPage() {
               return (
                 <button
                   key={tab.id}
+                  role="tab"
+                  aria-selected={isActive}
                   onClick={() => switchTab(tab.id)}
                   className={`
+                    ef-motion ${isActive ? 'is-active' : ''}
                     relative px-4 py-2.5 text-xs font-medium transition-colors whitespace-nowrap outline-none
                     flex items-center gap-1.5
                     ${isActive
@@ -667,7 +681,7 @@ export default function SchoolDetailPage() {
                     }
                   `}
                 >
-                  <span>{tab.emoji}</span>
+                  <AnimatedIcon name={TAB_SIGNATURE[tab.id]} size={16} applyAccent={false} />
                   {tab.label}
                   {badge && (
                     <span className={`

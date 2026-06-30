@@ -295,3 +295,20 @@
     transition: none !important;
   }
 }
+
+/* ============================================================================
+ * Generic fallback motion — any icon WITHOUT a bespoke signature still reacts.
+ * AnimatedIcon renders the original lucide glyph with `.ico .ico-generic` (no
+ * glyph swap); this gives it one subtle whole-glyph pop on hover/focus/active.
+ * `.ico-generic` carries `.ico`, so the reduced-motion block above gates it too.
+ * ========================================================================== */
+.ico-generic { transform-box: border-box; transform-origin: center; }
+:where(.ef-motion, [role="tab"]):is(:hover, :focus-visible) .ico-generic,
+:where(.ef-motion.is-active, [role="tab"][aria-selected="true"]) .ico-generic {
+  animation: sigNudge var(--icon-dur) var(--ease-spring);
+}
+@keyframes sigNudge {
+  0% { transform: scale(1); }
+  35% { transform: scale(calc(1 + .10 * var(--icon-k))); }
+  100% { transform: scale(1); }
+}

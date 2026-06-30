@@ -8,8 +8,8 @@
  *   - sets the per-item `--accent` on its own holder so the icon is accented in ANY
  *     host (nav buttons AND tabs),
  *   - exposes imperative `replay()` (a key-remount that restarts the CSS animation),
- *   - falls back to rendering the plain lucide glyph statically when no signature is
- *     registered (the resting state is always a correct, complete glyph).
+ *   - falls back to the ORIGINAL lucide glyph + a subtle generic motion when no
+ *     signature is registered (no glyph swap; resting state is always a complete glyph).
  *
  * Motion is gated by the CSS reduced-motion query; `useReducedMotion()` additionally
  * no-ops the JS replay path.
@@ -95,13 +95,21 @@ export const AnimatedIcon = forwardRef<AnimatedIconHandle, AnimatedIconProps>(
       : undefined;
     const holderClass = ['nav-ico', className].filter(Boolean).join(' ');
 
-    // Graceful fallback: no registered signature → static lucide glyph.
+    // No bespoke signature → render the ORIGINAL lucide glyph (no swap) with the
+    // generic fallback class so it still reacts on hover/focus/active. The
+    // prefers-reduced-motion block gates it (the `.ico` class is covered there).
     if (!resolved) {
       if (!icon) return null;
       const Lucide = icon;
       return (
         <span className={holderClass} style={style}>
-          <Lucide size={size} strokeWidth={strokeWidth} aria-hidden="true" />
+          <Lucide
+            key={replayKey}
+            className="ico ico-generic"
+            size={size}
+            strokeWidth={strokeWidth}
+            aria-hidden="true"
+          />
         </span>
       );
     }

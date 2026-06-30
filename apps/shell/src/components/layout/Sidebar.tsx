@@ -62,6 +62,9 @@ const NAV_SIGNATURE: Record<string, IconName> = {
   // grades (GraduationCap ≈ academics mortarboard)
   'my-grades': 'academics',
   'children-grades': 'academics',
+  // attendance (calendar + check)
+  'my-attendance': 'attendance',
+  'children-attendance': 'attendance',
   // settings sub-nav
   'my-account': 'account',
   preferences: 'preferences',
@@ -133,15 +136,15 @@ function NavIcon({
       style={{ background: containerBg }}
     >
       {/* Accent is owned by the .ef-motion ancestor (<a>), so applyAccent={false}.
-          Mapped items animate; unmapped items render their original glyph static
-          (still inside .nav-ico for the accent tint + glow). */}
-      {sigName ? (
-        <AnimatedIcon name={sigName} size={iconSize} applyAccent={false} />
-      ) : (
-        <span className="nav-ico">
-          <IconEl size={iconSize} strokeWidth={1.75} aria-hidden="true" />
-        </span>
-      )}
+          Mapped items play their bespoke signature; unmapped items render their
+          ORIGINAL lucide glyph with the generic fallback motion (no glyph swap). */}
+      <AnimatedIcon
+        name={sigName}
+        icon={IconEl}
+        size={iconSize}
+        strokeWidth={1.75}
+        applyAccent={false}
+      />
     </div>
   )
 }

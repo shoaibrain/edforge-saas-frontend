@@ -1615,11 +1615,7 @@ export default function StaffDetailPage() {
                                 id: tab.id,
                                 label: (
                                     <span className="flex items-center gap-2">
-                                        {sig ? (
-                                            <AnimatedIcon name={sig} icon={Icon} size={16} applyAccent={false} />
-                                        ) : (
-                                            <Icon className="w-4 h-4" />
-                                        )}
+                                        <AnimatedIcon name={sig} icon={Icon} size={16} applyAccent={false} />
                                         {tab.label}
                                     </span>
                                 ),

@@ -69,3 +69,19 @@ describe('host CSS contract (production Tailwind pipeline)', () => {
     ).toEqual([])
   }, 30_000)
 })
+
+describe('animated-icon reduced-motion gate (a11y contract)', () => {
+  // apps/shell/src/styles → repo root → packages/theme/src/icon-motion.css
+  const ICON_MOTION_CSS = resolve(HERE, '../../../../packages/theme/src/icon-motion.css')
+
+  it('keeps the prefers-reduced-motion gate that disables icon animation', () => {
+    const css = readFileSync(ICON_MOTION_CSS, 'utf8')
+    // The whole signature/generic motion system MUST stay gated: under
+    // prefers-reduced-motion every `.ico` animation is forced off, so the resting
+    // glyph is static. If this regresses, the a11y guarantee is silently broken.
+    expect(
+      css,
+      'icon-motion.css lost its prefers-reduced-motion gate (animation:none on .ico) — reduced-motion users would see motion.',
+    ).toMatch(/@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{[\s\S]*?\.ico[\s\S]*?animation:\s*none\s*!important/)
+  })
+})

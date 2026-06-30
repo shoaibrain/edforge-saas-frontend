@@ -32,6 +32,7 @@ import {
 import { z } from 'zod'
 import { useResourcePermissions } from '@edforge/abac'
 import { Tabs, type TabItem } from '@edforge/ui'
+import { AnimatedIcon, type IconName } from '@edforge/ui/motion'
 import { useSection, useUpdateSection, useSectionRoster } from '../../hooks/useSections'
 import { useCourse } from '../../hooks/useCourses'
 import { useActiveSchoolId } from '../../stores/app.store'
@@ -76,6 +77,12 @@ const TABS: { id: ClassroomDetailTab; labelKey: string; icon: LucideIcon }[] = [
 ]
 
 const VALID_TABS = new Set<string>(TABS.map((t) => t.id))
+
+// Bespoke signature where the metaphor is clean; the rest fall to generic motion.
+const TAB_SIGNATURE: Partial<Record<ClassroomDetailTab, IconName>> = {
+  overview: 'overview',
+  people: 'people',
+}
 
 // ============================================================================
 // LOADING SKELETON
@@ -776,7 +783,7 @@ export function ClassroomDetailPage() {
               id: tab.id,
               label: (
                 <span className="flex items-center gap-2">
-                  <tab.icon className="w-4 h-4" />
+                  <AnimatedIcon name={TAB_SIGNATURE[tab.id]} icon={tab.icon} size={16} applyAccent={false} />
                   {t(tab.labelKey)}
                 </span>
               ),

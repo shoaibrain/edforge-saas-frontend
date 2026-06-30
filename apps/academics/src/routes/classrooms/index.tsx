@@ -805,17 +805,13 @@ export function ClassroomsModule() {
                       : 'font-medium text-[rgb(var(--text-tertiary))] border-transparent hover:text-[rgb(var(--text-secondary))]'
                   }`}
                 >
-                  {sig ? (
-                    <AnimatedIcon
-                      name={sig}
-                      icon={tab.icon}
-                      size={16}
-                      applyAccent={false}
-                      className={isActive ? 'opacity-100' : 'opacity-70'}
-                    />
-                  ) : (
-                    <tab.icon className={`w-4 h-4 ${isActive ? 'opacity-100' : 'opacity-70'}`} />
-                  )}
+                  <AnimatedIcon
+                    name={sig}
+                    icon={tab.icon}
+                    size={16}
+                    applyAccent={false}
+                    className={isActive ? 'opacity-100' : 'opacity-70'}
+                  />
                   {t(tab.labelKey)}
                   {tab.id === 'overview' && sectionCount !== undefined && (
                     <span

@@ -14,6 +14,7 @@ import { useThemeStore } from "../../stores/theme.store";
 import { useHomeStore } from "../../stores/home.store";
 import { useAppStore } from "../../stores/app.store";
 import { Avatar } from "@edforge/ui";
+import { AnimatedIcon } from "@edforge/ui/motion";
 import { normalizePlatformLanguage, useTranslation } from "@edforge/i18n";
 import { getGreeting } from "../../lib/greeting";
 import { adToBS, formatBSLong } from "@edforge/date-utils";
@@ -308,10 +309,10 @@ function UserMenu() {
                   onClick={() =>
                     navigate({ to: "/settings", search: { tab: "account" } })
                   }
-                  className={`w-full flex items-center gap-3 px-4 py-3 transition-colors ${active ? "bg-[rgb(var(--background-tertiary))]" : ""}`}
+                  className={`ef-motion w-full flex items-center gap-3 px-4 py-3 transition-colors ${active ? "bg-[rgb(var(--background-tertiary))]" : ""}`}
                 >
                   <div className="w-8 h-8 rounded-lg bg-[rgb(var(--background-tertiary))] flex items-center justify-center">
-                    <User className="w-4 h-4 text-[rgb(var(--text-secondary))]" />
+                    <AnimatedIcon name="account" icon={User} size={16} applyAccent={false} className="text-[rgb(var(--text-secondary))]" />
                   </div>
                   <div className="text-left">
                     <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
@@ -330,10 +331,10 @@ function UserMenu() {
                   onClick={() =>
                     navigate({ to: "/settings", search: { tab: "account" } })
                   }
-                  className={`w-full flex items-center gap-3 px-4 py-3 transition-colors ${active ? "bg-[rgb(var(--background-tertiary))]" : ""}`}
+                  className={`ef-motion w-full flex items-center gap-3 px-4 py-3 transition-colors ${active ? "bg-[rgb(var(--background-tertiary))]" : ""}`}
                 >
                   <div className="w-8 h-8 rounded-lg bg-[rgb(var(--background-tertiary))] flex items-center justify-center">
-                    <Settings className="w-4 h-4 text-[rgb(var(--text-secondary))]" />
+                    <AnimatedIcon name="settings" icon={Settings} size={16} applyAccent={false} className="text-[rgb(var(--text-secondary))]" />
                   </div>
                   <div className="text-left">
                     <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
@@ -353,10 +354,10 @@ function UserMenu() {
               {({ active }) => (
                 <button
                   onClick={logout}
-                  className={`w-full flex items-center gap-3 px-4 py-3 transition-colors ${active ? "bg-rust-50 dark:bg-rust-900/20" : ""}`}
+                  className={`ef-motion w-full flex items-center gap-3 px-4 py-3 transition-colors ${active ? "bg-rust-50 dark:bg-rust-900/20" : ""}`}
                 >
                   <div className="w-8 h-8 rounded-lg bg-rust-100 dark:bg-rust-900/30 flex items-center justify-center">
-                    <LogOut className="w-4 h-4 text-rust-500" />
+                    <AnimatedIcon icon={LogOut} size={16} applyAccent={false} className="text-rust-500" />
                   </div>
                   <span className="text-sm font-medium text-rust-600 dark:text-rust-400">
                     {tNav("signOut")}
