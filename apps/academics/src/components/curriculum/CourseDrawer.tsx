@@ -32,6 +32,7 @@ import { CourseForm } from './CourseForm'
 import { useCreateCourse, useUpdateCourse } from '../../hooks/useCourses'
 import { parseApiError } from '../../services/academics.service'
 import { useActiveSchoolId } from '../../stores/app.store'
+import { useAcademicsI18n } from '../../lib/i18n'
 import { DrawerFooterCTA } from '../common/DrawerFooterCTA'
 import {
   courseFormSchema,
@@ -128,6 +129,7 @@ function CourseDetailView({
 }: {
   course: CourseResponseDto
 }) {
+  const { t, formatDate } = useAcademicsI18n()
   const subjectColors = SUBJECT_AREA_COLORS[course.subjectArea] ?? SUBJECT_AREA_COLORS.other
   const typeColors = COURSE_TYPE_COLORS[course.courseType] ?? COURSE_TYPE_COLORS.required
 
@@ -161,25 +163,25 @@ function CourseDetailView({
 
       {/* Classification */}
       <div>
-        <SectionHeader icon={GraduationCap} title="Classification" />
+        <SectionHeader icon={GraduationCap} title={t('curriculumModule.form.classificationTitle')} />
         <div className="grid grid-cols-2 gap-4">
           <DetailField
-            label="Academic Subject"
+            label={t('curriculumModule.form.academicSubject')}
             value={course.academicSubject ? getAcademicSubjectLabel(course.academicSubject) : null}
           />
-          <DetailField label="Subject Area (Ed-Fi rollup)" value={getSubjectAreaLabel(course.subjectArea)} />
-          <DetailField label="Course Type" value={getCourseTypeLabel(course.courseType)} />
-          <DetailField label="Credits" value={`${course.credits}${course.creditType ? ` (${getCreditTypeLabel(course.creditType)})` : ''}`} />
-          <DetailField label="Duration" value={getDurationLabel(course.typicalDuration)} />
+          <DetailField label={t('curriculumModule.drawer.subjectAreaRollup')} value={getSubjectAreaLabel(course.subjectArea)} />
+          <DetailField label={t('tables.courses.columns.type')} value={getCourseTypeLabel(course.courseType)} />
+          <DetailField label={t('tables.courses.columns.credits')} value={`${course.credits}${course.creditType ? ` (${getCreditTypeLabel(course.creditType)})` : ''}`} />
+          <DetailField label={t('tables.courses.columns.duration')} value={getDurationLabel(course.typicalDuration)} />
           {course.periodsPerWeek && (
-            <DetailField label="Periods/Week" value={course.periodsPerWeek} />
+            <DetailField label={t('curriculumModule.courseDetail.periodsPerWeekShort')} value={course.periodsPerWeek} />
           )}
         </div>
       </div>
 
       {/* Grade Levels */}
       <div>
-        <SectionHeader icon={Layers} title="Grade Levels" />
+        <SectionHeader icon={Layers} title={t('tables.courses.columns.grades')} />
         <div className="flex flex-wrap gap-2">
           {sortGradeCodes(course.gradeLevels).map((g) => (
             <span
@@ -195,7 +197,7 @@ function CourseDetailView({
       {/* Description */}
       {course.description && (
         <div>
-          <SectionHeader icon={FileText} title="Description" />
+          <SectionHeader icon={FileText} title={t('curriculumModule.courseDetail.description')} />
           <p className="text-sm text-text-secondary leading-relaxed">
             {course.description}
           </p>
@@ -205,7 +207,7 @@ function CourseDetailView({
       {/* Objectives */}
       {course.objectives && course.objectives.length > 0 && (
         <div>
-          <SectionHeader icon={Award} title="Learning Objectives" />
+          <SectionHeader icon={Award} title={t('curriculumModule.courseDetail.learningObjectives')} />
           <ul className="space-y-1.5">
             {course.objectives.map((obj, i) => (
               <li key={i} className="flex items-start gap-2 text-sm text-text-secondary">
@@ -220,7 +222,7 @@ function CourseDetailView({
       {/* Materials */}
       {course.textbooks && course.textbooks.length > 0 && (
         <div>
-          <SectionHeader icon={BookOpen} title="Course Materials" />
+          <SectionHeader icon={BookOpen} title={t('curriculumModule.form.materialsTitle')} />
           <div className="space-y-2">
             {course.textbooks.map((mat, i) => (
               <div
@@ -231,7 +233,7 @@ function CourseDetailView({
                 <div>
                   <p className="text-sm font-medium text-text-primary">{mat.title}</p>
                   {mat.author && (
-                    <p className="text-xs text-text-secondary">by {mat.author}</p>
+                    <p className="text-xs text-text-secondary">{t('curriculumModule.courseDetail.byAuthor', { author: mat.author })}</p>
                   )}
                   {mat.isbn && (
                     <p className="text-xs text-text-tertiary font-mono">ISBN: {mat.isbn}</p>
@@ -245,29 +247,21 @@ function CourseDetailView({
 
       {/* Metadata */}
       <div>
-        <SectionHeader icon={Clock} title="Metadata" />
+        <SectionHeader icon={Clock} title={t('curriculumModule.courseDetail.metadata')} />
         <div className="grid grid-cols-2 gap-4">
           <DetailField
-            label="Created"
+            label={t('curriculumModule.courseDetail.created')}
             value={
               course.createdAt
-                ? new Date(course.createdAt).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                  })
+                ? formatDate(course.createdAt)
                 : undefined
             }
           />
           <DetailField
-            label="Last Updated"
+            label={t('curriculumModule.courseDetail.lastUpdated')}
             value={
               course.updatedAt
-                ? new Date(course.updatedAt).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                  })
+                ? formatDate(course.updatedAt)
                 : undefined
             }
           />
@@ -294,6 +288,7 @@ function CourseFormView({
   onSuccess: () => void
   existingCourseCodes?: string[]
 }) {
+  const { t } = useAcademicsI18n()
   const schoolId = useActiveSchoolId()
   const createMutation = useCreateCourse()
   const updateMutation = useUpdateCourse()
@@ -352,7 +347,7 @@ function CourseFormView({
           if (parseApiError(err).statusCode === 409) {
             form.setError('courseCode', {
               type: 'manual',
-              message: 'That course code is already in use — Regenerate or edit it.',
+              message: t('curriculumModule.form.duplicateCourseCode'),
             })
             form.setFocus('courseCode')
             return
@@ -382,7 +377,7 @@ function CourseFormView({
         onSuccess()
       }
     },
-    [mode, course, schoolId, createMutation, updateMutation, onSuccess, form]
+    [mode, course, schoolId, createMutation, updateMutation, onSuccess, form, t]
   )
 
   // Prevent Enter key in text inputs from submitting the form
@@ -421,7 +416,7 @@ function CourseFormView({
             disabled={isPending}
             className="px-4 py-2 text-sm font-medium text-[rgb(var(--text-secondary))] bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] rounded-lg hover:bg-[rgb(var(--background-secondary))] transition-colors disabled:opacity-50"
           >
-            Cancel
+            {t('actions.cancel')}
           </button>
           <button
             type="submit"
@@ -431,12 +426,12 @@ function CourseFormView({
             {isPending ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                Saving...
+                {t('actions.saving')}
               </>
             ) : mode === 'create' ? (
-              'Create Course'
+              t('curriculumModule.drawer.createCourse')
             ) : (
-              'Save Changes'
+              t('actions.saveChanges')
             )}
           </button>
         </div>
@@ -457,6 +452,7 @@ export function CourseDrawer({
   onModeChange: _onModeChange,
   existingCourseCodes,
 }: CourseDrawerProps) {
+  const { t } = useAcademicsI18n()
   const [internalMode, setInternalMode] = useState<DrawerMode>(initialMode)
   const panelRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
@@ -520,8 +516,8 @@ export function CourseDrawer({
   // Dynamic title: entity name in view/edit, generic in create
   const title =
     internalMode === 'create'
-      ? 'Add New Course'
-      : course?.courseName || 'Course Details'
+      ? t('curriculumModule.drawer.addNewCourse')
+      : course?.courseName || t('curriculumModule.drawer.courseDetails')
 
   return (
     <AnimatePresence>
@@ -565,7 +561,7 @@ export function CourseDrawer({
                         </h2>
                         {internalMode === 'edit' && (
                           <span className="flex-shrink-0 text-xs bg-[rgb(var(--state-warning-bg)/0.18)] text-amber-700 dark:bg-[rgb(var(--state-warning-fg))]/20 dark:text-amber-400 px-2 py-0.5 rounded-full font-medium">
-                            Editing
+                            {t('curriculumModule.drawer.editing')}
                           </span>
                         )}
                       </div>
@@ -576,7 +572,7 @@ export function CourseDrawer({
                             {course.courseCode}
                           </span>
                           <span className={`text-xs font-medium ${course.isActive ? 'text-[rgb(var(--state-success-fg))]' : 'text-[rgb(var(--text-tertiary))]'}`}>
-                            {course.isActive ? 'Active' : 'Inactive'}
+                            {course.isActive ? t('common.active') : t('common.inactive')}
                           </span>
                         </div>
                       )}
@@ -586,7 +582,7 @@ export function CourseDrawer({
                     type="button"
                     onClick={handleClose}
                     className="p-1.5 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-surface-secondary transition-colors flex-shrink-0"
-                    aria-label="Close drawer"
+                    aria-label={t('curriculumModule.drawer.closeDrawer')}
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -609,7 +605,7 @@ export function CourseDrawer({
                   <div className="flex-1 flex items-center justify-center text-text-tertiary">
                     <div className="text-center">
                       <AlertCircle className="w-8 h-8 mx-auto mb-2" />
-                      <p className="text-sm">No course data available</p>
+                      <p className="text-sm">{t('curriculumModule.drawer.noCourseData')}</p>
                     </div>
                   </div>
                 )}
@@ -617,7 +613,7 @@ export function CourseDrawer({
                 {/* Footer CTA — view mode only */}
                 {internalMode === 'view' && course && (
                   <DrawerFooterCTA
-                    label="View Details"
+                    label={t('curriculumModule.drawer.viewDetails')}
                     onClick={handleViewDetails}
                     entityName={course.courseName}
                   />
