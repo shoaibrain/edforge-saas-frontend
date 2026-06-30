@@ -20,30 +20,23 @@ import {
   AlertCircle,
 } from 'lucide-react'
 import { Button, Select } from '@edforge/ui'
+import { useTranslation } from '@edforge/i18n'
 import { toast } from 'sonner'
+import type { TFunction } from 'i18next'
 import {
   toEdFiStateEducationAgency,
   toEdFiLocalEducationAgency,
   toEdFiEducationServiceCenter,
   toEdFiEducationOrganizationNetwork,
 } from '@aibrains/shared-types'
-import type {
-  SeaResponseDto,
-  LeaResponseDto,
-  EscResponseDto,
-  NetworkResponseDto,
-} from '@aibrains/shared-types'
+import type { SeaResponseDto, LeaResponseDto, EscResponseDto, NetworkResponseDto } from '@aibrains/shared-types'
 import {
   useStateEducationAgency,
   useLocalEducationAgencies,
   useEducationServiceCenters,
   useNetworks,
 } from '@/hooks/useEducationOrgs'
-import {
-  SettingsPageHeader,
-  fadeInUp,
-  staggerChildren,
-} from '@/components/settings/SettingsShared'
+import { SettingsPageHeader, fadeInUp, staggerChildren } from '@/components/settings/SettingsShared'
 
 // ============================================================================
 // TYPES
@@ -53,17 +46,36 @@ type EntityType = 'sea' | 'lea' | 'esc' | 'network' | 'staff'
 
 interface EntityOption {
   type: EntityType
-  label: string
+  labelKey: string
   icon: typeof Building2
-  description: string
 }
 
 const ENTITY_OPTIONS: EntityOption[] = [
-  { type: 'sea', label: 'State Education Agency', icon: Landmark, description: 'SEA root organization' },
-  { type: 'lea', label: 'Local Education Agency', icon: Building2, description: 'School districts' },
-  { type: 'esc', label: 'Education Service Center', icon: School, description: 'Regional service centers' },
-  { type: 'network', label: 'Organization Network', icon: Network, description: 'EdOrg networks' },
-  { type: 'staff', label: 'Staff', icon: Users, description: 'Staff members' },
+  {
+    type: 'sea',
+    labelKey: 'organization.entities.stateEducationAgency',
+    icon: Landmark,
+  },
+  {
+    type: 'lea',
+    labelKey: 'organization.entities.localEducationAgency',
+    icon: Building2,
+  },
+  {
+    type: 'esc',
+    labelKey: 'organization.entities.educationServiceCenter',
+    icon: School,
+  },
+  {
+    type: 'network',
+    labelKey: 'organization.edfiExport.entities.network',
+    icon: Network,
+  },
+  {
+    type: 'staff',
+    labelKey: 'organization.edfiExport.entities.staff',
+    icon: Users,
+  },
 ]
 
 // ============================================================================
@@ -76,7 +88,11 @@ interface ValidationResult {
   message: string
 }
 
-function validateEdFiOutput(json: Record<string, unknown>, entityType: EntityType): ValidationResult[] {
+function validateEdFiOutput(
+  json: Record<string, unknown>,
+  entityType: EntityType,
+  t: TFunction<'settings'>,
+): ValidationResult[] {
   const results: ValidationResult[] = []
 
   // Common required fields
@@ -84,9 +100,9 @@ function validateEdFiOutput(json: Record<string, unknown>, entityType: EntityTyp
   if (entityType !== 'staff') {
     for (const field of requiredCommon) {
       if (json[field]) {
-        results.push({ field, status: 'pass', message: `${field} is set` })
+        results.push({ field, status: 'pass', message: t('organization.edfiExport.validation.isSet', { field }) })
       } else {
-        results.push({ field, status: 'fail', message: `${field} is missing` })
+        results.push({ field, status: 'fail', message: t('organization.edfiExport.validation.isMissing', { field }) })
       }
     }
   }
@@ -94,29 +110,29 @@ function validateEdFiOutput(json: Record<string, unknown>, entityType: EntityTyp
   // Entity-specific checks
   switch (entityType) {
     case 'sea':
-      checkField(results, json, 'stateEducationAgencyId', 'required')
-      checkField(results, json, 'categories', 'required')
-      checkField(results, json, 'addresses', 'optional')
+      checkField(results, json, 'stateEducationAgencyId', 'required', t)
+      checkField(results, json, 'categories', 'required', t)
+      checkField(results, json, 'addresses', 'optional', t)
       break
     case 'lea':
-      checkField(results, json, 'localEducationAgencyId', 'required')
-      checkField(results, json, 'localEducationAgencyCategoryDescriptor', 'required')
-      checkField(results, json, 'categories', 'required')
-      checkField(results, json, 'charterStatusDescriptor', 'optional')
+      checkField(results, json, 'localEducationAgencyId', 'required', t)
+      checkField(results, json, 'localEducationAgencyCategoryDescriptor', 'required', t)
+      checkField(results, json, 'categories', 'required', t)
+      checkField(results, json, 'charterStatusDescriptor', 'optional', t)
       break
     case 'esc':
-      checkField(results, json, 'educationServiceCenterId', 'required')
-      checkField(results, json, 'categories', 'required')
+      checkField(results, json, 'educationServiceCenterId', 'required', t)
+      checkField(results, json, 'categories', 'required', t)
       break
     case 'network':
-      checkField(results, json, 'educationOrganizationNetworkId', 'required')
-      checkField(results, json, 'networkPurposeDescriptor', 'required')
+      checkField(results, json, 'educationOrganizationNetworkId', 'required', t)
+      checkField(results, json, 'networkPurposeDescriptor', 'required', t)
       break
     case 'staff':
-      checkField(results, json, 'staffUniqueId', 'required')
-      checkField(results, json, 'firstName', 'required')
-      checkField(results, json, 'lastSurname', 'required')
-      checkField(results, json, 'electronicMails', 'optional')
+      checkField(results, json, 'staffUniqueId', 'required', t)
+      checkField(results, json, 'firstName', 'required', t)
+      checkField(results, json, 'lastSurname', 'required', t)
+      checkField(results, json, 'electronicMails', 'optional', t)
       break
   }
 
@@ -127,18 +143,19 @@ function checkField(
   results: ValidationResult[],
   json: Record<string, unknown>,
   field: string,
-  requirement: 'required' | 'optional'
+  requirement: 'required' | 'optional',
+  t: TFunction<'settings'>,
 ) {
   const value = json[field]
   const hasValue = value !== undefined && value !== null && value !== ''
   const isArray = Array.isArray(value)
 
   if (hasValue && (!isArray || value.length > 0)) {
-    results.push({ field, status: 'pass', message: `${field} is set` })
+    results.push({ field, status: 'pass', message: t('organization.edfiExport.validation.isSet', { field }) })
   } else if (requirement === 'required') {
-    results.push({ field, status: 'fail', message: `${field} is required but missing` })
+    results.push({ field, status: 'fail', message: t('organization.edfiExport.validation.requiredMissing', { field }) })
   } else {
-    results.push({ field, status: 'warn', message: `${field} is optional and not set` })
+    results.push({ field, status: 'warn', message: t('organization.edfiExport.validation.optionalUnset', { field }) })
   }
 }
 
@@ -146,32 +163,31 @@ function checkField(
 // ENTITY SELECTOR
 // ============================================================================
 
-function EntitySelector({
-  selected,
-  onSelect,
-}: {
-  selected: EntityType
-  onSelect: (type: EntityType) => void
-}) {
+function EntitySelector({ selected, onSelect }: { selected: EntityType; onSelect: (type: EntityType) => void }) {
+  const { t } = useTranslation('settings')
+
   return (
     <div className="flex flex-wrap gap-2">
-      {ENTITY_OPTIONS.map(({ type, label, icon: Icon }) => (
-        <button
-          key={type}
-          type="button"
-          onClick={() => onSelect(type)}
-          aria-pressed={selected === type}
-          aria-label={`Preview ${label}`}
-          className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-            selected === type
-              ? 'bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--action-secondary-fg))]  ring-1 ring-[rgb(var(--border-focus))]/30'
-              : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary))]'
-          }`}
-        >
-          <Icon className="w-4 h-4" />
-          {label}
-        </button>
-      ))}
+      {ENTITY_OPTIONS.map(({ type, labelKey, icon: Icon }) => {
+        const label = t(labelKey)
+        return (
+          <button
+            key={type}
+            type="button"
+            onClick={() => onSelect(type)}
+            aria-pressed={selected === type}
+            aria-label={t('organization.edfiExport.previewEntityAria', { label })}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+              selected === type
+                ? 'bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--action-secondary-fg))]  ring-1 ring-[rgb(var(--border-focus))]/30'
+                : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary))]'
+            }`}
+          >
+            <Icon className="w-4 h-4" />
+            {label}
+          </button>
+        )
+      })}
     </div>
   )
 }
@@ -195,23 +211,21 @@ function EntityPicker<T>({
   getId: (item: T) => string
   isLoading: boolean
 }) {
+  const { t } = useTranslation('settings')
+
   if (isLoading) {
     return <div className="h-10 rounded-lg bg-[rgb(var(--background-tertiary))] animate-pulse" />
   }
 
   if (items.length === 0) {
-    return (
-      <p className="text-sm text-[rgb(var(--text-tertiary))] py-2">
-        No entities found for this type.
-      </p>
-    )
+    return <p className="text-sm text-[rgb(var(--text-tertiary))] py-2">{t('organization.edfiExport.noEntities')}</p>
   }
 
   return (
     <Select
-      aria-label="Select an entity to preview"
+      aria-label={t('organization.edfiExport.selectEntityAria')}
       className="w-full"
-      placeholder="Select an entity to preview..."
+      placeholder={t('organization.edfiExport.selectEntityPlaceholder')}
       value={selectedId || null}
       onChange={(v) => onSelect(v ?? '')}
       options={items.map((item) => ({ value: getId(item), label: getLabel(item) }))}
@@ -223,30 +237,26 @@ function EntityPicker<T>({
 // JSON PREVIEW PANEL
 // ============================================================================
 
-function JsonPreviewPanel({
-  json,
-  entityType,
-}: {
-  json: Record<string, unknown> | null
-  entityType: EntityType
-}) {
+function JsonPreviewPanel({ json, entityType }: { json: Record<string, unknown> | null; entityType: EntityType }) {
+  const { t } = useTranslation('settings')
+
   if (!json) {
     return (
       <div className="flex items-center justify-center h-64 text-sm text-[rgb(var(--text-tertiary))]">
-        Select an entity to preview its Ed-Fi JSON output
+        {t('organization.edfiExport.emptyPreview')}
       </div>
     )
   }
 
   const jsonString = JSON.stringify(json, null, 2)
-  const validation = validateEdFiOutput(json, entityType)
+  const validation = validateEdFiOutput(json, entityType, t)
   const passCount = validation.filter((v) => v.status === 'pass').length
   const failCount = validation.filter((v) => v.status === 'fail').length
   const warnCount = validation.filter((v) => v.status === 'warn').length
 
   const handleCopy = () => {
     navigator.clipboard.writeText(jsonString)
-    toast.success('JSON copied to clipboard')
+    toast.success(t('organization.edfiExport.toasts.copied'))
   }
 
   const handleDownload = () => {
@@ -271,22 +281,30 @@ function JsonPreviewPanel({
                 : 'bg-[rgb(var(--state-danger-bg)/0.18)]0/10 text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]'
             }`}
           >
-            {failCount === 0 ? (
-              <CheckCircle2 className="w-3 h-3" />
-            ) : (
-              <AlertCircle className="w-3 h-3" />
-            )}
-            {passCount} pass, {warnCount} warn, {failCount} fail
+            {failCount === 0 ? <CheckCircle2 className="w-3 h-3" /> : <AlertCircle className="w-3 h-3" />}
+            {t('organization.edfiExport.validation.summary', { passCount, warnCount, failCount })}
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <Button size="sm" variant="ghost" className="gap-1.5" onClick={handleCopy} aria-label="Copy JSON to clipboard">
+          <Button
+            size="sm"
+            variant="ghost"
+            className="gap-1.5"
+            onClick={handleCopy}
+            aria-label={t('organization.edfiExport.actions.copyAria')}
+          >
             <Copy className="w-3.5 h-3.5" />
-            Copy
+            {t('organization.edfiExport.actions.copy')}
           </Button>
-          <Button size="sm" variant="ghost" className="gap-1.5" onClick={handleDownload} aria-label="Download JSON file">
+          <Button
+            size="sm"
+            variant="ghost"
+            className="gap-1.5"
+            onClick={handleDownload}
+            aria-label={t('organization.edfiExport.actions.downloadAria')}
+          >
             <Download className="w-3.5 h-3.5" />
-            Download
+            {t('organization.edfiExport.actions.download')}
           </Button>
         </div>
       </div>
@@ -301,7 +319,7 @@ function JsonPreviewPanel({
       {/* Validation Details */}
       <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] p-4">
         <h4 className="text-xs font-semibold text-[rgb(var(--text-primary))] uppercase tracking-wider mb-3">
-          Validation
+          {t('organization.edfiExport.validation.title')}
         </h4>
         <div className="space-y-1.5">
           {validation.map((v) => (
@@ -328,6 +346,7 @@ function JsonPreviewPanel({
 // ============================================================================
 
 export default function EdFiExportPreviewPage() {
+  const { t } = useTranslation('settings')
   const [entityType, setEntityType] = useState<EntityType>('sea')
   const [selectedId, setSelectedId] = useState<string | null>(null)
 
@@ -381,15 +400,10 @@ export default function EdFiExportPreviewPage() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={staggerChildren}
-        className="space-y-8"
-      >
+      <motion.div initial="hidden" animate="visible" variants={staggerChildren} className="space-y-8">
         <SettingsPageHeader
-          title="Ed-Fi Export Preview"
-          description="Preview and validate Ed-Fi Data Standard JSON output for your education organizations"
+          title={t('organization.edfiExport.title')}
+          description={t('organization.edfiExport.description')}
           icon={FileJson2}
         />
 
@@ -405,18 +419,14 @@ export default function EdFiExportPreviewPage() {
               <div className="flex items-center gap-3 p-3 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]">
                 <Landmark className="w-5 h-5 text-[rgb(var(--state-info-fg))] " />
                 <div>
-                  <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
-                    {sea.nameOfInstitution}
-                  </p>
+                  <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{sea.nameOfInstitution}</p>
                   <p className="text-xs text-[rgb(var(--text-tertiary))]">
-                    Singleton — one SEA per tenant
+                    {t('organization.edfiExport.singletonSea')}
                   </p>
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-[rgb(var(--text-tertiary))] py-2">
-                No State Education Agency configured yet.
-              </p>
+              <p className="text-sm text-[rgb(var(--text-tertiary))] py-2">{t('organization.edfiExport.noSea')}</p>
             )
           ) : entityType === 'lea' ? (
             <EntityPicker
@@ -447,7 +457,7 @@ export default function EdFiExportPreviewPage() {
             />
           ) : entityType === 'staff' ? (
             <p className="text-sm text-[rgb(var(--text-tertiary))] py-2">
-              Staff export preview will be available from the People module.
+              {t('organization.edfiExport.staffUnavailable')}
             </p>
           ) : null}
         </motion.div>

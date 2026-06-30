@@ -8,6 +8,7 @@
 import { useState, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown, Copy, Check, AlertCircle, CheckCircle2 } from 'lucide-react'
+import { useTranslation } from '@edforge/i18n'
 import type { CreateSchoolDto, SchoolResponseDto } from '@aibrains/shared-types'
 import { toEdFiSchool } from '@aibrains/shared-types'
 
@@ -27,15 +28,17 @@ type ValidationLevel = 'valid' | 'partial' | 'minimal'
 // ============================================================================
 
 function highlightJson(json: string): string {
-  return json
-    // String values (after colon)
-    .replace(/"([^"]+)"(\s*:)/g, '<span class="text-[rgb(var(--text-primary))]">"$1"</span>$2')
-    // String values
-    .replace(/:\s*"([^"]+)"/g, ': <span class="text-[rgb(var(--action-secondary-fg))] ">"$1"</span>')
-    // Numbers
-    .replace(/:\s*(\d+)/g, ': <span class="text-amber-600 dark:text-amber-400">$1</span>')
-    // Booleans & null
-    .replace(/:\s*(true|false|null)/g, ': <span class="text-[rgb(var(--state-info-fg))] ">$1</span>')
+  return (
+    json
+      // String values (after colon)
+      .replace(/"([^"]+)"(\s*:)/g, '<span class="text-[rgb(var(--text-primary))]">"$1"</span>$2')
+      // String values
+      .replace(/:\s*"([^"]+)"/g, ': <span class="text-[rgb(var(--action-secondary-fg))] ">"$1"</span>')
+      // Numbers
+      .replace(/:\s*(\d+)/g, ': <span class="text-amber-600 dark:text-amber-400">$1</span>')
+      // Booleans & null
+      .replace(/:\s*(true|false|null)/g, ': <span class="text-[rgb(var(--state-info-fg))] ">$1</span>')
+  )
 }
 
 // ============================================================================
@@ -43,6 +46,7 @@ function highlightJson(json: string): string {
 // ============================================================================
 
 export function EdFiPreview({ formData }: EdFiPreviewProps) {
+  const { t } = useTranslation('settings')
   const [isOpen, setIsOpen] = useState(false)
   const [copied, setCopied] = useState(false)
 
@@ -86,9 +90,9 @@ export function EdFiPreview({ formData }: EdFiPreviewProps) {
       const { _ext, ...cleanEdfi } = edfi
       return JSON.stringify(cleanEdfi, null, 2)
     } catch {
-      return '{ "error": "Unable to generate preview" }'
+      return JSON.stringify({ error: t('organization.edfiPreview.generateError') }, null, 2)
     }
-  }, [formData])
+  }, [formData, t])
 
   // Assess completeness
   const validation = useMemo((): { level: ValidationLevel; message: string; filled: number; total: number } => {
@@ -105,15 +109,18 @@ export function EdFiPreview({ formData }: EdFiPreviewProps) {
     const filled = checks.filter(Boolean).length
     const total = checks.length
 
-    if (filled >= 6) return { level: 'valid', message: 'Good Ed-Fi compliance', filled, total }
-    if (filled >= 3) return { level: 'partial', message: 'Partial compliance — add more fields', filled, total }
-    return { level: 'minimal', message: 'Minimal data — fill basic fields first', filled, total }
-  }, [formData])
+    if (filled >= 6) return { level: 'valid', message: t('organization.edfiPreview.validation.good'), filled, total }
+    if (filled >= 3)
+      return { level: 'partial', message: t('organization.edfiPreview.validation.partial'), filled, total }
+    return { level: 'minimal', message: t('organization.edfiPreview.validation.minimal'), filled, total }
+  }, [formData, t])
 
   const validationColors = {
-    valid: 'text-[rgb(var(--state-success-fg))]  bg-[rgb(var(--state-success-bg)/0.18)] border-[rgb(var(--state-success-border)/0.35)]',
+    valid:
+      'text-[rgb(var(--state-success-fg))]  bg-[rgb(var(--state-success-bg)/0.18)] border-[rgb(var(--state-success-border)/0.35)]',
     partial: 'text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/20',
-    minimal: 'text-[rgb(var(--text-tertiary))] dark:text-[rgb(var(--text-tertiary))] bg-[rgb(var(--background-tertiary))]0/10 border-[rgb(var(--border-secondary))]',
+    minimal:
+      'text-[rgb(var(--text-tertiary))] dark:text-[rgb(var(--text-tertiary))] bg-[rgb(var(--background-tertiary))]0/10 border-[rgb(var(--border-secondary))]',
   }
 
   const handleCopy = async () => {
@@ -138,19 +145,19 @@ export function EdFiPreview({ formData }: EdFiPreviewProps) {
             <span className="text-sm font-mono font-bold text-[rgb(var(--state-info-fg))] ">{'{}'}</span>
           </div>
           <div className="text-left">
-            <h4 className="text-sm font-medium text-[rgb(var(--text-primary))]">Ed-Fi JSON Preview</h4>
-            <p className="text-xs text-[rgb(var(--text-tertiary))]">Real-time Ed-Fi Data Standard output</p>
+            <h4 className="text-sm font-medium text-[rgb(var(--text-primary))]">
+              {t('organization.edfiPreview.title')}
+            </h4>
+            <p className="text-xs text-[rgb(var(--text-tertiary))]">{t('organization.edfiPreview.description')}</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
           {/* Validation badge */}
-          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border ${validationColors[validation.level]}`}>
-            {validation.level === 'valid' ? (
-              <CheckCircle2 className="w-3 h-3" />
-            ) : (
-              <AlertCircle className="w-3 h-3" />
-            )}
-            {validation.filled}/{validation.total} fields
+          <span
+            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border ${validationColors[validation.level]}`}
+          >
+            {validation.level === 'valid' ? <CheckCircle2 className="w-3 h-3" /> : <AlertCircle className="w-3 h-3" />}
+            {t('organization.edfiPreview.fieldsComplete', { filled: validation.filled, total: validation.total })}
           </span>
           <motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
             <ChevronDown className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
@@ -170,26 +177,31 @@ export function EdFiPreview({ formData }: EdFiPreviewProps) {
             <div className="px-5 pb-5 border-t border-[rgb(var(--border-primary))]">
               {/* Toolbar */}
               <div className="flex items-center justify-between py-3">
-                <p className={`text-xs font-medium ${
-                  validation.level === 'valid' ? 'text-[rgb(var(--state-success-fg))] ' :
-                  validation.level === 'partial' ? 'text-amber-600 dark:text-amber-400' :
-                  'text-[rgb(var(--text-tertiary))]'
-                }`}>
+                <p
+                  className={`text-xs font-medium ${
+                    validation.level === 'valid'
+                      ? 'text-[rgb(var(--state-success-fg))] '
+                      : validation.level === 'partial'
+                        ? 'text-amber-600 dark:text-amber-400'
+                        : 'text-[rgb(var(--text-tertiary))]'
+                  }`}
+                >
                   {validation.message}
                 </p>
                 <button
                   onClick={handleCopy}
+                  aria-label={t('organization.edfiPreview.actions.copyAria')}
                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary))] transition-colors"
                 >
                   {copied ? (
                     <>
                       <Check className="w-3.5 h-3.5 text-[rgb(var(--state-success-fg))]" />
-                      Copied!
+                      {t('organization.edfiPreview.actions.copied')}
                     </>
                   ) : (
                     <>
                       <Copy className="w-3.5 h-3.5" />
-                      Copy JSON
+                      {t('organization.edfiPreview.actions.copyJson')}
                     </>
                   )}
                 </button>

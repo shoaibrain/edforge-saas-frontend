@@ -1357,7 +1357,56 @@
       "newDistrictFallback": "new district",
       "toasts": {
         "assigned": "{{schoolName}} assigned to {{districtName}}",
-        "unassigned": "{{schoolName}} unassigned from district"
+      "unassigned": "{{schoolName}} unassigned from district"
+      }
+    },
+    "edfiExport": {
+      "title": "Ed-Fi Export Preview",
+      "description": "Preview and validate Ed-Fi Data Standard JSON output for your education organizations",
+      "previewEntityAria": "Preview {{label}}",
+      "selectEntityAria": "Select an entity to preview",
+      "selectEntityPlaceholder": "Select an entity to preview...",
+      "noEntities": "No entities found for this type.",
+      "emptyPreview": "Select an entity to preview its Ed-Fi JSON output",
+      "singletonSea": "Singleton - one SEA per tenant",
+      "noSea": "No State Education Agency configured yet.",
+      "staffUnavailable": "Staff export preview will be available from the People module.",
+      "entities": {
+        "network": "Organization Network",
+        "staff": "Staff"
+      },
+      "actions": {
+        "copy": "Copy",
+        "copyAria": "Copy JSON to clipboard",
+        "download": "Download",
+        "downloadAria": "Download JSON file"
+      },
+      "validation": {
+        "title": "Validation",
+        "summary": "{{passCount}} pass, {{warnCount}} warn, {{failCount}} fail",
+        "isSet": "{{field}} is set",
+        "isMissing": "{{field}} is missing",
+        "requiredMissing": "{{field}} is required but missing",
+        "optionalUnset": "{{field}} is optional and not set"
+      },
+      "toasts": {
+        "copied": "JSON copied to clipboard"
+      }
+    },
+    "edfiPreview": {
+      "title": "Ed-Fi JSON Preview",
+      "description": "Real-time Ed-Fi Data Standard output",
+      "generateError": "Unable to generate preview",
+      "fieldsComplete": "{{filled}}/{{total}} fields",
+      "validation": {
+        "good": "Good Ed-Fi compliance",
+        "partial": "Partial compliance - add more fields",
+        "minimal": "Minimal data - fill basic fields first"
+      },
+      "actions": {
+        "copyJson": "Copy JSON",
+        "copyAria": "Copy Ed-Fi JSON to clipboard",
+        "copied": "Copied!"
       }
     },
     "assignmentManager": {
