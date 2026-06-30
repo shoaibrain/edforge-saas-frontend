@@ -68,8 +68,27 @@ export interface UseSchoolGradeOptionsResult {
   source: 'enabledGradeLevels' | 'gradeRange' | 'fallback'
 }
 
+export interface UseSchoolGradeOptionsArgs {
+  /**
+   * Append a "Unknown grade" sentinel to `options[]` that submits the
+   * literal value `__UNRESOLVED__`. The finance backend's
+   * `listBySchoolAndGrade` (Sprint B.1) accepts this exact literal as
+   * the discriminator for "rows whose gradeLevel could not be resolved
+   * to a canonical code at issue time" — see
+   * `server/application/microservices/finance/src/invoices/invoices.controller.ts`
+   * line 47 (`@Query('gradeLevel')`).
+   *
+   * Only the finance list pages (invoice list + payment list) opt in;
+   * other consumers (e.g. the bulk-generate wizard) intentionally do
+   * not, because "Unknown" is a filter-only concept — you can't
+   * generate an invoice "for the Unknown grade."
+   */
+  includeUnknownOption?: boolean
+}
+
 export function useSchoolGradeOptions(
   schoolId: string | null,
+  args: UseSchoolGradeOptionsArgs = {},
 ): UseSchoolGradeOptionsResult {
   const { data: school, isLoading } = useQuery({
     queryKey: ['school', schoolId],
@@ -109,13 +128,23 @@ export function useSchoolGradeOptions(
     return { gradeCodes: GRADE_LEVEL_OPTIONS.map(o => o.value), source: 'fallback' }
   }, [school?.enabledGradeLevels, school?.gradeRange])
 
+  const { includeUnknownOption = false } = args
   const options = useMemo(() => {
     const opts = gradeCodes.map(code => {
       const known = GRADE_LEVEL_OPTIONS.find(o => o.value === code)
       return known ?? { value: code, label: code }
     })
-    return [{ value: '', label: 'All Grades' }, ...opts]
-  }, [gradeCodes])
+    const base = [{ value: '', label: 'All Grades' }, ...opts]
+    // Sprint B-tail (PR #341 follow-up + A.5 close): the Unknown sentinel
+    // lights up the rows the A.5 backfill flagged as
+    // `gradeLevelResolutionStatus: 'unresolved'` — those are absent from
+    // GSI14 so the regular grade chips can't surface them. Backend routes
+    // the literal `__UNRESOLVED__` to a sparse-status query path.
+    if (includeUnknownOption) {
+      base.push({ value: '__UNRESOLVED__', label: 'Unknown grade' })
+    }
+    return base
+  }, [gradeCodes, includeUnknownOption])
 
   return { options, gradeCodes, isLoading, source }
 }
