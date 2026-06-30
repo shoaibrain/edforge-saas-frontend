@@ -366,6 +366,84 @@
       "viewFullProfile": "पूरा प्रोफाइल हेर्नुहोस्",
       "viewFullProfileAria": "{{student}} को पूरा प्रोफाइल हेर्नुहोस्",
       "bsPrefix": "वि.सं. {{date}}"
+    },
+    "csvImport": {
+      "title": "विद्यार्थी आयात गर्नुहोस्",
+      "subtitle": {
+        "upload": "धेरै विद्यार्थी आयात गर्न CSV फाइल अपलोड गर्नुहोस्",
+        "preview": "{{valid}} मान्य, {{invalid}} त्रुटिसहित",
+        "importing": "विद्यार्थी आयात हुँदै...",
+        "results": "आयात पूरा भयो"
+      },
+      "actions": {
+        "close": "आयात संवाद बन्द गर्नुहोस्",
+        "download": "डाउनलोड",
+        "remove": "हटाउनुहोस्",
+        "uploadDifferent": "अर्को फाइल अपलोड गर्नुहोस्",
+        "goToPending": "विचाराधीनमा जानुहोस्",
+        "cancel": "रद्द गर्नुहोस्",
+        "importAsPending": "विचाराधीन रूपमा आयात गर्नुहोस् ({{count}})"
+      },
+      "dropzone": {
+        "title": "CSV फाइल तानेर यहाँ छोड्नुहोस्",
+        "or": "वा",
+        "browse": "ब्राउज गर्न क्लिक गर्नुहोस्"
+      },
+      "template": {
+        "title": "CSV टेम्प्लेट",
+        "description": "आवश्यक स्तम्भहरूसहित डाउनलोड गर्नुहोस्"
+      },
+      "columns": {
+        "required": "आवश्यक",
+        "optional": "वैकल्पिक"
+      },
+      "errors": {
+        "unsupportedFile": ".csv फाइल मात्र समर्थित छ।",
+        "fileTooLarge": "फाइल साइज 2MB सीमा नाघ्यो ({{size}}MB)। कृपया फाइल सानो बनाउनुहोस्।",
+        "rowLimit": "प्रति आयात अधिकतम {{max}} विद्यार्थी। तपाईंको फाइलमा {{rows}} पङ्क्ति छन्। कृपया साना फाइलमा विभाजन गर्नुहोस्।"
+      },
+      "rowErrors": {
+        "missingFirstName": "पहिलो नाम छुटेको छ",
+        "missingLastName": "थर छुटेको छ",
+        "missingBirthDate": "जन्म मिति छुटेको छ",
+        "missingGender": "लिङ्ग छुटेको छ",
+        "missingGradeLevel": "ग्रेड स्तर छुटेको छ"
+      },
+      "preview": {
+        "rows": "{{value}} पङ्क्ति",
+        "rows_plural": "{{value}} पङ्क्ति",
+        "invalidRows": "{{value}} पङ्क्तिमा त्रुटि छ (छोडिनेछ)",
+        "invalidRows_plural": "{{value}} पङ्क्तिमा त्रुटि छ (छोडिनेछ)",
+        "rowError": "पङ्क्ति {{row}}: {{errors}}",
+        "andMore": "...र {{value}} थप",
+        "andMore_plural": "...र {{value}} थप",
+        "status": "स्थिति",
+        "error": "त्रुटि",
+        "valid": "मान्य"
+      },
+      "importing": {
+        "title": "{{value}} विद्यार्थी आयात हुँदै...",
+        "title_plural": "{{value}} विद्यार्थी आयात हुँदै...",
+        "keepOpen": "कृपया यो विन्डो बन्द नगर्नुहोस्।"
+      },
+      "results": {
+        "imported": "आयात भयो",
+        "skipped": "छोडियो",
+        "errors": "त्रुटिहरू",
+        "pendingNoticeStart": "{{value}} विद्यार्थी",
+        "pendingNoticeStart_plural": "{{value}} विद्यार्थी",
+        "pendingNoticeEnd": " रूपमा आयात भयो। समीक्षा गरी भर्ना गर्न Pending tab मा जानुहोस्।",
+        "duplicatesTitle": "डुप्लिकेट मिलान भेटियो",
+        "duplicateRow": "पङ्क्ति {{row}}: {{matches}} सँग मिल्यो ({{confidence}} confidence)",
+        "unknownConfidence": "अज्ञात",
+        "errorsTitle": "आयात त्रुटिहरू",
+        "errorRow": "पङ्क्ति {{row}}: {{field}} - {{message}}"
+      },
+      "footer": {
+        "constraints": ".csv मात्र · अधिकतम {{maxRows}} पङ्क्ति · अधिकतम 2MB",
+        "pendingStart": "आयातले",
+        "pendingEnd": "भर्नाहरू सिर्जना गर्छ"
+      }
     }
   },
   "privacy": {
