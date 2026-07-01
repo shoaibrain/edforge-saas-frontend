@@ -3,9 +3,12 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { cn, focusRing } from '../utils'
 
 const buttonVariants = cva(
-  // Base styles — use theme-aware focus ring
+  // Base styles — use theme-aware focus ring. `ef-motion` is a motion hook only:
+  // any lucide icon inside the button nudges on hover/focus (see @edforge/theme
+  // icon-motion.css). It is functionally inert otherwise — the accent focus-ring
+  // rule no-ops without an inherited `--accent`, and Tailwind's focus ring wins.
   cn(
-    'inline-flex items-center justify-center font-medium transition-all duration-200 disabled:opacity-50 disabled:pointer-events-none',
+    'ef-motion inline-flex items-center justify-center font-medium transition-all duration-200 disabled:opacity-50 disabled:pointer-events-none',
     focusRing
   ),
   {

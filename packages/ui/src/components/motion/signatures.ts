@@ -16,28 +16,61 @@
 import type { IconName } from './icons';
 
 export type AccentHue =
-  | 'emerald' | 'violet' | 'amber' | 'sky' | 'blue' | 'teal' | 'rose' | 'indigo';
+  | 'emerald' | 'violet' | 'amber' | 'sky' | 'blue' | 'teal' | 'rose' | 'indigo'
+  | 'slate';
 
 export type AccentMode = 'module' | 'mono';
 
 /** Per-icon accent (from the prototype's ACCENT map). */
 export const ICON_ACCENT: Record<IconName, AccentHue> = {
+  // primary nav
   home: 'emerald',
   academics: 'violet',
   people: 'amber',
   finance: 'teal',
   settings: 'blue',
+  // finance alternates
+  finance_receipt: 'teal',
+  finance_note: 'teal',
+  // academics surfaces
   overview: 'blue',
+  students: 'violet',
+  classrooms: 'indigo',
+  curriculum: 'emerald',
+  exams: 'rose',
+  attendance: 'amber',
+  // people / record
+  staff: 'sky',
+  family: 'amber',
+  profile: 'teal',
+  enrollment: 'emerald',
+  demographics: 'violet',
+  // metrics & status
+  metric_attendance: 'emerald',
+  gpa: 'amber',
+  sections: 'blue',
+  fees: 'teal',
+  atrisk: 'rose',
+  // actions & toolbar
+  create: 'emerald',
+  export: 'sky',
+  search: 'blue',
+  filter: 'indigo',
+  edit: 'amber',
+  remove: 'rose',
+  more: 'slate',
+  refresh: 'teal',
+  notifications: 'violet',
+  // settings sub-nav (production)
+  workspace: 'indigo',
+  configuration: 'blue',
   account: 'teal',
   preferences: 'violet',
   security: 'emerald',
-  workspace: 'indigo',
   organization: 'amber',
   rbac: 'rose',
   authdebug: 'sky',
-  configuration: 'blue',
   academicsetup: 'emerald',
-  attendance: 'amber',
   structure: 'violet',
   gradelevels: 'teal',
   auditlog: 'sky',
@@ -76,15 +109,46 @@ export function resolveAccent(
  * an explicit `name` prop or `registerSignature(icon, name)`.
  */
 const DISPLAY_NAME_TO_SIGNATURE: Record<string, IconName> = {
+  // nav + settings sub-nav (Round 1/2)
   Home: 'home',
   GraduationCap: 'academics',
   UsersRound: 'people',
-  DollarSign: 'finance',
   Settings: 'settings',
   ShieldCheck: 'security',
   Building2: 'organization',
   Bug: 'authdebug',
   GalleryVerticalEnd: 'overview',
+
+  // finance — retire the $: DollarSign/Wallet now resolve to the curated Wallet glyph
+  DollarSign: 'finance',
+  Wallet: 'finance',
+  Receipt: 'finance_receipt',
+  Banknote: 'finance_note',
+
+  // action / toolbar glyphs whose lucide silhouette ≈ the signature glyph (safe auto-swap)
+  Plus: 'create',
+  Trash2: 'remove',
+  Pencil: 'edit',
+  SquarePen: 'edit',
+  Edit2: 'edit',
+  Edit3: 'edit',
+  Search: 'search',
+  Filter: 'filter',
+  Download: 'export',
+  MoreHorizontal: 'more',
+  RotateCcw: 'refresh',
+  RefreshCw: 'refresh',
+  Bell: 'notifications',
+  AlertTriangle: 'atrisk',
+  UserPlus: 'enrollment',
+  BookOpen: 'curriculum',
+  LayoutGrid: 'sections',
+
+  // NOTE — silhouette-divergent education glyphs (School→classrooms, IdCard→demographics,
+  // ClipboardList→exams, ClipboardCheck→attendance, Target→metric_attendance, Award→gpa,
+  // CreditCard→finance, Briefcase→staff) are intentionally NOT auto-resolved here: a bare
+  // <AnimatedIcon icon={X}/> must not silently swap to a different-looking glyph. Those are
+  // wired explicitly at call sites via the `name` prop (per the Round-4 per-MFE sweep).
 };
 
 /** Resolve a signature glyph name from a lucide-react component's displayName. */

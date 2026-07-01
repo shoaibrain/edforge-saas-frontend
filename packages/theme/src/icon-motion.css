@@ -26,6 +26,7 @@
   --a-teal:    oklch(0.73 0.12 195);
   --a-rose:    oklch(0.68 0.18 18);
   --a-indigo:  oklch(0.64 0.18 280);
+  --a-slate:   oklch(0.62 0.03 250);
 }
 
 /* ---- icon holder + glyph -------------------------------------------------- */
@@ -34,7 +35,7 @@
   flex: none;
   display: grid;
   place-items: center;
-  perspective: 340px;            /* depth for the finance coin flip */
+  perspective: 340px;            /* depth for the banknote coin flip (finance_note) */
   color: currentColor;           /* rest = inherit host text color */
   transition: color .2s;
 }
@@ -81,6 +82,17 @@
 .al-min,.al-hour { transform-origin: 12px 12px; }
 .sc-check,.at-check,.st-l1,.st-l2 { stroke-dasharray: 1; }
 
+/* curated-set pivots (Round 4) */
+.wl-coin,.wl-coin-s,.fl-drop,.bn-coin,
+.fm-child,.dm-core,.ex-clip,.tg-dot,.aw-star,.ar-dot,
+.tg-r1,.tg-r2,
+.cr-plus,.rf-spin,.ed-pen,.se-mag,.ex-arr { transform-box: fill-box; transform-origin: center; }
+.sd-cap,.sd-tas,.aw-ribbon { transform-box: fill-box; transform-origin: center bottom; }
+.sf-badge,.sf-photo,.sf-l1,.sf-l2,.sf-lan,.fl-funnel,.bl-bell { transform-box: fill-box; transform-origin: top center; }
+.en-plus { transform-origin: 18.5px 17px; }
+.tr-lid  { transform-origin: 4px 6.4px; }
+.cl-line,.ex-check,.dm-s1,.dm-s2,.rc-l1,.rc-l2,.rc-l3 { stroke-dasharray: 1; }
+
 /* =========================================================
    Trigger = item/tab/lab hovered or focused, or item/tab active
    ========================================================= */
@@ -97,8 +109,11 @@
 :where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .pp-back,
 :where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .pp-back { animation: sigPopBack var(--icon-dur) var(--ease-spring); }
 
-:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .ico-finance,
-:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .ico-finance { animation: sigFlip calc(var(--icon-dur) * 1.4) var(--ease-soft); }
+/* finance — wallet coin deposit (retires the $ flip) */
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) :is(.wl-coin,.wl-coin-s),
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) :is(.wl-coin,.wl-coin-s) { animation: sigCoinDrop calc(var(--icon-dur) * 1.3) var(--ease-out); }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .wl-body,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .wl-body { animation: sigBob var(--icon-dur) var(--ease-spring) calc(var(--icon-dur) * 0.55) both; }
 
 :where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) :is(.g-cog,.ws-cog,.cf-cog),
 :where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) :is(.g-cog,.ws-cog,.cf-cog) { animation: sigSpin calc(var(--icon-dur) * 1.5) var(--ease-soft); }
@@ -175,8 +190,96 @@
 :where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .al-hour,
 :where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .al-hour { animation: sigSweepHour calc(var(--icon-dur) * 1.5) var(--ease-soft); }
 
+/* ---- curated-set signatures (Round 4) ------------------------------------- */
+/* finance alternates — receipt / fees lines write + tear, banknote coin flip */
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .rc-l1,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .rc-l1 { animation: sigDraw var(--icon-dur) var(--ease-out) both; }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .rc-l2,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .rc-l2 { animation: sigDraw var(--icon-dur) var(--ease-out) .08s both; }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .rc-l3,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .rc-l3 { animation: sigDraw var(--icon-dur) var(--ease-out) .16s both; }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .rc-body,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .rc-body { animation: sigBob var(--icon-dur) var(--ease-spring); }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .bn-coin,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .bn-coin { animation: sigFlip calc(var(--icon-dur) * 1.4) var(--ease-soft); }
+
+/* academics — students cap lift, classrooms lesson line, exams check + clip */
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) :is(.sd-cap,.sd-tas),
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) :is(.sd-cap,.sd-tas) { animation: sigHop var(--icon-dur) var(--ease-spring); }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .cl-line,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .cl-line { animation: sigDraw calc(var(--icon-dur) * 1.1) var(--ease-out) both; }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .cl-board,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .cl-board { animation: sigBob var(--icon-dur) var(--ease-spring); }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .ex-check,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .ex-check { animation: sigDraw var(--icon-dur) var(--ease-out) .08s both; }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .ex-clip,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .ex-clip { animation: sigPanel var(--icon-dur) var(--ease-spring); }
+
+/* people — staff badge swing, family child pops in */
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .sf-badge,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .sf-badge { animation: sigSwing var(--icon-dur) var(--ease-spring); }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .sf-photo,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .sf-photo { animation: sigPanel var(--icon-dur) var(--ease-spring) .08s both; }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .fm-child,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .fm-child { animation: sigPopBack var(--icon-dur) var(--ease-spring); }
+
+/* record — enrollment plus quarter-turn, demographics segments sweep */
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .en-plus,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .en-plus { animation: sigPlusPop var(--icon-dur) var(--ease-spring); }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .dm-s1,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .dm-s1 { animation: sigDraw var(--icon-dur) var(--ease-out) both; }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .dm-s2,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .dm-s2 { animation: sigDraw var(--icon-dur) var(--ease-out) .1s both; }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .dm-core,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .dm-core { animation: sigPanel var(--icon-dur) var(--ease-spring) .2s both; }
+
+/* metrics & status — rings converge, medal swing, alert shake */
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .tg-r1,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .tg-r1 { animation: sigConverge var(--icon-dur) var(--ease-spring); }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .tg-r2,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .tg-r2 { animation: sigConverge var(--icon-dur) var(--ease-spring) .07s both; }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .tg-dot,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .tg-dot { animation: sigPanel var(--icon-dur) var(--ease-spring) .16s both; }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .aw-ribbon,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .aw-ribbon { animation: sigSwing var(--icon-dur) var(--ease-spring); }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .aw-star,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .aw-star { animation: sigPanel var(--icon-dur) var(--ease-spring) .12s both; }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .ar-tri,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .ar-tri { animation: sigShake calc(var(--icon-dur) * 1.1) var(--ease-soft); }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .ar-dot,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .ar-dot { animation: sigPanel var(--icon-dur) var(--ease-spring) .14s both; }
+
+/* actions & toolbar */
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .cr-plus,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .cr-plus { animation: sigQuarterPop var(--icon-dur) var(--ease-spring); }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .ex-arr,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .ex-arr { animation: sigArrow var(--icon-dur) var(--ease-spring); }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .se-mag,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .se-mag { animation: sigScan calc(var(--icon-dur) * 1.2) var(--ease-soft); }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .fl-funnel,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .fl-funnel { animation: sigFunnel var(--icon-dur) var(--ease-spring); }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .fl-drop,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .fl-drop { animation: sigDropThru calc(var(--icon-dur) * 1.1) var(--ease-out); }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .ed-pen,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .ed-pen { animation: sigWrite var(--icon-dur) var(--ease-soft); }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .tr-lid,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .tr-lid { animation: sigLid var(--icon-dur) var(--ease-spring); }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .mr-1,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .mr-1 { animation: sigBounce var(--icon-dur) var(--ease-spring); }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .mr-2,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .mr-2 { animation: sigBounce var(--icon-dur) var(--ease-spring) .08s both; }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .mr-3,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .mr-3 { animation: sigBounce var(--icon-dur) var(--ease-spring) .16s both; }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .rf-spin,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .rf-spin { animation: sigSpin calc(var(--icon-dur) * 1.4) var(--ease-soft); }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .bl-bell,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .bl-bell { animation: sigRing calc(var(--icon-dur) * 1.3) var(--ease-spring); }
+:where(.ef-motion,[role="tab"]):is(:hover,:focus-visible) .bl-clap,
+:where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .bl-clap { animation: sigClap calc(var(--icon-dur) * 1.3) var(--ease-spring); }
+
 /* Optional resting idle loop on the active item (tweak gated) */
 .idle-on :where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) :is(.g-cog,.ws-cog,.cf-cog) { animation: sigSpin 10s linear infinite !important; }
+.idle-on :where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .rf-spin { animation: sigSpin 8s linear infinite !important; }
 .idle-on :where(.ef-motion.is-active,[role="tab"][aria-selected="true"]) .al-min { animation: sigSweep 6s linear infinite !important; }
 
 /* =========================================================
@@ -287,10 +390,27 @@
   to   { rotate: 30deg; }
 }
 
+/* ---- curated-set keyframes (Round 4) -------------------------------------- */
+@keyframes sigCoinDrop { 0% { transform: translateY(calc(-9px * var(--icon-k))); opacity: 0; } 28% { opacity: 1; } 78% { opacity: 1; } 100% { transform: translateY(1px); opacity: 0; } }
+@keyframes sigConverge { 0% { scale: 1.55; opacity: 0; } 60% { opacity: 1; } 100% { scale: 1; opacity: 1; } }
+@keyframes sigPlusPop { 0% { transform: rotate(-90deg) scale(.2); opacity: 0; } 62% { transform: rotate(8deg) scale(1.12); opacity: 1; } 100% { transform: rotate(0) scale(1); opacity: 1; } }
+@keyframes sigQuarterPop { 0% { transform: rotate(-90deg) scale(.5); } 70% { transform: rotate(6deg) scale(1.08); } 100% { transform: rotate(0) scale(1); } }
+@keyframes sigShake { 0%,100% { transform: rotate(0); } 18% { transform: rotate(calc(-7deg * var(--icon-k))); } 44% { transform: rotate(calc(7deg * var(--icon-k))); } 68% { transform: rotate(calc(-4deg * var(--icon-k))); } 86% { transform: rotate(calc(2deg * var(--icon-k))); } }
+@keyframes sigArrow { 0% { transform: translateY(calc(-3px * var(--icon-k))); } 55% { transform: translateY(calc(2px * var(--icon-k))); } 100% { transform: translateY(0); } }
+@keyframes sigScan { 0% { translate: 0 0; } 25% { translate: calc(1.6px * var(--icon-k)) calc(1px * var(--icon-k)); } 55% { translate: calc(-1px * var(--icon-k)) calc(1.6px * var(--icon-k)); } 80% { translate: calc(.6px * var(--icon-k)) calc(-1px * var(--icon-k)); } 100% { translate: 0 0; } }
+@keyframes sigFunnel { 0% { transform: scaleY(1); } 45% { transform: scaleY(.82); } 100% { transform: scaleY(1); } }
+@keyframes sigDropThru { 0% { transform: translateY(calc(-7px * var(--icon-k))); opacity: 0; } 35% { opacity: 1; } 100% { transform: translateY(13px); opacity: 0; } }
+@keyframes sigWrite { 0% { translate: calc(-1.6px * var(--icon-k)) calc(1.6px * var(--icon-k)); } 50% { translate: calc(1.6px * var(--icon-k)) calc(-1.6px * var(--icon-k)); } 100% { translate: 0 0; } }
+@keyframes sigLid { 0% { rotate: 0deg; } 35% { rotate: calc(-22deg * var(--icon-k)); } 70% { rotate: calc(5deg * var(--icon-k)); } 100% { rotate: 0deg; } }
+@keyframes sigBounce { 0%,100% { translate: 0 0; } 40% { translate: 0 calc(-3px * var(--icon-k)); } }
+@keyframes sigRing { 0% { rotate: 0deg; } 18% { rotate: calc(13deg * var(--icon-k)); } 44% { rotate: calc(-10deg * var(--icon-k)); } 67% { rotate: calc(6deg * var(--icon-k)); } 85% { rotate: calc(-3deg * var(--icon-k)); } 100% { rotate: 0deg; } }
+@keyframes sigClap { 0%,100% { transform: translateX(0); } 30% { transform: translateX(calc(1.4px * var(--icon-k))); } 65% { transform: translateX(calc(-1.4px * var(--icon-k))); } }
+
 @media (prefers-reduced-motion: reduce) {
   /* Kill signature animations AND the holder's glow/colour transitions, so the
-     resting state is fully static (no fade-in glow, no colour fade). */
-  .ico, .ico *, .nav-ico, .nav-ico::after {
+     resting state is fully static (no fade-in glow, no colour fade). `svg.lucide`
+     is included so the central raw-lucide nudge below is gated too. */
+  .ico, .ico *, .nav-ico, .nav-ico::after, svg.lucide {
     animation: none !important;
     transition: none !important;
   }
@@ -301,10 +421,15 @@
  * AnimatedIcon renders the original lucide glyph with `.ico .ico-generic` (no
  * glyph swap); this gives it one subtle whole-glyph pop on hover/focus/active.
  * `.ico-generic` carries `.ico`, so the reduced-motion block above gates it too.
+ *
+ * Central action-icon hook: the trigger ALSO matches a raw `svg.lucide`, so any
+ * lucide icon inside a `.ef-motion` host (every @edforge/ui Button + Dropdown
+ * item carries it) or a tab nudges on hover/focus — zero per-call-site wiring.
+ * `svg.lucide` is gated in the reduced-motion block above.
  * ========================================================================== */
-.ico-generic { transform-box: border-box; transform-origin: center; }
-:where(.ef-motion, [role="tab"]):is(:hover, :focus-visible) .ico-generic,
-:where(.ef-motion.is-active, [role="tab"][aria-selected="true"]) .ico-generic {
+.ico-generic, svg.lucide { transform-box: border-box; transform-origin: center; }
+:where(.ef-motion, [role="tab"]):is(:hover, :focus-visible) :where(.ico-generic, svg.lucide),
+:where(.ef-motion.is-active, [role="tab"][aria-selected="true"]) :where(.ico-generic, svg.lucide) {
   animation: sigNudge var(--icon-dur) var(--ease-spring);
 }
 @keyframes sigNudge {

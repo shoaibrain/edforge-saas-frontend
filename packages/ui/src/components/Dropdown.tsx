@@ -36,7 +36,7 @@ export function Dropdown({
     <Menu as="div" className={cn('relative', className)}>
       <MenuButton
         className={cn(
-          'flex items-center justify-between w-full px-3 py-2 text-sm font-medium text-left',
+          'ef-motion flex items-center justify-between w-full px-3 py-2 text-sm font-medium text-left',
           'bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-sm',
           'hover:bg-[rgb(var(--background-tertiary))]',
           focusRing,
@@ -67,7 +67,7 @@ export function Dropdown({
                   <button
                     onClick={() => onChange(option.id)}
                     className={cn(
-                      'flex items-center w-full px-3 py-2.5 text-sm',
+                      'ef-motion flex items-center w-full px-3 py-2.5 text-sm',
                       focusRingInset,
                       active ? 'bg-[rgb(var(--background-secondary))]' : '',
                       value === option.id ? 'text-[rgb(var(--action-secondary-fg))]' : 'text-[rgb(var(--text-primary))]'
