@@ -68,7 +68,14 @@ export { Accordion, type AccordionItem, type AccordionProps } from './components
 export { Container, containerVariants, type ContainerProps } from './components/layout/Container'
 export { Inline, inlineVariants, type InlineProps } from './components/layout/Inline'
 export { PageShell, pageShellVariants, type PageShellProps } from './components/layout/PageShell'
-export { PageHeader, type PageHeaderProps } from './components/layout/PageHeader'
+export {
+  PageHeader,
+  type PageHeaderProps,
+  type PageHeaderAction,
+  type PageHeaderTitledProps,
+  type PageHeaderPagebarProps,
+  type PageHeaderGreetingProps,
+} from './components/layout/PageHeader'
 export {
   ContextBar,
   ContextBarSep,
@@ -239,6 +246,21 @@ export { StatCard, type StatCardProps } from './components/StatCard'
 export { AnimatedProgressBar, type AnimatedProgressBarProps } from './components/AnimatedProgressBar'
 export { WidgetErrorBoundaryV2 } from './components/SectionErrorBoundary'
 export { V2AlertItem, type V2AlertItemProps } from './components/V2AlertItem'
+
+// Dashboard recipes (④ AlertLane · ⑤ WidgetCard · DashboardLayout)
+export {
+  AlertLane,
+  type AlertLaneProps,
+  type DashboardAlert,
+  type AlertSeverity,
+  WidgetCard,
+  WidgetGrid,
+  type WidgetCardProps,
+  type WidgetSpan,
+  type WidgetState,
+  DashboardLayout,
+  type DashboardLayoutProps,
+} from './components/dashboard'
 
 // V2 Hooks
 export { useCountUp, parseFormattedValue, formatAnimatedValue } from './hooks/useCountUp'
