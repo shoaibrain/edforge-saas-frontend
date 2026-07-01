@@ -58,3 +58,52 @@ jobs:
 
       - name: Unit tests
         run: pnpm vitest run
+
+  # Agent-era PR gate: the @smoke-tagged critical paths (seeded sessions +
+  # fully mocked API — see docs/testing/agent-e2e-guide.md) against the
+  # production build, using the proven visual-regression.yml serve recipe.
+  # Non-required while the suite beds in; flip to required after a week green.
+  e2e-smoke:
+    name: e2e smoke (@smoke, mocked)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browser
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Build production (host + remotes)
+        run: pnpm build:mvp
+
+      - name: Serve production preview
+        run: pnpm --filter @edforge/shell preview &
+      - name: Wait for preview
+        run: npx wait-on http://localhost:3000 --timeout 120000
+
+      - name: Run smoke suite
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:3000
+        run: pnpm test:e2e:smoke
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-smoke-report
+          path: |
+            playwright-report/
+            e2e/test-results/
+          retention-days: 7

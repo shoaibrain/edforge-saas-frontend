@@ -28,6 +28,12 @@ export default defineConfig({
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     ...(bypassHeaders ? { extraHTTPHeaders: bypassHeaders } : {}),
+    // Sandboxed agent environments ship a pre-installed Chromium whose
+    // revision may not match this Playwright version and forbid downloads —
+    // point PLAYWRIGHT_CHROMIUM_PATH at it (e.g. /opt/pw-browsers/chromium).
+    ...(process.env.PLAYWRIGHT_CHROMIUM_PATH
+      ? { launchOptions: { executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH } }
+      : {}),
   },
   expect: {
     toHaveScreenshot: {
@@ -36,9 +42,25 @@ export default defineConfig({
     },
   },
   projects: [
+    // Default project — existing invocations (test:e2e, test:e2e:visual,
+    // env-gated suites) keep working unchanged. Includes the @seed harness
+    // because the test agents' planner/generator setup runs it here.
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
+    },
+    // PR gate: critical-path tests only (tagged @smoke, mocked API, fast).
+    {
+      name: 'smoke',
+      use: { ...devices['Desktop Chrome'] },
+      grep: /@smoke/,
+      grepInvert: /@seed/,
+    },
+    // Nightly / on-demand: everything except the agent seed harness.
+    {
+      name: 'full',
+      use: { ...devices['Desktop Chrome'] },
+      grepInvert: /@seed/,
     },
   ],
   webServer: shouldStartServer

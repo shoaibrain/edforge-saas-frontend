@@ -21,14 +21,20 @@
     "scaffold:mfe-page": "node scripts/scaffold-mfe-page.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test",
-    "test:e2e:visual": "VISUAL_REGRESSION=1 playwright test e2e/tests/design-system-visual-regression.spec.ts",
+    "test:e2e": "playwright test --project=chromium",
+    "test:e2e:smoke": "playwright test --project=smoke",
+    "test:e2e:full": "playwright test --project=full",
+    "test:e2e:visual": "VISUAL_REGRESSION=1 playwright test --project=chromium e2e/tests/design-system-visual-regression.spec.ts",
+    "e2e:auth-states": "node scripts/e2e/write-auth-states.mjs",
+    "e2e:mock-api": "node scripts/e2e/mock-api-server.mjs",
     "i18n:audit": "node scripts/i18n/audit-hardcoded-strings.mjs",
     "check:icons": "node scripts/check-icon-coverage.mjs",
     "docker:dev": "docker-compose -f docker/docker-compose.dev.yml up",
     "docker:build": "docker-compose -f docker/docker-compose.dev.yml build"
   },
   "devDependencies": {
+    "@mswjs/http-middleware": "0.10.3",
+    "@playwright/mcp": "0.0.74",
     "@playwright/test": "^1.60.0",
     "@tailwindcss/postcss": "^4.1.18",
     "@testing-library/jest-dom": "^6.9.1",
@@ -60,6 +66,8 @@
   },
   "pnpm": {
     "overrides": {
+      "@playwright/mcp>playwright": "1.60.0",
+      "@playwright/mcp>playwright-core": "1.60.0",
       "zod": "~3.24.4",
       "@tanstack/react-router": "1.168.23",
       "@tanstack/react-query": "5.99.2",

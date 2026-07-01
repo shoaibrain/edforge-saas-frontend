@@ -1,0 +1,28 @@
+{
+  "mcpServers": {
+    "playwright-test": {
+      "command": "pnpm",
+      "args": [
+        "exec",
+        "playwright",
+        "run-test-mcp-server",
+        "--headless"
+      ]
+    },
+    "playwright": {
+      "command": "pnpm",
+      "args": [
+        "exec",
+        "playwright-mcp",
+        "--headless",
+        "--isolated",
+        "--viewport-size", "1440,900",
+        "--storage-state", "e2e/.auth/tenant-admin.json",
+        "--init-script", "scripts/e2e/mcp-init.js",
+        "--allowed-origins", "http://localhost:3000;http://localhost:3002;http://localhost:3003;http://localhost:3006;http://localhost:4010",
+        "--save-trace",
+        "--output-dir", "e2e/.mcp-artifacts"
+      ]
+    }
+  }
+}
