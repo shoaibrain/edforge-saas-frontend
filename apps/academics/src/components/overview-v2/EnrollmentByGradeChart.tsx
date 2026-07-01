@@ -28,6 +28,22 @@ interface EnrollmentByGradeChartProps {
   data: GradeLevelDistribution[]
   total: number
   isLoading: boolean
+  /** Render only the chart (no card chrome / title / footer) for WidgetCard framing. */
+  bare?: boolean
+}
+
+/** Reusable footer link → the students/enrollment view (also usable as a WidgetCard footer). */
+export function EnrollmentByGradeChartFooter() {
+  const { t } = useTranslation('academics')
+  return (
+    <Link
+      to="/students"
+      className="inline-flex items-center gap-1.5 text-xs font-medium transition-opacity hover:opacity-80 text-[rgb(var(--accent-enrollment-text))]"
+    >
+      {t('moduleOverview.enrollmentChart.viewEnrollment')}
+      <ArrowRight className="w-3 h-3" />
+    </Link>
+  )
 }
 
 function ChartSkeleton() {
@@ -72,6 +88,7 @@ export function EnrollmentByGradeChart({
   data,
   total,
   isLoading,
+  bare,
 }: EnrollmentByGradeChartProps) {
   const { t } = useTranslation('academics')
   const colors = useV2ChartColors()
@@ -79,28 +96,12 @@ export function EnrollmentByGradeChart({
   // Recharts needs a height proportional to data rows
   const chartHeight = useMemo(() => Math.max(data.length * 28, 120), [data.length])
 
-  return (
+  const chartRegion = (
     <div
-      // allow-presentation-style: card padding (18px) is off the 4px scale
-      className="rounded-xl border flex flex-col bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]"
-      style={{ padding: 18 }}
+      className="flex-1 min-h-0"
+      aria-label={t('moduleOverview.enrollmentChart.aria', { total })}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-[rgb(var(--text-secondary))]">
-          {t('moduleOverview.enrollmentChart.title')}
-        </h3>
-        <span className="text-xs font-semibold text-[rgb(var(--state-info-fg))]">
-          {t('moduleOverview.enrollmentChart.total', { total })}
-        </span>
-      </div>
-
-      {/* Chart */}
-      <div
-        className="flex-1 min-h-0"
-        aria-label={t('moduleOverview.enrollmentChart.aria', { total })}
-      >
-        {isLoading ? (
+      {isLoading ? (
           <ChartSkeleton />
         ) : data.length === 0 ? (
           <div
@@ -157,17 +158,32 @@ export function EnrollmentByGradeChart({
             </BarChart>
           </ResponsiveContainer>
         )}
+    </div>
+  )
+
+  if (bare) return chartRegion
+
+  return (
+    <div
+      // allow-presentation-style: card padding (18px) is off the 4px scale
+      className="rounded-xl border flex flex-col bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]"
+      style={{ padding: 18 }}
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-sm font-medium text-[rgb(var(--text-secondary))]">
+          {t('moduleOverview.enrollmentChart.title')}
+        </h3>
+        <span className="text-xs font-semibold text-[rgb(var(--state-info-fg))]">
+          {t('moduleOverview.enrollmentChart.total', { total })}
+        </span>
       </div>
+
+      {chartRegion}
 
       {/* Footer */}
       <div className="pt-3 mt-3 border-t border-[rgb(var(--border-primary)/0.35)]">
-        <Link
-          to="/students"
-          className="inline-flex items-center gap-1.5 text-xs font-medium transition-opacity hover:opacity-80 text-[rgb(var(--accent-enrollment-text))]"
-        >
-          {t('moduleOverview.enrollmentChart.viewEnrollment')}
-          <ArrowRight className="w-3 h-3" />
-        </Link>
+        <EnrollmentByGradeChartFooter />
       </div>
     </div>
   )

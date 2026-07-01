@@ -507,13 +507,34 @@
       "aria": "Attendance tabs"
     },
     "status": {
-      "present": { "label": "Present", "short": "P" },
-      "absent": { "label": "Absent", "short": "A" },
-      "late": { "label": "Tardy", "short": "T" },
-      "excused": { "label": "Excused", "short": "E" },
-      "remote": { "label": "Remote", "short": "R" },
-      "half_day": { "label": "Half Day", "short": "H" },
-      "early_departure": { "label": "Early Dep.", "short": "ED" }
+      "present": {
+        "label": "Present",
+        "short": "P"
+      },
+      "absent": {
+        "label": "Absent",
+        "short": "A"
+      },
+      "late": {
+        "label": "Tardy",
+        "short": "T"
+      },
+      "excused": {
+        "label": "Excused",
+        "short": "E"
+      },
+      "remote": {
+        "label": "Remote",
+        "short": "R"
+      },
+      "half_day": {
+        "label": "Half Day",
+        "short": "H"
+      },
+      "early_departure": {
+        "label": "Early Dep.",
+        "short": "ED"
+      }
     },
     "dateSelector": {
       "previousDay": "Previous day",
@@ -1326,7 +1347,8 @@
       "atRiskStudents": "At-Risk Students",
       "below80": "{{count}} below 80%",
       "riskBreakdown": "{{critical}} critical · {{warning}} warning",
-      "below90Threshold": "below 90% threshold"
+      "below90Threshold": "below 90% threshold",
+      "region": "Key metrics"
     },
     "needsAttention": {
       "title": "Needs Attention"
