@@ -85,7 +85,19 @@ jobs:
       - name: Install Playwright browser
         run: pnpm exec playwright install --with-deps chromium
 
+      # Placeholder Cognito env — baked into the production bundle at build
+      # time. @edforge/auth throws at module init in a PROD build if these are
+      # absent (white screen, every spec fails). E2E seeds cookies + mocks the
+      # API, so real Cognito is never contacted; any non-empty value works.
       - name: Build production (host + remotes)
+        env:
+          VITE_COGNITO_USER_POOL_ID: us-west-2_e2e000
+          VITE_COGNITO_CLIENT_ID: e2eclient000
+          VITE_COGNITO_DOMAIN: e2e.auth.local
+          VITE_COGNITO_REGION: us-west-2
+          VITE_REDIRECT_SIGN_IN: http://localhost:3000/
+          VITE_REDIRECT_SIGN_OUT: http://localhost:3000/
+          VITE_API_URL: http://localhost:9999
         run: pnpm build:mvp
 
       - name: Serve production preview
