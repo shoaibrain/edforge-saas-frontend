@@ -369,6 +369,7 @@ export default function StaffPage() {
             label={t('stats.totalStaff')}
             value={isLoading ? '—' : totalLoaded.toString()}
             icon={Users}
+            signature="people"
             accentColor="rgba(216,90,48,0.10)"
             iconColor="#D85A30"
             barColor="#D85A30"
@@ -380,6 +381,7 @@ export default function StaffPage() {
             label={t('stats.teachers')}
             value={isLoading ? '—' : teacherCount.toString()}
             icon={BookOpen}
+            signature="curriculum"
             accentColor="rgba(29,158,117,0.10)"
             iconColor="#1D9E75"
             barColor="#1D9E75"
@@ -391,6 +393,7 @@ export default function StaffPage() {
             label={t('stats.supportStaff')}
             value={isLoading ? '—' : supportCount.toString()}
             icon={Briefcase}
+            signature="staff"
             accentColor={supportCount > 0 ? 'rgba(55,138,221,0.10)' : 'rgba(255,255,255,0.06)'}
             iconColor={supportCount > 0 ? '#378ADD' : 'rgb(var(--text-tertiary))'}
             barColor={supportCount > 0 ? '#378ADD' : 'rgb(var(--text-disabled))'}

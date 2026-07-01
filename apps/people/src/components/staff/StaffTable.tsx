@@ -8,6 +8,7 @@
 
 import { useMemo, type MouseEvent, type ReactNode } from 'react'
 import { UsersRound, Eye, Pencil, MoreVertical } from 'lucide-react'
+import { AnimatedIcon } from '@edforge/ui/motion'
 import { useTranslation } from '@edforge/i18n'
 import { focusRingInset, IdentityCell, StatusBadge, TanstackDataTable, type ColumnDef, type StatusTone } from '@edforge/ui'
 import type { StaffResponseDto } from '@aibrains/shared-types'
@@ -145,12 +146,12 @@ export function StaffTable({
               }}
             />
             <ActionBtn
-              icon={<Pencil className="h-3.5 w-3.5" />}
+              icon={<AnimatedIcon name="edit" icon={Pencil} size={14} applyAccent={false} />}
               title={t('actions.edit')}
               onClick={(e) => e.stopPropagation()}
             />
             <ActionBtn
-              icon={<MoreVertical className="h-3.5 w-3.5" />}
+              icon={<AnimatedIcon name="more" icon={MoreVertical} size={14} applyAccent={false} />}
               title={t('actions.more')}
               onClick={(e) => e.stopPropagation()}
             />
@@ -203,7 +204,7 @@ function ActionBtn({
       title={title}
       aria-label={title}
       onClick={onClick}
-      className={`flex h-7 w-7 items-center justify-center rounded-md text-[rgb(var(--text-tertiary))] transition-colors hover:bg-[rgb(var(--background-tertiary))] hover:text-[rgb(var(--text-secondary))] ${focusRingInset}`}
+      className={`ef-motion flex h-7 w-7 items-center justify-center rounded-md text-[rgb(var(--text-tertiary))] transition-colors hover:bg-[rgb(var(--background-tertiary))] hover:text-[rgb(var(--text-secondary))] ${focusRingInset}`}
     >
       {icon}
     </button>
