@@ -9,6 +9,7 @@
 
 import { useState } from 'react'
 import { Download, Loader2 } from 'lucide-react'
+import { AnimatedIcon } from '@edforge/ui/motion'
 import { toast } from 'sonner'
 import type { Granularity } from '@edforge/types/analytics'
 import { useExportCsvUrl } from '../hooks/useAnalytics'
@@ -56,12 +57,12 @@ export function ExportCsvButton({
       type="button"
       onClick={handleClick}
       disabled={disabled || isBusy}
-      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md ring-1 ring-[rgb(var(--border-secondary))] hover:bg-[rgb(var(--background-tertiary))] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+      className="ef-motion inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md ring-1 ring-[rgb(var(--border-secondary))] hover:bg-[rgb(var(--background-tertiary))] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
     >
       {isBusy ? (
         <Loader2 className="h-3.5 w-3.5 animate-spin" />
       ) : (
-        <Download className="h-3.5 w-3.5" />
+        <AnimatedIcon name="export" icon={Download} size={14} applyAccent={false} />
       )}
       Export CSV
     </button>

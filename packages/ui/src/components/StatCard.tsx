@@ -14,12 +14,21 @@ import {
   parseFormattedValue,
   formatAnimatedValue,
 } from '../hooks/useCountUp'
+import { AnimatedIcon } from './motion'
+import type { IconName } from './motion'
 
 export interface StatCardProps {
   label: string
   value: string
   subtitle?: string
   icon: LucideIcon
+  /**
+   * Optional signature glyph name. When set, the KPI icon renders the curated
+   * animated glyph (meaning-tied motion on card hover) instead of the raw lucide
+   * `icon`; keeps the same `iconColor`. Omit to keep the lucide glyph (which still
+   * gets the subtle generic nudge via the card's `.ef-motion` hook).
+   */
+  signature?: IconName
   /** Hex color for the icon background (module accent) */
   accentColor: string
   /** Hex color for the icon fill */
@@ -58,6 +67,7 @@ export function StatCard({
   label,
   value,
   icon: Icon,
+  signature,
   accentColor,
   iconColor,
   barColor,
@@ -86,7 +96,7 @@ export function StatCard({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className="relative overflow-hidden rounded-xl border cursor-pointer pt-4 px-4 pb-3 bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)] hover:border-[rgb(var(--border-primary)/0.5)]"
+      className="ef-motion relative overflow-hidden rounded-xl border cursor-pointer pt-4 px-4 pb-3 bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)] hover:border-[rgb(var(--border-primary)/0.5)]"
       style={{ transition: 'border-color 150ms ease' }}
       role="status"
       aria-label={`${label}: ${value}`}
@@ -97,15 +107,19 @@ export function StatCard({
           {label}
         </span>
         <div
-          // allow-presentation-style: icon chip background is the module accent (prop)
+          // allow-presentation-style: icon chip bg + fill are the module accent (props)
           className="flex items-center justify-center w-7 h-7 rounded-[7px]"
-          style={{ background: accentColor }}
+          style={{ background: accentColor, color: iconColor }}
         >
-          <Icon
-            // allow-presentation-style: icon fill is the module accent (prop)
-            className="w-3.5 h-3.5"
-            style={{ color: iconColor }}
-          />
+          {signature ? (
+            <AnimatedIcon name={signature} icon={Icon} applyAccent={false} size={14} />
+          ) : (
+            <Icon
+              // allow-presentation-style: icon fill is the module accent (prop)
+              className="w-3.5 h-3.5"
+              style={{ color: iconColor }}
+            />
+          )}
         </div>
       </div>
 

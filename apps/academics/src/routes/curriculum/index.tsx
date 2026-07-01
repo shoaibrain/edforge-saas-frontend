@@ -355,6 +355,7 @@ export function CurriculumModule() {
           label={t('curriculumModule.stats.totalCourses')}
           value={formatNumber(stats.total)}
           icon={BookOpen}
+          signature="curriculum"
           accentColor="rgb(var(--accent-reports)/0.1)"
           iconColor="rgb(var(--accent-reports))"
           barColor="rgb(var(--accent-reports))"
@@ -379,6 +380,7 @@ export function CurriculumModule() {
           label={t('curriculumModule.stats.electives')}
           value={formatNumber(stats.elective)}
           icon={BookOpen}
+          signature="curriculum"
           accentColor="rgb(var(--accent-coral)/0.1)"
           iconColor="rgb(var(--accent-coral))"
           barColor="rgb(var(--accent-coral))"
@@ -397,6 +399,7 @@ export function CurriculumModule() {
           label={t('curriculumModule.stats.specializedTypes')}
           value={formatNumber(stats.specializedTypes)}
           icon={BookOpen}
+          signature="curriculum"
           accentColor="rgb(var(--accent-attendance)/0.1)"
           iconColor="rgb(var(--accent-attendance))"
           barColor="rgb(var(--accent-attendance))"

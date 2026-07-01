@@ -44,6 +44,12 @@ jobs:
       - name: Typecheck
         run: pnpm turbo typecheck
 
+      # Animated-icon coverage guard: hard-fails if the retired Finance `$`
+      # (lucide DollarSign) reappears in app source; also prints a non-failing
+      # advisory of interactive files still lacking `.ef-motion` / AnimatedIcon.
+      - name: Icon coverage guard
+        run: pnpm check:icons
+
       # Lint gate fails on errors only. The ~1.2k no-explicit-any /
       # no-unused-vars warnings are the documented ratchet backlog, held on
       # new code via review — not a build breaker (no --max-warnings 0 yet).

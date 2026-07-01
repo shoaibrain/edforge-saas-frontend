@@ -16,6 +16,7 @@ import {
   type ColumnDef,
 } from "@edforge/ui";
 import { Pencil, Trash2, Layers } from "lucide-react";
+import { AnimatedIcon } from "@edforge/ui/motion";
 import { useMemo } from "react";
 import { FeeTypeChip } from "../shared";
 
@@ -144,18 +145,18 @@ export function FeeStructureList({
             <button
               type="button"
               onClick={() => onEdit(row.original)}
-              className="p-1.5 rounded-lg hover:bg-[rgb(var(--background-tertiary))] transition-colors"
+              className="ef-motion p-1.5 rounded-lg hover:bg-[rgb(var(--background-tertiary))] transition-colors"
               aria-label={t("feeStructure.editAria")}
             >
-              <Pencil className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))]" />
+              <AnimatedIcon name="edit" icon={Pencil} size={14} applyAccent={false} className="text-[rgb(var(--text-tertiary))]" />
             </button>
             <button
               type="button"
               onClick={() => onDelete(row.original)}
-              className="p-1.5 rounded-lg hover:bg-[rgb(var(--state-danger-bg)/0.18)] transition-colors"
+              className="ef-motion p-1.5 rounded-lg hover:bg-[rgb(var(--state-danger-bg)/0.18)] transition-colors"
               aria-label={t("feeStructure.deleteAria")}
             >
-              <Trash2 className="w-3.5 h-3.5 text-[rgb(var(--state-danger-fg))]" />
+              <AnimatedIcon name="remove" icon={Trash2} size={14} applyAccent={false} className="text-[rgb(var(--state-danger-fg))]" />
             </button>
           </div>
         ),

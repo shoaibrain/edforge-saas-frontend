@@ -13,7 +13,7 @@ import { motion } from 'framer-motion'
 import {
   Users,
   GraduationCap,
-  DollarSign,
+  Wallet,
   Clock,
   Calendar,
   TrendingUp,
@@ -58,7 +58,7 @@ const STATS: StatItem[] = [
     value: '$45,678',
     change: '+12.3%',
     trend: 'up',
-    icon: DollarSign,
+    icon: Wallet,
   },
   {
     label: 'Attendance Rate',
@@ -96,7 +96,7 @@ const QUICK_ACTIONS: QuickAction[] = [
   {
     label: 'Create Invoice',
     description: 'Generate a new invoice',
-    icon: DollarSign,
+    icon: Wallet,
     href: '/finance/billing/new'
   },
 ]

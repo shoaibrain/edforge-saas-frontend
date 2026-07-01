@@ -637,6 +637,7 @@ export default function StudentAccountsPage() {
             label={t('studentAccount.summary.outstanding')}
             value={formatCompact(kpi.totalOutstanding)}
             icon={Receipt}
+            signature="finance_receipt"
             accentColor="rgba(239, 159, 39, 0.12)"
             iconColor="#EF9F27"
             barColor="#EF9F27"
@@ -658,6 +659,7 @@ export default function StudentAccountsPage() {
             label={t('studentAccount.summary.withBalance')}
             value={String(kpi.overdueCount)}
             icon={AlertTriangle}
+            signature="atrisk"
             accentColor="rgba(226, 75, 74, 0.12)"
             iconColor="#E24B4A"
             barColor="#E24B4A"

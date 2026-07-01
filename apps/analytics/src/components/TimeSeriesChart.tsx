@@ -253,6 +253,7 @@ export function TimeSeriesChart({
           </div>
         ) : error ? (
           <div className="flex items-start gap-3 py-12 justify-center">
+            {/* icon-coverage-static-ok: error-banner mark; granularity/metric buttons are text-only */}
             <AlertCircle className="h-5 w-5 text-[rgb(var(--state-danger-fg))] mt-0.5" />
             <p className="text-sm text-[rgb(var(--state-danger-fg))]">{error.message}</p>
           </div>

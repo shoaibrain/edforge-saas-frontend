@@ -3,7 +3,7 @@
  */
 
 import { motion } from 'framer-motion'
-import { DollarSign } from 'lucide-react'
+import { Wallet } from 'lucide-react'
 
 export default function FinancePlaceholder() {
   return (
@@ -25,7 +25,7 @@ export default function FinancePlaceholder() {
         transition={{ delay: 0.3 }}
         className="p-6 rounded-2xl bg-golden-500/10 border border-golden-500/20 flex items-start gap-4"
       >
-        <DollarSign className="w-6 h-6 text-golden-500 flex-shrink-0" />
+        <Wallet className="w-6 h-6 text-golden-500 flex-shrink-0" />
         <div>
           <h4 className="font-semibold text-golden-600 dark:text-golden-400 mb-1">
             Finance Federated Module

@@ -278,6 +278,7 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
               label={t('moduleOverview.kpis.totalEnrolled')}
               value={data.overview.totalEnrolled != null ? numberFormatter.format(data.overview.totalEnrolled) : '—'}
               icon={Users}
+              signature="enrollment"
               accentColor="rgb(var(--accent-enrollment)/0.12)"
               iconColor="rgb(var(--accent-enrollment))"
               barColor="rgb(var(--accent-enrollment))"
@@ -294,6 +295,7 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
             label={t('moduleOverview.kpis.activeSections')}
             value={data.overview.activeSections != null ? numberFormatter.format(data.overview.activeSections) : '—'}
             icon={LayoutGrid}
+            signature="sections"
             accentColor="rgb(var(--accent-academics)/0.12)"
             iconColor="rgb(var(--accent-academics))"
             barColor="rgb(var(--accent-academics))"
@@ -311,6 +313,7 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
             label={t('moduleOverview.kpis.todayAttendance')}
             value={attendanceRate != null ? `${attendanceRate.toFixed(1)}%` : '—'}
             icon={ClipboardCheck}
+            signature="attendance"
             accentColor="rgb(var(--accent-attendance)/0.12)"
             iconColor="rgb(var(--accent-attendance))"
             barColor={attendanceColor || 'rgb(var(--accent-attendance))'}
@@ -333,6 +336,7 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
             label={t('moduleOverview.kpis.atRiskStudents')}
             value={numberFormatter.format(data.alerts.totalCount)}
             icon={AlertTriangle}
+            signature="atrisk"
             accentColor="rgb(var(--accent-finance)/0.12)"
             iconColor="rgb(var(--accent-finance))"
             barColor="rgb(var(--accent-finance))"

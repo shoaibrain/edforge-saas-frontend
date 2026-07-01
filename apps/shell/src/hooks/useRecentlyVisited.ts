@@ -12,7 +12,7 @@ import { persist } from 'zustand/middleware'
 import {
   Users,
   GraduationCap,
-  DollarSign,
+  Wallet,
   Building2,
   Settings,
   BookOpen,
@@ -47,7 +47,7 @@ interface RecentlyVisitedState {
 const ICON_MAP: Record<string, LucideIcon> = {
   Users,
   GraduationCap,
-  DollarSign,
+  Wallet,
   Building2,
   Settings,
   BookOpen,
@@ -77,10 +77,10 @@ const PAGE_METADATA: Record<string, PageMetadata> = {
   '/academics/teachers': { title: 'Teachers', icon: 'UserCog', module: 'academics' },
   '/academics/classrooms': { title: 'Classrooms', icon: 'BookOpen', module: 'academics' },
   '/academics/gradebooks': { title: 'Gradebooks', icon: 'GraduationCap', module: 'academics' },
-  '/finance': { title: 'Finance', icon: 'DollarSign', module: 'finance' },
-  '/finance/billing': { title: 'Billing', icon: 'DollarSign', module: 'finance' },
-  '/finance/billing/invoices': { title: 'Invoices', icon: 'DollarSign', module: 'finance' },
-  '/finance/billing/payments': { title: 'Payments', icon: 'DollarSign', module: 'finance' },
+  '/finance': { title: 'Finance', icon: 'Wallet', module: 'finance' },
+  '/finance/billing': { title: 'Billing', icon: 'Wallet', module: 'finance' },
+  '/finance/billing/invoices': { title: 'Invoices', icon: 'Wallet', module: 'finance' },
+  '/finance/billing/payments': { title: 'Payments', icon: 'Wallet', module: 'finance' },
   '/finance/dashboard': { title: 'Financial Dashboard', icon: 'BarChart3', module: 'finance' },
   '/finance/ledger': { title: 'Ledger', icon: 'BookOpen', module: 'finance' },
   '/people': { title: 'People', icon: 'Users', module: 'people' },
@@ -203,7 +203,7 @@ export const MOCK_RECENT_PAGES: VisitedPage[] = [
   {
     path: '/finance/billing',
     title: 'Billing',
-    icon: 'DollarSign',
+    icon: 'Wallet',
     module: 'finance',
     visitedAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // Yesterday
   },

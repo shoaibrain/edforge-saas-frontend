@@ -10,6 +10,7 @@ export { cn, focusRing, focusRingInset, getUserAvatar } from './utils'
 
 // Components
 export { Button, buttonVariants, type ButtonProps } from './components/Button'
+export { IconButton, type IconButtonProps } from './components/IconButton'
 export {
   Card,
   CardHeader,

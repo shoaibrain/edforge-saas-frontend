@@ -10,7 +10,7 @@ import { Link } from '@tanstack/react-router'
 import {
   AlertTriangle,
   ClipboardCheck,
-  DollarSign,
+  Wallet,
 } from 'lucide-react'
 import type { HomeAlert } from '../../hooks/useHomeData'
 import { useTranslation } from '@edforge/i18n'
@@ -42,7 +42,7 @@ const SEVERITY_CONFIG = {
 
 const MODULE_ICONS = {
   academics: ClipboardCheck,
-  finance: DollarSign,
+  finance: Wallet,
 }
 
 interface AlertsRowProps {

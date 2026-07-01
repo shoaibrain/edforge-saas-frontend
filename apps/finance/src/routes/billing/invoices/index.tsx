@@ -32,7 +32,7 @@ import {
   Send,
   Clock,
   AlertTriangle,
-  DollarSign,
+  Wallet,
   TrendingUp,
   Receipt,
 } from 'lucide-react'
@@ -465,7 +465,8 @@ export default function InvoicesPage() {
           <StatCard
             label={t('overview.kpi.totalInvoiced')}
             value={formatCompact(kpi.totalInvoiced)}
-            icon={DollarSign}
+            icon={Wallet}
+            signature="finance"
             accentColor="rgba(55, 138, 221, 0.12)"
             iconColor="#378ADD"
             barColor="#378ADD"
@@ -487,6 +488,7 @@ export default function InvoicesPage() {
             label={t('overview.kpi.outstanding')}
             value={formatCompact(kpi.outstanding)}
             icon={Receipt}
+            signature="finance_receipt"
             accentColor="rgba(239, 159, 39, 0.12)"
             iconColor="#EF9F27"
             barColor="#EF9F27"
@@ -497,6 +499,7 @@ export default function InvoicesPage() {
             label={t('overview.kpi.overdue')}
             value={formatCompact(kpi.overdue)}
             icon={AlertTriangle}
+            signature="atrisk"
             accentColor="rgba(226, 75, 74, 0.12)"
             iconColor="#E24B4A"
             barColor="#E24B4A"

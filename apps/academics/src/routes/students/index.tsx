@@ -585,6 +585,7 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
                   label={t('studentsModule.stats.totalEnrolled')}
                   value={overviewData.overview.totalEnrolled != null ? formatNumber(overviewData.overview.totalEnrolled) : '—'}
                   icon={Users}
+                  signature="enrollment"
                   accentColor="rgb(var(--accent-enrollment)/0.12)"
                   iconColor="rgb(var(--accent-enrollment))"
                   barColor="rgb(var(--accent-enrollment))"
@@ -605,6 +606,7 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
                   label={t('studentsModule.stats.atRiskStudents')}
                   value={formatNumber(overviewData.alerts.totalCount)}
                   icon={AlertTriangle}
+                  signature="atrisk"
                   accentColor="rgb(var(--accent-finance)/0.12)"
                   iconColor="rgb(var(--accent-finance))"
                   barColor="rgb(var(--accent-finance))"
@@ -630,6 +632,7 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
                   label={t('studentsModule.stats.todayAttendance')}
                   value={attendanceRate != null ? `${formatNumber(Number(attendanceRate.toFixed(1)))}%` : '—'}
                   icon={ClipboardCheck}
+                  signature="attendance"
                   accentColor="rgb(var(--accent-attendance)/0.12)"
                   iconColor="rgb(var(--accent-attendance))"
                   barColor={attendanceColor || 'rgb(var(--accent-attendance))'}
@@ -660,6 +663,7 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
                   label={t('studentsModule.stats.gradeLevels')}
                   value={formatNumber(overviewData.enrollment.data.length)}
                   icon={GraduationCap}
+                  signature="academics"
                   accentColor="rgb(var(--accent-academics)/0.12)"
                   iconColor="rgb(var(--accent-academics))"
                   barColor="rgb(var(--accent-academics))"

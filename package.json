@@ -24,6 +24,7 @@
     "test:e2e": "playwright test",
     "test:e2e:visual": "VISUAL_REGRESSION=1 playwright test e2e/tests/design-system-visual-regression.spec.ts",
     "i18n:audit": "node scripts/i18n/audit-hardcoded-strings.mjs",
+    "check:icons": "node scripts/check-icon-coverage.mjs",
     "docker:dev": "docker-compose -f docker/docker-compose.dev.yml up",
     "docker:build": "docker-compose -f docker/docker-compose.dev.yml build"
   },

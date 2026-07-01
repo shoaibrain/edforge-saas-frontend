@@ -29,6 +29,7 @@ import {
     BarChart3,
     RefreshCw,
 } from 'lucide-react'
+import { AnimatedIcon } from '@edforge/ui/motion'
 import { useOverviewWidgetStore } from '../stores/overview-widgets.store'
 import { useAcademicsI18n } from '../lib/i18n'
 
@@ -103,7 +104,7 @@ function WidgetVisibilityMenu({ widgets, onToggle, onReset }: WidgetVisibilityMe
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className={`
-                    p-1.5 rounded-md
+                    ef-motion p-1.5 rounded-md
                     text-[rgb(var(--text-tertiary))]
                     hover:bg-[rgb(var(--background-tertiary))]
                     transition-colors
@@ -113,7 +114,7 @@ function WidgetVisibilityMenu({ widgets, onToggle, onReset }: WidgetVisibilityMe
                 aria-expanded={isOpen}
                 aria-haspopup="true"
             >
-                <MoreHorizontal className="w-5 h-5" />
+                <AnimatedIcon name="more" icon={MoreHorizontal} size={20} applyAccent={false} />
             </button>
 
             {isOpen && !showWidgets && (
@@ -201,7 +202,7 @@ function StatCard({ stat, index }: StatCardProps) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.03, duration: 0.3 }}
         >
-            <div className="group relative flex flex-col w-52 h-36 p-5 rounded-2xl bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary)/0.6)] shadow-sm transition-all duration-200 overflow-hidden">
+            <div className="ef-motion group relative flex flex-col w-52 h-36 p-5 rounded-2xl bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary)/0.6)] shadow-sm transition-all duration-200 overflow-hidden">
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-[rgb(var(--background-elevated)/0.10)] to-transparent pointer-events-none" />
                 <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${stat.iconBg}`}>
                     <stat.icon className={`w-5 h-5 ${stat.iconColor}`} />
@@ -302,7 +303,7 @@ function StatsCarousel({ stats }: StatsCarouselProps) {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     onClick={() => smoothScroll('left')}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full flex items-center justify-center bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] shadow-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))]"
+                    className="ef-motion absolute left-2 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full flex items-center justify-center bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] shadow-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))]"
                     aria-label={t('moduleOverview.stats.scrollLeft')}
                 >
                     <ChevronLeft className="w-5 h-5" />
@@ -313,7 +314,7 @@ function StatsCarousel({ stats }: StatsCarouselProps) {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     onClick={() => smoothScroll('right')}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full flex items-center justify-center bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] shadow-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))]"
+                    className="ef-motion absolute right-2 top-1/2 -translate-y-1/2 z-20 w-9 h-9 rounded-full flex items-center justify-center bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] shadow-lg text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))]"
                     aria-label={t('moduleOverview.stats.scrollRight')}
                 >
                     <ChevronRight className="w-5 h-5" />
@@ -399,10 +400,10 @@ function LastUpdatedIndicator({ date, onRefresh }: { date: Date | null; onRefres
     return (
         <button
             onClick={onRefresh}
-            className="flex items-center gap-1.5 text-xs text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] transition-colors"
+            className="ef-motion flex items-center gap-1.5 text-xs text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))] transition-colors"
             title={t('moduleOverview.updated.refreshTitle')}
         >
-            <RefreshCw className="w-3 h-3" />
+            <AnimatedIcon name="refresh" icon={RefreshCw} size={12} applyAccent={false} />
             {label}
         </button>
     )

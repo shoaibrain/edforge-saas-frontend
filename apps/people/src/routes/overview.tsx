@@ -194,6 +194,7 @@ export function Overview() {
             label={t('stats.totalStaff')}
             value={isLoading ? '—' : stats.total.toString()}
             icon={Users}
+            signature="people"
             accentColor="rgba(216,90,48,0.10)"
             iconColor="#D85A30"
             barColor="#D85A30"
@@ -205,6 +206,7 @@ export function Overview() {
             label={t('stats.activeTeachers')}
             value={isLoading ? '—' : stats.teachers.toString()}
             icon={BookOpen}
+            signature="curriculum"
             accentColor="rgba(29,158,117,0.10)"
             iconColor="#1D9E75"
             barColor="#1D9E75"
@@ -216,6 +218,7 @@ export function Overview() {
             label={t('stats.supportStaff')}
             value={isLoading ? '—' : stats.support.toString()}
             icon={Briefcase}
+            signature="staff"
             accentColor={stats.support > 0 ? 'rgba(55,138,221,0.10)' : 'rgba(255,255,255,0.06)'}
             iconColor={stats.support > 0 ? '#378ADD' : 'rgb(var(--text-tertiary))'}
             barColor={stats.support > 0 ? '#378ADD' : 'rgb(var(--text-disabled))'}
