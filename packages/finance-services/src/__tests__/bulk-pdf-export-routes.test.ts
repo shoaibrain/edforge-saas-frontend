@@ -27,6 +27,7 @@ vi.mock('@edforge/api-client', () => ({
 
 import { apiGet, apiPost } from '@edforge/api-client'
 import {
+  bulkReceiptPdfExport,
   bulkInvoicePdfExport,
   getFinanceJob,
 } from '../services/bulk-pdf-export.service'
@@ -99,5 +100,49 @@ describe('bulk-pdf-export.service route shapes (F.6)', () => {
     expect(url).toBe(`/finance/jobs/${JOB}`)
     // Specifically NOT this — the most likely-wrong refactor target.
     expect(url).not.toMatch(/^\/finance\/schools\//)
+  })
+
+  // ────────────────────────────────────────────────────────────────
+  // POST shape — bulkReceiptPdfExport (Sprint G.3/G.4)
+  //
+  // Mirror of the invoice-side POST guards. Same three-way handoff
+  // (Nest PaymentsController + API GW spec + this frontend service),
+  // same regression class: a URL refactor that renames the route in
+  // one layer without updating the other two → 403 SigV4 at smoke.
+  // ────────────────────────────────────────────────────────────────
+  it('bulkReceiptPdfExport → POST /finance/schools/:schoolId/payments/bulk-pdf-export', async () => {
+    await bulkReceiptPdfExport(SCHOOL, {
+      paymentIds: ['pay-1', 'pay-2', 'pay-3'],
+      format: 'zip',
+    })
+
+    expect(mockApiPost).toHaveBeenCalledTimes(1)
+    const [url, body, config] = mockApiPost.mock.calls[0]
+
+    expect(url).toBe(`/finance/schools/${SCHOOL}/payments/bulk-pdf-export`)
+    // Guard against the invoice-flavored URL leaking into the receipt-flavored
+    // service (the exact copy-paste mistake most likely on a G.3/G.4 refactor).
+    expect(url).not.toMatch(/\/invoices\/bulk-pdf-export$/)
+    expect(body).toEqual({
+      paymentIds: ['pay-1', 'pay-2', 'pay-3'],
+      format: 'zip',
+    })
+    expect(config?.headers).toBeDefined()
+    expect((config?.headers as Record<string, string>)['Idempotency-Key']).toMatch(UUID_REGEX)
+  })
+
+  it('receipt: mints a fresh Idempotency-Key per call', async () => {
+    await bulkReceiptPdfExport(SCHOOL, { paymentIds: ['pay-1'], format: 'zip' })
+    await bulkReceiptPdfExport(SCHOOL, { paymentIds: ['pay-2'], format: 'zip' })
+
+    const key1 = (mockApiPost.mock.calls[0][2]?.headers as Record<string, string>)['Idempotency-Key']
+    const key2 = (mockApiPost.mock.calls[1][2]?.headers as Record<string, string>)['Idempotency-Key']
+    expect(key1).not.toBe(key2)
+  })
+
+  it('receipt: passes format=zip verbatim', async () => {
+    await bulkReceiptPdfExport(SCHOOL, { paymentIds: ['pay-1'], format: 'zip' })
+    const [, body] = mockApiPost.mock.calls[0]
+    expect((body as { format: string }).format).toBe('zip')
   })
 })
