@@ -50,6 +50,13 @@ export function DataTable<TData>({
   toolbarStart,
   toolbarExtra,
   rightToolbarSlot,
+  presets,
+  activePreset,
+  onPresetChange,
+  searchValue,
+  onSearchChange,
+  primaryFilter,
+  moreFilters,
   density: densityProp,
   enableDensityToggle,
   bulkActions,
@@ -148,6 +155,9 @@ export function DataTable<TData>({
     enableColumnVisibility ||
     resolvedToolbarExtra ||
     toolbarStart ||
+    presets ||
+    primaryFilter ||
+    moreFilters ||
     showDensityToggle ||
     exportOptions
   const hasBulkActions = bulkActions && selectedRowCount > 0
@@ -192,10 +202,17 @@ export function DataTable<TData>({
           <DataTableToolbar
             table={table}
             searchPlaceholder={searchPlaceholder}
+            searchValue={searchValue}
+            onSearchChange={onSearchChange}
             facetedFilters={resolvedFacets}
             enableColumnVisibility={enableColumnVisibility}
             toolbarStart={toolbarStart}
             toolbarExtra={resolvedToolbarExtra}
+            presets={presets}
+            activePreset={activePreset}
+            onPresetChange={onPresetChange}
+            primaryFilter={primaryFilter}
+            moreFilters={moreFilters}
             density={density}
             onDensityChange={setDensity}
             enableDensityToggle={showDensityToggle}

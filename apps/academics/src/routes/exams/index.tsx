@@ -12,7 +12,7 @@ import { ClipboardList, Flag, Plus, RefreshCw, X } from 'lucide-react'
 import { toast } from 'sonner'
 import type { RowSelectionState } from '@tanstack/react-table'
 import { usePermission } from '@edforge/abac'
-import { ContextBar, ContextBarSep, ContextBarYear, type BulkAction } from '@edforge/ui'
+import { PageHeader, type BulkAction } from '@edforge/ui'
 import type { ExamResponseDto } from '@aibrains/shared-types'
 import { useActiveSchoolId } from '../../stores/app.store'
 import { useCurrentAcademicYear, useGradingPeriods } from '../../hooks/useSchool'
@@ -113,44 +113,27 @@ export function ExamsModule() {
 
   const showFilterChip = activeBucket !== 'total'
 
+  const today = formatDate(new Date(), { weekday: 'long', month: 'short', day: 'numeric' })
+
   return (
     <div className="min-h-full p-6 space-y-5">
-      <ContextBar
-        meta={
-          <>
-            {currentYear?.name ? (
-              <ContextBarYear>{currentYear.name}</ContextBarYear>
-            ) : null}
-            {currentYear?.name ? <ContextBarSep /> : null}
-            <span>
-                  {formatDate(new Date(), {
-                    weekday: 'long',
-                    month: 'short',
-                    day: 'numeric',
-              })}
-            </span>
-          </>
-        }
-        description={
-          <p className="text-sm text-[rgb(var(--text-tertiary))]">
-            {currentYear?.name
-              ? t('examModule.descriptionWithYear', { yearName: currentYear.name })
-              : t('examModule.description')}
-          </p>
-        }
+      <PageHeader
+        mode="pagebar"
+        year={currentYear?.name ?? ''}
+        date={today}
         actions={
-          canCreateExam ? (
-            <button
-              type="button"
-              onClick={() => setDrawerOpen(true)}
-              disabled={!canOpenDrawer}
-              title={!canOpenDrawer ? t('examModule.createDisabledTitle') : undefined}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-sm font-semibold rounded-lg bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors disabled:opacity-50"
-            >
-              <Plus className="w-4 h-4" />
-              {t('examModule.createExam')}
-            </button>
-          ) : undefined
+          canCreateExam
+            ? [
+                {
+                  label: t('examModule.createExam'),
+                  icon: <Plus className="h-3.5 w-3.5" />,
+                  primary: true,
+                  disabled: !canOpenDrawer,
+                  ariaLabel: !canOpenDrawer ? t('examModule.createDisabledTitle') : t('examModule.createExam'),
+                  onClick: () => setDrawerOpen(true),
+                },
+              ]
+            : undefined
         }
       />
 

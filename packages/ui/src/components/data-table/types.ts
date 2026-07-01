@@ -7,6 +7,7 @@ import type {
   RowSelectionState,
   VisibilityState,
 } from '@tanstack/react-table'
+import type { TablePreset } from './TablePresetTabs'
 
 // ============================================================================
 // COLUMN META
@@ -247,9 +248,23 @@ export interface DataTableProps<TData> {
 
   // -- Toolbar --
   searchPlaceholder?: string
+  /**
+   * Controlled search. Provide `onSearchChange` (and `searchValue`) to wire the
+   * toolbar search to a server-side store; omit for client-side global filter.
+   */
+  searchValue?: string
+  onSearchChange?: (value: string) => void
   /** Faceted filters. `facets` is the prototype name; `facetedFilters` kept for back-compat. */
   facetedFilters?: FacetedFilterConfig[]
   facets?: FacetedFilterConfig[]
+  /** Docked status presets (with counts) for the unified toolbar. */
+  presets?: TablePreset[]
+  activePreset?: string
+  onPresetChange?: (value: string) => void
+  /** Primary facet control shown inline (e.g. a Grade/Subject/Type dropdown). */
+  primaryFilter?: ReactNode
+  /** Secondary filters, typically wrapped in <DataTableMoreFilters>. */
+  moreFilters?: ReactNode
   /** Extra element rendered at the START (left) of the toolbar — e.g. filter chips. */
   toolbarStart?: ReactNode
   /** Extra element to render in the toolbar right cluster.

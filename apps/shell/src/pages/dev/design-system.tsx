@@ -23,15 +23,21 @@ import {
   SectionCard,
   Select,
   Stack,
+  StatBand,
   Switch,
+  DataTableMoreFilters,
+  TableBulkBar,
+  TablePresetTabs,
   Tag,
   Tabs,
   Text,
   Textarea,
   type FilterTab,
+  type StatMetric,
   type TabItem,
 } from '@edforge/ui'
 import { useState } from 'react'
+import { Archive, Upload, UserPlus } from 'lucide-react'
 
 const surfaceTokens = [
   ['background.primary', 'var(--background-primary)'],
@@ -64,6 +70,73 @@ const pageTabs: TabItem[] = [
   { id: 'hierarchy', label: 'Hierarchy', count: 3 },
   { id: 'networks', label: 'Networks' },
   { id: 'details', label: 'Details' },
+]
+
+// Handoff surface ② — exercises every state + micro-viz + animated-icon variant.
+const bandMetrics: StatMetric[] = [
+  {
+    label: 'Total Enrolled',
+    value: '255',
+    iconSignature: 'students',
+    state: 'normal',
+    primary: true,
+    delta: { dir: 'up', val: '+6' },
+    sub: 'across 13 grades',
+    detail: '6 enrolled in the last 30 days',
+  },
+  {
+    label: 'At-risk Students',
+    value: '20',
+    iconSignature: 'atrisk',
+    state: 'critical',
+    pill: { tone: 'critical', text: '20 critical' },
+    sub: 'below 90% attendance',
+  },
+  {
+    label: "Today's Attendance",
+    value: '0%',
+    iconSignature: 'metric_attendance',
+    state: 'warn',
+    meter: { pct: 0, target: 90 },
+    sub: 'Partial data · 0 marked',
+  },
+  {
+    label: 'Result Readiness',
+    value: '50%',
+    iconSignature: 'gpa',
+    state: 'normal',
+    donut: { pct: 50 },
+    sub: '1 / 2 generated',
+  },
+  {
+    label: 'Live Now',
+    value: '1',
+    iconSignature: 'overview',
+    state: 'live',
+    sub: 'in session',
+  },
+  {
+    label: 'Grade Levels',
+    value: '13',
+    iconSignature: 'gradelevels',
+    state: 'muted',
+    sub: 'covered this year',
+  },
+]
+
+const examBandMetrics: StatMetric[] = [
+  { label: 'Total Exams', value: '10', iconSignature: 'exams', state: 'normal', primary: true, sub: '5 types · 4 terms' },
+  { label: 'Live Now', value: '1', iconSignature: 'metric_attendance', state: 'live', sub: 'in session' },
+  { label: 'Upcoming', value: '1', iconSignature: 'attendance', state: 'info', sub: 'Next: Second Term Exam' },
+  { label: 'Awaiting Results', value: '1', iconSignature: 'atrisk', state: 'warn', pill: { tone: 'warn', text: 'Action needed' }, sub: 'result not generated' },
+  { label: 'Result Readiness', value: '50%', iconSignature: 'gpa', state: 'normal', donut: { pct: 50 }, sub: '1 / 2 generated' },
+]
+
+const bandPresets = [
+  { value: 'all', label: 'All', count: 255 },
+  { value: 'active', label: 'Active', count: 235 },
+  { value: 'atrisk', label: 'At-risk', count: 20 },
+  { value: 'pending', label: 'Pending', count: 0 },
 ]
 
 function TokenSwatch({
@@ -103,6 +176,8 @@ export default function DesignSystemDevPage() {
   const [comboboxValue, setComboboxValue] = useState<string | null>(null)
   const [radioValue, setRadioValue] = useState('high')
   const [switchValue, setSwitchValue] = useState(true)
+  const [bandPreset, setBandPreset] = useState('all')
+  const [showBulk, setShowBulk] = useState(false)
 
   if (!import.meta.env.DEV) {
     return (
@@ -294,6 +369,86 @@ export default function DesignSystemDevPage() {
               ]}
             />
           </div>
+        </SectionCard>
+
+        <SectionCard
+          title="Handoff surfaces"
+          description="The three canonical, config-driven operator surfaces: PageHeader (pagebar), StatBand, and the unified table toolbar. See docs/design-system/handoff-token-map.md."
+        >
+          <Stack space="lg">
+            {/* ① PageHeader — pagebar mode */}
+            <div>
+              <Text variant="label" className="mb-2 block">
+                ① PageHeader · pagebar mode
+              </Text>
+              <div className="rounded-xl border border-border-subtle bg-background-secondary p-4">
+                <PageHeader
+                  mode="pagebar"
+                  year="2083"
+                  date="Tuesday, Jun 30"
+                  onYearClick={() => undefined}
+                  actions={[
+                    { label: 'Import IEMIS', icon: <Upload className="h-3.5 w-3.5" /> },
+                    { label: 'Enroll student', icon: <UserPlus className="h-3.5 w-3.5" />, primary: true },
+                  ]}
+                />
+              </div>
+            </div>
+
+            {/* ② StatBand — every state + micro-viz */}
+            <div>
+              <Text variant="label" className="mb-2 block">
+                ② StatBand · delta · pill · meter · donut · live · muted (calm by default)
+              </Text>
+              <StatBand metrics={bandMetrics} ariaLabel="Students key metrics" />
+            </div>
+
+            <div>
+              <Text variant="label" className="mb-2 block">
+                ② StatBand · five-segment Exams band
+              </Text>
+              <StatBand metrics={examBandMetrics} ariaLabel="Exams key metrics" />
+            </div>
+
+            {/* ③ Table toolbar pieces */}
+            <div>
+              <Text variant="label" className="mb-2 block">
+                ③ Table toolbar · docked presets ↔ bulk bar (same footprint)
+              </Text>
+              <div className="rounded-xl border border-border-subtle bg-background-secondary p-3">
+                {showBulk ? (
+                  <TableBulkBar
+                    count={3}
+                    selectedRows={[{ id: 'a' }, { id: 'b' }, { id: 'c' }]}
+                    onClear={() => setShowBulk(false)}
+                    actions={[
+                      { id: 'archive', label: 'Archive', tone: 'critical', icon: <Archive className="h-4 w-4" />, onRun: () => setShowBulk(false) },
+                    ]}
+                  />
+                ) : (
+                  <div className="flex min-h-9 flex-wrap items-center gap-3">
+                    <TablePresetTabs presets={bandPresets} active={bandPreset} onChange={setBandPreset} />
+                    <DataTableMoreFilters label="More filters" activeCount={0}>
+                      <Select
+                        aria-label="Status"
+                        size="sm"
+                        value={selectValue ?? ''}
+                        onChange={setSelectValue}
+                        options={[
+                          { value: '', label: 'All status' },
+                          { value: 'active', label: 'Active' },
+                          { value: 'inactive', label: 'Inactive' },
+                        ]}
+                      />
+                    </DataTableMoreFilters>
+                    <Button variant="outline" size="sm" onClick={() => setShowBulk(true)}>
+                      Simulate selection
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </Stack>
         </SectionCard>
       </Stack>
     </PageShell>

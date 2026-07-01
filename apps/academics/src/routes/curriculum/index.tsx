@@ -10,18 +10,23 @@
  */
 
 import { useState, useMemo, useCallback } from 'react'
-import { useNavigate } from '@tanstack/react-router'
+import { useNavigate, useSearch } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { useResourcePermissions } from '@edforge/abac'
-import { StatCard, ContextBar, ContextBarSep, ContextBarYear } from '@edforge/ui'
+import { PageHeader, StatBand, type StatMetric } from '@edforge/ui'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
+  Award,
+  BarChart3,
   BookOpen,
+  GraduationCap,
   Layers,
   Plus,
   ShieldCheck,
+  Sparkles,
 } from 'lucide-react'
 import { useActiveSchoolId } from '../../stores/app.store'
+import { useSchoolEnabledGradeOptions } from '../../hooks/useGradeOptions'
 import { useCurrentAcademicYear } from '../../hooks/useSchool'
 import { useAcademicsOverview } from '../../hooks/useAcademicsOverview'
 import { useCourseFilters } from '../../stores/courses.store'
@@ -32,7 +37,7 @@ import {
   useUpdateCourse,
 } from '../../hooks/useCourses'
 import { CourseTable } from '../../components/curriculum/CourseTable'
-import { CourseFilters } from '../../components/curriculum/CourseFilters'
+import { useCourseToolbar } from '../../components/curriculum/CourseFilters'
 import { CourseDrawer, type DrawerMode } from '../../components/curriculum/CourseDrawer'
 import { GradeLevelsTab } from '../../components/curriculum/GradeLevelsTab'
 import { downloadCoursesCsv } from '../../components/curriculum/course-csv-export'
@@ -146,9 +151,20 @@ function StandardsContent() {
 
 export function CurriculumModule() {
   const { t, formatNumber, formatCount, formatDate } = useAcademicsI18n()
-  const [activeTab, setActiveTab] = useState<CurriculumTab>('courses')
   const navigate = useNavigate()
   const schoolId = useActiveSchoolId()
+
+  // Active tab is sourced from the URL (?tab=…) so it survives reload / deep
+  // links / back-forward. `validateSearch` on the route (router.tsx) coerces
+  // unknown values, so a bare read here is safe.
+  const search = useSearch({ strict: false }) as { tab?: CurriculumTab }
+  const activeTab: CurriculumTab = search?.tab ?? 'courses'
+  const setActiveTab = useCallback(
+    (tab: CurriculumTab) => {
+      navigate({ search: { tab } as never, replace: true })
+    },
+    [navigate]
+  )
 
   // Current academic year + per-grade enrollment counts (reuses unified dashboard
   // query — cached & deduped with the Overview / Students pages).
@@ -156,6 +172,10 @@ export function CurriculumModule() {
     schoolId ?? ''
   )
   const overview = useAcademicsOverview(schoolId, currentYear?.yearId)
+
+  // School-enabled grade levels — powers the Grade Levels tab's KPI band so the
+  // top-level stats stay in sync with the tab's table.
+  const { options: gradeOptions } = useSchoolEnabledGradeOptions(schoolId)
 
   // ABAC: check course/curriculum permissions
   const coursePerms = useResourcePermissions('courses')
@@ -313,118 +333,139 @@ export function CurriculumModule() {
     day: 'numeric',
   })
 
+  // Calm-by-default KPI band. Nothing here is in a warning/critical state, so
+  // the band stays neutral — Specialized Types reads 'muted' when zero.
+  const curriculumMetrics: StatMetric[] = [
+    {
+      label: t('curriculumModule.stats.totalCourses'),
+      value: formatNumber(stats.total),
+      icon: <BookOpen className="h-4 w-4" />,
+      iconSignature: 'curriculum',
+      state: 'normal',
+      primary: true,
+      meter: { pct: stats.total > 0 ? Math.round((stats.active / stats.total) * 100) : 0, target: 100 },
+      sub: formatCount('curriculumModule.stats.activeTag', stats.active),
+    },
+    {
+      label: t('curriculumModule.stats.subjectAreas'),
+      value: formatNumber(stats.subjects),
+      icon: <Layers className="h-4 w-4" />,
+      iconSignature: 'sections',
+      state: 'normal',
+      sub: stats.allLoaded ? t('curriculumModule.stats.subjectHint') : t('curriculumModule.summary.basedOnLoaded'),
+    },
+    {
+      label: t('curriculumModule.stats.electives'),
+      value: formatNumber(stats.elective),
+      icon: <Sparkles className="h-4 w-4" />,
+      iconSignature: 'gpa',
+      state: 'normal',
+      sub: stats.electiveName ?? undefined,
+    },
+    {
+      label: t('curriculumModule.stats.specializedTypes'),
+      value: formatNumber(stats.specializedTypes),
+      icon: <Award className="h-4 w-4" />,
+      iconSignature: 'academics',
+      state: stats.specializedTypes === 0 ? 'muted' : 'normal',
+      sub: t('curriculumModule.stats.specializedTag'),
+    },
+  ]
+
+  // Grade-level KPIs — computed on the page so the top band reflects the active
+  // tab (the Grade Levels tab's table no longer renders its own KPI cards).
+  // `courseCount` per grade = number of courses that include that grade; the sum
+  // is the total course→grade assignment count.
+  const gradeLevelStats = useMemo(() => {
+    const totalGrades = gradeOptions.length
+    const counts = new Map<string, number>()
+    for (const opt of gradeOptions) counts.set(opt.value, 0)
+    for (const c of courses) {
+      for (const g of c.gradeLevels ?? []) {
+        if (counts.has(g)) counts.set(g, (counts.get(g) ?? 0) + 1)
+      }
+    }
+    let totalAssignments = 0
+    let withCourses = 0
+    for (const n of counts.values()) {
+      totalAssignments += n
+      if (n > 0) withCourses += 1
+    }
+    const avgPerGrade = totalGrades > 0 ? (totalAssignments / totalGrades).toFixed(1) : '0'
+    return { totalGrades, totalAssignments, avgPerGrade, withCourses }
+  }, [gradeOptions, courses])
+
+  const gradeLevelMetrics: StatMetric[] = [
+    {
+      label: t('tables.gradeLevels.stats.totalGradeLevels'),
+      value: formatNumber(gradeLevelStats.totalGrades),
+      icon: <Layers className="h-4 w-4" />,
+      iconSignature: 'gradelevels',
+      state: 'normal',
+      primary: true,
+    },
+    {
+      label: t('tables.gradeLevels.stats.courseAssignments'),
+      value: formatNumber(gradeLevelStats.totalAssignments),
+      icon: <BookOpen className="h-4 w-4" />,
+      iconSignature: 'sections',
+      state: 'normal',
+    },
+    {
+      label: t('tables.gradeLevels.stats.avgCoursesPerGrade'),
+      value: gradeLevelStats.avgPerGrade,
+      icon: <BarChart3 className="h-4 w-4" />,
+      iconSignature: 'overview',
+      state: 'normal',
+    },
+    {
+      label: t('tables.gradeLevels.stats.gradesWithCourses'),
+      value: formatNumber(gradeLevelStats.withCourses),
+      icon: <GraduationCap className="h-4 w-4" />,
+      iconSignature: 'students',
+      state: gradeLevelStats.withCourses === 0 ? 'muted' : 'normal',
+    },
+  ]
+
+  // The band summarizes whichever tab is active. Standards has no data yet, so it
+  // reuses the catalog band as a neutral overview.
+  const bandMetrics = activeTab === 'grade-levels' ? gradeLevelMetrics : curriculumMetrics
+  const bandAriaLabel =
+    activeTab === 'grade-levels'
+      ? t('curriculumModule.tabs.gradeLevels')
+      : t('curriculumModule.stats.totalCourses')
+
+  // Unified table toolbar (search + Active presets + Subject facet + More filters + Export).
+  const courseToolbar = useCourseToolbar(schoolId, {
+    counts: { all: stats.total, active: stats.active, inactive: Math.max(0, stats.total - stats.active) },
+    onExport: handleExportCsv,
+  })
+
   return (
     <div className="min-h-full px-5 py-4">
-      {/* ---- Context Bar (operating context, not a page title) ---- */}
-      <ContextBar
+      {/* ---- Page header (pagebar) — breadcrumb names the page, band summarizes ---- */}
+      <PageHeader
         className="mb-4"
-        meta={
-          <>
-            {currentYear?.name ? (
-              <ContextBarYear>{currentYear.name}</ContextBarYear>
-            ) : null}
-            {currentYear?.name ? <ContextBarSep /> : null}
-            <span>{today}</span>
-          </>
-        }
-        description={
-          <p className="text-xs text-[rgb(var(--text-tertiary))] leading-relaxed">
-            <span className="font-medium text-[rgb(var(--accent-academics-text))]">
-              {stats.total}
-            </span>{' '}
-            {t('curriculumModule.summary.coursesAcross')}{' '}
-            <span className="font-medium text-[rgb(var(--accent-academics-text))]">
-              {formatNumber(stats.subjects)}
-            </span>{' '}
-            {t('curriculumModule.summary.subjectAreasSuffix')} ·{' '}
-            {formatCount('curriculumModule.summary.elective', stats.elective)} ·{' '}
-            <span className="font-medium text-[rgb(var(--accent-academics-text))]">
-              {formatNumber(stats.specializedTypes)}
-            </span>{' '}
-            {t('curriculumModule.summary.specializedTypesSuffix')}
-            {!stats.allLoaded && (
-              <span className="text-[rgb(var(--text-disabled))]">
-                {' '}
-                · {t('curriculumModule.summary.basedOnLoaded')}
-              </span>
-            )}
-          </p>
-        }
+        mode="pagebar"
+        year={currentYear?.name ?? ''}
+        date={today}
         actions={
-          coursePerms.create ? (
-            <button
-              type="button"
-              onClick={openCreateDrawer}
-              className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-[9px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-enrollment)/0.4)] cursor-pointer bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              {t('curriculumModule.actions.addCourse')}
-            </button>
-          ) : undefined
+          coursePerms.create
+            ? [
+                {
+                  label: t('curriculumModule.actions.addCourse'),
+                  icon: <Plus className="h-3.5 w-3.5" />,
+                  primary: true,
+                  onClick: openCreateDrawer,
+                },
+              ]
+            : undefined
         }
       />
 
-      {/* ---- KPI Tiles ---- */}
-      <div className="grid gap-3 grid-cols-2 lg:grid-cols-4 mb-3.5">
-        <StatCard
-          label={t('curriculumModule.stats.totalCourses')}
-          value={formatNumber(stats.total)}
-          icon={BookOpen}
-          signature="curriculum"
-          accentColor="rgb(var(--accent-reports)/0.1)"
-          iconColor="rgb(var(--accent-reports))"
-          barColor="rgb(var(--accent-reports))"
-          tag={{
-            text: formatCount('curriculumModule.stats.activeTag', stats.active),
-            color: 'rgb(var(--accent-enrollment))',
-            bg: 'rgb(var(--accent-enrollment)/0.1)',
-          }}
-          loading={isLoading}
-        />
-        <StatCard
-          label={t('curriculumModule.stats.subjectAreas')}
-          value={formatNumber(stats.subjects)}
-          icon={Layers}
-          accentColor="rgb(var(--accent-academics)/0.1)"
-          iconColor="rgb(var(--accent-academics))"
-          barColor="rgb(var(--accent-academics))"
-          hint={stats.allLoaded ? t('curriculumModule.stats.subjectHint') : t('curriculumModule.summary.basedOnLoaded')}
-          loading={isLoading}
-        />
-        <StatCard
-          label={t('curriculumModule.stats.electives')}
-          value={formatNumber(stats.elective)}
-          icon={BookOpen}
-          signature="curriculum"
-          accentColor="rgb(var(--accent-coral)/0.1)"
-          iconColor="rgb(var(--accent-coral))"
-          barColor="rgb(var(--accent-coral))"
-          tag={
-            stats.electiveName
-              ? {
-                  text: stats.electiveName,
-                  color: 'rgb(var(--accent-reports))',
-                  bg: 'rgb(var(--accent-reports)/0.1)',
-                }
-              : undefined
-          }
-          loading={isLoading}
-        />
-        <StatCard
-          label={t('curriculumModule.stats.specializedTypes')}
-          value={formatNumber(stats.specializedTypes)}
-          icon={BookOpen}
-          signature="curriculum"
-          accentColor="rgb(var(--accent-attendance)/0.1)"
-          iconColor="rgb(var(--accent-attendance))"
-          barColor="rgb(var(--accent-attendance))"
-          tag={{
-            text: t('curriculumModule.stats.specializedTag'),
-            color: 'rgb(var(--accent-attendance))',
-            bg: 'rgb(var(--accent-attendance)/0.1)',
-          }}
-          loading={isLoading}
-        />
+      {/* ---- Unified KPI stat band (dynamic per active tab) ---- */}
+      <div className="mb-3.5">
+        <StatBand metrics={bandMetrics} ariaLabel={bandAriaLabel} />
       </div>
 
       {/* ---- Tab Bar ---- */}
@@ -491,27 +532,16 @@ export function CurriculumModule() {
           transition={{ duration: 0.25, ease: 'easeOut' }}
         >
           {activeTab === 'courses' && (
-            <div>
-              {/* Filter strip */}
-              <CourseFilters
-                totalCount={totalCount}
-                schoolId={schoolId}
-                onExport={handleExportCsv}
-              />
-
-              {/* Course Table */}
-              <div className="mt-3">
-                <CourseTable
-                  courses={visibleCourses}
-                  isLoading={isLoading}
-                  onAddCourse={coursePerms.create ? openCreateDrawer : undefined}
-                  onViewCourse={openViewDrawer}
-                  onEditCourse={coursePerms.edit ? openEditDrawer : undefined}
-                  onToggleActive={coursePerms.edit ? handleToggleActive : undefined}
-                  onNavigateToCourse={navigateToCourse}
-                />
-              </div>
-            </div>
+            <CourseTable
+              courses={visibleCourses}
+              isLoading={isLoading}
+              onAddCourse={coursePerms.create ? openCreateDrawer : undefined}
+              onViewCourse={openViewDrawer}
+              onEditCourse={coursePerms.edit ? openEditDrawer : undefined}
+              onToggleActive={coursePerms.edit ? handleToggleActive : undefined}
+              onNavigateToCourse={navigateToCourse}
+              {...courseToolbar}
+            />
           )}
 
           {activeTab === 'grade-levels' && (

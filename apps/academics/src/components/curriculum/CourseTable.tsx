@@ -6,7 +6,7 @@
  * Uses the TanstackDataTable with ColumnDef-based column definitions.
  */
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 import {
   BookOpen,
   MoreVertical,
@@ -16,7 +16,7 @@ import {
   ToggleLeft,
   ToggleRight,
 } from 'lucide-react'
-import { TanstackDataTable, createActionsColumn, StatusBadge, type ColumnDef } from '@edforge/ui'
+import { TanstackDataTable, createActionsColumn, StatusBadge, type ColumnDef, type TablePreset } from '@edforge/ui'
 import type { CourseResponseDto } from '@aibrains/shared-types'
 import { getDurationLabel, sortGradeCodes } from '../../schemas/course.form'
 import { formatCourseType } from '../../utils/course-type'
@@ -36,6 +36,16 @@ interface CourseTableProps {
   onEditCourse?: (course: CourseResponseDto) => void
   onToggleActive?: (course: CourseResponseDto) => void
   onNavigateToCourse?: (course: CourseResponseDto) => void
+  /** Unified toolbar wiring (from useCourseToolbar). */
+  searchPlaceholder?: string
+  searchValue?: string
+  onSearchChange?: (value: string) => void
+  presets?: TablePreset[]
+  activePreset?: string
+  onPresetChange?: (value: string) => void
+  primaryFilter?: ReactNode
+  moreFilters?: ReactNode
+  toolbarExtra?: ReactNode
 }
 
 // ============================================================================
@@ -205,6 +215,15 @@ export function CourseTable({
   onEditCourse,
   onToggleActive,
   onNavigateToCourse,
+  searchPlaceholder,
+  searchValue,
+  onSearchChange,
+  presets,
+  activePreset,
+  onPresetChange,
+  primaryFilter,
+  moreFilters,
+  toolbarExtra,
 }: CourseTableProps) {
   const { t, dataTableLabels } = useAcademicsI18n()
   const columns: ColumnDef<CourseResponseDto, unknown>[] = useMemo(
@@ -344,6 +363,15 @@ export function CourseTable({
       pagination={{ pageSize: 20 }}
       enableSorting={true}
       onRowClick={onViewCourse}
+      searchPlaceholder={searchPlaceholder}
+      searchValue={searchValue}
+      onSearchChange={onSearchChange}
+      presets={presets}
+      activePreset={activePreset}
+      onPresetChange={onPresetChange}
+      primaryFilter={primaryFilter}
+      moreFilters={moreFilters}
+      toolbarExtra={toolbarExtra}
       maxHeight="calc(100vh - 24rem)"
     />
   )

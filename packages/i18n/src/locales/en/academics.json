@@ -492,7 +492,8 @@
     },
     "xlsxUnavailable": "XLSX export ships in a follow-up",
     "filterAriaLabel": "{{title}} filter",
-    "clearFilter": "Clear filter"
+    "clearFilter": "Clear filter",
+    "moreFilters": "More filters"
   },
   "attendance": {
     "title": "Attendance",
@@ -882,6 +883,12 @@
       "empty": {
         "title": "No grade levels found",
         "description": "Grade levels will appear once courses are configured."
+      },
+      "searchPlaceholder": "Search grade name or code…",
+      "presets": {
+        "all": "All",
+        "withCourses": "With courses",
+        "empty": "Empty"
       },
       "noCurrentYearTitle": "No active academic year — enrollment counts will appear once an academic year is set as current."
     },

@@ -145,6 +145,13 @@ export {
   DataTableEmpty,
   DataTableDensityToggle,
   DataTableExport,
+  TablePresetTabs,
+  TableBulkBar,
+  DataTableMoreFilters,
+  type TablePreset,
+  type TablePresetTabsProps,
+  type TableBulkBarProps,
+  type DataTableMoreFiltersProps,
   DEFAULT_DATA_TABLE_LABELS,
   resolveDataTableLabels,
   useDataTable,
@@ -201,6 +208,15 @@ export { ContentSection, type ContentSectionProps } from './components/ContentSe
 export { DashedDivider, type DashedDividerProps } from './components/DashedDivider'
 export { StatusPill, type StatusPillProps, type StatusPillVariant } from './components/StatusPill'
 export { StatStrip, type StatStripProps, type StatStripItem } from './components/StatStrip'
+export {
+  StatBand,
+  type StatBandProps,
+  type StatMetric,
+  type StatBandState,
+  type StatBandPillTone,
+  type IconName,
+} from './components/StatBand'
+export { Ring, type RingProps } from './components/Ring'
 export { GpaRing, type GpaRingProps, type GpaRingSize } from './components/GpaRing'
 export { CategoryBar, type CategoryBarProps } from './components/CategoryBar'
 export { CourseCard, type CourseCardProps, type CourseCardCategory } from './components/CourseCard'

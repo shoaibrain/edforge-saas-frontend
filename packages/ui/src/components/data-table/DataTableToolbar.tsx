@@ -1,11 +1,12 @@
+import { Search, X } from 'lucide-react'
 import { type ReactNode } from 'react'
 import type { Table } from '@tanstack/react-table'
-import { X } from 'lucide-react'
-import { cn, focusRingInset } from '../../utils'
+import { cn } from '../../utils'
 import { DataTableFacetedFilter } from './DataTableFacetedFilter'
 import { DataTableViewOptions } from './DataTableViewOptions'
 import { DataTableDensityToggle } from './DataTableDensityToggle'
 import { DataTableExport } from './DataTableExport'
+import { TablePresetTabs, type TablePreset } from './TablePresetTabs'
 import { DEFAULT_DATA_TABLE_LABELS } from './labels'
 import type {
   DataTableDensity,
@@ -26,6 +27,24 @@ interface DataTableToolbarProps<TData> {
   enableDensityToggle?: boolean
   exportOptions?: DataTableExportOptions
   labels?: DataTableLabels
+  /** Docked status presets (handoff ③). When set, renders TablePresetTabs. */
+  presets?: TablePreset[]
+  activePreset?: string
+  onPresetChange?: (value: string) => void
+  /** Bulk-action bar node; swaps in (same footprint) when `bulkActive`. */
+  bulkBar?: ReactNode
+  bulkActive?: boolean
+  /**
+   * Controlled search. When `onSearchChange` is provided the input is
+   * controlled (server-side-filtered pages wire it to their store); otherwise
+   * the input drives the table's global filter (client-side pages).
+   */
+  searchValue?: string
+  onSearchChange?: (value: string) => void
+  /** Primary facet control shown inline (e.g. a Grade/Subject/Type dropdown). */
+  primaryFilter?: ReactNode
+  /** Secondary filters, typically wrapped in <DataTableMoreFilters>. */
+  moreFilters?: ReactNode
 }
 
 export function DataTableToolbar<TData>({
@@ -40,9 +59,38 @@ export function DataTableToolbar<TData>({
   enableDensityToggle,
   exportOptions,
   labels,
+  presets,
+  activePreset,
+  onPresetChange,
+  bulkBar,
+  bulkActive,
+  searchValue,
+  onSearchChange,
+  primaryFilter,
+  moreFilters,
 }: DataTableToolbarProps<TData>) {
   const resolvedLabels = labels ?? DEFAULT_DATA_TABLE_LABELS
+
+  // Bulk-action bar swaps in on selection with the same min-height footprint,
+  // so there is no layout shift between the two states.
+  if (bulkActive && bulkBar) {
+    return <div className="min-h-9">{bulkBar}</div>
+  }
+
+  // Search can be controlled (server-side pages) or drive the table's global
+  // filter (client-side pages).
+  const controlledSearch = typeof onSearchChange === 'function'
   const globalFilter = (table.getState().globalFilter as string) ?? ''
+  const searchVal = controlledSearch ? (searchValue ?? '') : globalFilter
+  const setSearch = (value: string) => {
+    if (controlledSearch) {
+      onSearchChange?.(value)
+    } else {
+      table.setGlobalFilter(value)
+      table.setPageIndex(0)
+    }
+  }
+
   const activeFilterCount =
     table.getState().columnFilters.length + (globalFilter ? 1 : 0)
   const isFiltered = activeFilterCount > 0
@@ -58,60 +106,57 @@ export function DataTableToolbar<TData>({
     enableColumnVisibility || toolbarExtra || showDensity || exportOptions
 
   return (
-    <div className="flex items-center gap-x-3 gap-y-2 flex-wrap">
-      {/* Leading cluster — filters/search/facets grow and wrap among themselves */}
-      <div className="flex flex-1 min-w-0 items-center gap-x-3 gap-y-2 flex-wrap">
-        {/* Leading slot (e.g. filter chips / search / selects) */}
+    <div className="flex min-h-9 flex-wrap items-center gap-x-3 gap-y-2">
+      {/* Leading cluster — prototype order: [start] search · presets · facet · more filters */}
+      <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-2">
         {toolbarStart}
 
-        {/* Search */}
+        {/* Unified search — one clean field, consistent width across pages */}
         {searchPlaceholder && (
-          <div className="relative flex-1 max-w-sm min-w-40">
-            <svg
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[rgb(var(--text-tertiary))]"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
+          <div className="relative w-72 max-w-full flex-none">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[rgb(var(--text-tertiary))]" />
             <input
               type="text"
               placeholder={searchPlaceholder}
-              value={globalFilter}
-              onChange={(e) => {
-                table.setGlobalFilter(e.target.value)
-                table.setPageIndex(0)
-              }}
+              value={searchVal}
+              onChange={(e) => setSearch(e.target.value)}
               className={cn(
-                'w-full pl-9 pr-8 py-2 h-9 text-sm rounded-lg',
-                'border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))]',
+                // physical padding (pl/pr) — logical ps/pe does not render in this build
+                'h-9 w-full rounded-lg pl-9 pr-9 text-sm',
+                'border border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-primary))]',
                 'text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))]',
-                focusRingInset
+                'focus:border-[var(--mint-border)] focus:outline-none focus:ring-2 focus:ring-[var(--mint-soft)]',
               )}
             />
-            {globalFilter && (
+            {searchVal ? (
               <button
                 type="button"
-                onClick={() => {
-                  table.setGlobalFilter('')
-                  table.setPageIndex(0)
-                }}
+                onClick={() => setSearch('')}
                 aria-label={resolvedLabels.clearSearch}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-secondary))]"
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-[rgb(var(--text-tertiary))] hover:bg-[rgb(var(--background-secondary))] hover:text-[rgb(var(--text-primary))]"
               >
-                <X className="w-3.5 h-3.5" />
+                <X className="h-3.5 w-3.5" />
               </button>
+            ) : (
+              <kbd
+                aria-hidden="true"
+                className="absolute right-2 top-1/2 grid h-5 min-w-5 -translate-y-1/2 place-items-center rounded border border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-tertiary))] px-1.5 font-mono text-2xs font-semibold text-[rgb(var(--text-tertiary))]"
+              >
+                /
+              </kbd>
             )}
           </div>
         )}
 
-        {/* Faceted Filters */}
+        {/* Docked status presets */}
+        {presets && activePreset != null && onPresetChange ? (
+          <TablePresetTabs presets={presets} active={activePreset} onChange={onPresetChange} />
+        ) : null}
+
+        {/* Primary facet (inline) */}
+        {primaryFilter}
+
+        {/* Client-side faceted filters (TanStack columns) */}
         {facetedFilters?.map((filter) => {
           const column = table.getColumn(filter.columnId)
           if (!column) return null
@@ -126,45 +171,35 @@ export function DataTableToolbar<TData>({
           )
         })}
 
-        {/* Clear (N) — replaces the older "Reset" pill */}
+        {/* Secondary filters ("More filters" popover) */}
+        {moreFilters}
+
+        {/* Clear (N) — client-side facet/search reset */}
         {isFiltered && (
           <button
             type="button"
             onClick={handleClearAll}
             className={cn(
-              'inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md',
-              'text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))]',
-              'hover:bg-[rgb(var(--background-secondary))] transition-colors'
+              'inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium',
+              'text-[rgb(var(--text-secondary))] transition-colors hover:text-[rgb(var(--text-primary))]',
+              'hover:bg-[rgb(var(--background-secondary))]',
             )}
           >
-            <X className="w-3 h-3" />
-            <span className="tabular-nums">
-              {resolvedLabels.clearActiveFilters(activeFilterCount)}
-            </span>
+            <X className="h-3 w-3" />
+            <span className="tabular-nums">{resolvedLabels.clearActiveFilters(activeFilterCount)}</span>
           </button>
         )}
       </div>
 
-      {/* Trailing cluster — Density / View / Export / consumer extras.
-          On narrow widths this cluster stays grouped and wraps as a unit. */}
+      {/* Trailing cluster — Density / View / Export / consumer extras. */}
       {showRightCluster && (
-        <div className="flex items-center gap-2 ml-auto flex-shrink-0">
+        <div className="ml-auto flex flex-shrink-0 items-center gap-2">
           {showDensity && (
-            <DataTableDensityToggle
-              density={density}
-              onChange={onDensityChange}
-              labels={resolvedLabels}
-            />
+            <DataTableDensityToggle density={density} onChange={onDensityChange} labels={resolvedLabels} />
           )}
-          {enableColumnVisibility && (
-            <DataTableViewOptions table={table} labels={resolvedLabels} />
-          )}
+          {enableColumnVisibility && <DataTableViewOptions table={table} labels={resolvedLabels} />}
           {exportOptions && (
-            <DataTableExport
-              table={table}
-              options={exportOptions}
-              labels={resolvedLabels}
-            />
+            <DataTableExport table={table} options={exportOptions} labels={resolvedLabels} />
           )}
           {toolbarExtra}
         </div>

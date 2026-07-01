@@ -13,17 +13,10 @@
  * first paint at the typical academics content-pane width.
  */
 
-import { useMemo, type ReactNode } from 'react'
-import {
-  CalendarClock,
-  ClipboardList,
-  Flag,
-  PlayCircle,
-  Target,
-  type LucideIcon,
-} from 'lucide-react'
+import { useMemo } from 'react'
+import { CalendarClock, ClipboardList, Flag, PlayCircle, Target } from 'lucide-react'
 import type { ExamResponseDto } from '@aibrains/shared-types'
-import { cn, focusRing } from '@edforge/ui'
+import { StatBand, type StatMetric } from '@edforge/ui'
 import { useAcademicsI18n } from '../../lib/i18n'
 
 // ============================================================================
@@ -88,8 +81,8 @@ export function ExamSummary({
   )
 
   // 'total' is the reset state — it's never toggled off. Any other bucket
-  // toggles back to 'total' when re-clicked, matching the prototype's
-  // "click the active filter to return to all" behaviour.
+  // toggles back to 'total' when re-clicked ("click the active filter to
+  // return to all").
   const toggle = (bucket: ExamBucket) => {
     if (bucket === 'total') {
       onBucketChange('total')
@@ -98,249 +91,106 @@ export function ExamSummary({
     onBucketChange(activeBucket === bucket ? 'total' : bucket)
   }
 
-  return (
-    <nav
-      aria-label="Exam summary filters"
-      className="grid gap-2 grid-cols-2 sm:grid-cols-3 md:grid-cols-5"
-    >
-      <SummaryButton
-        active={activeBucket === 'total'}
-        onClick={() => toggle('total')}
-        label={t('examModule.summary.total')}
-      >
-        <CompactTile
-          icon={ClipboardList}
-          label={t('examModule.summary.total')}
-          value={formatNumber(summary.total)}
-          sub={t('examModule.summary.typeTermCount', {
-            types: formatNumber(summary.typeCount),
-            terms: formatNumber(summary.termCount),
-          })}
-          loading={isLoading}
-        />
-      </SummaryButton>
-
-      <SummaryButton
-        active={activeBucket === 'live'}
-        onClick={() => toggle('live')}
-        label={t('examModule.summary.live')}
-      >
-        <CompactTile
-          icon={PlayCircle}
-          label={t('examModule.summary.live')}
-          value={formatNumber(summary.live)}
-          sub={summary.live > 0 ? t('examModule.summary.inSession') : t('examModule.summary.nothingLive')}
-          loading={isLoading}
-        />
-      </SummaryButton>
-
-      <SummaryButton
-        active={activeBucket === 'upcoming'}
-        onClick={() => toggle('upcoming')}
-        label={t('examModule.summary.upcoming')}
-      >
-        <CompactTile
-          icon={CalendarClock}
-          label={t('examModule.summary.upcoming')}
-          value={formatNumber(summary.upcoming)}
-          sub={summary.nextHint}
-          loading={isLoading}
-        />
-      </SummaryButton>
-
-      <SummaryButton
-        active={activeBucket === 'awaiting'}
-        onClick={() => toggle('awaiting')}
-        label={t('examModule.summary.awaiting')}
-      >
-        <CompactTile
-          icon={Flag}
-          label={t('examModule.summary.awaiting')}
-          value={formatNumber(summary.awaiting)}
-          sub={summary.awaiting === 0 ? t('examModule.summary.allCaughtUp') : t('examModule.summary.actionNeeded')}
-          emphasize={summary.awaiting > 0 ? 'warning' : undefined}
-          loading={isLoading}
-        />
-      </SummaryButton>
-
-      {/* Result Readiness — read-only, not wrapped in SummaryButton. */}
-      <CompactTile
-        icon={Target}
-        label={t('examModule.summary.readiness')}
-        value={`${summary.readinessPercent}%`}
-        sub={
-          summary.readinessTotal === 0
-            ? t('examModule.summary.noClosed')
-            : t('examModule.summary.generatedCount', {
-                generated: formatNumber(summary.readinessGenerated),
-                total: formatNumber(summary.readinessTotal),
-              })
-        }
-        rightSlot={
-          summary.readinessTotal > 0 ? (
-            <ReadinessRing percent={summary.readinessPercent} />
-          ) : undefined
-        }
-        loading={isLoading}
-        ariaLabel={t('examModule.summary.readinessAria', {
-          percent: summary.readinessPercent,
-          generated: formatNumber(summary.readinessGenerated),
-          total: formatNumber(summary.readinessTotal),
-        })}
-      />
-    </nav>
-  )
-}
-
-// ============================================================================
-// COMPACT TILE
-// ============================================================================
-
-interface CompactTileProps {
-  icon: LucideIcon
-  label: string
-  value: ReactNode
-  sub?: ReactNode
-  /** Tints the value text — currently only 'warning' (used for Awaiting Results). */
-  emphasize?: 'warning'
-  /** Optional visual rendered on the right edge (e.g. the readiness ring). */
-  rightSlot?: ReactNode
-  loading?: boolean
-  /** Overrides the auto-generated aria-label for screen readers. */
-  ariaLabel?: string
-}
-
-function CompactTile({
-  icon: Icon,
-  label,
-  value,
-  sub,
-  emphasize,
-  rightSlot,
-  loading,
-  ariaLabel,
-}: CompactTileProps) {
-  if (loading) {
+  if (isLoading) {
     return (
-      <div className="h-11 rounded-lg border border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-secondary))] px-3 flex items-center">
-        <div className="h-3 w-24 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
+      <div className="flex min-h-24 items-stretch overflow-hidden rounded-xl border border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-secondary))]">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="flex-1 border-s border-[rgb(var(--border-primary)/0.15)] px-5 py-4 first:border-s-0">
+            <div className="h-3 w-20 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
+            <div className="mt-3 h-7 w-12 rounded v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
+          </div>
+        ))}
       </div>
     )
   }
 
-  const valueClass = cn(
-    'text-xl font-semibold leading-none tabular-nums',
-    emphasize === 'warning'
-      ? 'text-[rgb(var(--state-warning-fg))]'
-      : 'text-[rgb(var(--text-primary))]',
-  )
+  const awaiting: StatMetric =
+    summary.awaiting > 0
+      ? {
+          label: t('examModule.summary.awaiting'),
+          value: formatNumber(summary.awaiting),
+          icon: <Flag className="h-4 w-4" />,
+          iconSignature: 'atrisk',
+          state: 'warn',
+          pill: { tone: 'warn', text: t('examModule.summary.actionNeeded') },
+          sub: t('examModule.summary.actionNeeded'),
+          onClick: () => toggle('awaiting'),
+          active: activeBucket === 'awaiting',
+        }
+      : {
+          label: t('examModule.summary.awaiting'),
+          value: formatNumber(summary.awaiting),
+          icon: <Flag className="h-4 w-4" />,
+          iconSignature: 'atrisk',
+          state: 'normal',
+          sub: t('examModule.summary.allCaughtUp'),
+          onClick: () => toggle('awaiting'),
+          active: activeBucket === 'awaiting',
+        }
 
-  return (
-    <div
-      className="flex items-center gap-2.5 px-3 py-2 rounded-lg border border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-secondary))]"
-      role="status"
-      aria-label={ariaLabel ?? `${label}: ${typeof value === 'string' || typeof value === 'number' ? value : ''}`}
-    >
-      <Icon className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))] flex-shrink-0" aria-hidden />
-      <div className="min-w-0 flex-1">
-        <div className="text-3xs font-medium uppercase tracking-wide text-[rgb(var(--text-tertiary))] truncate">
-          {label}
-        </div>
-        <div className="flex items-baseline gap-2 mt-0.5">
-          <span className={valueClass}>{value}</span>
-          {sub != null && (
-            <span className="text-2xs text-[rgb(var(--text-tertiary))] truncate">
-              {sub}
-            </span>
-          )}
-        </div>
-      </div>
-      {rightSlot}
-    </div>
-  )
-}
+  const readiness: StatMetric =
+    summary.readinessTotal > 0
+      ? {
+          label: t('examModule.summary.readiness'),
+          value: `${summary.readinessPercent}%`,
+          icon: <Target className="h-4 w-4" />,
+          iconSignature: 'gpa',
+          state: 'normal',
+          donut: { pct: summary.readinessPercent },
+          sub: t('examModule.summary.generatedCount', {
+            generated: formatNumber(summary.readinessGenerated),
+            total: formatNumber(summary.readinessTotal),
+          }),
+        }
+      : {
+          label: t('examModule.summary.readiness'),
+          value: `${summary.readinessPercent}%`,
+          icon: <Target className="h-4 w-4" />,
+          iconSignature: 'gpa',
+          state: 'muted',
+          sub: t('examModule.summary.noClosed'),
+        }
 
-// ============================================================================
-// CLICKABLE WRAPPER
-// ============================================================================
+  const metrics: StatMetric[] = [
+    {
+      label: t('examModule.summary.total'),
+      value: formatNumber(summary.total),
+      icon: <ClipboardList className="h-4 w-4" />,
+      iconSignature: 'exams',
+      state: 'normal',
+      primary: true,
+      sub: t('examModule.summary.typeTermCount', {
+        types: formatNumber(summary.typeCount),
+        terms: formatNumber(summary.termCount),
+      }),
+      onClick: () => toggle('total'),
+      active: activeBucket === 'total',
+    },
+    {
+      label: t('examModule.summary.live'),
+      value: formatNumber(summary.live),
+      icon: <PlayCircle className="h-4 w-4" />,
+      iconSignature: 'metric_attendance',
+      state: summary.live > 0 ? 'live' : 'muted',
+      sub: summary.live > 0 ? t('examModule.summary.inSession') : t('examModule.summary.nothingLive'),
+      onClick: () => toggle('live'),
+      active: activeBucket === 'live',
+    },
+    {
+      label: t('examModule.summary.upcoming'),
+      value: formatNumber(summary.upcoming),
+      icon: <CalendarClock className="h-4 w-4" />,
+      iconSignature: 'attendance',
+      state: 'info',
+      sub: summary.nextHint,
+      onClick: () => toggle('upcoming'),
+      active: activeBucket === 'upcoming',
+    },
+    awaiting,
+    readiness,
+  ]
 
-function SummaryButton({
-  active,
-  onClick,
-  label,
-  children,
-}: {
-  active: boolean
-  onClick: () => void
-  label: string
-  children: ReactNode
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      aria-label={label}
-      className={cn(
-        'rounded-lg text-left transition-colors duration-150',
-        'motion-reduce:transition-none',
-        focusRing,
-        // Active state: thin mint outline + soft mint fill, no offset ring.
-        active && 'ring-1 ring-[var(--mint-border)] [&>div]:bg-[var(--mint-soft)]',
-      )}
-    >
-      {children}
-    </button>
-  )
-}
-
-// ============================================================================
-// READINESS RING (inline donut — see comment below for why not reused)
-// ============================================================================
-
-// We don't reuse `AttendanceDonutRing` because its color tiers
-// (red <80, orange <90, green ≥90) are attendance-specific; readiness should
-// always read as mint regardless of the completion ratio.
-function ReadinessRing({ percent }: { percent: number }) {
-  const size = 28
-  const stroke = 3
-  const half = size / 2
-  const radius = half - stroke / 2
-  const circumference = 2 * Math.PI * radius
-  const clamped = Math.max(0, Math.min(percent, 100))
-  const offset = circumference * (1 - clamped / 100)
-
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox={`0 0 ${size} ${size}`}
-      className="block flex-shrink-0"
-      aria-hidden
-    >
-      <circle
-        cx={half}
-        cy={half}
-        r={radius}
-        fill="none"
-        stroke="rgb(var(--border-primary) / 0.35)"
-        strokeWidth={stroke}
-      />
-      <circle
-        cx={half}
-        cy={half}
-        r={radius}
-        fill="none"
-        stroke="var(--mint)"
-        strokeWidth={stroke}
-        strokeLinecap="round"
-        strokeDasharray={circumference}
-        strokeDashoffset={offset}
-        transform={`rotate(-90 ${half} ${half})`}
-        style={{ transition: 'stroke-dashoffset 0.4s ease-out' }}
-      />
-    </svg>
-  )
+  return <StatBand metrics={metrics} ariaLabel={t('examModule.summary.total')} />
 }
 
 // ============================================================================
