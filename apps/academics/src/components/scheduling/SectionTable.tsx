@@ -53,6 +53,11 @@ interface SectionTableProps {
    *  needs to clear selection (e.g. after a bulk activate/deactivate). */
   rowSelection?: RowSelectionState
   onRowSelectionChange?: OnChangeFn<RowSelectionState>
+  /** Suppress the DataTable's built-in toolbar (search · facets · columns ·
+   *  export · density) so a single page-level unified toolbar can drive both
+   *  the card grid and the table. The floating bulk-action bar (on selection)
+   *  is unaffected. */
+  hideToolbar?: boolean
 }
 
 // ============================================================================
@@ -199,6 +204,7 @@ export function SectionTable({
   bulkActions: bulkActionsProp,
   rowSelection,
   onRowSelectionChange,
+  hideToolbar = false,
 }: SectionTableProps) {
   const { t, dataTableLabels } = useAcademicsI18n()
   const columns: ColumnDef<SectionResponseDto, unknown>[] = useMemo(
@@ -387,13 +393,14 @@ export function SectionTable({
       tableId="academics.sections"
       enableSorting
       enableRowSelection
-      enableColumnVisibility
-      searchPlaceholder={t('tables.sections.search')}
-      facets={facets}
+      enableColumnVisibility={!hideToolbar}
+      enableDensityToggle={hideToolbar ? false : undefined}
+      searchPlaceholder={hideToolbar ? undefined : t('tables.sections.search')}
+      facets={hideToolbar ? undefined : facets}
       bulkActions={bulkActions}
       rowSelection={rowSelection}
       onRowSelectionChange={onRowSelectionChange}
-      exportOptions={{ filename: 'sections', formats: ['csv'] }}
+      exportOptions={hideToolbar ? undefined : { filename: 'sections', formats: ['csv'] }}
       defaultSort={[{ id: 'sectionNumber', desc: false }]}
       pagination={{ pageSize: 20 }}
       pageSizes={[10, 20, 50]}
