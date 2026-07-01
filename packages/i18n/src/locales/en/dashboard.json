@@ -99,12 +99,14 @@
       "aboveTarget": "+{{diff}}% above target",
       "belowThreshold": "Below threshold",
       "critical": "Critical",
-      "dayAvg": "30-day avg {{avg}}%"
+      "dayAvg": "30-day avg {{avg}}%",
+      "region": "Key metrics"
     },
     "alerts": {
       "unableToLoad": "Unable to load alerts",
       "reviewBilling": "Review billing",
-      "viewStudents": "View students"
+      "viewStudents": "View students",
+      "region": "Alerts"
     },
     "attendance": {
       "classroomAttendance": "Classroom attendance",
