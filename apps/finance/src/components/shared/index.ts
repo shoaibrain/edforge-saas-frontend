@@ -1,6 +1,3 @@
-export { FinancePageHeader } from './FinancePageHeader'
-export type { FinancePageHeaderProps } from './FinancePageHeader'
-
 export { FinanceInfoBanner } from './FinanceInfoBanner'
 export type { FinanceInfoBannerProps } from './FinanceInfoBanner'
 

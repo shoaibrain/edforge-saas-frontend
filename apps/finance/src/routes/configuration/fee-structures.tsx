@@ -15,7 +15,7 @@ import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { FeeStructure } from "@edforge/types";
 import { useCurrency } from "@edforge/types/use-currency";
-import { useTranslation } from "@edforge/i18n";
+import { normalizePlatformLanguage, useTranslation } from "@edforge/i18n";
 import { useFinanceSettings } from "../../layouts/FinanceLayout";
 import { apiGet } from "@edforge/api-client";
 import type { AxiosError } from "@edforge/api-client";
@@ -24,14 +24,8 @@ import {
   getGradeLevelsInRange,
   type GradeLevel,
 } from "@aibrains/shared-types";
-import { Button, StatCard, WidgetErrorBoundaryV2 } from "@edforge/ui";
-import {
-  Plus,
-  AlertTriangle,
-  Wallet,
-  Layers,
-  TrendingUp,
-} from "lucide-react";
+import { Button, PageHeader, StatBand, type StatMetric } from "@edforge/ui";
+import { Plus, AlertTriangle } from "lucide-react";
 import { useAppStore } from "../../stores/app.store";
 import {
   useFeeStructures,
@@ -46,7 +40,6 @@ import type {
   AcademicYearOption,
 } from "../../components/configuration/FeeStructureForm";
 import {
-  FinancePageHeader,
   FinanceInfoBanner,
   FinanceFilterChips,
 } from "../../components/shared";
@@ -323,22 +316,57 @@ export default function FeeStructuresPage() {
     );
   }
 
+  const today = new Date().toLocaleDateString(
+    normalizePlatformLanguage(i18n.language) === "ne" ? "ne-NP" : "en-US",
+    { weekday: "long", month: "short", day: "numeric", year: "numeric" },
+  );
+
+  // ── StatBand metrics (calm) ──────────────────────────────────────────────
+  const metrics: StatMetric[] = [
+    {
+      label: t("feeStructure.stats.totalStructures"),
+      value: String(kpi.totalStructures),
+      iconSignature: "finance",
+      state: "normal",
+      primary: true,
+    },
+    {
+      label: t("feeStructure.stats.autoApply"),
+      value: String(kpi.autoApplyCount),
+      iconSignature: "overview",
+      state: "normal",
+    },
+    {
+      label: t("feeStructure.stats.feeTypes"),
+      value: String(kpi.feeTypes),
+      iconSignature: "finance_receipt",
+      state: "normal",
+    },
+    {
+      label: t("feeStructure.stats.maxFee"),
+      value: formatCompact(kpi.maxFee),
+      iconSignature: "fees",
+      state: "normal",
+    },
+  ];
+
   return (
     <div className="p-6 space-y-5">
-      {/* Header */}
-      <FinancePageHeader
-        title={t("feeStructure.title")}
-        subtitle={t("feeStructure.description")}
-        actions={
-          <button
-            type="button"
-            onClick={() => setShowForm(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            {t("feeStructure.addFee")}
-          </button>
-        }
+      {/* Screen-reader page heading (breadcrumb names the page visually) */}
+      <h1 className="sr-only">{t("feeStructure.title")}</h1>
+
+      {/* ---- Page header (pagebar) ---- */}
+      <PageHeader
+        mode="pagebar"
+        date={today}
+        actions={[
+          {
+            label: t("feeStructure.addFee"),
+            icon: <Plus className="h-3.5 w-3.5" />,
+            primary: true,
+            onClick: () => setShowForm(true),
+          },
+        ]}
       />
 
       {/* Info Banner */}
@@ -347,50 +375,8 @@ export default function FeeStructuresPage() {
         message={t("feeStructure.autoApplyBanner")}
       />
 
-      {/* KPI Grid */}
-      <WidgetErrorBoundaryV2>
-        <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
-          <StatCard
-            label={t("feeStructure.stats.totalStructures")}
-            value={String(kpi.totalStructures)}
-            icon={Layers}
-            accentColor="rgba(127, 119, 221, 0.12)"
-            iconColor="#7F77DD"
-            barColor="#7F77DD"
-            valueColor="#7F77DD"
-            loading={isLoading}
-          />
-          <StatCard
-            label={t("feeStructure.stats.autoApply")}
-            value={String(kpi.autoApplyCount)}
-            icon={TrendingUp}
-            accentColor="rgba(29, 158, 117, 0.12)"
-            iconColor="#1D9E75"
-            barColor="#1D9E75"
-            loading={isLoading}
-          />
-          <StatCard
-            label={t("feeStructure.stats.feeTypes")}
-            value={String(kpi.feeTypes)}
-            icon={Wallet}
-            signature="finance"
-            accentColor="rgba(55, 138, 221, 0.12)"
-            iconColor="#378ADD"
-            barColor="#378ADD"
-            loading={isLoading}
-          />
-          <StatCard
-            label={t("feeStructure.stats.maxFee")}
-            value={formatCompact(kpi.maxFee)}
-            icon={AlertTriangle}
-            signature="atrisk"
-            accentColor="rgba(239, 159, 39, 0.12)"
-            iconColor="#EF9F27"
-            barColor="#EF9F27"
-            loading={isLoading}
-          />
-        </div>
-      </WidgetErrorBoundaryV2>
+      {/* ---- StatBand — KPI summary ---- */}
+      <StatBand metrics={metrics} ariaLabel={t("feeStructure.kpi.region")} />
 
       {/* Filter Chips */}
       <FinanceFilterChips
