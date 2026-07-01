@@ -147,9 +147,11 @@ export {
   DataTableExport,
   TablePresetTabs,
   TableBulkBar,
+  DataTableMoreFilters,
   type TablePreset,
   type TablePresetTabsProps,
   type TableBulkBarProps,
+  type DataTableMoreFiltersProps,
   DEFAULT_DATA_TABLE_LABELS,
   resolveDataTableLabels,
   useDataTable,
@@ -212,6 +214,7 @@ export {
   type StatMetric,
   type StatBandState,
   type StatBandPillTone,
+  type IconName,
 } from './components/StatBand'
 export { Ring, type RingProps } from './components/Ring'
 export { GpaRing, type GpaRingProps, type GpaRingSize } from './components/GpaRing'

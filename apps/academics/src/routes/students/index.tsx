@@ -31,7 +31,7 @@ import {
 import type { BulkAction } from '@edforge/ui'
 import { StatBand, type StatMetric, PageHeader, EmptyState, ErrorState, Card, Button } from '@edforge/ui'
 import { useResourcePermissions } from '@edforge/abac'
-import { StudentTable, StudentQuickProfile, StudentsFilterRow, type StudentAttendanceSignal } from '../../components/students'
+import { StudentTable, StudentQuickProfile, useStudentsToolbar, type StudentAttendanceSignal } from '../../components/students'
 import { BulkArchiveStudentsModal } from '../../components/students/BulkArchiveStudentsModal'
 import { ConfirmationDialog } from '../../components/common'
 import {
@@ -287,6 +287,12 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
 
   const today = formatDate(new Date(), { weekday: 'long', month: 'short', day: 'numeric' })
 
+  // Unified table toolbar (controlled search + presets + Grade facet + More filters).
+  const studentsToolbar = useStudentsToolbar(schoolId, {
+    all: studentsTotalHint ?? overviewData.overview.totalEnrolled ?? undefined,
+    atRisk: overviewData.alerts.totalCount,
+  })
+
   // Page actions for the pagebar header (permission-gated).
   const headerActions = studentPerms.create
     ? [
@@ -330,6 +336,7 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
           label: t('studentsModule.stats.totalEnrolled'),
           value: enrolled != null ? formatNumber(enrolled) : '—',
           icon: <Users className="h-4 w-4" />,
+          iconSignature: 'students',
           state: 'normal',
           primary: true,
           delta: { dir: 'up', val: `+${formatNumber(recent)}` },
@@ -339,6 +346,7 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
           label: t('studentsModule.stats.totalEnrolled'),
           value: enrolled != null ? formatNumber(enrolled) : '—',
           icon: <Users className="h-4 w-4" />,
+          iconSignature: 'students',
           state: 'normal',
           primary: true,
           sub: enrolledSub,
@@ -350,6 +358,7 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
           label: t('studentsModule.stats.atRiskStudents'),
           value: formatNumber(atRiskTotal),
           icon: <AlertTriangle className="h-4 w-4" />,
+          iconSignature: 'atrisk',
           state: 'critical',
           pill: { tone: 'critical', text: formatCount('studentsModule.stats.criticalCount', critical) },
           sub: t('studentsModule.stats.riskBreakdown', { critical: formatNumber(critical), warning: formatNumber(warning) }),
@@ -358,6 +367,7 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
           label: t('studentsModule.stats.atRiskStudents'),
           value: formatNumber(atRiskTotal),
           icon: <AlertTriangle className="h-4 w-4" />,
+          iconSignature: 'atrisk',
           state: atRiskTotal > 0 ? 'warn' : 'good',
           sub: t('studentsModule.stats.belowThreshold'),
         }
@@ -368,6 +378,7 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
           label: t('studentsModule.stats.todayAttendance'),
           value: `${formatNumber(Number(attendanceRate.toFixed(1)))}%`,
           icon: <ClipboardCheck className="h-4 w-4" />,
+          iconSignature: 'metric_attendance',
           state: attendanceRate < 80 ? 'critical' : attendanceRate < 90 ? 'warn' : 'good',
           meter: { pct: attendanceRate, target: 90 },
           sub: attSummary
@@ -382,6 +393,7 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
           label: t('studentsModule.stats.todayAttendance'),
           value: '—',
           icon: <ClipboardCheck className="h-4 w-4" />,
+          iconSignature: 'metric_attendance',
           state: 'muted',
           sub: t('studentsModule.stats.today'),
         }
@@ -394,6 +406,7 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
       label: t('studentsModule.stats.gradeLevels'),
       value: formatNumber(overviewData.enrollment.data.length),
       icon: <GraduationCap className="h-4 w-4" />,
+      iconSignature: 'gradelevels',
       state: 'normal',
       sub: t('studentsModule.stats.coveredThisYear'),
     },
@@ -459,7 +472,7 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
                   bulkActions={bulkActions}
                   rowSelection={rowSelection}
                   onRowSelectionChange={setRowSelection}
-                  toolbarStart={<StudentsFilterRow schoolId={schoolId} />}
+                  {...studentsToolbar}
                   toolbarExtra={
                     <Button
                       variant="outline"

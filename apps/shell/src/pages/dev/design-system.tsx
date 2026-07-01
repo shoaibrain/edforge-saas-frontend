@@ -25,6 +25,7 @@ import {
   Stack,
   StatBand,
   Switch,
+  DataTableMoreFilters,
   TableBulkBar,
   TablePresetTabs,
   Tag,
@@ -36,19 +37,7 @@ import {
   type TabItem,
 } from '@edforge/ui'
 import { useState } from 'react'
-import {
-  AlertTriangle,
-  Archive,
-  Calendar,
-  ClipboardCheck,
-  Flag,
-  GraduationCap,
-  Play,
-  Target,
-  Upload,
-  UserPlus,
-  Users,
-} from 'lucide-react'
+import { Archive, Upload, UserPlus } from 'lucide-react'
 
 const surfaceTokens = [
   ['background.primary', 'var(--background-primary)'],
@@ -83,12 +72,12 @@ const pageTabs: TabItem[] = [
   { id: 'details', label: 'Details' },
 ]
 
-// Handoff surface ② — exercises every state + micro-viz variant of StatBand.
+// Handoff surface ② — exercises every state + micro-viz + animated-icon variant.
 const bandMetrics: StatMetric[] = [
   {
     label: 'Total Enrolled',
     value: '255',
-    icon: <Users className="h-4 w-4" />,
+    iconSignature: 'students',
     state: 'normal',
     primary: true,
     delta: { dir: 'up', val: '+6' },
@@ -98,7 +87,7 @@ const bandMetrics: StatMetric[] = [
   {
     label: 'At-risk Students',
     value: '20',
-    icon: <AlertTriangle className="h-4 w-4" />,
+    iconSignature: 'atrisk',
     state: 'critical',
     pill: { tone: 'critical', text: '20 critical' },
     sub: 'below 90% attendance',
@@ -106,7 +95,7 @@ const bandMetrics: StatMetric[] = [
   {
     label: "Today's Attendance",
     value: '0%',
-    icon: <ClipboardCheck className="h-4 w-4" />,
+    iconSignature: 'metric_attendance',
     state: 'warn',
     meter: { pct: 0, target: 90 },
     sub: 'Partial data · 0 marked',
@@ -114,7 +103,7 @@ const bandMetrics: StatMetric[] = [
   {
     label: 'Result Readiness',
     value: '50%',
-    icon: <Target className="h-4 w-4" />,
+    iconSignature: 'gpa',
     state: 'normal',
     donut: { pct: 50 },
     sub: '1 / 2 generated',
@@ -122,25 +111,25 @@ const bandMetrics: StatMetric[] = [
   {
     label: 'Live Now',
     value: '1',
-    icon: <Play className="h-4 w-4" />,
+    iconSignature: 'overview',
     state: 'live',
     sub: 'in session',
   },
   {
     label: 'Grade Levels',
     value: '13',
-    icon: <GraduationCap className="h-4 w-4" />,
+    iconSignature: 'gradelevels',
     state: 'muted',
     sub: 'covered this year',
   },
 ]
 
 const examBandMetrics: StatMetric[] = [
-  { label: 'Total Exams', value: '10', icon: <ClipboardCheck className="h-4 w-4" />, state: 'normal', primary: true, sub: '5 types · 4 terms' },
-  { label: 'Live Now', value: '1', icon: <Play className="h-4 w-4" />, state: 'live', sub: 'in session' },
-  { label: 'Upcoming', value: '1', icon: <Calendar className="h-4 w-4" />, state: 'info', sub: 'Next: Second Term Exam' },
-  { label: 'Awaiting Results', value: '1', icon: <Flag className="h-4 w-4" />, state: 'warn', pill: { tone: 'warn', text: 'Action needed' }, sub: 'result not generated' },
-  { label: 'Result Readiness', value: '50%', icon: <Target className="h-4 w-4" />, state: 'normal', donut: { pct: 50 }, sub: '1 / 2 generated' },
+  { label: 'Total Exams', value: '10', iconSignature: 'exams', state: 'normal', primary: true, sub: '5 types · 4 terms' },
+  { label: 'Live Now', value: '1', iconSignature: 'metric_attendance', state: 'live', sub: 'in session' },
+  { label: 'Upcoming', value: '1', iconSignature: 'attendance', state: 'info', sub: 'Next: Second Term Exam' },
+  { label: 'Awaiting Results', value: '1', iconSignature: 'atrisk', state: 'warn', pill: { tone: 'warn', text: 'Action needed' }, sub: 'result not generated' },
+  { label: 'Result Readiness', value: '50%', iconSignature: 'gpa', state: 'normal', donut: { pct: 50 }, sub: '1 / 2 generated' },
 ]
 
 const bandPresets = [
@@ -437,8 +426,21 @@ export default function DesignSystemDevPage() {
                     ]}
                   />
                 ) : (
-                  <div className="flex min-h-9 items-center gap-3">
+                  <div className="flex min-h-9 flex-wrap items-center gap-3">
                     <TablePresetTabs presets={bandPresets} active={bandPreset} onChange={setBandPreset} />
+                    <DataTableMoreFilters label="More filters" activeCount={0}>
+                      <Select
+                        aria-label="Status"
+                        size="sm"
+                        value={selectValue ?? ''}
+                        onChange={setSelectValue}
+                        options={[
+                          { value: '', label: 'All status' },
+                          { value: 'active', label: 'Active' },
+                          { value: 'inactive', label: 'Inactive' },
+                        ]}
+                      />
+                    </DataTableMoreFilters>
                     <Button variant="outline" size="sm" onClick={() => setShowBulk(true)}>
                       Simulate selection
                     </Button>

@@ -34,7 +34,7 @@ import {
   useUpdateCourse,
 } from '../../hooks/useCourses'
 import { CourseTable } from '../../components/curriculum/CourseTable'
-import { CourseFilters } from '../../components/curriculum/CourseFilters'
+import { useCourseToolbar } from '../../components/curriculum/CourseFilters'
 import { CourseDrawer, type DrawerMode } from '../../components/curriculum/CourseDrawer'
 import { GradeLevelsTab } from '../../components/curriculum/GradeLevelsTab'
 import { downloadCoursesCsv } from '../../components/curriculum/course-csv-export'
@@ -322,6 +322,7 @@ export function CurriculumModule() {
       label: t('curriculumModule.stats.totalCourses'),
       value: formatNumber(stats.total),
       icon: <BookOpen className="h-4 w-4" />,
+      iconSignature: 'curriculum',
       state: 'normal',
       primary: true,
       meter: { pct: stats.total > 0 ? Math.round((stats.active / stats.total) * 100) : 0, target: 100 },
@@ -331,6 +332,7 @@ export function CurriculumModule() {
       label: t('curriculumModule.stats.subjectAreas'),
       value: formatNumber(stats.subjects),
       icon: <Layers className="h-4 w-4" />,
+      iconSignature: 'sections',
       state: 'normal',
       sub: stats.allLoaded ? t('curriculumModule.stats.subjectHint') : t('curriculumModule.summary.basedOnLoaded'),
     },
@@ -338,6 +340,7 @@ export function CurriculumModule() {
       label: t('curriculumModule.stats.electives'),
       value: formatNumber(stats.elective),
       icon: <Sparkles className="h-4 w-4" />,
+      iconSignature: 'gpa',
       state: 'normal',
       sub: stats.electiveName ?? undefined,
     },
@@ -345,10 +348,17 @@ export function CurriculumModule() {
       label: t('curriculumModule.stats.specializedTypes'),
       value: formatNumber(stats.specializedTypes),
       icon: <Award className="h-4 w-4" />,
+      iconSignature: 'academics',
       state: stats.specializedTypes === 0 ? 'muted' : 'normal',
       sub: t('curriculumModule.stats.specializedTag'),
     },
   ]
+
+  // Unified table toolbar (search + Active presets + Subject facet + More filters + Export).
+  const courseToolbar = useCourseToolbar(schoolId, {
+    counts: { all: stats.total, active: stats.active, inactive: Math.max(0, stats.total - stats.active) },
+    onExport: handleExportCsv,
+  })
 
   return (
     <div className="min-h-full px-5 py-4">
@@ -441,27 +451,16 @@ export function CurriculumModule() {
           transition={{ duration: 0.25, ease: 'easeOut' }}
         >
           {activeTab === 'courses' && (
-            <div>
-              {/* Filter strip */}
-              <CourseFilters
-                totalCount={totalCount}
-                schoolId={schoolId}
-                onExport={handleExportCsv}
-              />
-
-              {/* Course Table */}
-              <div className="mt-3">
-                <CourseTable
-                  courses={visibleCourses}
-                  isLoading={isLoading}
-                  onAddCourse={coursePerms.create ? openCreateDrawer : undefined}
-                  onViewCourse={openViewDrawer}
-                  onEditCourse={coursePerms.edit ? openEditDrawer : undefined}
-                  onToggleActive={coursePerms.edit ? handleToggleActive : undefined}
-                  onNavigateToCourse={navigateToCourse}
-                />
-              </div>
-            </div>
+            <CourseTable
+              courses={visibleCourses}
+              isLoading={isLoading}
+              onAddCourse={coursePerms.create ? openCreateDrawer : undefined}
+              onViewCourse={openViewDrawer}
+              onEditCourse={coursePerms.edit ? openEditDrawer : undefined}
+              onToggleActive={coursePerms.edit ? handleToggleActive : undefined}
+              onNavigateToCourse={navigateToCourse}
+              {...courseToolbar}
+            />
           )}
 
           {activeTab === 'grade-levels' && (

@@ -21,6 +21,9 @@ import { cn, focusRing } from '../utils'
 import { StatusPill, type StatusPillVariant } from './StatusPill'
 import { AnimatedProgressBar } from './AnimatedProgressBar'
 import { Ring } from './Ring'
+import { AnimatedIcon, type IconName } from './motion'
+
+export type { IconName }
 
 export type StatBandState =
   | 'normal'
@@ -40,6 +43,12 @@ interface StatMetricBase {
   value: string
   /** Optional leading icon (a sized lucide element, e.g. <Users className="w-4 h-4" />). */
   icon?: ReactNode
+  /**
+   * Curated animated-icon signature (preferred). When set, the chip renders the
+   * platform AnimatedIcon (hover-replays via the segment's `.ef-motion`),
+   * overriding `icon`.
+   */
+  iconSignature?: IconName
   /** Drives the single accent color. Default "normal" (neutral). */
   state?: StatBandState
   /** Widen + enlarge this segment as the band's lead metric. */
@@ -226,7 +235,8 @@ function Segment({ metric }: { metric: StatMetric }) {
   const clickable = typeof metric.onClick === 'function'
 
   const outerClass = cn(
-    'group relative flex min-w-0 flex-col px-5 py-4 text-start',
+    // `ef-motion` lets the AnimatedIcon signature hover-replay (CSS-driven, reduced-motion safe).
+    'ef-motion group relative flex min-w-0 flex-col px-5 py-4 text-start',
     metric.primary ? 'flex-[1.28]' : 'flex-1',
     'border-s border-[rgb(var(--border-primary)/0.15)] first:border-s-0',
     'transition-colors hover:bg-[rgb(var(--background-tertiary)/0.4)]',
@@ -243,9 +253,13 @@ function Segment({ metric }: { metric: StatMetric }) {
 
       {/* head: icon chip + label */}
       <div className="flex items-center gap-2.5">
-        {metric.icon ? (
+        {metric.icon || metric.iconSignature ? (
           <span className={cn('relative grid h-7 w-7 shrink-0 place-items-center rounded-lg', CHIP[state])}>
-            {metric.icon}
+            {metric.iconSignature ? (
+              <AnimatedIcon name={metric.iconSignature} size={16} applyAccent={false} />
+            ) : (
+              metric.icon
+            )}
             {state === 'live' ? (
               <span
                 className="absolute inset-0 rounded-lg ring-2 ring-[rgb(var(--border-focus))] motion-safe:animate-ping motion-reduce:hidden"

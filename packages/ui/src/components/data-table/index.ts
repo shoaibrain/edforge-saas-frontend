@@ -14,6 +14,7 @@ export { DataTableDensityToggle } from './DataTableDensityToggle'
 export { DataTableExport } from './DataTableExport'
 export { TablePresetTabs, type TablePreset, type TablePresetTabsProps } from './TablePresetTabs'
 export { TableBulkBar, type TableBulkBarProps } from './TableBulkBar'
+export { DataTableMoreFilters, type DataTableMoreFiltersProps } from './DataTableMoreFilters'
 export {
   DEFAULT_DATA_TABLE_LABELS,
   resolveDataTableLabels,

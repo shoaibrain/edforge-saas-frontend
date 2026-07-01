@@ -492,7 +492,8 @@
     },
     "xlsxUnavailable": "XLSX export ships in a follow-up",
     "filterAriaLabel": "{{title}} filter",
-    "clearFilter": "Clear filter"
+    "clearFilter": "Clear filter",
+    "moreFilters": "More filters"
   },
   "attendance": {
     "title": "Attendance",

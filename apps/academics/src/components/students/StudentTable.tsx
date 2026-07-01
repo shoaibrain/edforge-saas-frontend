@@ -21,6 +21,7 @@ import {
   type BulkAction,
   type ColumnDef,
   type DataTableColumnMeta,
+  type TablePreset,
 } from '@edforge/ui'
 import { getStudentAvatar } from '../../lib/avatar'
 import { gradeSort } from '@edforge/types'
@@ -58,6 +59,15 @@ interface StudentTableProps {
   /** Toolbar content: filter presets/search/selects (left) and Export (right). */
   toolbarStart?: ReactNode
   toolbarExtra?: ReactNode
+  /** Unified toolbar wiring (from useStudentsToolbar). */
+  searchPlaceholder?: string
+  searchValue?: string
+  onSearchChange?: (value: string) => void
+  presets?: TablePreset[]
+  activePreset?: string
+  onPresetChange?: (value: string) => void
+  primaryFilter?: ReactNode
+  moreFilters?: ReactNode
   hasMore?: boolean
   isFetchingMore?: boolean
   onLoadMore?: () => void
@@ -156,6 +166,14 @@ export function StudentTable({
   canViewLocation = true,
   toolbarStart,
   toolbarExtra,
+  searchPlaceholder,
+  searchValue,
+  onSearchChange,
+  presets,
+  activePreset,
+  onPresetChange,
+  primaryFilter,
+  moreFilters,
   hasMore,
   isFetchingMore,
   onLoadMore,
@@ -309,6 +327,14 @@ export function StudentTable({
       initialColumnVisibility={initialColumnVisibility}
       toolbarStart={toolbarStart}
       toolbarExtra={toolbarExtra}
+      searchPlaceholder={searchPlaceholder}
+      searchValue={searchValue}
+      onSearchChange={onSearchChange}
+      presets={presets}
+      activePreset={activePreset}
+      onPresetChange={onPresetChange}
+      primaryFilter={primaryFilter}
+      moreFilters={moreFilters}
       pagination={{ pageSize: 50 }}
       pageSizes={[25, 50, 100]}
       defaultSort={[{ id: 'fullName', desc: false }]}

@@ -117,6 +117,17 @@ describe('StatBand', () => {
     expect(segs[1].className).not.toContain('border-l-')
   })
 
+  it('renders an animated-icon signature and marks the segment ef-motion', () => {
+    const { container } = render(
+      <StatBand metrics={[{ label: 'Enrolled', value: '255', iconSignature: 'students' }]} />,
+    )
+    const seg = screen.getByRole('status', { name: 'Enrolled: 255' })
+    // `.ef-motion` lets the AnimatedIcon signature hover-replay (CSS-driven).
+    expect(seg.className).toContain('ef-motion')
+    // AnimatedIcon renders an <svg> glyph inside the chip.
+    expect(container.querySelector('svg')).toBeTruthy()
+  })
+
   it('renders a clickable segment as a toggle button and fires onClick', () => {
     const onClick = vi.fn()
     render(

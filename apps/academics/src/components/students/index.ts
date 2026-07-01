@@ -4,7 +4,7 @@
 
 export { StudentTable, type StudentAttendanceSignal } from './StudentTable'
 export { StudentStatusBadge } from './StudentStatusBadge'
-export { StudentsFilterRow } from './StudentsFilterRow'
+export { useStudentsToolbar, type StudentsToolbar, type StudentPresetCounts } from './StudentsFilterRow'
 export { StudentDrawer } from './StudentDrawer'
 export { StudentQuickProfile } from './StudentQuickProfile'
 
