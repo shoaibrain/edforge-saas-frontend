@@ -26,6 +26,8 @@ const DOT_COLORS: Record<ActivityItem['type'], string> = {
 interface RecentActivityFeedProps {
   items: ActivityItem[]
   isLoading: boolean
+  /** Render only the feed list (no card chrome / title / link) for WidgetCard framing. */
+  bare?: boolean
 }
 
 function FeedSkeleton() {
@@ -51,8 +53,47 @@ function FeedSkeleton() {
   )
 }
 
-export function RecentActivityFeed({ items, isLoading }: RecentActivityFeedProps) {
+export function RecentActivityFeed({ items, isLoading, bare }: RecentActivityFeedProps) {
   const { t } = useTranslation('dashboard')
+
+  const feedList = isLoading ? (
+    <FeedSkeleton />
+  ) : items.length === 0 ? (
+    <p className="text-sm py-6 text-center text-[rgb(var(--text-tertiary))]">
+      {t('homeV2.activity.noActivity')}
+    </p>
+  ) : (
+    <div className="flex flex-col">
+      {items.map((item, i) => (
+        <div
+          key={item.id}
+          className="flex items-start gap-2.5 py-2"
+          style={{
+            borderBottom:
+              i < items.length - 1
+                ? '1px solid rgb(var(--border-primary) / 0.35)'
+                : 'none',
+          }}
+        >
+          <div
+            // allow-presentation-style: per-activity-type dot color
+            className="w-2 h-2 rounded-full flex-shrink-0 mt-1"
+            style={{ background: DOT_COLORS[item.type] }}
+          />
+          <div className="flex-1 min-w-0">
+            <p className="text-xs leading-snug text-[rgb(var(--text-tertiary))]">
+              {item.text}
+            </p>
+            <p className="text-xs mt-0.5 text-[rgb(var(--text-disabled))]">
+              {item.timestamp}
+            </p>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+
+  if (bare) return feedList
 
   return (
     <div
@@ -74,43 +115,7 @@ export function RecentActivityFeed({ items, isLoading }: RecentActivityFeedProps
         </Link>
       </div>
 
-      {/* Feed list */}
-      {isLoading ? (
-        <FeedSkeleton />
-      ) : items.length === 0 ? (
-        <p className="text-sm py-6 text-center text-[rgb(var(--text-tertiary))]">
-          {t('homeV2.activity.noActivity')}
-        </p>
-      ) : (
-        <div className="flex flex-col">
-          {items.map((item, i) => (
-            <div
-              key={item.id}
-              className="flex items-start gap-2.5 py-2"
-              style={{
-                borderBottom:
-                  i < items.length - 1
-                    ? '1px solid rgb(var(--border-primary) / 0.35)'
-                    : 'none',
-              }}
-            >
-              <div
-                // allow-presentation-style: per-activity-type dot color
-                className="w-2 h-2 rounded-full flex-shrink-0 mt-1"
-                style={{ background: DOT_COLORS[item.type] }}
-              />
-              <div className="flex-1 min-w-0">
-                <p className="text-xs leading-snug text-[rgb(var(--text-tertiary))]">
-                  {item.text}
-                </p>
-                <p className="text-xs mt-0.5 text-[rgb(var(--text-disabled))]">
-                  {item.timestamp}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      {feedList}
     </div>
   )
 }
