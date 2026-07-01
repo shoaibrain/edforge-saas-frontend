@@ -40,7 +40,8 @@
       "collectionRate": "संकलन दर {{rate}}% छ",
       "agingBucket": "{{bucket}} बकेटमा {{count}} बीजकहरू",
       "drafts": "{{count}} थप ड्राफ्ट जारी गर्न आवश्यक छ",
-      "reviewBilling": "बिलिङ समीक्षा"
+      "reviewBilling": "बिलिङ समीक्षा",
+      "region": "अलर्टहरू"
     },
     "kpi": {
       "totalInvoiced": "कुल बीजक",
@@ -50,7 +51,8 @@
       "invoiceCount": "{{count}} बीजकहरू",
       "paymentCount": "{{count}} भुक्तानीहरू",
       "awaiting": "{{count}} प्रतीक्षामा",
-      "thisMonth": "यो महिना"
+      "thisMonth": "यो महिना",
+      "region": "मुख्य मेट्रिक्स"
     },
     "empty": {
       "noPaymentsTitle": "अहिलेसम्म भुक्तानी छैन",

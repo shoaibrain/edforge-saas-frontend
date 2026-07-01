@@ -68,6 +68,8 @@ interface BillingHealthCardProps {
   totalPaymentCount: number;
   agingReport: AgingBucket[];
   isLoading: boolean;
+  /** Render only the donut + aging + gateways (no card chrome / title) for WidgetCard framing. */
+  bare?: boolean;
 }
 
 // ─── Skeletons ───────────────────────────────────────────────────────────────
@@ -186,6 +188,7 @@ export function BillingHealthCard({
   totalPaymentCount,
   agingReport,
   isLoading,
+  bare,
 }: BillingHealthCardProps) {
   const settings = useFinanceSettings();
   const { t, i18n } = useTranslation("payments");
@@ -241,29 +244,9 @@ export function BillingHealthCard({
   // Spectrum bar segment widths — proportional to count, minimum 6% for visibility
   const totalCount = buckets.reduce((s, b) => s + b.count, 0);
 
-  return (
-    <div
-      // allow-presentation-style: card padding (18px) is off the 4px scale
-      className="rounded-xl border flex flex-col bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]"
-      style={{ padding: 18 }}
-    >
-      {/* ── Header ── */}
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-[rgb(var(--text-secondary))]">
-          {t("overview.billingHealth.title")}
-        </h3>
-        {!isLoading && !hasAnyOverdue && totalInvoiceCount > 0 && (
-          <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-[rgb(var(--state-success-bg))] text-[rgb(var(--accent-enrollment-text))]">
-            <CheckCircle2 className="w-3 h-3" />
-            {t("overview.billingHealth.allAccountsCurrent")}
-          </span>
-        )}
-      </div>
-
-      {/* ── Invoice Status: Donut + Legend ── */}
-      {isLoading ? (
-        <BillingHealthSkeleton />
-      ) : totalInvoiceCount === 0 ? (
+  const content = isLoading ? (
+    <BillingHealthSkeleton />
+  ) : totalInvoiceCount === 0 ? (
         <div className="flex flex-col items-center py-6">
           <CheckCircle2 className="w-8 h-8 mb-2 opacity-40 text-[rgb(var(--text-tertiary))]" />
           <p className="text-xs font-medium text-[rgb(var(--text-tertiary))]">
@@ -527,7 +510,29 @@ export function BillingHealthCard({
             )}
           </div>
         </>
-      )}
+  );
+
+  if (bare) return content;
+
+  return (
+    <div
+      // allow-presentation-style: card padding (18px) is off the 4px scale
+      className="rounded-xl border flex flex-col bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]"
+      style={{ padding: 18 }}
+    >
+      {/* ── Header ── */}
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-sm font-medium text-[rgb(var(--text-secondary))]">
+          {t("overview.billingHealth.title")}
+        </h3>
+        {!isLoading && !hasAnyOverdue && totalInvoiceCount > 0 && (
+          <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-[rgb(var(--state-success-bg))] text-[rgb(var(--accent-enrollment-text))]">
+            <CheckCircle2 className="w-3 h-3" />
+            {t("overview.billingHealth.allAccountsCurrent")}
+          </span>
+        )}
+      </div>
+      {content}
     </div>
   );
 }
