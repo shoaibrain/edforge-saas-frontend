@@ -41,13 +41,13 @@ export function DataTableMoreFilters({
           focusRingInset,
           active
             ? 'border-[var(--mint-border)] bg-[var(--mint-soft)] text-[rgb(var(--text-primary))]'
-            : 'border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-secondary))]',
+            : 'border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-secondary))]',
         )}
       >
         <ListFilter className="h-3.5 w-3.5" />
         {label}
         {active ? (
-          <span className="ms-1 rounded-full bg-[var(--mint)] px-1.5 py-0.5 text-xs font-semibold tabular-nums text-[rgb(var(--text-on-accent))]">
+          <span className="ml-1 rounded-full bg-[var(--mint)] px-1.5 py-0.5 text-xs font-semibold tabular-nums text-[rgb(var(--text-on-accent))]">
             {activeCount}
           </span>
         ) : (
@@ -64,7 +64,7 @@ export function DataTableMoreFilters({
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <PopoverPanel className="absolute z-50 mt-1 w-64 origin-top-start rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))] shadow-popover focus:outline-none">
+        <PopoverPanel className="absolute z-50 mt-1 w-64 origin-top-left rounded-xl border border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-primary))] shadow-popover focus:outline-none">
           <div className="flex flex-col gap-3 p-3">{children}</div>
           {active && onClear ? (
             <div className="border-t border-[rgb(var(--border-secondary))] p-1">

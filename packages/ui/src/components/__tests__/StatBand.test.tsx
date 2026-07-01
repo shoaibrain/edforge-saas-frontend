@@ -103,7 +103,9 @@ describe('StatBand', () => {
     expect(screen.getByRole('status', { name: 'Grade Levels: 13' })).toBeTruthy()
   })
 
-  it('uses logical border properties so the band mirrors under dir="rtl"', () => {
+  it('draws a divider between segments (first segment has none)', () => {
+    // App is LTR-only (en + ne); physical `border-l` renders reliably in this
+    // Tailwind build where logical `border-s` did not.
     render(
       <StatBand
         metrics={[
@@ -113,8 +115,8 @@ describe('StatBand', () => {
       />,
     )
     const segs = screen.getAllByRole('status')
-    expect(segs[1].className).toContain('border-s')
-    expect(segs[1].className).not.toContain('border-l-')
+    expect(segs[1].className).toContain('border-l')
+    expect(segs[0].className).toContain('first:border-l-0')
   })
 
   it('renders an animated-icon signature and marks the segment ef-motion', () => {

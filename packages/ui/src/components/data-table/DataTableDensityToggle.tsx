@@ -25,7 +25,7 @@ export function DataTableDensityToggle({
     <div
       role="group"
       aria-label={resolvedLabels.rowDensity}
-      className="inline-flex items-center rounded-lg border border-[rgb(var(--border-primary))] overflow-hidden"
+      className="inline-flex items-center rounded-lg border border-[rgb(var(--border-primary)/0.35)] overflow-hidden"
     >
       <DensityButton
         active={density === 'comfortable'}

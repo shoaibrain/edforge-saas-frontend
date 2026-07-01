@@ -82,11 +82,16 @@ export function useStudentsToolbar(
     pending: counts?.pending,
   }
 
+  // Soften the shared Select/Export borders to match the rest of the toolbar
+  // chrome (subtle), without changing their global defaults (forms unaffected).
+  const subtleBorder = 'border-[rgb(var(--border-primary)/0.35)]'
+
   const primaryFilter = (
     <Select
       aria-label={t('studentsModule.filters.gradeAria')}
       size="sm"
       className="w-36"
+      buttonClassName={subtleBorder}
       value={filters.gradeLevel ?? ''}
       onChange={(v) => setGradeLevel(v || null)}
       disabled={gradeOptionsLoading}
@@ -110,6 +115,7 @@ export function useStudentsToolbar(
       <Select
         aria-label={t('studentsModule.filters.statusAria')}
         size="sm"
+        buttonClassName={subtleBorder}
         value={filters.status ?? ''}
         onChange={(v) => setStatus((v || null) as StudentStatus | null)}
         options={[

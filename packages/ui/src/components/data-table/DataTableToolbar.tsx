@@ -114,15 +114,16 @@ export function DataTableToolbar<TData>({
         {/* Unified search — one clean field, consistent width across pages */}
         {searchPlaceholder && (
           <div className="relative w-72 max-w-full flex-none">
-            <Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[rgb(var(--text-tertiary))]" />
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[rgb(var(--text-tertiary))]" />
             <input
               type="text"
               placeholder={searchPlaceholder}
               value={searchVal}
               onChange={(e) => setSearch(e.target.value)}
               className={cn(
-                'h-9 w-full rounded-lg text-sm ps-9 pe-9',
-                'border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))]',
+                // physical padding (pl/pr) — logical ps/pe does not render in this build
+                'h-9 w-full rounded-lg pl-9 pr-9 text-sm',
+                'border border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-primary))]',
                 'text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))]',
                 'focus:border-[var(--mint-border)] focus:outline-none focus:ring-2 focus:ring-[var(--mint-soft)]',
               )}
@@ -132,14 +133,14 @@ export function DataTableToolbar<TData>({
                 type="button"
                 onClick={() => setSearch('')}
                 aria-label={resolvedLabels.clearSearch}
-                className="absolute end-2 top-1/2 -translate-y-1/2 rounded p-1 text-[rgb(var(--text-tertiary))] hover:bg-[rgb(var(--background-secondary))] hover:text-[rgb(var(--text-primary))]"
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-[rgb(var(--text-tertiary))] hover:bg-[rgb(var(--background-secondary))] hover:text-[rgb(var(--text-primary))]"
               >
                 <X className="h-3.5 w-3.5" />
               </button>
             ) : (
               <kbd
                 aria-hidden="true"
-                className="absolute end-2 top-1/2 grid h-5 min-w-5 -translate-y-1/2 place-items-center rounded border border-[rgb(var(--border-tertiary))] bg-[rgb(var(--background-tertiary))] px-1.5 font-mono text-2xs font-semibold text-[rgb(var(--text-tertiary))]"
+                className="absolute right-2 top-1/2 grid h-5 min-w-5 -translate-y-1/2 place-items-center rounded border border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-tertiary))] px-1.5 font-mono text-2xs font-semibold text-[rgb(var(--text-tertiary))]"
               >
                 /
               </kbd>
@@ -192,7 +193,7 @@ export function DataTableToolbar<TData>({
 
       {/* Trailing cluster — Density / View / Export / consumer extras. */}
       {showRightCluster && (
-        <div className="ms-auto flex flex-shrink-0 items-center gap-2">
+        <div className="ml-auto flex flex-shrink-0 items-center gap-2">
           {showDensity && (
             <DataTableDensityToggle density={density} onChange={onDensityChange} labels={resolvedLabels} />
           )}

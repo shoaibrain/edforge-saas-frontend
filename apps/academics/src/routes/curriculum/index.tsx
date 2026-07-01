@@ -10,20 +10,23 @@
  */
 
 import { useState, useMemo, useCallback } from 'react'
-import { useNavigate } from '@tanstack/react-router'
+import { useNavigate, useSearch } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { useResourcePermissions } from '@edforge/abac'
 import { PageHeader, StatBand, type StatMetric } from '@edforge/ui'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Award,
+  BarChart3,
   BookOpen,
+  GraduationCap,
   Layers,
   Plus,
   ShieldCheck,
   Sparkles,
 } from 'lucide-react'
 import { useActiveSchoolId } from '../../stores/app.store'
+import { useSchoolEnabledGradeOptions } from '../../hooks/useGradeOptions'
 import { useCurrentAcademicYear } from '../../hooks/useSchool'
 import { useAcademicsOverview } from '../../hooks/useAcademicsOverview'
 import { useCourseFilters } from '../../stores/courses.store'
@@ -148,9 +151,20 @@ function StandardsContent() {
 
 export function CurriculumModule() {
   const { t, formatNumber, formatCount, formatDate } = useAcademicsI18n()
-  const [activeTab, setActiveTab] = useState<CurriculumTab>('courses')
   const navigate = useNavigate()
   const schoolId = useActiveSchoolId()
+
+  // Active tab is sourced from the URL (?tab=…) so it survives reload / deep
+  // links / back-forward. `validateSearch` on the route (router.tsx) coerces
+  // unknown values, so a bare read here is safe.
+  const search = useSearch({ strict: false }) as { tab?: CurriculumTab }
+  const activeTab: CurriculumTab = search?.tab ?? 'courses'
+  const setActiveTab = useCallback(
+    (tab: CurriculumTab) => {
+      navigate({ search: { tab } as never, replace: true })
+    },
+    [navigate]
+  )
 
   // Current academic year + per-grade enrollment counts (reuses unified dashboard
   // query — cached & deduped with the Overview / Students pages).
@@ -158,6 +172,10 @@ export function CurriculumModule() {
     schoolId ?? ''
   )
   const overview = useAcademicsOverview(schoolId, currentYear?.yearId)
+
+  // School-enabled grade levels — powers the Grade Levels tab's KPI band so the
+  // top-level stats stay in sync with the tab's table.
+  const { options: gradeOptions } = useSchoolEnabledGradeOptions(schoolId)
 
   // ABAC: check course/curriculum permissions
   const coursePerms = useResourcePermissions('courses')
@@ -354,6 +372,69 @@ export function CurriculumModule() {
     },
   ]
 
+  // Grade-level KPIs — computed on the page so the top band reflects the active
+  // tab (the Grade Levels tab's table no longer renders its own KPI cards).
+  // `courseCount` per grade = number of courses that include that grade; the sum
+  // is the total course→grade assignment count.
+  const gradeLevelStats = useMemo(() => {
+    const totalGrades = gradeOptions.length
+    const counts = new Map<string, number>()
+    for (const opt of gradeOptions) counts.set(opt.value, 0)
+    for (const c of courses) {
+      for (const g of c.gradeLevels ?? []) {
+        if (counts.has(g)) counts.set(g, (counts.get(g) ?? 0) + 1)
+      }
+    }
+    let totalAssignments = 0
+    let withCourses = 0
+    for (const n of counts.values()) {
+      totalAssignments += n
+      if (n > 0) withCourses += 1
+    }
+    const avgPerGrade = totalGrades > 0 ? (totalAssignments / totalGrades).toFixed(1) : '0'
+    return { totalGrades, totalAssignments, avgPerGrade, withCourses }
+  }, [gradeOptions, courses])
+
+  const gradeLevelMetrics: StatMetric[] = [
+    {
+      label: t('tables.gradeLevels.stats.totalGradeLevels'),
+      value: formatNumber(gradeLevelStats.totalGrades),
+      icon: <Layers className="h-4 w-4" />,
+      iconSignature: 'gradelevels',
+      state: 'normal',
+      primary: true,
+    },
+    {
+      label: t('tables.gradeLevels.stats.courseAssignments'),
+      value: formatNumber(gradeLevelStats.totalAssignments),
+      icon: <BookOpen className="h-4 w-4" />,
+      iconSignature: 'sections',
+      state: 'normal',
+    },
+    {
+      label: t('tables.gradeLevels.stats.avgCoursesPerGrade'),
+      value: gradeLevelStats.avgPerGrade,
+      icon: <BarChart3 className="h-4 w-4" />,
+      iconSignature: 'overview',
+      state: 'normal',
+    },
+    {
+      label: t('tables.gradeLevels.stats.gradesWithCourses'),
+      value: formatNumber(gradeLevelStats.withCourses),
+      icon: <GraduationCap className="h-4 w-4" />,
+      iconSignature: 'students',
+      state: gradeLevelStats.withCourses === 0 ? 'muted' : 'normal',
+    },
+  ]
+
+  // The band summarizes whichever tab is active. Standards has no data yet, so it
+  // reuses the catalog band as a neutral overview.
+  const bandMetrics = activeTab === 'grade-levels' ? gradeLevelMetrics : curriculumMetrics
+  const bandAriaLabel =
+    activeTab === 'grade-levels'
+      ? t('curriculumModule.tabs.gradeLevels')
+      : t('curriculumModule.stats.totalCourses')
+
   // Unified table toolbar (search + Active presets + Subject facet + More filters + Export).
   const courseToolbar = useCourseToolbar(schoolId, {
     counts: { all: stats.total, active: stats.active, inactive: Math.max(0, stats.total - stats.active) },
@@ -382,9 +463,9 @@ export function CurriculumModule() {
         }
       />
 
-      {/* ---- Unified KPI stat band ---- */}
+      {/* ---- Unified KPI stat band (dynamic per active tab) ---- */}
       <div className="mb-3.5">
-        <StatBand metrics={curriculumMetrics} ariaLabel={t('curriculumModule.stats.totalCourses')} />
+        <StatBand metrics={bandMetrics} ariaLabel={bandAriaLabel} />
       </div>
 
       {/* ---- Tab Bar ---- */}

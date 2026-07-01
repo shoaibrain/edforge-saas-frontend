@@ -3,18 +3,17 @@
  *
  * Enterprise-grade grade level management view with:
  * - DataTable listing all grade levels (PK–12) with course data
- * - Summary stats header (total grade levels, course assignments, avg per grade)
+ * - Unified toolbar: search (grade name or code) + docked presets
+ *   (All / With courses / Empty), filtered client-side
  * - Row click opens GradeLevelDrawer for detailed view
  * - Consistent with Courses tab design pattern
+ *
+ * Summary KPIs live in the page-level StatBand (see routes/curriculum), which
+ * swaps its metrics to these grade-level stats when this tab is active.
  */
 
 import { useMemo, useState, useCallback } from 'react'
-import {
-  BookOpen,
-  Layers,
-  BarChart3,
-  GraduationCap,
-} from 'lucide-react'
+import { Layers } from 'lucide-react'
 import { TanstackDataTable, type ColumnDef } from '@edforge/ui'
 import type { CourseResponseDto } from '@aibrains/shared-types'
 import { GradeLevelDrawer, type GradeLevelData } from './GradeLevelDrawer'
@@ -44,38 +43,6 @@ interface GradeLevelsTabProps {
   enrollmentLoading?: boolean
   /** False when the active school has no current academic year yet. */
   hasCurrentAY?: boolean
-}
-
-// ============================================================================
-// STAT CARD
-// ============================================================================
-
-function StatCard({
-  icon: Icon,
-  label,
-  value,
-  accent,
-  bg,
-}: {
-  icon: typeof BookOpen
-  label: string
-  value: string | number
-  accent: string
-  bg: string
-}) {
-  return (
-    <div className="bg-surface-primary rounded-xl border border-border-primary p-4">
-      <div className="flex items-center gap-3">
-        <div className={`p-2 rounded-lg ${bg}`}>
-          <Icon className={`w-4 h-4 ${accent}`} />
-        </div>
-        <div>
-          <p className="text-sm text-text-secondary">{label}</p>
-          <p className="text-xl font-semibold text-text-primary">{value}</p>
-        </div>
-      </div>
-    </div>
-  )
 }
 
 // ============================================================================
@@ -184,15 +151,26 @@ export function GradeLevelsTab({
   const showStudentCounts = hasCurrentAY && enrollmentByGradeLevel != null
   const studentsPending = hasCurrentAY && enrollmentLoading && enrollmentByGradeLevel == null
 
-  // Summary stats
-  const stats = useMemo(() => {
-    const totalGrades = filteredGradeOptions.length
-    const totalAssignments = gradeData.reduce((sum, g) => sum + g.courseCount, 0)
-    const avgPerGrade =
-      totalGrades > 0 ? (totalAssignments / totalGrades).toFixed(1) : '0'
+  // Unified-toolbar client state: a controlled search (grade name or code) and
+  // docked presets (All / With courses / Empty). Both filter `gradeData`
+  // client-side — the top-level KPI band now owns the summary stats.
+  const [gradeSearch, setGradeSearch] = useState('')
+  const [gradePreset, setGradePreset] = useState<'all' | 'with' | 'empty'>('all')
+
+  const presetCounts = useMemo(() => {
     const withCourses = gradeData.filter((g) => g.courseCount > 0).length
-    return { totalGrades, totalAssignments, avgPerGrade, withCourses }
-  }, [gradeData, filteredGradeOptions])
+    return { all: gradeData.length, withCourses, empty: gradeData.length - withCourses }
+  }, [gradeData])
+
+  const filteredGradeData = useMemo(() => {
+    const q = gradeSearch.trim().toLowerCase()
+    return gradeData.filter((g) => {
+      if (gradePreset === 'with' && g.courseCount === 0) return false
+      if (gradePreset === 'empty' && g.courseCount > 0) return false
+      if (!q) return true
+      return g.label.toLowerCase().includes(q) || g.value.toLowerCase().includes(q)
+    })
+  }, [gradeData, gradePreset, gradeSearch])
 
   // Open grade detail drawer
   const handleRowClick = useCallback((grade: GradeLevelData) => {
@@ -290,47 +268,26 @@ export function GradeLevelsTab({
 
   return (
     <div className="space-y-6">
-      {/* Summary Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <StatCard
-          icon={Layers}
-          label={t('tables.gradeLevels.stats.totalGradeLevels')}
-          value={stats.totalGrades}
-          accent="text-[rgb(var(--state-info-fg))]"
-          bg="bg-[rgb(var(--state-info-fg))]/10"
-        />
-        <StatCard
-          icon={BookOpen}
-          label={t('tables.gradeLevels.stats.courseAssignments')}
-          value={stats.totalAssignments}
-          accent="text-[rgb(var(--state-danger-fg))] "
-          bg="bg-[rgb(var(--state-danger-fg))]/10"
-        />
-        <StatCard
-          icon={BarChart3}
-          label={t('tables.gradeLevels.stats.avgCoursesPerGrade')}
-          value={stats.avgPerGrade}
-          accent="text-[rgb(var(--action-secondary-fg))]"
-          bg="bg-[rgb(var(--state-info-bg)/0.18)]"
-        />
-        <StatCard
-          icon={GraduationCap}
-          label={t('tables.gradeLevels.stats.gradesWithCourses')}
-          value={stats.withCourses}
-          accent="text-[rgb(var(--state-warning-fg))]"
-          bg="bg-[rgb(var(--state-warning-fg))]/10"
-        />
-      </div>
-
-      {/* Grade Levels DataTable */}
+      {/* Grade Levels DataTable — unified toolbar (search + docked presets).
+          The summary KPIs live in the page-level StatBand now. */}
       <TanstackDataTable
         columns={columns}
-        data={gradeData}
+        data={filteredGradeData}
         getRowId={(grade) => grade.value}
         isLoading={isLoading}
         tableId="academics.grade-levels"
         enableSorting={true}
         pagination={{ pageSize: 20 }}
+        searchPlaceholder={t('tables.gradeLevels.searchPlaceholder')}
+        searchValue={gradeSearch}
+        onSearchChange={setGradeSearch}
+        presets={[
+          { value: 'all', label: t('tables.gradeLevels.presets.all'), count: presetCounts.all },
+          { value: 'with', label: t('tables.gradeLevels.presets.withCourses'), count: presetCounts.withCourses },
+          { value: 'empty', label: t('tables.gradeLevels.presets.empty'), count: presetCounts.empty },
+        ]}
+        activePreset={gradePreset}
+        onPresetChange={(v) => setGradePreset(v as 'all' | 'with' | 'empty')}
         emptyState={{
           icon: <Layers className="w-10 h-10" />,
           title: t('tables.gradeLevels.empty.title'),

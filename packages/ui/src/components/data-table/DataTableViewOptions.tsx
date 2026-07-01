@@ -24,7 +24,7 @@ export function DataTableViewOptions<TData>({
 
   return (
     <Popover className="relative">
-      <PopoverButton className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg border border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-secondary))] transition-colors">
+      <PopoverButton className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg border border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-secondary))] transition-colors">
         <SlidersHorizontal className="w-3.5 h-3.5" />
         {resolvedLabels.viewOptions}
       </PopoverButton>
@@ -38,7 +38,7 @@ export function DataTableViewOptions<TData>({
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <PopoverPanel className="absolute right-0 z-50 mt-1 w-48 origin-top-right rounded-xl bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] shadow-lg focus:outline-none overflow-hidden">
+        <PopoverPanel className="absolute right-0 z-50 mt-1 w-48 origin-top-right rounded-xl bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary)/0.35)] shadow-lg focus:outline-none overflow-hidden">
           <div className="px-3 py-2 border-b border-[rgb(var(--border-secondary))]">
             <span className="text-xs font-semibold text-[rgb(var(--text-secondary))] uppercase tracking-wider">
               {resolvedLabels.toggleColumns}

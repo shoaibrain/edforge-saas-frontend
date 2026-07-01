@@ -76,7 +76,7 @@ function TableBulkBarInner<TData>(
         {clearLabel}
       </button>
 
-      <div className="ms-auto flex flex-wrap items-center gap-2">
+      <div className="ml-auto flex flex-wrap items-center gap-2">
         {actions.map((action, i) => (
           <button
             key={action.id ?? `${action.label}-${i}`}

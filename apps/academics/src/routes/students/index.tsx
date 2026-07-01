@@ -477,6 +477,7 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
                     <Button
                       variant="outline"
                       size="sm"
+                      className="border-[rgb(var(--border-primary)/0.35)]"
                       onClick={overviewData.handleExportCSV}
                       disabled={overviewData.isExporting || !overviewData.academicYear.id}
                       aria-label={t('studentsModule.actions.exportCsvAria')}

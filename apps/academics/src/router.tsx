@@ -315,7 +315,7 @@ const gradeLevelsRedirectRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/grade-levels',
     beforeLoad: () => {
-        throw redirect({ to: '/curriculum' })
+        throw redirect({ to: '/curriculum', search: { tab: 'grade-levels' } })
     },
     component: () => null,
 })
@@ -324,7 +324,7 @@ const coursesRedirectRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/courses',
     beforeLoad: () => {
-        throw redirect({ to: '/curriculum' })
+        throw redirect({ to: '/curriculum', search: { tab: 'courses' } })
     },
     component: () => null,
 })
@@ -333,7 +333,7 @@ const standardsRedirectRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/standards',
     beforeLoad: () => {
-        throw redirect({ to: '/curriculum' })
+        throw redirect({ to: '/curriculum', search: { tab: 'standards' } })
     },
     component: () => null,
 })
@@ -357,6 +357,13 @@ const curriculumRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/curriculum',
     component: CurriculumModule,
+    validateSearch: (search: Record<string, unknown>) => ({
+        tab: z
+            .enum(['courses', 'grade-levels', 'standards'])
+            .optional()
+            .catch(undefined)
+            .parse(search.tab),
+    }),
 })
 
 // Course detail - individual course view

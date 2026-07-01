@@ -37,7 +37,7 @@ export function DataTableExport<TData>({
       <PopoverButton
         className={cn(
           'inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg border transition-colors',
-          'border-[rgb(var(--border-primary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-secondary))]',
+          'border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-secondary))]',
           focusRingInset
         )}
         aria-label={resolvedLabels.export}
@@ -55,7 +55,7 @@ export function DataTableExport<TData>({
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <PopoverPanel className="absolute right-0 z-50 mt-1 w-44 origin-top-right rounded-xl bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] shadow-popover focus:outline-none overflow-hidden">
+        <PopoverPanel className="absolute right-0 z-50 mt-1 w-44 origin-top-right rounded-xl bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary)/0.35)] shadow-popover focus:outline-none overflow-hidden">
           {({ close }) => (
             <div className="py-1">
               {formats.map((format) => {

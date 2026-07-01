@@ -78,11 +78,14 @@ export function useCourseToolbar(
   const secondaryActive =
     (filters.courseType ? 1 : 0) + (filters.creditType ? 1 : 0) + (filters.gradeLevel ? 1 : 0)
 
+  const subtleBorder = 'border-[rgb(var(--border-primary)/0.35)]'
+
   const primaryFilter = (
     <Select
       aria-label={t('curriculumModule.filters.subjectArea')}
       size="sm"
       className="w-40"
+      buttonClassName={subtleBorder}
       value={filters.subjectArea ?? ''}
       onChange={(v) => actions.setSubjectArea(v ? (v as typeof filters.subjectArea) : null)}
       options={[{ value: '', label: t('curriculumModule.filters.allSubjects') }, ...SUBJECT_AREA_OPTIONS]}
@@ -102,6 +105,7 @@ export function useCourseToolbar(
       <Select
         aria-label={t('curriculumModule.filters.courseType')}
         size="sm"
+        buttonClassName={subtleBorder}
         value={filters.courseType ?? ''}
         onChange={(v) => actions.setCourseType(v ? (v as typeof filters.courseType) : null)}
         options={[{ value: '', label: t('curriculumModule.filters.allTypes') }, ...COURSE_TYPE_OPTIONS]}
@@ -109,6 +113,7 @@ export function useCourseToolbar(
       <Select
         aria-label={t('curriculumModule.filters.creditType')}
         size="sm"
+        buttonClassName={subtleBorder}
         value={filters.creditType ?? ''}
         onChange={(v) => actions.setCreditType(v ? (v as typeof filters.creditType) : null)}
         options={[{ value: '', label: t('curriculumModule.filters.allCreditTypes') }, ...CREDIT_TYPE_OPTIONS]}
@@ -116,6 +121,7 @@ export function useCourseToolbar(
       <Select
         aria-label={t('curriculumModule.filters.gradeLevel')}
         size="sm"
+        buttonClassName={subtleBorder}
         value={filters.gradeLevel ?? ''}
         onChange={(v) => actions.setGradeLevel(v || null)}
         options={[
@@ -131,6 +137,7 @@ export function useCourseToolbar(
       type="button"
       variant="outline"
       size="sm"
+      className={subtleBorder}
       aria-label={t('curriculumModule.filters.exportAria')}
       onClick={handleExport}
       isLoading={isExporting}
