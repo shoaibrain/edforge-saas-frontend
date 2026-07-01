@@ -6,6 +6,7 @@ import { DataTableFacetedFilter } from './DataTableFacetedFilter'
 import { DataTableViewOptions } from './DataTableViewOptions'
 import { DataTableDensityToggle } from './DataTableDensityToggle'
 import { DataTableExport } from './DataTableExport'
+import { TablePresetTabs, type TablePreset } from './TablePresetTabs'
 import { DEFAULT_DATA_TABLE_LABELS } from './labels'
 import type {
   DataTableDensity,
@@ -26,6 +27,13 @@ interface DataTableToolbarProps<TData> {
   enableDensityToggle?: boolean
   exportOptions?: DataTableExportOptions
   labels?: DataTableLabels
+  /** Docked status presets (handoff ③). When set, renders TablePresetTabs at the toolbar start. */
+  presets?: TablePreset[]
+  activePreset?: string
+  onPresetChange?: (value: string) => void
+  /** Bulk-action bar node; swaps in (same footprint) when `bulkActive`. */
+  bulkBar?: ReactNode
+  bulkActive?: boolean
 }
 
 export function DataTableToolbar<TData>({
@@ -40,8 +48,19 @@ export function DataTableToolbar<TData>({
   enableDensityToggle,
   exportOptions,
   labels,
+  presets,
+  activePreset,
+  onPresetChange,
+  bulkBar,
+  bulkActive,
 }: DataTableToolbarProps<TData>) {
   const resolvedLabels = labels ?? DEFAULT_DATA_TABLE_LABELS
+
+  // Bulk-action bar swaps in on selection with the same min-height footprint,
+  // so there is no layout shift between the two states.
+  if (bulkActive && bulkBar) {
+    return <div className="min-h-9">{bulkBar}</div>
+  }
   const globalFilter = (table.getState().globalFilter as string) ?? ''
   const activeFilterCount =
     table.getState().columnFilters.length + (globalFilter ? 1 : 0)
@@ -58,9 +77,14 @@ export function DataTableToolbar<TData>({
     enableColumnVisibility || toolbarExtra || showDensity || exportOptions
 
   return (
-    <div className="flex items-center gap-x-3 gap-y-2 flex-wrap">
+    <div className="flex min-h-9 items-center gap-x-3 gap-y-2 flex-wrap">
       {/* Leading cluster — filters/search/facets grow and wrap among themselves */}
       <div className="flex flex-1 min-w-0 items-center gap-x-3 gap-y-2 flex-wrap">
+        {/* Docked status presets (handoff ③) */}
+        {presets && activePreset != null && onPresetChange ? (
+          <TablePresetTabs presets={presets} active={activePreset} onChange={onPresetChange} />
+        ) : null}
+
         {/* Leading slot (e.g. filter chips / search / selects) */}
         {toolbarStart}
 

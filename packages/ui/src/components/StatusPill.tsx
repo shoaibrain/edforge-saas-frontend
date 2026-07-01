@@ -1,15 +1,29 @@
 import { forwardRef, type HTMLAttributes } from 'react'
 import { cn } from '../utils'
 
+const SUCCESS = 'bg-[rgb(var(--state-success-bg))] text-[rgb(var(--state-success-fg))] border-[rgb(var(--state-success-border))]'
+const DANGER = 'bg-[rgb(var(--state-danger-bg))] text-[rgb(var(--state-danger-fg))] border-[rgb(var(--state-danger-border))]'
+const WARNING = 'bg-[rgb(var(--state-warning-bg))] text-[rgb(var(--state-warning-fg))] border-[rgb(var(--state-warning-border))]'
+const INFO = 'bg-[rgb(var(--state-info-bg))] text-[rgb(var(--state-info-fg))] border-[rgb(var(--state-info-border))]'
+const NEUTRAL = 'bg-[rgb(var(--background-tertiary)/0.5)] text-[rgb(var(--text-tertiary))] border-[rgb(var(--border-primary)/0.35)]'
+
 const STATUS_STYLES = {
-  present: 'bg-[rgb(var(--state-success-bg))] text-[rgb(var(--state-success-fg))] border-[rgb(var(--state-success-border))]',
-  absent: 'bg-[rgb(var(--state-danger-bg))] text-[rgb(var(--state-danger-fg))] border-[rgb(var(--state-danger-border))]',
-  late: 'bg-[rgb(var(--state-warning-bg))] text-[rgb(var(--state-warning-fg))] border-[rgb(var(--state-warning-border))]',
-  excused: 'bg-[rgb(var(--state-info-bg))] text-[rgb(var(--state-info-fg))] border-[rgb(var(--state-info-border))]',
-  paid: 'bg-[rgb(var(--state-success-bg))] text-[rgb(var(--state-success-fg))] border-[rgb(var(--state-success-border))]',
-  overdue: 'bg-[rgb(var(--state-danger-bg))] text-[rgb(var(--state-danger-fg))] border-[rgb(var(--state-danger-border))]',
-  pending: 'bg-[rgb(var(--background-tertiary)/0.5)] text-[rgb(var(--text-tertiary))] border-[rgb(var(--border-primary)/0.35)]',
-  upcoming: 'bg-[rgb(var(--state-warning-bg))] text-[rgb(var(--state-warning-fg))] border-[rgb(var(--state-warning-border))]',
+  // Domain variants (attendance / fees) — kept for existing consumers.
+  present: SUCCESS,
+  absent: DANGER,
+  late: WARNING,
+  excused: INFO,
+  paid: SUCCESS,
+  overdue: DANGER,
+  pending: NEUTRAL,
+  upcoming: WARNING,
+  // Semantic tone variants — surfaces (e.g. StatBand) that need a tone-driven
+  // pill compose these instead of borrowing a domain name.
+  success: SUCCESS,
+  danger: DANGER,
+  warning: WARNING,
+  info: INFO,
+  neutral: NEUTRAL,
 } as const
 
 export type StatusPillVariant = keyof typeof STATUS_STYLES
