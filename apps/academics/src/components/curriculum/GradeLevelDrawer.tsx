@@ -25,6 +25,7 @@ import {
 import { toast } from 'sonner'
 import type { CourseResponseDto } from '@aibrains/shared-types'
 import { getSubjectAreaLabel, SUBJECT_AREA_COLORS } from '../../schemas/course.form'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 // ============================================================================
 // TYPES
@@ -54,6 +55,7 @@ interface GradeLevelDrawerProps {
 
 function ActionsDropdown() {
   const [isOpen, setIsOpen] = useState(false)
+  const { t } = useAcademicsI18n()
 
   return (
     <div className="relative">
@@ -61,7 +63,7 @@ function ActionsDropdown() {
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-secondary transition-colors"
-        aria-label="Actions"
+        aria-label={t('common.actions')}
       >
         <MoreVertical className="w-5 h-5" />
       </button>
@@ -74,23 +76,23 @@ function ActionsDropdown() {
               type="button"
               onClick={() => {
                 setIsOpen(false)
-                toast.info('Edit functionality coming soon')
+                toast.info(t('curriculumModule.gradeDrawer.editComingSoon'))
               }}
               className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-text-primary hover:bg-surface-secondary transition-colors"
             >
               <Pencil className="w-4 h-4" />
-              Edit
+              {t('actions.edit')}
             </button>
             <button
               type="button"
               onClick={() => {
                 setIsOpen(false)
-                toast.info('Export functionality coming soon')
+                toast.info(t('curriculumModule.gradeDrawer.exportComingSoon'))
               }}
               className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-secondary transition-colors"
             >
               <Download className="w-4 h-4" />
-              Export
+              {t('actions.export')}
             </button>
           </div>
         </>
@@ -136,6 +138,7 @@ function CourseRow({
   course: CourseResponseDto
   onView?: () => void
 }) {
+  const { t, formatCount } = useAcademicsI18n()
   const subjectColors =
     SUBJECT_AREA_COLORS[course.subjectArea] ?? SUBJECT_AREA_COLORS.other
 
@@ -160,8 +163,8 @@ function CourseRow({
           {course.courseName}
         </p>
         <p className="text-xs text-text-tertiary mt-1">
-          {course.credits} credit{course.credits !== 1 ? 's' : ''} &middot;{' '}
-          {course.isActive ? 'Active' : 'Inactive'}
+          {formatCount('curriculumModule.courseDetail.credits', course.credits)} &middot;{' '}
+          {course.isActive ? t('common.active') : t('common.inactive')}
         </p>
       </div>
       {onView && (
@@ -182,6 +185,7 @@ export function GradeLevelDrawer({
   onViewCourse,
   showStudentCount = false,
 }: GradeLevelDrawerProps) {
+  const { t, formatNumber, formatCount } = useAcademicsI18n()
   const panelRef = useRef<HTMLDivElement>(null)
 
   // Handle Escape key
@@ -246,7 +250,7 @@ export function GradeLevelDrawer({
                       <Layers className="w-5 h-5 text-[rgb(var(--state-info-fg))]" />
                     </div>
                     <h2 className="text-lg font-semibold text-text-primary">
-                      {gradeLevel.label} Details
+                      {t('curriculumModule.gradeDrawer.title', { grade: gradeLevel.label })}
                     </h2>
                   </div>
                   <div className="flex items-center gap-1.5">
@@ -255,7 +259,7 @@ export function GradeLevelDrawer({
                       type="button"
                       onClick={onClose}
                       className="p-2 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-surface-secondary transition-colors"
-                      aria-label="Close drawer"
+                      aria-label={t('curriculumModule.drawer.closeDrawer')}
                     >
                       <X className="w-5 h-5" />
                     </button>
@@ -277,9 +281,7 @@ export function GradeLevelDrawer({
                           {gradeLevel.label}
                         </h3>
                         <p className="text-sm text-text-secondary mt-1">
-                          {gradeLevel.courseCount} course
-                          {gradeLevel.courseCount !== 1 ? 's' : ''} assigned to
-                          this level
+                          {formatCount('curriculumModule.gradeDrawer.assignedToLevel', gradeLevel.courseCount)}
                         </p>
                       </div>
                     </div>
@@ -289,28 +291,28 @@ export function GradeLevelDrawer({
                       <div className="p-4 rounded-xl bg-surface-primary border border-border-secondary text-center">
                         <BookOpen className="w-5 h-5 text-[rgb(var(--state-danger-fg))] mx-auto mb-1.5" />
                         <p className="text-xl font-bold text-text-primary">
-                          {gradeLevel.courseCount}
+                          {formatNumber(gradeLevel.courseCount)}
                         </p>
                         <p className="text-xs text-text-tertiary mt-0.5">
-                          Courses
+                          {t('curriculumModule.gradeDrawer.courses')}
                         </p>
                       </div>
                       <div className="p-4 rounded-xl bg-surface-primary border border-border-secondary text-center">
                         <GraduationCap className="w-5 h-5 text-[rgb(var(--state-success-fg))] mx-auto mb-1.5" />
                         <p className="text-xl font-bold text-text-primary">
-                          {activeCourses.length}
+                          {formatNumber(activeCourses.length)}
                         </p>
                         <p className="text-xs text-text-tertiary mt-0.5">
-                          Active
+                          {t('common.active')}
                         </p>
                       </div>
                       <div className="p-4 rounded-xl bg-surface-primary border border-border-secondary text-center">
                         <Users className="w-5 h-5 text-[rgb(var(--state-info-fg))] mx-auto mb-1.5" />
                         <p className="text-xl font-bold text-text-primary">
-                          {showStudentCount ? gradeLevel.studentCount : <>&mdash;</>}
+                          {showStudentCount ? formatNumber(gradeLevel.studentCount) : <>&mdash;</>}
                         </p>
                         <p className="text-xs text-text-tertiary mt-0.5">
-                          Students
+                          {t('common.students', { count: gradeLevel.studentCount })}
                         </p>
                       </div>
                     </div>
@@ -319,15 +321,15 @@ export function GradeLevelDrawer({
                   {/* Section cards */}
                   <div className="px-8 py-6 space-y-5">
                     {/* Assigned Courses */}
-                    <SectionCard icon={BookOpen} title="Assigned Courses">
+                    <SectionCard icon={BookOpen} title={t('curriculumModule.gradeDrawer.assignedCourses')}>
                       {gradeLevel.courses.length === 0 ? (
                         <div className="py-8 text-center">
                           <BookOpen className="w-8 h-8 mx-auto text-text-tertiary mb-2" />
                           <p className="text-sm text-text-secondary">
-                            No courses assigned to this grade level
+                            {t('curriculumModule.gradeDrawer.noCoursesAssigned')}
                           </p>
                           <p className="text-xs text-text-tertiary mt-1">
-                            Courses with this grade level will appear here.
+                            {t('curriculumModule.gradeDrawer.noCoursesDescription')}
                           </p>
                         </div>
                       ) : (
@@ -335,7 +337,7 @@ export function GradeLevelDrawer({
                           {activeCourses.length > 0 && (
                             <>
                               <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-2">
-                                Active ({activeCourses.length})
+                                {t('curriculumModule.gradeDrawer.activeGroup', { count: formatNumber(activeCourses.length) })}
                               </p>
                               {activeCourses.map((course) => (
                                 <CourseRow
@@ -353,7 +355,7 @@ export function GradeLevelDrawer({
                           {inactiveCourses.length > 0 && (
                             <>
                               <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mt-5 mb-2">
-                                Inactive ({inactiveCourses.length})
+                                {t('curriculumModule.gradeDrawer.inactiveGroup', { count: formatNumber(inactiveCourses.length) })}
                               </p>
                               {inactiveCourses.map((course) => (
                                 <CourseRow
@@ -373,14 +375,14 @@ export function GradeLevelDrawer({
                     </SectionCard>
 
                     {/* Student Enrollment (placeholder) */}
-                    <SectionCard icon={Users} title="Student Enrollment">
+                    <SectionCard icon={Users} title={t('curriculumModule.gradeDrawer.studentEnrollment')}>
                       <div className="py-6 text-center">
                         <Users className="w-8 h-8 mx-auto text-text-tertiary mb-2" />
                         <p className="text-sm text-text-secondary">
-                          Student enrollment data by grade level
+                          {t('curriculumModule.gradeDrawer.studentEnrollmentDescription')}
                         </p>
                         <p className="text-xs text-text-tertiary mt-1">
-                          Coming in a future release
+                          {t('curriculumModule.gradeDrawer.futureRelease')}
                         </p>
                       </div>
                     </SectionCard>

@@ -107,6 +107,7 @@ function StandardsIcon({ active }: { active: boolean }) {
 // ============================================================================
 
 function StandardsContent() {
+  const { t } = useAcademicsI18n()
   return (
     <div
       style={{
@@ -128,13 +129,12 @@ function StandardsContent() {
 
       {/* Heading */}
       <h3 className="text-sm font-medium text-[rgb(var(--text-primary))] mb-1.5">
-        Standards alignment
+        {t('curriculumModule.standards.title')}
       </h3>
 
       {/* Body */}
       <p className="text-xs text-[rgb(var(--text-disabled))] max-w-80 leading-normal mb-4">
-        Map courses to academic standards to track curriculum coverage and EdFi
-        compliance. Standards can be configured per course.
+        {t('curriculumModule.standards.description')}
       </p>
     </div>
   )
@@ -145,7 +145,7 @@ function StandardsContent() {
 // ============================================================================
 
 export function CurriculumModule() {
-  const { t, formatNumber, formatCount } = useAcademicsI18n()
+  const { t, formatNumber, formatCount, formatDate } = useAcademicsI18n()
   const [activeTab, setActiveTab] = useState<CurriculumTab>('courses')
   const navigate = useNavigate()
   const schoolId = useActiveSchoolId()
@@ -286,13 +286,28 @@ export function CurriculumModule() {
       const filtered = filters.gradeLevel
         ? rows.filter((c) => c.gradeLevels?.includes(filters.gradeLevel as string))
         : rows
-      downloadCoursesCsv(filtered, `courses-${schoolId}.csv`)
+      downloadCoursesCsv(filtered, `courses-${schoolId}.csv`, {
+        headers: {
+          code: t('curriculumModule.export.headers.code'),
+          courseName: t('curriculumModule.export.headers.courseName'),
+          subject: t('curriculumModule.export.headers.subject'),
+          grades: t('curriculumModule.export.headers.grades'),
+          credits: t('curriculumModule.export.headers.credits'),
+          type: t('curriculumModule.export.headers.type'),
+          duration: t('curriculumModule.export.headers.duration'),
+          status: t('curriculumModule.export.headers.status'),
+        },
+        status: {
+          active: t('common.active'),
+          inactive: t('common.inactive'),
+        },
+      })
     } catch (e) {
       toast.error(parseApiError(e).message)
     }
-  }, [schoolId, queryFilters, filters.gradeLevel])
+  }, [schoolId, queryFilters, filters.gradeLevel, t])
 
-  const today = new Date().toLocaleDateString('en-US', {
+  const today = formatDate(new Date(), {
     weekday: 'long',
     month: 'short',
     day: 'numeric',
@@ -425,7 +440,7 @@ export function CurriculumModule() {
           }`}
         >
           <CoursesIcon active={activeTab === 'courses'} />
-          Courses
+          {t('curriculumModule.tabs.courses')}
           <span
             className={`text-2xs font-semibold py-0.5 px-1.5 rounded-md ${
               activeTab === 'courses'
@@ -448,7 +463,7 @@ export function CurriculumModule() {
           }`}
         >
           <GradeLevelsIcon active={activeTab === 'grade-levels'} />
-          Grade levels
+          {t('curriculumModule.tabs.gradeLevels')}
         </button>
 
         {/* Standards tab */}
@@ -462,7 +477,7 @@ export function CurriculumModule() {
           }`}
         >
           <StandardsIcon active={activeTab === 'standards'} />
-          Standards
+          {t('curriculumModule.tabs.standards')}
         </button>
       </div>
 
