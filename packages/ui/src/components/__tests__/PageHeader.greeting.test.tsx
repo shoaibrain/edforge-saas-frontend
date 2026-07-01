@@ -40,4 +40,12 @@ describe('PageHeader greeting mode', () => {
     expect(screen.getByText('2083')).toBeTruthy()
     expect(document.querySelector('h1')).toBeNull()
   })
+
+  it('renders a date-only pagebar (no year chip) when year is omitted', () => {
+    render(<PageHeader mode="pagebar" date="Wednesday, Jul 1" />)
+    expect(screen.getByText('Wednesday, Jul 1')).toBeTruthy()
+    // no academic-year chip label when year is not provided
+    expect(screen.queryByText(/academic year/i)).toBeNull()
+    expect(document.querySelector('h1')).toBeNull()
+  })
 })

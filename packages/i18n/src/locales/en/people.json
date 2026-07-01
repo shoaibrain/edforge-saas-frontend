@@ -51,7 +51,10 @@
       "staffFallback": "staff",
       "empty": "No recent staff activity"
     },
-    "directoryShortcutDescription": "Search, filter, and manage complete staff profiles."
+    "directoryShortcutDescription": "Search, filter, and manage complete staff profiles.",
+    "kpi": {
+      "region": "Key metrics"
+    }
   },
   "quickAccess": {
     "addNew": "Add New Person",
