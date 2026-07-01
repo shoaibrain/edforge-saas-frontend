@@ -17,7 +17,7 @@
  * tokens + the Tailwind scale; motion respects prefers-reduced-motion.
  */
 import { forwardRef, type HTMLAttributes, type ReactNode } from 'react'
-import { cn } from '../utils'
+import { cn, focusRing } from '../utils'
 import { StatusPill, type StatusPillVariant } from './StatusPill'
 import { AnimatedProgressBar } from './AnimatedProgressBar'
 import { Ring } from './Ring'
@@ -48,6 +48,10 @@ interface StatMetricBase {
   sub?: ReactNode
   /** Detail line revealed on hover (falls back to `sub` when absent). */
   detail?: ReactNode
+  /** Makes the segment a toggle button (e.g. a KPI that filters a table). */
+  onClick?: () => void
+  /** Pressed state for a clickable segment. */
+  active?: boolean
 }
 
 interface DeltaCfg {
@@ -219,18 +223,19 @@ function Segment({ metric }: { metric: StatMetric }) {
       </span>
     ) : null
 
-  return (
-    <div
-      role="status"
-      aria-label={`${metric.label}: ${metric.value}`}
-      data-state={state}
-      className={cn(
-        'group relative flex min-w-0 flex-col px-5 py-4',
-        metric.primary ? 'flex-[1.28]' : 'flex-1',
-        'border-s border-[rgb(var(--border-primary)/0.15)] first:border-s-0',
-        'transition-colors hover:bg-[rgb(var(--background-tertiary)/0.4)]',
-      )}
-    >
+  const clickable = typeof metric.onClick === 'function'
+
+  const outerClass = cn(
+    'group relative flex min-w-0 flex-col px-5 py-4 text-start',
+    metric.primary ? 'flex-[1.28]' : 'flex-1',
+    'border-s border-[rgb(var(--border-primary)/0.15)] first:border-s-0',
+    'transition-colors hover:bg-[rgb(var(--background-tertiary)/0.4)]',
+    clickable && focusRing,
+    clickable && metric.active && 'bg-[rgb(var(--mint-soft))] hover:bg-[rgb(var(--mint-soft))]',
+  )
+
+  const body = (
+    <>
       {/* state accent tick */}
       {TICK[state] ? (
         <span className={cn('absolute inset-x-4 top-0 h-0.5 rounded-b-sm', TICK[state])} aria-hidden="true" />
@@ -284,6 +289,27 @@ function Segment({ metric }: { metric: StatMetric }) {
           ) : null}
         </div>
       ) : null}
+    </>
+  )
+
+  if (clickable) {
+    return (
+      <button
+        type="button"
+        onClick={metric.onClick}
+        aria-pressed={metric.active ?? false}
+        aria-label={`${metric.label}: ${metric.value}`}
+        data-state={state}
+        className={outerClass}
+      >
+        {body}
+      </button>
+    )
+  }
+
+  return (
+    <div role="status" aria-label={`${metric.label}: ${metric.value}`} data-state={state} className={outerClass}>
+      {body}
     </div>
   )
 }

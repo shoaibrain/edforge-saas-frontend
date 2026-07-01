@@ -9,7 +9,7 @@
 
 import { useState, useEffect } from 'react'
 import { Search, X } from 'lucide-react'
-import { Select, Input } from '@edforge/ui'
+import { Select, Input, TablePresetTabs } from '@edforge/ui'
 import type { StudentStatus } from '@aibrains/shared-types'
 import { useDebounce } from '../../hooks'
 import { useSchoolEnabledGradeOptions } from '../../hooks/useGradeOptions'
@@ -90,25 +90,12 @@ export function StudentsFilterRow({ schoolId }: StudentsFilterRowProps) {
 
   return (
     <div className="flex items-center gap-2 flex-wrap">
-      {/* Mode chips */}
-      {MODE_CHIPS.map((chip) => {
-        const isActive = filters.filterMode === chip.key
-        return (
-          <button
-            key={chip.key}
-            onClick={() => setFilterMode(chip.key)}
-            className={`px-2.5 py-1 text-xs font-medium rounded-full border transition-all focus:outline-none ${
-              isActive
-                ? 'bg-[rgb(var(--accent-enrollment))] text-[rgb(var(--action-primary-fg))] border-[rgb(var(--accent-enrollment))]'
-                : 'bg-transparent text-[rgb(var(--text-tertiary))] border-[rgb(var(--border-primary))] hover:text-[rgb(var(--text-secondary))]'
-            }`}
-          >
-            {t(chip.labelKey)}
-          </button>
-        )
-      })}
-
-      <span className="text-xs mx-1 text-[rgb(var(--text-tertiary))]">{t('studentsModule.filters.or')}</span>
+      {/* Status presets — docked segmented control (handoff ③) */}
+      <TablePresetTabs
+        presets={MODE_CHIPS.map((chip) => ({ value: chip.key, label: t(chip.labelKey) }))}
+        active={filters.filterMode}
+        onChange={(value) => setFilterMode(value as StudentFilterMode)}
+      />
 
       {/* Search input */}
       <Input
@@ -162,7 +149,7 @@ export function StudentsFilterRow({ schoolId }: StudentsFilterRowProps) {
       {isActiveFilters && (
         <button
           onClick={handleClearFilters}
-          className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full text-[rgb(var(--accent-enrollment-text))] hover:opacity-80 transition-opacity"
+          className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-md text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
         >
           <X className="w-3 h-3" />
           {t('studentsModule.filters.clear')}

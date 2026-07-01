@@ -117,6 +117,21 @@ describe('StatBand', () => {
     expect(segs[1].className).not.toContain('border-l-')
   })
 
+  it('renders a clickable segment as a toggle button and fires onClick', () => {
+    const onClick = vi.fn()
+    render(
+      <StatBand
+        metrics={[
+          { label: 'Awaiting', value: '1', state: 'warn', active: true, onClick },
+        ]}
+      />,
+    )
+    const btn = screen.getByRole('button', { name: 'Awaiting: 1' })
+    expect(btn.getAttribute('aria-pressed')).toBe('true')
+    btn.click()
+    expect(onClick).toHaveBeenCalled()
+  })
+
   it('warns at runtime if a metric is given more than one micro-viz', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     const bad = { label: 'X', value: '1', delta: { dir: 'up', val: '+1' }, pill: { tone: 'good', text: 'ok' } }

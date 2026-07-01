@@ -13,13 +13,15 @@ import { useState, useMemo, useCallback } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { useResourcePermissions } from '@edforge/abac'
-import { StatCard, ContextBar, ContextBarSep, ContextBarYear } from '@edforge/ui'
+import { PageHeader, StatBand, type StatMetric } from '@edforge/ui'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
+  Award,
   BookOpen,
   Layers,
   Plus,
   ShieldCheck,
+  Sparkles,
 } from 'lucide-react'
 import { useActiveSchoolId } from '../../stores/app.store'
 import { useCurrentAcademicYear } from '../../hooks/useSchool'
@@ -313,118 +315,66 @@ export function CurriculumModule() {
     day: 'numeric',
   })
 
+  // Calm-by-default KPI band. Nothing here is in a warning/critical state, so
+  // the band stays neutral — Specialized Types reads 'muted' when zero.
+  const curriculumMetrics: StatMetric[] = [
+    {
+      label: t('curriculumModule.stats.totalCourses'),
+      value: formatNumber(stats.total),
+      icon: <BookOpen className="h-4 w-4" />,
+      state: 'normal',
+      primary: true,
+      meter: { pct: stats.total > 0 ? Math.round((stats.active / stats.total) * 100) : 0, target: 100 },
+      sub: formatCount('curriculumModule.stats.activeTag', stats.active),
+    },
+    {
+      label: t('curriculumModule.stats.subjectAreas'),
+      value: formatNumber(stats.subjects),
+      icon: <Layers className="h-4 w-4" />,
+      state: 'normal',
+      sub: stats.allLoaded ? t('curriculumModule.stats.subjectHint') : t('curriculumModule.summary.basedOnLoaded'),
+    },
+    {
+      label: t('curriculumModule.stats.electives'),
+      value: formatNumber(stats.elective),
+      icon: <Sparkles className="h-4 w-4" />,
+      state: 'normal',
+      sub: stats.electiveName ?? undefined,
+    },
+    {
+      label: t('curriculumModule.stats.specializedTypes'),
+      value: formatNumber(stats.specializedTypes),
+      icon: <Award className="h-4 w-4" />,
+      state: stats.specializedTypes === 0 ? 'muted' : 'normal',
+      sub: t('curriculumModule.stats.specializedTag'),
+    },
+  ]
+
   return (
     <div className="min-h-full px-5 py-4">
-      {/* ---- Context Bar (operating context, not a page title) ---- */}
-      <ContextBar
+      {/* ---- Page header (pagebar) — breadcrumb names the page, band summarizes ---- */}
+      <PageHeader
         className="mb-4"
-        meta={
-          <>
-            {currentYear?.name ? (
-              <ContextBarYear>{currentYear.name}</ContextBarYear>
-            ) : null}
-            {currentYear?.name ? <ContextBarSep /> : null}
-            <span>{today}</span>
-          </>
-        }
-        description={
-          <p className="text-xs text-[rgb(var(--text-tertiary))] leading-relaxed">
-            <span className="font-medium text-[rgb(var(--accent-academics-text))]">
-              {stats.total}
-            </span>{' '}
-            {t('curriculumModule.summary.coursesAcross')}{' '}
-            <span className="font-medium text-[rgb(var(--accent-academics-text))]">
-              {formatNumber(stats.subjects)}
-            </span>{' '}
-            {t('curriculumModule.summary.subjectAreasSuffix')} ·{' '}
-            {formatCount('curriculumModule.summary.elective', stats.elective)} ·{' '}
-            <span className="font-medium text-[rgb(var(--accent-academics-text))]">
-              {formatNumber(stats.specializedTypes)}
-            </span>{' '}
-            {t('curriculumModule.summary.specializedTypesSuffix')}
-            {!stats.allLoaded && (
-              <span className="text-[rgb(var(--text-disabled))]">
-                {' '}
-                · {t('curriculumModule.summary.basedOnLoaded')}
-              </span>
-            )}
-          </p>
-        }
+        mode="pagebar"
+        year={currentYear?.name ?? ''}
+        date={today}
         actions={
-          coursePerms.create ? (
-            <button
-              type="button"
-              onClick={openCreateDrawer}
-              className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-[9px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-enrollment)/0.4)] cursor-pointer bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              {t('curriculumModule.actions.addCourse')}
-            </button>
-          ) : undefined
+          coursePerms.create
+            ? [
+                {
+                  label: t('curriculumModule.actions.addCourse'),
+                  icon: <Plus className="h-3.5 w-3.5" />,
+                  primary: true,
+                  onClick: openCreateDrawer,
+                },
+              ]
+            : undefined
         }
       />
 
-      {/* ---- KPI Tiles ---- */}
-      <div className="grid gap-3 grid-cols-2 lg:grid-cols-4 mb-3.5">
-        <StatCard
-          label={t('curriculumModule.stats.totalCourses')}
-          value={formatNumber(stats.total)}
-          icon={BookOpen}
-          signature="curriculum"
-          accentColor="rgb(var(--accent-reports)/0.1)"
-          iconColor="rgb(var(--accent-reports))"
-          barColor="rgb(var(--accent-reports))"
-          tag={{
-            text: formatCount('curriculumModule.stats.activeTag', stats.active),
-            color: 'rgb(var(--accent-enrollment))',
-            bg: 'rgb(var(--accent-enrollment)/0.1)',
-          }}
-          loading={isLoading}
-        />
-        <StatCard
-          label={t('curriculumModule.stats.subjectAreas')}
-          value={formatNumber(stats.subjects)}
-          icon={Layers}
-          accentColor="rgb(var(--accent-academics)/0.1)"
-          iconColor="rgb(var(--accent-academics))"
-          barColor="rgb(var(--accent-academics))"
-          hint={stats.allLoaded ? t('curriculumModule.stats.subjectHint') : t('curriculumModule.summary.basedOnLoaded')}
-          loading={isLoading}
-        />
-        <StatCard
-          label={t('curriculumModule.stats.electives')}
-          value={formatNumber(stats.elective)}
-          icon={BookOpen}
-          signature="curriculum"
-          accentColor="rgb(var(--accent-coral)/0.1)"
-          iconColor="rgb(var(--accent-coral))"
-          barColor="rgb(var(--accent-coral))"
-          tag={
-            stats.electiveName
-              ? {
-                  text: stats.electiveName,
-                  color: 'rgb(var(--accent-reports))',
-                  bg: 'rgb(var(--accent-reports)/0.1)',
-                }
-              : undefined
-          }
-          loading={isLoading}
-        />
-        <StatCard
-          label={t('curriculumModule.stats.specializedTypes')}
-          value={formatNumber(stats.specializedTypes)}
-          icon={BookOpen}
-          signature="curriculum"
-          accentColor="rgb(var(--accent-attendance)/0.1)"
-          iconColor="rgb(var(--accent-attendance))"
-          barColor="rgb(var(--accent-attendance))"
-          tag={{
-            text: t('curriculumModule.stats.specializedTag'),
-            color: 'rgb(var(--accent-attendance))',
-            bg: 'rgb(var(--accent-attendance)/0.1)',
-          }}
-          loading={isLoading}
-        />
+      {/* ---- Unified KPI stat band ---- */}
+      <div className="mb-3.5">
+        <StatBand metrics={curriculumMetrics} ariaLabel={t('curriculumModule.stats.totalCourses')} />
       </div>
 
       {/* ---- Tab Bar ---- */}
