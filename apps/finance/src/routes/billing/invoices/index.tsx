@@ -59,7 +59,7 @@ import { useFinanceSettings } from '../../../layouts/FinanceLayout'
 import { formatDateDual } from '../../../utils/format-date'
 import { StudentSearchInput } from '../../../components/billing/StudentSearchInput'
 import { BulkSendInvoiceReminderDrawer } from '../../../components/billing/BulkSendInvoiceReminderDrawer'
-import { BulkPdfExportModal } from '../../../components/billing/BulkPdfExportModal'
+import { BulkPdfExportDrawer } from '../../../components/billing/BulkPdfExportDrawer'
 import {
   FinancePageHeader,
   FinanceInfoBanner,
@@ -620,14 +620,13 @@ export default function InvoicesPage() {
         onComplete={() => setRowSelection({})}
       />
 
-      {/* Sprint F.5 — Bulk PDF Export Modal */}
+      {/* Sprint F.5 — Bulk PDF Export Drawer (right-side sibling of
+          BulkSendInvoiceReminderDrawer + BulkSendReceiptsDrawer et al) */}
       {bulkPdfExportTarget && (
-        <BulkPdfExportModal
+        <BulkPdfExportDrawer
           open={!!bulkPdfExportTarget}
-          onClose={() => {
-            setBulkPdfExportTarget(null)
-            setRowSelection({})
-          }}
+          onClose={() => setBulkPdfExportTarget(null)}
+          onComplete={() => setRowSelection({})}
           schoolId={schoolId ?? ''}
           invoiceIds={bulkPdfExportTarget}
         />

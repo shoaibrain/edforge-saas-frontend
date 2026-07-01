@@ -1,7 +1,6 @@
 {
   "title": "Fee Payments",
   "description": "View invoices, make payments, and download receipts",
-
   "overview": {
     "finance": "Finance",
     "selectSchoolTitle": "Select a School",
@@ -110,7 +109,6 @@
       "daysAgo": "{{count}} days ago"
     }
   },
-
   "invoices": {
     "title": "Invoices",
     "description": "View and manage fee invoices",
@@ -167,25 +165,7 @@
     "issueSelected": "Issue Selected ({{count}})",
     "sendReminder": "Send reminder",
     "bulkPdfExport": {
-      "menuLabel": "Download PDF (ZIP)",
-      "title": "Export {{count}} invoices as ZIP",
-      "close": "Close",
-      "runInBackground": "Run in background",
-      "done": "Done",
-      "backgroundDefault": "Large exports run in the background and may take a few minutes.",
-      "runningTitle": "Generating invoices…",
-      "runningProgress": "{{done}} of {{total}}",
-      "succeededTitle": "Generated {{succeeded}} invoice(s)",
-      "partialFailed": "{{count}} failed; check the job log for details.",
-      "downloadZip": "Download invoices.zip",
-      "urlPending": "Generating download link…",
-      "failedTitle": "Export failed",
-      "failedGeneric": "The worker ended in a failed state; check the job log.",
-      "kickoffFailed": "Failed to start the export. Please try again.",
-      "alreadyRunning": "An export is already running for this school. Showing its progress.",
-      "payloadTooLarge": "Too many invoices selected ({{requested}}). Maximum is {{limit}}.",
-      "succeeded": "Export ready: {{succeeded}} succeeded, {{failed}} failed.",
-      "failed": "Export failed."
+      "menuLabel": "Download PDF (ZIP)"
     },
     "cancelTitle": "Cancel Invoice {{invoiceNumber}}?",
     "cancelDescriptionPrefix": "This action is",
@@ -201,7 +181,6 @@
     "issueCountInvoices": "Issue {{count}} Invoice",
     "issueCountInvoices_plural": "Issue {{count}} Invoices"
   },
-
   "invoiceDetail": {
     "backToInvoices": "Back to Invoices",
     "invoice": "Invoice",
@@ -227,7 +206,6 @@
       "notes": "Notes: {{notes}}"
     }
   },
-
   "lineItems": {
     "description": "Description",
     "amount": "Amount",
@@ -236,7 +214,6 @@
     "tax": "Tax",
     "total": "Total"
   },
-
   "summary": {
     "subtotal": "Subtotal",
     "taxTotal": "Tax",
@@ -246,7 +223,6 @@
     "amountDue": "Amount Due",
     "balanceDue": "Balance Due"
   },
-
   "gateway": {
     "selectMethod": "Select Payment Method",
     "selectMethodDescription": "Choose how you would like to pay",
@@ -271,7 +247,6 @@
     "configured": "Configured",
     "notConfigured": "Not Configured"
   },
-
   "flow": {
     "confirmPayment": "Confirm Payment",
     "confirmDescription": "You are about to pay {{amount}} via {{gateway}}",
@@ -293,7 +268,6 @@
     "paymentInProgressDescription": "Complete your payment in the {{gateway}} tab that just opened. Click 'Check Status' once you're done.",
     "checkStatus": "Check Status"
   },
-
   "receipt": {
     "title": "Payment Receipt",
     "receiptNumber": "Receipt #",
@@ -314,7 +288,6 @@
     "taxAmount": "Tax Amount",
     "thankYou": "Thank you for your payment!"
   },
-
   "status": {
     "draft": "Draft",
     "issued": "Issued",
@@ -332,7 +305,6 @@
     "debit": "Debit",
     "credit": "Credit"
   },
-
   "feeStructure": {
     "title": "Fee Structures",
     "description": "Configure fee types and amounts for your school",
@@ -462,7 +434,6 @@
       "annual": "Annual"
     }
   },
-
   "bulkGenerate": {
     "title": "Bulk Generate Invoices",
     "description": "Generate invoices for multiple students at once - by grade, by student, or by smart segment.",
@@ -673,7 +644,6 @@
       "newBatch": "New batch"
     }
   },
-
   "gatewayConfig": {
     "title": "Payment Gateways",
     "description": "Configure payment gateways for your school",
@@ -689,7 +659,6 @@
     "saved": "Gateway configuration saved successfully",
     "credentialsMasked": "Credentials are masked for security"
   },
-
   "paymentsList": {
     "title": "Payments",
     "description": "View and manage all payment transactions.",
@@ -727,7 +696,6 @@
     "exportFailed": "Failed to export payments CSV",
     "recordManualPayment": "Record Manual Payment"
   },
-
   "recordPayment": {
     "title": "Record Payment",
     "description": "Manually record a cash, bank transfer, or cheque payment.",
@@ -757,7 +725,6 @@
     "method": "Method",
     "reference": "Reference #"
   },
-
   "asyncJobs": {
     "common": {
       "closeDrawer": "Close drawer",
@@ -780,7 +747,9 @@
         "email": "Email",
         "sms": "SMS",
         "both": "Both"
-      }
+      },
+      "cancel": "Cancel",
+      "close": "Close"
     },
     "progress": {
       "queued": "Queued - waiting for a worker to pick up the job.",
@@ -880,9 +849,22 @@
       "noneEligible": "None of the selected payments are eligible to void.",
       "voiding": "Voiding...",
       "apply": "Void {{count}}"
+    },
+    "pdfExport": {
+      "title": "Bulk PDF export",
+      "progress": "Generating PDFs",
+      "readyTitle": "Ready to export {{count}} invoice as ZIP",
+      "readyBody": "The generated ZIP contains one PDF per invoice. This may take a few minutes for larger batches; you can close the drawer and the job will keep running in the background.",
+      "startExport": "Start export",
+      "starting": "Starting export...",
+      "downloadZip": "Download invoices.zip",
+      "alreadyRunning": "Another bulk export is already running for this school. Showing its progress.",
+      "payloadTooLarge": "Cannot export {{requested}} invoices in one batch (limit is {{limit}}). Please narrow the selection.",
+      "toastSucceeded": "Bulk export complete: {{succeeded}} succeeded, {{failed}} failed.",
+      "toastFailed": "Bulk export failed. Check the drawer for details.",
+      "readyTitle_plural": "Ready to export {{count}} invoices as ZIP"
     }
   },
-
   "financeLayout": {
     "error": {
       "title": "Something went wrong",
@@ -896,7 +878,6 @@
       "goToSettings": "Go to Settings"
     }
   },
-
   "paymentGateways": {
     "title": "Payment Gateways",
     "description": "Configure which payment gateways are available for your school.",
@@ -936,14 +917,12 @@
       "apiKey": "API Key"
     }
   },
-
   "studentSearch": {
     "placeholder": "Search by name or student number...",
     "searching": "Searching...",
     "noStudents": "No students found.",
     "grade": "Grade {{grade}}"
   },
-
   "studentAccount": {
     "title": "Student Account",
     "pageTitle": "Student Accounts",
@@ -1018,12 +997,10 @@
       "unknown": "Unknown error"
     }
   },
-
   "currency": {
     "npr": "NPR",
     "symbol": "रू"
   },
-
   "actions": {
     "payNow": "Pay Now",
     "viewReceipt": "View Receipt",
@@ -1039,7 +1016,6 @@
     "next": "Next",
     "retry": "Retry"
   },
-
   "filters": {
     "label": "Filters",
     "allStatuses": "All Statuses",
@@ -1047,12 +1023,10 @@
     "academicYear": "Academic Year",
     "clearAll": "Clear All"
   },
-
   "empty": {
     "noPayments": "No payments found",
     "noPaymentsDescription": "Payment records will appear here once payments are made."
   },
-
   "error": {
     "failedToLoad": "Failed to load payment data",
     "failedToInitiate": "Failed to initiate payment",
@@ -1064,14 +1038,12 @@
     "receiptNotFound": "We couldn't find a receipt for this payment. It may have been deleted or never issued.",
     "receiptForbidden": "You don't have permission to view this receipt."
   },
-
   "toast": {
     "paymentSuccess": "Payment completed successfully",
     "paymentFailed": "Payment failed. Please try again.",
     "invoiceGenerated": "Invoice generated successfully",
     "receiptDownloaded": "Receipt downloaded"
   },
-
   "widgets": {
     "outstandingFees": "Outstanding Fees",
     "recentPayments": "Recent Payments",
