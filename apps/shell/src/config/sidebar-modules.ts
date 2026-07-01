@@ -15,7 +15,6 @@
 
 import {
   GraduationCap,
-  DollarSign,
   GalleryVerticalEnd,
   Users,
   Settings,
@@ -128,7 +127,7 @@ const homeModule: ModuleConfig = {
         {
           id: 'finance',
           label: 'Finance',
-          icon: DollarSign,
+          icon: Wallet,
           href: '/finance',
           permission: { action: 'view', resource: 'billing' },
         },
@@ -423,7 +422,7 @@ const academicsModule: ModuleConfig = {
 const financeModule: ModuleConfig = {
   id: 'finance',
   title: 'Finance',
-  icon: DollarSign,
+  icon: Wallet,
   backTo: { path: '/home', label: 'Back to Home' },
   groups: [
     {

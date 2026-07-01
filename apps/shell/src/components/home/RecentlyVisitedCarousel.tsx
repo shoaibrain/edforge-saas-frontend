@@ -45,7 +45,7 @@ const EXTENDED_MOCK_PAGES: VisitedPage[] = [
   {
     path: '/finance',
     title: 'Finance',
-    icon: 'DollarSign',
+    icon: 'Wallet',
     module: 'finance',
     visitedAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
   },
