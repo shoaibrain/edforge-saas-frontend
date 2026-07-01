@@ -37,8 +37,12 @@ export interface PageHeaderAction {
 
 export interface PageHeaderPagebarProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
   mode: 'pagebar'
-  /** Academic-year label shown in the switcher chip (e.g. "2083"). */
-  year: ReactNode
+  /**
+   * Academic-year label shown in the switcher chip (e.g. "2083"). Optional —
+   * omit it for module overviews that aren't scoped to an academic year (e.g.
+   * People), and the header renders date + actions only, no year chip.
+   */
+  year?: ReactNode
   /** Small trailing label after the year (default "Academic Year"). */
   yearLabel?: string
   /** When provided, the year chip becomes a switcher button. */
@@ -132,13 +136,15 @@ const PageBar = forwardRef<HTMLDivElement, PageHeaderPagebarProps>(
         {breadcrumbs ? <div className="text-sm text-[rgb(var(--text-tertiary))]">{breadcrumbs}</div> : null}
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
           <div className="flex min-w-0 items-center gap-3">
-            {onYearClick ? (
-              <button type="button" onClick={onYearClick} title="Switch academic year" className={cn(yearChipClass, focusRing)}>
-                {yearInner}
-              </button>
-            ) : (
-              <span className={yearChipClass}>{yearInner}</span>
-            )}
+            {year != null ? (
+              onYearClick ? (
+                <button type="button" onClick={onYearClick} title="Switch academic year" className={cn(yearChipClass, focusRing)}>
+                  {yearInner}
+                </button>
+              ) : (
+                <span className={yearChipClass}>{yearInner}</span>
+              )
+            ) : null}
             {date ? <span className="whitespace-nowrap text-sm text-[rgb(var(--text-tertiary))]">{date}</span> : null}
           </div>
           <PageActions actions={actions} />

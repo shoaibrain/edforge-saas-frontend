@@ -1,30 +1,22 @@
 /**
- * People Overview Page — V2
+ * People Overview Page — dashboard recipe
  *
- * Data command center replacing the old navigation-card layout.
- * Uses live staff data from useStaffList hook.
+ * PageHeader (pagebar, date-only — People isn't academic-year scoped) → StatBand
+ * → WidgetCard grid. No alert source for People, so the AlertLane slot is
+ * omitted (same as Teacher Home). Reuses the live `useStaffList` data + the
+ * inline StaffRow/BarRow bodies, now framed by WidgetCard.
  */
 
 import { useMemo } from 'react'
 import { useNavigate } from '@tanstack/react-router'
+import { Users, UserPlus, ChevronRight } from 'lucide-react'
 import {
-  Users,
-  UserPlus,
-  BookOpen,
-  Lock,
-  Briefcase,
-  ChevronRight,
-  Clock,
-  BarChart3,
-} from 'lucide-react'
-import {
-  ContextBar,
   Container,
-  focusRing,
-  focusRingInset,
-  Inline,
-  StatCard,
-  Text,
+  PageHeader,
+  StatBand,
+  type StatMetric,
+  WidgetGrid,
+  WidgetCard,
   WidgetErrorBoundaryV2,
 } from '@edforge/ui'
 import { useTranslation } from '@edforge/i18n'
@@ -62,6 +54,8 @@ export function Overview() {
     schoolId ? { schoolId } : undefined,
   )
 
+  const goStaff = () => navigate({ to: '/staff' as string })
+
   // Derived stats
   const stats = useMemo(() => {
     const teachers = staff.filter((s) => s.role === 'teacher')
@@ -88,8 +82,7 @@ export function Overview() {
       const dept = s.departmentName || t('common.unassigned')
       deptMap.set(dept, (deptMap.get(dept) || 0) + 1)
     }
-    const departments = Array.from(deptMap.entries())
-      .sort((a, b) => b[1] - a[1])
+    const departments = Array.from(deptMap.entries()).sort((a, b) => b[1] - a[1])
 
     return {
       total: staff.length,
@@ -129,146 +122,93 @@ export function Overview() {
       }))
   }, [staff, t])
 
+  // ── StatBand metrics (calm; attention only via state) ────────────────────
+  const metrics: StatMetric[] = [
+    {
+      label: t('stats.totalStaff'),
+      value: isLoading ? '—' : String(stats.total),
+      iconSignature: 'people',
+      state: 'normal',
+      primary: true,
+      sub: t('overview.stats.thisMonth', { count: 1 }),
+    },
+    {
+      label: t('stats.activeTeachers'),
+      value: isLoading ? '—' : String(stats.teachers),
+      iconSignature: 'academics',
+      state: 'normal',
+      sub: t('overview.stats.fullTimeContract'),
+    },
+    {
+      label: t('stats.supportStaff'),
+      value: isLoading ? '—' : String(stats.support),
+      iconSignature: 'staff',
+      state: stats.support > 0 ? 'normal' : 'muted',
+      sub: stats.support > 0 ? t('stats.tags.active') : t('overview.stats.noneOnboarded'),
+    },
+    {
+      label: t('stats.systemAccess'),
+      value: isLoading ? '—' : String(stats.withAccess),
+      iconSignature: 'security',
+      state: 'normal',
+      sub: t('stats.tags.noAccess', { count: stats.noAccess }),
+    },
+  ]
+
   return (
     <Container size="full" padding="lg" className="overflow-auto py-6">
-      {/* Context Bar (operating context, not a page title — the shell breadcrumb
-          carries "People") */}
+      {/* Screen-reader page heading (breadcrumb names the page visually) */}
       <h1 className="sr-only">{t('title')}</h1>
-      <ContextBar
-        className="mb-2"
-        meta={
-          <span>
-            {new Date().toLocaleDateString('en-US', {
-              weekday: 'long',
-              month: 'short',
-              day: 'numeric',
-              year: 'numeric',
-            })}
-          </span>
-        }
-        actions={(
-          <Inline gap="sm">
-          <button
-            type="button"
-            onClick={() => navigate({ to: '/staff' as string })}
-            className={`inline-flex h-9 items-center gap-1.5 rounded-lg border border-border-secondary bg-surface-secondary px-3.5 text-xs font-medium text-text-secondary transition-colors hover:bg-surface-tertiary hover:text-text-primary ${focusRingInset}`}
-          >
-            <Users className="h-3.5 w-3.5" />
-            {t('staffDirectory.title')}
-          </button>
-          <button
-            type="button"
-            onClick={() => modal.openCreate()}
-            className={`inline-flex h-9 items-center gap-1.5 rounded-lg bg-[rgb(var(--action-primary-bg))] px-3.5 text-xs font-medium text-[rgb(var(--text-inverted))] transition-colors hover:bg-[rgb(var(--state-info-fg))] ${focusRing}`}
-          >
-            <UserPlus className="h-3.5 w-3.5" />
-            {t('staffDirectory.addStaff')}
-          </button>
-          </Inline>
-        )}
+
+      {/* ---- Page header (pagebar, date-only) ---- */}
+      <PageHeader
+        className="mb-4"
+        mode="pagebar"
+        date={new Date().toLocaleDateString('en-US', {
+          weekday: 'long',
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric',
+        })}
+        actions={[
+          {
+            label: t('staffDirectory.title'),
+            icon: <Users className="h-3.5 w-3.5" />,
+            onClick: goStaff,
+          },
+          {
+            label: t('staffDirectory.addStaff'),
+            icon: <UserPlus className="h-3.5 w-3.5" />,
+            primary: true,
+            onClick: () => modal.openCreate(),
+          },
+        ]}
       />
 
-      {/* CONTEXT BANNER */}
-      <Text variant="caption" className="mb-5">
-        <em className="font-medium not-italic text-[rgb(var(--action-secondary-fg))]">
-          {t('staffDirectory.summary.activeStaff', { count: stats.total })}
-        </em>
-        {' · '}
-        <span className="font-medium text-[rgb(var(--state-success-fg))]">
-          {t('staffDirectory.summary.teachers', { count: stats.teachers })}
-        </span>
-        {' · '}
-        <span className="font-medium text-[rgb(var(--state-info-fg))]">
-          {t('staffDirectory.summary.principals', { count: stats.principals })}
-        </span>
-        {' · '}
-        <span className="font-medium text-[rgb(var(--action-primary-bg))]">
-          {t('staffDirectory.summary.systemAccess', { count: stats.withAccess })}
-        </span>
-      </Text>
+      {/* ---- StatBand — staff KPIs ---- */}
+      <div className="mb-4">
+        <StatBand metrics={metrics} ariaLabel={t('overview.kpi.region')} />
+      </div>
 
-      {/* KPI TILES */}
-      <WidgetErrorBoundaryV2>
-        <div className="mb-4 grid grid-cols-4 gap-2.5">
-          <StatCard
-            label={t('stats.totalStaff')}
-            value={isLoading ? '—' : stats.total.toString()}
-            icon={Users}
-            signature="people"
-            accentColor="rgba(216,90,48,0.10)"
-            iconColor="#D85A30"
-            barColor="#D85A30"
-            valueColor="#D85A30"
-            tag={{ text: t('overview.stats.thisMonth', { count: 1 }), color: '#D85A30', bg: 'rgba(216,90,48,0.10)' }}
-            loading={isLoading}
-          />
-          <StatCard
-            label={t('stats.activeTeachers')}
-            value={isLoading ? '—' : stats.teachers.toString()}
-            icon={BookOpen}
-            signature="curriculum"
-            accentColor="rgba(29,158,117,0.10)"
-            iconColor="#1D9E75"
-            barColor="#1D9E75"
-            valueColor="#1D9E75"
-            tag={{ text: t('overview.stats.fullTimeContract'), color: '#1D9E75', bg: 'rgba(29,158,117,0.10)' }}
-            loading={isLoading}
-          />
-          <StatCard
-            label={t('stats.supportStaff')}
-            value={isLoading ? '—' : stats.support.toString()}
-            icon={Briefcase}
-            signature="staff"
-            accentColor={stats.support > 0 ? 'rgba(55,138,221,0.10)' : 'rgba(255,255,255,0.06)'}
-            iconColor={stats.support > 0 ? '#378ADD' : 'rgb(var(--text-tertiary))'}
-            barColor={stats.support > 0 ? '#378ADD' : 'rgb(var(--text-disabled))'}
-            valueColor={stats.support > 0 ? '#378ADD' : 'rgb(var(--text-tertiary))'}
-            tag={{
-              text: stats.support > 0 ? t('stats.tags.active') : t('overview.stats.noneOnboarded'),
-              color: stats.support > 0 ? '#378ADD' : 'rgb(var(--text-tertiary))',
-              bg: stats.support > 0 ? 'rgba(55,138,221,0.10)' : 'rgba(255,255,255,0.05)',
-            }}
-            loading={isLoading}
-          />
-          <StatCard
-            label={t('stats.systemAccess')}
-            value={isLoading ? '—' : stats.withAccess.toString()}
-            icon={Lock}
-            accentColor="rgba(55,138,221,0.10)"
-            iconColor="#378ADD"
-            barColor="#378ADD"
-            valueColor="#378ADD"
-            tag={{
-              text: t('stats.tags.noAccess', { count: stats.noAccess }),
-              color: '#378ADD',
-              bg: 'rgba(55,138,221,0.10)',
-            }}
-            loading={isLoading}
-          />
-        </div>
-      </WidgetErrorBoundaryV2>
-
-      {/* TWO-COL: Staff Roster + Employment Breakdown */}
-      <div className="mb-3 grid grid-cols-[1.6fr_1fr] gap-3">
-        {/* STAFF ROSTER */}
-        <div className="overflow-hidden rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]">
-          <div className="flex items-center justify-between border-b border-[rgb(var(--border-primary))] px-3.5 py-3">
-            <div className="flex items-center gap-2 text-xs font-semibold text-[rgb(var(--text-primary))]">
-              <div className="flex h-5 w-5 items-center justify-center rounded bg-[rgb(var(--action-secondary-fg))]/10">
-                <Users className="h-3 w-3 text-[rgb(var(--action-secondary-fg))]" />
-              </div>
-              {t('overview.roster.title')}
-            </div>
+      {/* ---- WidgetCard grid ---- */}
+      <WidgetGrid>
+        {/* Staff roster */}
+        <WidgetCard
+          title={t('overview.roster.title')}
+          iconSignature="staff"
+          span={8}
+          footer={
             <button
               type="button"
-              onClick={() => navigate({ to: '/staff' as string })}
-              className="flex cursor-pointer items-center gap-1 text-xs font-medium text-[rgb(var(--action-secondary-fg))]"
+              onClick={goStaff}
+              className="inline-flex items-center gap-1 text-xs font-medium text-[rgb(var(--action-secondary-fg))] transition-opacity hover:opacity-80"
             >
-              {t('overview.roster.viewDirectory')}{' '}
-              <ChevronRight className="h-2.5 w-2.5" />
+              {t('overview.roster.viewDirectory')}
+              <ChevronRight className="h-3 w-3" />
             </button>
-          </div>
-          <div className="px-3.5 pb-2.5 pt-1">
+          }
+        >
+          <WidgetErrorBoundaryV2>
             {isLoading ? (
               <div className="py-5 text-center">
                 <span className="text-xs text-[rgb(var(--text-tertiary))]">
@@ -282,45 +222,20 @@ export function Overview() {
                 </span>
               </div>
             ) : (
-              staff.slice(0, 5).map((s) => (
-                <StaffRow key={s.staffId} staff={s} />
-              ))
+              staff.slice(0, 5).map((s) => <StaffRow key={s.staffId} staff={s} />)
             )}
-          </div>
-        </div>
+          </WidgetErrorBoundaryV2>
+        </WidgetCard>
 
-        {/* EMPLOYMENT BREAKDOWN */}
-        <div className="overflow-hidden rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]">
-          <div className="flex items-center justify-between border-b border-[rgb(var(--border-primary))] px-3.5 py-3">
-            <div className="flex items-center gap-2 text-xs font-semibold text-[rgb(var(--text-primary))]">
-              <div className="flex h-5 w-5 items-center justify-center rounded bg-[rgb(var(--state-info-fg))]/10">
-                <BarChart3 className="h-3 w-3 text-[rgb(var(--state-info-fg))]" />
-              </div>
-              {t('overview.breakdown.title')}
-            </div>
-          </div>
-          <div className="px-3.5 py-2.5">
+        {/* Employment breakdown */}
+        <WidgetCard title={t('overview.breakdown.title')} iconSignature="overview" span={4}>
+          <WidgetErrorBoundaryV2>
             <div className="mb-2 text-xs font-bold uppercase tracking-wide text-[rgb(var(--text-disabled))]">
               {t('overview.breakdown.employmentType')}
             </div>
-            <BarRow
-              label={t('employmentTypes.fullTime')}
-              value={stats.fullTime}
-              total={stats.total}
-              color="#D85A30"
-            />
-            <BarRow
-              label={t('overview.breakdown.contract')}
-              value={stats.contract}
-              total={stats.total}
-              color="#EF9F27"
-            />
-            <BarRow
-              label={t('overview.breakdown.partTime')}
-              value={stats.partTime}
-              total={stats.total}
-              color="#378ADD"
-            />
+            <BarRow label={t('employmentTypes.fullTime')} value={stats.fullTime} total={stats.total} color="#D85A30" />
+            <BarRow label={t('overview.breakdown.contract')} value={stats.contract} total={stats.total} color="#EF9F27" />
+            <BarRow label={t('overview.breakdown.partTime')} value={stats.partTime} total={stats.total} color="#378ADD" />
 
             <div className="my-2.5 h-px bg-[rgb(var(--border-primary))]" />
 
@@ -333,33 +248,15 @@ export function Overview() {
               </div>
             ) : (
               stats.departments.slice(0, 4).map(([dept, count]) => (
-                <BarRow
-                  key={dept}
-                  label={dept}
-                  value={count}
-                  total={stats.total}
-                  color="#7F77DD"
-                  showCount
-                />
+                <BarRow key={dept} label={dept} value={count} total={stats.total} color="#7F77DD" showCount />
               ))
             )}
-          </div>
-        </div>
-      </div>
+          </WidgetErrorBoundaryV2>
+        </WidgetCard>
 
-      {/* TWO-COL: Activity (wide) + Staff Directory shortcut (HR shortcut removed — out of scope) */}
-      <div className="grid grid-cols-[2fr_1fr] gap-3">
-        {/* RECENT ACTIVITY */}
-        <div className="overflow-hidden rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]">
-          <div className="flex items-center gap-2 border-b border-[rgb(var(--border-primary))] px-3.5 py-3">
-            <div className="flex h-5 w-5 items-center justify-center rounded bg-[rgb(var(--state-warning-fg))]/10">
-              <Clock className="h-3 w-3 text-[rgb(var(--state-warning-fg))]" />
-            </div>
-            <span className="text-xs font-semibold text-[rgb(var(--text-primary))]">
-              {t('overview.activity.title')}
-            </span>
-          </div>
-          <div className="px-3.5 pb-2.5 pt-1">
+        {/* Recent activity */}
+        <WidgetCard title={t('overview.activity.title')} iconSignature="overview" span={8}>
+          <WidgetErrorBoundaryV2>
             {activityFeed.length === 0 ? (
               <>
                 {[1, 2, 3].map((i) => (
@@ -396,35 +293,29 @@ export function Overview() {
                 </div>
               ))
             )}
-          </div>
-        </div>
+          </WidgetErrorBoundaryV2>
+        </WidgetCard>
 
-        {/* STAFF DIRECTORY SHORTCUT */}
-        <button
-          type="button"
-          onClick={() => navigate({ to: '/staff' as string })}
-          className={`flex cursor-pointer flex-col gap-2 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] p-3.5 text-left transition-colors hover:border-[rgb(var(--border-secondary))] ${focusRing}`}
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-[rgb(var(--state-success-fg))]/10">
-              <Users className="h-3.5 w-3.5 text-[rgb(var(--state-success-fg))]" />
-            </div>
-            <ChevronRight className="h-3.5 w-3.5 text-[rgb(var(--text-disabled))]" />
+        {/* Staff directory shortcut */}
+        <WidgetCard title={t('staffDirectory.title')} iconSignature="staff" span={4}>
+          <div className="flex h-full flex-col justify-between gap-3">
+            <p className="text-xs leading-normal text-[rgb(var(--text-tertiary))]">
+              {t('overview.directoryShortcutDescription')}
+            </p>
+            <button
+              type="button"
+              onClick={goStaff}
+              className="inline-flex w-fit items-center gap-1 text-xs font-medium text-[rgb(var(--action-secondary-fg))] transition-opacity hover:opacity-80"
+            >
+              {t('overview.roster.viewDirectory')}
+              <ChevronRight className="h-3 w-3" />
+            </button>
           </div>
-          <div className="text-xs font-semibold text-[rgb(var(--text-primary))]">
-            {t('staffDirectory.title')}
-          </div>
-          <div className="text-xs leading-normal text-[rgb(var(--text-tertiary))]">
-            {t('overview.directoryShortcutDescription')}
-          </div>
-        </button>
-      </div>
+        </WidgetCard>
+      </WidgetGrid>
 
       {/* CREATE USER MODAL */}
-      <CreateUserModal
-        open={modal.mode === 'create'}
-        onClose={modal.close}
-      />
+      <CreateUserModal open={modal.mode === 'create'} onClose={modal.close} />
     </Container>
   )
 }
