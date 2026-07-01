@@ -111,7 +111,7 @@ export function GradebookGrid({
       if (!rosterIds.has(g.studentId)) {
         result.push({
           studentId: g.studentId,
-          studentName: g.studentName || `${t('gradesModule.gradebook.student')} (transferred)`,
+          studentName: g.studentName || t('gradesModule.gradebook.transferredStudent'),
           grade: g,
         })
       }
@@ -305,7 +305,18 @@ export function GradebookGrid({
               <th
                 key={col.name}
                 className="sticky top-0 z-10 bg-surface-secondary px-3 py-3 text-center font-medium text-text-secondary min-w-24 border-r border-border-secondary group relative"
-                title={`${col.name}\n${col.categoryId ? `Category: ${col.categoryId}` : ''}\nPoints: ${col.possiblePoints}`}
+                title={
+                  col.categoryId
+                    ? t('gradesModule.gradebook.assignmentTooltipWithCategory', {
+                        name: col.name,
+                        category: col.categoryId,
+                        points: formatNumber(col.possiblePoints),
+                      })
+                    : t('gradesModule.gradebook.assignmentTooltip', {
+                        name: col.name,
+                        points: formatNumber(col.possiblePoints),
+                      })
+                }
               >
                 <div className="truncate max-w-32">{col.name}</div>
                 <div className="text-xs text-text-tertiary font-normal mt-0.5">

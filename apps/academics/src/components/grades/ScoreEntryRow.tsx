@@ -8,6 +8,7 @@
  */
 
 import { UserAvatar } from '../common/UserAvatar'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 export interface ScoreEntryRowProps {
   studentId: string
@@ -26,6 +27,7 @@ export function ScoreEntryRow({
   maxPoints,
   disabled,
 }: ScoreEntryRowProps) {
+  const { t, formatNumber } = useAcademicsI18n()
   const num = value === '' ? null : Number(value)
   const invalid = num !== null && (isNaN(num) || num < 0 || num > maxPoints)
 
@@ -48,7 +50,7 @@ export function ScoreEntryRow({
           disabled={disabled}
           onChange={(e) => onChange(e.target.value)}
           placeholder="—"
-          aria-label={`Score for ${studentName}`}
+          aria-label={t('gradesModule.gradebook.scoreForStudent', { studentName })}
           aria-invalid={invalid || undefined}
           className={`w-20 rounded-lg border bg-[rgb(var(--background-secondary))] px-2.5 py-1.5 text-sm tabular-nums text-right focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] disabled:opacity-50 ${
             invalid
@@ -57,7 +59,7 @@ export function ScoreEntryRow({
           }`}
         />
         <span className="text-xs text-[rgb(var(--text-tertiary))] tabular-nums w-10">
-          / {maxPoints}
+          / {formatNumber(maxPoints)}
         </span>
       </div>
     </div>

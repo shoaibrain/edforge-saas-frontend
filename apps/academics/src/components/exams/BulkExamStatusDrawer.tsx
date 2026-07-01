@@ -28,6 +28,7 @@ import {
   getExamTransitionActions,
   type ExamTransitionAction,
 } from '../../schemas/exam-state-machine'
+import { useAcademicsI18n } from '../../lib/i18n'
 
 // ============================================================================
 // PUBLIC API
@@ -53,6 +54,7 @@ export function BulkExamStatusDrawer({
   onComplete,
 }: BulkExamStatusDrawerProps) {
   const queryClient = useQueryClient()
+  const { t, formatNumber, formatCount } = useAcademicsI18n()
 
   // Intersection of allowed next statuses across the selection — exposed to
   // the operator as the dropdown options. Any picked target outside this set
@@ -119,7 +121,9 @@ export function BulkExamStatusDrawer({
       const failures = results.filter((r) => r.status === 'rejected')
       const ok = results.length - failures.length
       const skippedCount = skippedRows.length
-      const targetLabel = getExamStatusMeta(target).label
+      const targetLabel = t(`examModule.status.${target}`, {
+        defaultValue: getExamStatusMeta(target).label,
+      })
 
       // Invalidate once after the fan-out — the per-row hook would have
       // invalidated detail keys, but no exam detail page is open during
@@ -127,17 +131,37 @@ export function BulkExamStatusDrawer({
       queryClient.invalidateQueries({ queryKey: examKeys.lists() })
 
       if (failures.length === 0 && skippedCount === 0) {
-        toast.success(`Moved ${ok} exam${ok === 1 ? '' : 's'} to ${targetLabel}`)
+        toast.success(t('examModule.bulkDrawer.toast.movedAll', {
+          count: ok,
+          value: formatNumber(ok),
+          target: targetLabel,
+        }))
       } else if (failures.length > 0 && ok === 0) {
         const firstError = parseApiError(
           (failures[0] as PromiseRejectedResult).reason as Error,
         ).message
-        toast.error(`No exams moved — ${firstError}`)
+        toast.error(t('examModule.bulkDrawer.toast.noneMoved', { error: firstError }))
       } else {
-        const parts: string[] = [`Moved ${ok} to ${targetLabel}`]
-        if (skippedCount > 0) parts.push(`${skippedCount} skipped`)
-        if (failures.length > 0) parts.push(`${failures.length} failed`)
-        toast.error(parts.join(' · '))
+        const parts: string[] = [
+          t('examModule.bulkDrawer.toast.movedPartial', {
+            count: ok,
+            value: formatNumber(ok),
+            target: targetLabel,
+          }),
+        ]
+        if (skippedCount > 0) {
+          parts.push(t('examModule.bulkDrawer.toast.skipped', {
+            count: skippedCount,
+            value: formatNumber(skippedCount),
+          }))
+        }
+        if (failures.length > 0) {
+          parts.push(t('examModule.bulkDrawer.toast.failed', {
+            count: failures.length,
+            value: formatNumber(failures.length),
+          }))
+        }
+        toast.error(parts.join(t('examModule.bulkDrawer.toast.separator')))
       }
 
       if (ok > 0) {
@@ -189,10 +213,10 @@ export function BulkExamStatusDrawer({
                         id="bulk-exam-status-title"
                         className="text-lg font-semibold text-text-primary truncate"
                       >
-                        Change exam status
+                        {t('examModule.bulkDrawer.title')}
                       </h2>
                       <p className="text-xs text-text-tertiary tabular-nums">
-                        {exams.length} exam{exams.length === 1 ? '' : 's'} selected
+                        {formatCount('examModule.bulkDrawer.selectedCount', exams.length)}
                       </p>
                     </div>
                   </div>
@@ -200,7 +224,7 @@ export function BulkExamStatusDrawer({
                     type="button"
                     onClick={handleClose}
                     className="p-1.5 rounded-lg text-text-tertiary hover:text-text-primary hover:bg-surface-secondary transition-colors flex-shrink-0"
-                    aria-label="Close drawer"
+                    aria-label={t('examModule.detail.closeDrawer')}
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -211,24 +235,29 @@ export function BulkExamStatusDrawer({
                   {/* Target picker */}
                   <section>
                     <h3 className="text-sm font-medium text-text-primary mb-2">
-                      Move to
+                      {t('examModule.bulkDrawer.moveTo')}
                     </h3>
                     {intersection.actions.length === 0 ? (
                       <div
                         className="rounded-lg border border-dashed border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary)/0.4)] px-3 py-3 text-sm text-text-secondary"
                         role="status"
                       >
-                        No status is reachable from every selected exam — narrow
-                        the selection or move them in groups.
+                        {t('examModule.bulkDrawer.noSharedTarget')}
                       </div>
                     ) : (
                       <div
                         className="flex flex-wrap gap-2"
                         role="radiogroup"
-                        aria-label="Target status"
+                        aria-label={t('examModule.bulkDrawer.targetStatusAria')}
                       >
                         {intersection.actions.map((action) => {
                           const isActive = action.to === target
+                          const actionLabel = t(`examModule.transitions.${action.to}`, {
+                            defaultValue: action.label,
+                          })
+                          const statusLabel = t(`examModule.status.${action.to}`, {
+                            defaultValue: getExamStatusMeta(action.to).label,
+                          })
                           return (
                             <button
                               key={action.to}
@@ -244,9 +273,9 @@ export function BulkExamStatusDrawer({
                                   : 'bg-surface-primary text-text-secondary border-border-primary hover:border-[rgb(var(--border-focus))] hover:text-text-primary',
                               ].join(' ')}
                             >
-                              {action.label}
+                              {actionLabel}
                               <span className="text-xs opacity-80">
-                                ({getExamStatusMeta(action.to).label})
+                                ({statusLabel})
                               </span>
                             </button>
                           )
@@ -262,7 +291,11 @@ export function BulkExamStatusDrawer({
                       role="alert"
                     >
                       <AlertTriangle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                      <span>{targetAction.confirm}</span>
+                      <span>
+                        {t(`examModule.transitionConfirm.${targetAction.to}`, {
+                          defaultValue: targetAction.confirm,
+                        })}
+                      </span>
                     </div>
                   )}
 
@@ -272,14 +305,17 @@ export function BulkExamStatusDrawer({
                       htmlFor="bulk-exam-status-notes"
                       className="block text-sm font-medium text-text-primary mb-2"
                     >
-                      Notes <span className="text-text-tertiary font-normal">(optional)</span>
+                      {t('examModule.bulkDrawer.notes')}{' '}
+                      <span className="text-text-tertiary font-normal">
+                        {t('examModule.bulkDrawer.optional')}
+                      </span>
                     </label>
                     <textarea
                       id="bulk-exam-status-notes"
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
                       rows={3}
-                      placeholder="Add a reason or context that goes with every transition…"
+                      placeholder={t('examModule.bulkDrawer.notesPlaceholder')}
                       className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] resize-none focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
                     />
                   </section>
@@ -287,7 +323,7 @@ export function BulkExamStatusDrawer({
                   {/* Per-row preview, grouped by current status */}
                   <section>
                     <h3 className="text-sm font-medium text-text-primary mb-2">
-                      Selection ({exams.length})
+                      {t('examModule.bulkDrawer.selection', { count: formatNumber(exams.length) })}
                     </h3>
                     <div className="space-y-3">
                       {EXAM_STATUS_PIPELINE.flatMap((status) => {
@@ -304,10 +340,12 @@ export function BulkExamStatusDrawer({
                                   aria-hidden
                                   className="inline-block w-1.5 h-1.5 rounded-full bg-current"
                                 />
-                                {statusMeta.label}
+                                {t(`examModule.status.${status}`, {
+                                  defaultValue: statusMeta.label,
+                                })}
                               </span>
                               <span className="text-xs text-text-tertiary tabular-nums">
-                                {rows.length} exam{rows.length === 1 ? '' : 's'}
+                                {formatCount('examModule.bulkDrawer.statusCount', rows.length)}
                               </span>
                             </div>
                             <ul className="space-y-1">
@@ -327,16 +365,23 @@ export function BulkExamStatusDrawer({
                                     </span>
                                     {target == null ? (
                                       <span className="text-xs text-text-tertiary">
-                                        pick a target
+                                        {t('examModule.bulkDrawer.pickTarget')}
                                       </span>
                                     ) : eligible ? (
                                       <span className="inline-flex items-center gap-1 text-xs text-[rgb(var(--state-success-fg))]">
-                                        → {getExamStatusMeta(target).label}
+                                        {t('examModule.bulkDrawer.targetPreview', {
+                                          target: t(`examModule.status.${target}`, {
+                                            defaultValue: getExamStatusMeta(target).label,
+                                          }),
+                                        })}
                                       </span>
                                     ) : (
                                       <span className="inline-flex items-center gap-1 text-xs text-text-tertiary">
-                                        — skipped (no path to{' '}
-                                        {getExamStatusMeta(target).label})
+                                        {t('examModule.bulkDrawer.skippedPreview', {
+                                          target: t(`examModule.status.${target}`, {
+                                            defaultValue: getExamStatusMeta(target).label,
+                                          }),
+                                        })}
                                       </span>
                                     )}
                                   </li>
@@ -358,7 +403,7 @@ export function BulkExamStatusDrawer({
                     disabled={isApplying}
                     className="px-4 py-2 text-sm font-medium text-[rgb(var(--text-secondary))] bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] rounded-lg hover:bg-[rgb(var(--background-secondary))] transition-colors disabled:opacity-50"
                   >
-                    Cancel
+                    {t('actions.cancel')}
                   </button>
                   <button
                     type="button"
@@ -371,10 +416,10 @@ export function BulkExamStatusDrawer({
                     {isApplying ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        Applying…
+                        {t('examModule.bulkDrawer.applying')}
                       </>
                     ) : (
-                      <>Apply to {eligibleRows.length}</>
+                      <>{t('examModule.bulkDrawer.applyTo', { count: formatNumber(eligibleRows.length) })}</>
                     )}
                   </button>
                 </div>
