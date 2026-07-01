@@ -144,6 +144,8 @@ export {
   DataTableColumnHeader,
   DataTablePagination,
   DataTableToolbar,
+  ToolbarSearch,
+  type ToolbarSearchProps,
   DataTableFacetedFilter,
   DataTableViewOptions,
   DataTableRowActions,

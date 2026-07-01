@@ -58,6 +58,9 @@ interface SectionTableProps {
    *  the card grid and the table. The floating bulk-action bar (on selection)
    *  is unaffected. */
   hideToolbar?: boolean
+  /** Extra classes for the DataTable's outer container (e.g. to connect it to a
+   *  page-level toolbar above via `!rounded-t-none !border-t-0`). */
+  className?: string
 }
 
 // ============================================================================
@@ -205,6 +208,7 @@ export function SectionTable({
   rowSelection,
   onRowSelectionChange,
   hideToolbar = false,
+  className,
 }: SectionTableProps) {
   const { t, dataTableLabels } = useAcademicsI18n()
   const columns: ColumnDef<SectionResponseDto, unknown>[] = useMemo(
@@ -386,6 +390,7 @@ export function SectionTable({
 
   return (
     <TanstackDataTable
+      className={className}
       columns={columns}
       data={sections}
       getRowId={(section) => section.sectionId}

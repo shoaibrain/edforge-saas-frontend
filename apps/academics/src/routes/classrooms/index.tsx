@@ -30,8 +30,12 @@ import {
   Lock,
   AlertTriangle,
   ChevronDown,
-  Search,
   Download,
+  BookOpen,
+  Users,
+  Calendar,
+  LayoutGrid,
+  List,
   Send,
   ToggleLeft,
   ToggleRight,
@@ -42,7 +46,7 @@ import {
   type StatMetric,
   Button,
   Select,
-  Input,
+  ToolbarSearch,
   PageHeader,
   Tabs,
   SegmentedControl,
@@ -298,116 +302,137 @@ function OverviewTab() {
       {/* KPI band */}
       <StatBand metrics={metrics} ariaLabel={t('classrooms.stats.region')} />
 
-      {/* Unified toolbar — one row drives both the card grid and the table */}
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-secondary))] px-3 py-2.5">
-        {/* Search */}
-        <Input
-          type="search"
-          size="sm"
-          className="w-72 max-w-full flex-none"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder={t('classrooms.toolbar.searchPlaceholder')}
-          aria-label={t('classrooms.toolbar.searchPlaceholder')}
-          prefix={<Search className="h-4 w-4" />}
-        />
-
-        {/* Status presets */}
-        <TablePresetTabs
-          presets={[
-            { value: 'all', label: t('classrooms.toolbar.all') },
-            { value: 'active', label: t('common.active') },
-            { value: 'inactive', label: t('common.inactive') },
-          ]}
-          active={activePreset}
-          onChange={(v) => filterActions.setIsActive(v === 'all' ? null : v === 'active')}
-          ariaLabel={t('classrooms.toolbar.statusPresets')}
-        />
-
-        {/* Facets: Course · Teacher · Year */}
-        <Select
-          size="sm"
-          className="w-40"
-          clearable
-          placeholder={t('classrooms.toolbar.course')}
-          value={filters.courseId || ''}
-          onChange={(v) => filterActions.setCourseId(v || null)}
-          options={courses.map((c) => ({ value: c.courseId, label: `${c.courseCode} — ${c.courseName}` }))}
-          buttonClassName="border-[rgb(var(--border-primary)/0.35)]"
-        />
-        <Select
-          size="sm"
-          className="w-40"
-          clearable
-          placeholder={t('classrooms.toolbar.teacher')}
-          value={filters.teacherId || ''}
-          onChange={(v) => filterActions.setTeacherId(v || null)}
-          options={teachers.map((tc) => ({ value: tc.staffId, label: getStaffDisplayName(tc) }))}
-          buttonClassName="border-[rgb(var(--border-primary)/0.35)]"
-        />
-        <Select
-          size="sm"
-          className="w-36"
-          clearable
-          placeholder={t('classrooms.toolbar.year')}
-          value={filters.academicYearId || ''}
-          onChange={(v) => filterActions.setAcademicYearId(v || null)}
-          options={(academicYears || []).map((y) => ({
-            value: y.yearId,
-            label: `${y.name}${y.isCurrent ? ` (${t('common.current')})` : ''}`,
-          }))}
-          buttonClassName="border-[rgb(var(--border-primary)/0.35)]"
-        />
-
-        {/* Right cluster: view toggle + export */}
-        <div className="ml-auto flex items-center gap-2">
-          <SegmentedControl
-            aria-label={t('classrooms.toolbar.viewToggle')}
-            value={viewMode === 'grid' ? 'cards' : 'table'}
-            onChange={(v) => setViewMode(v === 'cards' ? 'grid' : 'list')}
-            tabs={[
-              { id: 'cards', label: t('classrooms.toolbar.cards') },
-              { id: 'table', label: t('classrooms.toolbar.table') },
-            ]}
+      {/* Unified toolbar + body — one connected container (toolbar row → content) */}
+      <div>
+        {/* Toolbar: one row drives both the card grid and the table */}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-t-xl border border-b-0 border-[rgb(var(--border-primary)/0.5)] bg-[rgb(var(--background-secondary))] px-3 py-2.5">
+          {/* Search — canonical unified-toolbar field */}
+          <ToolbarSearch
+            value={search}
+            onChange={setSearch}
+            placeholder={t('classrooms.toolbar.searchPlaceholder')}
+            aria-label={t('classrooms.toolbar.searchPlaceholder')}
           />
-          <button
-            type="button"
-            onClick={handleExport}
-            className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-[rgb(var(--border-primary)/0.35)] px-3 text-sm font-medium text-[rgb(var(--text-secondary))] transition-colors hover:bg-[rgb(var(--background-tertiary))]"
-          >
-            <Download className="h-4 w-4" />
-            {t('classrooms.toolbar.export')}
-          </button>
-        </div>
-      </div>
 
-      {/* Grid or Table (one unified toolbar above; table's own toolbar suppressed) */}
-      {viewMode === 'grid' ? (
-        <ClassroomCardGrid
-          sections={sections}
-          isLoading={isLoading}
-          hasMore={hasNextPage}
-          isFetchingMore={isFetchingNextPage}
-          subjectAreaMap={subjectAreaMap}
-          onLoadMore={() => fetchNextPage()}
-          onNavigate={(id) => navigate({ to: `/classrooms/${id}` })}
-          onEdit={schedPerms.edit ? (id) => navigate({ to: `/classrooms/${id}/edit` }) : undefined}
-          onToggleActive={schedPerms.edit ? handleToggleActive : undefined}
-        />
-      ) : (
-        <SectionTable
-          sections={sections}
-          isLoading={isLoading}
-          hideToolbar
-          onViewSection={handleNavigateToDetail}
-          onEditSection={schedPerms.edit ? handleNavigateToEdit : undefined}
-          onToggleActive={schedPerms.edit ? handleToggleActive : undefined}
-          onViewRoster={handleNavigateToDetail}
-          bulkActions={schedPerms.edit ? bulkActions : undefined}
-          rowSelection={rowSelection}
-          onRowSelectionChange={setRowSelection}
-        />
-      )}
+          {/* Status presets */}
+          <TablePresetTabs
+            presets={[
+              { value: 'all', label: t('classrooms.toolbar.all') },
+              { value: 'active', label: t('common.active') },
+              { value: 'inactive', label: t('common.inactive') },
+            ]}
+            active={activePreset}
+            onChange={(v) => filterActions.setIsActive(v === 'all' ? null : v === 'active')}
+            ariaLabel={t('classrooms.toolbar.statusPresets')}
+          />
+
+          {/* Facets: Course · Teacher · Year (context icons) */}
+          <Select
+            size="sm"
+            className="w-40"
+            clearable
+            leadingIcon={<BookOpen className="h-4 w-4" />}
+            placeholder={t('classrooms.toolbar.course')}
+            value={filters.courseId || ''}
+            onChange={(v) => filterActions.setCourseId(v || null)}
+            options={courses.map((c) => ({ value: c.courseId, label: `${c.courseCode} — ${c.courseName}` }))}
+            buttonClassName="border-[rgb(var(--border-primary)/0.35)]"
+          />
+          <Select
+            size="sm"
+            className="w-40"
+            clearable
+            leadingIcon={<Users className="h-4 w-4" />}
+            placeholder={t('classrooms.toolbar.teacher')}
+            value={filters.teacherId || ''}
+            onChange={(v) => filterActions.setTeacherId(v || null)}
+            options={teachers.map((tc) => ({ value: tc.staffId, label: getStaffDisplayName(tc) }))}
+            buttonClassName="border-[rgb(var(--border-primary)/0.35)]"
+          />
+          <Select
+            size="sm"
+            className="w-36"
+            clearable
+            leadingIcon={<Calendar className="h-4 w-4" />}
+            placeholder={t('classrooms.toolbar.year')}
+            value={filters.academicYearId || ''}
+            onChange={(v) => filterActions.setAcademicYearId(v || null)}
+            options={(academicYears || []).map((y) => ({
+              value: y.yearId,
+              label: `${y.name}${y.isCurrent ? ` (${t('common.current')})` : ''}`,
+            }))}
+            buttonClassName="border-[rgb(var(--border-primary)/0.35)]"
+          />
+
+          {/* Right cluster: icon-only view toggle + export */}
+          <div className="ml-auto flex items-center gap-2">
+            <SegmentedControl
+              aria-label={t('classrooms.toolbar.viewToggle')}
+              value={viewMode === 'grid' ? 'cards' : 'table'}
+              onChange={(v) => setViewMode(v === 'cards' ? 'grid' : 'list')}
+              tabs={[
+                {
+                  id: 'cards',
+                  label: (
+                    <>
+                      <LayoutGrid aria-hidden="true" className="h-4 w-4" />
+                      <span className="sr-only">{t('classrooms.actions.gridView')}</span>
+                    </>
+                  ),
+                },
+                {
+                  id: 'table',
+                  label: (
+                    <>
+                      <List aria-hidden="true" className="h-4 w-4" />
+                      <span className="sr-only">{t('classrooms.actions.listView')}</span>
+                    </>
+                  ),
+                },
+              ]}
+            />
+            <button
+              type="button"
+              onClick={handleExport}
+              className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-[rgb(var(--border-primary)/0.35)] px-3 text-sm font-medium text-[rgb(var(--text-secondary))] transition-colors hover:bg-[rgb(var(--background-tertiary))]"
+            >
+              <Download className="h-4 w-4" />
+              {t('classrooms.toolbar.export')}
+            </button>
+          </div>
+        </div>
+
+        {/* Body — connects to the toolbar above (shared bordered container) */}
+        {viewMode === 'grid' ? (
+          <div className="rounded-b-xl border border-t-0 border-[rgb(var(--border-primary)/0.5)] p-4">
+            <ClassroomCardGrid
+              sections={sections}
+              isLoading={isLoading}
+              hasMore={hasNextPage}
+              isFetchingMore={isFetchingNextPage}
+              subjectAreaMap={subjectAreaMap}
+              onLoadMore={() => fetchNextPage()}
+              onNavigate={(id) => navigate({ to: `/classrooms/${id}` })}
+              onEdit={schedPerms.edit ? (id) => navigate({ to: `/classrooms/${id}/edit` }) : undefined}
+              onToggleActive={schedPerms.edit ? handleToggleActive : undefined}
+            />
+          </div>
+        ) : (
+          <SectionTable
+            sections={sections}
+            isLoading={isLoading}
+            hideToolbar
+            className="!rounded-t-none !border-t-0"
+            onViewSection={handleNavigateToDetail}
+            onEditSection={schedPerms.edit ? handleNavigateToEdit : undefined}
+            onToggleActive={schedPerms.edit ? handleToggleActive : undefined}
+            onViewRoster={handleNavigateToDetail}
+            bulkActions={schedPerms.edit ? bulkActions : undefined}
+            rowSelection={rowSelection}
+            onRowSelectionChange={setRowSelection}
+          />
+        )}
+      </div>
 
       {/* Bulk activate / deactivate modal (#224) */}
       <BulkSectionStatusModal
