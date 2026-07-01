@@ -495,6 +495,7 @@ export function GradeOverview({
             label={t('gradesModule.overview.kpis.studentsGraded')}
             value={formatNumber(data.totalStudentsGraded)}
             icon={Users}
+            signature="students"
             accentColor="rgba(55,138,221,0.10)"
             iconColor={V2.info}
             barColor={V2.info}
@@ -507,6 +508,7 @@ export function GradeOverview({
             label={t('gradesModule.overview.kpis.averageGpa')}
             value={data.averageGpa.toFixed(2)}
             icon={Users}
+            signature="gpa"
             accentColor="rgba(29,158,117,0.10)"
             iconColor={V2.success}
             barColor={V2.success}
@@ -527,6 +529,7 @@ export function GradeOverview({
             label={t('gradesModule.overview.kpis.atRisk')}
             value={formatNumber(data.atRiskCount)}
             icon={AlertTriangle}
+            signature="atrisk"
             accentColor="rgba(226,75,74,0.10)"
             iconColor={V2.danger}
             barColor={V2.danger}

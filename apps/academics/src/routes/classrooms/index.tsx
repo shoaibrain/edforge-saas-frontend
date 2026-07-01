@@ -228,6 +228,7 @@ function OverviewTab() {
             label={t('classrooms.stats.totalSections')}
             value={formatNumber(total ?? stats.totalSections)}
             icon={LayoutGrid}
+            signature="sections"
             accentColor="rgb(var(--accent-academics)/0.1)"
             iconColor="rgb(var(--accent-academics))"
             barColor="rgb(var(--accent-academics))"
@@ -238,6 +239,7 @@ function OverviewTab() {
             label={t('classrooms.stats.totalStudents')}
             value={formatNumber(stats.totalEnrolled)}
             icon={Users}
+            signature="students"
             accentColor="rgb(var(--accent-enrollment)/0.1)"
             iconColor="rgb(var(--accent-enrollment))"
             barColor="rgb(var(--accent-enrollment))"
@@ -258,6 +260,7 @@ function OverviewTab() {
             label={t('classrooms.stats.activeTeachers')}
             value={formatNumber(stats.uniqueTeachers)}
             icon={UsersRound}
+            signature="people"
             accentColor="rgb(var(--accent-reports)/0.1)"
             iconColor="rgb(var(--accent-reports))"
             barColor="rgb(var(--accent-reports))"
