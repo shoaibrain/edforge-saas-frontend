@@ -112,6 +112,9 @@
     }
   },
   "invoices": {
+    "kpi": {
+      "region": "Key metrics"
+    },
     "title": "Invoices",
     "description": "View and manage fee invoices",
     "manageDescription": "Generate, issue, and manage student invoices.",
@@ -308,6 +311,9 @@
     "credit": "Credit"
   },
   "feeStructure": {
+    "kpi": {
+      "region": "Key metrics"
+    },
     "title": "Fee Structures",
     "description": "Configure fee types and amounts for your school",
     "addFee": "Add Fee Structure",
@@ -662,6 +668,9 @@
     "credentialsMasked": "Credentials are masked for security"
   },
   "paymentsList": {
+    "kpi": {
+      "region": "Key metrics"
+    },
     "title": "Payments",
     "description": "View and manage all payment transactions.",
     "selectSchool": "Select a school to view payments.",
@@ -926,6 +935,9 @@
     "grade": "Grade {{grade}}"
   },
   "studentAccount": {
+    "kpi": {
+      "region": "Key metrics"
+    },
     "title": "Student Account",
     "pageTitle": "Student Accounts",
     "description": "View student billing accounts, invoices, payments, and ledger history.",

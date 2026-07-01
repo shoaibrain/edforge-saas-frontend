@@ -11,15 +11,12 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Loader2,
   Users,
-  TrendingUp,
-  Receipt,
-  AlertTriangle,
   Wallet,
   Mail,
   Pencil,
 } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
-import { useTranslation } from '@edforge/i18n'
+import { normalizePlatformLanguage, useTranslation } from '@edforge/i18n'
 import {
   TanstackDataTable,
   createExpandColumn,
@@ -28,8 +25,9 @@ import {
   IdentityCell,
   type BulkAction,
   type ColumnDef,
-  StatCard,
-  WidgetErrorBoundaryV2,
+  PageHeader,
+  StatBand,
+  type StatMetric,
 } from '@edforge/ui'
 import { UuidBadge } from '@edforge/archetype'
 import { useAppStore } from '../../../stores/app.store'
@@ -41,7 +39,7 @@ import {
 import type { StudentAccount, StudentLedgerEntry, Invoice } from '@edforge/types'
 import { useCurrency } from '@edforge/types/use-currency'
 import { useFinanceSettings } from '../../../layouts/FinanceLayout'
-import { FinancePageHeader, FinanceStatusChip } from '../../../components/shared'
+import { FinanceStatusChip } from '../../../components/shared'
 import { formatDate, formatDateDual } from '../../../utils/format-date'
 import { BulkSendStatementsDrawer } from '../../../components/billing/BulkSendStatementsDrawer'
 import { BulkAdjustBalanceDrawer } from '../../../components/billing/BulkAdjustBalanceDrawer'
@@ -556,7 +554,7 @@ function buildColumns(
 // ============================================================================
 
 export default function StudentAccountsPage() {
-  const { t } = useTranslation('payments')
+  const { t, i18n } = useTranslation('payments')
   const schoolId = useAppStore((s) => s.activeSchoolId)
   const settings = useFinanceSettings()
   const { format, formatCompact } = useCurrency(settings)
@@ -612,62 +610,54 @@ export default function StudentAccountsPage() {
     )
   }
 
+  const today = new Date().toLocaleDateString(
+    normalizePlatformLanguage(i18n.language) === 'ne' ? 'ne-NP' : 'en-US',
+    { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' },
+  )
+
+  // ── StatBand metrics (calm; the numbers carry the signal) ────────────────
+  const metrics: StatMetric[] = [
+    {
+      label: t('studentAccount.summary.totalStudents'),
+      value: String(kpi.totalStudents),
+      iconSignature: 'students',
+      state: 'normal',
+      primary: true,
+      sub: t('studentAccount.summary.accounts', { count: kpi.totalStudents }),
+    },
+    {
+      label: t('studentAccount.summary.outstanding'),
+      value: formatCompact(kpi.totalOutstanding),
+      iconSignature: 'finance_receipt',
+      state: 'normal',
+      sub: t('studentAccount.summary.withBalanceCount', { count: kpi.overdueCount }),
+    },
+    {
+      label: t('studentAccount.summary.fullyPaid'),
+      value: String(kpi.fullyPaidCount),
+      iconSignature: 'finance',
+      state: 'normal',
+      sub: t('studentAccount.summary.noBalance'),
+    },
+    {
+      label: t('studentAccount.summary.withBalance'),
+      value: String(kpi.overdueCount),
+      iconSignature: 'atrisk',
+      state: 'normal',
+      sub: t('studentAccount.summary.withBalanceCount', { count: kpi.overdueCount }),
+    },
+  ]
+
   return (
     <div className="p-6 space-y-5">
-      {/* Header */}
-      <FinancePageHeader
-        title={t('studentAccount.pageTitle')}
-        subtitle={t('studentAccount.description')}
-      />
+      {/* Screen-reader page heading (breadcrumb names the page visually) */}
+      <h1 className="sr-only">{t('studentAccount.pageTitle')}</h1>
 
-      {/* KPI Tiles */}
-      <WidgetErrorBoundaryV2>
-        <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
-          <StatCard
-            label={t('studentAccount.summary.totalStudents')}
-            value={String(kpi.totalStudents)}
-            icon={Users}
-            accentColor="rgba(29, 158, 117, 0.12)"
-            iconColor="#1D9E75"
-            barColor="#1D9E75"
-            tag={{ text: t('studentAccount.summary.accounts', { count: kpi.totalStudents }), color: '#1D9E75', bg: 'rgba(29,158,117,0.10)' }}
-            loading={isLoading}
-          />
-          <StatCard
-            label={t('studentAccount.summary.outstanding')}
-            value={formatCompact(kpi.totalOutstanding)}
-            icon={Receipt}
-            signature="finance_receipt"
-            accentColor="rgba(239, 159, 39, 0.12)"
-            iconColor="#EF9F27"
-            barColor="#EF9F27"
-            tag={{ text: t('studentAccount.summary.withBalanceCount', { count: kpi.overdueCount }), color: '#EF9F27', bg: 'rgba(239,159,39,0.10)' }}
-            valueColor="#EF9F27"
-            loading={isLoading}
-          />
-          <StatCard
-            label={t('studentAccount.summary.fullyPaid')}
-            value={String(kpi.fullyPaidCount)}
-            icon={TrendingUp}
-            accentColor="rgba(29, 158, 117, 0.12)"
-            iconColor="#1D9E75"
-            barColor="#1D9E75"
-            tag={{ text: t('studentAccount.summary.noBalance'), color: '#1D9E75', bg: 'rgba(29,158,117,0.10)' }}
-            loading={isLoading}
-          />
-          <StatCard
-            label={t('studentAccount.summary.withBalance')}
-            value={String(kpi.overdueCount)}
-            icon={AlertTriangle}
-            signature="atrisk"
-            accentColor="rgba(226, 75, 74, 0.12)"
-            iconColor="#E24B4A"
-            barColor="#E24B4A"
-            tag={{ text: t('studentAccount.summary.withBalanceCount', { count: kpi.overdueCount }), color: '#E24B4A', bg: 'rgba(226,75,74,0.10)' }}
-            loading={isLoading}
-          />
-        </div>
-      </WidgetErrorBoundaryV2>
+      {/* ---- Page header (pagebar) ---- */}
+      <PageHeader mode="pagebar" date={today} />
+
+      {/* ---- StatBand — KPI summary ---- */}
+      <StatBand metrics={metrics} ariaLabel={t('studentAccount.kpi.region')} />
 
       {/* Data Table */}
       <TanstackDataTable<StudentAccount>

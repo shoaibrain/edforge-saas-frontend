@@ -15,9 +15,11 @@ import {
   createActionsColumn,
   createSelectColumn,
   IdentityCell,
-  StatCard,
-  WidgetErrorBoundaryV2,
+  PageHeader,
+  StatBand,
+  type StatMetric,
   Select,
+  DataTableMoreFilters,
 } from '@edforge/ui'
 import type { BulkAction, ColumnDef } from '@edforge/ui'
 import type { RowSelectionState } from '@tanstack/react-table'
@@ -30,12 +32,10 @@ import {
   RotateCcw,
   X,
   AlertTriangle,
-  Wallet,
-  TrendingUp,
   Receipt,
   Download,
 } from 'lucide-react'
-import { useTranslation } from '@edforge/i18n'
+import { normalizePlatformLanguage, useTranslation } from '@edforge/i18n'
 import { useAppStore } from '../../../stores/app.store'
 import {
   useSchoolPayments,
@@ -50,11 +50,7 @@ import type { Payment } from '@edforge/types'
 import { useCurrency } from '@edforge/types/use-currency'
 import { useFinanceSettings } from '../../../layouts/FinanceLayout'
 import { formatDate, formatDateDual } from '../../../utils/format-date'
-import {
-  FinancePageHeader,
-  FinanceStatusChip,
-  ExportCsvButton,
-} from '../../../components/shared'
+import { FinanceStatusChip, ExportCsvButton } from '../../../components/shared'
 import { BulkVoidPaymentsDrawer } from '../../../components/billing/BulkVoidPaymentsDrawer'
 import { BulkSendReceiptsDrawer } from '../../../components/billing/BulkSendReceiptsDrawer'
 
@@ -701,7 +697,7 @@ function formatGatewayForLocale(gateway: string, t: Translate): string {
 // ============================================================================
 
 export default function PaymentsPage() {
-  const { t } = useTranslation('payments')
+  const { t, i18n } = useTranslation('payments')
   const navigate = useNavigate()
   const schoolId = useAppStore((s) => s.activeSchoolId)
   const settings = useFinanceSettings()
@@ -829,80 +825,80 @@ export default function PaymentsPage() {
     )
   }
 
+  const today = new Date().toLocaleDateString(
+    normalizePlatformLanguage(i18n.language) === 'ne' ? 'ne-NP' : 'en-US',
+    { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' },
+  )
+
+  const STATUS_PRESETS = [
+    { label: t('filters.allStatuses'), value: '' },
+    { label: t('status.completed'), value: 'completed' },
+    { label: t('status.failed'), value: 'failed' },
+    { label: t('status.cancelled'), value: 'cancelled' },
+    { label: t('status.refunded'), value: 'refunded' },
+    { label: t('status.pending'), value: 'pending' },
+  ]
+
+  // ── StatBand metrics (calm; attention only via state) ────────────────────
+  const metrics: StatMetric[] = [
+    {
+      label: t('overview.kpi.collected'),
+      value: formatCompact(kpi.totalCollected),
+      iconSignature: 'finance',
+      state: 'normal',
+      primary: true,
+      sub: t('paymentsList.paymentCount', { count: paymentList.length }),
+    },
+    {
+      label: t('status.completed'),
+      value: String(kpi.completedCount),
+      iconSignature: 'finance_note',
+      state: 'normal',
+      sub: t('paymentsList.processed'),
+    },
+    {
+      label: t('paymentsList.partialRefunds'),
+      value: String(kpi.partialRefundCount),
+      iconSignature: 'finance_receipt',
+      state: 'normal',
+      sub: t('status.pending'),
+    },
+    {
+      label: t('status.cancelled'),
+      value: String(kpi.cancelledCount),
+      iconSignature: 'atrisk',
+      state: kpi.cancelledCount > 0 ? 'normal' : 'muted',
+    },
+  ]
+
   return (
     <div className="p-6 space-y-5">
-      {/* Header */}
-      <FinancePageHeader
-        title={t('paymentsList.title')}
-        subtitle={t('paymentsList.description')}
-        actions={
-          <button
-            type="button"
-            onClick={() => navigate({ to: '/payments/record' })}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
-          >
-            {t('overview.actions.recordPayment')}
-          </button>
-        }
+      {/* Screen-reader page heading (breadcrumb names the page visually) */}
+      <h1 className="sr-only">{t('paymentsList.title')}</h1>
+
+      {/* ---- Page header (pagebar) ---- */}
+      <PageHeader
+        mode="pagebar"
+        date={today}
+        actions={[
+          {
+            label: t('overview.actions.recordPayment'),
+            icon: <CreditCard className="h-3.5 w-3.5" />,
+            primary: true,
+            onClick: () => navigate({ to: '/payments/record' }),
+          },
+        ]}
       />
 
-      {/* KPI Tiles */}
-      <WidgetErrorBoundaryV2>
-        <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
-          <StatCard
-            label={t('overview.kpi.collected')}
-            value={formatCompact(kpi.totalCollected)}
-            icon={Wallet}
-            signature="finance"
-            accentColor="rgba(29, 158, 117, 0.12)"
-            iconColor="#1D9E75"
-            barColor="#1D9E75"
-            tag={{ text: t('paymentsList.paymentCount', { count: paymentList.length }), color: '#1D9E75', bg: 'rgba(29,158,117,0.10)' }}
-            loading={isLoading}
-            valueColor="#1D9E75"
-          />
-          <StatCard
-            label={t('status.completed')}
-            value={String(kpi.completedCount)}
-            icon={TrendingUp}
-            accentColor="rgba(55, 138, 221, 0.12)"
-            iconColor="#378ADD"
-            barColor="#378ADD"
-            tag={{ text: t('paymentsList.processed'), color: '#378ADD', bg: 'rgba(55,138,221,0.10)' }}
-            loading={isLoading}
-          />
-          <StatCard
-            label={t('paymentsList.partialRefunds')}
-            value={String(kpi.partialRefundCount)}
-            icon={Receipt}
-            signature="finance_receipt"
-            accentColor="rgba(239, 159, 39, 0.12)"
-            iconColor="#EF9F27"
-            barColor="#EF9F27"
-            tag={{ text: t('status.pending'), color: '#EF9F27', bg: 'rgba(239,159,39,0.10)' }}
-            loading={isLoading}
-          />
-          <StatCard
-            label={t('status.cancelled')}
-            value={String(kpi.cancelledCount)}
-            icon={AlertTriangle}
-            signature="atrisk"
-            accentColor="rgba(128, 128, 128, 0.12)"
-            iconColor="rgb(var(--text-tertiary))"
-            barColor="rgb(var(--text-tertiary))"
-            loading={isLoading}
-          />
-        </div>
-      </WidgetErrorBoundaryV2>
+      {/* ---- StatBand — KPI summary (Cancelled → muted when 0) ---- */}
+      <StatBand metrics={metrics} ariaLabel={t('paymentsList.kpi.region')} />
 
-      {/* Data Table — status / gateway / grade Selects stay in `toolbarStart`
-          because they drive the server `useSchoolPayments` query (GSI14 for
-          grade, indexed lookups for status / gateway). Reshaping them into
-          client-side `facets` would double-filter the already-narrowed
-          payment list, so we keep them as-is and only bring in tableId
-          persistence, density, the built-in CSV export (full-school via
-          useExportPaymentsCsv lives in `toolbarExtra`), and a bulk action
-          shell. */}
+      {/* Data Table — status presets + gateway facet + grade "More filters"
+          drive the server `useSchoolPayments` query (GSI14 for grade, indexed
+          lookups for status / gateway) via the unified toolbar slots, NOT the
+          client-side `facets` prop (which would double-filter the already-
+          narrowed list). Search stays the built-in client filter; the
+          full-school CSV export (useExportPaymentsCsv) lives in `toolbarExtra`. */}
       <TanstackDataTable<Payment>
         className="min-h-96"
         columns={columns}
@@ -919,46 +915,42 @@ export default function PaymentsPage() {
         pageSizes={[10, 20, 50]}
         defaultSort={[{ id: 'date', desc: true }]}
         searchPlaceholder={t('paymentsList.searchPlaceholder')}
-        toolbarStart={
-          <div className="flex items-center gap-2 flex-wrap">
-            <Select
-              size="sm"
-              className="w-44"
-              value={statusFilter}
-              onChange={(v) => setStatusFilter(v ?? '')}
-              options={[
-                { label: t('filters.allStatuses'), value: '' },
-                { label: t('status.completed'), value: 'completed' },
-                { label: t('status.failed'), value: 'failed' },
-                { label: t('status.cancelled'), value: 'cancelled' },
-                { label: t('status.refunded'), value: 'refunded' },
-                { label: t('status.pending'), value: 'pending' },
-              ]}
-            />
-            <Select
-              size="sm"
-              className="w-48"
-              value={gatewayFilter}
-              onChange={(v) => setGatewayFilter(v ?? '')}
-              options={[
-                { label: t('paymentsList.allGateways'), value: '' },
-                { label: t('gateway.cash'), value: 'cash' },
-                { label: t('gateway.bankTransfer'), value: 'bank_transfer' },
-                { label: t('gateway.cheque'), value: 'cheque' },
-                { label: t('gateway.esewa'), value: 'esewa' },
-                { label: t('gateway.khalti'), value: 'khalti' },
-                { label: t('gateway.fonepay'), value: 'fonepay' },
-              ]}
-            />
+        presets={STATUS_PRESETS}
+        activePreset={statusFilter}
+        onPresetChange={(v) => setStatusFilter(v)}
+        primaryFilter={
+          <Select
+            size="sm"
+            className="w-48"
+            value={gatewayFilter}
+            onChange={(v) => setGatewayFilter(v ?? '')}
+            options={[
+              { label: t('paymentsList.allGateways'), value: '' },
+              { label: t('gateway.cash'), value: 'cash' },
+              { label: t('gateway.bankTransfer'), value: 'bank_transfer' },
+              { label: t('gateway.cheque'), value: 'cheque' },
+              { label: t('gateway.esewa'), value: 'esewa' },
+              { label: t('gateway.khalti'), value: 'khalti' },
+              { label: t('gateway.fonepay'), value: 'fonepay' },
+            ]}
+            buttonClassName="border-[rgb(var(--border-primary)/0.35)]"
+          />
+        }
+        moreFilters={
+          <DataTableMoreFilters
+            activeCount={gradeFilter ? 1 : 0}
+            onClear={() => setGradeFilter('')}
+          >
             {/* Sprint B.5 — grade filter routes through GSI14 (sparse) */}
             <Select
               size="sm"
-              className="w-40"
+              className="w-full"
+              label={t('feeStructure.gradeLevels')}
               value={gradeFilter}
               onChange={(v) => setGradeFilter(v ?? '')}
               options={gradeOptions}
             />
-          </div>
+          </DataTableMoreFilters>
         }
         toolbarExtra={
           <ExportCsvButton

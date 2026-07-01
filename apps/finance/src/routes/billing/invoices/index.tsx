@@ -14,31 +14,29 @@ import {
   TanstackDataTable,
   createSelectColumn,
   createActionsColumn,
-  StatCard,
-  WidgetErrorBoundaryV2,
+  PageHeader,
+  StatBand,
+  type StatMetric,
   Select,
   type ColumnDef,
 } from '@edforge/ui'
 import { EntityIdDisplay, UuidBadge } from '@edforge/archetype'
 import {
   Plus,
+  FileStack,
   FileText,
   Loader2,
   Check,
   X,
   Eye,
   Download,
-  Users,
   Send,
   Clock,
   AlertTriangle,
-  Wallet,
-  TrendingUp,
-  Receipt,
 } from 'lucide-react'
 import type { RowSelectionState } from '@tanstack/react-table'
 import { useNavigate } from '@tanstack/react-router'
-import { useTranslation } from '@edforge/i18n'
+import { normalizePlatformLanguage, useTranslation } from '@edforge/i18n'
 import { useSchoolGradeOptions } from '../../../hooks/useSchoolGradeOptions'
 import { useAppStore } from '../../../stores/app.store'
 import {
@@ -60,12 +58,7 @@ import { formatDateDual } from '../../../utils/format-date'
 import { StudentSearchInput } from '../../../components/billing/StudentSearchInput'
 import { BulkSendInvoiceReminderDrawer } from '../../../components/billing/BulkSendInvoiceReminderDrawer'
 import { BulkPdfExportDrawer } from '../../../components/billing/BulkPdfExportDrawer'
-import {
-  FinancePageHeader,
-  FinanceInfoBanner,
-  FinanceStatusChip,
-  FinanceFilterChips,
-} from '../../../components/shared'
+import { FinanceStatusChip } from '../../../components/shared'
 
 type InvoiceStatusFilter = '' | 'draft' | 'issued' | 'partially_paid' | 'paid' | 'overdue' | 'cancelled'
 
@@ -126,7 +119,7 @@ function InvoiceDownloadIconButton({
 }
 
 export default function InvoicesPage() {
-  const { t } = useTranslation('payments')
+  const { t, i18n } = useTranslation('payments')
   const navigate = useNavigate()
   const schoolId = useAppStore((s) => s.activeSchoolId)
   const settings = useFinanceSettings()
@@ -171,7 +164,7 @@ export default function InvoicesPage() {
     totalLoaded,
   } = useInvoicesInfinite(schoolId ?? '', invoiceFilters)
 
-  const { data: dashboard, isLoading: dashboardLoading } = useDashboardSummary(schoolId ?? '')
+  const { data: dashboard } = useDashboardSummary(schoolId ?? '')
 
   const { serverPagination, isFetching } = buildServerPaginationProps({
     hasMore,
@@ -414,123 +407,80 @@ export default function InvoicesPage() {
     { label: t('status.cancelled'), value: 'cancelled' },
   ]
 
+  const today = new Date().toLocaleDateString(
+    normalizePlatformLanguage(i18n.language) === 'ne' ? 'ne-NP' : 'en-US',
+    { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' },
+  )
+
+  // ── StatBand metrics (calm; attention only via state) ────────────────────
+  const metrics: StatMetric[] = [
+    {
+      label: t('overview.kpi.totalInvoiced'),
+      value: formatCompact(kpi.totalInvoiced),
+      iconSignature: 'finance',
+      state: 'normal',
+      primary: true,
+      sub: t('invoices.loadedInvoices', { count: `${totalLoaded}${countSuffix}` }),
+    },
+    {
+      label: t('overview.kpi.collected'),
+      value: formatCompact(kpi.totalCollected),
+      iconSignature: 'finance',
+      state: 'normal',
+      sub: t('invoices.paidCount', { count: kpi.paidCount }),
+    },
+    {
+      label: t('overview.kpi.outstanding'),
+      value: formatCompact(kpi.outstanding),
+      iconSignature: 'finance_receipt',
+      state: 'normal',
+      sub: t('invoices.loadedCount', { count: `${totalLoaded}${countSuffix}` }),
+    },
+    kpi.overdueCount > 0
+      ? {
+          label: t('overview.kpi.overdue'),
+          value: formatCompact(kpi.overdue),
+          iconSignature: 'atrisk',
+          state: 'critical',
+          pill: {
+            tone: 'critical',
+            text: t('overview.insight.invoiceOverdue', { count: kpi.overdueCount }),
+          },
+        }
+      : {
+          label: t('overview.kpi.overdue'),
+          value: formatCompact(kpi.overdue),
+          iconSignature: 'atrisk',
+          state: 'normal',
+        },
+  ]
+
   return (
     <div className="p-6 space-y-5">
-      {/* V2 Page Header */}
-      <FinancePageHeader
-        title={t('invoices.title')}
-        subtitle={t('invoices.manageDescription')}
-        actions={
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => navigate({ to: '/invoices/bulk-generate' })}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
-            >
-              <Users className="w-3.5 h-3.5" />
-              {t('bulkGenerate.title')}
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowGenerateForm(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              {t('invoices.generateInvoice')}
-            </button>
-          </div>
-        }
+      {/* Screen-reader page heading (breadcrumb names the page visually) */}
+      <h1 className="sr-only">{t('invoices.title')}</h1>
+
+      {/* ---- Page header (pagebar) ---- */}
+      <PageHeader
+        mode="pagebar"
+        date={today}
+        actions={[
+          {
+            label: t('bulkGenerate.title'),
+            icon: <FileStack className="h-3.5 w-3.5" />,
+            onClick: () => navigate({ to: '/invoices/bulk-generate' }),
+          },
+          {
+            label: t('invoices.generateInvoice'),
+            icon: <Plus className="h-3.5 w-3.5" />,
+            primary: true,
+            onClick: () => setShowGenerateForm(true),
+          },
+        ]}
       />
 
-      {/* Overdue Info Banner */}
-      {!isLoading && kpi.overdueCount > 0 && (
-        <FinanceInfoBanner
-          variant="danger"
-          message={t('invoices.overdueBanner', {
-            count: kpi.overdueCount,
-            amount: formatCompact(kpi.overdue),
-          })}
-          subtitle={t(
-            kpi.draftCount > 0
-              ? 'invoices.overdueBannerWithDrafts'
-              : 'invoices.overdueBannerRate',
-            {
-              rate: kpi.collectionRate.toFixed(1),
-              drafts: kpi.draftCount,
-            },
-          )}
-        />
-      )}
-
-      {/* KPI Grid */}
-      <WidgetErrorBoundaryV2>
-        <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
-          <StatCard
-            label={t('overview.kpi.totalInvoiced')}
-            value={formatCompact(kpi.totalInvoiced)}
-            icon={Wallet}
-            signature="finance"
-            accentColor="rgba(55, 138, 221, 0.12)"
-            iconColor="#378ADD"
-            barColor="#378ADD"
-            tag={{ text: t('invoices.loadedInvoices', { count: `${totalLoaded}${countSuffix}` }), color: '#378ADD', bg: 'rgba(55,138,221,0.10)' }}
-            loading={isLoading || dashboardLoading}
-          />
-          <StatCard
-            label={t('overview.kpi.collected')}
-            value={formatCompact(kpi.totalCollected)}
-            icon={TrendingUp}
-            accentColor="rgba(29, 158, 117, 0.12)"
-            iconColor="#1D9E75"
-            barColor="#1D9E75"
-            tag={{ text: t('invoices.paidCount', { count: kpi.paidCount }), color: '#1D9E75', bg: 'rgba(29,158,117,0.10)' }}
-            loading={isLoading || dashboardLoading}
-            valueColor="#1D9E75"
-          />
-          <StatCard
-            label={t('overview.kpi.outstanding')}
-            value={formatCompact(kpi.outstanding)}
-            icon={Receipt}
-            signature="finance_receipt"
-            accentColor="rgba(239, 159, 39, 0.12)"
-            iconColor="#EF9F27"
-            barColor="#EF9F27"
-            tag={{ text: t('invoices.loadedCount', { count: `${totalLoaded}${countSuffix}` }), color: '#EF9F27', bg: 'rgba(239,159,39,0.10)' }}
-            loading={isLoading || dashboardLoading}
-          />
-          <StatCard
-            label={t('overview.kpi.overdue')}
-            value={formatCompact(kpi.overdue)}
-            icon={AlertTriangle}
-            signature="atrisk"
-            accentColor="rgba(226, 75, 74, 0.12)"
-            iconColor="#E24B4A"
-            barColor="#E24B4A"
-            tag={{ text: t('overview.insight.invoiceOverdue', { count: kpi.overdueCount }), color: '#E24B4A', bg: 'rgba(226,75,74,0.10)' }}
-            loading={isLoading || dashboardLoading}
-          />
-        </div>
-      </WidgetErrorBoundaryV2>
-
-      {/* Filter Chips */}
-      <div className="flex items-center justify-between flex-wrap gap-2">
-        <div className="flex items-center gap-3 flex-wrap">
-          <FinanceFilterChips
-            options={STATUS_FILTER_OPTIONS}
-            value={statusFilter}
-            onChange={(v) => setStatusFilter(v as InvoiceStatusFilter)}
-            accentColor="#EF9F27"
-          />
-          {/* Sprint B.4 — grade filter chip */}
-          <Select
-            size="sm"
-            className="w-40"
-            value={gradeFilter}
-            onChange={(v) => setGradeFilter(v ?? '')}
-            options={gradeOptions}
-          />
-        </div>
-      </div>
+      {/* ---- StatBand — KPI summary (Overdue → critical pill) ---- */}
+      <StatBand metrics={metrics} ariaLabel={t('invoices.kpi.region')} />
 
       {/* DataTable */}
       {Object.keys(rowSelection).some((id) => rowSelection[id]) && hasMore && (
@@ -548,11 +498,10 @@ export default function InvoicesPage() {
         getRowId={(row) => row.id}
         isLoading={isLoading}
         isFetching={isFetching}
-        // Status / grade live as page-level chips above the table because
-        // they drive the server's GSI-backed pagination (`useInvoicesInfinite`).
-        // Promoting them into client-side `facets` would double-filter and
-        // break the infinite-load contract, so we keep them out and only
-        // adopt tableId persistence + a built-in Export + bulk action shell.
+        // Status presets + Grade facet drive the server's GSI-backed pagination
+        // (`useInvoicesInfinite`) via the unified toolbar's `presets`/`primaryFilter`
+        // slots — NOT the client-side `facets` prop, which would double-filter and
+        // break the infinite-load contract. Search stays the built-in client filter.
         tableId="finance.invoices"
         enableRowSelection={true}
         enableColumnVisibility
@@ -564,6 +513,19 @@ export default function InvoicesPage() {
         defaultSort={[{ id: 'dueDate', desc: false }]}
         serverPagination={serverPagination}
         searchPlaceholder={t('invoices.searchPlaceholder')}
+        presets={STATUS_FILTER_OPTIONS}
+        activePreset={statusFilter}
+        onPresetChange={(v) => setStatusFilter(v as InvoiceStatusFilter)}
+        primaryFilter={
+          <Select
+            size="sm"
+            className="w-40"
+            value={gradeFilter}
+            onChange={(v) => setGradeFilter(v ?? '')}
+            options={gradeOptions}
+            buttonClassName="border-[rgb(var(--border-primary)/0.35)]"
+          />
+        }
         bulkActions={[
           {
             id: 'issue',

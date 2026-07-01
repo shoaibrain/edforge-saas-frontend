@@ -70,7 +70,8 @@ vi.mock('@tanstack/react-router', () => ({
 }))
 
 vi.mock('@edforge/i18n', () => ({
-  useTranslation: () => ({ t: (k: string) => k }),
+  useTranslation: () => ({ t: (k: string) => k, i18n: { language: 'en' } }),
+  normalizePlatformLanguage: (l: string) => l,
 }))
 
 vi.mock('@edforge/types/use-currency', () => ({
