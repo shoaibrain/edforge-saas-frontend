@@ -103,7 +103,7 @@ function ActionCard({
       transition={{ delay, type: 'spring', stiffness: 300, damping: 20 }}
     >
       <Link to={card.href}>
-        <Card className="p-6 h-full hover:shadow-lg transition-shadow duration-300 cursor-pointer group border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-focus)/0.35)] dark:hover:border-[rgb(var(--border-focus)/0.35)]">
+        <Card className="ef-motion p-6 h-full hover:shadow-lg transition-shadow duration-300 cursor-pointer group border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-focus)/0.35)] dark:hover:border-[rgb(var(--border-focus)/0.35)]">
           <div className="flex items-start justify-between mb-4">
             <div className={`p-3 rounded-xl ${card.iconBg} transition-colors duration-200`}>
               <card.icon className={`w-6 h-6 ${card.iconColor}`} />

@@ -9,6 +9,7 @@
 
 import type { ReactNode } from 'react'
 import type { LucideIcon } from 'lucide-react'
+import { AnimatedIcon } from '@edforge/ui/motion'
 import { Link } from '@tanstack/react-router'
 import { motion } from 'framer-motion'
 import { useSpring, animated } from '@react-spring/web'
@@ -93,10 +94,10 @@ function WidgetVisibilityMenu({ widgets, onToggle, onReset }: WidgetVisibilityMe
         <div className="relative" ref={menuRef}>
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className={`p-1.5 rounded-md text-[rgb(var(--text-tertiary))] hover:bg-[rgb(var(--background-tertiary))] transition-colors ${isOpen ? 'bg-[rgb(var(--background-tertiary))]' : ''}`}
+                className={`ef-motion p-1.5 rounded-md text-[rgb(var(--text-tertiary))] hover:bg-[rgb(var(--background-tertiary))] transition-colors ${isOpen ? 'bg-[rgb(var(--background-tertiary))]' : ''}`}
                 title="Page options"
             >
-                <MoreHorizontal className="w-5 h-5" />
+                <AnimatedIcon name="more" icon={MoreHorizontal} size={20} applyAccent={false} />
             </button>
 
             {isOpen && !showWidgets && (
@@ -170,7 +171,7 @@ function StatCard({ stat, index }: { stat: ModuleStat; index: number }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.03, duration: 0.3 }}
         >
-            <div className="group relative flex flex-col w-44 h-36 p-4 rounded-2xl bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] shadow-sm transition-all duration-200 overflow-hidden">
+            <div className="ef-motion group relative flex flex-col w-44 h-36 p-4 rounded-2xl bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] shadow-sm transition-all duration-200 overflow-hidden">
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-[rgb(var(--background-elevated)/0.10)] to-transparent pointer-events-none" />
                 <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${stat.iconBg}`}>
                     <stat.icon className={`w-4.5 h-4.5 ${stat.iconColor}`} />
