@@ -35,6 +35,8 @@ interface AttendanceBySectionCardProps {
   isLoading: boolean
   /** When undefined, shows empty state directing user to settings (Ticket 2.5) */
   academicYearId?: string
+  /** Render only the summary bar + table (no card chrome / title) for WidgetCard framing. */
+  bare?: boolean
 }
 
 // Ticket 2.2: color coding for attendance rate
@@ -93,6 +95,7 @@ export function AttendanceBySectionCard({
   todayRate,
   isLoading,
   academicYearId,
+  bare,
 }: AttendanceBySectionCardProps) {
   const navigate = useNavigate()
   const { t } = useTranslation('dashboard')
@@ -121,24 +124,8 @@ export function AttendanceBySectionCard({
     [handleRowClick],
   )
 
-  return (
-    <div
-      // allow-presentation-style: card padding (18px) is off the 4px scale
-      className="rounded-xl border bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]"
-      style={{ padding: 18 }}
-    >
-      {/* Header */}
-      <div className="flex items-center justify-between mb-1">
-        <span className="text-sm font-medium text-[rgb(var(--text-secondary))]">
-          {t('homeV2.attendance.classroomAttendance')}
-        </span>
-        {todayRate != null && (
-          <span className="text-xs font-medium text-[rgb(var(--state-warning-fg))]">
-            {todayRate.toFixed(1)}% today
-          </span>
-        )}
-      </div>
-
+  const body = (
+    <>
       {/* Ticket 2.4: Summary header bar */}
       {!isLoading && sections.length > 0 && (
         <div className="flex items-center gap-3 mb-3 text-xs text-[rgb(var(--text-tertiary))]">
@@ -344,6 +331,29 @@ export function AttendanceBySectionCard({
           </table>
         </div>
       )}
+    </>
+  )
+
+  if (bare) return body
+
+  return (
+    <div
+      // allow-presentation-style: card padding (18px) is off the 4px scale
+      className="rounded-xl border bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]"
+      style={{ padding: 18 }}
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-sm font-medium text-[rgb(var(--text-secondary))]">
+          {t('homeV2.attendance.classroomAttendance')}
+        </span>
+        {todayRate != null && (
+          <span className="text-xs font-medium text-[rgb(var(--state-warning-fg))]">
+            {todayRate.toFixed(1)}% today
+          </span>
+        )}
+      </div>
+      {body}
     </div>
   )
 }

@@ -89,37 +89,36 @@ vi.mock('@edforge/i18n', () => ({
   }),
 }))
 
-// Mock framer-motion (skip animations in tests)
-vi.mock('framer-motion', () => ({
-  motion: {
-    div: ({ children, ...props }: { children: React.ReactNode; [key: string]: unknown }) => {
-      // Filter out framer-motion-specific props
-      const {
-        variants: _v, initial: _i, animate: _a, exit: _e,
-        transition: _t, whileHover: _wh, whileTap: _wt,
-        ...domProps
-      } = props
-      return <div {...domProps}>{children}</div>
+// Mock framer-motion (skip animations in tests). A proxy over `motion` returns a
+// prop-stripping passthrough for ANY tag (div/span/button/…), and the hooks used
+// by AnimatedIcon / AlertLane (useReducedMotion) are stubbed.
+vi.mock('framer-motion', () => {
+  const strip = (props: Record<string, unknown>) => {
+    const {
+      variants: _v, initial: _i, animate: _a, exit: _e, transition: _t,
+      whileHover: _wh, whileTap: _wt, whileInView: _wi, layout: _l, layoutId: _lid,
+      ...domProps
+    } = props
+    return domProps
+  }
+  const motion = new Proxy(
+    {},
+    {
+      get: (_target, tag: string | symbol) => {
+        if (typeof tag !== 'string') return undefined
+        const Tag = tag as unknown as React.ElementType
+        return ({ children, ...props }: { children?: React.ReactNode; [key: string]: unknown }) => (
+          <Tag {...strip(props)}>{children}</Tag>
+        )
+      },
     },
-    li: ({ children, ...props }: { children: React.ReactNode; [key: string]: unknown }) => {
-      const {
-        variants: _v, initial: _i, animate: _a, exit: _e,
-        transition: _t,
-        ...domProps
-      } = props
-      return <li {...domProps}>{children}</li>
-    },
-    ul: ({ children, ...props }: { children: React.ReactNode; [key: string]: unknown }) => {
-      const {
-        variants: _v, initial: _i, animate: _a, exit: _e,
-        transition: _t,
-        ...domProps
-      } = props
-      return <ul {...domProps}>{children}</ul>
-    },
-  },
-  AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-}))
+  )
+  return {
+    motion,
+    AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+    useReducedMotion: () => false,
+  }
+})
 
 // Mock recharts (SVG charts don't render in jsdom)
 vi.mock('recharts', () => ({

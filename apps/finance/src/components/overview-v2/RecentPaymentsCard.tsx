@@ -53,6 +53,8 @@ interface RecentPayment {
 interface RecentPaymentsCardProps {
   payments: RecentPayment[];
   isLoading: boolean;
+  /** Render only the feed list (no card chrome / title) for WidgetCard framing. */
+  bare?: boolean;
 }
 
 function FeedSkeleton() {
@@ -75,6 +77,7 @@ function FeedSkeleton() {
 export function RecentPaymentsCard({
   payments,
   isLoading,
+  bare,
 }: RecentPaymentsCardProps) {
   const settings = useFinanceSettings();
   const { t, i18n } = useTranslation("payments");
@@ -88,17 +91,7 @@ export function RecentPaymentsCard({
     return t(`gateway.${key}`, { defaultValue: formatGatewayLabel(gateway) });
   };
 
-  return (
-    <div
-      // allow-presentation-style: card padding (18px) is off the 4px scale
-      className="rounded-xl border flex flex-col bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]"
-      style={{ padding: 18 }}
-    >
-      <h3 className="text-sm font-medium mb-3 text-[rgb(var(--text-secondary))]">
-        {t("overview.recent.payments")}
-      </h3>
-
-      {isLoading ? (
+  const content = isLoading ? (
         <FeedSkeleton />
       ) : top5.length === 0 ? (
         <p className="text-xs py-4 text-[rgb(var(--text-tertiary))]">
@@ -166,7 +159,20 @@ export function RecentPaymentsCard({
             );
           })}
         </div>
-      )}
+  );
+
+  if (bare) return content;
+
+  return (
+    <div
+      // allow-presentation-style: card padding (18px) is off the 4px scale
+      className="rounded-xl border flex flex-col bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]"
+      style={{ padding: 18 }}
+    >
+      <h3 className="text-sm font-medium mb-3 text-[rgb(var(--text-secondary))]">
+        {t("overview.recent.payments")}
+      </h3>
+      {content}
     </div>
   );
 }

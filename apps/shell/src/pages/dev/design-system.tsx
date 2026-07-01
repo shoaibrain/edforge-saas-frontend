@@ -24,6 +24,10 @@ import {
   Select,
   Stack,
   StatBand,
+  AlertLane,
+  type DashboardAlert,
+  WidgetCard,
+  WidgetGrid,
   Switch,
   DataTableMoreFilters,
   TableBulkBar,
@@ -447,6 +451,107 @@ export default function DesignSystemDevPage() {
                   </div>
                 )}
               </div>
+            </div>
+          </Stack>
+        </SectionCard>
+
+        <SectionCard
+          title="Dashboard surfaces"
+          description="The two new canonical recipes for Home + module Overview: ④ AlertLane (severity-ranked, ack/dismiss, session-only) and ⑤ WidgetCard grid, plus the PageHeader greeting mode. See docs/design-system/retrospective-s0-s2-academics.md."
+        >
+          <Stack space="lg">
+            {/* PageHeader — greeting mode (Home) */}
+            <div>
+              <Text variant="label" className="mb-2 block">
+                PageHeader · greeting mode (Home)
+              </Text>
+              <div className="rounded-xl border border-border-subtle bg-background-secondary p-4">
+                <PageHeader
+                  mode="greeting"
+                  greeting="Good morning, Shoaib"
+                  actions={[
+                    { label: 'Enroll student', icon: <UserPlus className="h-3.5 w-3.5" /> },
+                    { label: 'Record payment', icon: <Upload className="h-3.5 w-3.5" />, primary: true },
+                  ]}
+                />
+              </div>
+            </div>
+
+            {/* ④ AlertLane — dismiss all to reach the all-clear strip */}
+            <div>
+              <Text variant="label" className="mb-2 block">
+                ④ AlertLane · critical=Acknowledge · warning/info=dismiss · collapse · all-clear
+              </Text>
+              <AlertLane
+                alerts={[
+                  {
+                    id: 'ds-crit',
+                    severity: 'critical',
+                    iconSignature: 'fees',
+                    title: 'Overdue invoices — NPR 8.8 lakh uncollected',
+                    description: 'Collection rate is 18.1%. Outstanding overdue requires follow-up.',
+                    cta: { label: 'Review billing', onAction: () => undefined },
+                  },
+                  {
+                    id: 'ds-warn',
+                    severity: 'warning',
+                    iconSignature: 'attendance',
+                    title: '16 students below 80% attendance',
+                    description: 'Attendance requires intervention — today 18.8%, 30-day avg 78%.',
+                    cta: { label: 'View students', onAction: () => undefined },
+                  },
+                  {
+                    id: 'ds-info',
+                    severity: 'info',
+                    title: '206 students without an attendance record today',
+                    description: 'Attendance has not yet been recorded for all sections.',
+                    cta: { label: 'Take attendance', onAction: () => undefined },
+                  },
+                ] satisfies DashboardAlert[]}
+              />
+            </div>
+
+            {/* ⑤ WidgetCard grid — spans + ready/empty/loading states */}
+            <div>
+              <Text variant="label" className="mb-2 block">
+                ⑤ WidgetCard · 12-col spans · one-of metric|link · ready / empty / loading
+              </Text>
+              <WidgetGrid>
+                <WidgetCard
+                  title="Attendance trend"
+                  iconSignature="attendance"
+                  subtitle="30-day rolling average · school-wide"
+                  span={8}
+                  footer={<Text variant="secondary">View Attendance →</Text>}
+                >
+                  <div className="flex h-32 items-center justify-center rounded-lg bg-background-tertiary text-text-tertiary">
+                    <Text variant="secondary">line chart body</Text>
+                  </div>
+                </WidgetCard>
+                <WidgetCard title="Financial overview" iconSignature="fees" subtitle="18.1% collected" span={4} metric="NPR 10.1L due">
+                  <div className="flex h-32 items-center justify-center rounded-lg bg-background-tertiary text-text-tertiary">
+                    <Text variant="secondary">progress rows</Text>
+                  </div>
+                </WidgetCard>
+                <WidgetCard
+                  title="At-risk students"
+                  iconSignature="atrisk"
+                  span={4}
+                  link={{ label: 'View all', href: '#' }}
+                  state="empty"
+                  empty={{ iconSignature: 'students', title: 'No at-risk students', subtitle: 'Everyone is above 80% attendance' }}
+                >
+                  placeholder
+                </WidgetCard>
+                <WidgetCard title="Recent activity" iconSignature="overview" span={4} state="loading">
+                  placeholder
+                </WidgetCard>
+                <WidgetCard title="Quick actions" iconSignature="create" span={4}>
+                  <div className="flex h-32 items-center justify-center rounded-lg bg-background-tertiary text-text-tertiary">
+                    <Text variant="secondary">action grid</Text>
+                  </div>
+                </WidgetCard>
+              </WidgetGrid>
             </div>
           </Stack>
         </SectionCard>

@@ -25,6 +25,8 @@ import { useTranslation } from '@edforge/i18n'
 interface MySectionsCardProps {
   sections: TeacherSectionItem[]
   isLoading: boolean
+  /** Render only the summary + section list (no card chrome / title / link) for WidgetCard framing. */
+  bare?: boolean
 }
 
 function SectionsSkeleton() {
@@ -37,41 +39,15 @@ function SectionsSkeleton() {
   )
 }
 
-export function MySectionsCard({ sections, isLoading }: MySectionsCardProps) {
+export function MySectionsCard({ sections, isLoading, bare }: MySectionsCardProps) {
   const totalStudents = useMemo(
     () => sections.reduce((sum, s) => sum + s.currentEnrollment, 0),
     [sections],
   )
   const { t } = useTranslation('dashboard')
 
-  return (
-    <div
-      // allow-presentation-style: card padding (18px) is off the 4px scale
-      className="rounded-xl border bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]"
-      style={{ padding: 18 }}
-    >
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <CalendarDays className="w-4 h-4 text-[rgb(var(--accent-academics-text))]" />
-          <h3 className="text-sm font-medium text-[rgb(var(--text-secondary))]">
-            {t('homeV2.teacher.mySections')}
-          </h3>
-          {!isLoading && (
-            <span className="text-xs text-[rgb(var(--text-tertiary))]">
-              ({sections.length})
-            </span>
-          )}
-        </div>
-        <Link
-          to="/academics/$"
-          params={{ _splat: 'classrooms' }}
-          className="flex items-center gap-1 text-xs font-medium transition-opacity hover:opacity-80 text-[#1D9E75]"
-        >
-          {t('homeV2.teacher.viewAll')}
-          <ArrowRight className="w-3 h-3" />
-        </Link>
-      </div>
-
+  const content = (
+    <>
       {isLoading ? (
         <SectionsSkeleton />
       ) : sections.length === 0 ? (
@@ -147,6 +123,39 @@ export function MySectionsCard({ sections, isLoading }: MySectionsCardProps) {
           </ul>
         </>
       )}
+    </>
+  )
+
+  if (bare) return content
+
+  return (
+    <div
+      // allow-presentation-style: card padding (18px) is off the 4px scale
+      className="rounded-xl border bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]"
+      style={{ padding: 18 }}
+    >
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <CalendarDays className="w-4 h-4 text-[rgb(var(--accent-academics-text))]" />
+          <h3 className="text-sm font-medium text-[rgb(var(--text-secondary))]">
+            {t('homeV2.teacher.mySections')}
+          </h3>
+          {!isLoading && (
+            <span className="text-xs text-[rgb(var(--text-tertiary))]">
+              ({sections.length})
+            </span>
+          )}
+        </div>
+        <Link
+          to="/academics/$"
+          params={{ _splat: 'classrooms' }}
+          className="flex items-center gap-1 text-xs font-medium transition-opacity hover:opacity-80 text-[#1D9E75]"
+        >
+          {t('homeV2.teacher.viewAll')}
+          <ArrowRight className="w-3 h-3" />
+        </Link>
+      </div>
+      {content}
     </div>
   )
 }

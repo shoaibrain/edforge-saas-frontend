@@ -75,12 +75,30 @@ interface AttendanceTrendChartProps {
   chartData: AttendanceTrendPoint[]
   summary: { min: number; max: number; avg: number } | null
   isLoading: boolean
+  /** Render only the legend + chart (no card chrome / title / footer) for WidgetCard framing. */
+  bare?: boolean
+}
+
+/** Reusable footer link → the attendance view (also usable as a WidgetCard footer). */
+export function AttendanceTrendChartFooter() {
+  const { t } = useTranslation('academics')
+  return (
+    <Link
+      to="/classrooms"
+      search={{ tab: 'attendance' }}
+      className="inline-flex items-center gap-1.5 text-xs font-medium transition-opacity hover:opacity-80 text-[rgb(var(--accent-enrollment-text))]"
+    >
+      {t('moduleOverview.attendanceTrend.viewAttendance')}
+      <ArrowRight className="w-3 h-3" />
+    </Link>
+  )
 }
 
 export function AttendanceTrendChart({
   chartData,
   summary,
   isLoading,
+  bare,
 }: AttendanceTrendChartProps) {
   const { t } = useTranslation('academics')
   const resolvedTheme = useAppStore((s) => s.theme) === 'dark' ? 'dark' : 'light'
@@ -95,6 +113,100 @@ export function AttendanceTrendChart({
       target: THRESHOLD,
     })
   }, [summary, chartData, t])
+
+  const legend = (
+    <div className="flex items-center gap-4">
+      <div className="flex items-center gap-1.5">
+        <div className="rounded-sm w-2 h-0.5 bg-[rgb(var(--accent-enrollment))]" />
+        <span className="text-xs text-[rgb(var(--text-disabled))]">{t('moduleOverview.attendanceTrend.actual')}</span>
+      </div>
+      <div className="flex items-center gap-1.5">
+        <div style={{ width: 8, height: 0, borderTop: '1px dashed rgba(239, 159, 39, 0.6)' }} />
+        <span className="text-xs text-[rgb(var(--text-disabled))]">{t('moduleOverview.attendanceTrend.target', { value: THRESHOLD })}</span>
+      </div>
+      {summary && (
+        <span className="text-xs font-semibold text-[rgb(var(--accent-enrollment-text))]">
+          {t('moduleOverview.attendanceTrend.average', { value: summary.avg.toFixed(1) })}
+        </span>
+      )}
+    </div>
+  )
+
+  const chartRegion = (
+    <div className="flex-1 min-h-0">
+      {isLoading ? (
+        <TrendSkeleton />
+      ) : chartData.length === 0 ? (
+        <div
+          // allow-presentation-style: fixed 160px empty-state height
+          className="flex items-center justify-center text-sm text-[rgb(var(--text-tertiary))]"
+          style={{ height: 160 }}
+        >
+          {t('moduleOverview.attendanceTrend.empty')}
+        </div>
+      ) : (
+        <figure
+          role="img"
+          aria-label={t('moduleOverview.attendanceTrend.aria')}
+          aria-describedby="academics-v2-trend-desc"
+        >
+          <figcaption id="academics-v2-trend-desc" className="sr-only">
+            {srSummary}
+          </figcaption>
+          <ResponsiveContainer width="100%" height={160}>
+            <AreaChart data={chartData} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
+              <defs>
+                <linearGradient id="v2AcademicsTrendGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={colors.line} stopOpacity={0.08} />
+                  <stop offset="95%" stopColor={colors.line} stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} vertical={false} />
+              <XAxis
+                dataKey="displayDate"
+                tick={{ fontSize: 10, fill: colors.tick }}
+                tickLine={false}
+                axisLine={false}
+                interval="preserveStartEnd"
+              />
+              <YAxis
+                domain={[40, 110]}
+                tick={{ fontSize: 10, fill: colors.tick }}
+                tickLine={false}
+                axisLine={false}
+                tickFormatter={(v: number) => `${v}%`}
+              />
+              <Tooltip content={<ChartTooltip />} />
+              <ReferenceLine
+                y={THRESHOLD}
+                stroke={colors.threshold}
+                strokeDasharray="4 4"
+                strokeWidth={1}
+              />
+              <Area
+                type="monotone"
+                dataKey="rate"
+                stroke={colors.line}
+                strokeWidth={2}
+                fill="url(#v2AcademicsTrendGradient)"
+                dot={{ r: 2.5, fill: colors.line, stroke: colors.pointBorder, strokeWidth: 1.5 }}
+                activeDot={{ r: 4, fill: colors.line, stroke: colors.pointBorder, strokeWidth: 2 }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </figure>
+      )}
+    </div>
+  )
+
+  if (bare) {
+    return (
+      <div className="flex flex-col">
+        <div className="mb-3 flex justify-end">{legend}</div>
+        {chartRegion}
+      </div>
+    )
+  }
 
   return (
     <div
@@ -112,99 +224,15 @@ export function AttendanceTrendChart({
             {t('moduleOverview.attendanceTrend.subtitle')}
           </p>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1.5">
-            <div className="rounded-sm w-2 h-0.5 bg-[rgb(var(--accent-enrollment))]" />
-            <span className="text-xs text-[rgb(var(--text-disabled))]">{t('moduleOverview.attendanceTrend.actual')}</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div style={{ width: 8, height: 0, borderTop: '1px dashed rgba(239, 159, 39, 0.6)' }} />
-            <span className="text-xs text-[rgb(var(--text-disabled))]">{t('moduleOverview.attendanceTrend.target', { value: THRESHOLD })}</span>
-          </div>
-          {summary && (
-            <span className="text-xs font-semibold text-[rgb(var(--accent-enrollment-text))]">
-              {t('moduleOverview.attendanceTrend.average', { value: summary.avg.toFixed(1) })}
-            </span>
-          )}
-        </div>
+        {legend}
       </div>
 
       {/* Chart */}
-      <div className="flex-1 min-h-0">
-        {isLoading ? (
-          <TrendSkeleton />
-        ) : chartData.length === 0 ? (
-          <div
-            // allow-presentation-style: fixed 160px empty-state height
-            className="flex items-center justify-center text-sm text-[rgb(var(--text-tertiary))]"
-            style={{ height: 160 }}
-          >
-            {t('moduleOverview.attendanceTrend.empty')}
-          </div>
-        ) : (
-          <figure
-            role="img"
-            aria-label={t('moduleOverview.attendanceTrend.aria')}
-            aria-describedby="academics-v2-trend-desc"
-          >
-            <figcaption id="academics-v2-trend-desc" className="sr-only">
-              {srSummary}
-            </figcaption>
-            <ResponsiveContainer width="100%" height={160}>
-              <AreaChart data={chartData} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="v2AcademicsTrendGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={colors.line} stopOpacity={0.08} />
-                    <stop offset="95%" stopColor={colors.line} stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} vertical={false} />
-                <XAxis
-                  dataKey="displayDate"
-                  tick={{ fontSize: 10, fill: colors.tick }}
-                  tickLine={false}
-                  axisLine={false}
-                  interval="preserveStartEnd"
-                />
-                <YAxis
-                  domain={[40, 110]}
-                  tick={{ fontSize: 10, fill: colors.tick }}
-                  tickLine={false}
-                  axisLine={false}
-                  tickFormatter={(v: number) => `${v}%`}
-                />
-                <Tooltip content={<ChartTooltip />} />
-                <ReferenceLine
-                  y={THRESHOLD}
-                  stroke={colors.threshold}
-                  strokeDasharray="4 4"
-                  strokeWidth={1}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="rate"
-                  stroke={colors.line}
-                  strokeWidth={2}
-                  fill="url(#v2AcademicsTrendGradient)"
-                  dot={{ r: 2.5, fill: colors.line, stroke: colors.pointBorder, strokeWidth: 1.5 }}
-                  activeDot={{ r: 4, fill: colors.line, stroke: colors.pointBorder, strokeWidth: 2 }}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </figure>
-        )}
-      </div>
+      {chartRegion}
 
       {/* Footer */}
       <div className="pt-3 mt-3 border-t border-[rgb(var(--border-primary)/0.35)]">
-        <Link
-          to="/classrooms"
-          search={{ tab: 'attendance' }}
-          className="inline-flex items-center gap-1.5 text-xs font-medium transition-opacity hover:opacity-80 text-[rgb(var(--accent-enrollment-text))]"
-        >
-          {t('moduleOverview.attendanceTrend.viewAttendance')}
-          <ArrowRight className="w-3 h-3" />
-        </Link>
+        <AttendanceTrendChartFooter />
       </div>
     </div>
   )

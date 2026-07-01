@@ -29,6 +29,8 @@ interface CollectionPerformanceCardProps {
     collectedAmount: number;
   }>;
   isLoading: boolean;
+  /** Render only the bars + fee-type breakdown (no card chrome / title) for WidgetCard framing. */
+  bare?: boolean;
 }
 
 function CardSkeleton() {
@@ -65,6 +67,7 @@ export function CollectionPerformanceCard({
   collectionRate,
   byFeeType,
   isLoading,
+  bare,
 }: CollectionPerformanceCardProps) {
   const settings = useFinanceSettings();
   const { t, i18n } = useTranslation("payments");
@@ -90,29 +93,10 @@ export function CollectionPerformanceCard({
       defaultValue: formatFeeType(feeType),
     });
 
-  return (
-    <div
-      // allow-presentation-style: card padding (18px) is off the 4px scale
-      className="rounded-xl border flex flex-col bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]"
-      style={{ padding: 18 }}
-    >
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-[rgb(var(--text-secondary))]">
-          {t("overview.collection.title")}
-        </h3>
-        <span className="text-xs text-[rgb(var(--text-disabled))]">
-          {t("overview.collection.percentCollected", {
-            rate: collectionRate.toFixed(1),
-          })}
-        </span>
-      </div>
-
-      {/* Content */}
-      {isLoading ? (
-        <CardSkeleton />
-      ) : (
-        <div className="flex flex-col gap-3">
+  const content = isLoading ? (
+    <CardSkeleton />
+  ) : (
+    <div className="flex flex-col gap-3">
           {/* Collected */}
           <div>
             <div className="flex items-center justify-between mb-1">
@@ -279,7 +263,29 @@ export function CollectionPerformanceCard({
             </span>
           </div>
         </div>
-      )}
+  );
+
+  if (bare) return content;
+
+  return (
+    <div
+      // allow-presentation-style: card padding (18px) is off the 4px scale
+      className="rounded-xl border flex flex-col bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]"
+      style={{ padding: 18 }}
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-sm font-medium text-[rgb(var(--text-secondary))]">
+          {t("overview.collection.title")}
+        </h3>
+        <span className="text-xs text-[rgb(var(--text-disabled))]">
+          {t("overview.collection.percentCollected", {
+            rate: collectionRate.toFixed(1),
+          })}
+        </span>
+      </div>
+
+      {content}
     </div>
   );
 }

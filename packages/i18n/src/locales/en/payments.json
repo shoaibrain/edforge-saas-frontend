@@ -40,7 +40,8 @@
       "collectionRate": "Collection rate is {{rate}}%",
       "agingBucket": "{{count}} invoices in {{bucket}} bucket",
       "drafts": "{{count}} additional drafts need to be issued",
-      "reviewBilling": "Review billing"
+      "reviewBilling": "Review billing",
+      "region": "Alerts"
     },
     "kpi": {
       "totalInvoiced": "Total Invoiced",
@@ -50,7 +51,8 @@
       "invoiceCount": "{{count}} invoices",
       "paymentCount": "{{count}} payments",
       "awaiting": "{{count}} awaiting",
-      "thisMonth": "this month"
+      "thisMonth": "this month",
+      "region": "Key metrics"
     },
     "empty": {
       "noPaymentsTitle": "No payments yet",

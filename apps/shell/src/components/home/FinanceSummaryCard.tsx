@@ -23,6 +23,23 @@ interface FinanceSummaryCardProps {
   isLoading: boolean
   isError: boolean
   onRetry?: () => void
+  /** Render only the content region (no card chrome / title / footer) for WidgetCard framing. */
+  bare?: boolean
+}
+
+/** Reusable footer link → the finance module (also usable as a WidgetCard footer). */
+export function FinanceSummaryFooter() {
+  const { t } = useTranslation('dashboard')
+  return (
+    <Link
+      to="/finance/$"
+      params={{ _splat: '' }}
+      className="inline-flex items-center gap-1.5 text-xs font-medium transition-opacity hover:opacity-80 text-[#1D9E75]"
+    >
+      {t('homeV2.finance.viewFinance')}
+      <ArrowRight className="w-3 h-3" />
+    </Link>
+  )
 }
 
 function FinanceSkeleton() {
@@ -98,6 +115,7 @@ export function FinanceSummaryCard({
   isLoading,
   isError,
   onRetry,
+  bare,
 }: FinanceSummaryCardProps) {
   const { t } = useTranslation('dashboard')
   const settings = useSettings()
@@ -107,27 +125,9 @@ export function FinanceSummaryCard({
   const outstandingPct = total > 0 ? (outstanding / total) * 100 : 0
   const overduePct = total > 0 ? (overdue / total) * 100 : 0
 
-  return (
-    <div
-      // allow-presentation-style: card padding (18px) is off the 4px scale
-      className="rounded-xl border flex flex-col bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]"
-      style={{ padding: 18 }}
-    >
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-sm font-medium text-[rgb(var(--text-secondary))]">
-          {t('homeV2.finance.financialOverview')}
-        </h3>
-        {!isLoading && !isError && (
-          <span className="text-xs text-[rgb(var(--text-disabled))]">
-            {collectionRate.toFixed(1)}% collected
-          </span>
-        )}
-      </div>
-
-      {/* Content */}
-      <div className="flex-1 min-h-0">
-        {isLoading ? (
+  const content = (
+    <div className="flex-1 min-h-0">
+      {isLoading ? (
           <FinanceSkeleton />
         ) : isError ? (
           <div className="flex flex-col items-center justify-center gap-2 py-8 text-[rgb(var(--text-tertiary))]">
@@ -226,17 +226,33 @@ export function FinanceSummaryCard({
           </div>
         )}
       </div>
+  )
+
+  if (bare) return content
+
+  return (
+    <div
+      // allow-presentation-style: card padding (18px) is off the 4px scale
+      className="rounded-xl border flex flex-col bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]"
+      style={{ padding: 18 }}
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-sm font-medium text-[rgb(var(--text-secondary))]">
+          {t('homeV2.finance.financialOverview')}
+        </h3>
+        {!isLoading && !isError && (
+          <span className="text-xs text-[rgb(var(--text-disabled))]">
+            {collectionRate.toFixed(1)}% collected
+          </span>
+        )}
+      </div>
+
+      {content}
 
       {/* Footer link */}
       <div className="pt-3 mt-3 border-t border-[rgb(var(--border-primary)/0.35)]">
-        <Link
-          to="/finance/$"
-          params={{ _splat: '' }}
-          className="inline-flex items-center gap-1.5 text-xs font-medium transition-opacity hover:opacity-80 text-[#1D9E75]"
-        >
-          {t('homeV2.finance.viewFinance')}
-          <ArrowRight className="w-3 h-3" />
-        </Link>
+        <FinanceSummaryFooter />
       </div>
     </div>
   )

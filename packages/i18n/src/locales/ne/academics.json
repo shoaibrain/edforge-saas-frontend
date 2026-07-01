@@ -507,13 +507,34 @@
       "aria": "उपस्थिति ट्याबहरू"
     },
     "status": {
-      "present": { "label": "उपस्थित", "short": "उ" },
-      "absent": { "label": "अनुपस्थित", "short": "अ" },
-      "late": { "label": "ढिलो", "short": "ढ" },
-      "excused": { "label": "अनुमति सहित", "short": "क्ष" },
-      "remote": { "label": "दूरस्थ", "short": "दू" },
-      "half_day": { "label": "आधा दिन", "short": "आ" },
-      "early_departure": { "label": "छिटो छुट्टी", "short": "छु" }
+      "present": {
+        "label": "उपस्थित",
+        "short": "उ"
+      },
+      "absent": {
+        "label": "अनुपस्थित",
+        "short": "अ"
+      },
+      "late": {
+        "label": "ढिलो",
+        "short": "ढ"
+      },
+      "excused": {
+        "label": "अनुमति सहित",
+        "short": "क्ष"
+      },
+      "remote": {
+        "label": "दूरस्थ",
+        "short": "दू"
+      },
+      "half_day": {
+        "label": "आधा दिन",
+        "short": "आ"
+      },
+      "early_departure": {
+        "label": "छिटो छुट्टी",
+        "short": "छु"
+      }
     },
     "dateSelector": {
       "previousDay": "अघिल्लो दिन",
@@ -1326,7 +1347,8 @@
       "atRiskStudents": "जोखिममा विद्यार्थी",
       "below80": "{{count}} ८०% भन्दा कम",
       "riskBreakdown": "{{critical}} गम्भीर · {{warning}} चेतावनी",
-      "below90Threshold": "९०% सीमाभन्दा कम"
+      "below90Threshold": "९०% सीमाभन्दा कम",
+      "region": "मुख्य मेट्रिक्स"
     },
     "needsAttention": {
       "title": "ध्यान आवश्यक"
