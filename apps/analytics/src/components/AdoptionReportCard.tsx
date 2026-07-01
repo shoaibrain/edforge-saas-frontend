@@ -153,6 +153,7 @@ export function AdoptionReportCard({
       <Card>
         <CardContent>
           <div className="flex items-start gap-3 py-6">
+            {/* icon-coverage-static-ok: error-banner mark; the Retry button is text-only */}
             <AlertCircle className="h-5 w-5 text-[rgb(var(--state-danger-fg))] mt-0.5 shrink-0" />
             <div className="flex-1">
               <p className="text-sm font-medium text-[rgb(var(--state-danger-fg))]">

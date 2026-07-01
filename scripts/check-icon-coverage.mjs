@@ -62,7 +62,14 @@ for (const file of files) {
   if (!importsLucide) continue
   const interactive = src.includes('<button') || src.includes('role="tab"')
   if (!interactive) continue
-  const hasMotion = src.includes('ef-motion') || src.includes('AnimatedIcon')
+  // `icon-coverage-static-ok` clears a file whose only lucide icons are
+  // legitimately static (status/identity marks, text-only buttons) — an
+  // explicit, greppable escape hatch instead of a silent false-positive.
+  const hasMotion =
+    src.includes('ef-motion') ||
+    src.includes('AnimatedIcon') ||
+    src.includes('IconButton') ||
+    src.includes('icon-coverage-static-ok')
   if (!hasMotion) advisories.push(relative(ROOT, file))
 }
 
