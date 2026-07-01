@@ -28,7 +28,7 @@ import { Button, StatCard, WidgetErrorBoundaryV2 } from "@edforge/ui";
 import {
   Plus,
   AlertTriangle,
-  DollarSign,
+  Wallet,
   Layers,
   TrendingUp,
 } from "lucide-react";
@@ -372,7 +372,8 @@ export default function FeeStructuresPage() {
           <StatCard
             label={t("feeStructure.stats.feeTypes")}
             value={String(kpi.feeTypes)}
-            icon={DollarSign}
+            icon={Wallet}
+            signature="finance"
             accentColor="rgba(55, 138, 221, 0.12)"
             iconColor="#378ADD"
             barColor="#378ADD"
@@ -382,6 +383,7 @@ export default function FeeStructuresPage() {
             label={t("feeStructure.stats.maxFee")}
             value={formatCompact(kpi.maxFee)}
             icon={AlertTriangle}
+            signature="atrisk"
             accentColor="rgba(239, 159, 39, 0.12)"
             iconColor="#EF9F27"
             barColor="#EF9F27"

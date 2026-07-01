@@ -8,7 +8,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { motion, useReducedMotion } from "framer-motion";
 import {
-  DollarSign,
+  Wallet,
   TrendingUp,
   Receipt,
   AlertTriangle,
@@ -158,7 +158,7 @@ export function Overview() {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
-          <DollarSign className="w-12 h-12 mx-auto mb-4 opacity-30 text-[rgb(var(--text-tertiary))]" />
+          <Wallet className="w-12 h-12 mx-auto mb-4 opacity-30 text-[rgb(var(--text-tertiary))]" />
           <h2 className="text-lg font-semibold text-[rgb(var(--text-primary))]">
             {t("overview.selectSchoolTitle")}
           </h2>
@@ -296,7 +296,8 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
           <StatCard
             label={t("overview.kpi.totalInvoiced")}
             value={formatCompact(kpi.totalInvoiced)}
-            icon={DollarSign}
+            icon={Wallet}
+            signature="finance"
             accentColor="rgba(29, 158, 117, 0.12)"
             iconColor="#1D9E75"
             barColor="#1D9E75"
@@ -330,6 +331,7 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
             label={t("overview.kpi.outstanding")}
             value={formatCompact(kpi.outstanding)}
             icon={Receipt}
+            signature="finance_receipt"
             accentColor="rgba(239, 159, 39, 0.12)"
             iconColor="#EF9F27"
             barColor="#EF9F27"
@@ -347,6 +349,7 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
             label={t("overview.kpi.overdue")}
             value={formatCompact(kpi.overdue)}
             icon={AlertTriangle}
+            signature="atrisk"
             accentColor="rgba(226, 75, 74, 0.12)"
             iconColor="#E24B4A"
             barColor="#E24B4A"

@@ -30,7 +30,7 @@ import {
   RotateCcw,
   X,
   AlertTriangle,
-  DollarSign,
+  Wallet,
   TrendingUp,
   Receipt,
   Download,
@@ -852,7 +852,8 @@ export default function PaymentsPage() {
           <StatCard
             label={t('overview.kpi.collected')}
             value={formatCompact(kpi.totalCollected)}
-            icon={DollarSign}
+            icon={Wallet}
+            signature="finance"
             accentColor="rgba(29, 158, 117, 0.12)"
             iconColor="#1D9E75"
             barColor="#1D9E75"
@@ -874,6 +875,7 @@ export default function PaymentsPage() {
             label={t('paymentsList.partialRefunds')}
             value={String(kpi.partialRefundCount)}
             icon={Receipt}
+            signature="finance_receipt"
             accentColor="rgba(239, 159, 39, 0.12)"
             iconColor="#EF9F27"
             barColor="#EF9F27"
@@ -884,6 +886,7 @@ export default function PaymentsPage() {
             label={t('status.cancelled')}
             value={String(kpi.cancelledCount)}
             icon={AlertTriangle}
+            signature="atrisk"
             accentColor="rgba(128, 128, 128, 0.12)"
             iconColor="rgb(var(--text-tertiary))"
             barColor="rgb(var(--text-tertiary))"
