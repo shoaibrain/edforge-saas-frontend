@@ -68,6 +68,7 @@ import {
   useFinanceJob,
   type FinanceJobRow,
 } from '@edforge/finance-services'
+import { RadioGroup } from '@edforge/ui'
 import { AsyncJobProgress } from './AsyncJobProgress'
 import { financeJobToAsyncBulkJob } from './finance-job-adapter'
 
@@ -115,6 +116,11 @@ export function BulkPdfExportDrawer({
   const queryClient = useQueryClient()
   const [jobId, setJobId] = useState<string | null>(null)
   const [terminalLogged, setTerminalLogged] = useState(false)
+  // Sprint H.4 — operator picks between zip (default) and merged_pdf.
+  // Backend F.4 controller enforces 2000-cap for zip / 1000-cap for merged
+  // (BULK_EXPORT_CAPS[format]) via a 413. Any cap-violation surfaces in
+  // the existing PAYLOAD_TOO_LARGE handler below.
+  const [format, setFormat] = useState<'zip' | 'merged_pdf'>('zip')
 
   const startExport = useBulkInvoicePdfExport(schoolId)
   const job = useFinanceJob(jobId)
@@ -127,6 +133,7 @@ export function BulkPdfExportDrawer({
     if (!open) {
       setJobId(null)
       setTerminalLogged(false)
+      setFormat('zip')
       startExport.reset()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -156,7 +163,7 @@ export function BulkPdfExportDrawer({
   const handleStart = async () => {
     if (invoiceIds.length === 0) return
     try {
-      const ack = await startExport.mutateAsync({ invoiceIds, format: 'zip' })
+      const ack = await startExport.mutateAsync({ invoiceIds, format })
       setJobId(ack.jobId)
     } catch (err) {
       // MVP.5 sentinel conflict: pivot to poll the existing in-flight job.
@@ -206,8 +213,21 @@ export function BulkPdfExportDrawer({
   )
 
   const status = job.data?.status ?? (isKickingOff ? 'queued' : null)
-  const canDownload =
-    job.data?.status === 'succeeded' && !!job.data.output?.zipUrl
+  // Sprint H.4 — backend is the source of truth for outputFormat AFTER the
+  // job is terminal (operator could hit the ALREADY_RUNNING conflict and
+  // pivot to an in-flight job with a DIFFERENT format than what they picked).
+  // Fall back to the picked `format` before the job resolves.
+  const resolvedFormat: 'zip' | 'merged_pdf' =
+    (job.data?.outputFormat as 'zip' | 'merged_pdf' | undefined) ?? format
+  const downloadUrl =
+    resolvedFormat === 'merged_pdf'
+      ? job.data?.output?.mergedPdfUrl
+      : job.data?.output?.zipUrl
+  // Sprint H.3 P2 fix — merged_pdf with 0 succeeded produces NO artifact
+  // (output has only urlExpiresAt). canDownload correctly stays false here
+  // even though status === 'succeeded'; AsyncJobProgress renders the
+  // skipped counter so the operator still gets a meaningful summary.
+  const canDownload = job.data?.status === 'succeeded' && !!downloadUrl
 
   return (
     <AnimatePresence>
@@ -280,27 +300,69 @@ export function BulkPdfExportDrawer({
                       />
                       {canDownload && (
                         <a
-                          href={job.data!.output!.zipUrl}
+                          href={downloadUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           className={/* allow-hardcoded-color: contrast text on --action-primary-bg button */ "inline-flex items-center gap-2 rounded-md bg-[rgb(var(--action-primary-bg))] px-3 py-2 text-sm font-medium text-white hover:bg-[rgb(var(--action-primary-bg-hover))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"}
                           data-testid="bulk-pdf-export-download-link"
+                          data-format={resolvedFormat}
                         >
                           <Download className="w-4 h-4" />
-                          {t('asyncJobs.pdfExport.downloadZip')}
+                          {resolvedFormat === 'merged_pdf'
+                            ? t('asyncJobs.pdfExport.downloadMergedPdf')
+                            : t('asyncJobs.pdfExport.downloadZip')}
                         </a>
                       )}
                     </>
                   ) : (
-                    <section>
-                      <h3 className="text-sm font-medium text-[rgb(var(--text-primary))] mb-2">
-                        {t('asyncJobs.pdfExport.readyTitle', {
-                          count: invoiceIds.length,
-                        })}
-                      </h3>
-                      <p className="text-sm text-[rgb(var(--text-secondary))]">
-                        {t('asyncJobs.pdfExport.readyBody')}
-                      </p>
+                    <section className="space-y-4">
+                      <div>
+                        <h3 className="text-sm font-medium text-[rgb(var(--text-primary))] mb-2">
+                          {t(
+                            format === 'merged_pdf'
+                              ? 'asyncJobs.pdfExport.readyTitleMerged'
+                              : 'asyncJobs.pdfExport.readyTitle',
+                            { count: invoiceIds.length },
+                          )}
+                        </h3>
+                        <p className="text-sm text-[rgb(var(--text-secondary))]">
+                          {t(
+                            format === 'merged_pdf'
+                              ? 'asyncJobs.pdfExport.readyBodyMerged'
+                              : 'asyncJobs.pdfExport.readyBody',
+                          )}
+                        </p>
+                      </div>
+                      {/* Sprint H.4 — format picker. RadioGroup from
+                          @edforge/ui gives us design-system-conformant
+                          radio semantics (roving-tabindex, aria-checked,
+                          keyboard navigation) without hand-rolling. */}
+                      <div className="border-t border-[rgb(var(--border-primary))] pt-4">
+                        <p
+                          id="bulk-pdf-export-format-label"
+                          className="text-sm font-medium text-[rgb(var(--text-primary))] mb-2"
+                        >
+                          {t('asyncJobs.pdfExport.formatPickerLabel')}
+                        </p>
+                        <RadioGroup
+                          aria-labelledby="bulk-pdf-export-format-label"
+                          name="bulk-pdf-export-format"
+                          value={format}
+                          onChange={(v) => setFormat(v as 'zip' | 'merged_pdf')}
+                          disabled={isKickingOff}
+                          data-testid="bulk-pdf-export-format-picker"
+                          options={[
+                            {
+                              value: 'zip',
+                              label: t('asyncJobs.pdfExport.formatZip'),
+                            },
+                            {
+                              value: 'merged_pdf',
+                              label: t('asyncJobs.pdfExport.formatMergedPdf'),
+                            },
+                          ]}
+                        />
+                      </div>
                     </section>
                   )}
                 </div>
