@@ -51,6 +51,7 @@ import {
   Tabs,
   SegmentedControl,
   TablePresetTabs,
+  DataTableMoreFilters,
   type BulkAction,
 } from '@edforge/ui'
 import type { RowSelectionState } from '@tanstack/react-table'
@@ -326,7 +327,7 @@ function OverviewTab() {
             ariaLabel={t('classrooms.toolbar.statusPresets')}
           />
 
-          {/* Facets: Course · Teacher · Year (context icons) */}
+          {/* Primary facet: Course (inline) */}
           <Select
             size="sm"
             className="w-40"
@@ -338,31 +339,43 @@ function OverviewTab() {
             options={courses.map((c) => ({ value: c.courseId, label: `${c.courseCode} — ${c.courseName}` }))}
             buttonClassName="border-[rgb(var(--border-primary)/0.35)]"
           />
-          <Select
-            size="sm"
-            className="w-40"
-            clearable
-            leadingIcon={<Users className="h-4 w-4" />}
-            placeholder={t('classrooms.toolbar.teacher')}
-            value={filters.teacherId || ''}
-            onChange={(v) => filterActions.setTeacherId(v || null)}
-            options={teachers.map((tc) => ({ value: tc.staffId, label: getStaffDisplayName(tc) }))}
-            buttonClassName="border-[rgb(var(--border-primary)/0.35)]"
-          />
-          <Select
-            size="sm"
-            className="w-36"
-            clearable
-            leadingIcon={<Calendar className="h-4 w-4" />}
-            placeholder={t('classrooms.toolbar.year')}
-            value={filters.academicYearId || ''}
-            onChange={(v) => filterActions.setAcademicYearId(v || null)}
-            options={(academicYears || []).map((y) => ({
-              value: y.yearId,
-              label: `${y.name}${y.isCurrent ? ` (${t('common.current')})` : ''}`,
-            }))}
-            buttonClassName="border-[rgb(var(--border-primary)/0.35)]"
-          />
+
+          {/* Secondary facets folded into "More filters": Teacher · Year */}
+          <DataTableMoreFilters
+            label={t('dataTable.moreFilters')}
+            clearLabel={t('dataTable.clearFilters')}
+            activeCount={(filters.teacherId ? 1 : 0) + (filters.academicYearId ? 1 : 0)}
+            onClear={() => {
+              filterActions.setTeacherId(null)
+              filterActions.setAcademicYearId(null)
+            }}
+          >
+            <Select
+              size="sm"
+              className="w-full"
+              clearable
+              leadingIcon={<Users className="h-4 w-4" />}
+              placeholder={t('classrooms.toolbar.teacher')}
+              value={filters.teacherId || ''}
+              onChange={(v) => filterActions.setTeacherId(v || null)}
+              options={teachers.map((tc) => ({ value: tc.staffId, label: getStaffDisplayName(tc) }))}
+              buttonClassName="border-[rgb(var(--border-primary)/0.35)]"
+            />
+            <Select
+              size="sm"
+              className="w-full"
+              clearable
+              leadingIcon={<Calendar className="h-4 w-4" />}
+              placeholder={t('classrooms.toolbar.year')}
+              value={filters.academicYearId || ''}
+              onChange={(v) => filterActions.setAcademicYearId(v || null)}
+              options={(academicYears || []).map((y) => ({
+                value: y.yearId,
+                label: `${y.name}${y.isCurrent ? ` (${t('common.current')})` : ''}`,
+              }))}
+              buttonClassName="border-[rgb(var(--border-primary)/0.35)]"
+            />
+          </DataTableMoreFilters>
 
           {/* Right cluster: icon-only view toggle + export */}
           <div className="ml-auto flex items-center gap-2">
