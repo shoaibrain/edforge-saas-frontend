@@ -572,6 +572,10 @@
       "selectSectionDescription": "Choose a section from the dropdown above to record attendance. Use quick actions to mark all present, then adjust individual students.",
       "noStudentsTitle": "No students in this section",
       "noStudentsDescription": "Enroll students in this section to start taking attendance.",
+      "noGradebookTitle": "No gradebook set up",
+      "noGradebookDescription": "Add your first assignment to start recording grades. Columns follow the weighted categories from your grading policy.",
+      "importFromTemplate": "Import from template",
+      "uncategorized": "Uncategorized",
       "noStudentsEnrolledTitle": "No Students Enrolled",
       "noStudentsEnrolledDescription": "This section has no students enrolled yet. Add students from the People tab.",
       "noSearchMatches": "No students match your search.",
@@ -1742,6 +1746,7 @@
     },
     "gradebook": {
       "selectSection": "Select a section...",
+      "gradedChip": "{{pct}}% graded · avg {{avg}}%",
       "sectionFallback": "Section",
       "selectGradingPeriod": "Select grading period...",
       "selectGradingPeriodPrompt": "Select a grading period",

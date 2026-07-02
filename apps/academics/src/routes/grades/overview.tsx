@@ -24,14 +24,12 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import {
   GraduationCap,
-  AlertTriangle,
   CheckCircle,
   Download,
-  Users,
   MoreHorizontal,
 } from 'lucide-react'
 import { useResourcePermissions } from '@edforge/abac'
-import { StatCard, WidgetErrorBoundaryV2 } from '@edforge/ui'
+import { StatBand, type StatMetric, WidgetErrorBoundaryV2 } from '@edforge/ui'
 import { useGradeOverview } from '../../hooks/useGrades'
 import { useAcademicsI18n } from '../../lib/i18n'
 import { getStudentGradient } from '../../utils/student-gradient'
@@ -395,9 +393,9 @@ export function GradeOverview({
   if (isLoading) {
     return (
       <WidgetErrorBoundaryV2 fallbackMessage={t('gradesModule.overview.errorStats')}>
-        <div className="grid grid-cols-4 gap-2.5">
+        <div className="grid grid-cols-2 gap-2.5 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <StatCard key={i} label="" value="" icon={Users} accentColor="rgba(55,138,221,0.10)" iconColor={V2.info} barColor={V2.info} loading />
+            <div key={i} className="h-24 rounded-xl bg-[rgb(var(--background-secondary))] animate-pulse" />
           ))}
         </div>
       </WidgetErrorBoundaryV2>
@@ -449,6 +447,50 @@ export function GradeOverview({
     t('gradesModule.overview.courseHeaders.passRate'),
   ]
 
+  // ── KPI band (calm; At-Risk → critical pill) ─────────────────────────────
+  const gradeMetrics: StatMetric[] = [
+    {
+      label: t('gradesModule.overview.kpis.studentsGraded'),
+      value: formatNumber(data.totalStudentsGraded),
+      iconSignature: 'students',
+      state: 'normal',
+      primary: true,
+      sub: t('gradesModule.overview.sectionsGraded', {
+        graded: formatNumber(data.sectionsWithGrades),
+        total: formatNumber(data.totalSections),
+      }),
+    },
+    {
+      label: t('gradesModule.overview.kpis.averageGpa'),
+      value: data.averageGpa.toFixed(2),
+      iconSignature: 'gpa',
+      state: 'normal',
+      sub: t('gradesModule.overview.kpis.avgGradeHint', { grade: data.averageGrade.toFixed(1) }),
+    },
+    {
+      label: t('gradesModule.overview.kpis.passRate'),
+      value: `${data.passRate.toFixed(1)}%`,
+      iconSignature: 'overview',
+      state: data.passRate >= 60 ? 'normal' : 'warn',
+      sub: t('gradesModule.overview.kpis.passRateHint'),
+    },
+    data.atRiskCount > 0
+      ? {
+          label: t('gradesModule.overview.kpis.atRisk'),
+          value: formatNumber(data.atRiskCount),
+          iconSignature: 'atrisk',
+          state: 'critical',
+          pill: { tone: 'critical', text: t('gradesModule.overview.kpis.atRiskHint') },
+        }
+      : {
+          label: t('gradesModule.overview.kpis.atRisk'),
+          value: formatNumber(data.atRiskCount),
+          iconSignature: 'atrisk',
+          state: 'normal',
+          sub: t('gradesModule.overview.kpis.atRiskHint'),
+        },
+  ]
+
   return (
     <div>
       {/* ---- GRADE ANALYTICS SUB-HEADER ---- */}
@@ -488,53 +530,10 @@ export function GradeOverview({
         </div>
       </div>
 
-      {/* ---- KPI ROW (CLS-005) ---- */}
+      {/* ---- KPI ROW (StatBand) ---- */}
       <WidgetErrorBoundaryV2 fallbackMessage={t('gradesModule.overview.errorStats')}>
-        <div className="grid grid-cols-4 gap-2.5 mb-3.5">
-          <StatCard
-            label={t('gradesModule.overview.kpis.studentsGraded')}
-            value={formatNumber(data.totalStudentsGraded)}
-            icon={Users}
-            signature="students"
-            accentColor="rgba(55,138,221,0.10)"
-            iconColor={V2.info}
-            barColor={V2.info}
-            hint={t('gradesModule.overview.sectionsGraded', {
-              graded: formatNumber(data.sectionsWithGrades),
-              total: formatNumber(data.totalSections),
-            })}
-          />
-          <StatCard
-            label={t('gradesModule.overview.kpis.averageGpa')}
-            value={data.averageGpa.toFixed(2)}
-            icon={Users}
-            signature="gpa"
-            accentColor="rgba(29,158,117,0.10)"
-            iconColor={V2.success}
-            barColor={V2.success}
-            hint={t('gradesModule.overview.kpis.avgGradeHint', {
-              grade: data.averageGrade.toFixed(1),
-            })}
-          />
-          <StatCard
-            label={t('gradesModule.overview.kpis.passRate')}
-            value={`${data.passRate.toFixed(1)}%`}
-            icon={CheckCircle}
-            accentColor="rgba(29,158,117,0.10)"
-            iconColor={V2.success}
-            barColor={V2.success}
-            hint={t('gradesModule.overview.kpis.passRateHint')}
-          />
-          <StatCard
-            label={t('gradesModule.overview.kpis.atRisk')}
-            value={formatNumber(data.atRiskCount)}
-            icon={AlertTriangle}
-            signature="atrisk"
-            accentColor="rgba(226,75,74,0.10)"
-            iconColor={V2.danger}
-            barColor={V2.danger}
-            hint={t('gradesModule.overview.kpis.atRiskHint')}
-          />
+        <div className="mb-3.5">
+          <StatBand metrics={gradeMetrics} ariaLabel={t('gradesModule.overview.title')} />
         </div>
       </WidgetErrorBoundaryV2>
 

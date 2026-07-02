@@ -3,11 +3,15 @@
  *
  * Interactive spreadsheet-like grid for viewing and editing section grades.
  * Merges section roster with grade data to show ALL enrolled students.
- * Supports inline cell editing with auto-save on blur/Tab.
+ * Assignment columns are grouped by the grading policy's weighted categories,
+ * each with a Σ category subtotal; Student is frozen left, Overall % + Letter
+ * frozen right. Supports inline cell editing with auto-save on blur/Tab —
+ * the record flow (`useRecordGrade`) is unchanged.
  */
 
 import { useState, useMemo, useRef, useCallback } from 'react'
-import { GraduationCap, Lock, Plus, FileText } from 'lucide-react'
+import { GraduationCap, Lock, Plus, FileText, Inbox } from 'lucide-react'
+import { StatusPill } from '@edforge/ui'
 import { useRecordGrade } from '../../hooks/useGrades'
 import { UserAvatar } from '../common/UserAvatar'
 import type { GradeRecord } from '../../services/academics.service'
@@ -17,6 +21,12 @@ import { useAcademicsI18n } from '../../lib/i18n'
 // ============================================================================
 // TYPES
 // ============================================================================
+
+interface CategoryWeight {
+  categoryId: string
+  categoryName: string
+  weight: number
+}
 
 interface GradebookGridProps {
   grades: GradeRecord[]
@@ -29,6 +39,8 @@ interface GradebookGridProps {
   termId?: string
   academicYearId?: string
   teacherId?: string
+  /** Weighted categories from the section's grading policy — drives column grouping. */
+  categoryWeights?: CategoryWeight[]
   disabled?: boolean
   onAddAssignment?: () => void
   onViewReportCard?: (studentId: string, studentName: string) => void
@@ -44,6 +56,13 @@ interface EditingCell {
   studentId: string
   assignmentName: string
   value: string
+}
+
+interface AssignmentColumn {
+  name: string
+  categoryId?: string
+  possiblePoints: number
+  dueDate?: string
 }
 
 // ============================================================================
@@ -66,6 +85,14 @@ function getGradeBg(percentage: number): string {
   return 'bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)]'
 }
 
+/** Letter-pill tone from an overall percentage. */
+function letterVariant(percentage: number): 'success' | 'info' | 'warning' | 'danger' {
+  if (percentage >= 80) return 'success'
+  if (percentage >= 70) return 'info'
+  if (percentage >= 60) return 'warning'
+  return 'danger'
+}
+
 // ============================================================================
 // COMPONENT
 // ============================================================================
@@ -81,6 +108,7 @@ export function GradebookGrid({
   termId,
   academicYearId,
   teacherId,
+  categoryWeights,
   disabled,
   onViewReportCard,
   onAddAssignment,
@@ -120,9 +148,9 @@ export function GradebookGrid({
     return result
   }, [roster, grades, t, formatNumber])
 
-  // Get unique assignment names with metadata for tooltips (Ticket 3.1)
-  const assignmentColumns = useMemo(() => {
-    const seen = new Map<string, { name: string; categoryId?: string; possiblePoints: number; dueDate?: string }>()
+  // Unique assignment columns (de-duped by name), each carrying category metadata.
+  const assignmentColumns = useMemo<AssignmentColumn[]>(() => {
+    const seen = new Map<string, AssignmentColumn>()
     grades.forEach((grade) => {
       grade.assignments?.forEach((a) => {
         if (!seen.has(a.assignmentName)) {
@@ -137,7 +165,53 @@ export function GradebookGrid({
     })
     return Array.from(seen.values())
   }, [grades])
-  const assignmentNames = useMemo(() => assignmentColumns.map((c) => c.name), [assignmentColumns])
+
+  // Group assignment columns by the policy's weighted categories (ordered by the
+  // policy). Columns whose category isn't in the policy fall into "Uncategorized".
+  const categoryGroups = useMemo(() => {
+    const catMeta = new Map(
+      (categoryWeights ?? []).map((c, i) => [c.categoryId, { label: c.categoryName, weight: c.weight, order: i }]),
+    )
+    const groups = new Map<
+      string,
+      { key: string; label: string; weight: number | null; order: number; columns: AssignmentColumn[] }
+    >()
+    assignmentColumns.forEach((col) => {
+      const key = col.categoryId ?? '__uncat__'
+      if (!groups.has(key)) {
+        const meta = col.categoryId ? catMeta.get(col.categoryId) : undefined
+        groups.set(key, {
+          key,
+          label: meta?.label ?? t('gradesModule.gradebook.uncategorized'),
+          weight: meta?.weight ?? null,
+          order: meta?.order ?? 999,
+          columns: [],
+        })
+      }
+      groups.get(key)!.columns.push(col)
+    })
+    return Array.from(groups.values()).sort((a, b) => a.order - b.order)
+  }, [assignmentColumns, categoryWeights, t])
+
+  // Flat assignment-name order (grouped order) — drives keyboard navigation.
+  const assignmentNames = useMemo(
+    () => categoryGroups.flatMap((g) => g.columns.map((c) => c.name)),
+    [categoryGroups],
+  )
+
+  // Per-student category subtotal % (null when the category has no scored work).
+  const categorySubtotal = useCallback((grade: GradeRecord | null, columns: AssignmentColumn[]): number | null => {
+    let got = 0
+    let max = 0
+    columns.forEach((col) => {
+      const a = grade?.assignments?.find((x) => x.assignmentName === col.name)
+      if (a && a.earnedPoints !== undefined) {
+        got += a.earnedPoints
+        max += a.possiblePoints
+      }
+    })
+    return max > 0 ? Math.round((got / max) * 100) : null
+  }, [])
 
   const handleCellClick = useCallback(
     (studentId: string, assignmentName: string, currentValue: number | undefined, isFinal: boolean) => {
@@ -266,6 +340,76 @@ export function GradebookGrid({
     [handleCellSave]
   )
 
+  // One score cell (inline-editable) — used inside each category group.
+  const renderScoreCell = useCallback(
+    (student: MergedStudent, aName: string) => {
+      const grade = student.grade
+      const isFinal = grade?.isFinal ?? false
+      const assignment = grade?.assignments?.find((a) => a.assignmentName === aName)
+      const isEditing =
+        editingCell?.studentId === student.studentId && editingCell?.assignmentName === aName
+
+      const editInput = (
+        <input
+          ref={inputRef}
+          type="number"
+          value={editingCell?.value ?? ''}
+          onChange={(e) => setEditingCell((prev) => (prev ? { ...prev, value: e.target.value } : null))}
+          onBlur={() => handleBlur(student, aName, editingCell?.value ?? '')}
+          onKeyDown={(e) => handleKeyDown(e, student, aName)}
+          className="w-16 px-1.5 py-1 bg-[rgb(var(--background-primary))] dark:bg-surface-secondary border-2 border-[rgb(var(--border-focus))] rounded text-sm text-center text-text-primary focus:outline-none"
+          min={0}
+          step="any"
+        />
+      )
+
+      // No grade document at all, or assignment not on this student → em-dash + warning dot.
+      if (!assignment || assignment.earnedPoints === undefined) {
+        return (
+          <td
+            key={aName}
+            className={`px-3 py-3 text-center border-r border-border-secondary ${
+              !grade ? 'bg-surface-secondary/20 text-text-tertiary' : 'text-text-tertiary'
+            } ${canEdit && !isFinal ? 'cursor-text hover:bg-surface-hover/50' : ''}`}
+            onClick={() => {
+              if (canEdit && !isFinal) handleCellClick(student.studentId, aName, undefined, isFinal)
+            }}
+          >
+            {isEditing ? (
+              editInput
+            ) : (
+              <span className="inline-flex items-center gap-1 text-text-tertiary">
+                <span className="h-1.5 w-1.5 rounded-full bg-[rgb(var(--state-warning-fg))]" aria-hidden="true" />
+                —
+              </span>
+            )}
+          </td>
+        )
+      }
+
+      const pct = assignment.possiblePoints > 0 ? (assignment.earnedPoints / assignment.possiblePoints) * 100 : 0
+
+      return (
+        <td
+          key={aName}
+          className={`px-1 py-1 text-center border-r border-border-secondary ${getGradeBg(pct)} ${
+            canEdit && !isFinal ? 'cursor-text' : ''
+          }`}
+          onClick={() => handleCellClick(student.studentId, aName, assignment.earnedPoints, isFinal)}
+        >
+          {isEditing ? (
+            editInput
+          ) : (
+            <span className={`inline-block px-2 py-1 rounded text-sm font-medium ${getGradeColor(pct)}`}>
+              {assignment.earnedPoints}/{assignment.possiblePoints}
+            </span>
+          )}
+        </td>
+      )
+    },
+    [editingCell, canEdit, handleBlur, handleKeyDown, handleCellClick]
+  )
+
   if (isLoading) {
     return (
       <div className="space-y-3">
@@ -291,31 +435,71 @@ export function GradebookGrid({
     )
   }
 
+  // No-assignment empty state — students exist but the section has no gradebook yet.
+  if (assignmentColumns.length === 0) {
+    return (
+      <div className="rounded-xl border border-border-secondary py-16 px-6 text-center">
+        <GraduationCap className="w-11 h-11 mx-auto text-text-tertiary mb-4" />
+        <h4 className="text-base font-semibold text-text-primary mb-1.5">
+          {t('gradesModule.gradebook.noGradebookTitle')}
+        </h4>
+        <p className="text-sm text-text-secondary max-w-md mx-auto mb-5">
+          {t('gradesModule.gradebook.noGradebookDescription')}
+        </p>
+        {canEdit && onAddAssignment && (
+          <div className="flex items-center justify-center gap-2">
+            <button
+              type="button"
+              onClick={onAddAssignment}
+              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              {t('gradesModule.gradebook.addAssignment')}
+            </button>
+            <button
+              type="button"
+              onClick={onAddAssignment}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[rgb(var(--border-primary)/0.35)] px-3 py-2 text-sm font-medium text-text-secondary hover:bg-surface-secondary transition-colors"
+            >
+              <Inbox className="w-4 h-4" />
+              {t('gradesModule.gradebook.importFromTemplate')}
+            </button>
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  const subtotalHeadClass =
+    'sticky top-0 z-10 bg-surface-secondary px-2 py-3 text-center font-semibold text-text-tertiary border-r border-border-secondary'
+
   return (
     <div className="overflow-auto max-h-[calc(100vh-15rem)] rounded-xl border border-border-secondary">
       <table className="w-full text-sm">
         <thead>
+          {/* Row 1 — category band */}
           <tr className="bg-surface-secondary">
-            {/* Frozen student column (sticky on both axes — top-left corner) */}
-            <th className="sticky left-0 top-0 z-20 bg-surface-secondary px-4 py-3 text-left font-semibold text-text-primary border-r border-border-secondary min-w-52">
+            <th
+              rowSpan={2}
+              className="sticky left-0 top-0 z-30 bg-surface-secondary px-4 py-3 text-left font-semibold text-text-primary border-r border-border-secondary min-w-52"
+            >
               {t('gradesModule.gradebook.student')}
             </th>
-            {/* Assignment columns with tooltips (Ticket 3.1) */}
-            {assignmentColumns.map((col) => (
+            {categoryGroups.map((g) => (
               <th
-                key={col.name}
-                className="sticky top-0 z-10 bg-surface-secondary px-3 py-3 text-center font-medium text-text-secondary min-w-24 border-r border-border-secondary group relative"
-                title={`${col.name}\n${col.categoryId ? `Category: ${col.categoryId}` : ''}\nPoints: ${col.possiblePoints}`}
+                key={g.key}
+                colSpan={g.columns.length + 1}
+                className="sticky top-0 z-10 bg-surface-secondary px-3 py-2 text-center text-xs font-semibold uppercase tracking-wide text-text-secondary border-r border-b border-border-secondary"
               >
-                <div className="truncate max-w-32">{col.name}</div>
-                <div className="text-xs text-text-tertiary font-normal mt-0.5">
-                  {t('gradesModule.gradebook.pointsShort', { points: formatNumber(col.possiblePoints) })}
-                </div>
+                {g.label}
+                {g.weight != null ? ` · ${formatNumber(g.weight)}%` : ''}
               </th>
             ))}
-            {/* Add Assignment column */}
             {canEdit && onAddAssignment && (
-              <th className="sticky top-0 z-10 bg-surface-secondary px-2 py-3 text-center border-r border-border-secondary min-w-16">
+              <th
+                rowSpan={2}
+                className="sticky top-0 z-10 bg-surface-secondary px-2 py-3 text-center border-r border-border-secondary min-w-16"
+              >
                 <button
                   type="button"
                   onClick={onAddAssignment}
@@ -326,33 +510,39 @@ export function GradebookGrid({
                 </button>
               </th>
             )}
-            {/* Overall Grade */}
-            <th className="sticky top-0 z-10 px-4 py-3 text-center font-semibold text-text-primary min-w-24 bg-surface-hover">
+            <th
+              rowSpan={2}
+              className="sticky right-24 top-0 z-20 px-4 py-3 text-center font-semibold text-text-primary w-24 bg-surface-hover border-l border-border-secondary"
+            >
               {t('gradesModule.gradebook.overall')}
             </th>
-            <th className="sticky top-0 z-10 px-4 py-3 text-center font-semibold text-text-primary min-w-20 bg-surface-hover">
+            <th
+              rowSpan={2}
+              className="sticky right-0 top-0 z-20 px-4 py-3 text-center font-semibold text-text-primary w-24 bg-surface-hover"
+            >
               {t('gradesModule.reportCard.letter')}
             </th>
+          </tr>
+          {/* Row 2 — assignment columns + Σ subtotal per category */}
+          <tr className="bg-surface-secondary">
+            {categoryGroups.map((g) => (
+              <ColumnHeaders key={g.key} columns={g.columns} pointsLabel={(pts) => t('gradesModule.gradebook.pointsShort', { points: formatNumber(pts) })} subtotalClass={subtotalHeadClass} />
+            ))}
           </tr>
         </thead>
         <tbody className="divide-y divide-border-secondary">
           {mergedStudents.map((student) => {
             const grade = student.grade
             const isFinal = grade?.isFinal ?? false
+            const hasScored = !!grade && grade.assignments?.some((a) => a.earnedPoints !== undefined)
 
             return (
               <tr key={student.studentId} className="group hover:bg-surface-secondary/50 transition-colors">
-                {/* Student name */}
+                {/* Student name (frozen left) */}
                 <td className="sticky left-0 z-10 bg-surface-primary px-4 py-2.5 border-r border-border-secondary">
                   <div className="flex items-center gap-2.5">
-                    <UserAvatar
-                      userId={student.studentId}
-                      userName={student.studentName}
-                      size="sm"
-                    />
-                    <span className="font-medium text-text-primary truncate">
-                      {student.studentName}
-                    </span>
+                    <UserAvatar userId={student.studentId} userName={student.studentName} size="sm" />
+                    <span className="font-medium text-text-primary truncate">{student.studentName}</span>
                     {isFinal && (
                       <Lock className="w-3 h-3 text-text-tertiary flex-shrink-0" aria-label={t('gradesModule.gradebook.gradeFinalized')} />
                     )}
@@ -368,118 +558,44 @@ export function GradebookGrid({
                     )}
                   </div>
                 </td>
-                {/* Assignment scores */}
-                {assignmentNames.map((aName) => {
-                  const assignment = grade?.assignments?.find(
-                    (a) => a.assignmentName === aName
-                  )
-                  const isEditing =
-                    editingCell?.studentId === student.studentId &&
-                    editingCell?.assignmentName === aName
-
-                  // No grade document at all, or assignment not on this student
-                  if (!assignment || assignment.earnedPoints === undefined) {
-                    return (
-                      <td
-                        key={aName}
-                        className={`px-3 py-3 text-center border-r border-border-secondary ${
-                          !grade
-                            ? 'bg-surface-secondary/20 text-text-tertiary'
-                            : 'text-text-tertiary'
-                        } ${canEdit && !isFinal ? 'cursor-text hover:bg-surface-hover/50' : ''}`}
-                        onClick={() => {
-                          if (canEdit && !isFinal) {
-                            handleCellClick(student.studentId, aName, undefined, isFinal)
-                          }
-                        }}
-                      >
-                        {isEditing ? (
-                          <input
-                            ref={inputRef}
-                            type="number"
-                            value={editingCell.value}
-                            onChange={(e) =>
-                              setEditingCell((prev) =>
-                                prev ? { ...prev, value: e.target.value } : null
-                              )
-                            }
-                            onBlur={() => handleBlur(student, aName, editingCell.value)}
-                            onKeyDown={(e) => handleKeyDown(e, student, aName)}
-                            className="w-16 px-1.5 py-1 bg-[rgb(var(--background-primary))] dark:bg-surface-secondary border-2 border-[rgb(var(--border-focus))] rounded text-sm text-center text-text-primary focus:outline-none"
-                            min={0}
-                            step="any"
-                          />
-                        ) : (
-                          <span className="text-text-tertiary">—</span>
-                        )}
-                      </td>
-                    )
-                  }
-
-                  const pct = assignment.possiblePoints > 0
-                    ? (assignment.earnedPoints / assignment.possiblePoints) * 100
-                    : 0
-
+                {/* Score cells grouped by category, each followed by a Σ subtotal */}
+                {categoryGroups.map((g) => {
+                  const sub = categorySubtotal(grade, g.columns)
                   return (
-                    <td
-                      key={aName}
-                      className={`px-1 py-1 text-center border-r border-border-secondary ${getGradeBg(pct)} ${
-                        canEdit && !isFinal ? 'cursor-text' : ''
-                      }`}
-                      onClick={() =>
-                        handleCellClick(student.studentId, aName, assignment.earnedPoints, isFinal)
-                      }
-                    >
-                      {isEditing ? (
-                        <input
-                          ref={inputRef}
-                          type="number"
-                          value={editingCell.value}
-                          onChange={(e) =>
-                            setEditingCell((prev) =>
-                              prev ? { ...prev, value: e.target.value } : null
-                            )
-                          }
-                          onBlur={() => handleBlur(student, aName, editingCell.value)}
-                          onKeyDown={(e) => handleKeyDown(e, student, aName)}
-                          className="w-16 px-1.5 py-1 bg-[rgb(var(--background-primary))] dark:bg-surface-secondary border-2 border-[rgb(var(--border-focus))] rounded text-sm text-center text-text-primary focus:outline-none"
-                          min={0}
-                          step="any"
-                        />
-                      ) : (
-                        <span className={`inline-block px-2 py-1 rounded text-sm font-medium ${getGradeColor(pct)}`}>
-                          {assignment.earnedPoints}/{assignment.possiblePoints}
-                        </span>
-                      )}
-                    </td>
+                    <GroupCells
+                      key={g.key}
+                      columns={g.columns}
+                      renderScoreCell={(name) => renderScoreCell(student, name)}
+                      subtotal={sub}
+                    />
                   )
                 })}
-                {/* Add Assignment spacer */}
-                {canEdit && onAddAssignment && (
-                  <td className="border-r border-border-secondary" />
-                )}
-                {/* Overall grade */}
-                {grade && grade.assignments?.some(a => a.earnedPoints !== undefined) ? (
+                {/* Add-assignment spacer */}
+                {canEdit && onAddAssignment && <td className="border-r border-border-secondary" />}
+                {/* Overall % + Letter (frozen right) */}
+                {hasScored && grade ? (
                   <>
-                    <td className="px-4 py-3 text-center bg-surface-secondary/30">
+                    <td className="sticky right-24 z-10 w-24 px-3 py-3 text-center bg-surface-secondary/95 border-l border-border-secondary">
                       <span
                         className={`inline-flex items-center justify-center px-2.5 py-1 rounded-lg text-sm font-bold ${getGradeColor(grade.numericGrade)} ${getGradeBg(grade.numericGrade)}`}
                       >
                         {grade.numericGrade.toFixed(1)}%
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-center bg-surface-secondary/30">
-                      <span className="text-sm font-bold text-text-primary">
-                        {grade.letterGrade || '—'}
-                      </span>
+                    <td className="sticky right-0 z-10 w-24 px-3 py-3 text-center bg-surface-secondary/95">
+                      {grade.letterGrade ? (
+                        <StatusPill variant={letterVariant(grade.numericGrade)} label={grade.letterGrade} />
+                      ) : (
+                        <span className="text-sm text-text-tertiary">—</span>
+                      )}
                     </td>
                   </>
                 ) : (
                   <>
-                    <td className="px-4 py-3 text-center bg-surface-secondary/20">
+                    <td className="sticky right-24 z-10 w-24 px-3 py-3 text-center bg-surface-secondary/95 border-l border-border-secondary">
                       <span className="text-sm text-text-tertiary">—</span>
                     </td>
-                    <td className="px-4 py-3 text-center bg-surface-secondary/20">
+                    <td className="sticky right-0 z-10 w-24 px-3 py-3 text-center bg-surface-secondary/95">
                       <span className="text-sm text-text-tertiary">—</span>
                     </td>
                   </>
@@ -490,5 +606,60 @@ export function GradebookGrid({
         </tbody>
       </table>
     </div>
+  )
+}
+
+// ============================================================================
+// SUB-RENDERERS
+// ============================================================================
+
+/** Row-2 header cells for one category: each assignment column + a Σ header. */
+function ColumnHeaders({
+  columns,
+  pointsLabel,
+  subtotalClass,
+}: {
+  columns: AssignmentColumn[]
+  pointsLabel: (points: number) => string
+  subtotalClass: string
+}) {
+  return (
+    <>
+      {columns.map((col) => (
+        <th
+          key={col.name}
+          className="sticky top-0 z-10 bg-surface-secondary px-3 py-3 text-center font-medium text-text-secondary min-w-24 border-r border-border-secondary"
+          title={`${col.name} · ${col.possiblePoints}`}
+        >
+          <div className="truncate max-w-32">{col.name}</div>
+          <div className="text-xs text-text-tertiary font-normal mt-0.5">{pointsLabel(col.possiblePoints)}</div>
+        </th>
+      ))}
+      <th className={subtotalClass} title="Category subtotal">
+        Σ
+      </th>
+    </>
+  )
+}
+
+/** Body cells for one category: each score cell + the Σ subtotal cell. */
+function GroupCells({
+  columns,
+  renderScoreCell,
+  subtotal,
+}: {
+  columns: AssignmentColumn[]
+  renderScoreCell: (assignmentName: string) => React.ReactNode
+  subtotal: number | null
+}) {
+  return (
+    <>
+      {columns.map((col) => renderScoreCell(col.name))}
+      <td className="px-2 py-3 text-center border-r border-border-secondary bg-surface-secondary/40">
+        <span className="text-sm font-semibold text-text-secondary tabular-nums">
+          {subtotal != null ? `${subtotal}%` : '—'}
+        </span>
+      </td>
+    </>
   )
 }

@@ -516,6 +516,16 @@ function GradebookTab() {
     () => defaultPolicy?.categoryWeights?.map((c) => ({ id: c.categoryId, label: c.categoryName })) ?? [],
     [defaultPolicy]
   )
+
+  // "% graded · class avg" chip for the section sub-header.
+  const gradebookStats = useMemo(() => {
+    const list = gradebook?.grades ?? []
+    const rosterCount = roster?.students?.length ?? list.length
+    const scored = list.filter((g) => g.assignments?.some((a) => a.earnedPoints !== undefined))
+    const pctGraded = rosterCount > 0 ? Math.round((scored.length / rosterCount) * 100) : 0
+    const avg = scored.length > 0 ? Math.round(scored.reduce((s, g) => s + g.numericGrade, 0) / scored.length) : null
+    return { pctGraded, avg, hasData: list.length > 0 }
+  }, [gradebook, roster])
   const hasNoPolicies = policies !== undefined && policies.length === 0
   const hasNoDefaultPolicy = policies !== undefined && policies.length > 0 && !defaultPolicy
 
@@ -574,6 +584,14 @@ function GradebookTab() {
         {selectedSectionId && (
           <>
             <div className="w-px h-6 bg-border-primary/30" />
+            {gradebookStats.hasData && (
+              <span className="inline-flex h-7 items-center rounded-md border border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-secondary))] px-2.5 text-xs font-medium text-text-secondary tabular-nums">
+                {t('classrooms.gradebook.gradedChip', {
+                  pct: gradebookStats.pctGraded,
+                  avg: gradebookStats.avg ?? '—',
+                })}
+              </span>
+            )}
             {hasGradingPeriods && !selectedTermId && (
               <span className="text-xs text-caramel-300">{t('classrooms.gradebook.selectGradingPeriodPrompt')}</span>
             )}
@@ -669,6 +687,7 @@ function GradebookTab() {
           termId={effectiveTermId || ''}
           academicYearId={currentYear?.yearId}
           teacherId={selectedSection?.primaryTeacherId}
+          categoryWeights={defaultPolicy?.categoryWeights}
           disabled={hasAllFinalized || !effectiveTermId || !gradePerms.edit}
           onAddAssignment={gradePerms.create && effectiveTermId ? () => setShowAssignmentEditor(true) : undefined}
           onViewReportCard={handleViewReportCard}
