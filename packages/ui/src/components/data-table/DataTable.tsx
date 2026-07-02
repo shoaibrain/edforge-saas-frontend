@@ -1,6 +1,6 @@
 import { type KeyboardEvent, type ReactNode } from 'react'
 import { flexRender } from '@tanstack/react-table'
-import type { Row, Table } from '@tanstack/react-table'
+import type { Row } from '@tanstack/react-table'
 import { cn, focusRingInset } from '../../utils'
 import { useDataTable } from './hooks/useDataTable'
 import { DataTableColumnHeader } from './DataTableColumnHeader'
@@ -10,13 +10,11 @@ import { DataTablePagination } from './DataTablePagination'
 import { DataTableToolbar } from './DataTableToolbar'
 import { resolveDataTableLabels } from './labels'
 import type {
-  BulkAction,
   DataTableColumnMeta,
-  DataTableLabels,
   DataTableProps,
   FacetedFilterConfig,
 } from './types'
-import { AlertCircle, RefreshCw, X } from 'lucide-react'
+import { AlertCircle, RefreshCw } from 'lucide-react'
 
 export function DataTable<TData>({
   columns,
@@ -65,7 +63,6 @@ export function DataTable<TData>({
   overflowClearLabel,
   density: densityProp,
   enableDensityToggle,
-  bulkActions,
   selectionBar,
   exportOptions,
   labels,
@@ -90,7 +87,7 @@ export function DataTable<TData>({
   const hasFacets = !!resolvedFacets?.length
   const hasSearch = !!searchPlaceholder
   const showDensityToggle =
-    enableDensityToggle ?? (hasFacets || hasSearch || !!bulkActions?.length)
+    enableDensityToggle ?? (hasFacets || hasSearch || !!selectionBar)
 
   const { table, density, setDensity } = useDataTable<TData>({
     data,
@@ -168,9 +165,8 @@ export function DataTable<TData>({
     overflowFilters ||
     showDensityToggle ||
     exportOptions
-  const hasBulkActions = bulkActions && selectedRowCount > 0
-  // ⑨ Selection Context Bar: morphs the toolbar in place on selection and
-  // retires the floating pill for pages that adopt it.
+  // ⑨ Selection Context Bar: morphs the toolbar in place on selection.
+  // (The legacy floating bulk pill is gone — this is the only bulk surface.)
   const selectionBarActive = !!selectionBar && selectedRowCount > 0
   const activeFilterCount =
     table.getState().columnFilters.length +
@@ -351,115 +347,6 @@ export function DataTable<TData>({
         </div>
       )}
 
-      {/* Floating bulk action bar — legacy pill, unmounted entirely once a
-          page adopts the in-place SelectionContextBar (pass `selectionBar`). */}
-      {!selectionBar && (
-        <FloatingBulkBar
-          visible={!!hasBulkActions}
-          actions={bulkActions ?? []}
-          table={table}
-          hasFooter={!!resolvedPagination && !isEmpty}
-          labels={resolvedLabels}
-        />
-      )}
-    </div>
-  )
-}
-
-// ============================================================================
-// FLOATING BULK BAR
-// ============================================================================
-
-function FloatingBulkBar<TData>({
-  visible,
-  actions,
-  table,
-  hasFooter,
-  labels,
-}: {
-  visible: boolean
-  actions: BulkAction<TData>[]
-  table: Table<TData>
-  hasFooter: boolean
-  labels: DataTableLabels
-}) {
-  const selectedRows = table.getFilteredSelectedRowModel().rows.map((r) => r.original)
-  const count = selectedRows.length
-
-  return (
-    <div
-      aria-live="polite"
-      role={visible ? 'region' : undefined}
-      aria-label={visible ? labels.selectedRows(count) : undefined}
-      // bottom offset matches the prototype's "58px above footer" spec;
-      // inline style avoids the design-system arbitrary-spacing lint rule
-      // since this magic gap is specific to this component's layout.
-      style={{ bottom: hasFooter ? 68 : 16 }}
-      className={cn(
-        'pointer-events-none absolute left-1/2 -translate-x-1/2 z-30',
-        'transition-[opacity,transform] duration-[var(--dt-duration,200ms)] ease-[var(--dt-easing,cubic-bezier(.32,.72,0,1))]',
-        'motion-reduce:transition-none',
-        visible
-          ? 'opacity-100 translate-y-0'
-          : 'opacity-0 translate-y-2'
-      )}
-    >
-      <div
-        // 58px is the prototype's bulk-bar height; inline style for the same
-        // reason as the parent.
-        style={{ height: 58 }}
-        className={cn(
-          'pointer-events-auto flex items-center gap-3 pl-4 pr-2 rounded-full',
-          'bg-[rgb(var(--background-elevated))] border border-[rgb(var(--border-strong))]',
-          'shadow-overlay text-sm text-[rgb(var(--text-primary))]'
-        )}
-      >
-        <span className="font-medium tabular-nums">
-          {labels.selectedRows(count)}
-        </span>
-        <span className="h-5 w-px bg-[rgb(var(--border-primary)/0.4)]" aria-hidden />
-        <div className="flex items-center gap-1.5">
-          {actions.map((action, i) => {
-            const handler = action.onRun ?? action.onClick
-            const tone = action.tone === 'critical' ? 'danger' : action.variant
-            return (
-              <button
-                key={action.id ?? i}
-                type="button"
-                onClick={() => handler?.(selectedRows)}
-                disabled={action.disabled}
-                aria-label={action.label}
-                title={action.label}
-                className={cn(
-                  'inline-flex items-center gap-1.5 h-9 px-3 text-sm font-medium rounded-full transition-colors',
-                  tone === 'danger'
-                    ? 'text-[rgb(var(--action-danger-bg))] hover:bg-[rgb(var(--action-danger-bg)/0.1)]'
-                    : tone === 'outline'
-                      ? 'border border-[rgb(var(--border-primary))] text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-secondary))]'
-                      : 'text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-tertiary))]',
-                  action.disabled && 'opacity-50 cursor-not-allowed'
-                )}
-              >
-                {action.icon}
-                {action.label}
-              </button>
-            )
-          })}
-          <button
-            type="button"
-            onClick={() => table.toggleAllRowsSelected(false)}
-            aria-label={labels.clearSelection}
-            title={labels.clearSelection}
-            className={cn(
-              'inline-flex items-center justify-center w-9 h-9 rounded-full',
-              'text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-secondary))]',
-              focusRingInset
-            )}
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
     </div>
   )
 }

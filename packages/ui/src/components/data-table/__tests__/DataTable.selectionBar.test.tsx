@@ -62,8 +62,12 @@ describe('DataTable — ⑨ selectionBar swap', () => {
     expect(queryByRole('toolbar', { name: 'Selection actions' })).toBeNull()
   })
 
-  it('suppresses the legacy floating pill when selectionBar is provided alongside bulkActions', () => {
-    const { queryByText } = render(
+  it('renders no floating pill when rows are selected without a selectionBar (legacy path removed)', () => {
+    // The legacy floating bulk pill rendered an aria-live `region` centered
+    // over the table whenever rows were selected and bulk actions were passed.
+    // Both the prop and the pill are gone (#303a): selecting rows without a
+    // `selectionBar` leaves the ordinary toolbar and adds no extra surface.
+    const { getByPlaceholderText, queryByRole } = render(
       <DataTable<Row>
         columns={columns}
         data={data}
@@ -72,12 +76,10 @@ describe('DataTable — ⑨ selectionBar swap', () => {
         searchPlaceholder="Search"
         rowSelection={{ r1: true }}
         onRowSelectionChange={() => {}}
-        bulkActions={[{ id: 'x', label: 'Legacy pill action', onRun: vi.fn() }]}
-        selectionBar={
-          <SelectionContextBar selectedCount={1} onClear={vi.fn()} actions={[]} />
-        }
       />,
     )
-    expect(queryByText('Legacy pill action')).toBeNull()
+    expect(getByPlaceholderText('Search')).toBeTruthy()
+    expect(queryByRole('region')).toBeNull()
+    expect(queryByRole('toolbar', { name: 'Selection actions' })).toBeNull()
   })
 })

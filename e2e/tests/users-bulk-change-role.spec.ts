@@ -22,13 +22,19 @@ test.describe('Bulk change global user role (#233)', () => {
   test.fixme(
     'self-demote guard — current user always skipped',
     async ({ page }) => {
+      // Drives the ⑨ SelectionContextBar toolbar morph (mirror
+      // sections-bulk-status.spec.ts — the floating pill is gone):
       // 1. Visit /settings/people; seed 4 users, one of which is the current user.
-      // 2. Select all 4.
-      // 3. Click "Change role" → modal opens; target picker defaults to StandardUser.
-      // 4. Confirm the "Skipped" line names the current user with reason
-      //    "cannot change your own role".
+      // 2. page.getByRole('checkbox', { name: 'Select all rows' }).check()
+      //    → the selection toolbar (role="toolbar") shows "4 selected";
+      //    "Change role" carries a ·3 subset count chip (self excluded up
+      //    front — the bar passes only the 3 applicable ids to the modal).
+      // 3. page.getByRole('button', { name: 'Change role', exact: true })
+      //    .click() → modal opens; target picker defaults to StandardUser.
+      // 4. Modal header reads "Change role for 3 users" (the current user
+      //    never reaches it).
       // 5. Mock POST /tenant/users/:id/global-role × 3 to 200.
-      // 6. Confirm → toast "Set 3 users to Standard User · 1 skipped".
+      // 6. Confirm → toast "Set 3 users to Standard User".
       await page.goto('/settings/people')
       await expect(page.getByRole('heading', { name: /user accounts/i })).toBeVisible()
     },
@@ -37,9 +43,11 @@ test.describe('Bulk change global user role (#233)', () => {
   test.fixme(
     'already-in-target skipped — rows whose role matches target are dropped',
     async ({ page }) => {
-      // Seed 2 StandardUser + 1 TenantAdmin. Pick target = TenantAdmin.
-      // Confirm modal shows "Set 2 users to Tenant Admin" and lists the
-      // existing admin under "Skipped (already Tenant Admin)".
+      // Seed 2 StandardUser + 1 TenantAdmin; select all 3 via the selection
+      // toolbar and open the modal from the "Change role" toolbar button.
+      // Pick target = TenantAdmin. Confirm modal shows "Set 2 users to
+      // Tenant Admin" and lists the existing admin under "Skipped (already
+      // Tenant Admin)" — target-role skips remain the modal's concern.
       await page.goto('/settings/people')
     },
   )

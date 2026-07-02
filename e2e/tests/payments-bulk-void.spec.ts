@@ -22,17 +22,22 @@ test.describe('Bulk void payments (#229)', () => {
   test.fixme(
     'eligibility split — 2 completed + 1 refunded + 1 missing-receipt',
     async ({ page }) => {
+      // Drives the ⑨ SelectionContextBar toolbar morph (mirror
+      // sections-bulk-status.spec.ts — the floating pill is gone):
       // 1. Visit /finance/billing/payments; seed 4 payments via page.route.
-      // 2. Select all 4 → bulk bar shows "4 selected".
-      // 3. Click "Void selected" → drawer opens.
-      // 4. Confirm "Will void (2)" section lists the 2 completed+receipted
-      //    payments and "Will skip (2)" shows the refunded one ("not
-      //    completed (refunded)") and the no-receipt one ("no receipt
-      //    number").
+      // 2. page.getByRole('checkbox', { name: 'Select all rows' }).check()
+      //    → the selection toolbar (role="toolbar", name "Selection
+      //    actions") shows "4 selected"; "Void selected" carries a ·2
+      //    subset count chip (only completed+receipted rows qualify).
+      // 3. page.getByRole('button', { name: 'Void selected', exact: true })
+      //    .click() → drawer opens with EXACTLY the 2 applicable ids —
+      //    subset honesty means the refunded / no-receipt rows never
+      //    reach the drawer (no "Will skip" section anymore).
+      // 4. Confirm "Will void (2)" lists the 2 completed+receipted payments.
       // 5. Type a reason "duplicate" → Apply button enables.
       // 6. Mock POST /finance/.../payments/:id/void × 2 to 200.
-      // 7. Confirm → toast "Voided 2 payments · 2 skipped".
-      // 8. Drawer closes; selection cleared.
+      // 7. Confirm → toast "Voided 2 payments".
+      // 8. Drawer closes; selection cleared (toolbar restores).
       await page.goto('/finance/billing/payments')
       await expect(page.getByRole('heading', { name: /payments/i })).toBeVisible()
     },
