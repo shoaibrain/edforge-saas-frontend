@@ -817,7 +817,10 @@
       "gradeLabel": "Grade {{grade}}",
       "trendRateNote": "Among sections that recorded · a rate, not coverage",
       "trendAvgTarget": "avg {{avg}}% · target {{target}}%",
-      "trendAria": "30-day recorded attendance rate, averaging {{avg}} percent"
+      "trendAria": "30-day recorded attendance rate, averaging {{avg}} percent",
+      "updating": "Updating…",
+      "staleWarning": "Couldn’t refresh for {{date}} — showing the last loaded data.",
+      "retry": "Retry"
     },
     "modal": {
       "trendTitle": "Trend over the window (recent vs earlier)",

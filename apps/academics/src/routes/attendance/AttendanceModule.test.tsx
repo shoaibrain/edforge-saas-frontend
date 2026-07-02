@@ -52,9 +52,9 @@ vi.mock('../../hooks', async () => {
   }
 })
 
-const mockUseAttendanceOverview = vi.fn(() => ({ data: undefined, isLoading: false, error: undefined }))
+const mockUseAttendanceOverview = vi.fn()
 vi.mock('../../hooks/useAttendance', () => ({
-  useAttendanceOverview: (...args: unknown[]) => mockUseAttendanceOverview(...args),
+  useAttendanceOverview: (args: unknown) => mockUseAttendanceOverview(args),
   useAttendancePolicy: () => ({ data: undefined }),
   useAttendanceStudentTrends: () => ({ data: {} }),
   useCalendarDate: () => ({ data: undefined }),
@@ -105,10 +105,18 @@ const OVERVIEW = {
   dayOfWeekPattern: {},
 }
 
+const idleOverview = {
+  data: undefined,
+  isLoading: false,
+  isFetching: false,
+  error: undefined,
+  refetch: vi.fn(),
+}
+
 afterEach(() => {
   cleanup()
   vi.clearAllMocks()
-  mockUseAttendanceOverview.mockReturnValue({ data: undefined, isLoading: false, error: undefined })
+  mockUseAttendanceOverview.mockReturnValue(idleOverview)
 })
 
 describe('AttendanceModule — entry-level current-AY gate', () => {

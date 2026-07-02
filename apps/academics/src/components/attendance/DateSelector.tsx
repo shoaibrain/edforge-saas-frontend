@@ -73,6 +73,16 @@ export function DateSelector({
             value={selectedDate}
             max={today}
             onChange={(e) => onDateChange(e.target.value)}
+            onClick={(e) => {
+              // The input is a transparent overlay — clicking it only focuses a
+              // date segment, so the pill reads as "not clickable". Explicitly
+              // open the native picker (supported browsers; focus fallback).
+              try {
+                e.currentTarget.showPicker?.()
+              } catch {
+                /* non-user-gesture or unsupported — the focused input still works */
+              }
+            }}
             className="absolute inset-0 opacity-0 cursor-pointer"
             aria-label={t('attendance.dateSelector.selectDate')}
           />

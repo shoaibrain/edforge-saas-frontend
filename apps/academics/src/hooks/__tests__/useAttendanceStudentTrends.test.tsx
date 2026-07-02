@@ -54,6 +54,7 @@ describe('useAttendanceStudentTrends', () => {
       { wrapper: makeWrapper() },
     )
     await waitFor(() => expect(mock).toHaveBeenCalled())
-    expect(mock).toHaveBeenCalledWith('s1', ['a', 'b', 'c'], WINDOW.startDate, WINDOW.endDate)
+    // The hook forwards react-query's abort signal (cancels superseded fetches).
+    expect(mock).toHaveBeenCalledWith('s1', ['a', 'b', 'c'], WINDOW.startDate, WINDOW.endDate, expect.any(AbortSignal))
   })
 })

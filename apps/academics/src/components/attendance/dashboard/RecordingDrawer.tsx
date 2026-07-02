@@ -208,6 +208,7 @@ export function RecordingDrawer({
       ) : (
         <AttendanceGrid
           key={`${sid}-${date}`}
+          compact
           students={roster?.students ?? []}
           date={date}
           existingRecords={existingRecords}

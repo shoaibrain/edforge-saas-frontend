@@ -25,7 +25,7 @@ import {
   useAttendancePolicy,
   useAttendanceStudentTrends,
 } from '../../hooks/useAttendance'
-import { useSections, flattenSectionPages, useCurrentAcademicYear } from '../../hooks'
+import { useSections, flattenSectionPages, useCurrentAcademicYear, useDebounce } from '../../hooks'
 import { NoCurrentAcademicYearEmptyState } from '../../components/common'
 import {
   AttendanceCommandBar,
@@ -97,6 +97,9 @@ export function AttendanceModuleContent({ schoolId, currentYearId }: AttendanceM
   const { t, formatDate } = useAcademicsI18n()
   const selectedDate = useAttendanceStore((s) => s.selectedDate)
   const dateActions = useAttendanceDateActions()
+  // The date pill responds instantly; data fetches key on the SETTLED date so
+  // rapid ‹ › clicking doesn't fire one heavy aggregate per intermediate day.
+  const queryDate = useDebounce(selectedDate, 300)
 
   // ABAC — recording, IEMiS export, and the derived scope lens (school-wide vs
   // my-sections). The aggregate is scoped server-side by the caller's role; the
@@ -111,13 +114,19 @@ export function AttendanceModuleContent({ schoolId, currentYearId }: AttendanceM
   const {
     data: overview,
     isLoading,
+    isFetching,
     error,
+    refetch,
   } = useAttendanceOverview({
     schoolId,
     academicYearId: currentYearId,
-    date: selectedDate,
+    date: queryDate,
     enabled: !!schoolId && !!currentYearId,
   })
+  // keepPreviousData keeps the last payload on screen while the new date loads —
+  // surface that transition explicitly (dim + aria-busy) so stale numbers are
+  // never mistaken for the selected day's.
+  const updating = isFetching && !isLoading
 
   const { data: policy } = useAttendancePolicy(schoolId)
   const isDailyPresence = policy?.effectiveMode === 'daily_presence'
@@ -148,8 +157,11 @@ export function AttendanceModuleContent({ schoolId, currentYearId }: AttendanceM
   const gradeRates = useMemo(() => toGradeRates(overview?.todaySummary?.byGradeLevel), [overview])
 
   // Real 30-day sparkline series for the visible at-risk students (batched).
+  // The window is anchored to TODAY (a rolling risk signal), not the browsed
+  // date — otherwise every ‹ › click re-fires this heavy batch query.
   const atRiskIds = useMemo(() => rankedAlerts.slice(0, 50).map((a) => a.studentId), [rankedAlerts])
-  const { startDate, endDate } = useMemo(() => thirtyDayWindow(selectedDate), [selectedDate])
+  const todayStr = useMemo(() => new Date().toISOString().split('T')[0], [])
+  const { startDate, endDate } = useMemo(() => thirtyDayWindow(todayStr), [todayStr])
   const { data: trends } = useAttendanceStudentTrends({
     schoolId,
     studentIds: atRiskIds,
@@ -158,7 +170,11 @@ export function AttendanceModuleContent({ schoolId, currentYearId }: AttendanceM
     enabled: !!schoolId && atRiskIds.length > 0,
   })
 
-  const dateLabel = formatDate(`${selectedDate}T00:00:00`, {
+  // Label the data by the date it actually belongs to (the loaded payload's own
+  // date, falling back to the settled query date) — the pill may already show a
+  // newer date while the previous payload is still on screen.
+  const dataDate = overview?.todaySummary?.date ?? queryDate
+  const dateLabel = formatDate(`${dataDate}T00:00:00`, {
     weekday: 'long',
     month: 'long',
     day: 'numeric',
@@ -175,12 +191,12 @@ export function AttendanceModuleContent({ schoolId, currentYearId }: AttendanceM
     : undefined
   const drawerSection = drawerSectionId ? sectionsById.get(drawerSectionId) : undefined
 
-  // Reframe numbers: the deflated blended average vs the recorded rate.
+  // Reframe numbers: the deflated blended average vs the honest recorded rate
+  // (attending ÷ recorded, from computeCoverageSummary — never the blend).
+  // Before anything is recorded today, fall back to the 7-day average.
   const artifactPct = overview?.periodAverages?.academicYear ?? 0
   const recordedRate =
-    (overview?.todaySummary?.totalRecorded ?? 0) > 0
-      ? (overview?.todaySummary?.attendanceRate ?? 0)
-      : (overview?.periodAverages?.last7Days ?? 0)
+    summary.studentsRecorded > 0 ? summary.recordedRate : (overview?.periodAverages?.last7Days ?? 0)
 
   return (
     <div className="flex flex-col gap-4 px-6 pb-8 pt-3">
@@ -196,7 +212,8 @@ export function AttendanceModuleContent({ schoolId, currentYearId }: AttendanceM
         onExport={() => setExportOpen(true)}
       />
 
-      {error ? (
+      {error && !overview ? (
+        // Hard failure with nothing to show — blocking error card with retry.
         <div className="rounded-xl border border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-secondary))] p-6 text-center">
           <p className="text-sm font-medium text-[rgb(var(--state-danger-fg))]">
             {t('attendance.dashboard.loadFailed')}
@@ -204,9 +221,33 @@ export function AttendanceModuleContent({ schoolId, currentYearId }: AttendanceM
           <p className="mt-1 text-2xs text-[rgb(var(--text-tertiary))]">
             {t('attendance.dashboard.loadFailedDescription')}
           </p>
+          <button
+            type="button"
+            onClick={() => refetch()}
+            className="mt-3 inline-flex h-8 items-center rounded-lg border border-[rgb(var(--border-primary)/0.35)] px-3 text-xs font-medium text-[rgb(var(--text-secondary))] transition-colors hover:bg-[rgb(var(--background-tertiary))]"
+          >
+            {t('attendance.dashboard.retry')}
+          </button>
         </div>
       ) : (
         <>
+          {/* Refetch failed but the last payload is still on screen — say so
+              instead of silently presenting stale numbers as the new date's. */}
+          {error && overview && (
+            <div className="flex items-center gap-2 rounded-lg border border-[rgb(var(--state-warning-fg)/0.25)] bg-[rgb(var(--state-warning-bg)/0.12)] px-3 py-2 text-xs text-[rgb(var(--state-warning-fg))]">
+              <span className="min-w-0 flex-1">
+                {t('attendance.dashboard.staleWarning', { date: dateLabel })}
+              </span>
+              <button
+                type="button"
+                onClick={() => refetch()}
+                className="shrink-0 rounded-md px-2 py-1 font-medium transition-colors hover:bg-[rgb(var(--state-warning-bg)/0.25)]"
+              >
+                {t('attendance.dashboard.retry')}
+              </button>
+            </div>
+          )}
+
           {overview && (
             <CoverageReframeBanner
               artifactPct={artifactPct}
@@ -223,10 +264,14 @@ export function AttendanceModuleContent({ schoolId, currentYearId }: AttendanceM
             dateLabel={dateLabel}
             onRecord={setDrawerSectionId}
             loading={isLoading}
+            updating={updating}
           />
 
           {!isLoading && overview && (
-            <>
+            <div
+              aria-busy={updating}
+              className={`flex flex-col gap-4 transition-opacity ${updating ? 'opacity-60' : ''}`}
+            >
               <AttendanceInsightStrip rankedAlerts={rankedAlerts} gradeRates={gradeRates} />
 
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
@@ -239,7 +284,7 @@ export function AttendanceModuleContent({ schoolId, currentYearId }: AttendanceM
               </div>
 
               <TrendPanel trend={overview.trend ?? []} periodAverages={overview.periodAverages} />
-            </>
+            </div>
           )}
         </>
       )}
@@ -253,7 +298,7 @@ export function AttendanceModuleContent({ schoolId, currentYearId }: AttendanceM
         recordedCount={drawerCoverage?.recordedCount ?? 0}
         enrolledCount={drawerCoverage?.studentCount ?? drawerSection?.currentEnrollment ?? 0}
         schoolId={schoolId}
-        date={selectedDate}
+        date={queryDate}
         canCreate={canCreate}
         isDailyPresence={isDailyPresence}
         onClose={() => setDrawerSectionId(null)}
