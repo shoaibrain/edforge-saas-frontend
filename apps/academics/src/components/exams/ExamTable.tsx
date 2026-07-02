@@ -7,7 +7,7 @@
  * lives in the shared component.
  */
 
-import { useMemo } from 'react'
+import { useMemo, type ReactNode } from 'react'
 import { ClipboardList, CheckCircle2, Clock } from 'lucide-react'
 import type { ExamResponseDto, ExamStatus } from '@aibrains/shared-types'
 import type { OnChangeFn, RowSelectionState } from '@tanstack/react-table'
@@ -28,6 +28,9 @@ interface ExamTableProps {
   onSelectExam?: (exam: ExamResponseDto) => void
   /** Optional bulk actions wired from the page (status drawer, generate, etc). */
   bulkActions?: BulkAction<ExamResponseDto>[]
+  /** ⑨ Selection Context Bar node — morphs the toolbar in place on selection
+   *  and retires the floating pill (bulkActions are ignored when provided). */
+  selectionBar?: ReactNode
   /** Controlled row selection — lift state into the page when an action
    *  needs to clear selection (e.g. after a bulk status apply). */
   rowSelection?: RowSelectionState
@@ -52,6 +55,7 @@ export function ExamTable({
   isLoading,
   onSelectExam,
   bulkActions,
+  selectionBar,
   rowSelection,
   onRowSelectionChange,
 }: ExamTableProps) {
@@ -299,7 +303,7 @@ export function ExamTable({
       getRowId={(row) => row.examId}
       isLoading={isLoading}
       enableSorting
-      enableRowSelection={!!bulkActions?.length || !!onRowSelectionChange}
+      enableRowSelection={!!bulkActions?.length || !!selectionBar || !!onRowSelectionChange}
       rowSelection={rowSelection}
       onRowSelectionChange={onRowSelectionChange}
       enableColumnVisibility
@@ -311,7 +315,8 @@ export function ExamTable({
       pageSizes={[8, 12, 20]}
       density="comfortable"
       onRowClick={onSelectExam}
-      bulkActions={bulkActions}
+      bulkActions={selectionBar ? undefined : bulkActions}
+      selectionBar={selectionBar}
       exportOptions={{ filename: 'exams', formats: ['csv'] }}
       labels={dataTableLabels}
       emptyState={{
