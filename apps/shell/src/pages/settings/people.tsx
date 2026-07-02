@@ -27,7 +27,8 @@ import {
   ShieldAlert,
 } from 'lucide-react'
 import type { RowSelectionState } from '@tanstack/react-table'
-import { Button, Select, TanstackDataTable, createActionsColumn, createSelectColumn, type BulkAction, type ColumnDef } from '@edforge/ui'
+import { useTranslation } from '@edforge/i18n'
+import { Button, Select, TanstackDataTable, createActionsColumn, createSelectColumn, SelectionContextBar, type SelectionAction, type ColumnDef } from '@edforge/ui'
 import { BulkChangeUserRoleModal } from '@/components/people/BulkChangeUserRoleModal'
 import { BulkSuspendUsersModal } from '@/components/people/BulkSuspendUsersModal'
 import { useAuthStore } from '@/stores/auth.store'
@@ -386,6 +387,7 @@ function UserActionsDropdown({
 // ============================================================================
 
 export default function PeopleSettingsPage() {
+  const { t } = useTranslation('settings')
   const { user } = useAuthStore.getState()
   const { activeSchoolId } = useAppStore.getState()
 
@@ -438,28 +440,56 @@ export default function PeopleSettingsPage() {
   const [bulkSuspendTarget, setBulkSuspendTarget] = useState<UserResponseDto[] | null>(null)
   const currentUserId = user?.id ?? ''
 
-  // Change role + Suspend open real modals (closes #233 + #234).
+  // ── ⑨ Selection Context Bar — retires the legacy floating pill.
+  // Change role + Suspend open the real modals (#233 + #234). Applicability
+  // mirrors the modals' own eligibility guards up front (self excluded from
+  // both; already-suspended rows excluded from Suspend — target-role skips
+  // stay inside BulkChangeUserRoleModal because the target is picked there).
+  // Both actions render locked (visible, not hidden) for non-TenantAdmin
+  // roles — global role/status changes are a tenant-admin capability.
   // The earlier `Re-invite` placeholder was dropped — its backend slice
   // (#235) isn't built, and a toast for an unsupported flow confuses
   // operators. Re-add here once the backend lands.
-  const userBulkActions = useMemo<BulkAction<UserResponseDto>[]>(
-    () => [
+  const isTenantAdmin = user?.globalRole === 'TenantAdmin'
+  const selectedUsers = useMemo(() => {
+    const ids = new Set(Object.keys(rowSelection).filter((id) => rowSelection[id]))
+    return users.filter((u) => ids.has(u.userId))
+  }, [rowSelection, users])
+
+  const selectionActions = useMemo<SelectionAction[]>(() => {
+    const byId = new Map(selectedUsers.map((u) => [u.userId, u]))
+    const rowsFor = (ids: string[]) =>
+      ids.map((id) => byId.get(id)).filter((u): u is UserResponseDto => !!u)
+    const roleChangeIds = selectedUsers
+      .filter((u) => u.userId !== currentUserId)
+      .map((u) => u.userId)
+    const suspendableIds = selectedUsers
+      .filter((u) => u.userId !== currentUserId && u.status !== 'suspended')
+      .map((u) => u.userId)
+    return [
       {
         id: 'change-role',
-        label: 'Change role',
-        icon: <UserCog className="w-4 h-4" />,
-        onRun: (rows) => setBulkChangeRoleTarget(rows),
+        label: t('people.selection.changeRole'),
+        icon: <UserCog className="h-3.5 w-3.5" />,
+        applicableIds: roleChangeIds,
+        locked: !isTenantAdmin,
+        lockedReason: t('people.selection.requiresAdmin'),
+        disabledReason: t('people.selection.noneEligibleRole'),
+        onAction: (ids) => setBulkChangeRoleTarget(rowsFor(ids)),
       },
       {
         id: 'suspend',
-        label: 'Suspend',
-        icon: <ShieldAlert className="w-4 h-4" />,
-        tone: 'critical',
-        onRun: (rows) => setBulkSuspendTarget(rows),
+        label: t('people.selection.suspend'),
+        icon: <ShieldAlert className="h-3.5 w-3.5" />,
+        danger: true,
+        applicableIds: suspendableIds,
+        locked: !isTenantAdmin,
+        lockedReason: t('people.selection.requiresAdmin'),
+        disabledReason: t('people.selection.noneSuspendable'),
+        onAction: (ids) => setBulkSuspendTarget(rowsFor(ids)),
       },
-    ],
-    [],
-  )
+    ]
+  }, [selectedUsers, currentUserId, isTenantAdmin, t])
 
   // Table columns
   const columns: ColumnDef<UserResponseDto, unknown>[] = useMemo(() => [
@@ -562,6 +592,42 @@ export default function PeopleSettingsPage() {
     return <AccessDenied message="You don't have permission to view access policy settings." />
   }
 
+  const singleUser = selectedUsers.length === 1 ? selectedUsers[0] : null
+  const selectionBar = (
+    <SelectionContextBar
+      selectedCount={selectedUsers.length}
+      totalCount={users.length}
+      onClear={() => setRowSelection({})}
+      onSelectAll={() =>
+        setRowSelection(Object.fromEntries(users.map((u) => [u.userId, true])))
+      }
+      actions={selectionActions}
+      aria-label={t('headerZone.selection.aria')}
+      labels={{
+        selected: (count) => t('headerZone.selection.selected', { count }),
+        selectAll: (total) => t('headerZone.selection.selectAll', { count: total }),
+        clear: t('headerZone.selection.clear'),
+      }}
+      peek={
+        singleUser ? (
+          <div className="flex min-w-0 items-center gap-2">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--state-info-bg)/0.18)] text-xs font-semibold text-[rgb(var(--action-secondary-fg))]">
+              {singleUser.firstName?.[0] || ''}{singleUser.lastName?.[0] || ''}
+            </div>
+            <div className="min-w-0">
+              <div className="truncate text-sm font-semibold text-[rgb(var(--text-primary))]">
+                {singleUser.firstName} {singleUser.lastName}
+              </div>
+              <div className="truncate text-2xs text-[rgb(var(--text-tertiary))]">
+                {singleUser.email} · {singleUser.globalRole === 'TenantAdmin' ? 'Admin' : 'User'}
+              </div>
+            </div>
+          </div>
+        ) : undefined
+      }
+    />
+  )
+
   return (
     <div className="max-w-6xl mx-auto px-6 py-8">
       <motion.div
@@ -633,7 +699,7 @@ export default function PeopleSettingsPage() {
             pagination={{ pageSize: 20 }}
             pageSizes={[10, 20, 50]}
             defaultSort={[{ id: 'name', desc: false }]}
-            bulkActions={userBulkActions}
+            selectionBar={selectionBar}
             exportOptions={{ filename: 'users', formats: ['csv'] }}
             maxHeight="calc(100vh - 18rem)"
             emptyState={{

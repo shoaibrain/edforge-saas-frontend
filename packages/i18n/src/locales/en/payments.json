@@ -720,6 +720,10 @@
     "recordManualPayment": "Record Manual Payment",
     "bulkReceiptPdfExport": {
       "menuLabel": "Download PDF (ZIP)"
+    },
+    "selection": {
+      "noneVoidable": "No selected payments can be voided — only completed payments with a receipt qualify.",
+      "noneCompleted": "No completed payments in the selection."
     }
   },
   "recordPayment": {

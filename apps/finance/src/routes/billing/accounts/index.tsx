@@ -23,7 +23,8 @@ import {
   createSelectColumn,
   FilterTabs,
   IdentityCell,
-  type BulkAction,
+  SelectionContextBar,
+  type SelectionAction,
   type ColumnDef,
   StatBand,
   type StatMetric,
@@ -576,30 +577,44 @@ export default function StudentAccountsPage() {
     return { totalStudents, totalOutstanding, fullyPaidCount, overdueCount }
   }, [accountList])
 
-  // Both bulk actions now drive real drawers backed by the D1–D4 finance
+  // Both bulk actions drive real drawers backed by the D1–D4 finance
   // async-job framework (PR #339): D3 send-statement (#231) and D4
   // adjust-balance (#232).
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const [bulkStatementsTarget, setBulkStatementsTarget] = useState<StudentAccount[] | null>(null)
   const [bulkAdjustTarget, setBulkAdjustTarget] = useState<StudentAccount[] | null>(null)
 
-  const accountBulkActions = useMemo<BulkAction<StudentAccount>[]>(
-    () => [
+  // ── ⑨ Selection Context Bar — retires the legacy floating pill. Accounts
+  // have no disqualifying state today, so both actions apply to the full
+  // selection; handlers still receive `applicableIds` and map them back to
+  // rows for the existing D3/D4 drawers.
+  const selectedAccounts = useMemo(() => {
+    const ids = new Set(Object.keys(rowSelection).filter((id) => rowSelection[id]))
+    return accountList.filter((a) => ids.has(a.id))
+  }, [rowSelection, accountList])
+
+  const selectionActions = useMemo<SelectionAction[]>(() => {
+    const byId = new Map(selectedAccounts.map((a) => [a.id, a]))
+    const rowsFor = (ids: string[]) =>
+      ids.map((id) => byId.get(id)).filter((a): a is StudentAccount => !!a)
+    const allIds = selectedAccounts.map((a) => a.id)
+    return [
       {
         id: 'send-statement',
         label: t('studentAccount.actions.sendStatement'),
-        icon: <Mail className="w-4 h-4" />,
-        onRun: (rows) => setBulkStatementsTarget(rows),
+        icon: <Mail className="h-3.5 w-3.5" />,
+        applicableIds: allIds,
+        onAction: (ids) => setBulkStatementsTarget(rowsFor(ids)),
       },
       {
         id: 'adjust-balance',
         label: t('studentAccount.actions.adjustBalance'),
-        icon: <Pencil className="w-4 h-4" />,
-        onRun: (rows) => setBulkAdjustTarget(rows),
+        icon: <Pencil className="h-3.5 w-3.5" />,
+        applicableIds: allIds,
+        onAction: (ids) => setBulkAdjustTarget(rowsFor(ids)),
       },
-    ],
-    [t],
-  )
+    ]
+  }, [selectedAccounts, t])
 
   if (!schoolId) {
     return (
@@ -643,6 +658,43 @@ export default function StudentAccountsPage() {
     },
   ]
 
+  const singleAccount = selectedAccounts.length === 1 ? selectedAccounts[0] : null
+  const selectionBar = (
+    <SelectionContextBar
+      selectedCount={selectedAccounts.length}
+      totalCount={accountList.length}
+      onClear={() => setRowSelection({})}
+      onSelectAll={() =>
+        setRowSelection(Object.fromEntries(accountList.map((a) => [a.id, true])))
+      }
+      actions={selectionActions}
+      aria-label={t('headerZone.selection.aria')}
+      labels={{
+        selected: (count) => t('headerZone.selection.selected', { count }),
+        selectAll: (total) => t('headerZone.selection.selectAll', { count: total }),
+        clear: t('headerZone.selection.clear'),
+      }}
+      peek={
+        singleAccount ? (
+          <div className="min-w-0">
+            <div className="truncate text-sm font-semibold text-[rgb(var(--text-primary))]">
+              {singleAccount.studentName ?? singleAccount.studentId}
+            </div>
+            <div
+              className={`truncate text-2xs ${
+                singleAccount.balance > 0
+                  ? 'text-[rgb(var(--state-danger-fg))]'
+                  : 'text-[rgb(var(--state-success-fg))]'
+              }`}
+            >
+              {format(singleAccount.balance)}
+            </div>
+          </div>
+        ) : undefined
+      }
+    />
+  )
+
   return (
     <div className="p-6 space-y-5">
       {/* Screen-reader page heading (breadcrumb names the page visually) */}
@@ -679,7 +731,7 @@ export default function StudentAccountsPage() {
           },
         ]}
         initialColumnVisibility={{ balanceBucket: false }}
-        bulkActions={accountBulkActions}
+        selectionBar={selectionBar}
         exportOptions={{ filename: 'student-accounts', formats: ['csv'] }}
         renderSubComponent={({ row }) => (
           <AccountDetail account={row.original} schoolId={schoolId} />
