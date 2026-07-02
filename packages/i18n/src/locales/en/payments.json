@@ -705,7 +705,10 @@
     "searchPlaceholder": "Search by receipt #, invoice #, or student...",
     "exportSuccess": "Payments CSV exported",
     "exportFailed": "Failed to export payments CSV",
-    "recordManualPayment": "Record Manual Payment"
+    "recordManualPayment": "Record Manual Payment",
+    "bulkReceiptPdfExport": {
+      "menuLabel": "Download PDF (ZIP)"
+    }
   },
   "recordPayment": {
     "title": "Record Payment",
@@ -874,6 +877,20 @@
       "toastSucceeded": "Bulk export complete: {{succeeded}} succeeded, {{failed}} failed.",
       "toastFailed": "Bulk export failed. Check the drawer for details.",
       "readyTitle_plural": "Ready to export {{count}} invoices as ZIP"
+    },
+    "receiptPdfExport": {
+      "title": "Bulk receipt export",
+      "progress": "Generating receipts",
+      "readyTitle": "Ready to export {{count}} receipt as ZIP",
+      "readyTitle_plural": "Ready to export {{count}} receipts as ZIP",
+      "readyBody": "The generated ZIP contains one PDF per receipt. Non-completed payments (voided / refunded / failed) are skipped automatically. This may take a few minutes for larger batches; you can close the drawer and the job will keep running in the background.",
+      "startExport": "Start export",
+      "starting": "Starting export...",
+      "downloadZip": "Download receipts.zip",
+      "alreadyRunning": "Another bulk export is already running for this school. Showing its progress.",
+      "payloadTooLarge": "Cannot export {{requested}} receipts in one batch (limit is {{limit}}). Please narrow the selection.",
+      "toastSucceeded": "Bulk export complete: {{succeeded}} succeeded, {{failed}} failed.",
+      "toastFailed": "Bulk export failed. Check the drawer for details."
     }
   },
   "financeLayout": {

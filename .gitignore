@@ -122,3 +122,7 @@ package-lock.json
 yarn.lock
 
 .vercel
+
+# Agent E2E artifacts (generated)
+e2e/.auth/
+e2e/.mcp-artifacts/

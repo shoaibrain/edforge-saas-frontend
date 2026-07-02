@@ -84,7 +84,7 @@ export function Step3InvoiceDetails({
               {t('bulkGenerate.step3.sequentialNumbers', { count: studentCount })}
             </span>
           </div>
-          <span className="text-[11px] text-[rgb(var(--text-tertiary))] mt-1 block">
+          <span className={/* allow-arbitrary-spacing: dense bulk-wizard helper text; pre-token-sweep */ "text-[11px] text-[rgb(var(--text-tertiary))] mt-1 block"}>
             {t('bulkGenerate.step3.numberPreviewHelp')}{' '}
             INV-<i>{`{school}`}</i>-<i>{`{year}`}</i>-<i>{`{term}`}</i>-<i>{`{seq}`}</i>.
           </span>
@@ -147,7 +147,7 @@ function Field({
       </label>
       {children}
       {help && (
-        <span className="block mt-1 text-[11px] text-[rgb(var(--text-tertiary))]">
+        <span className={/* allow-arbitrary-spacing: dense bulk-wizard helper text; pre-token-sweep */ "block mt-1 text-[11px] text-[rgb(var(--text-tertiary))]"}>
           {help}
         </span>
       )}
@@ -204,7 +204,7 @@ function OptionToggle({
         className={[
           'inline-flex items-center justify-center w-8 h-8 rounded-md flex-shrink-0',
           value
-            ? 'bg-[rgb(var(--accent-strong))] text-white'
+            ? /* allow-hardcoded-color: contrast label on filled accent toggle */ 'bg-[rgb(var(--accent-strong))] text-white'
             : 'bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-tertiary))]',
         ].join(' ')}
       >
@@ -222,7 +222,7 @@ function OptionToggle({
       >
         <span
           className={[
-            'inline-block w-4 h-4 rounded-full bg-white transition-transform',
+            /* allow-hardcoded-color: toggle knob fill */ 'inline-block w-4 h-4 rounded-full bg-white transition-transform',
             value ? 'translate-x-4' : 'translate-x-0.5',
           ].join(' ')}
         />
