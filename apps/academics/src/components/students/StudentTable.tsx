@@ -67,7 +67,11 @@ interface StudentTableProps {
   activePreset?: string
   onPresetChange?: (value: string) => void
   primaryFilter?: ReactNode
-  moreFilters?: ReactNode
+  overflowFilters?: ReactNode
+  overflowActiveCount?: number
+  onOverflowClear?: () => void
+  overflowLabel?: string
+  overflowClearLabel?: string
   hasMore?: boolean
   isFetchingMore?: boolean
   onLoadMore?: () => void
@@ -173,7 +177,11 @@ export function StudentTable({
   activePreset,
   onPresetChange,
   primaryFilter,
-  moreFilters,
+  overflowFilters,
+  overflowActiveCount,
+  onOverflowClear,
+  overflowLabel,
+  overflowClearLabel,
   hasMore,
   isFetchingMore,
   onLoadMore,
@@ -334,7 +342,11 @@ export function StudentTable({
       activePreset={activePreset}
       onPresetChange={onPresetChange}
       primaryFilter={primaryFilter}
-      moreFilters={moreFilters}
+      overflowFilters={overflowFilters}
+      overflowActiveCount={overflowActiveCount}
+      onOverflowClear={onOverflowClear}
+      overflowLabel={overflowLabel}
+      overflowClearLabel={overflowClearLabel}
       pagination={{ pageSize: 50 }}
       pageSizes={[25, 50, 100]}
       defaultSort={[{ id: 'fullName', desc: false }]}

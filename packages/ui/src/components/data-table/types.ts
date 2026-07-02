@@ -168,6 +168,7 @@ export interface DataTableLabels {
   compactDensityTitle: string
   viewOptions: string
   toggleColumns: string
+  moreFilters: string
   export: string
   exportFormat: (format: DataTableExportFormat) => string
   xlsxUnavailable: string
@@ -257,13 +258,34 @@ export interface DataTableProps<TData> {
   /** Faceted filters. `facets` is the prototype name; `facetedFilters` kept for back-compat. */
   facetedFilters?: FacetedFilterConfig[]
   facets?: FacetedFilterConfig[]
+  /** Keep the first faceted filter inline and fold the rest into "More filters". */
+  foldFacets?: boolean
   /** Docked status presets (with counts) for the unified toolbar. */
   presets?: TablePreset[]
   activePreset?: string
   onPresetChange?: (value: string) => void
-  /** Primary facet control shown inline (e.g. a Grade/Subject/Type dropdown). */
+  /** Primary facet control shown inline (e.g. a Grade/Subject/Type dropdown). Folds into the toolbar's built-in "More filters" overflow on narrow container widths. */
   primaryFilter?: ReactNode
-  /** Secondary filters, typically wrapped in <DataTableMoreFilters>. */
+  /**
+   * Secondary filter controls the toolbar places in its OWN built-in "More
+   * filters" overflow popover (preferred). The toolbar renders a single
+   * overflow trigger that also absorbs the primary filter when the pane is
+   * narrow — the responsive "move controls into More filters" behavior.
+   */
+  overflowFilters?: ReactNode
+  /** Active-secondary-filter count for the overflow badge. */
+  overflowActiveCount?: number
+  /** Clears the overflow filters (renders a "Clear" footer when active). */
+  onOverflowClear?: () => void
+  /** Overflow trigger label (i18n). Defaults to the "More filters" label. */
+  overflowLabel?: string
+  /** Overflow "Clear" footer label (i18n). */
+  overflowClearLabel?: string
+  /**
+   * @deprecated Pass `overflowFilters` instead so the toolbar owns a single,
+   * responsive overflow. A pre-built `<DataTableMoreFilters>` passed here is
+   * still rendered inline (back-compat) but won't participate in the fold.
+   */
   moreFilters?: ReactNode
   /** Extra element rendered at the START (left) of the toolbar — e.g. filter chips. */
   toolbarStart?: ReactNode

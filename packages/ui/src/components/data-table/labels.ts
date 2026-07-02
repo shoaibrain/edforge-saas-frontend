@@ -26,6 +26,7 @@ export const DEFAULT_DATA_TABLE_LABELS: DataTableLabels = {
   compactDensityTitle: 'Compact rows',
   viewOptions: 'View',
   toggleColumns: 'Toggle columns',
+  moreFilters: 'More filters',
   export: 'Export',
   exportFormat: (format: DataTableExportFormat) =>
     format === 'csv' ? 'Export as CSV' : 'Export as XLSX',

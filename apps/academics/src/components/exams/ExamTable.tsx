@@ -304,6 +304,7 @@ export function ExamTable({
       onRowSelectionChange={onRowSelectionChange}
       enableColumnVisibility
       facets={facets}
+      foldFacets
       searchPlaceholder={t('tables.exams.search')}
       defaultSort={[{ id: 'schedule', desc: true }]}
       pagination={{ pageSize: 8 }}
