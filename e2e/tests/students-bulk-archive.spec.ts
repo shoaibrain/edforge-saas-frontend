@@ -26,7 +26,7 @@ test.describe('Bulk archive students', () => {
     await mockAcademicsApi(page, { students: ROSTER })
   })
 
-  test('happy path — select 2, archive, aggregate success toast + 2 DELETEs', async ({ page }) => {
+  test('happy path — select 2, archive, aggregate success toast + 2 DELETEs @smoke', async ({ page }) => {
     const captured = await captureBulkWrites(page)
     await page.goto('/academics/students')
 

@@ -34,7 +34,7 @@ test.describe('Bulk section activate', () => {
     await mockAcademicsApi(page, { sections: SECTIONS })
   })
 
-  test('select all 4 → activate 3, skip 1, PATCH the 3 inactive', async ({ page }) => {
+  test('select all 4 → activate 3, skip 1, PATCH the 3 inactive @smoke', async ({ page }) => {
     const captured = await captureBulkWrites(page)
     await openListView(page)
     await expect(page.getByText('Grade 10 Science')).toBeVisible()
