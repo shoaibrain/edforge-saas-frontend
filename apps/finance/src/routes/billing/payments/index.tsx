@@ -35,7 +35,7 @@ import {
   Receipt,
   Download,
 } from 'lucide-react'
-import { normalizePlatformLanguage, useTranslation } from '@edforge/i18n'
+import { useTranslation } from '@edforge/i18n'
 import { useAppStore } from '../../../stores/app.store'
 import {
   useSchoolPayments,
@@ -697,7 +697,7 @@ function formatGatewayForLocale(gateway: string, t: Translate): string {
 // ============================================================================
 
 export default function PaymentsPage() {
-  const { t, i18n } = useTranslation('payments')
+  const { t } = useTranslation('payments')
   const navigate = useNavigate()
   const schoolId = useAppStore((s) => s.activeSchoolId)
   const settings = useFinanceSettings()
@@ -825,10 +825,6 @@ export default function PaymentsPage() {
     )
   }
 
-  const today = new Date().toLocaleDateString(
-    normalizePlatformLanguage(i18n.language) === 'ne' ? 'ne-NP' : 'en-US',
-    { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' },
-  )
 
   const STATUS_PRESETS = [
     { label: t('filters.allStatuses'), value: '' },
@@ -879,7 +875,6 @@ export default function PaymentsPage() {
       {/* ---- Page header (pagebar) ---- */}
       <PageHeader
         mode="pagebar"
-        date={today}
         actions={[
           {
             label: t('overview.actions.recordPayment'),

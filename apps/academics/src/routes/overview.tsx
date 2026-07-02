@@ -125,8 +125,6 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
   const attendanceState: StatBandState =
     attendanceRate == null ? 'normal' : attendanceRate >= 90 ? 'good' : attendanceRate >= 75 ? 'warn' : 'critical'
 
-  const today = new Date().toLocaleDateString(locale, { weekday: 'long', month: 'short', day: 'numeric' })
-
   // Guards
   if (!data.academicYear.isLoading && !data.academicYear.id && !data.academicYear.isError) {
     return <NoAcademicYearGuard />
@@ -280,8 +278,6 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
         <motion.div variants={fadeInUp}>
           <PageHeader
             mode="pagebar"
-            year={data.academicYear.name ?? ''}
-            date={today}
             actions={[
               {
                 label: t('moduleOverview.actions.enrollStudent'),

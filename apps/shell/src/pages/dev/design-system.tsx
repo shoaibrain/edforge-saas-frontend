@@ -388,9 +388,6 @@ export default function DesignSystemDevPage() {
               <div className="rounded-xl border border-border-subtle bg-background-secondary p-4">
                 <PageHeader
                   mode="pagebar"
-                  year="2083"
-                  date="Tuesday, Jun 30"
-                  onYearClick={() => undefined}
                   actions={[
                     { label: 'Import IEMIS', icon: <Upload className="h-3.5 w-3.5" /> },
                     { label: 'Enroll student', icon: <UserPlus className="h-3.5 w-3.5" />, primary: true },

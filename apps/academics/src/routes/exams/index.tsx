@@ -33,7 +33,7 @@ interface TermOption {
 }
 
 export function ExamsModule() {
-  const { t, formatDate } = useAcademicsI18n()
+  const { t } = useAcademicsI18n()
   const schoolId = useActiveSchoolId() || ''
   const navigate = useNavigate()
   const canCreateExam = usePermission('create', 'assessments')
@@ -113,14 +113,10 @@ export function ExamsModule() {
 
   const showFilterChip = activeBucket !== 'total'
 
-  const today = formatDate(new Date(), { weekday: 'long', month: 'short', day: 'numeric' })
-
   return (
     <div className="min-h-full p-6 space-y-5">
       <PageHeader
         mode="pagebar"
-        year={currentYear?.name ?? ''}
-        date={today}
         actions={
           canCreateExam
             ? [

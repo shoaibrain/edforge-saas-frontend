@@ -15,7 +15,7 @@ import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import type { FeeStructure } from "@edforge/types";
 import { useCurrency } from "@edforge/types/use-currency";
-import { normalizePlatformLanguage, useTranslation } from "@edforge/i18n";
+import { useTranslation } from "@edforge/i18n";
 import { useFinanceSettings } from "../../layouts/FinanceLayout";
 import { apiGet } from "@edforge/api-client";
 import type { AxiosError } from "@edforge/api-client";
@@ -316,10 +316,6 @@ export default function FeeStructuresPage() {
     );
   }
 
-  const today = new Date().toLocaleDateString(
-    normalizePlatformLanguage(i18n.language) === "ne" ? "ne-NP" : "en-US",
-    { weekday: "long", month: "short", day: "numeric", year: "numeric" },
-  );
 
   // ── StatBand metrics (calm) ──────────────────────────────────────────────
   const metrics: StatMetric[] = [
@@ -358,7 +354,6 @@ export default function FeeStructuresPage() {
       {/* ---- Page header (pagebar) ---- */}
       <PageHeader
         mode="pagebar"
-        date={today}
         actions={[
           {
             label: t("feeStructure.addFee"),

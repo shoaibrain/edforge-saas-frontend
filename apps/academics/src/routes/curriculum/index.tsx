@@ -150,7 +150,7 @@ function StandardsContent() {
 // ============================================================================
 
 export function CurriculumModule() {
-  const { t, formatNumber, formatCount, formatDate } = useAcademicsI18n()
+  const { t, formatNumber, formatCount } = useAcademicsI18n()
   const navigate = useNavigate()
   const schoolId = useActiveSchoolId()
 
@@ -327,11 +327,6 @@ export function CurriculumModule() {
     }
   }, [schoolId, queryFilters, filters.gradeLevel, t])
 
-  const today = formatDate(new Date(), {
-    weekday: 'long',
-    month: 'short',
-    day: 'numeric',
-  })
 
   // Calm-by-default KPI band. Nothing here is in a warning/critical state, so
   // the band stays neutral — Specialized Types reads 'muted' when zero.
@@ -447,8 +442,6 @@ export function CurriculumModule() {
       <PageHeader
         className="mb-4"
         mode="pagebar"
-        year={currentYear?.name ?? ''}
-        date={today}
         actions={
           coursePerms.create
             ? [

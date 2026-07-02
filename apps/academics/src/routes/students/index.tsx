@@ -102,7 +102,7 @@ export function StudentsModule() {
 }
 
 function StudentsContent({ schoolId }: { schoolId: string }) {
-  const { t, formatNumber, formatCount, formatDate } = useAcademicsI18n()
+  const { t, formatNumber, formatCount } = useAcademicsI18n()
   const navigate = useNavigate()
   const { staggerContainer, fadeInUp } = useMotionVariants()
 
@@ -285,8 +285,6 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
 
   const showEmptyFilterState = !studentsLoading && filteredStudents.length === 0 && students.length > 0
 
-  const today = formatDate(new Date(), { weekday: 'long', month: 'short', day: 'numeric' })
-
   // Unified table toolbar (controlled search + presets + Grade facet + More filters).
   const studentsToolbar = useStudentsToolbar(schoolId, {
     all: studentsTotalHint ?? overviewData.overview.totalEnrolled ?? undefined,
@@ -422,12 +420,7 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
       >
         {/* ---- Page header (pagebar) — breadcrumb names the page, band summarizes ---- */}
         <motion.div variants={fadeInUp}>
-          <PageHeader
-            mode="pagebar"
-            year={overviewData.academicYear.name ?? ''}
-            date={today}
-            actions={headerActions}
-          />
+          <PageHeader mode="pagebar" actions={headerActions} />
         </motion.div>
 
         {/* ---- Error State ---- */}
