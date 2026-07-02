@@ -48,12 +48,10 @@ import {
   type StatMetric,
   Button,
   Select,
-  ToolbarSearch,
   PageHeader,
   Tabs,
   SegmentedControl,
-  TablePresetTabs,
-  DataTableMoreFilters,
+  DataTableToolbar,
   AttentionCorner,
   AttentionCornerPill,
   AttentionCornerShade,
@@ -130,7 +128,7 @@ const TAB_SIGNATURE: Partial<Record<ClassroomTabId, IconName>> = {
 function OverviewTab() {
   const schoolId = useActiveSchoolId() || ''
   const navigate = useNavigate()
-  const { t, formatNumber } = useAcademicsI18n()
+  const { t, formatNumber, dataTableLabels } = useAcademicsI18n()
   const schedPerms = useResourcePermissions('scheduling')
   const { viewMode, setViewMode } = useViewMode()
 
@@ -372,123 +370,115 @@ function OverviewTab() {
 
       {/* Unified toolbar + body — one connected container (toolbar row → content) */}
       <div>
-        {/* ⑨ Selecting rows morphs this row into the selection bar in place
-            (same container chrome — zero layout shift); ✕/Esc restores it. */}
-        {selectedSections.length > 0 ? (
-          <div className="rounded-t-xl border border-b-0 border-[rgb(var(--border-primary)/0.5)] bg-[rgb(var(--background-secondary))] px-3 py-2.5">
-            {selectionBar}
-          </div>
-        ) : (
-        /* Toolbar: one row drives both the card grid and the table */
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-t-xl border border-b-0 border-[rgb(var(--border-primary)/0.5)] bg-[rgb(var(--background-secondary))] px-3 py-2.5">
-          {/* Search — canonical unified-toolbar field */}
-          <ToolbarSearch
-            value={search}
-            onChange={setSearch}
-            placeholder={t('classrooms.toolbar.searchPlaceholder')}
-            aria-label={t('classrooms.toolbar.searchPlaceholder')}
-          />
-
-          {/* Status presets */}
-          <TablePresetTabs
+        {/* Shared toolbar in STANDALONE mode (no table instance — one bar
+            drives both the card grid and the table): fluid search, scrollable
+            presets, Course primary facet (folds into the overflow below @4xl),
+            Teacher · Year in the overflow, view toggle + export trailing.
+            ⑨ Selecting rows morphs it into the selection bar in place via the
+            shared same-footprint swap; ✕/Esc restores it. */}
+        <div className="rounded-t-xl border border-b-0 border-[rgb(var(--border-primary)/0.5)] bg-[rgb(var(--background-secondary))] px-3 py-2.5">
+          <DataTableToolbar
+            searchPlaceholder={t('classrooms.toolbar.searchPlaceholder')}
+            searchValue={search}
+            onSearchChange={setSearch}
+            labels={dataTableLabels}
             presets={[
               { value: 'all', label: t('classrooms.toolbar.all') },
               { value: 'active', label: t('common.active') },
               { value: 'inactive', label: t('common.inactive') },
             ]}
-            active={activePreset}
-            onChange={(v) => filterActions.setIsActive(v === 'all' ? null : v === 'active')}
-            ariaLabel={t('classrooms.toolbar.statusPresets')}
-          />
-
-          {/* Primary facet: Course (inline) */}
-          <Select
-            size="sm"
-            className="w-40"
-            clearable
-            leadingIcon={<BookOpen className="h-4 w-4" />}
-            placeholder={t('classrooms.toolbar.course')}
-            value={filters.courseId || ''}
-            onChange={(v) => filterActions.setCourseId(v || null)}
-            options={courses.map((c) => ({ value: c.courseId, label: `${c.courseCode} — ${c.courseName}` }))}
-            buttonClassName="border-[rgb(var(--border-primary)/0.35)]"
-          />
-
-          {/* Secondary facets folded into "More filters": Teacher · Year */}
-          <DataTableMoreFilters
-            label={t('dataTable.moreFilters')}
-            clearLabel={t('dataTable.clearFilters')}
-            activeCount={(filters.teacherId ? 1 : 0) + (filters.academicYearId ? 1 : 0)}
-            onClear={() => {
+            activePreset={activePreset}
+            onPresetChange={(v) => filterActions.setIsActive(v === 'all' ? null : v === 'active')}
+            primaryFilter={
+              <Select
+                size="sm"
+                className="w-40"
+                clearable
+                leadingIcon={<BookOpen className="h-4 w-4" />}
+                placeholder={t('classrooms.toolbar.course')}
+                value={filters.courseId || ''}
+                onChange={(v) => filterActions.setCourseId(v || null)}
+                options={courses.map((c) => ({ value: c.courseId, label: `${c.courseCode} — ${c.courseName}` }))}
+                buttonClassName="border-[rgb(var(--border-primary)/0.35)]"
+              />
+            }
+            overflowFilters={
+              <>
+                <Select
+                  size="sm"
+                  className="w-full"
+                  clearable
+                  leadingIcon={<Users className="h-4 w-4" />}
+                  placeholder={t('classrooms.toolbar.teacher')}
+                  value={filters.teacherId || ''}
+                  onChange={(v) => filterActions.setTeacherId(v || null)}
+                  options={teachers.map((tc) => ({ value: tc.staffId, label: getStaffDisplayName(tc) }))}
+                  buttonClassName="border-[rgb(var(--border-primary)/0.35)]"
+                />
+                <Select
+                  size="sm"
+                  className="w-full"
+                  clearable
+                  leadingIcon={<Calendar className="h-4 w-4" />}
+                  placeholder={t('classrooms.toolbar.year')}
+                  value={filters.academicYearId || ''}
+                  onChange={(v) => filterActions.setAcademicYearId(v || null)}
+                  options={(academicYears || []).map((y) => ({
+                    value: y.yearId,
+                    label: `${y.name}${y.isCurrent ? ` (${t('common.current')})` : ''}`,
+                  }))}
+                  buttonClassName="border-[rgb(var(--border-primary)/0.35)]"
+                />
+              </>
+            }
+            overflowLabel={t('dataTable.moreFilters')}
+            overflowClearLabel={t('dataTable.clearFilters')}
+            overflowActiveCount={(filters.teacherId ? 1 : 0) + (filters.academicYearId ? 1 : 0)}
+            onOverflowClear={() => {
               filterActions.setTeacherId(null)
               filterActions.setAcademicYearId(null)
             }}
-          >
-            <Select
-              size="sm"
-              className="w-full"
-              clearable
-              leadingIcon={<Users className="h-4 w-4" />}
-              placeholder={t('classrooms.toolbar.teacher')}
-              value={filters.teacherId || ''}
-              onChange={(v) => filterActions.setTeacherId(v || null)}
-              options={teachers.map((tc) => ({ value: tc.staffId, label: getStaffDisplayName(tc) }))}
-              buttonClassName="border-[rgb(var(--border-primary)/0.35)]"
-            />
-            <Select
-              size="sm"
-              className="w-full"
-              clearable
-              leadingIcon={<Calendar className="h-4 w-4" />}
-              placeholder={t('classrooms.toolbar.year')}
-              value={filters.academicYearId || ''}
-              onChange={(v) => filterActions.setAcademicYearId(v || null)}
-              options={(academicYears || []).map((y) => ({
-                value: y.yearId,
-                label: `${y.name}${y.isCurrent ? ` (${t('common.current')})` : ''}`,
-              }))}
-              buttonClassName="border-[rgb(var(--border-primary)/0.35)]"
-            />
-          </DataTableMoreFilters>
-
-          {/* Right cluster: icon-only view toggle + export */}
-          <div className="ml-auto flex items-center gap-2">
-            <SegmentedControl
-              aria-label={t('classrooms.toolbar.viewToggle')}
-              value={viewMode === 'grid' ? 'cards' : 'table'}
-              onChange={(v) => setViewMode(v === 'cards' ? 'grid' : 'list')}
-              tabs={[
-                {
-                  id: 'cards',
-                  label: (
-                    <>
-                      <LayoutGrid aria-hidden="true" className="h-4 w-4" />
-                      <span className="sr-only">{t('classrooms.actions.gridView')}</span>
-                    </>
-                  ),
-                },
-                {
-                  id: 'table',
-                  label: (
-                    <>
-                      <List aria-hidden="true" className="h-4 w-4" />
-                      <span className="sr-only">{t('classrooms.actions.listView')}</span>
-                    </>
-                  ),
-                },
-              ]}
-            />
-            <button
-              type="button"
-              onClick={handleExport}
-              className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-[rgb(var(--border-primary)/0.35)] px-3 text-sm font-medium text-[rgb(var(--text-secondary))] transition-colors hover:bg-[rgb(var(--background-tertiary))]"
-            >
-              <Download className="h-4 w-4" />
-              {t('classrooms.toolbar.export')}
-            </button>
-          </div>
+            toolbarExtra={
+              <>
+                <SegmentedControl
+                  aria-label={t('classrooms.toolbar.viewToggle')}
+                  value={viewMode === 'grid' ? 'cards' : 'table'}
+                  onChange={(v) => setViewMode(v === 'cards' ? 'grid' : 'list')}
+                  tabs={[
+                    {
+                      id: 'cards',
+                      label: (
+                        <>
+                          <LayoutGrid aria-hidden="true" className="h-4 w-4" />
+                          <span className="sr-only">{t('classrooms.actions.gridView')}</span>
+                        </>
+                      ),
+                    },
+                    {
+                      id: 'table',
+                      label: (
+                        <>
+                          <List aria-hidden="true" className="h-4 w-4" />
+                          <span className="sr-only">{t('classrooms.actions.listView')}</span>
+                        </>
+                      ),
+                    },
+                  ]}
+                />
+                <button
+                  type="button"
+                  onClick={handleExport}
+                  className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-[rgb(var(--border-primary)/0.35)] px-3 text-sm font-medium text-[rgb(var(--text-secondary))] transition-colors hover:bg-[rgb(var(--background-tertiary))]"
+                >
+                  <Download className="h-4 w-4" />
+                  {t('classrooms.toolbar.export')}
+                </button>
+              </>
+            }
+            bulkBar={selectionBar}
+            bulkActive={selectedSections.length > 0}
+          />
         </div>
-        )}
 
         {/* Body — connects to the toolbar above (shared bordered container) */}
         {viewMode === 'grid' ? (
@@ -506,6 +496,9 @@ function OverviewTab() {
             />
           </div>
         ) : (
+          /* Selection morph lives in the page-level standalone toolbar above
+             (the table's internal toolbar is suppressed, so a selectionBar
+             passed here would never render). */
           <SectionTable
             sections={sections}
             isLoading={isLoading}
@@ -515,7 +508,6 @@ function OverviewTab() {
             onEditSection={schedPerms.edit ? handleNavigateToEdit : undefined}
             onToggleActive={schedPerms.edit ? handleToggleActive : undefined}
             onViewRoster={handleNavigateToDetail}
-            selectionBar={selectionBar}
             rowSelection={rowSelection}
             onRowSelectionChange={setRowSelection}
           />
