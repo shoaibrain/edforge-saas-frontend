@@ -42,9 +42,12 @@ test.describe('Bulk archive students', () => {
     await expect(page.getByText('2 selected')).toBeVisible()
     await page.getByRole('button', { name: 'Archive' }).click()
 
-    // Modal opens with the exact (hardcoded) copy.
-    await expect(page.getByRole('heading', { name: 'Withdraw 2 students?' })).toBeVisible()
-    await expect(page.getByText('Bhavna Poudel')).toBeVisible()
+    // Modal opens with the exact (hardcoded) copy. Scope the roster assertion to
+    // the dialog — "Bhavna Poudel" also renders in the table row behind it, and an
+    // unscoped getByText would resolve to both (strict-mode violation).
+    const dialog = page.getByRole('dialog')
+    await expect(dialog.getByRole('heading', { name: 'Withdraw 2 students?' })).toBeVisible()
+    await expect(dialog.getByText('Bhavna Poudel')).toBeVisible()
 
     await page.getByRole('button', { name: 'Withdraw 2' }).click()
 

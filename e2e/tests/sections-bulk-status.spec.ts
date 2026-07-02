@@ -41,7 +41,9 @@ test.describe('Bulk section activate', () => {
 
     await page.getByRole('checkbox', { name: 'Select all rows' }).check()
     await expect(page.getByText('4 selected')).toBeVisible()
-    await page.getByRole('button', { name: 'Activate' }).click()
+    // exact: true — the bulk bar has both "Activate" and "Deactivate"; substring
+    // matching would resolve "Activate" to both (strict-mode violation).
+    await page.getByRole('button', { name: 'Activate', exact: true }).click()
 
     // Modal counts eligible, not selected, and surfaces the skipped active one.
     await expect(page.getByRole('heading', { name: 'Activate 3 sections?' })).toBeVisible()
@@ -73,7 +75,7 @@ test.describe('Bulk section deactivate', () => {
 
     await page.getByRole('checkbox', { name: 'Select all rows' }).check()
     await expect(page.getByText('2 selected')).toBeVisible()
-    await page.getByRole('button', { name: 'Deactivate' }).click()
+    await page.getByRole('button', { name: 'Deactivate', exact: true }).click()
 
     await expect(page.getByRole('heading', { name: 'Deactivate 2 sections?' })).toBeVisible()
     await expect(page.getByText(/12 students currently enrolled across these sections/)).toBeVisible()
