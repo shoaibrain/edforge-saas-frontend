@@ -1751,7 +1751,40 @@
       "noDefaultPolicyDescription": "तपाईंसँग {{count}} ग्रेडिङ नीति छ, तर कुनै पनि पूर्वनिर्धारित छैन।",
       "noDefaultPolicyDescription_plural": "तपाईंसँग {{count}} ग्रेडिङ नीतिहरू छन्, तर कुनै पनि पूर्वनिर्धारित छैन।",
       "setAcademicYearBeforeGrades": "ग्रेड रेकर्ड गर्नु अघि शैक्षिक वर्ष सेटअप गर्नुहोस्।",
-      "classAverage": "कक्षा औसत"
+      "classAverage": "कक्षा औसत",
+      "gradedChip": "{{pct}}% ग्रेड गरिएको · औसत {{avg}}%",
+      "launchpad": {
+        "helper": "ग्रेड रेकर्ड र समीक्षा गर्न सेक्सन छान्नुहोस्, वा विद्यालयव्यापी विश्लेषण खोल्नुहोस्।",
+        "noSectionsTitle": "कुनै सेक्सन तोकिएको छैन",
+        "backToSections": "सेक्सनहरू",
+        "summary": {
+          "sections": "सेक्सन",
+          "withGrades": "ग्रेड सहित",
+          "needAttention": "ध्यान चाहिन्छ",
+          "notStarted": "सुरु भएको छैन"
+        },
+        "resume": {
+          "title": "फेरि सुरु गर्नुहोस्",
+          "action": "पुनः सुरु"
+        },
+        "status": {
+          "attention": "ध्यान चाहिन्छ",
+          "inProgress": "प्रगतिमा",
+          "notStarted": "सुरु भएको छैन",
+          "onTrack": "ठीक ट्र्याकमा"
+        },
+        "card": {
+          "classAvg": "कक्षा औसत",
+          "avgGpa": "औसत GPA",
+          "atRisk": "जोखिममा",
+          "noGradesYet": "अझै ग्रेड रेकर्ड गरिएको छैन ·",
+          "startGrading": "ग्रेडिङ सुरु गर्नुहोस्",
+          "gradedAvg": "{{pct}}% ग्रेड · औसत {{avg}}%",
+          "gradedProgress": "{{graded}}/{{total}} ग्रेड · {{pct}}%",
+          "progressAria": "{{pct}}% ग्रेड गरिएको",
+          "students": "{{count}} विद्यार्थी"
+        }
+      }
     },
     "context": {
       "activeSections": "सक्रिय सेक्सनहरू",
@@ -2497,7 +2530,8 @@
       "actions": {
         "more": "थप actions",
         "exportGradebookCsv": "Gradebook CSV निर्यात गर्नुहोस्",
-        "exportAtRiskCsv": "At-Risk CSV निर्यात गर्नुहोस्"
+        "exportAtRiskCsv": "At-Risk CSV निर्यात गर्नुहोस्",
+        "export": "निर्यात"
       },
       "kpis": {
         "studentsGraded": "ग्रेड भएका विद्यार्थी",
@@ -2506,7 +2540,9 @@
         "atRisk": "जोखिममा",
         "avgGradeHint": "औसत ग्रेड: {{grade}}%",
         "passRateHint": "60%+ ल्याएका विद्यार्थी",
-        "atRiskHint": "60% threshold भन्दा तल"
+        "atRiskHint": "60% threshold भन्दा तल",
+        "belowThreshold": "६०% भन्दा कम",
+        "needSupport": "सहयोग चाहिन्छ"
       },
       "completion": {
         "title": "ग्रेडिङ प्रगति",
@@ -2514,7 +2550,10 @@
         "gradedShort": "graded",
         "graded": "ग्रेड गरिएको",
         "remaining": "बाँकी",
-        "totalEntries": "कुल {{total}} assignment entries"
+        "totalEntries": "कुल {{total}} assignment entries",
+        "gradedCount": "{{count}} ग्रेड",
+        "remainingCount": "{{count}} ग्रेड पर्खिरहेको",
+        "total": "{{count}} कुल असाइनमेन्ट प्रविष्टि"
       },
       "assessment": {
         "title": "मूल्यांकन प्रदर्शन",
@@ -2526,7 +2565,12 @@
         "summativeHigher": "Summative {{diff}}% बढी",
         "summativeHigherSuffix": "formative भन्दा।",
         "equal": "Formative र summative अङ्क बराबर छन् — राम्रो सन्तुलन।",
-        "unclassified": "+{{value}} unclassified (avg {{avg}}%)"
+        "unclassified": "+{{value}} unclassified (avg {{avg}}%)",
+        "formative": "फर्मेटिभ — क्विज, गृहकार्य ({{count}} वटा)",
+        "summative": "समेटिभ — परीक्षा ({{count}} वटा)",
+        "noneYet": "— · अझै छैन",
+        "noteBalanced": "ग्रेडिङ चलिरहेको कामतर्फ राम्रोसँग सन्तुलित छ।",
+        "noteNoSummative": "सबै ग्रेड गरिएका वस्तुहरू फर्मेटिभ हुन् — अझै कुनै समेटिभ मूल्याङ्कन रेकर्ड गरिएको छैन।"
       },
       "distribution": {
         "title": "ग्रेड वितरण",
@@ -2535,7 +2579,9 @@
         "b": "B (80–89)",
         "c": "C (70–79)",
         "d": "D (60–69)",
-        "f": "F (0–59)"
+        "f": "F (0–59)",
+        "metric": "{{count}} ग्रेड",
+        "note": "F गणनामा अझै ग्रेड पर्खिरहेका विद्यार्थी समावेश छन् (तिनीहरू 0% देखिन्छन्)।"
       },
       "category": {
         "title": "श्रेणी प्रदर्शन",
@@ -2569,7 +2615,43 @@
           "course": "Course",
           "grade": "ग्रेड",
           "letter": "अक्षर"
-        }
+        },
+        "dedupeSubtitle": "६०% उत्तीर्ण सीमाभन्दा तलका अद्वितीय विद्यार्थी — {{raw}} फ्ल्याग प्रविष्टिबाट डिड्युप गरिएको",
+        "export": "जोखिम निर्यात",
+        "filterAria": "जोखिम विद्यार्थी फिल्टर गर्नुहोस्",
+        "filterAll": "सबै",
+        "filterGraded": "ग्रेड गरिएको",
+        "filterPending": "ग्रेड पर्खिरहेको",
+        "pendingNote": "{{count}} जना ग्रेड प्रविष्ट नगरिएकाले मात्र फ्ल्याग गरिएका",
+        "tagFailing": "फेल",
+        "tagBelowPass": "उत्तीर्ण तल",
+        "tagNotGraded": "अझै ग्रेड गरिएको छैन"
+      },
+      "backToGradebook": "ग्रेडबुकमा फर्कनुहोस्",
+      "scope": "विद्यालयव्यापी · {{total}} मध्ये {{graded}} सेक्सन ग्रेड गरिएको",
+      "noData": "डाटा उपलब्ध छैन",
+      "emptyState": {
+        "title": "अझै ग्रेड रेकर्ड गरिएको छैन",
+        "description": "विद्यालयव्यापी विश्लेषण हेर्न केही असाइनमेन्ट ग्रेड गर्नुहोस्।"
+      },
+      "insight": {
+        "body": "{{unique}} मध्ये {{pending}} जोखिम फ्ल्यागहरू ग्रेड बाँकी भएका हुन्, फेल भएका विद्यार्थी होइनन्। {{totalEntries}} मध्ये {{ungraded}} असाइनमेन्ट प्रविष्टि ग्रेड नगरिएका छन्, त्यसैले ती विद्यार्थी 0% देखिन्छन् — जसले {{passRate}}% उत्तीर्ण दरलाई घटाउँछ र जोखिम गणना बढाउँछ। सही चित्रका लागि बाँकी काम ग्रेड गर्नुहोस्।",
+        "reviewPending": "बाँकी ग्रेडहरू समीक्षा गर्नुहोस्"
+      },
+      "courses": {
+        "title": "पाठ्यक्रम प्रदर्शन",
+        "subtitle": "प्रति पाठ्यक्रम समग्र ग्रेड मेट्रिक्स",
+        "course": "पाठ्यक्रम",
+        "sections": "सेक्सन",
+        "students": "विद्यार्थी",
+        "avg": "औसत",
+        "gpa": "GPA",
+        "pass": "उत्तीर्ण %"
+      },
+      "categories": {
+        "title": "कोटि प्रदर्शन",
+        "subtitle": "ग्रेडिङ नीति कोटि अनुसार औसत अंक",
+        "empty": "अझै कोटि डाटा छैन"
       }
     }
   },

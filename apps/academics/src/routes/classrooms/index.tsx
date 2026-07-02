@@ -29,7 +29,7 @@ import {
   GraduationCap,
   Lock,
   AlertTriangle,
-  ChevronDown,
+  ChevronLeft,
   Download,
   BookOpen,
   Users,
@@ -79,6 +79,7 @@ import { useGradesStore } from '../../stores/grades.store'
 import { useCurrentAcademicYear, useGradingPeriods } from '../../hooks'
 import { useSectionGrades, useGradingPolicies } from '../../hooks/useGrades'
 import { GradebookGrid } from '../../components/grades/GradebookGrid'
+import { GradebookLaunchpad } from '../../components/grades/GradebookLaunchpad'
 import { GradingPolicyList } from '../../components/grades/GradingPolicyList'
 import { BulkGradeModal } from '../../components/grades/BulkGradeModal'
 import { FinalizationWizard } from '../../components/grades/FinalizationWizard'
@@ -469,10 +470,18 @@ function GradebookTab() {
   const navigate = useNavigate()
   const { t } = useAcademicsI18n()
   const gradePerms = useResourcePermissions('grades')
-  // Default-collapsed: the gradebook grid is the primary surface; analytics is
-  // opt-in so the page doesn't open with a tall dashboard pushing the grid below
-  // the fold.
-  const [analyticsCollapsed, setAnalyticsCollapsed] = useState(true)
+  // Gradebook views: launchpad (no section entered) → section grid → analytics
+  // (school-wide, opens in place of the grid). `gbEntered` gates launchpad↔grid;
+  // `showAnalytics` swaps in the analytics view over either.
+  const [gbEntered, setGbEntered] = useState(false)
+  const [showAnalytics, setShowAnalytics] = useState(false)
+  const [lastSectionId, setLastSectionId] = useState<string | null>(() => {
+    try {
+      return localStorage.getItem('edf-cr-lastsec')
+    } catch {
+      return null
+    }
+  })
 
   // --- Grade Analytics data ---
   const { data: currentYear } = useCurrentAcademicYear(schoolId)
@@ -507,11 +516,28 @@ function GradebookTab() {
   })
   const sections = useMemo(() => flattenSectionPages(sectionsData), [sectionsData])
 
-  useEffect(() => {
-    if (!selectedSectionId && sections.length > 0 && sections.length <= 5) {
-      setSelectedSectionId(sections[0].sectionId)
-    }
-  }, [sections, selectedSectionId, setSelectedSectionId])
+  // Enter a section's gradebook grid (from the launchpad or the switcher);
+  // persists the id so Attendance stays in sync + the launchpad can resume it.
+  const enterSection = useCallback(
+    (id: string) => {
+      setSelectedSectionId(id)
+      setLastSectionId(id)
+      setShowAnalytics(false)
+      setGbEntered(true)
+      try {
+        localStorage.setItem('edf-cr-lastsec', id)
+      } catch {
+        /* ignore */
+      }
+    },
+    [setSelectedSectionId],
+  )
+
+  // Back to the launchpad — keep the section selected so Attendance keeps it.
+  const backToLaunchpad = useCallback(() => {
+    setGbEntered(false)
+    setShowAnalytics(false)
+  }, [])
 
   const { data: gradebook, isLoading: gradesLoading } = useSectionGrades(
     selectedSectionId || '',
@@ -538,6 +564,17 @@ function GradebookTab() {
     return grades.length > 0 && grades.every((g) => g.isFinal)
   }, [gradebook])
 
+  // "% graded · avg" chip for the section-context sub-header.
+  const gradedStats = useMemo(() => {
+    const grades = gradebook?.grades ?? []
+    const rosterCount = roster?.students?.length ?? 0
+    if (grades.length === 0 || rosterCount === 0) return null
+    return {
+      pct: Math.round((grades.length / rosterCount) * 100),
+      avg: Math.round(grades.reduce((sum, g) => sum + g.numericGrade, 0) / grades.length),
+    }
+  }, [gradebook, roster])
+
   const handleViewReportCard = useCallback(
     (studentId: string, studentName: string) => {
       navigate({ to: '/classrooms/report-card', search: { studentId, studentName } })
@@ -549,27 +586,67 @@ function GradebookTab() {
     return <NoCurrentAcademicYearEmptyState />
   }
 
+  // Grade Analytics — school-wide; opens in place of the grid/launchpad.
+  if (showAnalytics) {
+    return (
+      <GradeOverview
+        schoolId={schoolId}
+        academicYearId={currentYear.yearId}
+        policyWeights={defaultPolicy?.categoryWeights}
+        onBack={() => setShowAnalytics(false)}
+      />
+    )
+  }
+
+  // Launchpad — the default landing when no section is open.
+  if (!gbEntered || !selectedSectionId) {
+    if (!sectionsLoading && sections.length === 0) {
+      return (
+        <div className="bg-surface-secondary rounded-xl border border-border-secondary p-12 text-center">
+          <GraduationCap className="w-12 h-12 mx-auto text-text-tertiary mb-4" />
+          <h4 className="text-lg font-medium text-text-primary mb-2">
+            {t('classrooms.gradebook.launchpad.noSectionsTitle')}
+          </h4>
+          <p className="text-text-secondary max-w-md mx-auto">{t('classrooms.empty.noSectionsAssigned')}</p>
+        </div>
+      )
+    }
+    return (
+      <GradebookLaunchpad
+        sections={sections}
+        schoolId={schoolId}
+        termId={effectiveTermId || undefined}
+        lastSectionId={lastSectionId}
+        onEnterSection={enterSection}
+        onOpenAnalytics={() => setShowAnalytics(true)}
+      />
+    )
+  }
+
+  // Section grid view — section-context sub-header + grid + modals.
   return (
     <div className="space-y-5">
-      {/* Control toolbar: section / term selectors + actions + analytics toggle */}
+      {/* Section-context sub-header */}
       <div className="flex items-center gap-3 flex-wrap">
-        {!sectionsLoading && sections.length === 0 ? (
-          <div className="px-3 py-2 text-sm text-text-tertiary bg-surface-secondary border border-border-secondary rounded-lg min-w-64">
-            {t('classrooms.empty.noSectionsAssigned')}
-          </div>
-        ) : (
-          <Select
-            className="min-w-64"
-            value={selectedSectionId ?? ''}
-            onChange={(v) => setSelectedSectionId(v || null)}
-            disabled={sectionsLoading}
-            placeholder={t('classrooms.gradebook.selectSection')}
-            options={sections.map((s) => ({
-              value: s.sectionId,
-              label: `${s.courseName || s.courseCode || t('classrooms.gradebook.sectionFallback')} - ${s.sectionNumber}`,
-            }))}
-          />
-        )}
+        <button
+          type="button"
+          onClick={backToLaunchpad}
+          className="inline-flex items-center gap-1 text-sm font-medium text-text-secondary hover:text-text-primary transition-colors"
+        >
+          <ChevronLeft className="w-4 h-4" />
+          {t('classrooms.gradebook.launchpad.backToSections')}
+        </button>
+        <div className="w-px h-6 bg-border-primary/30" />
+        <Select
+          className="min-w-64"
+          value={selectedSectionId ?? ''}
+          onChange={(v) => v && enterSection(v)}
+          placeholder={t('classrooms.gradebook.selectSection')}
+          options={sections.map((s) => ({
+            value: s.sectionId,
+            label: `${s.courseName || s.courseCode || t('classrooms.gradebook.sectionFallback')} - ${s.sectionNumber}`,
+          }))}
+        />
 
         {gradingPeriods && gradingPeriods.length > 0 && (
           <Select
@@ -584,60 +661,43 @@ function GradebookTab() {
           />
         )}
 
-        {selectedSectionId && (
-          <>
-            <div className="w-px h-6 bg-border-primary/30" />
-            {hasGradingPeriods && !selectedTermId && (
-              <span className="text-xs text-caramel-300">{t('classrooms.gradebook.selectGradingPeriodPrompt')}</span>
-            )}
-            {gradePerms.create && (
-              <Button
-                size="sm"
-                onClick={() => setShowBulkModal(true)}
-                disabled={!effectiveTermId || !currentYear?.yearId}
-              >
-                <Plus className="w-3.5 h-3.5" />
-                {t('classrooms.actions.record')}
-              </Button>
-            )}
-            {gradePerms.edit && (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => setShowFinalize(true)}
-                disabled={!effectiveTermId || !currentYear?.yearId}
-              >
-                <Lock className="w-3.5 h-3.5" />
-                {t('classrooms.actions.finalize')}
-              </Button>
-            )}
-          </>
+        {gradedStats && (
+          <span className="inline-flex h-7 items-center rounded-full bg-[rgb(var(--state-warning-bg)/0.4)] px-2.5 text-xs font-medium text-[rgb(var(--state-warning-fg))]">
+            {t('classrooms.gradebook.gradedChip', { pct: gradedStats.pct, avg: gradedStats.avg })}
+          </span>
         )}
 
-        {/* Analytics toggle — right-aligned, opt-in */}
-        <button
-          type="button"
-          onClick={() => setAnalyticsCollapsed(!analyticsCollapsed)}
-          className="ml-auto flex items-center gap-2 text-sm font-medium text-text-secondary hover:text-text-primary transition-colors"
-          aria-expanded={!analyticsCollapsed}
-        >
-          <BarChart3 className="w-4 h-4" />
-          {t('classrooms.actions.gradeAnalytics')}
-          <ChevronDown className={`w-4 h-4 transition-transform ${analyticsCollapsed ? '-rotate-90' : ''}`} />
-        </button>
+        <div className="ml-auto flex items-center gap-2">
+          {hasGradingPeriods && !selectedTermId && (
+            <span className="text-xs text-caramel-300">{t('classrooms.gradebook.selectGradingPeriodPrompt')}</span>
+          )}
+          {gradePerms.create && (
+            <Button size="sm" onClick={() => setShowBulkModal(true)} disabled={!effectiveTermId || !currentYear?.yearId}>
+              <Plus className="w-3.5 h-3.5" />
+              {t('classrooms.actions.record')}
+            </Button>
+          )}
+          {gradePerms.edit && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setShowFinalize(true)}
+              disabled={!effectiveTermId || !currentYear?.yearId}
+            >
+              <Lock className="w-3.5 h-3.5" />
+              {t('classrooms.actions.finalize')}
+            </Button>
+          )}
+          <button
+            type="button"
+            onClick={() => setShowAnalytics(true)}
+            className="inline-flex items-center gap-2 text-sm font-medium text-text-secondary hover:text-text-primary transition-colors"
+          >
+            <BarChart3 className="w-4 h-4" />
+            {t('classrooms.actions.gradeAnalytics')}
+          </button>
+        </div>
       </div>
-
-      {/* Grade Analytics (collapsible, opt-in) */}
-      {!analyticsCollapsed && (
-        <>
-          <GradeOverview
-            schoolId={schoolId}
-            academicYearId={currentYear.yearId}
-            policyWeights={defaultPolicy?.categoryWeights}
-          />
-          <div className="border-t border-border-secondary" />
-        </>
-      )}
 
       {/* Warnings */}
       {hasNoPolicies && selectedSectionId && (
@@ -663,30 +723,22 @@ function GradebookTab() {
         </div>
       )}
 
-      {/* Gradebook Content */}
-      {!selectedSectionId ? (
-        <div className="bg-surface-secondary rounded-xl border border-border-secondary p-12 text-center">
-          <GraduationCap className="w-12 h-12 mx-auto text-text-tertiary mb-4" />
-          <h4 className="text-lg font-medium text-text-primary mb-2">{t('classrooms.empty.selectClassSectionTitle')}</h4>
-          <p className="text-text-secondary max-w-md mx-auto">{t('classrooms.empty.selectClassSectionDescription')}</p>
-        </div>
-      ) : (
-        <GradebookGrid
-          grades={gradebook?.grades ?? []}
-          roster={roster?.students ?? []}
-          isLoading={gradesLoading}
-          sectionId={selectedSectionId}
-          courseId={selectedSection?.courseId}
-          courseName={selectedSection?.courseName}
-          schoolId={schoolId}
-          termId={effectiveTermId || ''}
-          academicYearId={currentYear?.yearId}
-          teacherId={selectedSection?.primaryTeacherId}
-          disabled={hasAllFinalized || !effectiveTermId || !gradePerms.edit}
-          onAddAssignment={gradePerms.create && effectiveTermId ? () => setShowAssignmentEditor(true) : undefined}
-          onViewReportCard={handleViewReportCard}
-        />
-      )}
+      {/* Gradebook grid (roster always renders — empty-section state lives in GradebookGrid) */}
+      <GradebookGrid
+        grades={gradebook?.grades ?? []}
+        roster={roster?.students ?? []}
+        isLoading={gradesLoading}
+        sectionId={selectedSectionId}
+        courseId={selectedSection?.courseId}
+        courseName={selectedSection?.courseName}
+        schoolId={schoolId}
+        termId={effectiveTermId || ''}
+        academicYearId={currentYear?.yearId}
+        teacherId={selectedSection?.primaryTeacherId}
+        disabled={hasAllFinalized || !effectiveTermId || !gradePerms.edit}
+        onAddAssignment={gradePerms.create && effectiveTermId ? () => setShowAssignmentEditor(true) : undefined}
+        onViewReportCard={handleViewReportCard}
+      />
 
       {/* Modals */}
       {showBulkModal && selectedSectionId && selectedSection && selectedSection.courseId && effectiveTermId && currentYear?.yearId && (
