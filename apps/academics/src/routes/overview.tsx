@@ -1,24 +1,29 @@
 /**
  * Academics Overview Page — dashboard recipe
  *
- * PageHeader (pagebar) → AlertLane (④) → StatBand → WidgetCard grid (⑤), the
- * same canonical structure as Home. Reuses `useAcademicsOverviewV2` and the
- * existing overview-v2 chart cards in `bare` mode; preserves the filters/export
- * row, guards, per-widget error boundaries, and reduced-motion stagger.
+ * PageHeader (pagebar, with the ⑧ AttentionCorner pill in its left slot) →
+ * AttentionCorner shade → StatBand → WidgetCard grid (⑤), the header-zone
+ * structure. Signals are derived from live `useAcademicsOverviewV2` data
+ * (page-scoped; they auto-resolve when the data heals), tagged with the SABER
+ * domain they serve. Reuses the existing overview-v2 chart cards in `bare`
+ * mode; preserves the filters/export row, guards, per-widget error boundaries,
+ * and reduced-motion stagger.
  */
 
 import { useMemo } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { motion, useReducedMotion } from 'framer-motion'
-import { UserPlus, ClipboardCheck, CalendarClock, School } from 'lucide-react'
+import { UserPlus, ClipboardCheck, CalendarClock, School, AlertTriangle, Flag, Gauge } from 'lucide-react'
 import {
   Card,
   PageHeader,
   StatBand,
   type StatMetric,
   type StatBandState,
-  AlertLane,
-  type DashboardAlert,
+  AttentionCorner,
+  AttentionCornerPill,
+  AttentionCornerShade,
+  type Signal,
   WidgetGrid,
   WidgetCard,
   WidgetErrorBoundaryV2,
@@ -26,6 +31,7 @@ import {
 import { useTranslation } from '@edforge/i18n'
 import { useActiveSchoolId } from '../stores/app.store'
 import { useAcademicsOverviewV2 } from '../hooks/useAcademicsOverviewV2'
+import { useSignalAcks } from '../hooks/useSignalAcks'
 
 // V2 chart cards (framed by WidgetCard in `bare` mode)
 import { AttendanceTrendChart, AttendanceTrendChartFooter } from '../components/overview-v2/AttendanceTrendChart'
@@ -109,6 +115,7 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
   const navigate = useNavigate()
   const { t, i18n } = useTranslation('academics')
   const data = useAcademicsOverviewV2(schoolId)
+  const { acked, ack, unack } = useSignalAcks()
   const { staggerContainer, fadeInUp } = useMotionVariants()
   const locale = i18n.language === 'ne' ? 'ne-NP' : 'en-US'
   const numberFormatter = useMemo(() => new Intl.NumberFormat(locale), [locale])
@@ -235,36 +242,42 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
         },
   )
 
-  // ── AlertLane (replaces the "Needs Attention" stack) ─────────────────────
-  const dashAlerts: DashboardAlert[] = []
+  // ── ⑧ Attention Corner signals (replaces the AlertLane stack) ────────────
+  // Derived from live query data — recording attendance / risk improving makes
+  // a signal stop being emitted, which auto-resolves it in the pill. Page-
+  // scoped (Academics Overview) and tagged with the SABER domain served.
+  const signals: Signal[] = []
   if (data.alerts.criticalCount > 0) {
-    dashAlerts.push({
-      id: 'ao-crit',
+    signals.push({
+      id: 'academics.at-risk-critical',
       severity: 'critical',
-      iconSignature: 'atrisk',
+      domain: t('moduleOverview.signals.domains.attendance'),
+      icon: <AlertTriangle className="h-4 w-4" aria-hidden="true" />,
       title: t('moduleOverview.alerts.criticalTitle', { count: data.alerts.criticalCount }),
       description: t('moduleOverview.alerts.criticalSubtitle', { total: data.alerts.totalCount }),
-      cta: { label: t('moduleOverview.alerts.viewDetails'), onAction: () => navigate({ to: '/students' }) },
+      fix: { label: t('moduleOverview.alerts.viewDetails'), onAction: () => navigate({ to: '/students' }) },
     })
   }
   if (data.alerts.warningCount > 0) {
-    dashAlerts.push({
-      id: 'ao-warn',
-      severity: 'warning',
-      iconSignature: 'attendance',
+    signals.push({
+      id: 'academics.at-risk-warning',
+      severity: 'warn',
+      domain: t('moduleOverview.signals.domains.attendance'),
+      icon: <Flag className="h-4 w-4" aria-hidden="true" />,
       title: t('moduleOverview.alerts.warningTitle', { count: data.alerts.warningCount }),
       description: t('moduleOverview.alerts.warningSubtitle'),
-      cta: { label: t('moduleOverview.alerts.review'), onAction: () => navigate({ to: '/students' }) },
+      fix: { label: t('moduleOverview.alerts.review'), onAction: () => navigate({ to: '/students' }) },
     })
   }
   if (unrecordedCount != null && unrecordedCount > 0) {
-    dashAlerts.push({
-      id: 'ao-info',
+    signals.push({
+      id: 'academics.attendance-unrecorded',
       severity: 'info',
-      iconSignature: 'metric_attendance',
+      domain: t('moduleOverview.signals.domains.dataQuality'),
+      icon: <Gauge className="h-4 w-4" aria-hidden="true" />,
       title: t('moduleOverview.alerts.unrecordedTitle', { count: unrecordedCount }),
       description: t('moduleOverview.alerts.unrecordedSubtitle'),
-      cta: {
+      fix: {
         label: t('moduleOverview.actions.takeAttendance'),
         onAction: () => navigate({ to: '/classrooms', search: { tab: 'attendance' } }),
       },
@@ -274,27 +287,48 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
   return (
     <div className="p-5 pb-10">
       <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="space-y-5">
-        {/* ---- Page header (pagebar) — breadcrumb names the page, band summarizes ---- */}
-        <motion.div variants={fadeInUp}>
-          <PageHeader
-            mode="pagebar"
-            actions={[
-              {
-                label: t('moduleOverview.actions.enrollStudent'),
-                icon: <UserPlus className="h-3.5 w-3.5" />,
-                ariaLabel: t('moduleOverview.actions.enrollStudentAria'),
-                onClick: () => navigate({ to: '/students/enrollment', search: { tab: 'registration' } }),
-              },
-              {
-                label: t('moduleOverview.actions.takeAttendance'),
-                icon: <ClipboardCheck className="h-3.5 w-3.5" />,
-                primary: true,
-                ariaLabel: t('moduleOverview.actions.takeAttendanceAria'),
-                onClick: () => navigate({ to: '/classrooms', search: { tab: 'attendance' } }),
-              },
-            ]}
-          />
-        </motion.div>
+        {/* ---- ⑧ Header zone — attention pill balances the primary actions;
+                the shade expands in flow, pushing content ---- */}
+        <AttentionCorner
+          signals={data.alerts.isLoading ? [] : signals}
+          acked={acked}
+          onAck={ack}
+          onUnack={unack}
+          labels={{
+            needAttention: t('moduleOverview.signals.needAttention'),
+            allClear: t('moduleOverview.signals.allClear'),
+            region: t('moduleOverview.needsAttention.title'),
+            minimize: t('moduleOverview.signals.minimize'),
+            acknowledge: t('moduleOverview.signals.acknowledge'),
+            acknowledged: t('moduleOverview.signals.acknowledged'),
+            acknowledgedHint: t('moduleOverview.signals.acknowledgedHint'),
+            dismiss: t('moduleOverview.signals.dismiss'),
+            emptyTitle: t('moduleOverview.signals.emptyTitle'),
+          }}
+        >
+          <motion.div variants={fadeInUp}>
+            <PageHeader
+              mode="pagebar"
+              attention={<AttentionCornerPill />}
+              actions={[
+                {
+                  label: t('moduleOverview.actions.enrollStudent'),
+                  icon: <UserPlus className="h-3.5 w-3.5" />,
+                  ariaLabel: t('moduleOverview.actions.enrollStudentAria'),
+                  onClick: () => navigate({ to: '/students/enrollment', search: { tab: 'registration' } }),
+                },
+                {
+                  label: t('moduleOverview.actions.takeAttendance'),
+                  icon: <ClipboardCheck className="h-3.5 w-3.5" />,
+                  primary: true,
+                  ariaLabel: t('moduleOverview.actions.takeAttendanceAria'),
+                  onClick: () => navigate({ to: '/classrooms', search: { tab: 'attendance' } }),
+                },
+              ]}
+            />
+          </motion.div>
+          <AttentionCornerShade />
+        </AttentionCorner>
 
         {/* ---- Filters & Export ---- */}
         <AcademicsFilterRow
@@ -311,13 +345,6 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
           onClear={data.clearFilters}
           onExport={data.handleExportCSV}
         />
-
-        {/* ---- ④ AlertLane (severity-ranked; ack/dismiss; session-only) ---- */}
-        {!data.alerts.isLoading && dashAlerts.length > 0 && (
-          <motion.div variants={fadeInUp}>
-            <AlertLane alerts={dashAlerts} ariaLabel={t('moduleOverview.needsAttention.title')} />
-          </motion.div>
-        )}
 
         {/* ---- StatBand — KPI summary ---- */}
         <motion.div variants={fadeInUp}>

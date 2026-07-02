@@ -41,6 +41,11 @@ export interface PageHeaderPagebarProps extends Omit<HTMLAttributes<HTMLDivEleme
   /** Right-aligned page actions (primary last). */
   actions?: PageHeaderAction[]
   breadcrumbs?: ReactNode
+  /**
+   * Top-left header slot — the Attention Corner pill mounts here, balancing
+   * the primary actions on the right (same row, same height).
+   */
+  attention?: ReactNode
 }
 
 export interface PageHeaderGreetingProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
@@ -88,14 +93,15 @@ function PageActions({ actions }: { actions?: PageHeaderAction[] }) {
 }
 
 const PageBar = forwardRef<HTMLDivElement, PageHeaderPagebarProps>(
-  ({ className, actions, breadcrumbs, mode: _mode, ...props }, ref) => {
+  ({ className, actions, breadcrumbs, attention, mode: _mode, ...props }, ref) => {
     // No year chip / date anymore — an empty pagebar renders nothing.
-    if (!breadcrumbs && !actions?.length) return null
+    if (!breadcrumbs && !actions?.length && !attention) return null
     return (
       <div ref={ref} className={cn('flex flex-col gap-3', className)} {...props}>
         {breadcrumbs ? <div className="text-sm text-[rgb(var(--text-tertiary))]">{breadcrumbs}</div> : null}
-        {actions?.length ? (
-          <div className="flex justify-end">
+        {actions?.length || attention ? (
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center">{attention}</div>
             <PageActions actions={actions} />
           </div>
         ) : null}

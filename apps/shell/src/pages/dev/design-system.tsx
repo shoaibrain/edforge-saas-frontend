@@ -25,6 +25,11 @@ import {
   Stack,
   StatBand,
   AlertLane,
+  AttentionCorner,
+  AttentionCornerPill,
+  AttentionCornerShade,
+  SelectionContextBar,
+  type Signal,
   type DashboardAlert,
   WidgetCard,
   WidgetGrid,
@@ -182,6 +187,7 @@ export default function DesignSystemDevPage() {
   const [switchValue, setSwitchValue] = useState(true)
   const [bandPreset, setBandPreset] = useState('all')
   const [showBulk, setShowBulk] = useState(false)
+  const [hzAcked, setHzAcked] = useState<Set<string>>(new Set())
 
   if (!import.meta.env.DEV) {
     return (
@@ -552,7 +558,114 @@ export default function DesignSystemDevPage() {
             </div>
           </Stack>
         </SectionCard>
+
+        <SectionCard
+          title="Header Zone"
+          description="⑧ AttentionCorner — page-scoped, severity-segmented signals in the header's top-left (expand the pill; acknowledge the critical, dismiss the rest to reach all-clear) · ⑨ SelectionContextBar — state-aware selection actions with subset counts, disabled reasons, and role locks."
+        >
+          <Stack space="lg">
+            <div>
+              <Text variant="label" className="mb-2 block">
+                ⑧ AttentionCorner · pill in the pagebar's left slot · shade pushes content
+              </Text>
+              <div className="rounded-xl border border-border-subtle bg-background-secondary p-4">
+                <AttentionCorner
+                  signals={hzSignals}
+                  acked={hzAcked}
+                  onAck={(id) => setHzAcked((prev) => new Set(prev).add(id))}
+                  onUnack={(id) =>
+                    setHzAcked((prev) => {
+                      const next = new Set(prev)
+                      next.delete(id)
+                      return next
+                    })
+                  }
+                >
+                  <PageHeader
+                    mode="pagebar"
+                    attention={<AttentionCornerPill />}
+                    actions={[
+                      { label: 'Enroll student', icon: <UserPlus className="h-3.5 w-3.5" /> },
+                      { label: 'Take attendance', primary: true },
+                    ]}
+                  />
+                  <div className="mt-3">
+                    <AttentionCornerShade />
+                  </div>
+                </AttentionCorner>
+              </div>
+            </div>
+
+            <div>
+              <Text variant="label" className="mb-2 block">
+                ⑨ SelectionContextBar · subset count chips · disabled reasons · role locks · Esc clears
+              </Text>
+              <SelectionContextBar
+                selectedCount={5}
+                totalCount={255}
+                onClear={() => undefined}
+                onSelectAll={() => undefined}
+                actions={[
+                  {
+                    id: 'remind',
+                    label: 'Send reminder',
+                    applicableIds: ['a', 'b', 'c'],
+                    onAction: () => undefined,
+                  },
+                  {
+                    id: 'issue',
+                    label: 'Issue',
+                    applicableIds: [],
+                    disabledReason: 'No drafts in selection',
+                  },
+                  {
+                    id: 'move',
+                    label: 'Change section',
+                    applicableIds: ['a', 'b', 'c', 'd', 'e'],
+                    locked: true,
+                    lockedReason: 'Requires Admin',
+                  },
+                  {
+                    id: 'close',
+                    label: 'Close exam',
+                    applicableIds: ['a'],
+                    danger: true,
+                    onAction: () => undefined,
+                  },
+                ]}
+              />
+            </div>
+          </Stack>
+        </SectionCard>
       </Stack>
     </PageShell>
   )
 }
+
+/** Header Zone showcase fixtures — hoisted so the section reads clean. */
+const hzSignals: Signal[] = [
+  {
+    id: 'hz-crit',
+    severity: 'critical',
+    domain: 'Attendance',
+    title: '16 students below 80% attendance — intervention needed',
+    description: '30-day period · 20 total at-risk',
+    fix: { label: 'View details', onAction: () => undefined },
+  },
+  {
+    id: 'hz-warn',
+    severity: 'warn',
+    domain: 'Capacity',
+    title: '3 sections are below 40% seat utilization',
+    description: 'Avg utilization 42% — consider merging',
+    fix: { label: 'Review sections', onAction: () => undefined },
+  },
+  {
+    id: 'hz-info',
+    severity: 'info',
+    domain: 'Data quality',
+    title: '6 sections haven’t recorded attendance today',
+    description: '2 of 8 recorded so far',
+    fix: { label: 'Open attendance', onAction: () => undefined },
+  },
+]
