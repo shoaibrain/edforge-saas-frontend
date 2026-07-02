@@ -296,7 +296,8 @@
     "bulk": {
       "message": "Message",
       "moveSection": "Move section",
-      "archive": "Archive"
+      "archive": "Archive",
+      "requiresAdmin": "Requires an administrator role"
     },
     "filters": {
       "modes": {
@@ -446,6 +447,12 @@
         "pendingStart": "Imports create",
         "pendingEnd": "enrollments"
       }
+    },
+    "signals": {
+      "showAtRisk": "Show at-risk"
+    },
+    "selection": {
+      "peekAttendance": "{{rate}}% attendance"
     }
   },
   "privacy": {
@@ -493,7 +500,13 @@
     "xlsxUnavailable": "XLSX export ships in a follow-up",
     "filterAriaLabel": "{{title}} filter",
     "clearFilter": "Clear filter",
-    "moreFilters": "More filters"
+    "moreFilters": "More filters",
+    "selection": {
+      "aria": "Selection actions",
+      "selected": "{{count}} selected",
+      "selectAll": "Select all {{count}}",
+      "clear": "Clear selection"
+    }
   },
   "attendance": {
     "title": "Attendance",

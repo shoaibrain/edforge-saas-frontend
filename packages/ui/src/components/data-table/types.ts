@@ -302,6 +302,13 @@ export interface DataTableProps<TData> {
 
   // -- Bulk Actions --
   bulkActions?: BulkAction<TData>[]
+  /**
+   * ⑨ Selection Context Bar node (e.g. `<SelectionContextBar/>`). When provided
+   * and rows are selected, it swaps into the toolbar's footprint in place
+   * (zero layout shift) and the legacy FloatingBulkBar pill is suppressed.
+   * Requires the toolbar to be rendered (any toolbar prop present).
+   */
+  selectionBar?: ReactNode
 
   // -- Export --
   /** Surfaces a built-in Export button in the toolbar right cluster. */

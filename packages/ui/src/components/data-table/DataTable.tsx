@@ -66,6 +66,7 @@ export function DataTable<TData>({
   density: densityProp,
   enableDensityToggle,
   bulkActions,
+  selectionBar,
   exportOptions,
   labels,
   className,
@@ -168,6 +169,9 @@ export function DataTable<TData>({
     showDensityToggle ||
     exportOptions
   const hasBulkActions = bulkActions && selectedRowCount > 0
+  // ⑨ Selection Context Bar: morphs the toolbar in place on selection and
+  // retires the floating pill for pages that adopt it.
+  const selectionBarActive = !!selectionBar && selectedRowCount > 0
   const activeFilterCount =
     table.getState().columnFilters.length +
     (((table.getState().globalFilter as string) ?? '') ? 1 : 0)
@@ -231,6 +235,8 @@ export function DataTable<TData>({
             enableDensityToggle={showDensityToggle}
             exportOptions={exportOptions}
             labels={resolvedLabels}
+            bulkBar={selectionBar}
+            bulkActive={selectionBarActive}
           />
         </div>
       )}
@@ -345,14 +351,17 @@ export function DataTable<TData>({
         </div>
       )}
 
-      {/* Floating bulk action bar — centered above the footer, on top of the body. */}
-      <FloatingBulkBar
-        visible={!!hasBulkActions}
-        actions={bulkActions ?? []}
-        table={table}
-        hasFooter={!!resolvedPagination && !isEmpty}
-        labels={resolvedLabels}
-      />
+      {/* Floating bulk action bar — legacy pill, unmounted entirely once a
+          page adopts the in-place SelectionContextBar (pass `selectionBar`). */}
+      {!selectionBar && (
+        <FloatingBulkBar
+          visible={!!hasBulkActions}
+          actions={bulkActions ?? []}
+          table={table}
+          hasFooter={!!resolvedPagination && !isEmpty}
+          labels={resolvedLabels}
+        />
+      )}
     </div>
   )
 }

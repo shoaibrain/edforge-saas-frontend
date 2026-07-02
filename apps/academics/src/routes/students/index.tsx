@@ -27,13 +27,30 @@ import {
   FileSpreadsheet,
   Download,
   Loader2,
+  Flag,
+  Gauge,
 } from 'lucide-react'
-import type { BulkAction } from '@edforge/ui'
-import { StatBand, type StatMetric, PageHeader, EmptyState, ErrorState, Card, Button } from '@edforge/ui'
+import {
+  StatBand,
+  type StatMetric,
+  PageHeader,
+  EmptyState,
+  ErrorState,
+  Card,
+  Button,
+  AttentionCorner,
+  AttentionCornerPill,
+  AttentionCornerShade,
+  SelectionContextBar,
+  type Signal,
+  type SelectionAction,
+} from '@edforge/ui'
 import { useResourcePermissions } from '@edforge/abac'
 import { StudentTable, StudentQuickProfile, useStudentsToolbar, type StudentAttendanceSignal } from '../../components/students'
 import { BulkArchiveStudentsModal } from '../../components/students/BulkArchiveStudentsModal'
 import { ConfirmationDialog } from '../../components/common'
+import { UserAvatar } from '../../components/common/UserAvatar'
+import { useSignalAcks } from '../../hooks/useSignalAcks'
 import {
   useStudents,
   flattenStudentPages,
@@ -241,47 +258,63 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
     }
   }
 
-  const { resetFilters } = useStudentFilterActions()
+  const { resetFilters, setFilterMode } = useStudentFilterActions()
 
   const handleClearFilters = useCallback(() => {
     resetFilters()
   }, [resetFilters])
 
-  // Bulk actions surfaced on the floating bulk bar. Archive now opens a
-  // real drawer (closes #223); Message + Move stay as toasts pending their
-  // own backend slices (#221 + #222).
-  const bulkActions = useMemo<BulkAction<StudentResponseDto>[]>(
-    () => [
+  // ⑨ Selection Context Bar — the state-aware action matrix (retires the
+  // floating pill). Archive opens the real drawer (closes #223); Message +
+  // Move stay as toasts pending their backend slices (#221 + #222). Role locks
+  // are visible with a reason, not hidden: Move needs students:edit, Archive
+  // needs students:delete. Confirm handlers receive the applicable ids only.
+  const selectedStudents = useMemo(() => {
+    const ids = new Set(Object.keys(rowSelection))
+    return filteredStudents.filter((s) => ids.has(s.studentId))
+  }, [rowSelection, filteredStudents])
+
+  const selectionActions = useMemo<SelectionAction[]>(() => {
+    const allIds = selectedStudents.map((s) => s.studentId)
+    const byId = new Map(selectedStudents.map((s) => [s.studentId, s]))
+    const rowsFor = (ids: string[]) =>
+      ids.map((id) => byId.get(id)).filter((s): s is StudentResponseDto => !!s)
+    const comingSoon = (labelKey: string) => (ids: string[]) =>
+      toast.info(
+        t('common.comingSoon', {
+          action: t(labelKey),
+          countLabel: t('common.students', { count: ids.length }),
+        }),
+      )
+    return [
       {
         id: 'message',
         label: t('studentsModule.bulk.message'),
-        icon: <MessageSquare className="w-4 h-4" />,
-        onRun: (rows) =>
-          toast.info(t('common.comingSoon', {
-            action: t('studentsModule.bulk.message'),
-            countLabel: t('common.students', { count: rows.length }),
-          })),
+        icon: <MessageSquare className="h-3.5 w-3.5" />,
+        applicableIds: allIds,
+        onAction: comingSoon('studentsModule.bulk.message'),
       },
       {
         id: 'move',
         label: t('studentsModule.bulk.moveSection'),
-        icon: <ArrowRightLeft className="w-4 h-4" />,
-        onRun: (rows) =>
-          toast.info(t('common.comingSoon', {
-            action: t('studentsModule.bulk.moveSection'),
-            countLabel: t('common.students', { count: rows.length }),
-          })),
+        icon: <ArrowRightLeft className="h-3.5 w-3.5" />,
+        applicableIds: allIds,
+        locked: !studentPerms.edit,
+        lockedReason: t('studentsModule.bulk.requiresAdmin'),
+        onAction: comingSoon('studentsModule.bulk.moveSection'),
       },
       {
         id: 'archive',
         label: t('studentsModule.bulk.archive'),
-        icon: <Archive className="w-4 h-4" />,
-        tone: 'critical',
-        onRun: (rows) => setBulkArchiveTarget(rows),
+        icon: <Archive className="h-3.5 w-3.5" />,
+        danger: true,
+        applicableIds: allIds,
+        locked: !studentPerms.delete,
+        lockedReason: t('studentsModule.bulk.requiresAdmin'),
+        onAction: (ids) => setBulkArchiveTarget(rowsFor(ids)),
       },
-    ],
-    [t],
-  )
+    ]
+  }, [selectedStudents, studentPerms.edit, studentPerms.delete, t])
 
   const showEmptyFilterState = !studentsLoading && filteredStudents.length === 0 && students.length > 0
 
@@ -323,6 +356,105 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
   const warning = overviewData.alerts.warningCount
   const atRiskTotal = overviewData.alerts.totalCount
   const attSummary = overviewData.overview.todayAttendanceSummary
+
+  // ── ⑧ Attention Corner signals — page-scoped, derived from live data (they
+  // auto-resolve when the data heals). At-risk fixes deep-link into this page's
+  // own at-risk preset; unrecorded attendance links to the recording surface.
+  const { acked, ack, unack } = useSignalAcks()
+  const unrecordedToday = attSummary
+    ? Math.max(0, attSummary.totalStudents - (attSummary.totalRecorded ?? 0))
+    : 0
+  const signals: Signal[] = []
+  if (critical > 0) {
+    signals.push({
+      id: 'students.at-risk-critical',
+      severity: 'critical',
+      domain: t('moduleOverview.signals.domains.attendance'),
+      icon: <AlertTriangle className="h-4 w-4" aria-hidden="true" />,
+      title: t('moduleOverview.alerts.criticalTitle', { count: critical }),
+      description: t('moduleOverview.alerts.criticalSubtitle', { total: atRiskTotal }),
+      fix: { label: t('studentsModule.signals.showAtRisk'), onAction: () => setFilterMode('at-risk') },
+    })
+  }
+  if (warning > 0) {
+    signals.push({
+      id: 'students.at-risk-warning',
+      severity: 'warn',
+      domain: t('moduleOverview.signals.domains.attendance'),
+      icon: <Flag className="h-4 w-4" aria-hidden="true" />,
+      title: t('moduleOverview.alerts.warningTitle', { count: warning }),
+      description: t('moduleOverview.alerts.warningSubtitle'),
+      fix: { label: t('studentsModule.signals.showAtRisk'), onAction: () => setFilterMode('at-risk') },
+    })
+  }
+  if (unrecordedToday > 0) {
+    signals.push({
+      id: 'students.attendance-unrecorded',
+      severity: 'info',
+      domain: t('moduleOverview.signals.domains.dataQuality'),
+      icon: <Gauge className="h-4 w-4" aria-hidden="true" />,
+      title: t('moduleOverview.alerts.unrecordedTitle', { count: unrecordedToday }),
+      description: t('moduleOverview.alerts.unrecordedSubtitle'),
+      fix: {
+        label: t('moduleOverview.actions.takeAttendance'),
+        onAction: () => navigate({ to: '/classrooms', search: { tab: 'attendance' } }),
+      },
+    })
+  }
+
+  // ── ⑨ Selection bar node (swaps into the table toolbar in place) ──
+  const singleSelected = selectedStudents.length === 1 ? selectedStudents[0] : null
+  const singleRate = singleSelected ? alertsMap.get(singleSelected.studentId) : undefined
+  const selectionBar = (
+    <SelectionContextBar
+      selectedCount={selectedStudents.length}
+      totalCount={filteredStudents.length}
+      onClear={() => setRowSelection({})}
+      onSelectAll={() =>
+        setRowSelection(Object.fromEntries(filteredStudents.map((s) => [s.studentId, true])))
+      }
+      actions={selectionActions}
+      aria-label={t('dataTable.selection.aria')}
+      labels={{
+        selected: (count) => t('dataTable.selection.selected', { count: formatNumber(count) }),
+        selectAll: (total) => t('dataTable.selection.selectAll', { count: formatNumber(total) }),
+        clear: t('dataTable.selection.clear'),
+      }}
+      peek={
+        singleSelected ? (
+          <>
+            <UserAvatar
+              userId={singleSelected.studentId}
+              userName={singleSelected.fullName ?? singleSelected.studentId}
+              size="sm"
+            />
+            <div className="min-w-0">
+              <div className="truncate text-sm font-semibold text-[rgb(var(--text-primary))]">
+                {singleSelected.fullName}
+              </div>
+              <div className="truncate text-2xs text-[rgb(var(--text-tertiary))]">
+                {singleSelected.currentGradeLevel ?? '—'}
+                {singleRate != null ? (
+                  <>
+                    {' · '}
+                    <span
+                      className={
+                        singleRate < 80
+                          ? 'font-semibold text-[rgb(var(--state-danger-fg))]'
+                          : 'font-semibold text-[rgb(var(--state-warning-fg))]'
+                      }
+                    >
+                      {t('studentsModule.selection.peekAttendance', { rate: formatNumber(Math.round(singleRate)) })}
+                    </span>
+                  </>
+                ) : null}
+              </div>
+            </div>
+          </>
+        ) : undefined
+      }
+    />
+  )
 
   const enrolledSub =
     overviewData.enrollment.data.length > 0
@@ -418,10 +550,30 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
         animate="visible"
         className="space-y-5"
       >
-        {/* ---- Page header (pagebar) — breadcrumb names the page, band summarizes ---- */}
-        <motion.div variants={fadeInUp}>
-          <PageHeader mode="pagebar" actions={headerActions} />
-        </motion.div>
+        {/* ---- ⑧ Header zone — attention pill balances the page actions;
+                the shade expands in flow, pushing content ---- */}
+        <AttentionCorner
+          signals={overviewData.alerts.isLoading ? [] : signals}
+          acked={acked}
+          onAck={ack}
+          onUnack={unack}
+          labels={{
+            needAttention: t('moduleOverview.signals.needAttention'),
+            allClear: t('moduleOverview.signals.allClear'),
+            region: t('moduleOverview.needsAttention.title'),
+            minimize: t('moduleOverview.signals.minimize'),
+            acknowledge: t('moduleOverview.signals.acknowledge'),
+            acknowledged: t('moduleOverview.signals.acknowledged'),
+            acknowledgedHint: t('moduleOverview.signals.acknowledgedHint'),
+            dismiss: t('moduleOverview.signals.dismiss'),
+            emptyTitle: t('moduleOverview.signals.emptyTitle'),
+          }}
+        >
+          <motion.div variants={fadeInUp}>
+            <PageHeader mode="pagebar" attention={<AttentionCornerPill />} actions={headerActions} />
+          </motion.div>
+          <AttentionCornerShade />
+        </AttentionCorner>
 
         {/* ---- Error State ---- */}
         {isError ? (
@@ -462,7 +614,7 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
                   attendanceByStudent={attendanceByStudent}
                   canViewGuardians={guardianPerms.view}
                   canViewLocation={studentPerms.view}
-                  bulkActions={bulkActions}
+                  selectionBar={selectionBar}
                   rowSelection={rowSelection}
                   onRowSelectionChange={setRowSelection}
                   {...studentsToolbar}

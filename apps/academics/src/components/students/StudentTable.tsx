@@ -79,6 +79,10 @@ interface StudentTableProps {
   /** Override the internal toast-placeholder bulk actions. Pass from the route
    *  when wiring a real bulk drawer (e.g. BulkArchiveStudentsModal). */
   bulkActions?: BulkAction<StudentResponseDto>[]
+  /** ⑨ Selection Context Bar node — morphs the toolbar in place on selection.
+   *  When provided, the legacy floating pill (bulkActions) is retired. Row ids
+   *  are studentIds, so the page can map its selection state to rows. */
+  selectionBar?: ReactNode
   /** Controlled row selection — lift state into the page when an action
    *  needs to clear selection (e.g. after a bulk archive). */
   rowSelection?: RowSelectionState
@@ -187,6 +191,7 @@ export function StudentTable({
   onLoadMore,
   serverTotalHint,
   bulkActions: bulkActionsProp,
+  selectionBar,
   rowSelection,
   onRowSelectionChange,
 }: StudentTableProps) {
@@ -351,7 +356,9 @@ export function StudentTable({
       pageSizes={[25, 50, 100]}
       defaultSort={[{ id: 'fullName', desc: false }]}
       serverPagination={serverPagination}
-      bulkActions={bulkActions}
+      bulkActions={selectionBar ? undefined : bulkActions}
+      selectionBar={selectionBar}
+      getRowId={(s) => s.studentId}
       rowSelection={rowSelection}
       onRowSelectionChange={onRowSelectionChange}
       emptyState={{
