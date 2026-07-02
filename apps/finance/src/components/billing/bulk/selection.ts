@@ -24,7 +24,8 @@ import type {
 
 export function toggleStudent(state: SelectionState, id: string): SelectionState {
   const next = new Set(state.selectedIds)
-  next.has(id) ? next.delete(id) : next.add(id)
+  if (next.has(id)) next.delete(id)
+  else next.add(id)
   return { ...state, selectedIds: next }
 }
 
@@ -102,7 +103,8 @@ export function toggleGradeGroup(
 
 export function toggleSegment(state: SelectionState, segment: SegmentId): SelectionState {
   const nextSegs = new Set(state.activeSegments)
-  nextSegs.has(segment) ? nextSegs.delete(segment) : nextSegs.add(segment)
+  if (nextSegs.has(segment)) nextSegs.delete(segment)
+  else nextSegs.add(segment)
   return { ...state, activeSegments: nextSegs }
 }
 

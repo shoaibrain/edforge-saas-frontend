@@ -47,6 +47,31 @@ vi.mock('@edforge/ui', () => ({
   Select: () => null,
 }))
 
+// The component renders every label via useTranslation('settings') (step nav,
+// pills, drift callout, banner, toasts). Resolve `t` against the REAL en
+// settings bundle — with {{param}} interpolation — so assertions on English
+// strings match the actual rendered text (robust to i18n key churn; no
+// hand-maintained key→value map to drift out of date).
+vi.mock('@edforge/i18n', async () => {
+  const en = (
+    await import('../../../../../../../packages/i18n/src/locales/en/settings.json')
+  ).default as Record<string, unknown>
+  const resolve = (key: string): unknown =>
+    key.split('.').reduce<unknown>((o, k) => (o && typeof o === 'object' ? (o as Record<string, unknown>)[k] : undefined), en)
+  const interpolate = (s: string, p?: Record<string, unknown>): string =>
+    p ? s.replace(/\{\{(\w+)\}\}/g, (_, k) => (p[k] != null ? String(p[k]) : `{{${k}}}`)) : s
+  return {
+    useTranslation: () => ({
+      t: (key: string, params?: Record<string, unknown>) => {
+        const v = resolve(key)
+        return typeof v === 'string' ? interpolate(v, params) : key
+      },
+      // Some steps also read the i18n instance for `.language` (date locale).
+      i18n: { language: 'en' },
+    }),
+  }
+})
+
 vi.mock('@/hooks/useCalendar', () => ({
   useAcademicSessions: () => ({ data: { items: [] } }),
   useCalendarStats: () => ({ data: { totalDays: 0 } }),

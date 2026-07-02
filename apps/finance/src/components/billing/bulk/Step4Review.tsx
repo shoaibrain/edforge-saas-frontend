@@ -126,7 +126,7 @@ export function Step4Review({
           <SummaryRow icon={Calendar} label={t('bulkGenerate.step4.period')}>
             <div>
               {details.billingPeriod || '—'} · {details.academicYear}
-              <div className="text-[11px] text-[rgb(var(--text-tertiary))] font-mono whitespace-nowrap mt-0.5">
+              <div className={/* allow-arbitrary-spacing: dense bulk-wizard mono metadata; pre-token-sweep */ "text-[11px] text-[rgb(var(--text-tertiary))] font-mono whitespace-nowrap mt-0.5"}>
                 {t('bulkGenerate.step4.issueDue', {
                   issueDate: details.issueDate || '—',
                   dueDate: details.dueDate || '—',
@@ -140,10 +140,10 @@ export function Step4Review({
         {details.showPreview && (
           <div>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-[rgb(var(--text-secondary))]">
+              <span className={/* allow-arbitrary-spacing: dense bulk-wizard label; pre-token-sweep */ "text-[11px] font-semibold uppercase tracking-wider text-[rgb(var(--text-secondary))]"}>
                 {t('bulkGenerate.step4.perStudentPreview')}
               </span>
-              <span className="text-[11px] text-[rgb(var(--text-tertiary))]">
+              <span className={/* allow-arbitrary-spacing: dense bulk-wizard metadata; pre-token-sweep */ "text-[11px] text-[rgb(var(--text-tertiary))]"}>
                 {t('bulkGenerate.step4.tapToExpand')}
               </span>
             </div>
@@ -182,7 +182,7 @@ export function Step4Review({
 
         <BulkPreviewBanner previewQuery={previewQuery} />
 
-        <div className="flex items-start gap-2 p-3 rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-[11px] text-[rgb(var(--text-secondary))] leading-relaxed">
+        <div className={/* allow-arbitrary-spacing: dense bulk-wizard note; pre-token-sweep */ "flex items-start gap-2 p-3 rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-[11px] text-[rgb(var(--text-secondary))] leading-relaxed"}>
           <Shield className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))] flex-shrink-0 mt-0.5" />
           <span>{t('bulkGenerate.step4.postingNotice')}</span>
         </div>
@@ -240,7 +240,7 @@ function BulkPreviewBanner({
       <PreviewRow icon={Info} label={t('bulkGenerate.step4.notBilledThisPeriod')}>
         {fmtCounter(data.studentsNotBilledThisPeriod)}
       </PreviewRow>
-      <div className="text-[10px] text-[rgb(var(--text-tertiary))] pt-1 border-t border-[rgb(var(--border-primary))]">
+      <div className={/* allow-arbitrary-spacing: dense bulk-wizard footnote; pre-token-sweep */ "text-[10px] text-[rgb(var(--text-tertiary))] pt-1 border-t border-[rgb(var(--border-primary))]"}>
         {t('bulkGenerate.step4.estimatedDuration', {
           seconds: data.estimatedDurationSec,
         })}
@@ -281,7 +281,7 @@ function PerStudentRow({ inv }: { inv: ComputedInvoice }) {
           <div className="text-sm text-[rgb(var(--text-primary))] truncate">
             {inv.studentName}
           </div>
-          <div className="text-[11px] text-[rgb(var(--text-tertiary))]">
+          <div className={/* allow-arbitrary-spacing: dense bulk-wizard metadata; pre-token-sweep */ "text-[11px] text-[rgb(var(--text-tertiary))]"}>
             {gradeLabel(inv.gradeLevel, t)} · {t('bulkGenerate.step4.lineItemCount', {
               count: inv.lines.length,
             })}
@@ -302,7 +302,7 @@ function PerStudentRow({ inv }: { inv: ComputedInvoice }) {
                 <td className="px-3 py-1.5 text-[rgb(var(--text-secondary))]">
                   {line.name}
                   {line.isCustom && (
-                    <span className="ml-1.5 text-[10px] px-1 py-0 rounded bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-tertiary))]">
+                    <span className={/* allow-arbitrary-spacing: dense bulk-wizard chip; pre-token-sweep */ "ml-1.5 text-[10px] px-1 py-0 rounded bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-tertiary))]"}>
                       {t('bulkGenerate.step4.customBadge')}
                     </span>
                   )}
@@ -351,7 +351,7 @@ function SummaryRow({
         <Icon className="w-3.5 h-3.5" />
       </span>
       <div className="flex-1 min-w-0">
-        <div className="text-[11px] font-medium uppercase tracking-wider text-[rgb(var(--text-tertiary))]">
+        <div className={/* allow-arbitrary-spacing: dense bulk-wizard label; pre-token-sweep */ "text-[11px] font-medium uppercase tracking-wider text-[rgb(var(--text-tertiary))]"}>
           {label}
         </div>
         <div className="text-sm text-[rgb(var(--text-primary))] mt-0.5">{children}</div>
