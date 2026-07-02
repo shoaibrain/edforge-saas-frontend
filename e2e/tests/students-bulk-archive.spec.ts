@@ -52,8 +52,10 @@ test.describe('Bulk archive students', () => {
     await page.getByRole('button', { name: 'Withdraw 2' }).click()
 
     // Aggregate success toast, and exactly the 2 selected students were DELETEd.
+    // Sonner emits both a visible toast and an aria-live sr-only copy — both
+    // match the text, tripping strict-mode. .first() picks the visible toast.
     await expect(
-      page.getByText('Withdrew 2 students (reversible by a school administrator)'),
+      page.getByText('Withdrew 2 students (reversible by a school administrator)').first(),
     ).toBeVisible()
     expect(captured.studentDeletes.sort()).toEqual(['stu-aarav', 'stu-bhavna'])
 
