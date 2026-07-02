@@ -2654,10 +2654,19 @@
       "editPolicy": "नीति सम्पादन गर्नुहोस्",
       "gradeScale": "ग्रेड scale",
       "categoryWeights": "श्रेणी weight ({{total}}%)",
-      "rounding": "Rounding: {{rule}}",
       "newPolicy": "नयाँ नीति",
       "emptyTitle": "ग्रेडिङ नीति configured छैन",
-      "emptyDescription": "ग्रेड scale, category weight र rounding rule परिभाषित गर्न grading policy सिर्जना गर्नुहोस्।"
+      "emptyDescription": "ग्रेड scale, category weight र rounding rule परिभाषित गर्न grading policy सिर्जना गर्नुहोस्।",
+      "gradeChip": "{{letter}} · {{min}}–{{max}}% · {{gpa}} GPA",
+      "weightAria": "{{category}} भार: {{weight}}%",
+      "scheme": "पद्धति",
+      "schemeValue": "{{scheme}} · {{scale}}",
+      "schemeType": {
+        "letter_gpa": "अक्षर + GPA",
+        "division": "डिभिजन"
+      },
+      "minimumPassing": "न्यूनतम उत्तीर्णाङ्क",
+      "roundingLabel": "Rounding"
     },
     "overview": {
       "title": "ग्रेड विश्लेषण",
