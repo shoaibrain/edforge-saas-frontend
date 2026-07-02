@@ -249,19 +249,14 @@ export { AnimatedProgressBar, type AnimatedProgressBarProps } from './components
 export { WidgetErrorBoundaryV2 } from './components/SectionErrorBoundary'
 export { V2AlertItem, type V2AlertItemProps } from './components/V2AlertItem'
 
-// Dashboard recipes (④ AlertLane · ⑤ WidgetCard · DashboardLayout)
+// Dashboard recipes (⑤ WidgetCard — ④ AlertLane retired in favor of the
+// Header Zone AttentionCorner; DashboardLayout deleted with it)
 export {
-  AlertLane,
-  type AlertLaneProps,
-  type DashboardAlert,
-  type AlertSeverity,
   WidgetCard,
   WidgetGrid,
   type WidgetCardProps,
   type WidgetSpan,
   type WidgetState,
-  DashboardLayout,
-  type DashboardLayoutProps,
 } from './components/dashboard'
 
 // V2 Hooks

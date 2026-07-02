@@ -91,7 +91,7 @@ vi.mock('@edforge/i18n', () => ({
 
 // Mock framer-motion (skip animations in tests). A proxy over `motion` returns a
 // prop-stripping passthrough for ANY tag (div/span/button/…), and the hooks used
-// by AnimatedIcon / AlertLane (useReducedMotion) are stubbed.
+// by AnimatedIcon / AttentionCorner (useReducedMotion) are stubbed.
 vi.mock('framer-motion', () => {
   const strip = (props: Record<string, unknown>) => {
     const {

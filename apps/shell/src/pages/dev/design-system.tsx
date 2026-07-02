@@ -24,13 +24,11 @@ import {
   Select,
   Stack,
   StatBand,
-  AlertLane,
   AttentionCorner,
   AttentionCornerPill,
   AttentionCornerShade,
   SelectionContextBar,
   type Signal,
-  type DashboardAlert,
   WidgetCard,
   WidgetGrid,
   Switch,
@@ -460,7 +458,7 @@ export default function DesignSystemDevPage() {
 
         <SectionCard
           title="Dashboard surfaces"
-          description="The two new canonical recipes for Home + module Overview: ④ AlertLane (severity-ranked, ack/dismiss, session-only) and ⑤ WidgetCard grid, plus the PageHeader greeting mode. See docs/design-system/retrospective-s0-s2-academics.md."
+          description="The canonical recipes for Home + module Overview: ⑤ WidgetCard grid plus the PageHeader greeting mode (page-scoped alerts live in the ⑧ AttentionCorner — see the Header Zone section). See docs/design-system/retrospective-s0-s2-academics.md."
         >
           <Stack space="lg">
             {/* PageHeader — greeting mode (Home) */}
@@ -478,40 +476,6 @@ export default function DesignSystemDevPage() {
                   ]}
                 />
               </div>
-            </div>
-
-            {/* ④ AlertLane — dismiss all to reach the all-clear strip */}
-            <div>
-              <Text variant="label" className="mb-2 block">
-                ④ AlertLane · critical=Acknowledge · warning/info=dismiss · collapse · all-clear
-              </Text>
-              <AlertLane
-                alerts={[
-                  {
-                    id: 'ds-crit',
-                    severity: 'critical',
-                    iconSignature: 'fees',
-                    title: 'Overdue invoices — NPR 8.8 lakh uncollected',
-                    description: 'Collection rate is 18.1%. Outstanding overdue requires follow-up.',
-                    cta: { label: 'Review billing', onAction: () => undefined },
-                  },
-                  {
-                    id: 'ds-warn',
-                    severity: 'warning',
-                    iconSignature: 'attendance',
-                    title: '16 students below 80% attendance',
-                    description: 'Attendance requires intervention — today 18.8%, 30-day avg 78%.',
-                    cta: { label: 'View students', onAction: () => undefined },
-                  },
-                  {
-                    id: 'ds-info',
-                    severity: 'info',
-                    title: '206 students without an attendance record today',
-                    description: 'Attendance has not yet been recorded for all sections.',
-                    cta: { label: 'Take attendance', onAction: () => undefined },
-                  },
-                ] satisfies DashboardAlert[]}
-              />
             </div>
 
             {/* ⑤ WidgetCard grid — spans + ready/empty/loading states */}

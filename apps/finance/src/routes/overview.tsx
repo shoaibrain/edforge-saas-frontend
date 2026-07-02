@@ -1,11 +1,11 @@
 /**
  * Finance Overview Page — dashboard recipe
  *
- * PageHeader (pagebar) → AlertLane (④) → StatBand → WidgetCard grid (⑤), the
- * same canonical structure as Home + Academics Overview. Reuses
- * `useFinanceOverviewV2` and the existing overview-v2 cards in `bare` mode;
- * preserves the filters/export row, no-school guard, per-widget error
- * boundaries, and reduced-motion stagger.
+ * PageHeader (pagebar, ⑧ AttentionCorner pill in the attention slot) → StatBand
+ * → WidgetCard grid (⑤), the same canonical structure as Home + Academics
+ * Overview. Reuses `useFinanceOverviewV2` and the existing overview-v2 cards in
+ * `bare` mode; preserves the filters/export row, no-school guard, per-widget
+ * error boundaries, and reduced-motion stagger.
  */
 
 import { useNavigate } from "@tanstack/react-router";
@@ -15,8 +15,11 @@ import {
   PageHeader,
   StatBand,
   type StatMetric,
-  AlertLane,
-  type DashboardAlert,
+  AttentionCorner,
+  AttentionCornerPill,
+  AttentionCornerShade,
+  useSignalAcks,
+  type Signal,
   WidgetGrid,
   WidgetCard,
   WidgetErrorBoundaryV2,
@@ -168,9 +171,12 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
         },
   ];
 
-  // ── AlertLane (replaces OverdueAlertBanner) ──────────────────────────────
-  const dashAlerts: DashboardAlert[] = [];
-  if (kpi.overdue > 0) {
+  // ── ⑧ Attention Corner signals (replaces the AlertLane stack) ────────────
+  // Derived from the same overview-v2 query on every render, so collecting the
+  // overdue amount auto-resolves the signal. `[]` while the query loads.
+  const { acked, ack, unack } = useSignalAcks();
+  const signals: Signal[] = [];
+  if (!isLoading && kpi.overdue > 0) {
     const largestBucket = agingReport
       .filter((b) => b.count > 0)
       .sort((a, b) => b.count - a.count)[0];
@@ -188,16 +194,16 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
       ]
         .filter(Boolean)
         .join(". ") + ".";
-    dashAlerts.push({
-      id: "fo-overdue",
+    signals.push({
+      id: "finance.overdue",
       severity: "critical",
-      iconSignature: "fees",
+      domain: t("headerZone.domains.finance"),
       title: t("overview.alert.title", {
         count: overdueCount,
         amount: formatShort(kpi.overdue),
       }),
       description,
-      cta: {
+      fix: {
         label: t("overview.alert.reviewBilling"),
         onAction: () =>
           navigate({ to: "/invoices", search: { status: "overdue" } as never }),
@@ -210,26 +216,46 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
       {/* Screen-reader page heading (breadcrumb names the page visually) */}
       <h1 className="sr-only">{t("overview.finance")}</h1>
 
-      {/* ---- Page header (pagebar) ---- */}
+      {/* ---- ⑧ Header zone — attention pill left, actions right ---- */}
       <motion.div variants={fadeInUp} initial="hidden" animate="visible">
-        <PageHeader
-          mode="pagebar"
-          actions={[
-            {
-              label: t("overview.actions.bulkInvoice"),
-              icon: <FileStack className="h-3.5 w-3.5" />,
-              ariaLabel: t("overview.actions.bulkInvoiceAria"),
-              onClick: () => navigate({ to: "/invoices/bulk-generate" }),
-            },
-            {
-              label: t("overview.actions.recordPayment"),
-              icon: <CreditCard className="h-3.5 w-3.5" />,
-              primary: true,
-              ariaLabel: t("overview.actions.recordPaymentAria"),
-              onClick: () => navigate({ to: "/payments/record" }),
-            },
-          ]}
-        />
+        <AttentionCorner
+          signals={signals}
+          acked={acked}
+          onAck={ack}
+          onUnack={unack}
+          labels={{
+            needAttention: t("headerZone.needAttention"),
+            allClear: t("headerZone.allClear"),
+            region: t("headerZone.region"),
+            minimize: t("headerZone.minimize"),
+            acknowledge: t("headerZone.acknowledge"),
+            acknowledged: t("headerZone.acknowledged"),
+            acknowledgedHint: t("headerZone.acknowledgedHint"),
+            dismiss: t("headerZone.dismiss"),
+            emptyTitle: t("headerZone.emptyTitle"),
+          }}
+        >
+          <PageHeader
+            mode="pagebar"
+            attention={<AttentionCornerPill />}
+            actions={[
+              {
+                label: t("overview.actions.bulkInvoice"),
+                icon: <FileStack className="h-3.5 w-3.5" />,
+                ariaLabel: t("overview.actions.bulkInvoiceAria"),
+                onClick: () => navigate({ to: "/invoices/bulk-generate" }),
+              },
+              {
+                label: t("overview.actions.recordPayment"),
+                icon: <CreditCard className="h-3.5 w-3.5" />,
+                primary: true,
+                ariaLabel: t("overview.actions.recordPaymentAria"),
+                onClick: () => navigate({ to: "/payments/record" }),
+              },
+            ]}
+          />
+          <AttentionCornerShade />
+        </AttentionCorner>
       </motion.div>
 
       {/* ---- Filters & Export ---- */}
@@ -246,13 +272,6 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
         onClear={clearFilters}
         onExport={handleExportCSV}
       />
-
-      {/* ---- ④ AlertLane (overdue → critical) ---- */}
-      {!isLoading && dashAlerts.length > 0 && (
-        <motion.div variants={fadeInUp} initial="hidden" animate="visible">
-          <AlertLane alerts={dashAlerts} ariaLabel={t("overview.alert.region")} />
-        </motion.div>
-      )}
 
       {/* ---- StatBand — KPI summary ---- */}
       <motion.div variants={fadeInUp} initial="hidden" animate="visible">
