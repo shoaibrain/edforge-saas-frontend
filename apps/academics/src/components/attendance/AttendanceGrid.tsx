@@ -68,6 +68,12 @@ interface AttendanceGridProps {
    * to opt into pre-fill.
    */
   defaultStatus?: AttendanceStatus | null
+  /**
+   * Narrow-container mode (the recording drawer): drops the keyboard-hint row
+   * (shortcuts still work) and lets the search share a row with the filter
+   * chips, so the toolbar reads as one calm line instead of three stacked rows.
+   */
+  compact?: boolean
 }
 
 type SortKey = 'name' | 'number' | 'status'
@@ -122,6 +128,7 @@ export function AttendanceGrid({
   onCorrection,
   lockedStudents,
   defaultStatus = null,
+  compact = false,
 }: AttendanceGridProps) {
   const { t, attendanceStatusLabel } = useAcademicsI18n()
   // Task 4.6: Determine if this is a past date
@@ -480,9 +487,10 @@ export function AttendanceGrid({
         {announcement}
       </div>
 
-      {/* Keyboard Hint (hide on past dates and on mobile) — derived from the
-          single status source (F0.T2/F2.T3) so labels + shortcuts can't drift. */}
-      {!isPastDate && (
+      {/* Keyboard Hint (hide on past dates, on mobile, and in compact mode) —
+          derived from the single status source (F0.T2/F2.T3) so labels +
+          shortcuts can't drift. */}
+      {!isPastDate && !compact && (
         <div className="text-xs text-text-tertiary px-1 hidden sm:block">
           {t('attendance.grid.keyboardShortcuts')}{' '}
           {ENTRY_STATUSES.map((s) => {
@@ -511,6 +519,7 @@ export function AttendanceGrid({
         aria-label={t('attendance.grid.ariaLabel')}
       >
         <RosterToolbar
+          compact={compact}
           search={searchQuery}
           onSearchChange={setSearchQuery}
           activeFilter={activeFilter}

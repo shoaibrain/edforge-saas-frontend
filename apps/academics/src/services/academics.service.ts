@@ -1890,12 +1890,14 @@ export async function getAttendanceStudentTrends(
   studentIds: string[],
   startDate: string,
   endDate: string,
+  signal?: AbortSignal,
 ): Promise<Record<string, StudentAttendanceTrend>> {
   if (studentIds.length === 0) return {}
   if (DEBUG) console.debug('[Academics Service] getAttendanceStudentTrends', { count: studentIds.length })
   const res = await apiGet<{ trends: Record<string, StudentAttendanceTrend> }>(
     '/academics/attendance/student-trends',
     { schoolId, studentIds: studentIds.join(','), startDate, endDate },
+    { signal },
   )
   return res?.trends ?? {}
 }
@@ -1909,9 +1911,12 @@ export async function getAttendanceStudentTrends(
  * GET /academics/attendance/overview?schoolId=&academicYearId=&date=
  */
 export async function getAttendanceOverview(
-  params: { schoolId: string; academicYearId: string; date: string }
+  params: { schoolId: string; academicYearId: string; date: string },
+  signal?: AbortSignal,
 ): Promise<AttendanceOverviewResponse> {
-  return apiGet<AttendanceOverviewResponse>('/academics/attendance/overview', params)
+  // Signal lets react-query abort a superseded fetch — rapid date navigation
+  // would otherwise stack heavy aggregate requests on the server.
+  return apiGet<AttendanceOverviewResponse>('/academics/attendance/overview', params, { signal })
 }
 
 // ============================================================================

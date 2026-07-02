@@ -113,9 +113,13 @@ export function computeCoverageSummary(
   const summary = overview?.todaySummary
   const studentsTotal = summary?.totalStudents ?? 0
   const studentsRecorded = summary?.totalRecorded ?? 0
-  // Rate among recorded = the recorded-attendance rate the aggregate already
-  // computes over the sessions that were taken (NOT the coverage-deflated blend).
-  const recordedRate = summary?.attendanceRate ?? 0
+  // Rate among recorded = attending ÷ RECORDED, computed here. The aggregate's
+  // `attendanceRate` is the coverage-deflated blend (present ÷ enrolled), which
+  // is exactly the artifact this dashboard reframes — never show it as the
+  // recorded rate. Attending = present + late + remote (the counting policy's
+  // attendingCategories); excused counts as absent for the rate (Nepal default).
+  const attending = (summary?.present ?? 0) + (summary?.late ?? 0) + (summary?.remote ?? 0)
+  const recordedRate = studentsRecorded > 0 ? (attending / studentsRecorded) * 100 : 0
 
   return {
     sectionCount,

@@ -37,7 +37,18 @@ describe('coverage — weighted coverage', () => {
     expect(covered[1].completionPct).toBe(50)
     // weighted coverage = (1 + 0.5 + 0) / 3 = 50%  (NOT the naive 1-of-3 = 33%)
     const overview = {
-      todaySummary: { totalStudents: 60, totalRecorded: 30, attendanceRate: 88 },
+      // attendanceRate here is the coverage-deflated blend (would be ~45%) and
+      // must NOT surface as the recorded rate.
+      todaySummary: {
+        totalStudents: 60,
+        totalRecorded: 30,
+        attendanceRate: 45,
+        present: 24,
+        late: 2,
+        remote: 1,
+        absent: 2,
+        excused: 1,
+      },
     } as unknown as AttendanceOverviewResponse
     const summary = computeCoverageSummary(overview, covered)
     expect(summary.covWeightedPct).toBe(50)
@@ -46,7 +57,20 @@ describe('coverage — weighted coverage', () => {
     expect(summary.notStarted).toBe(1)
     expect(summary.studentsRecorded).toBe(30)
     expect(summary.studentsTotal).toBe(60)
-    expect(summary.recordedRate).toBe(88)
+    // rate among recorded = attending ÷ recorded = (24+2+1)/30 = 90 — NOT the
+    // blended 45% the aggregate reports (that leak was the "6% rate among
+    // recorded" bug seen in preview).
+    expect(summary.recordedRate).toBe(90)
+  })
+
+  it('reports a 0 recorded rate when nothing is recorded (never the blend)', () => {
+    const covered = toSectionCoverage([
+      { sectionId: 's1', sectionNumber: 'A', courseName: 'Math', studentCount: 20, recordedCount: 0, isComplete: false },
+    ])
+    const overview = {
+      todaySummary: { totalStudents: 20, totalRecorded: 0, attendanceRate: 9.9, present: 0, late: 0 },
+    } as unknown as AttendanceOverviewResponse
+    expect(computeCoverageSummary(overview, covered).recordedRate).toBe(0)
   })
 
   it('orders sections actionable-first (partial → not-started → recorded)', () => {

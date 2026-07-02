@@ -26,6 +26,8 @@ interface SectionsToRecordProps {
   dateLabel: string
   onRecord: (sectionId: string) => void
   loading?: boolean
+  /** A newer date's payload is in flight — dim the data so stale numbers read as transitional. */
+  updating?: boolean
 }
 
 export function SectionsToRecord({
@@ -35,6 +37,7 @@ export function SectionsToRecord({
   dateLabel,
   onRecord,
   loading = false,
+  updating = false,
 }: SectionsToRecordProps) {
   const { t, formatNumber } = useAcademicsI18n()
   const rows = useMemo(() => sortActionableFirst(coverage), [coverage])
@@ -65,7 +68,10 @@ export function SectionsToRecord({
   }
 
   return (
-    <section className="rounded-xl border border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-secondary))]">
+    <section
+      aria-busy={updating}
+      className="rounded-xl border border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-secondary))]"
+    >
       {/* Head */}
       <div className="flex items-start justify-between gap-3 px-4 pt-4">
         <div className="flex items-center gap-2">
@@ -80,10 +86,16 @@ export function SectionsToRecord({
           </div>
         </div>
         <span className="whitespace-nowrap text-2xs font-medium text-[rgb(var(--text-tertiary))]">
-          {t('attendance.dashboard.sections.complete', {
-            done: formatNumber(summary.full),
-            total: formatNumber(summary.sectionCount),
-          })}
+          {updating ? (
+            <span className="text-[rgb(var(--state-info-fg))]" role="status">
+              {t('attendance.dashboard.updating')}
+            </span>
+          ) : (
+            t('attendance.dashboard.sections.complete', {
+              done: formatNumber(summary.full),
+              total: formatNumber(summary.sectionCount),
+            })
+          )}
         </span>
       </div>
 
@@ -135,8 +147,9 @@ export function SectionsToRecord({
         </div>
       </div>
 
-      {/* Section list */}
-      <div className="px-4 pb-2">
+      {/* Section list — height-capped: with many sections the list scrolls
+          inside the widget instead of growing the page unbounded. */}
+      <div className={`max-h-96 overflow-y-auto px-4 pb-2 transition-opacity ${updating ? 'opacity-60' : ''}`}>
         {rows.length === 0 ? (
           <div className="py-10 text-center text-sm text-[rgb(var(--text-tertiary))]">
             {t('attendance.dashboard.sections.emptyScope')}
