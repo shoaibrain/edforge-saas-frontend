@@ -144,8 +144,10 @@ export default function InvoicesPage() {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const [showBulkIssueConfirm, setShowBulkIssueConfirm] = useState(false)
   const [bulkReminderTarget, setBulkReminderTarget] = useState<Invoice[] | null>(null)
-  // Sprint F.5 — bulk PDF export target (selected invoice IDs); null = modal closed.
-  const [bulkPdfExportTarget, setBulkPdfExportTarget] = useState<string[] | null>(null)
+  // Sprint F.5 — bulk PDF export target (selected invoice rows, so the
+  // drawer's preflight manifest can aggregate without refetching);
+  // null = drawer closed.
+  const [bulkPdfExportTarget, setBulkPdfExportTarget] = useState<Invoice[] | null>(null)
 
   // Cancel dialog state
   const [cancelTarget, setCancelTarget] = useState<{ id: string; invoiceNumber: string } | null>(null)
@@ -471,7 +473,7 @@ export default function InvoicesPage() {
         label: t('invoices.bulkPdfExport.menuLabel'),
         icon: <Download className="h-3.5 w-3.5" />,
         applicableIds: selectedInvoices.map((i) => i.id),
-        onAction: (ids) => setBulkPdfExportTarget(Array.from(new Set(ids))),
+        onAction: (ids) => setBulkPdfExportTarget(rowsFor(Array.from(new Set(ids)))),
       },
     ]
   }, [selectedInvoices, t])
@@ -700,7 +702,7 @@ export default function InvoicesPage() {
           onClose={() => setBulkPdfExportTarget(null)}
           onComplete={() => setRowSelection({})}
           schoolId={schoolId ?? ''}
-          invoiceIds={bulkPdfExportTarget}
+          invoices={bulkPdfExportTarget}
         />
       )}
 

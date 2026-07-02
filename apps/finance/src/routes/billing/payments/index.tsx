@@ -803,11 +803,11 @@ export default function PaymentsPage() {
   const [bulkVoidTarget, setBulkVoidTarget] = useState<Payment[] | null>(null)
   const [bulkReceiptTarget, setBulkReceiptTarget] = useState<Payment[] | null>(null)
   // Sprint G.4 — receipt-side counterpart of the invoice-list
-  // bulkPdfExportTarget state. Stored as string[] because the drawer
-  // takes flat paymentIds (not full Payment objects — no client-side
-  // eligibility branching; the G.2 worker's status='completed' filter
+  // bulkPdfExportTarget state. Holds full Payment rows so the drawer's
+  // preflight manifest can aggregate without refetching; server-side
+  // eligibility still rules (the G.2 worker's status='completed' filter
   // is the source of truth).
-  const [bulkPdfExportTarget, setBulkPdfExportTarget] = useState<string[] | null>(null)
+  const [bulkPdfExportTarget, setBulkPdfExportTarget] = useState<Payment[] | null>(null)
 
   // ── ⑨ Selection Context Bar — state-aware action matrix (retires the
   // legacy floating pill). Void / Send receipt mirror the drawers' own
@@ -856,7 +856,7 @@ export default function PaymentsPage() {
         icon: <Download className="h-3.5 w-3.5" />,
         applicableIds: completedIds,
         disabledReason: t('paymentsList.selection.noneCompleted'),
-        onAction: (ids) => setBulkPdfExportTarget(Array.from(new Set(ids))),
+        onAction: (ids) => setBulkPdfExportTarget(rowsFor(Array.from(new Set(ids)))),
       },
     ]
   }, [selectedPayments, t])
@@ -1100,7 +1100,7 @@ export default function PaymentsPage() {
           onClose={() => setBulkPdfExportTarget(null)}
           onComplete={() => setRowSelection({})}
           schoolId={schoolId}
-          paymentIds={bulkPdfExportTarget}
+          payments={bulkPdfExportTarget}
         />
       )}
     </div>
