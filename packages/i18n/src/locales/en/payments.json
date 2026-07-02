@@ -204,7 +204,10 @@
     "student": "Student: {{name}}",
     "due": "Due: {{date}}",
     "actions": {
-      "issueInvoice": "Issue Invoice"
+      "issueInvoice": "Issue Invoice",
+      "sendReminder": "Send reminder",
+      "cancelDraft": "Cancel draft",
+      "moreActions": "More actions"
     },
     "sections": {
       "lineItems": "Line Items",
@@ -215,12 +218,65 @@
     },
     "paymentHistory": {
       "payment": "Payment",
-      "via": "via {{gateway}}"
+      "via": "via {{gateway}}",
+      "empty": "No payments recorded on this invoice yet.",
+      "recordFirst": "Record the first payment"
     },
     "metadata": {
       "created": "Created: {{date}}",
       "issued": "Issued: {{date}}",
       "notes": "Notes: {{notes}}"
+    },
+    "banner": {
+      "draftTitle": "This invoice is a draft.",
+      "draftBody": "It isn't visible on the student account and no payments can be recorded until it's issued.",
+      "cancelledTitle": "This invoice was cancelled",
+      "cancelledOn": "on {{date}}",
+      "cancelledBy": "by {{name}}",
+      "cancelledBody": "It no longer affects the student's balance."
+    },
+    "band": {
+      "region": "Invoice summary",
+      "lineItemCount": "{{count}} line items",
+      "lineItemCount_one": "{{count}} line item",
+      "lineItemCount_other": "{{count}} line items",
+      "noPaymentsYet": "no payments yet",
+      "invoiceCancelled": "invoice cancelled",
+      "settledInFull": "settled in full",
+      "outstandingBalance": "outstanding balance",
+      "dueDate": "Due Date",
+      "daysLate": "{{days}}d late"
+    },
+    "lineItems": {
+      "qtyAt": "{{quantity}} × {{amount}}"
+    },
+    "aside": {
+      "details": "Details",
+      "status": "Status",
+      "issued": "Issued",
+      "notIssuedYet": "Not issued yet",
+      "due": "Due",
+      "billingPeriod": "Billing period",
+      "academicYear": "Academic year",
+      "viewStudentAccount": "View student account",
+      "activity": "Activity"
+    },
+    "timeline": {
+      "created": "Invoice created",
+      "issued": "Issued to student account",
+      "overdue": "Marked overdue",
+      "overdueSub": "Automatic · past due date",
+      "payment": "Payment received — {{amount}}",
+      "paymentSub": "{{gateway}} · Receipt {{receipt}}",
+      "paid": "Paid in full",
+      "paidSub": "Balance settled",
+      "cancelled": "Invoice cancelled",
+      "writtenOff": "Written off",
+      "by": "by {{name}}"
+    },
+    "error": {
+      "forbidden": "You don't have permission to view this invoice.",
+      "notFound": "We couldn't find this invoice. It may have been deleted."
     }
   },
   "lineItems": {
@@ -753,7 +809,34 @@
     "notesPlaceholder": "Optional notes about this payment...",
     "preview": "Preview",
     "method": "Method",
-    "reference": "Reference #"
+    "reference": "Reference #",
+    "drawer": {
+      "amountLabel": "Amount received",
+      "dueHint": "due {{amount}}",
+      "overpayError": "More than the amount due — overpayment isn't allowed. Max {{max}}.",
+      "overCapError": "Amount exceeds the {{max}} per-payment limit.",
+      "partialHint": "Partial payment — {{amount}} will remain due.",
+      "chipFull": "Full amount due",
+      "chipHalf": "Half",
+      "methodLabel": "Payment method",
+      "referenceLabel": "Transaction reference",
+      "referenceHint": "required for {{method}}",
+      "dateLabel": "Payment date",
+      "receivedBy": "Received by",
+      "noteLabel": "Note",
+      "noteHint": "optional — appears on the receipt",
+      "notePlaceholder": "e.g. Paid in cash at counter by guardian",
+      "infoNote": "A receipt is generated automatically and the student account balance updates immediately.",
+      "recording": "Recording…",
+      "recordAmount": "Record {{amount}}",
+      "toastRecorded": "Payment recorded — receipt {{receipt}}",
+      "view": "View",
+      "done": "Done",
+      "viewReceipt": "View receipt",
+      "doneVia": "Payment recorded via {{method}} · {{date}}",
+      "donePaidInFull": "This invoice is now paid in full.",
+      "doneRemains": "{{amount}} remains due on this invoice."
+    }
   },
   "asyncJobs": {
     "common": {

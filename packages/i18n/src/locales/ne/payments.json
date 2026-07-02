@@ -204,7 +204,10 @@
     "student": "विद्यार्थी: {{name}}",
     "due": "तिर्नुपर्ने: {{date}}",
     "actions": {
-      "issueInvoice": "बीजक जारी गर्नुहोस्"
+      "issueInvoice": "बीजक जारी गर्नुहोस्",
+      "sendReminder": "रिमाइन्डर पठाउनुहोस्",
+      "cancelDraft": "ड्राफ्ट रद्द गर्नुहोस्",
+      "moreActions": "थप कार्यहरू"
     },
     "sections": {
       "lineItems": "लाइन आइटमहरू",
@@ -215,12 +218,65 @@
     },
     "paymentHistory": {
       "payment": "भुक्तानी",
-      "via": "{{gateway}} मार्फत"
+      "via": "{{gateway}} मार्फत",
+      "empty": "यस बीजकमा हालसम्म कुनै भुक्तानी रेकर्ड गरिएको छैन।",
+      "recordFirst": "पहिलो भुक्तानी रेकर्ड गर्नुहोस्"
     },
     "metadata": {
       "created": "सिर्जना: {{date}}",
       "issued": "जारी: {{date}}",
       "notes": "नोट: {{notes}}"
+    },
+    "banner": {
+      "draftTitle": "यो बीजक ड्राफ्ट हो।",
+      "draftBody": "यो विद्यार्थी खातामा देखिँदैन र जारी नगरेसम्म कुनै भुक्तानी रेकर्ड गर्न सकिँदैन।",
+      "cancelledTitle": "यो बीजक रद्द गरिएको थियो",
+      "cancelledOn": "{{date}} मा",
+      "cancelledBy": "{{name}} द्वारा",
+      "cancelledBody": "यसले अब विद्यार्थीको ब्यालेन्समा असर गर्दैन।"
+    },
+    "band": {
+      "region": "बीजक सारांश",
+      "lineItemCount": "{{count}} लाइन आइटमहरू",
+      "lineItemCount_one": "{{count}} लाइन आइटम",
+      "lineItemCount_other": "{{count}} लाइन आइटमहरू",
+      "noPaymentsYet": "हालसम्म कुनै भुक्तानी छैन",
+      "invoiceCancelled": "बीजक रद्द गरियो",
+      "settledInFull": "पूर्ण रूपमा भुक्तानी भयो",
+      "outstandingBalance": "बाँकी रकम",
+      "dueDate": "भुक्तानी मिति",
+      "daysLate": "{{days}} दिन ढिलो"
+    },
+    "lineItems": {
+      "qtyAt": "{{quantity}} × {{amount}}"
+    },
+    "aside": {
+      "details": "विवरण",
+      "status": "स्थिति",
+      "issued": "जारी मिति",
+      "notIssuedYet": "हालसम्म जारी गरिएको छैन",
+      "due": "भुक्तानी मिति",
+      "billingPeriod": "बिलिङ अवधि",
+      "academicYear": "शैक्षिक वर्ष",
+      "viewStudentAccount": "विद्यार्थी खाता हेर्नुहोस्",
+      "activity": "गतिविधि"
+    },
+    "timeline": {
+      "created": "बीजक सिर्जना गरियो",
+      "issued": "विद्यार्थी खातामा जारी गरियो",
+      "overdue": "म्याद नाघेको चिन्ह लगाइयो",
+      "overdueSub": "स्वचालित · भुक्तानी मिति नाघेको",
+      "payment": "भुक्तानी प्राप्त — {{amount}}",
+      "paymentSub": "{{gateway}} · रसिद {{receipt}}",
+      "paid": "पूर्ण भुक्तानी भयो",
+      "paidSub": "ब्यालेन्स मिलान भयो",
+      "cancelled": "बीजक रद्द गरियो",
+      "writtenOff": "अपलेखन गरियो",
+      "by": "{{name}} द्वारा"
+    },
+    "error": {
+      "forbidden": "तपाईंसँग यो बीजक हेर्ने अनुमति छैन।",
+      "notFound": "यो बीजक फेला परेन। यो मेटाइएको हुन सक्छ।"
     }
   },
   "lineItems": {
@@ -753,7 +809,34 @@
     "notesPlaceholder": "यो भुक्तानीबारे वैकल्पिक नोट...",
     "preview": "पूर्वावलोकन",
     "method": "विधि",
-    "reference": "सन्दर्भ नं."
+    "reference": "सन्दर्भ नं.",
+    "drawer": {
+      "amountLabel": "प्राप्त रकम",
+      "dueHint": "बाँकी {{amount}}",
+      "overpayError": "बाँकी रकमभन्दा बढी — बढी भुक्तानी अनुमति छैन। अधिकतम {{max}}।",
+      "overCapError": "रकम प्रति-भुक्तानी सीमा {{max}} भन्दा बढी छ।",
+      "partialHint": "आंशिक भुक्तानी — {{amount}} बाँकी रहनेछ।",
+      "chipFull": "पूरै बाँकी रकम",
+      "chipHalf": "आधा",
+      "methodLabel": "भुक्तानी विधि",
+      "referenceLabel": "कारोबार सन्दर्भ",
+      "referenceHint": "{{method}} का लागि आवश्यक",
+      "dateLabel": "भुक्तानी मिति",
+      "receivedBy": "प्राप्तकर्ता",
+      "noteLabel": "टिप्पणी",
+      "noteHint": "वैकल्पिक — रसिदमा देखिन्छ",
+      "notePlaceholder": "जस्तै: अभिभावकले काउन्टरमा नगद भुक्तानी",
+      "infoNote": "रसिद स्वतः बन्छ र विद्यार्थी खाताको ब्यालेन्स तुरुन्तै अद्यावधिक हुन्छ।",
+      "recording": "रेकर्ड हुँदैछ…",
+      "recordAmount": "{{amount}} रेकर्ड गर्नुहोस्",
+      "toastRecorded": "भुक्तानी रेकर्ड भयो — रसिद {{receipt}}",
+      "view": "हेर्नुहोस्",
+      "done": "सम्पन्न",
+      "viewReceipt": "रसिद हेर्नुहोस्",
+      "doneVia": "{{method}} मार्फत भुक्तानी रेकर्ड भयो · {{date}}",
+      "donePaidInFull": "यो बीजक अब पूर्ण रूपमा भुक्तानी भएको छ।",
+      "doneRemains": "यस बीजकमा {{amount}} बाँकी छ।"
+    }
   },
   "asyncJobs": {
     "common": {
