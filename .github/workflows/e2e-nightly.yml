@@ -1,0 +1,119 @@
+name: E2E Nightly
+
+# Full agent-generated regression suite, nightly + on demand.
+# See docs/testing/agent-e2e-guide.md ("Mocked vs live mode").
+#
+# Job 1 (full-mocked): every non-@seed spec against the production build with
+#   seeded sessions + mocked API — deterministic frontend regression net.
+# Job 2 (deployed-frontend): same suite against a DEPLOYED non-prod frontend
+#   (Vercel), exercising the real bundle/CDN/rewrites. Opt-in via repo
+#   variable EDFORGE_E2E_LIVE=true + secrets. True live-backend integration
+#   (real Cognito logins per role) is the documented follow-up once the
+#   operator provisions the dedicated E2E tenant and e2e/fixtures/live-login.ts
+#   lands.
+
+on:
+  schedule:
+    - cron: '30 20 * * *' # 02:15 NPT
+  workflow_dispatch:
+
+concurrency:
+  group: e2e-nightly-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  full-mocked:
+    name: full suite (mocked, production build)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browser
+        run: pnpm exec playwright install --with-deps chromium
+
+      # Consolidated build so remote routes (/academics, /finance, /people) load
+      # — see ci.yml. Placeholder Cognito env baked in (PROD build white-screens
+      # without it); E2E seeds cookies + mocks the API, so real Cognito is never hit.
+      - name: Build production (consolidated host + remotes)
+        env:
+          VITE_COGNITO_USER_POOL_ID: us-west-2_e2e000
+          VITE_COGNITO_CLIENT_ID: e2eclient000
+          VITE_COGNITO_DOMAIN: e2e.auth.local
+          VITE_COGNITO_REGION: us-west-2
+          VITE_REDIRECT_SIGN_IN: http://localhost:3000/
+          VITE_REDIRECT_SIGN_OUT: http://localhost:3000/
+          VITE_API_URL: http://localhost:9999
+        run: bash scripts/build-deploy.sh
+
+      - name: Serve consolidated output (shell + remotes)
+        run: node scripts/e2e/serve-output.mjs output 3000 &
+      - name: Wait for preview
+        run: npx wait-on http://localhost:3000 --timeout 120000
+
+      - name: Run full suite
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:3000
+        run: pnpm test:e2e:full
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-nightly-report
+          path: |
+            playwright-report/
+            e2e/test-results/
+          retention-days: 14
+
+  deployed-frontend:
+    name: full suite (deployed non-prod frontend)
+    # Opt-in: set repo variable EDFORGE_E2E_LIVE=true and the secrets below.
+    if: vars.EDFORGE_E2E_LIVE == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browser
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Run full suite against deployed frontend
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ secrets.EDFORGE_E2E_BASE_URL }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+        run: pnpm test:e2e:full
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-nightly-deployed-report
+          path: |
+            playwright-report/
+            e2e/test-results/
+          retention-days: 14

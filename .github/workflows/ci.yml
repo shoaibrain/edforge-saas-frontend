@@ -58,3 +58,65 @@ jobs:
 
       - name: Unit tests
         run: pnpm vitest run
+
+  # Agent-era PR gate: the @smoke-tagged critical paths (seeded sessions +
+  # fully mocked API — see docs/testing/agent-e2e-guide.md) against the
+  # production build, using the proven visual-regression.yml serve recipe.
+  # Non-required while the suite beds in; flip to required after a week green.
+  e2e-smoke:
+    name: e2e smoke (@smoke, mocked)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browser
+        run: pnpm exec playwright install --with-deps chromium
+
+      # Consolidated build (shell at root + /remotes/<mfe>/) so module-federation
+      # REMOTE routes (/academics, /finance, /people) load — a shell-only preview
+      # serves no /remotes/*. Placeholder Cognito env is baked in at build time:
+      # @edforge/auth throws at module init in a PROD build if absent (white
+      # screen). E2E seeds cookies + mocks the API, so real Cognito is never hit.
+      - name: Build production (consolidated host + remotes)
+        env:
+          VITE_COGNITO_USER_POOL_ID: us-west-2_e2e000
+          VITE_COGNITO_CLIENT_ID: e2eclient000
+          VITE_COGNITO_DOMAIN: e2e.auth.local
+          VITE_COGNITO_REGION: us-west-2
+          VITE_REDIRECT_SIGN_IN: http://localhost:3000/
+          VITE_REDIRECT_SIGN_OUT: http://localhost:3000/
+          VITE_API_URL: http://localhost:9999
+        run: bash scripts/build-deploy.sh
+
+      - name: Serve consolidated output (shell + remotes)
+        run: node scripts/e2e/serve-output.mjs output 3000 &
+      - name: Wait for preview
+        run: npx wait-on http://localhost:3000 --timeout 120000
+
+      - name: Run smoke suite
+        env:
+          PLAYWRIGHT_BASE_URL: http://localhost:3000
+        run: pnpm test:e2e:smoke
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-smoke-report
+          path: |
+            playwright-report/
+            e2e/test-results/
+          retention-days: 7
