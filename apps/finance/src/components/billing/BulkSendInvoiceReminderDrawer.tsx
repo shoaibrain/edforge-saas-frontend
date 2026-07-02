@@ -17,6 +17,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Bell, Loader2, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { useTranslation } from '@edforge/i18n'
+import { UuidBadge } from '@edforge/archetype'
 import {
   useAsyncBulkJob,
   useBulkSendInvoiceReminders,
@@ -250,7 +251,7 @@ export function BulkSendInvoiceReminderDrawer({
                             className="flex items-center justify-between gap-2 px-2 py-1 text-sm"
                           >
                             <span className="text-[rgb(var(--text-primary))] truncate">
-                              {inv.invoiceNumber ?? inv.id.slice(0, 8)}
+                              {inv.invoiceNumber ?? <UuidBadge value={inv.id} />}
                             </span>
                             <span className="text-xs text-[rgb(var(--text-tertiary))] flex-shrink-0">
                               {t(`status.${inv.status}`, { defaultValue: inv.status })}
@@ -273,7 +274,7 @@ export function BulkSendInvoiceReminderDrawer({
                             className="flex items-center justify-between gap-2 px-2 py-1 text-sm"
                           >
                             <span className="text-[rgb(var(--text-secondary))] truncate">
-                              {invoice.invoiceNumber ?? invoice.id.slice(0, 8)}
+                              {invoice.invoiceNumber ?? <UuidBadge value={invoice.id} />}
                             </span>
                             <span className="text-xs text-[rgb(var(--text-tertiary))] flex-shrink-0">
                               {formatKnownSkipReason(t, reason)}

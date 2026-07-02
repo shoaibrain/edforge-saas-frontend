@@ -92,7 +92,7 @@ export function GenerateSuccess({ result, onReset, onClose }: GenerateSuccessPro
       </div>
 
       {result.invoices.length > 0 && (
-        <div className="border border-[rgb(var(--border-primary))] rounded-md bg-[rgb(var(--background-primary))] max-h-[380px] overflow-y-auto divide-y divide-[rgb(var(--border-primary))]">
+        <div className={/* allow-arbitrary-spacing: fixed scroll-region height, not a type scale */ "border border-[rgb(var(--border-primary))] rounded-md bg-[rgb(var(--background-primary))] max-h-[380px] overflow-y-auto divide-y divide-[rgb(var(--border-primary))]"}>
           {result.invoices.map(iv => (
             <div
               key={iv.number}
@@ -144,7 +144,7 @@ function Stat({
       >
         {value}
       </div>
-      <div className="text-[11px] uppercase tracking-wider text-[rgb(var(--text-tertiary))] mt-0.5">
+      <div className={/* allow-arbitrary-spacing: dense bulk-wizard label; pre-token-sweep */ "text-[11px] uppercase tracking-wider text-[rgb(var(--text-tertiary))] mt-0.5"}>
         {label}
       </div>
     </div>

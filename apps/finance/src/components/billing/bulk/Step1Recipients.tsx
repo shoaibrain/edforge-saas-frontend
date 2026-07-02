@@ -93,7 +93,8 @@ export function Step1Recipients({
 
   const toggleOpen = (grade: string) => {
     const next = new Set(openGrades)
-    next.has(grade) ? next.delete(grade) : next.add(grade)
+    if (next.has(grade)) next.delete(grade)
+    else next.add(grade)
     setOpenGrades(next)
   }
 
@@ -257,7 +258,7 @@ function SegmentChips({
   const { t } = useTranslation('payments')
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <span className="text-[11px] font-medium uppercase tracking-wider text-[rgb(var(--text-tertiary))] mr-1">
+      <span className={/* allow-arbitrary-spacing: dense bulk-wizard label; pre-token-sweep */ "text-[11px] font-medium uppercase tracking-wider text-[rgb(var(--text-tertiary))] mr-1"}>
         {t('bulkGenerate.step1.quickSegments')}
       </span>
       {SEGMENTS.map(seg => {
@@ -289,7 +290,7 @@ function SegmentChips({
             <Icon className="w-3 h-3" />
             <span>{t(`bulkGenerate.step1.segments.${seg.id}`)}</span>
             {count !== undefined && (
-              <span className="px-1.5 py-0 text-[10px] rounded bg-[rgb(var(--background-primary))] tabular-nums">
+              <span className={/* allow-arbitrary-spacing: dense bulk-wizard count chip; pre-token-sweep */ "px-1.5 py-0 text-[10px] rounded bg-[rgb(var(--background-primary))] tabular-nums"}>
                 {count}
               </span>
             )}
@@ -390,7 +391,7 @@ function GradeList({
               >
                 <TriCheckbox state={state} />
               </div>
-              <div className="inline-flex items-center justify-center min-w-[44px] px-2 py-0.5 rounded-md text-xs font-semibold bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-secondary))]">
+              <div className={/* allow-arbitrary-spacing: fixed count-badge min width, not a type scale */ "inline-flex items-center justify-center min-w-[44px] px-2 py-0.5 rounded-md text-xs font-semibold bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-secondary))]"}>
                 {gradeLabel(grade, t)}
               </div>
               <div className="flex-1 min-w-0">
@@ -490,15 +491,15 @@ function StudentRow({
 function TriCheckbox({ state }: { state: 'off' | 'mixed' | 'on' }) {
   if (state === 'on') {
     return (
-      <span className="inline-flex items-center justify-center w-4 h-4 rounded border bg-[rgb(var(--accent-strong))] border-[rgb(var(--accent-strong))] text-white">
+      <span className={/* allow-hardcoded-color: contrast tick on filled accent checkbox */ "inline-flex items-center justify-center w-4 h-4 rounded border bg-[rgb(var(--accent-strong))] border-[rgb(var(--accent-strong))] text-white"}>
         <Check className="w-3 h-3" strokeWidth={3} />
       </span>
     )
   }
   if (state === 'mixed') {
     return (
-      <span className="inline-flex items-center justify-center w-4 h-4 rounded border bg-[rgb(var(--accent-strong))] border-[rgb(var(--accent-strong))] text-white">
-        <span className="block w-2 h-0.5 bg-white" />
+      <span className={/* allow-hardcoded-color: contrast tick on filled accent checkbox */ "inline-flex items-center justify-center w-4 h-4 rounded border bg-[rgb(var(--accent-strong))] border-[rgb(var(--accent-strong))] text-white"}>
+        <span className={/* allow-hardcoded-color: indeterminate dash on filled accent checkbox */ "block w-2 h-0.5 bg-white"} />
       </span>
     )
   }
@@ -559,7 +560,7 @@ function RecipientRail({
   return (
     <aside className="space-y-3 p-4 border border-[rgb(var(--border-primary))] rounded-md bg-[rgb(var(--background-secondary))] h-fit sticky top-2">
       <div>
-        <div className="text-[11px] uppercase tracking-wider text-[rgb(var(--text-tertiary))]">
+        <div className={/* allow-arbitrary-spacing: dense bulk-wizard label; pre-token-sweep */ "text-[11px] uppercase tracking-wider text-[rgb(var(--text-tertiary))]"}>
           {t('bulkGenerate.step1.recipientsSelected')}
         </div>
         <div className="text-2xl font-semibold text-[rgb(var(--text-primary))] mt-0.5">
@@ -580,7 +581,7 @@ function RecipientRail({
             {summary.perGrade.map(({ grade, count }) => (
               <span
                 key={grade}
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))]"
+                className={/* allow-arbitrary-spacing: dense bulk-wizard segment chip; pre-token-sweep */ "inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))]"}
               >
                 {gradeLabel(grade, t)}
                 <span className="px-1 py-0 rounded bg-[rgb(var(--background-secondary))] tabular-nums">

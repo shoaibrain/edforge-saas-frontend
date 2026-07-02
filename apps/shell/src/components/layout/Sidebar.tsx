@@ -205,6 +205,7 @@ function NavItemLink({
         {/* Danger active bg — expanded only (accent is already var(--color-danger)) */}
         {isActive && isDanger && !collapsed && (
           <div
+            // allow-presentation-style: active danger nav bg is accent-driven (color-mix)
             className="absolute inset-0 rounded-3xl"
             style={{ background: 'color-mix(in oklch, var(--accent) 12%, transparent)' }}
           />
