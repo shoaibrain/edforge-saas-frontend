@@ -68,18 +68,42 @@ deactivate enrollment-warning paths. They run in the `full`/nightly suite (not
   availability), BS calendar dates in forms (`BsDatePicker`), and that almost
   all labels are `academics`-namespace i18n keys (assert by role/aria-label).
 
-## 3. People — fastest full-module win
+## 3. People — IN PROGRESS (third module remote)
 
-Why third: smallest surface (overview + staff directory + wizard), exercises
-the Teacher/Staff fixtures created in phase 2, and unblocks the
-`users-bulk-change-role` / `users-bulk-suspend` fixme specs (RBAC mutations —
-high-value coverage for the security-policies surface).
+Plans: `specs/people/` (overview, staff-directory, staff-wizard). Tests:
+`e2e/tests/people/` (`@smoke` on overview + staff-directory + staff-wizard
+mount). Mock layer: `e2e/fixtures/people.ts` (`mockPeopleApi`, `staff()` factory,
+`PEOPLE_STAFF` roster, `captureStaffWrites`; layered on `mockShellApi`).
+
+**Key gating fact — People hard-gates on an active school** (not on an API call):
+`PeopleLayout` reads `activeSchoolId` from the `edforge-app` cookie (seeded by
+`seedRoleSession`) + the shared school-context-channel; with no active school it
+renders a "No schools configured" card instead of the page. The seeded cookie
+carries `school-e2e`, so the gate passes. Unlike academics there is **no**
+`academic-year/current` or `/users/me` gate on these pages. Single load call for
+both overview + directory: `GET /api/staff?limit=20&schoolId=…`.
+
+Current specs assert the remote **mounts and renders cleanly** (sidebar People
+sub-nav present, no `RemoteModuleError`, no console errors) + light chrome per
+page (seeded roster visible, directory column headers, wizard step-1 + progress
+stepper). Field-name traps captured in the fixture: staff name is
+`firstName` + `lastSurname` (NOT `lastName`); row id is `staffId` (NOT `id`).
+
+**Follow-up (not in this PR):** full staff-wizard create drive (fill all 5 steps
+→ assert the `POST /staff` | `/staff/with-user` body + assignment fan-out via
+`captureStaffWrites`, already in place). Deferred because each step gates
+"Continue" on step-specific required fields. Then the `users-bulk-change-role` /
+`users-bulk-suspend` fixme specs (RBAC mutations) once the users mock is fleshed
+out.
 
 - Routes (`apps/people/src/router.tsx`): `/people`, `/staff`, `/staff/new`
   (wizard), `/staff/$staffId`, `/departments`, `/roles`, `/settings`,
   `/analytics`.
-- Watch for: staff-creation wizard sub-steps (trace `activeStep` before
-  editing/asserting), role-assignment writes (assert via `captured.writes`).
+- Watch for: staff-creation wizard sub-steps (`currentStep` is React state, no
+  URL param — trace before editing/asserting); nav labels ("Back"/"Continue")
+  are hardcoded English from `@edforge/wizard`, only the submit
+  ("Create Staff Member") + step titles are `people`-namespace i18n;
+  role-assignment writes (assert via `captureStaffWrites`).
 
 ## 4. Finance — richest data, hardest flows
 
