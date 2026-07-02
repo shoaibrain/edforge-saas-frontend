@@ -50,7 +50,9 @@ test.describe('Bulk section activate', () => {
     await expect(page.getByText(/1 already active/)).toBeVisible()
     await page.getByRole('button', { name: 'Activate 3' }).click()
 
-    await expect(page.getByText(/Activated 3 sections.*1 skipped/)).toBeVisible()
+    // Sonner emits both a visible toast and an aria-live sr-only copy — both
+    // match the text, tripping strict-mode. .first() picks the visible toast.
+    await expect(page.getByText(/Activated 3 sections.*1 skipped/).first()).toBeVisible()
     // Exactly the 3 inactive sections were PATCHed to isActive:true (not sec-d).
     expect(captured.sectionPatches.map((p) => p.id).sort()).toEqual(['sec-a', 'sec-b', 'sec-c'])
     expect(captured.sectionPatches.every((p) => p.isActive === true)).toBe(true)
