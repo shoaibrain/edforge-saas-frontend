@@ -69,6 +69,10 @@ const COURSE = {
 export interface AcademicsMockOptions {
   /** Empty datasets (exercise empty states) instead of the seeded roster. */
   empty?: boolean
+  /** Override the student list (bulk specs seed a specific roster). */
+  students?: Array<Record<string, unknown>>
+  /** Override the section list (bulk specs seed active/inactive mixes). */
+  sections?: Array<Record<string, unknown>>
 }
 
 /**
@@ -77,8 +81,8 @@ export interface AcademicsMockOptions {
  * beforeEach), so these take precedence over the shell catch-all.
  */
 export async function mockAcademicsApi(page: Page, opts: AcademicsMockOptions = {}): Promise<void> {
-  const students = opts.empty ? [] : ACADEMICS_ROSTER
-  const sections = opts.empty ? [] : [SECTION]
+  const students = opts.students ?? (opts.empty ? [] : ACADEMICS_ROSTER)
+  const sections = opts.sections ?? (opts.empty ? [] : [SECTION])
   const courses = opts.empty ? [] : [COURSE]
   const totalEnrolled = students.length
 
@@ -148,4 +152,85 @@ export async function mockAcademicsApi(page: Page, opts: AcademicsMockOptions = 
 
   // Staff (overview staff-roster card + teachers page).
   await page.route('**/api/schools/*/staff**', (r) => r.fulfill(json({ items: [], total: 0 })))
+}
+
+// ---------------------------------------------------------------------------
+// Bulk-action fixtures (#237 — students archive / sections status)
+// ---------------------------------------------------------------------------
+
+/** A StudentResponseDto-shaped record (StudentTable reads fullName/currentGradeLevel/status). */
+export function student(overrides: Record<string, unknown> = {}): Record<string, unknown> {
+  return {
+    studentId: 'stu-x',
+    fullName: 'Student X',
+    studentNumber: '000',
+    currentGradeLevel: '9',
+    status: 'active',
+    ...overrides,
+  }
+}
+
+/** A SectionResponseDto-shaped record (SectionTable/modal read isActive/currentEnrollment/…). */
+export function section(overrides: Record<string, unknown> = {}): Record<string, unknown> {
+  return {
+    sectionId: 'sec-x',
+    sectionNumber: 'A',
+    sectionName: 'Section A',
+    courseName: 'Course',
+    isActive: true,
+    currentEnrollment: 0,
+    maxEnrollment: 30,
+    ...overrides,
+  }
+}
+
+/** Captured bulk writes so specs can assert the exact fan-out the UI sent. */
+export interface BulkCapture {
+  /** studentIds hit by DELETE /academics/students/:id (one per archived student). */
+  studentDeletes: string[]
+  /** { id, isActive } per PATCH /academics/sections/:id (one per eligible section). */
+  sectionPatches: Array<{ id: string; isActive: unknown }>
+}
+
+export interface CaptureOptions {
+  /** studentIds that should return 409 (EnrollmentLocked) instead of 204. */
+  failStudentIds?: string[]
+  /** sectionIds that should return 409 instead of 200. */
+  failSectionIds?: string[]
+}
+
+/**
+ * Capture the bulk write fan-out. Register AFTER mockAcademicsApi (later routes
+ * win). DELETE has no body, so we capture the id from the URL; section PATCH
+ * carries `{ isActive }`. Non-target methods fall through via route.fallback()
+ * so the list/roster GET mocks still apply.
+ */
+export async function captureBulkWrites(page: Page, opts: CaptureOptions = {}): Promise<BulkCapture> {
+  const failStudents = new Set(opts.failStudentIds ?? [])
+  const failSections = new Set(opts.failSectionIds ?? [])
+  const captured: BulkCapture = { studentDeletes: [], sectionPatches: [] }
+
+  await page.route('**/api/academics/students/*', async (route) => {
+    if (route.request().method() !== 'DELETE') return route.fallback()
+    const id = new URL(route.request().url()).pathname.split('/').pop()!.split('?')[0]
+    captured.studentDeletes.push(id)
+    if (failStudents.has(id)) {
+      return route.fulfill({ status: 409, contentType: 'application/json', body: JSON.stringify({ error: 'EnrollmentLocked' }) })
+    }
+    return route.fulfill({ status: 204, body: '' })
+  })
+
+  await page.route('**/api/academics/sections/*', async (route) => {
+    if (route.request().method() !== 'PATCH') return route.fallback()
+    const url = new URL(route.request().url())
+    const id = url.pathname.split('/').pop()!.split('?')[0]
+    const body = route.request().postDataJSON?.() as { isActive?: unknown } | undefined
+    captured.sectionPatches.push({ id, isActive: body?.isActive })
+    if (failSections.has(id)) {
+      return route.fulfill({ status: 409, contentType: 'application/json', body: JSON.stringify({ error: 'Conflict' }) })
+    }
+    return route.fulfill(json({ sectionId: id, isActive: body?.isActive }))
+  })
+
+  return captured
 }

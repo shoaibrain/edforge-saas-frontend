@@ -46,9 +46,17 @@ these specs need served remotes:
 
 Current specs assert the remote **mounts and renders cleanly** (sidebar present,
 no `RemoteModuleError`, no console errors) + a light chrome check per page
-(seeded roster/course visible, classrooms 4-tab ARIA tablist). Deeper
-data-driven + bulk-action coverage (unblocking the `sections-bulk-status` /
-`students-bulk-archive` #237 fixmes) is the follow-up now that the fixture exists.
+(seeded roster/course visible, classrooms 4-tab ARIA tablist).
+
+**Bulk-action coverage (#237) — DONE.** `e2e/tests/students-bulk-archive.spec.ts`
++ `e2e/tests/sections-bulk-status.spec.ts` are now real tests (no longer
+`test.fixme`/`BULK_E2E`-gated): they drive the real modals and assert the exact
+fan-out via `captureBulkWrites` (`e2e/fixtures/academics.ts`) — one
+`DELETE /academics/students/:id` per archived student, one
+`PATCH /academics/sections/:id {isActive}` per eligible section — plus
+happy-path, partial-failure (409), skipped-already-active, and the
+deactivate enrollment-warning paths. They run in the `full`/nightly suite (not
+`@smoke`). Remaining follow-up: deeper Teacher/Staff/Counselor role coverage.
 
 - Routes (`apps/academics/src/router.tsx`): `/academics`, `/students`
   (+ `/students/enrollment`, `/students/$studentId`), `/classrooms` (+ create/
