@@ -296,7 +296,8 @@
     "bulk": {
       "message": "Message",
       "moveSection": "Section सार्नुहोस्",
-      "archive": "Archive"
+      "archive": "Archive",
+      "requiresAdmin": "प्रशासक भूमिका आवश्यक छ"
     },
     "filters": {
       "modes": {
@@ -446,6 +447,12 @@
         "pendingStart": "आयातले",
         "pendingEnd": "भर्नाहरू सिर्जना गर्छ"
       }
+    },
+    "signals": {
+      "showAtRisk": "जोखिममा रहेका देखाउनुहोस्"
+    },
+    "selection": {
+      "peekAttendance": "{{rate}}% उपस्थिति"
     }
   },
   "privacy": {
@@ -493,7 +500,13 @@
     "xlsxUnavailable": "XLSX निर्यात अर्को चरणमा आउनेछ",
     "filterAriaLabel": "{{title}} फिल्टर",
     "clearFilter": "फिल्टर हटाउनुहोस्",
-    "moreFilters": "थप फिल्टरहरू"
+    "moreFilters": "थप फिल्टरहरू",
+    "selection": {
+      "aria": "चयन कारबाहीहरू",
+      "selected": "{{count}} चयन गरियो",
+      "selectAll": "सबै {{count}} चयन गर्नुहोस्",
+      "clear": "चयन खाली गर्नुहोस्"
+    }
   },
   "attendance": {
     "title": "उपस्थिति",
