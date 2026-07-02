@@ -12,6 +12,13 @@ import { toast } from 'sonner'
 import {
   Button,
   TanstackDataTable,
+  AttentionCorner,
+  AttentionCornerPill,
+  AttentionCornerShade,
+  SelectionContextBar,
+  useSignalAcks,
+  type Signal,
+  type SelectionAction,
   createSelectColumn,
   createActionsColumn,
   PageHeader,
@@ -61,6 +68,9 @@ import { BulkPdfExportDrawer } from '../../../components/billing/BulkPdfExportDr
 import { FinanceStatusChip } from '../../../components/shared'
 
 type InvoiceStatusFilter = '' | 'draft' | 'issued' | 'partially_paid' | 'paid' | 'overdue' | 'cancelled'
+
+/** Statuses the dues reminder applies to — paid/draft/cancelled are skipped. */
+const REMINDABLE_STATUSES: Invoice['status'][] = ['overdue', 'issued', 'partially_paid']
 
 /** Calculate how many days overdue an invoice is */
 function getOverdueDays(dueDate: string | undefined): number {
@@ -389,6 +399,83 @@ export default function InvoicesPage() {
     [navigate, issueMutation.isPending, cancelMutation.isPending, t, format, settings, schoolId]
   )
 
+  // ── ⑧ Attention Corner signals — page-scoped, from the dashboard summary
+  // already fetched (auto-resolve as invoices are issued/collected). Fixes
+  // deep-link into this page's own status presets.
+  const { acked, ack, unack } = useSignalAcks()
+  const signals: Signal[] = useMemo(() => {
+    const list: Signal[] = []
+    if (kpi.overdueCount > 0) {
+      list.push({
+        id: 'invoices.overdue',
+        severity: 'critical',
+        domain: t('headerZone.domains.finance'),
+        icon: <Clock className="h-4 w-4" aria-hidden="true" />,
+        title: t('invoices.signals.overdueTitle', {
+          amount: formatCompact(kpi.overdue),
+          count: kpi.overdueCount,
+        }),
+        description: t('invoices.signals.overdueSub'),
+        fix: { label: t('invoices.signals.viewOverdue'), onAction: () => setStatusFilter('overdue') },
+      })
+    }
+    if (kpi.draftCount > 0) {
+      list.push({
+        id: 'invoices.drafts-ready',
+        severity: 'info',
+        domain: t('headerZone.domains.finance'),
+        icon: <FileText className="h-4 w-4" aria-hidden="true" />,
+        title: t('invoices.signals.draftsTitle', { count: kpi.draftCount }),
+        description: t('invoices.signals.draftsSub'),
+        fix: { label: t('invoices.signals.viewDrafts'), onAction: () => setStatusFilter('draft') },
+      })
+    }
+    return list
+  }, [kpi, t, formatCompact])
+
+  // ── ⑨ Selection Context Bar — state-aware money matrix (retires the pill).
+  // Issue applies only to selected DRAFTS; Send reminder only to Overdue /
+  // Issued / Partially Paid; Download PDF (ZIP) to everything. Confirm
+  // handlers receive the applicable ids and feed the existing drawers/confirm.
+  const selectedInvoices = useMemo(() => {
+    const ids = new Set(Object.keys(rowSelection).filter((id) => rowSelection[id]))
+    return invoices.filter((i) => ids.has(i.id))
+  }, [rowSelection, invoices])
+
+  const selectionActions = useMemo<SelectionAction[]>(() => {
+    const byId = new Map(selectedInvoices.map((i) => [i.id, i]))
+    const rowsFor = (ids: string[]) => ids.map((id) => byId.get(id)).filter((i): i is Invoice => !!i)
+    const draftIds = selectedInvoices.filter((i) => i.status === 'draft').map((i) => i.id)
+    const remindableIds = selectedInvoices
+      .filter((i) => REMINDABLE_STATUSES.includes(i.status))
+      .map((i) => i.id)
+    return [
+      {
+        id: 'issue',
+        label: t('invoices.issue'),
+        icon: <Send className="h-3.5 w-3.5" />,
+        applicableIds: draftIds,
+        disabledReason: t('invoices.selection.noDrafts'),
+        onAction: () => setShowBulkIssueConfirm(true),
+      },
+      {
+        id: 'send-reminder',
+        label: t('invoices.sendReminder'),
+        icon: <Clock className="h-3.5 w-3.5" />,
+        applicableIds: remindableIds,
+        disabledReason: t('invoices.selection.noneRemindable'),
+        onAction: (ids) => setBulkReminderTarget(rowsFor(ids)),
+      },
+      {
+        id: 'pdf-export',
+        label: t('invoices.bulkPdfExport.menuLabel'),
+        icon: <Download className="h-3.5 w-3.5" />,
+        applicableIds: selectedInvoices.map((i) => i.id),
+        onAction: (ids) => setBulkPdfExportTarget(Array.from(new Set(ids))),
+      },
+    ]
+  }, [selectedInvoices, t])
+
   if (!schoolId) {
     return (
       <div className="p-6 text-center text-sm text-[rgb(var(--text-tertiary))]">
@@ -451,28 +538,81 @@ export default function InvoicesPage() {
         },
   ]
 
+
+
+  const singleInvoice = selectedInvoices.length === 1 ? selectedInvoices[0] : null
+  const selectionBar = (
+    <SelectionContextBar
+      selectedCount={selectedInvoices.length}
+      totalCount={invoices.length}
+      onClear={() => setRowSelection({})}
+      onSelectAll={() =>
+        setRowSelection(Object.fromEntries(invoices.map((i) => [i.id, true])))
+      }
+      actions={selectionActions}
+      aria-label={t('headerZone.selection.aria')}
+      labels={{
+        selected: (count) => t('headerZone.selection.selected', { count }),
+        selectAll: (total) => t('headerZone.selection.selectAll', { count: total }),
+        clear: t('headerZone.selection.clear'),
+      }}
+      peek={
+        singleInvoice ? (
+          <div className="min-w-0">
+            <div className="truncate text-sm font-semibold text-[rgb(var(--text-primary))]">
+              {singleInvoice.invoiceNumber}
+            </div>
+            <div className="truncate text-2xs text-[rgb(var(--text-tertiary))]">
+              {STATUS_FILTER_OPTIONS.find((o) => o.value === singleInvoice.status)?.label ?? singleInvoice.status}
+            </div>
+          </div>
+        ) : undefined
+      }
+    />
+  )
+
   return (
     <div className="p-6 space-y-5">
       {/* Screen-reader page heading (breadcrumb names the page visually) */}
       <h1 className="sr-only">{t('invoices.title')}</h1>
 
-      {/* ---- Page header (pagebar) ---- */}
-      <PageHeader
-        mode="pagebar"
-        actions={[
-          {
-            label: t('bulkGenerate.title'),
-            icon: <FileStack className="h-3.5 w-3.5" />,
-            onClick: () => navigate({ to: '/invoices/bulk-generate' }),
-          },
-          {
-            label: t('invoices.generateInvoice'),
-            icon: <Plus className="h-3.5 w-3.5" />,
-            primary: true,
-            onClick: () => setShowGenerateForm(true),
-          },
-        ]}
-      />
+      {/* ---- ⑧ Header zone — attention pill left, actions right ---- */}
+      <AttentionCorner
+        signals={signals}
+        acked={acked}
+        onAck={ack}
+        onUnack={unack}
+        labels={{
+          needAttention: t('headerZone.needAttention'),
+          allClear: t('headerZone.allClear'),
+          region: t('headerZone.region'),
+          minimize: t('headerZone.minimize'),
+          acknowledge: t('headerZone.acknowledge'),
+          acknowledged: t('headerZone.acknowledged'),
+          acknowledgedHint: t('headerZone.acknowledgedHint'),
+          dismiss: t('headerZone.dismiss'),
+          emptyTitle: t('headerZone.emptyTitle'),
+        }}
+      >
+        <PageHeader
+          mode="pagebar"
+          attention={<AttentionCornerPill />}
+          actions={[
+            {
+              label: t('bulkGenerate.title'),
+              icon: <FileStack className="h-3.5 w-3.5" />,
+              onClick: () => navigate({ to: '/invoices/bulk-generate' }),
+            },
+            {
+              label: t('invoices.generateInvoice'),
+              icon: <Plus className="h-3.5 w-3.5" />,
+              primary: true,
+              onClick: () => setShowGenerateForm(true),
+            },
+          ]}
+        />
+        <AttentionCornerShade />
+      </AttentionCorner>
 
       {/* ---- StatBand — KPI summary (Overdue → critical pill) ---- */}
       <StatBand metrics={metrics} ariaLabel={t('invoices.kpi.region')} />
@@ -521,35 +661,7 @@ export default function InvoicesPage() {
             buttonClassName="border-[rgb(var(--border-primary)/0.35)]"
           />
         }
-        bulkActions={[
-          {
-            id: 'issue',
-            label: t('invoices.issueSelected', { count: selectedDraftIds.length }),
-            onClick: () => setShowBulkIssueConfirm(true),
-            icon: <Send className="w-4 h-4" />,
-            variant: 'primary',
-            disabled: selectedDraftIds.length === 0 || bulkIssueMutation.isPending,
-          },
-          {
-            id: 'send-reminder',
-            label: t('invoices.sendReminder'),
-            icon: <Clock className="w-4 h-4" />,
-            onRun: (rows) => setBulkReminderTarget(rows),
-          },
-          {
-            // Sprint F.5 — bulk PDF (ZIP) export.
-            // Selection set comes from row checkboxes (selected-all-filtered
-            // works because the data-table's `rowSelection` state is keyed
-            // by row id even across paged loads). The F.4 backend dedupes
-            // at the schema layer; we still pass an Array.from(new Set())
-            // here to keep "Download (N)" label honest.
-            id: 'pdf-export',
-            label: t('invoices.bulkPdfExport.menuLabel'),
-            icon: <Download className="w-4 h-4" />,
-            onRun: (rows) =>
-              setBulkPdfExportTarget(Array.from(new Set(rows.map((r) => r.id)))),
-          },
-        ]}
+        selectionBar={selectionBar}
         exportOptions={{ filename: 'invoices', formats: ['csv'] }}
         emptyState={{
           icon: <FileText className="w-10 h-10 text-[rgb(var(--text-tertiary))] opacity-40" />,

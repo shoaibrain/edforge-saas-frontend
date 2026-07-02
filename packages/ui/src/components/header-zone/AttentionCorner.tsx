@@ -169,7 +169,10 @@ export function AttentionCorner({
 }
 
 /** The collapsed control — mounts into the page header's top-left slot. */
-export function AttentionCornerPill({ className }: { className?: string }) {
+export function AttentionCornerPill({
+  className,
+  ...rest
+}: { className?: string } & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'className'>) {
   const { open, setOpen, pillRef, labels, counts, total } = useAttentionContext('AttentionCornerPill')
   const reduce = useReducedMotion()
 
@@ -190,6 +193,7 @@ export function AttentionCornerPill({ className }: { className?: string }) {
           base,
           'border-[rgb(var(--state-success-border))] bg-[rgb(var(--state-success-bg)/0.4)] text-[rgb(var(--state-success-fg))]',
         )}
+        {...rest}
       >
         <Check className="h-3.5 w-3.5" aria-hidden="true" />
         {labels.allClear}
@@ -211,6 +215,7 @@ export function AttentionCornerPill({ className }: { className?: string }) {
         base,
         'border-[rgb(var(--border-primary)/0.5)] bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-primary))] hover:border-[rgb(var(--border-primary)/0.8)]',
       )}
+      {...rest}
     >
       {SEVERITY_ORDER.filter((sev) => counts[sev] > 0).map((sev) => (
         <span key={sev} className="inline-flex items-center gap-1.5 tabular-nums">

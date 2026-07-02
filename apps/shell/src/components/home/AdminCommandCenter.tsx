@@ -15,8 +15,11 @@ import {
   StatBand,
   type StatMetric,
   type StatBandState,
-  AlertLane,
-  type DashboardAlert,
+  AttentionCorner,
+  AttentionCornerPill,
+  AttentionCornerShade,
+  useSignalAcks,
+  type Signal,
   WidgetGrid,
   WidgetCard,
 } from '@edforge/ui'
@@ -176,14 +179,21 @@ export function AdminCommandCenter({ schoolId }: AdminCommandCenterProps) {
         },
   ]
 
-  // ── Alerts → AlertLane (navigates to the alert's href) ──────────────────
-  const dashAlerts: DashboardAlert[] = alerts.map((a: HomeAlert) => ({
+  // ── ⑧ Attention Corner signals (replaces the AlertLane stack). Home has no
+  // page header row (the greeting lives in the shell topbar), so the corner
+  // mounts as its own slim row: pill left, shade in flow below. Signals map
+  // straight from useHomeAlerts and auto-resolve when the data heals.
+  const { acked, ack, unack } = useSignalAcks()
+  const signals: Signal[] = alerts.map((a: HomeAlert) => ({
     id: a.id,
-    severity: a.severity,
-    iconSignature: a.module === 'finance' ? 'fees' : 'attendance',
+    severity: a.severity === 'critical' ? 'critical' : 'warn',
+    domain:
+      a.module === 'finance'
+        ? t('homeV2.headerZone.domains.finance')
+        : t('homeV2.headerZone.domains.attendance'),
     title: a.title,
     description: a.description,
-    cta: {
+    fix: {
       label: a.module === 'finance' ? t('homeV2.alerts.reviewBilling') : t('homeV2.alerts.viewStudents'),
       onAction: () => navigate({ to: a.href as never }),
     },
@@ -251,11 +261,32 @@ export function AdminCommandCenter({ schoolId }: AdminCommandCenterProps) {
         </motion.div>
       )}
 
-      {/* SECTION 1: ④ AlertLane (severity-ranked; ack/dismiss; session-only) */}
+      {/* SECTION 1: ⑧ Attention Corner (severity-segmented pill → in-flow shade) */}
       <SectionErrorBoundary fallbackMessage={t('homeV2.alerts.unableToLoad')}>
         {!alertsLoading && (
           <motion.div variants={sectionVariants} transition={{ duration: 0.2 }}>
-            <AlertLane alerts={dashAlerts} ariaLabel={t('homeV2.alerts.region')} />
+            <AttentionCorner
+              signals={signals}
+              acked={acked}
+              onAck={ack}
+              onUnack={unack}
+              labels={{
+                needAttention: t('homeV2.headerZone.needAttention'),
+                allClear: t('homeV2.headerZone.allClear'),
+                region: t('homeV2.alerts.region'),
+                minimize: t('homeV2.headerZone.minimize'),
+                acknowledge: t('homeV2.headerZone.acknowledge'),
+                acknowledged: t('homeV2.headerZone.acknowledged'),
+                acknowledgedHint: t('homeV2.headerZone.acknowledgedHint'),
+                dismiss: t('homeV2.headerZone.dismiss'),
+                emptyTitle: t('homeV2.headerZone.emptyTitle'),
+              }}
+            >
+              <div className="flex items-center">
+                <AttentionCornerPill data-testid="attention-pill" />
+              </div>
+              <AttentionCornerShade className="mt-3" />
+            </AttentionCorner>
           </motion.div>
         )}
       </SectionErrorBoundary>

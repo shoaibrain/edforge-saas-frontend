@@ -184,7 +184,19 @@
     "bulkIssueTitle_plural": "{{count}} बीजकहरू जारी गर्ने?",
     "bulkIssueDescription": "जारी भएपछि विद्यार्थीहरूले यी बीजकहरू हेर्न र भुक्तानी गर्न सक्छन्। यो कार्य उल्टाउन सकिँदैन।",
     "issueCountInvoices": "{{count}} बीजक जारी गर्नुहोस्",
-    "issueCountInvoices_plural": "{{count}} बीजकहरू जारी गर्नुहोस्"
+    "issueCountInvoices_plural": "{{count}} बीजकहरू जारी गर्नुहोस्",
+    "signals": {
+      "overdueTitle": "{{count}} बीजकमा {{amount}} भुक्तानी बाँकी",
+      "overdueSub": "थप ढिलो हुनुअघि फलोअप गर्नुहोस्",
+      "viewOverdue": "बाँकी हेर्नुहोस्",
+      "draftsTitle": "{{count}} मस्यौदा बीजक जारी गर्न तयार छन्",
+      "draftsSub": "मस्यौदा जारी नभएसम्म परिवारले तिर्न सक्दैनन्",
+      "viewDrafts": "मस्यौदा हेर्नुहोस्"
+    },
+    "selection": {
+      "noDrafts": "चयनमा मस्यौदा छैन",
+      "noneRemindable": "भुक्तानी भइसकेका बीजकलाई रिमाइन्डर चाहिँदैन"
+    }
   },
   "invoiceDetail": {
     "backToInvoices": "बीजकहरूमा फर्कनुहोस्",
@@ -1079,5 +1091,25 @@
     "outstandingFees": "बाँकी शुल्कहरू",
     "recentPayments": "हालका भुक्तानीहरू",
     "paymentHistory": "भुक्तानी इतिहास"
+  },
+  "headerZone": {
+    "needAttention": "ध्यान चाहिन्छ",
+    "allClear": "सबै ठीक छ",
+    "region": "ध्यान आवश्यक",
+    "minimize": "सानो बनाउनुहोस्",
+    "acknowledge": "बुझेँ",
+    "acknowledged": "स्वीकार गरियो",
+    "acknowledgedHint": "स्वीकार गरियो — उल्टाउन क्लिक गर्नुहोस्",
+    "dismiss": "हटाउनुहोस्",
+    "emptyTitle": "तपाईं पूर्ण रूपमा अद्यावधिक हुनुहुन्छ।",
+    "domains": {
+      "finance": "वित्त"
+    },
+    "selection": {
+      "aria": "चयन कारबाहीहरू",
+      "selected": "{{count}} चयन गरियो",
+      "selectAll": "सबै {{count}} चयन गर्नुहोस्",
+      "clear": "चयन खाली गर्नुहोस्"
+    }
   }
 }

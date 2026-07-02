@@ -307,6 +307,7 @@ export {
 
 // Hooks
 export { useFocusTrap } from './hooks/useFocusTrap'
+export { useSignalAcks } from './hooks/useSignalAcks'
 
 // MFE infrastructure
 export {

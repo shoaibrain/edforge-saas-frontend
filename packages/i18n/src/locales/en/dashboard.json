@@ -184,6 +184,20 @@
       "unableToLoadAttendance": "Unable to load attendance data",
       "unableToLoadDashboard": "Unable to load dashboard",
       "somethingWentWrong": "Something went wrong"
+    },
+    "headerZone": {
+      "needAttention": "need attention",
+      "allClear": "All clear",
+      "minimize": "Minimize",
+      "acknowledge": "Got it",
+      "acknowledged": "Acknowledged",
+      "acknowledgedHint": "Acknowledged — click to undo",
+      "dismiss": "Dismiss",
+      "emptyTitle": "You’re all caught up.",
+      "domains": {
+        "finance": "Finance",
+        "attendance": "Attendance"
+      }
     }
   }
 }
