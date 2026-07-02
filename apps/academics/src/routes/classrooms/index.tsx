@@ -1025,7 +1025,7 @@ export function ClassroomsModule() {
                 : undefined
             }
           />
-          <AttentionCornerShade className="mt-3" />
+          <AttentionCornerShade className="pt-3" />
         </AttentionCorner>
         <Tabs
           className="mt-4"

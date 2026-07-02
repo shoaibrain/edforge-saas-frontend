@@ -553,9 +553,7 @@ export default function DesignSystemDevPage() {
                       { label: 'Take attendance', primary: true },
                     ]}
                   />
-                  <div className="mt-3">
-                    <AttentionCornerShade />
-                  </div>
+                  <AttentionCornerShade className="pt-3" />
                 </AttentionCorner>
               </div>
             </div>

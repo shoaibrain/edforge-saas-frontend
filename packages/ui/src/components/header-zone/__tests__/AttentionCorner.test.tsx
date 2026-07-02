@@ -143,6 +143,23 @@ describe('AttentionCorner — shade rows', () => {
     await waitFor(() => expect(queryByRole('region')).toBeNull())
   })
 
+  it('applies className to the inner layer, inside the animated height', () => {
+    // Pins the anti-jank structure: the height-animated region carries only
+    // overflow-hidden; the caller's gap (pt-*) rides inside the measured box
+    // so it collapses with the height instead of popping at mount/unmount.
+    const { getByRole } = render(
+      <AttentionCorner signals={SIGNALS}>
+        <AttentionCornerPill />
+        <AttentionCornerShade className="pt-3" />
+      </AttentionCorner>,
+    )
+    fireEvent.click(getByRole('button', { expanded: false }))
+    const region = getByRole('region', { name: 'Needs attention' })
+    expect(region.className).not.toContain('pt-3')
+    expect(region.className).toContain('overflow-hidden')
+    expect((region.firstElementChild as HTMLElement).className).toContain('pt-3')
+  })
+
   it('auto-resolves: a signal that stops being emitted disappears', () => {
     const { getByRole, queryByText, rerender } = renderCorner()
     fireEvent.click(getByRole('button', { expanded: false }))

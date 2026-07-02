@@ -285,7 +285,7 @@ export function AdminCommandCenter({ schoolId }: AdminCommandCenterProps) {
               <div className="flex items-center">
                 <AttentionCornerPill data-testid="attention-pill" />
               </div>
-              <AttentionCornerShade className="mt-3" />
+              <AttentionCornerShade className="pt-3" />
             </AttentionCorner>
           </motion.div>
         )}

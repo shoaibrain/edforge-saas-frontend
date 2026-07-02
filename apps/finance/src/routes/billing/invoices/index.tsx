@@ -594,24 +594,27 @@ export default function InvoicesPage() {
           emptyTitle: t('headerZone.emptyTitle'),
         }}
       >
-        <PageHeader
-          mode="pagebar"
-          attention={<AttentionCornerPill />}
-          actions={[
-            {
-              label: t('bulkGenerate.title'),
-              icon: <FileStack className="h-3.5 w-3.5" />,
-              onClick: () => navigate({ to: '/invoices/bulk-generate' }),
-            },
-            {
-              label: t('invoices.generateInvoice'),
-              icon: <Plus className="h-3.5 w-3.5" />,
-              primary: true,
-              onClick: () => setShowGenerateForm(true),
-            },
-          ]}
-        />
-        <AttentionCornerShade />
+        {/* One space-y child: the shade's gap lives inside its animated height */}
+        <div>
+          <PageHeader
+            mode="pagebar"
+            attention={<AttentionCornerPill />}
+            actions={[
+              {
+                label: t('bulkGenerate.title'),
+                icon: <FileStack className="h-3.5 w-3.5" />,
+                onClick: () => navigate({ to: '/invoices/bulk-generate' }),
+              },
+              {
+                label: t('invoices.generateInvoice'),
+                icon: <Plus className="h-3.5 w-3.5" />,
+                primary: true,
+                onClick: () => setShowGenerateForm(true),
+              },
+            ]}
+          />
+          <AttentionCornerShade className="pt-5" />
+        </div>
       </AttentionCorner>
 
       {/* ---- StatBand — KPI summary (Overdue → critical pill) ---- */}
