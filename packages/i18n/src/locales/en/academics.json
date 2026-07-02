@@ -1749,6 +1749,17 @@
       "emptyTitle": "No Result Cards Yet",
       "emptyDescription": "Result cards are generated automatically once this exam is closed. Close the exam after all scores are entered.",
       "student": "Student"
+    },
+    "signals": {
+      "endingTodayTitle": "{{count}} live exams end today",
+      "endingTodaySub": "Enter marks before they close",
+      "awaitingTitle": "{{count}} closed exams are awaiting results",
+      "awaitingSub": "Report cards are blocked until results generate",
+      "startingSoonTitle": "{{count}} exams start within 7 days",
+      "startingSoonSub": "Confirm schedules and readiness",
+      "viewLive": "View live",
+      "viewAwaiting": "View awaiting",
+      "viewUpcoming": "View upcoming"
     }
   },
   "classrooms": {

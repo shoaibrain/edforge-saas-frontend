@@ -1749,6 +1749,17 @@
       "emptyTitle": "Result Cards अझै छैन",
       "emptyDescription": "Exam closed भएपछि result cards स्वचालित रूपमा बनिन्छन्। सबै scores प्रविष्ट भएपछि exam close गर्नुहोस्।",
       "student": "विद्यार्थी"
+    },
+    "signals": {
+      "endingTodayTitle": "{{count}} चलिरहेका परीक्षा आज सकिन्छन्",
+      "endingTodaySub": "बन्द हुनुअघि अङ्क प्रविष्ट गर्नुहोस्",
+      "awaitingTitle": "{{count}} बन्द परीक्षाका नतिजा बाँकी छन्",
+      "awaitingSub": "नतिजा नबनेसम्म रिपोर्ट कार्ड रोकिन्छन्",
+      "startingSoonTitle": "{{count}} परीक्षा ७ दिनभित्र सुरु हुन्छन्",
+      "startingSoonSub": "तालिका र तयारी पक्का गर्नुहोस्",
+      "viewLive": "चलिरहेका हेर्नुहोस्",
+      "viewAwaiting": "बाँकी हेर्नुहोस्",
+      "viewUpcoming": "आगामी हेर्नुहोस्"
     }
   },
   "classrooms": {
