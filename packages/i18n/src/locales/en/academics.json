@@ -1991,6 +1991,20 @@
     "toast": {
       "notifyComingSoon": "Notify {{count}} section - coming soon",
       "notifyComingSoon_plural": "Notify {{count}} sections - coming soon"
+    },
+    "signals": {
+      "atCapacityTitle": "{{count}} sections are at seat capacity",
+      "atCapacitySub": "Incoming placements have no seat — consider rebalancing",
+      "lowUtilTitle": "{{count}} sections are below 40% seat utilization",
+      "lowUtilSub": "Consider merging under-filled sections",
+      "unrecordedTitle": "{{count}} sections haven’t recorded attendance today",
+      "unrecordedSub": "{{done}} of {{total}} recorded so far",
+      "reviewSections": "Review sections"
+    },
+    "selection": {
+      "noInactive": "No inactive sections in the selection",
+      "noActive": "No active sections in the selection",
+      "peekSeats": "{{enrolled}}/{{cap}} seated"
     }
   },
   "enrollmentModule": {

@@ -1991,6 +1991,20 @@
     "toast": {
       "notifyComingSoon": "{{count}} सेक्सनलाई सूचना - चाँडै आउँदैछ",
       "notifyComingSoon_plural": "{{count}} सेक्सनहरूलाई सूचना - चाँडै आउँदैछ"
+    },
+    "signals": {
+      "atCapacityTitle": "{{count}} सेक्सन सिट क्षमतामा पुगेका छन्",
+      "atCapacitySub": "आउने भर्नाका लागि सिट छैन — पुनःसन्तुलन विचार गर्नुहोस्",
+      "lowUtilTitle": "{{count}} सेक्सन ४०% भन्दा कम सिट उपयोगमा छन्",
+      "lowUtilSub": "कम भरिएका सेक्सनहरू मर्ज गर्ने विचार गर्नुहोस्",
+      "unrecordedTitle": "{{count}} सेक्सनले आज उपस्थिति रेकर्ड गरेका छैनन्",
+      "unrecordedSub": "अहिलेसम्म {{total}} मध्ये {{done}} रेकर्ड",
+      "reviewSections": "सेक्सनहरू समीक्षा गर्नुहोस्"
+    },
+    "selection": {
+      "noInactive": "चयनमा निष्क्रिय सेक्सन छैन",
+      "noActive": "चयनमा सक्रिय सेक्सन छैन",
+      "peekSeats": "{{enrolled}}/{{cap}} सिटमा"
     }
   },
   "enrollmentModule": {

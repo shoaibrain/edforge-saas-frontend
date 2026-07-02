@@ -5,7 +5,7 @@
  * teacher assignments, and row actions.
  */
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 import {
   CalendarDays,
   MoreVertical,
@@ -49,6 +49,9 @@ interface SectionTableProps {
   /** Override the internal toast-placeholder bulk actions. Pass from the route
    *  when wiring real bulk drawers (e.g. BulkSectionStatusModal). */
   bulkActions?: BulkAction<SectionResponseDto>[]
+  /** ⑨ Selection Context Bar node — when provided, the legacy floating pill
+   *  (bulkActions) is retired; the page renders the bar in its own toolbar. */
+  selectionBar?: ReactNode
   /** Controlled row selection — lift state into the page when an action
    *  needs to clear selection (e.g. after a bulk activate/deactivate). */
   rowSelection?: RowSelectionState
@@ -205,6 +208,7 @@ export function SectionTable({
   onToggleActive,
   onViewRoster,
   bulkActions: bulkActionsProp,
+  selectionBar,
   rowSelection,
   onRowSelectionChange,
   hideToolbar = false,
@@ -386,7 +390,7 @@ export function SectionTable({
     [t],
   )
 
-  const bulkActions = bulkActionsProp ?? defaultBulkActions
+  const bulkActions = selectionBar ? undefined : (bulkActionsProp ?? defaultBulkActions)
 
   return (
     <TanstackDataTable
@@ -403,6 +407,7 @@ export function SectionTable({
       searchPlaceholder={hideToolbar ? undefined : t('tables.sections.search')}
       facets={hideToolbar ? undefined : facets}
       bulkActions={bulkActions}
+      selectionBar={selectionBar}
       rowSelection={rowSelection}
       onRowSelectionChange={onRowSelectionChange}
       exportOptions={hideToolbar ? undefined : { filename: 'sections', formats: ['csv'] }}
