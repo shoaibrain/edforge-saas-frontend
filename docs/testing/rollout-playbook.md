@@ -24,21 +24,41 @@ rbac-sidebar). Tests: `e2e/tests/shell/` incl. the computed 10-role RBAC
 sidebar matrix. Foundation: role fixtures, network mock layer, MCP config,
 agent definitions, CI smoke + nightly.
 
-## 2. Academics — next (highest value, lowest marginal cost)
+## 2. Academics — IN PROGRESS (first module remote)
 
-Why second: the biggest operator surface (students, classrooms, curriculum,
-exams, enrollment) AND `e2e/fixtures/attendance.ts` already mocks 13+
-academics endpoints — reuse its shapes in the module mock layer. Unblocks the
-`sections-bulk-status` / `students-bulk-archive` fixme specs.
+Plans: `specs/academics/` (overview, students, classrooms, curriculum, exams).
+Tests: `e2e/tests/academics/` (matching specs; `@smoke` on overview + students
++ classrooms). Mock layer: `e2e/fixtures/academics.ts` (`mockAcademicsApi`,
+reuses the E2E tenant/AY constants; layered on `mockShellApi`).
 
-- Routes (`apps/academics/src/router.tsx`): `/academics`, `/students`,
-  `/students/$studentId`, `/classrooms` (+ create/detail/edit/report-card),
-  `/teachers`, `/enrollment`, `/curriculum`, `/exams`.
-- Roles to cover: TenantAdmin/Principal (full), Teacher (grade/attendance
-  entry), Staff (read-only), Counselor/Nurse (student view).
-- Watch for: the classrooms tab consolidation (`?tab=attendance|grades`),
-  academic-year gating (`/academic-years/current` drives module availability),
-  BS calendar dates in forms (`BsDatePicker`).
+**Key difference from Shell — academics is a federated REMOTE** (`/academics/$*`
+lazy-loads `academics/AcademicsModule`). A shell-only preview can't load it, so
+these specs need served remotes:
+- **Local:** `PLAYWRIGHT_START_SERVER=1 pnpm test:e2e:full e2e/tests/academics`
+  (runs `dev:mvp` — shell :3000 + academics :3002 + …; dev mode needs no Cognito
+  env). This is the mechanism `attendance.spec.ts` already uses successfully —
+  proof the remote renders under the seeded-cookie + mock approach.
+- **CI:** `scripts/build-deploy.sh` (consolidated `output/` = shell + `/remotes/*`)
+  served by `scripts/e2e/serve-output.mjs` (SPA fallback + static remotes). The
+  e2e-smoke + nightly jobs were switched to this so remote routes load.
+- The academics remote reads the active school from the `edforge-app` cookie
+  (seeded by `seedRoleSession`) — no extra wiring needed.
+
+Current specs assert the remote **mounts and renders cleanly** (sidebar present,
+no `RemoteModuleError`, no console errors) + a light chrome check per page
+(seeded roster/course visible, classrooms 4-tab ARIA tablist). Deeper
+data-driven + bulk-action coverage (unblocking the `sections-bulk-status` /
+`students-bulk-archive` #237 fixmes) is the follow-up now that the fixture exists.
+
+- Routes (`apps/academics/src/router.tsx`): `/academics`, `/students`
+  (+ `/students/enrollment`, `/students/$studentId`), `/classrooms` (+ create/
+  detail/edit/report-card), `/teachers`, `/curriculum`, `/exams`.
+- Roles to cover next: Teacher (grade/attendance entry), Staff (read-only),
+  Counselor/Nurse (student view).
+- Watch for: classrooms tab consolidation (`?tab=overview|gradebook|policies|
+  attendance`), academic-year gating (`/academic-years/current` drives module
+  availability), BS calendar dates in forms (`BsDatePicker`), and that almost
+  all labels are `academics`-namespace i18n keys (assert by role/aria-label).
 
 ## 3. People — fastest full-module win
 

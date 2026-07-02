@@ -85,11 +85,12 @@ jobs:
       - name: Install Playwright browser
         run: pnpm exec playwright install --with-deps chromium
 
-      # Placeholder Cognito env — baked into the production bundle at build
-      # time. @edforge/auth throws at module init in a PROD build if these are
-      # absent (white screen, every spec fails). E2E seeds cookies + mocks the
-      # API, so real Cognito is never contacted; any non-empty value works.
-      - name: Build production (host + remotes)
+      # Consolidated build (shell at root + /remotes/<mfe>/) so module-federation
+      # REMOTE routes (/academics, /finance, /people) load — a shell-only preview
+      # serves no /remotes/*. Placeholder Cognito env is baked in at build time:
+      # @edforge/auth throws at module init in a PROD build if absent (white
+      # screen). E2E seeds cookies + mocks the API, so real Cognito is never hit.
+      - name: Build production (consolidated host + remotes)
         env:
           VITE_COGNITO_USER_POOL_ID: us-west-2_e2e000
           VITE_COGNITO_CLIENT_ID: e2eclient000
@@ -98,10 +99,10 @@ jobs:
           VITE_REDIRECT_SIGN_IN: http://localhost:3000/
           VITE_REDIRECT_SIGN_OUT: http://localhost:3000/
           VITE_API_URL: http://localhost:9999
-        run: pnpm build:mvp
+        run: bash scripts/build-deploy.sh
 
-      - name: Serve production preview
-        run: pnpm --filter @edforge/shell preview &
+      - name: Serve consolidated output (shell + remotes)
+        run: node scripts/e2e/serve-output.mjs output 3000 &
       - name: Wait for preview
         run: npx wait-on http://localhost:3000 --timeout 120000
 

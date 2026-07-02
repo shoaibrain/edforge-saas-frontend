@@ -44,9 +44,10 @@ jobs:
       - name: Install Playwright browser
         run: pnpm exec playwright install --with-deps chromium
 
-      # Placeholder Cognito env — see ci.yml. A PROD build white-screens without
-      # these; E2E seeds cookies + mocks the API, so real Cognito is never hit.
-      - name: Build production (host + remotes)
+      # Consolidated build so remote routes (/academics, /finance, /people) load
+      # — see ci.yml. Placeholder Cognito env baked in (PROD build white-screens
+      # without it); E2E seeds cookies + mocks the API, so real Cognito is never hit.
+      - name: Build production (consolidated host + remotes)
         env:
           VITE_COGNITO_USER_POOL_ID: us-west-2_e2e000
           VITE_COGNITO_CLIENT_ID: e2eclient000
@@ -55,10 +56,10 @@ jobs:
           VITE_REDIRECT_SIGN_IN: http://localhost:3000/
           VITE_REDIRECT_SIGN_OUT: http://localhost:3000/
           VITE_API_URL: http://localhost:9999
-        run: pnpm build:mvp
+        run: bash scripts/build-deploy.sh
 
-      - name: Serve production preview
-        run: pnpm --filter @edforge/shell preview &
+      - name: Serve consolidated output (shell + remotes)
+        run: node scripts/e2e/serve-output.mjs output 3000 &
       - name: Wait for preview
         run: npx wait-on http://localhost:3000 --timeout 120000
 
