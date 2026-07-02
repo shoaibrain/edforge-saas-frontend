@@ -33,7 +33,11 @@ import { apiGet, apiPost } from '@edforge/api-client'
 
 export interface BulkInvoicePdfExportDto {
   invoiceIds: string[]
-  format: 'zip' // 'merged_pdf' enables in Sprint H.3
+  /**
+   * Sprint H.4 — both formats supported. Backend F.4 controller enforces
+   * per-format caps: 2000 for zip, 1000 for merged_pdf (surfaces as 413).
+   */
+  format: 'zip' | 'merged_pdf'
 }
 
 export interface BulkInvoicePdfExportAck {
@@ -61,6 +65,14 @@ export interface FinanceJobRow {
   output?: {
     zipKey?: string
     zipUrl?: string
+    /**
+     * Sprint H.3 — populated on merged_pdf jobs. Absent when
+     * `outputFormat === 'zip'` AND absent for the P2 all-skipped merged
+     * case (succeeded=0 + skipped=N → markCompleted without an artifact).
+     * Consumers MUST guard for undefined before rendering a download link.
+     */
+    mergedPdfKey?: string
+    mergedPdfUrl?: string
     urlExpiresAt?: string
   }
   failedInvoiceIds?: string[]
@@ -100,7 +112,8 @@ export async function getFinanceJob(jobId: string): Promise<FinanceJobRow> {
  */
 export interface BulkReceiptPdfExportDto {
   paymentIds: string[]
-  format: 'zip' // 'merged_pdf' enables in Sprint H.3
+  /** Sprint H.4 — see BulkInvoicePdfExportDto.format for cap details. */
+  format: 'zip' | 'merged_pdf'
 }
 
 /**

@@ -145,4 +145,47 @@ describe('bulk-pdf-export.service route shapes (F.6)', () => {
     const [, body] = mockApiPost.mock.calls[0]
     expect((body as { format: string }).format).toBe('zip')
   })
+
+  // ────────────────────────────────────────────────────────────────
+  // Sprint H.4 — merged_pdf format now supported end-to-end
+  //
+  // Backend H.3 removed the 501 FORMAT_NOT_SUPPORTED gate on both
+  // endpoints; H.2 published pdf-renderer@0.10.0 with mergePdfBuffers.
+  // These guards ensure the frontend service passes format=merged_pdf
+  // through to the SAME URL as the zip variant (backend branches
+  // internally on the request body) — a refactor that split the two
+  // formats into different URLs would silently regress and only
+  // surface as 403 SigV4 or 404 at smoke.
+  // ────────────────────────────────────────────────────────────────
+  it('invoice: passes format=merged_pdf verbatim to the SAME URL as zip', async () => {
+    await bulkInvoicePdfExport(SCHOOL, {
+      invoiceIds: ['inv-1', 'inv-2'],
+      format: 'merged_pdf',
+    })
+
+    expect(mockApiPost).toHaveBeenCalledTimes(1)
+    const [url, body] = mockApiPost.mock.calls[0]
+    expect(url).toBe(`/finance/schools/${SCHOOL}/invoices/bulk-pdf-export`)
+    expect((body as { format: string }).format).toBe('merged_pdf')
+    expect(body).toEqual({
+      invoiceIds: ['inv-1', 'inv-2'],
+      format: 'merged_pdf',
+    })
+  })
+
+  it('receipt: passes format=merged_pdf verbatim to the SAME URL as zip', async () => {
+    await bulkReceiptPdfExport(SCHOOL, {
+      paymentIds: ['pay-1', 'pay-2'],
+      format: 'merged_pdf',
+    })
+
+    expect(mockApiPost).toHaveBeenCalledTimes(1)
+    const [url, body] = mockApiPost.mock.calls[0]
+    expect(url).toBe(`/finance/schools/${SCHOOL}/payments/bulk-pdf-export`)
+    expect((body as { format: string }).format).toBe('merged_pdf')
+    expect(body).toEqual({
+      paymentIds: ['pay-1', 'pay-2'],
+      format: 'merged_pdf',
+    })
+  })
 })

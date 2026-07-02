@@ -865,7 +865,14 @@
       "payloadTooLarge": "Cannot export {{requested}} invoices in one batch (limit is {{limit}}). Please narrow the selection.",
       "toastSucceeded": "Bulk export complete: {{succeeded}} succeeded, {{failed}} failed.",
       "toastFailed": "Bulk export failed. Check the drawer for details.",
-      "readyTitle_plural": "Ready to export {{count}} invoices as ZIP"
+      "readyTitle_plural": "Ready to export {{count}} invoices as ZIP",
+      "formatPickerLabel": "Output format",
+      "formatZip": "ZIP of individual PDFs (one file per invoice)",
+      "formatMergedPdf": "Single merged PDF (all invoices concatenated)",
+      "readyTitleMerged": "Ready to export {{count}} invoice as merged PDF",
+      "readyTitle_pluralMerged": "Ready to export {{count}} invoices as merged PDF",
+      "readyBodyMerged": "The generated PDF concatenates all invoices in the order they were selected. The merged output is capped at 1,000 invoices per export (ZIP allows up to 2,000). This may take a few minutes for larger batches; you can close the drawer and the job will keep running in the background.",
+      "downloadMergedPdf": "Download invoices-merged.pdf"
     },
     "receiptPdfExport": {
       "title": "Bulk receipt export",
@@ -879,7 +886,14 @@
       "alreadyRunning": "Another bulk export is already running for this school. Showing its progress.",
       "payloadTooLarge": "Cannot export {{requested}} receipts in one batch (limit is {{limit}}). Please narrow the selection.",
       "toastSucceeded": "Bulk export complete: {{succeeded}} succeeded, {{failed}} failed.",
-      "toastFailed": "Bulk export failed. Check the drawer for details."
+      "toastFailed": "Bulk export failed. Check the drawer for details.",
+      "formatPickerLabel": "Output format",
+      "formatZip": "ZIP of individual PDFs (one file per receipt)",
+      "formatMergedPdf": "Single merged PDF (all receipts concatenated)",
+      "readyTitleMerged": "Ready to export {{count}} receipt as merged PDF",
+      "readyTitle_pluralMerged": "Ready to export {{count}} receipts as merged PDF",
+      "readyBodyMerged": "The generated PDF concatenates all completed-payment receipts in the order they were selected. Non-completed payments (voided / refunded / failed) are skipped automatically. The merged output is capped at 1,000 receipts per export (ZIP allows up to 2,000).",
+      "downloadMergedPdf": "Download receipts-merged.pdf"
     }
   },
   "financeLayout": {
