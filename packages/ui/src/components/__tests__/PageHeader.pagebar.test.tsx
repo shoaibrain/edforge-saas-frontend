@@ -53,8 +53,31 @@ describe('PageHeader pagebar mode', () => {
     expect(screen.getByText('Academics / Students')).toBeTruthy()
   })
 
-  it('renders nothing when it has neither breadcrumbs nor actions', () => {
+  it('renders nothing when it has neither breadcrumbs, actions, nor attention', () => {
     const { container } = render(<PageHeader mode="pagebar" />)
     expect(container.firstChild).toBeNull()
+  })
+
+  it('mounts the attention slot on the left, balanced against the actions row', () => {
+    render(
+      <PageHeader
+        mode="pagebar"
+        attention={<button type="button">2 need attention</button>}
+        actions={[{ label: 'Enroll student', primary: true }]}
+      />,
+    )
+    const attention = screen.getByText('2 need attention')
+    const action = screen.getByText('Enroll student')
+    expect(attention).toBeTruthy()
+    expect(action).toBeTruthy()
+    // Same row: both live under the justify-between container.
+    const row = attention.closest('.justify-between')
+    expect(row).toBeTruthy()
+    expect(row!.contains(action)).toBe(true)
+  })
+
+  it('renders the attention slot even with no actions', () => {
+    render(<PageHeader mode="pagebar" attention={<span>All clear</span>} />)
+    expect(screen.getByText('All clear')).toBeTruthy()
   })
 })

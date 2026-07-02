@@ -288,6 +288,23 @@ export {
   type QuickDrawerFooterProps,
 } from './components/QuickDrawer'
 
+// Header Zone (⑧ AttentionCorner · ⑨ SelectionContextBar)
+export {
+  AttentionCorner,
+  AttentionCornerPill,
+  AttentionCornerShade,
+  SelectionContextBar,
+  DEFAULT_ATTENTION_LABELS,
+  DEFAULT_SELECTION_LABELS,
+  type AttentionCornerProps,
+  type AttentionCornerLabels,
+  type Signal,
+  type SignalSeverity,
+  type SelectionContextBarProps,
+  type SelectionContextBarLabels,
+  type SelectionAction,
+} from './components/header-zone'
+
 // Hooks
 export { useFocusTrap } from './hooks/useFocusTrap'
 

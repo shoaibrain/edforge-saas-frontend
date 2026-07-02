@@ -1522,6 +1522,24 @@
       "insights": "Insights",
       "insightsCharts": "Insights & Charts",
       "activityAlerts": "Activity & Alerts"
+    },
+    "signals": {
+      "needAttention": "need attention",
+      "allClear": "All clear",
+      "minimize": "Minimize",
+      "acknowledge": "Got it",
+      "acknowledged": "Acknowledged",
+      "acknowledgedHint": "Acknowledged — click to undo",
+      "dismiss": "Dismiss",
+      "emptyTitle": "You’re all caught up.",
+      "domains": {
+        "attendance": "Attendance",
+        "assessment": "Assessment",
+        "finance": "Finance",
+        "enrollment": "Enrollment",
+        "capacity": "Capacity",
+        "dataQuality": "Data quality"
+      }
     }
   },
   "examModule": {

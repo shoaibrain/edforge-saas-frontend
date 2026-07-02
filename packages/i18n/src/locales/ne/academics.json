@@ -1522,6 +1522,24 @@
       "insights": "Insights",
       "insightsCharts": "Insights & Charts",
       "activityAlerts": "Activity & Alerts"
+    },
+    "signals": {
+      "needAttention": "ध्यान चाहिन्छ",
+      "allClear": "सबै ठीक छ",
+      "minimize": "सानो बनाउनुहोस्",
+      "acknowledge": "बुझेँ",
+      "acknowledged": "स्वीकार गरियो",
+      "acknowledgedHint": "स्वीकार गरियो — उल्टाउन क्लिक गर्नुहोस्",
+      "dismiss": "हटाउनुहोस्",
+      "emptyTitle": "तपाईं पूर्ण रूपमा अद्यावधिक हुनुहुन्छ।",
+      "domains": {
+        "attendance": "उपस्थिति",
+        "assessment": "मूल्याङ्कन",
+        "finance": "वित्त",
+        "enrollment": "भर्ना",
+        "capacity": "क्षमता",
+        "dataQuality": "डेटा गुणस्तर"
+      }
     }
   },
   "examModule": {
