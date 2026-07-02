@@ -762,6 +762,7 @@
     "actions": "कार्यहरू",
     "active": "सक्रिय",
     "inactive": "निष्क्रिय",
+    "current": "हालको",
     "teacher": "शिक्षक",
     "primaryInstructor": "मुख्य प्रशिक्षक",
     "student": "विद्यार्थी",
@@ -1637,6 +1638,19 @@
     }
   },
   "classrooms": {
+    "pageTitle": "कक्षाकोठाहरू",
+    "toolbar": {
+      "searchPlaceholder": "सेक्सनहरू खोज्नुहोस्…",
+      "all": "सबै",
+      "statusPresets": "स्थिति प्रिसेटहरू",
+      "course": "कोर्स",
+      "teacher": "शिक्षक",
+      "year": "वर्ष",
+      "viewToggle": "दृश्य",
+      "cards": "कार्डहरू",
+      "table": "तालिका",
+      "export": "निर्यात"
+    },
     "tabs": {
       "overview": "अवलोकन",
       "gradebook": "ग्रेडबुक",
@@ -1699,6 +1713,7 @@
       "attachments": "संलग्नकहरू:"
     },
     "stats": {
+      "region": "मुख्य मेट्रिक्स",
       "totalSections": "कुल सेक्सनहरू",
       "totalStudents": "कुल विद्यार्थी",
       "avgUtilization": "औसत उपयोग",

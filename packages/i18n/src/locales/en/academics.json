@@ -762,6 +762,7 @@
     "actions": "Actions",
     "active": "Active",
     "inactive": "Inactive",
+    "current": "Current",
     "teacher": "Teacher",
     "primaryInstructor": "Primary Instructor",
     "student": "Student",
@@ -1637,6 +1638,19 @@
     }
   },
   "classrooms": {
+    "pageTitle": "Classrooms",
+    "toolbar": {
+      "searchPlaceholder": "Search sections…",
+      "all": "All",
+      "statusPresets": "Status presets",
+      "course": "Course",
+      "teacher": "Teacher",
+      "year": "Year",
+      "viewToggle": "View",
+      "cards": "Cards",
+      "table": "Table",
+      "export": "Export"
+    },
     "tabs": {
       "overview": "Overview",
       "gradebook": "Gradebook",
@@ -1699,6 +1713,7 @@
       "attachments": "Attachments:"
     },
     "stats": {
+      "region": "Key metrics",
       "totalSections": "Total Sections",
       "totalStudents": "Total Students",
       "avgUtilization": "Avg Utilization",

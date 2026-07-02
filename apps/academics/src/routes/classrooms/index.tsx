@@ -29,23 +29,36 @@ import {
   GraduationCap,
   Lock,
   AlertTriangle,
+  ChevronDown,
+  Download,
+  BookOpen,
+  Users,
+  Calendar,
   LayoutGrid,
   List,
-  ChevronDown,
-  Users,
-  Gauge,
-  UsersRound,
   Send,
   ToggleLeft,
   ToggleRight,
 } from 'lucide-react'
 import { toast } from 'sonner'
-import type { BulkAction } from '@edforge/ui'
+import {
+  StatBand,
+  type StatMetric,
+  Button,
+  Select,
+  ToolbarSearch,
+  PageHeader,
+  Tabs,
+  SegmentedControl,
+  TablePresetTabs,
+  DataTableMoreFilters,
+  type BulkAction,
+} from '@edforge/ui'
 import type { RowSelectionState } from '@tanstack/react-table'
 import { useActiveSchoolId } from '../../stores/app.store'
 
 // --- Scheduling (My Classes) imports ---
-import { useSectionFilters, useViewMode } from '../../stores/sections.store'
+import { useSectionFilters, useSectionFilterActions, useViewMode } from '../../stores/sections.store'
 import {
   useSections,
   flattenSectionPages,
@@ -54,8 +67,9 @@ import {
   useSectionRoster,
 } from '../../hooks/useSections'
 import { useCourses, flattenCoursePages } from '../../hooks/useCourses'
+import { useSchoolStaff, flattenStaffData, getStaffDisplayName } from '../../hooks/useStaff'
+import { useAcademicYears } from '../../hooks/useSchool'
 import { SectionTable } from '../../components/scheduling/SectionTable'
-import { SectionFilters } from '../../components/scheduling/SectionFilters'
 import { BulkSectionStatusModal } from '../../components/scheduling/BulkSectionStatusModal'
 import type { SectionResponseDto } from '@aibrains/shared-types'
 import { ClassroomCardGrid } from '../../components/classrooms/ClassroomCardGrid'
@@ -63,7 +77,7 @@ import { ClassroomCardGrid } from '../../components/classrooms/ClassroomCardGrid
 // --- Grades imports ---
 import { useGradesStore } from '../../stores/grades.store'
 import { useCurrentAcademicYear, useGradingPeriods } from '../../hooks'
-import { useSectionGrades, useGradingPolicies, useGradeOverview } from '../../hooks/useGrades'
+import { useSectionGrades, useGradingPolicies } from '../../hooks/useGrades'
 import { GradebookGrid } from '../../components/grades/GradebookGrid'
 import { GradingPolicyList } from '../../components/grades/GradingPolicyList'
 import { BulkGradeModal } from '../../components/grades/BulkGradeModal'
@@ -74,9 +88,7 @@ import { GradeOverview } from '../grades/overview'
 // --- Shared ---
 import { TabErrorBoundary } from '../../components/common/TabErrorBoundary'
 import { NoCurrentAcademicYearEmptyState } from '../../components/common'
-import { StatCard, WidgetErrorBoundaryV2, Button, Select, ContextBar } from '@edforge/ui'
 import { AnimatedIcon, type IconName } from '@edforge/ui/motion'
-import { useAttendanceOverview } from '../../hooks/useAttendance'
 import { useAcademicsI18n } from '../../lib/i18n'
 
 // ============================================================================
@@ -102,22 +114,6 @@ const TAB_SIGNATURE: Partial<Record<ClassroomTabId, IconName>> = {
 }
 
 // ============================================================================
-// V2 CAPACITY COLOR (for KPI utilization tile)
-// ============================================================================
-
-function getUtilizationAccent(utilization: number) {
-  if (utilization < 15) return 'rgb(var(--accent-finance))'
-  if (utilization <= 33) return 'rgb(var(--accent-attendance))'
-  return 'rgb(var(--accent-enrollment))'
-}
-
-function getUtilizationAccentTint(utilization: number) {
-  if (utilization < 15) return 'rgb(var(--accent-finance)/0.1)'
-  if (utilization <= 33) return 'rgb(var(--accent-attendance)/0.1)'
-  return 'rgb(var(--accent-enrollment)/0.1)'
-}
-
-// ============================================================================
 // OVERVIEW TAB (class cards / list with stats and filters)
 // ============================================================================
 
@@ -128,8 +124,10 @@ function OverviewTab() {
   const schedPerms = useResourcePermissions('scheduling')
   const { viewMode, setViewMode } = useViewMode()
 
-  // Filters
+  // Filters (server-driven) + local text search (client-side over loaded pages)
   const filters = useSectionFilters()
+  const filterActions = useSectionFilterActions()
+  const [search, setSearch] = useState('')
 
   // Section query
   const {
@@ -150,26 +148,80 @@ function OverviewTab() {
     enabled: !!schoolId,
   })
 
-  const sections = flattenSectionPages(sectionsData)
+  const allSections = flattenSectionPages(sectionsData)
   const total = getSectionTotalFromPages(sectionsData)
   const updateMutation = useUpdateSection()
 
-  // Courses lookup for subjectArea fallback (sections created before backfill)
+  // Facet option sources (Course · Teacher · Year) — reused by the unified toolbar.
   const { data: coursesData } = useCourses({ schoolId, filters: { isActive: true }, limit: 100, enabled: !!schoolId })
-  const subjectAreaMap = useMemo(() => {
-    const courses = flattenCoursePages(coursesData)
-    return new Map(courses.map((c) => [c.courseId, c.subjectArea]))
-  }, [coursesData])
+  const courses = useMemo(() => flattenCoursePages(coursesData), [coursesData])
+  const subjectAreaMap = useMemo(
+    () => new Map(courses.map((c) => [c.courseId, c.subjectArea])),
+    [courses],
+  )
+  const { data: staffData } = useSchoolStaff(schoolId)
+  const teachers = useMemo(() => flattenStaffData(staffData), [staffData])
+  const teacherNameById = useMemo(
+    () => new Map(teachers.map((tc) => [tc.staffId, getStaffDisplayName(tc)])),
+    [teachers],
+  )
+  const { data: academicYears } = useAcademicYears(schoolId)
 
-  // Stats
+  // Client-side text search over the loaded sections (course · code · number · teacher).
+  const sections = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    if (!q) return allSections
+    return allSections.filter((s) => {
+      const tn = s.primaryTeacherId ? teacherNameById.get(s.primaryTeacherId) ?? '' : ''
+      return [s.courseName, s.courseCode, s.sectionNumber, tn]
+        .filter(Boolean)
+        .some((v) => String(v).toLowerCase().includes(q))
+    })
+  }, [allSections, search, teacherNameById])
+
+  // Stats derive from the full (unfiltered) result set.
   const stats = useMemo(() => {
-    const totalSections = sections.length
-    const totalEnrolled = sections.reduce((sum, s) => sum + s.currentEnrollment, 0)
-    const totalCapacity = sections.reduce((sum, s) => sum + s.maxEnrollment, 0)
+    const totalSections = allSections.length
+    const totalEnrolled = allSections.reduce((sum, s) => sum + s.currentEnrollment, 0)
+    const totalCapacity = allSections.reduce((sum, s) => sum + s.maxEnrollment, 0)
     const utilization = totalCapacity > 0 ? Math.round((totalEnrolled / totalCapacity) * 100) : 0
-    const uniqueTeachers = new Set(sections.map((s) => s.primaryTeacherId)).size
+    const uniqueTeachers = new Set(allSections.map((s) => s.primaryTeacherId)).size
     return { totalSections, totalEnrolled, utilization, uniqueTeachers }
-  }, [sections])
+  }, [allSections])
+
+  // ── StatBand metrics (calm; Avg Utilization → meter vs 80% target) ────────
+  const metrics: StatMetric[] = [
+    {
+      label: t('classrooms.stats.totalSections'),
+      value: formatNumber(total ?? stats.totalSections),
+      iconSignature: 'sections',
+      state: 'normal',
+      primary: true,
+      sub: t('classrooms.stats.activeClassrooms'),
+    },
+    {
+      label: t('classrooms.stats.totalStudents'),
+      value: formatNumber(stats.totalEnrolled),
+      iconSignature: 'students',
+      state: 'normal',
+      sub: t('classrooms.stats.acrossAllSections'),
+    },
+    {
+      label: t('classrooms.stats.avgUtilization'),
+      value: `${formatNumber(stats.utilization)}%`,
+      iconSignature: 'overview',
+      state: stats.utilization >= 80 ? 'normal' : 'warn',
+      meter: { pct: stats.utilization, target: 80 },
+      sub: t('classrooms.stats.ofSeatCapacity'),
+    },
+    {
+      label: t('classrooms.stats.activeTeachers'),
+      value: formatNumber(stats.uniqueTeachers),
+      iconSignature: 'people',
+      state: 'normal',
+      sub: t('classrooms.stats.assignedSections'),
+    },
+  ]
 
   const handleToggleActive = async (section: SectionResponseDto) => {
     await updateMutation.mutateAsync({
@@ -219,108 +271,181 @@ function OverviewTab() {
     navigate({ to: `/classrooms/${section.sectionId}/edit` })
   }
 
+  // CSV export of the current (filtered) sections.
+  const handleExport = useCallback(() => {
+    const rows = [
+      ['Section', 'Course', 'Code', 'Teacher', 'Enrolled', 'Capacity', 'Status'],
+      ...sections.map((s) => [
+        s.courseName ?? s.courseCode ?? '',
+        s.courseName ?? '',
+        s.courseCode ?? '',
+        (s.primaryTeacherId ? teacherNameById.get(s.primaryTeacherId) : '') ?? '',
+        String(s.currentEnrollment),
+        String(s.maxEnrollment),
+        s.isActive ? 'Active' : 'Inactive',
+      ]),
+    ]
+    const csv = rows.map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(',')).join('\n')
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'sections.csv'
+    a.click()
+    URL.revokeObjectURL(url)
+  }, [sections, teacherNameById])
+
+  // Docked status presets ↔ store `isActive`.
+  const activePreset = filters.isActive === null ? 'all' : filters.isActive ? 'active' : 'inactive'
+
   return (
-    <div className="space-y-6">
-      {/* V2 KPI Tiles */}
-      <WidgetErrorBoundaryV2 fallbackMessage={t('classrooms.stats.failedToLoad')}>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <StatCard
-            label={t('classrooms.stats.totalSections')}
-            value={formatNumber(total ?? stats.totalSections)}
-            icon={LayoutGrid}
-            signature="sections"
-            accentColor="rgb(var(--accent-academics)/0.1)"
-            iconColor="rgb(var(--accent-academics))"
-            barColor="rgb(var(--accent-academics))"
-            hint={t('classrooms.stats.activeClassrooms')}
-            loading={isLoading}
-          />
-          <StatCard
-            label={t('classrooms.stats.totalStudents')}
-            value={formatNumber(stats.totalEnrolled)}
-            icon={Users}
-            signature="students"
-            accentColor="rgb(var(--accent-enrollment)/0.1)"
-            iconColor="rgb(var(--accent-enrollment))"
-            barColor="rgb(var(--accent-enrollment))"
-            hint={t('classrooms.stats.acrossAllSections')}
-            loading={isLoading}
-          />
-          <StatCard
-            label={t('classrooms.stats.avgUtilization')}
-            value={`${formatNumber(stats.utilization)}%`}
-            icon={Gauge}
-            accentColor={getUtilizationAccentTint(stats.utilization)}
-            iconColor={getUtilizationAccent(stats.utilization)}
-            barColor={getUtilizationAccent(stats.utilization)}
-            hint={t('classrooms.stats.ofSeatCapacity')}
-            loading={isLoading}
-          />
-          <StatCard
-            label={t('classrooms.stats.activeTeachers')}
-            value={formatNumber(stats.uniqueTeachers)}
-            icon={UsersRound}
-            signature="people"
-            accentColor="rgb(var(--accent-reports)/0.1)"
-            iconColor="rgb(var(--accent-reports))"
-            barColor="rgb(var(--accent-reports))"
-            hint={t('classrooms.stats.assignedSections')}
-            loading={isLoading}
-          />
-        </div>
-      </WidgetErrorBoundaryV2>
+    <div className="space-y-5">
+      {/* KPI band */}
+      <StatBand metrics={metrics} ariaLabel={t('classrooms.stats.region')} />
 
-      {/* Filters + View Toggle — single horizontal strip */}
-      <div className="flex items-start gap-3">
-        <div className="flex-1 min-w-0">
-          <SectionFilters schoolId={schoolId} totalResults={total} />
-        </div>
-        <div className="flex items-center rounded-lg p-0.5 flex-shrink-0 bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary)/0.35)]">
-          <button
-            type="button"
-            onClick={() => setViewMode('grid')}
-            className={`p-1.5 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-[rgb(var(--accent-academics)/0.12)] text-[rgb(var(--accent-academics-text))]' : 'bg-transparent text-[rgb(var(--text-tertiary))]'}`}
-            aria-label={t('classrooms.actions.gridView')}
+      {/* Unified toolbar + body — one connected container (toolbar row → content) */}
+      <div>
+        {/* Toolbar: one row drives both the card grid and the table */}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-t-xl border border-b-0 border-[rgb(var(--border-primary)/0.5)] bg-[rgb(var(--background-secondary))] px-3 py-2.5">
+          {/* Search — canonical unified-toolbar field */}
+          <ToolbarSearch
+            value={search}
+            onChange={setSearch}
+            placeholder={t('classrooms.toolbar.searchPlaceholder')}
+            aria-label={t('classrooms.toolbar.searchPlaceholder')}
+          />
+
+          {/* Status presets */}
+          <TablePresetTabs
+            presets={[
+              { value: 'all', label: t('classrooms.toolbar.all') },
+              { value: 'active', label: t('common.active') },
+              { value: 'inactive', label: t('common.inactive') },
+            ]}
+            active={activePreset}
+            onChange={(v) => filterActions.setIsActive(v === 'all' ? null : v === 'active')}
+            ariaLabel={t('classrooms.toolbar.statusPresets')}
+          />
+
+          {/* Primary facet: Course (inline) */}
+          <Select
+            size="sm"
+            className="w-40"
+            clearable
+            leadingIcon={<BookOpen className="h-4 w-4" />}
+            placeholder={t('classrooms.toolbar.course')}
+            value={filters.courseId || ''}
+            onChange={(v) => filterActions.setCourseId(v || null)}
+            options={courses.map((c) => ({ value: c.courseId, label: `${c.courseCode} — ${c.courseName}` }))}
+            buttonClassName="border-[rgb(var(--border-primary)/0.35)]"
+          />
+
+          {/* Secondary facets folded into "More filters": Teacher · Year */}
+          <DataTableMoreFilters
+            label={t('dataTable.moreFilters')}
+            clearLabel={t('dataTable.clearFilters')}
+            activeCount={(filters.teacherId ? 1 : 0) + (filters.academicYearId ? 1 : 0)}
+            onClear={() => {
+              filterActions.setTeacherId(null)
+              filterActions.setAcademicYearId(null)
+            }}
           >
-            <LayoutGrid className="w-4 h-4" />
-          </button>
-          <button
-            type="button"
-            onClick={() => setViewMode('list')}
-            className={`p-1.5 rounded-md transition-colors ${viewMode === 'list' ? 'bg-[rgb(var(--accent-academics)/0.12)] text-[rgb(var(--accent-academics-text))]' : 'bg-transparent text-[rgb(var(--text-tertiary))]'}`}
-            aria-label={t('classrooms.actions.listView')}
-          >
-            <List className="w-4 h-4" />
-          </button>
+            <Select
+              size="sm"
+              className="w-full"
+              clearable
+              leadingIcon={<Users className="h-4 w-4" />}
+              placeholder={t('classrooms.toolbar.teacher')}
+              value={filters.teacherId || ''}
+              onChange={(v) => filterActions.setTeacherId(v || null)}
+              options={teachers.map((tc) => ({ value: tc.staffId, label: getStaffDisplayName(tc) }))}
+              buttonClassName="border-[rgb(var(--border-primary)/0.35)]"
+            />
+            <Select
+              size="sm"
+              className="w-full"
+              clearable
+              leadingIcon={<Calendar className="h-4 w-4" />}
+              placeholder={t('classrooms.toolbar.year')}
+              value={filters.academicYearId || ''}
+              onChange={(v) => filterActions.setAcademicYearId(v || null)}
+              options={(academicYears || []).map((y) => ({
+                value: y.yearId,
+                label: `${y.name}${y.isCurrent ? ` (${t('common.current')})` : ''}`,
+              }))}
+              buttonClassName="border-[rgb(var(--border-primary)/0.35)]"
+            />
+          </DataTableMoreFilters>
+
+          {/* Right cluster: icon-only view toggle + export */}
+          <div className="ml-auto flex items-center gap-2">
+            <SegmentedControl
+              aria-label={t('classrooms.toolbar.viewToggle')}
+              value={viewMode === 'grid' ? 'cards' : 'table'}
+              onChange={(v) => setViewMode(v === 'cards' ? 'grid' : 'list')}
+              tabs={[
+                {
+                  id: 'cards',
+                  label: (
+                    <>
+                      <LayoutGrid aria-hidden="true" className="h-4 w-4" />
+                      <span className="sr-only">{t('classrooms.actions.gridView')}</span>
+                    </>
+                  ),
+                },
+                {
+                  id: 'table',
+                  label: (
+                    <>
+                      <List aria-hidden="true" className="h-4 w-4" />
+                      <span className="sr-only">{t('classrooms.actions.listView')}</span>
+                    </>
+                  ),
+                },
+              ]}
+            />
+            <button
+              type="button"
+              onClick={handleExport}
+              className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-[rgb(var(--border-primary)/0.35)] px-3 text-sm font-medium text-[rgb(var(--text-secondary))] transition-colors hover:bg-[rgb(var(--background-tertiary))]"
+            >
+              <Download className="h-4 w-4" />
+              {t('classrooms.toolbar.export')}
+            </button>
+          </div>
         </div>
+
+        {/* Body — connects to the toolbar above (shared bordered container) */}
+        {viewMode === 'grid' ? (
+          <div className="rounded-b-xl border border-t-0 border-[rgb(var(--border-primary)/0.5)] p-4">
+            <ClassroomCardGrid
+              sections={sections}
+              isLoading={isLoading}
+              hasMore={hasNextPage}
+              isFetchingMore={isFetchingNextPage}
+              subjectAreaMap={subjectAreaMap}
+              onLoadMore={() => fetchNextPage()}
+              onNavigate={(id) => navigate({ to: `/classrooms/${id}` })}
+              onEdit={schedPerms.edit ? (id) => navigate({ to: `/classrooms/${id}/edit` }) : undefined}
+              onToggleActive={schedPerms.edit ? handleToggleActive : undefined}
+            />
+          </div>
+        ) : (
+          <SectionTable
+            sections={sections}
+            isLoading={isLoading}
+            hideToolbar
+            className="!rounded-t-none !border-t-0"
+            onViewSection={handleNavigateToDetail}
+            onEditSection={schedPerms.edit ? handleNavigateToEdit : undefined}
+            onToggleActive={schedPerms.edit ? handleToggleActive : undefined}
+            onViewRoster={handleNavigateToDetail}
+            bulkActions={schedPerms.edit ? bulkActions : undefined}
+            rowSelection={rowSelection}
+            onRowSelectionChange={setRowSelection}
+          />
+        )}
       </div>
-
-      {/* Grid or Table */}
-      {viewMode === 'grid' ? (
-        <ClassroomCardGrid
-          sections={sections}
-          isLoading={isLoading}
-          hasMore={hasNextPage}
-          isFetchingMore={isFetchingNextPage}
-          subjectAreaMap={subjectAreaMap}
-          onLoadMore={() => fetchNextPage()}
-          onNavigate={(id) => navigate({ to: `/classrooms/${id}` })}
-          onEdit={schedPerms.edit ? (id) => navigate({ to: `/classrooms/${id}/edit` }) : undefined}
-          onToggleActive={schedPerms.edit ? handleToggleActive : undefined}
-        />
-      ) : (
-        <SectionTable
-          sections={sections}
-          isLoading={isLoading}
-          onViewSection={handleNavigateToDetail}
-          onEditSection={schedPerms.edit ? handleNavigateToEdit : undefined}
-          onToggleActive={schedPerms.edit ? handleToggleActive : undefined}
-          onViewRoster={handleNavigateToDetail}
-          bulkActions={schedPerms.edit ? bulkActions : undefined}
-          rowSelection={rowSelection}
-          onRowSelectionChange={setRowSelection}
-        />
-      )}
 
       {/* Bulk activate / deactivate modal (#224) */}
       <BulkSectionStatusModal
@@ -612,119 +737,6 @@ function GradebookTab() {
 import { AttendanceModule } from '../attendance/index'
 
 // ============================================================================
-// CONTEXT BANNER (CLS-003)
-// ============================================================================
-
-function ContextBanner({
-  activeTab,
-  schoolId,
-}: {
-  activeTab: ClassroomTabId
-  schoolId: string
-}) {
-  const { t, formatNumber } = useAcademicsI18n()
-  // Overview data — from sections
-  const { data: sectionsPages } = useSections({
-    schoolId,
-    filters: { isActive: true },
-    enabled: !!schoolId && activeTab === 'overview',
-  })
-  const overviewSections = useMemo(() => flattenSectionPages(sectionsPages), [sectionsPages])
-  const overviewStats = useMemo(() => {
-    const total = overviewSections.length
-    const students = overviewSections.reduce((s, sec) => s + sec.currentEnrollment, 0)
-    const capacity = overviewSections.reduce((s, sec) => s + sec.maxEnrollment, 0)
-    const utilization = capacity > 0 ? Math.round((students / capacity) * 100) : 0
-    const courses = new Set(overviewSections.map((s) => s.courseId)).size
-    return { total, students, utilization, courses }
-  }, [overviewSections])
-
-  // Gradebook data
-  const { data: currentYear } = useCurrentAcademicYear(schoolId)
-  const { data: gradeData } = useGradeOverview(
-    schoolId,
-    currentYear?.yearId || '',
-    !!schoolId && !!currentYear?.yearId && activeTab === 'gradebook'
-  )
-
-  // Attendance data
-  const today = new Date().toISOString().split('T')[0]
-  const { data: attendanceData } = useAttendanceOverview({
-    schoolId,
-    academicYearId: currentYear?.yearId || '',
-    date: today,
-    enabled: !!schoolId && !!currentYear?.yearId && activeTab === 'attendance',
-  })
-
-  const bannerContent = useMemo(() => {
-    if (activeTab === 'overview') {
-      return (
-        <>
-          <em className="not-italic text-[rgb(var(--accent-academics-text))]">{formatNumber(overviewStats.total)} {t('classrooms.context.activeSections')}</em>
-          {' '}{t('classrooms.context.across')}{' '}
-          <em className="not-italic text-[rgb(var(--accent-academics-text))]">{formatNumber(overviewStats.courses)} {t('classrooms.context.courses')}</em>
-          {' '}&mdash;{' '}
-          <em className="not-italic text-[rgb(var(--accent-enrollment-text))]">{formatNumber(overviewStats.students)} {t('classrooms.context.studentsEnrolled')}</em>
-          , {t('classrooms.context.avgUtilization')}{' '}
-          <em className="not-italic text-[rgb(var(--accent-attendance-text))]">{formatNumber(overviewStats.utilization)}%</em>
-          .
-        </>
-      )
-    }
-
-    if (activeTab === 'gradebook' && gradeData) {
-      const worstCourse = gradeData.coursePerformance.length > 0
-        ? [...gradeData.coursePerformance].sort((a, b) => a.avgGrade - b.avgGrade)[0]?.courseName
-        : null
-      const passingCourses = gradeData.coursePerformance.filter((c) => c.passRate === 100).length
-      const completionPct = gradeData.gradingProgress?.completionRate?.toFixed(0) ?? '—'
-      return (
-        <>
-          <em className="not-italic text-[rgb(var(--accent-finance-text))]">{formatNumber(gradeData.atRiskCount)}</em>
-          {' '}{t('classrooms.context.studentsAtRisk')}{worstCourse && (
-            <> &mdash; {t('classrooms.context.concentratedIn')} <em className="not-italic text-[rgb(var(--accent-finance-text))]">{worstCourse}</em></>
-          )}.{' '}
-          <em className="not-italic text-[rgb(var(--accent-enrollment-text))]">{formatNumber(passingCourses)} {t('classrooms.context.atFullPassRate')}</em>
-          . {t('classrooms.context.grading')}{' '}
-          <em className="not-italic text-[rgb(var(--accent-academics-text))]">{completionPct}% {t('classrooms.context.complete')}</em>
-          .
-        </>
-      )
-    }
-
-    if (activeTab === 'attendance' && attendanceData) {
-      const recorded = attendanceData.todaySummary?.totalRecorded ?? 0
-      const totalStudents = attendanceData.todaySummary?.totalStudents ?? 0
-      const avg7 = attendanceData.periodAverages?.last7Days?.toFixed(1) ?? '—'
-      const avg30 = attendanceData.periodAverages?.last30Days?.toFixed(1) ?? '—'
-      const atRiskCount = attendanceData.atRiskStudents?.length ?? 0
-      return (
-        <>
-          <em className="not-italic text-[rgb(var(--accent-academics-text))]">{formatNumber(recorded)} of {formatNumber(totalStudents)} {t('classrooms.card.students')}</em>
-          {' '}{t('classrooms.context.recordedToday')}. {t('classrooms.context.sevenDayAverage')}{' '}
-          <em className="not-italic text-[rgb(var(--accent-enrollment-text))]">{avg7}%</em>
-          {' '}{t('classrooms.context.vsThirtyDay')}{' '}
-          <em className="not-italic text-[rgb(var(--accent-attendance-text))]">{avg30}%</em>
-          .{atRiskCount > 0 && (
-            <>{' '}<em className="not-italic text-[rgb(var(--accent-finance-text))]">{formatNumber(atRiskCount)} {t('classrooms.card.students')}</em> {t('classrooms.context.flaggedBelowAttendance')}.</>
-          )}
-        </>
-      )
-    }
-
-    return null
-  }, [activeTab, overviewStats, gradeData, attendanceData, t, formatNumber])
-
-  if (!bannerContent) return null
-
-  return (
-    <p className="px-6 pb-3 text-2xs text-[rgb(var(--text-tertiary))] leading-normal">
-      {bannerContent}
-    </p>
-  )
-}
-
-// ============================================================================
 // CLASSROOMS MODULE (main export)
 // ============================================================================
 
@@ -732,7 +744,7 @@ export function ClassroomsModule() {
   const navigate = useNavigate()
   const schedPerms = useResourcePermissions('scheduling')
   const schoolId = useActiveSchoolId() || ''
-  const { t, formatDate, formatNumber } = useAcademicsI18n()
+  const { t } = useAcademicsI18n()
 
   // Lightweight section count for tab badge
   const { data: sectionPages } = useSections({ schoolId, enabled: !!schoolId, limit: 1 })
@@ -750,92 +762,60 @@ export function ClassroomsModule() {
     [navigate]
   )
 
+  // Canonical tab bar (icon + label + count). Label is a ReactNode so the
+  // per-tab AnimatedIcon rides inside it; the `?tab=` URL stays the source of truth.
+  const tabItems = TABS.map((tab) => ({
+    id: tab.id,
+    label: (
+      <span className="inline-flex items-center gap-1.5">
+        <AnimatedIcon
+          name={TAB_SIGNATURE[tab.id]}
+          icon={tab.icon}
+          size={16}
+          applyAccent={false}
+          className={activeTab === tab.id ? 'opacity-100' : 'opacity-70'}
+        />
+        {t(tab.labelKey)}
+      </span>
+    ),
+    count: tab.id === 'overview' ? sectionCount : undefined,
+  }))
+  const activeTabLabel = t(TABS.find((x) => x.id === activeTab)?.labelKey ?? 'classrooms.tabs.overview')
+
   return (
     <div className="min-h-full bg-[rgb(var(--background-primary))]">
-      {/* Page Header */}
-      <div className="border-b border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-secondary))]">
-        <div className="px-6 py-4">
-          <ContextBar
-            divider={false}
-            meta={
-              <span>
-                {formatDate(new Date(), {
-                  weekday: 'long',
-                  month: 'short',
-                  day: 'numeric',
-                })}
-              </span>
-            }
-            actions={
-              schedPerms.create ? (
-                <button
-                  onClick={() => navigate({ to: '/classrooms/create' })}
-                  aria-label={t('classrooms.actions.newClassroom')}
-                  className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-semibold rounded-[9px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-enrollment)/0.4)] bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  {t('classrooms.actions.newClassroom')}
-                </button>
-              ) : undefined
-            }
-          />
-        </div>
+      {/* Screen-reader page heading (breadcrumb names the page visually) */}
+      <h1 className="sr-only">{t('classrooms.pageTitle')}</h1>
 
-        {/* Context Banner (CLS-003) */}
-        <ContextBanner activeTab={activeTab} schoolId={schoolId} />
-
-        {/* Tab Navigation */}
-        <div className="px-6">
-          <nav
-            className="flex overflow-x-auto gap-0 border-b border-[rgb(var(--border-primary)/0.35)]"
-            aria-label={t('classrooms.aria.tabs')}
-            role="tablist"
-          >
-            {TABS.map((tab) => {
-              const isActive = activeTab === tab.id
-              const sig = TAB_SIGNATURE[tab.id]
-              return (
-                <button
-                  key={tab.id}
-                  role="tab"
-                  id={`tab-${tab.id}`}
-                  aria-selected={isActive}
-                  aria-controls={`panel-${tab.id}`}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`whitespace-nowrap flex items-center gap-1.5 px-4 py-2.5 text-sm cursor-pointer transition-colors bg-transparent border-b-2 -mb-px ${
-                    isActive
-                      ? 'font-semibold text-[rgb(var(--accent-academics-text))] border-[rgb(var(--accent-academics))]'
-                      : 'font-medium text-[rgb(var(--text-tertiary))] border-transparent hover:text-[rgb(var(--text-secondary))]'
-                  }`}
-                >
-                  <AnimatedIcon
-                    name={sig}
-                    icon={tab.icon}
-                    size={16}
-                    applyAccent={false}
-                    className={isActive ? 'opacity-100' : 'opacity-70'}
-                  />
-                  {t(tab.labelKey)}
-                  {tab.id === 'overview' && sectionCount !== undefined && (
-                    <span
-                      className={`text-2xs font-semibold py-0.5 px-1.5 rounded-md ${
-                        isActive
-                          ? 'bg-[rgb(var(--accent-academics)/0.12)] text-[rgb(var(--accent-academics-text))]'
-                          : 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]'
-                      }`}
-                    >
-                      {formatNumber(sectionCount)}
-                    </span>
-                  )}
-                </button>
-              )
-            })}
-          </nav>
-        </div>
+      {/* Page header (pagebar) + canonical tab bar */}
+      <div className="border-b border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-secondary))] px-6 pt-4">
+        <PageHeader
+          mode="pagebar"
+          actions={
+            schedPerms.create
+              ? [
+                  {
+                    label: t('classrooms.actions.newClassroom'),
+                    icon: <Plus className="h-3.5 w-3.5" />,
+                    primary: true,
+                    onClick: () => navigate({ to: '/classrooms/create' }),
+                  },
+                ]
+              : undefined
+          }
+        />
+        <Tabs
+          className="mt-4"
+          variant="line"
+          value={activeTab}
+          onChange={(v) => setActiveTab(v as ClassroomTabId)}
+          tabs={tabItems}
+          aria-label={t('classrooms.aria.tabs')}
+        />
       </div>
 
       {/* Tab Content — error-bounded */}
-      <div className="p-6 min-h-128" role="tabpanel" id={`panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
+      <div className="p-6 min-h-128" role="tabpanel" aria-label={activeTabLabel}>
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
