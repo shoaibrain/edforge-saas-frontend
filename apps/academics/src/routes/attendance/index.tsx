@@ -1,189 +1,58 @@
 /**
- * Attendance Module
+ * Attendance Module — one adaptive dashboard.
  *
- * Real-time attendance tracking for the Academics domain.
- * Two-tab layout: Daily Entry (bulk grid) and Dashboard (analytics).
- * Includes calendar-aware validation and offline resilience.
+ * Monitoring IS the page; recording opens in a focused drawer; IEMiS export is a
+ * dialog. This replaces the old Overview / Daily-Entry / IEMiS child-tabs (and
+ * their sub-router), which were three jobs at three cadences stacked as siblings.
+ * The redesign leads with the coverage-vs-rate reframe, then a weighted-coverage
+ * "Sections to record" widget, an at-risk insight strip + list, patterns, and a
+ * 30-day trend. The recording flow (marking, locks, save, IEMiS export) is
+ * re-housed, not rewritten. Scope is derived from the signed-in user's role (the
+ * aggregate is server-scoped); no manual lens toggle.
  *
- * Sprint 5 — Rostering & Attendance
+ * Sprint 5 — Rostering & Attendance · Classrooms redesign (Attendance tab).
  */
 
-import { useState, useMemo, useCallback, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useMemo, useState } from 'react'
 import { usePermission } from '@edforge/abac'
-import { Select } from '@edforge/ui'
-import {
-  ClipboardCheck,
-  BarChart3,
-  AlertTriangle,
-  Info,
-  FileSpreadsheet,
-  Check,
-} from 'lucide-react'
 import { useActiveSchoolId } from '../../stores/app.store'
 import {
   useAttendanceStore,
   useAttendanceDateActions,
 } from '../../stores/attendance.store'
 import {
-  useCalendarDate,
   useAttendanceOverview,
   useAttendancePolicy,
-  usePresenceLocks,
+  useAttendanceStudentTrends,
 } from '../../hooks/useAttendance'
-import {
-  useSectionAttendanceRecords,
-  useRecordBulkSectionAttendance,
-  useUpdateSectionAttendance,
-} from '../../hooks/useSectionAttendance'
-import { useSections, flattenSectionPages, useSectionRoster } from '../../hooks'
-import { useCurrentAcademicYear } from '../../hooks'
-import { useOfflineAttendance } from '../../hooks/useOfflineAttendance'
-import { DateSelector } from '../../components/attendance/DateSelector'
-import { AttendanceGrid } from '../../components/attendance/AttendanceGrid'
-import { useAcknowledged } from '../../hooks/useAcknowledged'
-import { IemisExportPanel } from '../../components/attendance/IemisExportPanel'
-import { AttendanceDashboard } from './dashboard'
+import { useSections, flattenSectionPages, useCurrentAcademicYear } from '../../hooks'
 import { NoCurrentAcademicYearEmptyState } from '../../components/common'
-import type { AttendanceStatus } from '../../services/academics.service'
+import {
+  AttendanceCommandBar,
+  CoverageReframeBanner,
+  SectionsToRecord,
+  AttendanceInsightStrip,
+  AtRiskPanel,
+  PatternsRail,
+  TrendPanel,
+  RecordingDrawer,
+  IemisExportDialog,
+  toSectionCoverage,
+  computeCoverageSummary,
+  rankAtRisk,
+  toGradeRates,
+  sortActionableFirst,
+} from '../../components/attendance/dashboard'
 import { useAcademicsI18n } from '../../lib/i18n'
 
-type TabId = 'overview' | 'daily-entry' | 'iemis-export'
-type TabLabelKey = 'overview' | 'dailyEntry' | 'iemisExport'
-
-const TABS: { id: TabId; labelKey: TabLabelKey; icon: typeof BarChart3 }[] = [
-  { id: 'overview', labelKey: 'overview', icon: BarChart3 },
-  { id: 'daily-entry', labelKey: 'dailyEntry', icon: ClipboardCheck },
-  { id: 'iemis-export', labelKey: 'iemisExport', icon: FileSpreadsheet },
-]
-
 // ============================================================================
-// TAB BAR (framer-motion animated underline — consistent with other modules)
-// ============================================================================
-
-function TabBar({
-  activeTab,
-  onTabChange,
-  tabs,
-}: {
-  activeTab: TabId
-  onTabChange: (tab: TabId) => void
-  tabs: { id: TabId; labelKey: TabLabelKey; icon: typeof BarChart3 }[]
-}) {
-  const { t } = useAcademicsI18n()
-  return (
-    <nav className="flex gap-1" aria-label={t('attendance.tabs.aria')}>
-      {tabs.map((tab) => {
-        const isActive = activeTab === tab.id
-        return (
-          <button
-            key={tab.id}
-            type="button"
-            onClick={() => onTabChange(tab.id)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-2xs font-medium cursor-pointer transition-all border ${
-              isActive
-                ? 'text-[#378ADD] border-[rgb(var(--accent-academics)/0.2)] bg-[rgb(var(--accent-academics)/0.1)]'
-                : 'text-[rgb(var(--text-disabled))] border-transparent bg-transparent'
-            }`}
-          >
-            <tab.icon style={{ width: 11, height: 11 }} />
-            {t(`attendance.tabs.${tab.labelKey}`)}
-          </button>
-        )
-      })}
-    </nav>
-  )
-}
-
-// ============================================================================
-// CALENDAR INDICATOR
-// ============================================================================
-
-function CalendarBanner({
-  description,
-  eventType,
-}: {
-  description: string
-  eventType: string
-}) {
-  const { t } = useAcademicsI18n()
-  const resolvedDescription = description || t('attendance.calendar.nonInstructionalFallback', { eventType })
-  return (
-    <div className="flex items-center gap-3 p-4 rounded-xl bg-amber-50 dark:bg-[rgb(var(--state-warning-fg))]/10 border border-amber-200 dark:border-amber-500/20">
-      <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
-      <div>
-        <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
-          {t('attendance.calendar.nonInstructionalTitle')}
-        </p>
-        <p className="text-xs text-[rgb(var(--state-warning-fg))] mt-0.5">
-          {t('attendance.calendar.cannotSubmit', { description: resolvedDescription })}
-        </p>
-      </div>
-    </div>
-  )
-}
-
-// ============================================================================
-// SECTION SELECTOR
-// ============================================================================
-
-function SectionSelector({
-  sections,
-  selectedId,
-  onSelect,
-  isLoading,
-  completedSectionIds,
-}: {
-  sections: Array<{ sectionId: string; sectionNumber: string; courseName?: string; courseCode?: string }>
-  selectedId: string | null
-  onSelect: (id: string | null) => void
-  isLoading: boolean
-  /** Task 4.1: Section IDs that have completed attendance today */
-  completedSectionIds?: Set<string>
-}) {
-  const { t } = useAcademicsI18n()
-  // Auto-select first section when sections load and nothing is selected
-  useEffect(() => {
-    if (!selectedId && sections.length > 0 && sections.length <= 5) {
-      onSelect(sections[0].sectionId)
-    }
-  }, [sections, selectedId, onSelect])
-
-  if (!isLoading && sections.length === 0) {
-    return (
-      <div className="px-3 py-2 text-sm text-text-tertiary bg-surface-secondary border border-border-secondary rounded-lg max-w-xs">
-        {t('attendance.sectionSelector.empty')}
-      </div>
-    )
-  }
-
-  return (
-    <Select
-      className="w-full max-w-xs"
-      value={selectedId ?? ''}
-      onChange={(v) => onSelect(v || null)}
-      disabled={isLoading}
-      loading={isLoading}
-      placeholder={t('attendance.sectionSelector.placeholder')}
-      options={sections.map((s) => ({
-        value: s.sectionId,
-        label: `${completedSectionIds?.has(s.sectionId) ? '\u2713 ' : ''}${s.courseName || s.courseCode || t('attendance.sectionSelector.fallback')} - ${s.sectionNumber}`,
-      }))}
-    />
-  )
-}
-
-// ============================================================================
-// ATTENDANCE MODULE
+// ATTENDANCE MODULE — entry-level current-AY gate (unchanged from Ticket 1.3a)
 // ============================================================================
 
 /**
- * Thin gate component. Splits the entry-level current-AY check from the
- * content component so the rules-of-hooks ordering in `AttendanceModuleContent`
- * stays simple — the inner component never has to deal with an undefined
- * `currentYear`. Falls back to the shared empty state when no AY is current.
- *
- * Sprint 1 / Ticket 1.3a (academic-year-current-flag-bug).
+ * Thin gate: keeps the current-AY check out of the content component so its
+ * rules-of-hooks ordering stays simple. Falls back to the shared empty state
+ * when no academic year is current.
  */
 export function AttendanceModule() {
   const schoolId = useActiveSchoolId() || ''
@@ -209,369 +78,195 @@ export function AttendanceModule() {
     )
   }
 
-  return <AttendanceModuleContent schoolId={schoolId} currentYearId={currentYear.yearId} currentYearName={currentYear.name} />
+  return <AttendanceModuleContent schoolId={schoolId} currentYearId={currentYear.yearId} />
 }
 
 interface AttendanceModuleContentProps {
   schoolId: string
   currentYearId: string
-  currentYearName: string
 }
 
-function AttendanceModuleContent({ schoolId, currentYearId, currentYearName }: AttendanceModuleContentProps) {
-  const { t, locale } = useAcademicsI18n()
+/** 30-day window ending on `date` (YYYY-MM-DD), for the at-risk sparkline trends. */
+function thirtyDayWindow(date: string): { startDate: string; endDate: string } {
+  const end = new Date(`${date}T00:00:00`)
+  const start = new Date(end.getTime() - 29 * 24 * 60 * 60 * 1000)
+  return { startDate: start.toISOString().split('T')[0], endDate: date }
+}
+
+export function AttendanceModuleContent({ schoolId, currentYearId }: AttendanceModuleContentProps) {
+  const { t, formatDate } = useAcademicsI18n()
   const selectedDate = useAttendanceStore((s) => s.selectedDate)
-  const selectedSectionId = useAttendanceStore((s) => s.selectedSectionId)
-  const setSelectedSectionId = useAttendanceStore((s) => s.setSelectedSectionId)
   const dateActions = useAttendanceDateActions()
-  const [activeTab, setActiveTab] = useState<TabId>('overview')
-  const lastUpdatedLabel = useMemo(
-    () => t('attendance.lastUpdated', {
-      time: new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' }).format(new Date()),
-    }),
-    [locale, t],
-  )
 
-  // ABAC: check if user can create/edit attendance
-  const canCreateAttendance = usePermission('create', 'attendance')
-  // ABAC: IEMiS export is gated on attendance:export (Principal/VP/admin); hide
-  // the tab for view-only roles (matches the export-gated backend route).
-  const canExportAttendance = usePermission('export', 'attendance')
-  const visibleTabs = useMemo(
-    () => (canExportAttendance ? TABS : TABS.filter((t) => t.id !== 'iemis-export')),
-    [canExportAttendance],
-  )
+  // ABAC — recording, IEMiS export, and the derived scope lens (school-wide vs
+  // my-sections). The aggregate is scoped server-side by the caller's role; the
+  // lens is a read-only indicator, not a data toggle.
+  const canCreate = usePermission('create', 'attendance')
+  const canExport = usePermission('export', 'attendance')
+  const isSchoolWide = usePermission('manage', 'attendance')
 
-  // currentYearId / currentYearName are guaranteed non-empty by the gate in
-  // `AttendanceModule` above (Sprint 1 / Ticket 1.3a). Defensive `?.` falsy
-  // defaults on `currentYear` were removed in Ticket 1.3b.
+  const [drawerSectionId, setDrawerSectionId] = useState<string | null>(null)
+  const [exportOpen, setExportOpen] = useState(false)
 
-  // Fetch all active sections
   const {
-    data: sectionsData,
-    isLoading: sectionsLoading,
-  } = useSections({
-    schoolId,
-    filters: {
-      isActive: true,
-      academicYearId: currentYearId,
-    },
-    enabled: !!schoolId,
-  })
-
-  const sections = useMemo(() => flattenSectionPages(sectionsData), [sectionsData])
-
-  // Fetch section roster when section selected
-  const { data: roster, isLoading: rosterLoading } = useSectionRoster({
-    sectionId: selectedSectionId || '',
-    schoolId,
-    enabled: !!selectedSectionId && !!schoolId,
-  })
-
-  // Fetch section-specific attendance records (no client-side filtering needed)
-  const { data: sectionRecords } = useSectionAttendanceRecords({
-    sectionId: selectedSectionId || '',
-    schoolId,
-    date: selectedDate,
-    enabled: !!schoolId && !!selectedSectionId && activeTab === 'daily-entry',
-  })
-
-  const existingRecords = useMemo(() => {
-    if (!sectionRecords) return []
-    return sectionRecords.map((r) => ({
-      studentId: r.studentId,
-      status: r.status as AttendanceStatus,
-      notes: r.notes,
-      // PR5 — carry the saved reason so it hydrates the row (and a reason-only
-      // edit is correctly detected as dirty). The route previously dropped
-      // excuseReason here, so reasons never round-tripped on return.
-      excuseReason: r.excuseReason,
-    }))
-  }, [sectionRecords])
-
-  // Calendar date check (Sprint 5)
-  const { data: calendarDate } = useCalendarDate({
-    schoolId,
-    date: selectedDate,
-    enabled: !!schoolId && activeTab === 'daily-entry',
-  })
-
-  const isNonInstructional = calendarDate != null &&
-    !calendarDate.isInstructionalDay
-  const isPastDate = selectedDate < new Date().toISOString().split('T')[0]
-
-  // Section-level mutations
-  const bulkMutation = useRecordBulkSectionAttendance()
-  const updateMutation = useUpdateSectionAttendance()
-
-  // Task 4.1: Fetch overview for section completion indicators
-  const { data: overviewData } = useAttendanceOverview({
+    data: overview,
+    isLoading,
+    error,
+  } = useAttendanceOverview({
     schoolId,
     academicYearId: currentYearId,
     date: selectedDate,
-    enabled: !!schoolId && activeTab === 'daily-entry',
+    enabled: !!schoolId && !!currentYearId,
   })
 
-  // Task 4.1: Build completed section IDs set
-  const completedSectionIds = useMemo(() => {
-    const ids = new Set<string>()
-    if (overviewData?.sectionCompletion?.sections) {
-      for (const s of overviewData.sectionCompletion.sections) {
-        if (s.isComplete) ids.add(s.sectionId)
-      }
-    }
-    return ids
-  }, [overviewData])
-
-  // Attendance realignment: resolve the effective policy (daily_presence |
-  // per_section_granular). Mode drives the presence-lock overlay below.
   const { data: policy } = useAttendancePolicy(schoolId)
   const isDailyPresence = policy?.effectiveMode === 'daily_presence'
+  const atRiskThreshold = policy?.countingPolicy?.atRiskThresholdPct ?? 90
 
-  // Dismissable mode banner — acknowledged per mode (reappears if the mode changes).
-  const [modeBannerAcked, ackModeBanner] = useAcknowledged(
-    `attendance.modeBanner.${policy?.effectiveMode ?? 'pending'}`,
-  )
-
-  // Under daily_presence, a student's day-presence is locked by their FIRST
-  // section. Fetch the cross-section locks (only in this mode) and mark students
-  // already locked by ANOTHER section as read-only in the current section's grid.
-  const { data: presenceLockData } = usePresenceLocks(
-    isDailyPresence && activeTab === 'daily-entry' ? schoolId : undefined,
-    isDailyPresence && activeTab === 'daily-entry' ? selectedDate : undefined,
-  )
-  const lockedStudents = useMemo(() => {
-    const map = new Map<string, string>()
-    if (!isDailyPresence || !presenceLockData?.locks || !selectedSectionId) return map
-    for (const lock of presenceLockData.locks) {
-      if (lock.lockedBySectionId !== selectedSectionId) {
-        const where = lock.lockedBySectionName ? ` in ${lock.lockedBySectionName}` : ''
-        map.set(lock.studentId, `Already ${lock.status}${where}`)
-      }
-    }
-    return map
-  }, [isDailyPresence, presenceLockData, selectedSectionId])
-
-  // Offline resilience (Sprint 5)
-  const offlineState = useOfflineAttendance({
+  // Full section objects enrich the sections-to-record list with subject + teacher
+  // (the aggregate's per-section completion has neither).
+  const { data: sectionsData } = useSections({
     schoolId,
-    sectionId: selectedSectionId || '',
-    date: selectedDate,
-    onSave: async (records) => {
-      if (!schoolId || !selectedSectionId) return
-      await bulkMutation.mutateAsync({
-        date: selectedDate,
-        schoolId,
-        sectionId: selectedSectionId,
-        records,
-      })
-    },
+    filters: { isActive: true, academicYearId: currentYearId },
+    enabled: !!schoolId,
+  })
+  const sectionsById = useMemo(() => {
+    const list = flattenSectionPages(sectionsData)
+    return new Map(list.map((s) => [s.sectionId, s]))
+  }, [sectionsData])
+
+  // Derive the two honest signals + the at-risk cohort from the single aggregate.
+  const coverage = useMemo(
+    () => toSectionCoverage(overview?.sectionCompletion?.sections ?? []),
+    [overview],
+  )
+  const summary = useMemo(() => computeCoverageSummary(overview, coverage), [overview, coverage])
+  const rankedAlerts = useMemo(
+    () => rankAtRisk(overview?.atRiskStudents ?? [], atRiskThreshold),
+    [overview, atRiskThreshold],
+  )
+  const gradeRates = useMemo(() => toGradeRates(overview?.todaySummary?.byGradeLevel), [overview])
+
+  // Real 30-day sparkline series for the visible at-risk students (batched).
+  const atRiskIds = useMemo(() => rankedAlerts.slice(0, 50).map((a) => a.studentId), [rankedAlerts])
+  const { startDate, endDate } = useMemo(() => thirtyDayWindow(selectedDate), [selectedDate])
+  const { data: trends } = useAttendanceStudentTrends({
+    schoolId,
+    studentIds: atRiskIds,
+    startDate,
+    endDate,
+    enabled: !!schoolId && atRiskIds.length > 0,
   })
 
-  const handleSave = useCallback(
-    (records: Array<{ studentId: string; status: AttendanceStatus; notes?: string; excuseReason?: string }>) => {
-      if (!schoolId || !selectedSectionId) return
-      // Persist locally for offline resilience. F2.T6 — carry excuseReason through
-      // the offline round-trip; the route previously stripped it before
-      // persistLocally, so absence reasons never reached the server on save.
-      offlineState.persistLocally(
-        records.map(r => ({ studentId: r.studentId, status: r.status, notes: r.notes ?? '', excuseReason: r.excuseReason }))
-      )
-      // Then save to server
-      offlineState.save()
-    },
-    [schoolId, selectedSectionId, offlineState]
-  )
+  const dateLabel = formatDate(`${selectedDate}T00:00:00`, {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+  })
 
-  const handleCorrection = useCallback(
-    (record: { studentId: string; status: AttendanceStatus; notes?: string; excuseType?: string }) => {
-      if (!schoolId || !selectedSectionId) return
-      // Check if this student already has a record for this date
-      const hasExisting = sectionRecords?.some((r) => r.studentId === record.studentId)
-      if (hasExisting) {
-        // PATCH existing record
-        updateMutation.mutate({
-          date: selectedDate,
-          sectionId: selectedSectionId,
-          studentId: record.studentId,
-          status: record.status,
-          notes: record.notes,
-          excuseReason: record.excuseType,
-          schoolId,
-        })
-      } else {
-        // POST new record via bulk endpoint (single-record array)
-        bulkMutation.mutate({
-          date: selectedDate,
-          schoolId,
-          sectionId: selectedSectionId,
-          records: [{ studentId: record.studentId, status: record.status, notes: record.notes, excuseReason: record.excuseType }],
-        })
-      }
-    },
-    [schoolId, selectedSectionId, selectedDate, sectionRecords, updateMutation, bulkMutation]
-  )
+  const openFirstUnrecorded = () => {
+    const first = sortActionableFirst(coverage).find((c) => c.status !== 'recorded')
+    if (first) setDrawerSectionId(first.sectionId)
+  }
+  const canRecord = coverage.some((c) => c.status !== 'recorded')
+
+  const drawerCoverage = drawerSectionId
+    ? coverage.find((c) => c.sectionId === drawerSectionId)
+    : undefined
+  const drawerSection = drawerSectionId ? sectionsById.get(drawerSectionId) : undefined
+
+  // Reframe numbers: the deflated blended average vs the recorded rate.
+  const artifactPct = overview?.periodAverages?.academicYear ?? 0
+  const recordedRate =
+    (overview?.todaySummary?.totalRecorded ?? 0) > 0
+      ? (overview?.todaySummary?.attendanceRate ?? 0)
+      : (overview?.periodAverages?.last7Days ?? 0)
 
   return (
-    <div style={{ minHeight: '100%' }}>
-      {/* V2 Attendance Sub-Header + Sub-Tabs */}
-      <div className="px-6">
-        {/* Sub-Header Row */}
-        <div className="flex items-center justify-between mb-3.5">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center justify-center rounded-lg bg-[rgb(var(--accent-attendance)/0.1)]" style={{ width: 32, height: 32 }}>
-              <ClipboardCheck className="w-4 h-4 text-[rgb(var(--accent-attendance-text))]" />
-            </div>
-            <div>
-              <div className="text-base font-semibold tracking-[-0.2px] text-[rgb(var(--text-primary))]">{t('attendance.title')}</div>
-              <div className="text-3xs text-[rgb(var(--text-disabled))]">
-                {t('attendance.subtitle', { year: currentYearName || t('attendance.academicYearFallback') })}
-              </div>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-3xs text-[rgb(var(--text-disabled))]">
-              {lastUpdatedLabel}
-            </span>
-          </div>
+    <div className="flex flex-col gap-4 px-6 pb-8 pt-3">
+      <AttendanceCommandBar
+        selectedDate={selectedDate}
+        onDateChange={dateActions.setSelectedDate}
+        onPreviousDay={dateActions.goToPreviousDay}
+        onNextDay={dateActions.goToNextDay}
+        onToday={dateActions.goToToday}
+        policy={policy}
+        isSchoolWide={isSchoolWide}
+        canExport={canExport}
+        onExport={() => setExportOpen(true)}
+      />
+
+      {error ? (
+        <div className="rounded-xl border border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-secondary))] p-6 text-center">
+          <p className="text-sm font-medium text-[rgb(var(--state-danger-fg))]">
+            {t('attendance.dashboard.loadFailed')}
+          </p>
+          <p className="mt-1 text-2xs text-[rgb(var(--text-tertiary))]">
+            {t('attendance.dashboard.loadFailedDescription')}
+          </p>
         </div>
-
-        {/* Sub-Tabs */}
-        <TabBar activeTab={activeTab} onTabChange={setActiveTab} tabs={visibleTabs} />
-
-        {/* Controls Row (only for daily entry) */}
-        {activeTab === 'daily-entry' && (
-          <div className="flex items-center gap-6 flex-wrap mt-3 mb-1">
-            <SectionSelector
-              sections={sections}
-              selectedId={selectedSectionId}
-              onSelect={setSelectedSectionId}
-              isLoading={sectionsLoading}
-              completedSectionIds={completedSectionIds}
+      ) : (
+        <>
+          {overview && (
+            <CoverageReframeBanner
+              artifactPct={artifactPct}
+              recordedRate={recordedRate}
+              onRecordFirst={openFirstUnrecorded}
+              canRecord={canRecord}
             />
-            <DateSelector
-              selectedDate={selectedDate}
-              onDateChange={dateActions.setSelectedDate}
-              onPrevious={dateActions.goToPreviousDay}
-              onNext={dateActions.goToNextDay}
-              onToday={dateActions.goToToday}
-            />
-          </div>
-        )}
-      </div>
+          )}
 
-      {/* Tab Content */}
-      <div className="pt-4 px-6 pb-6">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.15 }}
-          >
-            {activeTab === 'overview' && (
-              <AttendanceDashboard
-                schoolId={schoolId}
-                academicYearId={currentYearId}
-                currentDate={selectedDate}
-              />
-            )}
+          <SectionsToRecord
+            coverage={coverage}
+            summary={summary}
+            sectionsById={sectionsById}
+            dateLabel={dateLabel}
+            onRecord={setDrawerSectionId}
+            loading={isLoading}
+          />
 
-            {activeTab === 'daily-entry' && (
-              <div className="space-y-6">
-                {/* Calendar Non-Instructional Banner */}
-                {isNonInstructional && (
-                  <CalendarBanner
-                    description={calendarDate?.calendarEvents?.[0]?.description || ''}
-                    eventType={calendarDate?.calendarEvents?.[0]?.eventType || 'non-instructional'}
-                  />
-                )}
+          {!isLoading && overview && (
+            <>
+              <AttendanceInsightStrip rankedAlerts={rankedAlerts} gradeRates={gradeRates} />
 
-                {/* Attendance policy banner (realignment) — dismissable per mode */}
-                {policy && !modeBannerAcked && (
-                  <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-[rgb(var(--state-info-bg)/0.12)] border border-[rgb(var(--state-info-fg)/0.2)] text-xs text-text-secondary">
-                    <Info className="w-3.5 h-3.5 mt-0.5 text-[rgb(var(--state-info-fg))] shrink-0" />
-                    <span className="flex-1">
-                      {t('attendance.policy.modeLabel')}{' '}
-                      <strong>{isDailyPresence ? t('attendance.policy.dailyPresence') : t('attendance.policy.perSection')}</strong>
-                      {isDailyPresence
-                        ? ` — ${t('attendance.policy.dailyPresenceDescription')}`
-                        : ` — ${t('attendance.policy.perSectionDescription')}`}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={ackModeBanner}
-                      className="flex shrink-0 items-center gap-1 rounded-md px-2 py-1 font-medium text-[rgb(var(--state-info-fg))] transition-colors hover:bg-[rgb(var(--state-info-bg)/0.2)]"
-                      aria-label={t('attendance.policy.dismissAria')}
-                    >
-                      <Check className="h-3.5 w-3.5" />
-                      {t('attendance.policy.dismiss')}
-                    </button>
-                  </div>
-                )}
-
-                {/* Missing-data affordance for an instructional day with no saved
-                    records. The grid no longer pre-fills Present — so make the
-                    "not recorded" state explicit (a misleading 0% / blank table is
-                    worse than nothing), and point at the one-click "All Present"
-                    path for today/future days. Past days get a plain not-recorded
-                    notice (they're in per-row correction mode). */}
-                {selectedSectionId && !isNonInstructional && existingRecords.length === 0 &&
-                  (roster?.students?.length ?? 0) > 0 && (
-                    <div className="flex items-start gap-2 px-3 py-2 rounded-lg bg-[rgb(var(--state-warning-bg)/0.12)] border border-[rgb(var(--state-warning-fg)/0.2)] text-xs text-text-secondary">
-                      <Info className="w-3.5 h-3.5 mt-0.5 text-[rgb(var(--state-warning-fg))] shrink-0" />
-                      <span>
-                        {isPastDate
-                          ? t('attendance.notRecorded.past')
-                          : t('attendance.notRecorded.current')}
-                      </span>
-                    </div>
-                  )}
-
-                {/* Attendance Grid */}
-                {!selectedSectionId ? (
-                  <div className="bg-surface-secondary rounded-xl border border-border-secondary p-12 text-center">
-                    <ClipboardCheck className="w-12 h-12 mx-auto text-text-tertiary mb-4" />
-                    <h4 className="text-lg font-medium text-text-primary mb-2">
-                      {t('attendance.empty.selectSectionTitle')}
-                    </h4>
-                    <p className="text-text-secondary max-w-md mx-auto">
-                      {t('attendance.empty.selectSectionDescription')}
-                    </p>
-                  </div>
-                ) : rosterLoading ? (
-                  <div className="space-y-3">
-                    {Array.from({ length: 8 }).map((_, i) => (
-                      <div
-                        key={i}
-                        className="h-14 bg-surface-secondary rounded-lg animate-pulse"
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <AttendanceGrid
-                    key={`${selectedSectionId}-${selectedDate}`}
-                    students={roster?.students ?? []}
-                    date={selectedDate}
-                    existingRecords={existingRecords}
-                    onSave={handleSave}
-                    isSaving={bulkMutation.isPending || offlineState.saveStatus === 'saving'}
-                    disabled={isNonInstructional || !canCreateAttendance}
-                    saveStatus={offlineState.saveStatus}
-                    onCorrection={handleCorrection}
-                    lockedStudents={lockedStudents}
-                  />
-                )}
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
+                <div className="lg:col-span-7">
+                  <AtRiskPanel alerts={rankedAlerts} trends={trends ?? {}} schoolId={schoolId} />
+                </div>
+                <div className="lg:col-span-5">
+                  <PatternsRail dayOfWeekPattern={overview.dayOfWeekPattern} gradeRates={gradeRates} />
+                </div>
               </div>
-            )}
 
-            {activeTab === 'iemis-export' && canExportAttendance && (
-              <IemisExportPanel schoolId={schoolId} academicYearId={currentYearId} />
-            )}
-          </motion.div>
-        </AnimatePresence>
-      </div>
+              <TrendPanel trend={overview.trend ?? []} periodAverages={overview.periodAverages} />
+            </>
+          )}
+        </>
+      )}
+
+      <RecordingDrawer
+        open={!!drawerSectionId}
+        sectionId={drawerSectionId}
+        courseName={drawerCoverage?.courseName ?? drawerSection?.courseName}
+        sectionNumber={drawerCoverage?.sectionNumber ?? drawerSection?.sectionNumber}
+        recordStatus={drawerCoverage?.status}
+        recordedCount={drawerCoverage?.recordedCount ?? 0}
+        enrolledCount={drawerCoverage?.studentCount ?? drawerSection?.currentEnrollment ?? 0}
+        schoolId={schoolId}
+        date={selectedDate}
+        canCreate={canCreate}
+        isDailyPresence={isDailyPresence}
+        onClose={() => setDrawerSectionId(null)}
+      />
+
+      {canExport && (
+        <IemisExportDialog
+          open={exportOpen}
+          onClose={() => setExportOpen(false)}
+          schoolId={schoolId}
+          academicYearId={currentYearId}
+        />
+      )}
     </div>
   )
 }
