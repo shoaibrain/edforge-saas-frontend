@@ -2654,10 +2654,19 @@
       "editPolicy": "Edit policy",
       "gradeScale": "Grade Scale",
       "categoryWeights": "Category Weights ({{total}}%)",
-      "rounding": "Rounding: {{rule}}",
       "newPolicy": "New Policy",
       "emptyTitle": "No grading policies configured",
-      "emptyDescription": "Create a grading policy to define grade scales, category weights, and rounding rules."
+      "emptyDescription": "Create a grading policy to define grade scales, category weights, and rounding rules.",
+      "gradeChip": "{{letter}} · {{min}}–{{max}}% · {{gpa}} GPA",
+      "weightAria": "{{category}} weight: {{weight}}%",
+      "scheme": "Scheme",
+      "schemeValue": "{{scheme}} · {{scale}}",
+      "schemeType": {
+        "letter_gpa": "Letter + GPA",
+        "division": "Division"
+      },
+      "minimumPassing": "Minimum passing",
+      "roundingLabel": "Rounding"
     },
     "overview": {
       "title": "Grade Analytics",

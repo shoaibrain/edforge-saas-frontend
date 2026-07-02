@@ -720,6 +720,10 @@
     "recordManualPayment": "म्यानुअल भुक्तानी रेकर्ड गर्नुहोस्",
     "bulkReceiptPdfExport": {
       "menuLabel": "PDF डाउनलोड (ZIP)"
+    },
+    "selection": {
+      "noneVoidable": "चयन गरिएका कुनै पनि भुक्तानी भोइड गर्न मिल्दैन — रसिद भएका पूरा भुक्तानीहरू मात्र योग्य हुन्छन्।",
+      "noneCompleted": "चयनमा कुनै पूरा भएको भुक्तानी छैन।"
     }
   },
   "recordPayment": {

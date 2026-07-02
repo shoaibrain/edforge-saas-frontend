@@ -2,9 +2,9 @@
  * TeacherDashboard — dashboard recipe
  *
  * Teacher/educator Home on the canonical surfaces: StatBand (KPIs) → WidgetCard
- * grid (My sections + section attendance). No teacher-scoped alert source yet,
- * so the AlertLane slot is omitted. Greeting lives in the shell topbar. All live
- * hooks + section error boundaries + reduced-motion stagger are preserved.
+ * grid (My sections + section attendance). No teacher-scoped signal source yet,
+ * so the ⑧ AttentionCorner is omitted. Greeting lives in the shell topbar. All
+ * live hooks + section error boundaries + reduced-motion stagger are preserved.
  */
 
 import { useMemo } from 'react'

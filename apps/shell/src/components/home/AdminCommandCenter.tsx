@@ -2,8 +2,8 @@
  * AdminCommandCenter — dashboard recipe
  *
  * Home page for school administrators, on the canonical dashboard surfaces:
- * AlertLane (④) → StatBand (KPIs) → WidgetCard grid (⑤). The greeting lives in
- * the shell topbar (HomeTopbarCenter). All live data hooks + operational chrome
+ * ⑧ AttentionCorner → StatBand (KPIs) → WidgetCard grid (⑤). The greeting lives
+ * in the shell topbar (HomeTopbarCenter). All live data hooks + operational chrome
  * (offline banner, getting-started, day-change, per-widget loading/error/retry,
  * section error boundaries, reduced-motion stagger) are preserved.
  */

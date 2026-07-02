@@ -24,11 +24,17 @@ test.describe('Bulk send payment receipts (#230 — D1)', () => {
   test.fixme(
     'happy path — 2 completed payments selected, send by email, see success toast',
     async ({ page }) => {
+      // Drives the ⑨ SelectionContextBar toolbar morph (mirror
+      // sections-bulk-status.spec.ts — the floating pill is gone):
       // 1. Visit /finance/billing/payments; seed 2 completed payments
       //    (with receiptNumber) + 1 refunded (no receiptNumber).
-      // 2. Select all 3 → bulk bar shows "3 selected".
-      // 3. Click "Send receipt" → drawer opens. Pick channel "Email".
-      // 4. Confirm "Will send (2)" + "Will skip (1)" with reason "refunded".
+      // 2. page.getByRole('checkbox', { name: 'Select all rows' }).check()
+      //    → the selection toolbar (role="toolbar") shows "3 selected";
+      //    "Send receipt" carries a ·2 subset count chip.
+      // 3. page.getByRole('button', { name: 'Send receipt', exact: true })
+      //    .click() → drawer opens with exactly the 2 applicable ids
+      //    (the refunded row never reaches the drawer). Pick channel "Email".
+      // 4. Confirm "Will send (2)".
       // 5. Mock POST /finance/schools/:id/payments/bulk-send-receipt →
       //    { jobId: "job_1", status: "queued", totalRecords: 2 }.
       // 6. Mock GET /finance/schools/:id/payments/jobs/job_1 →

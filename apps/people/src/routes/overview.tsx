@@ -2,9 +2,10 @@
  * People Overview Page — dashboard recipe
  *
  * PageHeader (pagebar, date-only — People isn't academic-year scoped) → StatBand
- * → WidgetCard grid. No alert source for People, so the AlertLane slot is
- * omitted (same as Teacher Home). Reuses the live `useStaffList` data + the
- * inline StaffRow/BarRow bodies, now framed by WidgetCard.
+ * → WidgetCard grid. No signal source for People yet, so the ⑧ AttentionCorner
+ * is omitted (same as Teacher Home; see header-zone-spec §7b for the planned
+ * corner). Reuses the live `useStaffList` data + the inline StaffRow/BarRow
+ * bodies, now framed by WidgetCard.
  */
 
 import { useMemo } from 'react'

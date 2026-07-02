@@ -22,14 +22,19 @@ test.describe('Bulk suspend users (#234)', () => {
   test.fixme(
     'happy path — 3 active users selected, suspend, see success toast',
     async ({ page }) => {
+      // Drives the ⑨ SelectionContextBar toolbar morph (mirror
+      // sections-bulk-status.spec.ts — the floating pill is gone):
       // 1. Visit /settings/people; seed 3 active + 1 already-suspended user.
-      // 2. Select all 4 → bulk bar shows "4 selected" with critical-tone
-      //    Suspend button.
-      // 3. Click Suspend → modal opens, header "Suspend 3 users?"
-      //    (skipped row shown with reason "already suspended").
+      // 2. page.getByRole('checkbox', { name: 'Select all rows' }).check()
+      //    → the selection toolbar (role="toolbar") shows "4 selected";
+      //    the danger-styled "Suspend" button carries a ·3 subset count
+      //    chip (already-suspended rows excluded up front).
+      // 3. page.getByRole('button', { name: 'Suspend', exact: true })
+      //    .click() → modal opens, header "Suspend 3 users?" (the
+      //    already-suspended row never reaches the modal).
       // 4. Mock PATCH /tenant/users/:id × 3 to 200.
-      // 5. Confirm → toast "Suspended 3 users · 1 skipped".
-      // 6. Table refetches; selection cleared.
+      // 5. Confirm → toast "Suspended 3 users".
+      // 6. Table refetches; selection cleared (toolbar restores).
       await page.goto('/settings/people')
       await expect(page.getByRole('heading', { name: /user accounts/i })).toBeVisible()
     },
@@ -38,8 +43,10 @@ test.describe('Bulk suspend users (#234)', () => {
   test.fixme(
     'self always skipped — cannot suspend yourself',
     async ({ page }) => {
-      // Seed: 2 other active + the current user. Select all 3.
-      // Confirm the current user appears as skipped ("cannot suspend yourself").
+      // Seed: 2 other active + the current user. Select all 3 via the
+      // selection toolbar → "Suspend" shows a ·2 subset count chip (self
+      // excluded up front); the modal header reads "Suspend 2 users?" —
+      // the current user never reaches the modal.
       await page.goto('/settings/people')
     },
   )

@@ -1,8 +1,9 @@
 /**
- * Dashboard recipes (@edforge/ui) — the two new canonical surfaces the
- * role-aware Home and every module Overview compose from.
+ * Dashboard recipes (@edforge/ui) — the canonical widget surface the
+ * role-aware Home and every module Overview compose from. (AlertLane and
+ * DashboardLayout were retired in favor of the ⑧ AttentionCorner header
+ * zone — see docs/design-system/header-zone-spec.md §7f.)
  */
-export { AlertLane, type AlertLaneProps, type DashboardAlert, type AlertSeverity } from './AlertLane'
 export {
   WidgetCard,
   WidgetGrid,
@@ -10,4 +11,3 @@ export {
   type WidgetSpan,
   type WidgetState,
 } from './WidgetCard'
-export { DashboardLayout, type DashboardLayoutProps } from './DashboardLayout'

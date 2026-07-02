@@ -9,8 +9,7 @@
  */
 
 import { useMemo, useState, type ReactNode } from 'react'
-import { User, MoreVertical, UserMinus, ExternalLink, Archive } from 'lucide-react'
-import { toast } from 'sonner'
+import { User, MoreVertical, UserMinus, ExternalLink } from 'lucide-react'
 import type { OnChangeFn, RowSelectionState } from '@tanstack/react-table'
 import {
   TanstackDataTable,
@@ -18,7 +17,6 @@ import {
   createSelectColumn,
   IdentityCell,
   type AttendanceTrendDirection,
-  type BulkAction,
   type ColumnDef,
   type DataTableColumnMeta,
   type TablePreset,
@@ -76,12 +74,8 @@ interface StudentTableProps {
   isFetchingMore?: boolean
   onLoadMore?: () => void
   serverTotalHint?: number
-  /** Override the internal toast-placeholder bulk actions. Pass from the route
-   *  when wiring a real bulk drawer (e.g. BulkArchiveStudentsModal). */
-  bulkActions?: BulkAction<StudentResponseDto>[]
   /** ⑨ Selection Context Bar node — morphs the toolbar in place on selection.
-   *  When provided, the legacy floating pill (bulkActions) is retired. Row ids
-   *  are studentIds, so the page can map its selection state to rows. */
+   *  Row ids are studentIds, so the page can map its selection state to rows. */
   selectionBar?: ReactNode
   /** Controlled row selection — lift state into the page when an action
    *  needs to clear selection (e.g. after a bulk archive). */
@@ -190,7 +184,6 @@ export function StudentTable({
   isFetchingMore,
   onLoadMore,
   serverTotalHint,
-  bulkActions: bulkActionsProp,
   selectionBar,
   rowSelection,
   onRowSelectionChange,
@@ -304,30 +297,6 @@ export function StudentTable({
     ? { hasMore: Boolean(hasMore), isFetching: Boolean(isFetchingMore), onLoadMore, serverTotalHint }
     : undefined
 
-  // Fallback bulk actions used when the route doesn't pass `bulkActionsProp`.
-  // Only Archive is included — the per-row mutation already exists, so the
-  // route at /students upgrades this to a real `BulkArchiveStudentsModal`.
-  // Earlier `Message` and `Move section` placeholders were dropped: their
-  // backend slices (#221, #222) aren't built, and shipping toast placeholders
-  // for unsupported flows confuses operators. Re-add here once those land.
-  const defaultBulkActions = useMemo<BulkAction<StudentResponseDto>[]>(
-    () => [
-      {
-        id: 'archive',
-        label: t('tables.students.actions.archive'),
-        icon: <Archive className="w-4 h-4" />,
-        tone: 'critical',
-        onRun: (rows) => toast.info(t('common.comingSoon', {
-          action: t('tables.students.bulk.archive'),
-          countLabel: t('common.students', { count: rows.length }),
-        })),
-      },
-    ],
-    [t],
-  )
-
-  const bulkActions = bulkActionsProp ?? defaultBulkActions
-
   return (
     <TanstackDataTable
       columns={columns}
@@ -356,7 +325,6 @@ export function StudentTable({
       pageSizes={[25, 50, 100]}
       defaultSort={[{ id: 'fullName', desc: false }]}
       serverPagination={serverPagination}
-      bulkActions={selectionBar ? undefined : bulkActions}
       selectionBar={selectionBar}
       getRowId={(s) => s.studentId}
       rowSelection={rowSelection}

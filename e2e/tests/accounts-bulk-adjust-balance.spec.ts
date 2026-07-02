@@ -27,7 +27,11 @@ test.describe('Bulk adjust student-account balance (#232 — D4)', () => {
   test.fixme(
     'Apply button stays disabled until amount + reason + effectiveDate are valid',
     async ({ page }) => {
-      // Open drawer with 2 accounts selected.
+      // Drives the ⑨ SelectionContextBar toolbar morph (mirror
+      // sections-bulk-status.spec.ts — the floating pill is gone):
+      // select 2 rows → toolbar (role="toolbar") shows "2 selected" →
+      // page.getByRole('button', { name: 'Adjust balance', exact: true })
+      // .click() opens the drawer with the 2 applicable ids.
       // Confirm Apply is disabled with empty inputs.
       // Fill amount=50, reason="x", effectiveDate=today → Apply enables.
       // Clear reason → Apply disables again.

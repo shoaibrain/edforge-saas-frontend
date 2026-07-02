@@ -70,6 +70,12 @@ export interface FacetedFilterConfig {
 // BULK ACTIONS
 // ============================================================================
 
+/**
+ * @deprecated Contract of the legacy floating bulk pill, which was removed
+ * from `DataTable` (issue #303a) — build a page-level `<SelectionContextBar/>`
+ * with `SelectionAction[]` and pass it via the `selectionBar` prop instead.
+ * Kept exported for one release for `TableBulkBar` and external consumers.
+ */
 export interface BulkAction<TData> {
   /** Stable id (used for React keys + analytics). Optional for back-compat. */
   id?: string
@@ -297,15 +303,15 @@ export interface DataTableProps<TData> {
   // -- Density --
   /** Initial density. Persisted state takes precedence when `tableId` is set. */
   density?: DataTableDensity
-  /** Show the toolbar density toggle. Defaults to true when bulkActions/facets exist. */
+  /** Show the toolbar density toggle. Defaults to true when facets/search/selectionBar exist. */
   enableDensityToggle?: boolean
 
   // -- Bulk Actions --
-  bulkActions?: BulkAction<TData>[]
   /**
    * ⑨ Selection Context Bar node (e.g. `<SelectionContextBar/>`). When provided
    * and rows are selected, it swaps into the toolbar's footprint in place
-   * (zero layout shift) and the legacy FloatingBulkBar pill is suppressed.
+   * (zero layout shift). This is the only bulk surface — the legacy
+   * `bulkActions` floating pill was removed (issue #303a).
    * Requires the toolbar to be rendered (any toolbar prop present).
    */
   selectionBar?: ReactNode

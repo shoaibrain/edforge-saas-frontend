@@ -20,8 +20,10 @@ import {
   type StatMetric,
   Select,
   DataTableMoreFilters,
+  SelectionContextBar,
+  type SelectionAction,
 } from '@edforge/ui'
-import type { BulkAction, ColumnDef } from '@edforge/ui'
+import type { ColumnDef } from '@edforge/ui'
 import type { RowSelectionState } from '@tanstack/react-table'
 import { EntityIdDisplay } from '@edforge/archetype'
 import {
@@ -735,7 +737,7 @@ export default function PaymentsPage() {
   const refundMutation = useCreateRefund(schoolId ?? '')
   const exportCsvMutation = useExportPaymentsCsv()
 
-  const paymentList = Array.isArray(payments) ? payments : []
+  const paymentList = useMemo(() => (Array.isArray(payments) ? payments : []), [payments])
 
   // KPI computation
   const kpi = useMemo(() => {
@@ -793,7 +795,7 @@ export default function PaymentsPage() {
     format,
   )
 
-  // Bulk actions on the Payments list:
+  // Bulk surfaces on the Payments list:
   //   - Void (#229, cheap-path fan-out)
   //   - Send receipt (#230, D1 of the async-job framework, PR #339)
   //   - Download PDF (ZIP) — Sprint G.4, wires G.2 backend worker via
@@ -807,38 +809,57 @@ export default function PaymentsPage() {
   // is the source of truth).
   const [bulkPdfExportTarget, setBulkPdfExportTarget] = useState<string[] | null>(null)
 
-  const paymentBulkActions = useMemo<BulkAction<Payment>[]>(
-    () => [
+  // ── ⑨ Selection Context Bar — state-aware action matrix (retires the
+  // legacy floating pill). Void / Send receipt mirror the drawers' own
+  // eligibility splits (`splitEligibleVoid` / `splitEligibleReceipts`:
+  // completed + receipted); Download PDF (ZIP) applies to completed
+  // payments — the G.2 worker's status filter surfaced as the subset chip
+  // up front instead of a post-hoc skip. Handlers receive `applicableIds`
+  // only, so the drawers open with exactly the qualifying rows.
+  const selectedPayments = useMemo(() => {
+    const ids = new Set(Object.keys(rowSelection).filter((id) => rowSelection[id]))
+    return paymentList.filter((p) => ids.has(p.id))
+  }, [rowSelection, paymentList])
+
+  const selectionActions = useMemo<SelectionAction[]>(() => {
+    const byId = new Map(selectedPayments.map((p) => [p.id, p]))
+    const rowsFor = (ids: string[]) =>
+      ids.map((id) => byId.get(id)).filter((p): p is Payment => !!p)
+    // Same predicate as splitEligibleVoid / splitEligibleReceipts.
+    const receiptedCompletedIds = selectedPayments
+      .filter((p) => p.status === 'completed' && p.receiptNumber)
+      .map((p) => p.id)
+    const completedIds = selectedPayments
+      .filter((p) => p.status === 'completed')
+      .map((p) => p.id)
+    return [
       {
         id: 'void',
         label: t('paymentsList.voidSelected'),
-        icon: <Ban className="w-4 h-4" />,
-        tone: 'critical',
-        onRun: (rows) => setBulkVoidTarget(rows),
+        icon: <Ban className="h-3.5 w-3.5" />,
+        danger: true,
+        applicableIds: receiptedCompletedIds,
+        disabledReason: t('paymentsList.selection.noneVoidable'),
+        onAction: (ids) => setBulkVoidTarget(rowsFor(ids)),
       },
       {
         id: 'send-receipt',
         label: t('paymentsList.sendReceipt'),
-        icon: <Receipt className="w-4 h-4" />,
-        onRun: (rows) => setBulkReceiptTarget(rows),
+        icon: <Receipt className="h-3.5 w-3.5" />,
+        applicableIds: receiptedCompletedIds,
+        disabledReason: t('paymentsList.selection.noneCompleted'),
+        onAction: (ids) => setBulkReceiptTarget(rowsFor(ids)),
       },
       {
-        // Sprint G.4 — bulk PDF (ZIP) export of RECEIPTS.
-        // Symmetric to the invoice-list `pdf-export` action.
-        // Selection set comes from row checkboxes; the G.2 worker
-        // filters non-completed payments as `skipped` (not `failed`).
-        // Backend dedupes at the schema layer; we still pass an
-        // Array.from(new Set()) here to keep any per-page duplication
-        // out of the initial ID array.
         id: 'pdf-export',
         label: t('paymentsList.bulkReceiptPdfExport.menuLabel'),
-        icon: <Download className="w-4 h-4" />,
-        onRun: (rows) =>
-          setBulkPdfExportTarget(Array.from(new Set(rows.map((r) => r.id)))),
+        icon: <Download className="h-3.5 w-3.5" />,
+        applicableIds: completedIds,
+        disabledReason: t('paymentsList.selection.noneCompleted'),
+        onAction: (ids) => setBulkPdfExportTarget(Array.from(new Set(ids))),
       },
-    ],
-    [t],
-  )
+    ]
+  }, [selectedPayments, t])
 
   if (!schoolId) {
     return (
@@ -889,6 +910,38 @@ export default function PaymentsPage() {
       state: kpi.cancelledCount > 0 ? 'normal' : 'muted',
     },
   ]
+
+  const singlePayment = selectedPayments.length === 1 ? selectedPayments[0] : null
+  const selectionBar = (
+    <SelectionContextBar
+      selectedCount={selectedPayments.length}
+      totalCount={paymentList.length}
+      onClear={() => setRowSelection({})}
+      onSelectAll={() =>
+        setRowSelection(Object.fromEntries(paymentList.map((p) => [p.id, true])))
+      }
+      actions={selectionActions}
+      aria-label={t('headerZone.selection.aria')}
+      labels={{
+        selected: (count) => t('headerZone.selection.selected', { count }),
+        selectAll: (total) => t('headerZone.selection.selectAll', { count: total }),
+        clear: t('headerZone.selection.clear'),
+      }}
+      peek={
+        singlePayment ? (
+          <div className="min-w-0">
+            <div className="truncate text-sm font-semibold text-[rgb(var(--text-primary))]">
+              {singlePayment.studentName ?? singlePayment.receiptNumber ?? '—'}
+            </div>
+            <div className="truncate text-2xs text-[rgb(var(--text-tertiary))]">
+              {format(singlePayment.amount)} ·{' '}
+              {t(`status.${singlePayment.status}`, { defaultValue: singlePayment.status })}
+            </div>
+          </div>
+        ) : undefined
+      }
+    />
+  )
 
   return (
     <div className="p-6 space-y-5">
@@ -982,7 +1035,7 @@ export default function PaymentsPage() {
             isExporting={exportCsvMutation.isPending}
           />
         }
-        bulkActions={paymentBulkActions}
+        selectionBar={selectionBar}
         emptyState={{
           icon: <CreditCard className="w-10 h-10" />,
           title: t('empty.noPayments'),
