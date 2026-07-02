@@ -1,21 +1,27 @@
 /**
  * People Overview Page — dashboard recipe
  *
- * PageHeader (pagebar, date-only — People isn't academic-year scoped) → StatBand
- * → WidgetCard grid. No signal source for People yet, so the ⑧ AttentionCorner
- * is omitted (same as Teacher Home; see header-zone-spec §7b for the planned
- * corner). Reuses the live `useStaffList` data + the inline StaffRow/BarRow
- * bodies, now framed by WidgetCard.
+ * PageHeader (pagebar, date-only — People isn't academic-year scoped, with the
+ * ⑧ AttentionCorner pill in the attention slot) → StatBand → WidgetCard grid.
+ * Signals derive from the same live `useStaffList` data the page already
+ * renders (header-zone-spec §7b): unassigned-department (warn, Capacity) and
+ * no-system-access (info, Data quality) — both auto-resolve as records are
+ * fixed. Reuses the inline StaffRow/BarRow bodies, framed by WidgetCard.
  */
 
 import { useMemo } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { Users, UserPlus, ChevronRight } from 'lucide-react'
 import {
+  AttentionCorner,
+  AttentionCornerPill,
+  AttentionCornerShade,
   Container,
   PageHeader,
   StatBand,
+  type Signal,
   type StatMetric,
+  useSignalAcks,
   WidgetGrid,
   WidgetCard,
   WidgetErrorBoundaryV2,
@@ -71,6 +77,7 @@ export function Overview() {
     )
     const withAccess = staff.filter((s) => !!s.userId)
     const noAccess = staff.length - withAccess.length
+    const unassigned = staff.filter((s) => !s.departmentName).length
 
     // Employment type counts
     const fullTime = staff.filter((s) => s.employmentStatus === 'active').length
@@ -92,6 +99,7 @@ export function Overview() {
       support: support.length,
       withAccess: withAccess.length,
       noAccess,
+      unassigned,
       fullTime,
       contract,
       partTime,
@@ -122,6 +130,35 @@ export function Overview() {
         color: s.userId ? '#1D9E75' : '#7F77DD',
       }))
   }, [staff, t])
+
+  // ── ⑧ Attention Corner signals (spec §7b) ─────────────────────────────────
+  // Derived from the same staff query on every render, so assigning the
+  // department or provisioning access auto-resolves the signal. `[]` while
+  // the query loads.
+  const { acked, ack, unack } = useSignalAcks()
+  const signals: Signal[] = []
+  if (!isLoading) {
+    if (stats.unassigned > 0) {
+      signals.push({
+        id: 'people.unassignedDepartment',
+        severity: 'warn',
+        domain: t('headerZone.domains.capacity'),
+        title: t('overview.signals.unassignedTitle', { count: stats.unassigned }),
+        description: t('overview.signals.unassignedDescription'),
+        fix: { label: t('overview.signals.openDirectory'), onAction: goStaff },
+      })
+    }
+    if (stats.noAccess > 0) {
+      signals.push({
+        id: 'people.noSystemAccess',
+        severity: 'info',
+        domain: t('headerZone.domains.dataQuality'),
+        title: t('overview.signals.noAccessTitle', { count: stats.noAccess }),
+        description: t('overview.signals.noAccessDescription'),
+        fix: { label: t('overview.signals.openDirectory'), onAction: goStaff },
+      })
+    }
+  }
 
   // ── StatBand metrics (calm; attention only via state) ────────────────────
   const metrics: StatMetric[] = [
@@ -161,24 +198,45 @@ export function Overview() {
       {/* Screen-reader page heading (breadcrumb names the page visually) */}
       <h1 className="sr-only">{t('title')}</h1>
 
-      {/* ---- Page header (pagebar) ---- */}
-      <PageHeader
-        className="mb-4"
-        mode="pagebar"
-        actions={[
-          {
-            label: t('staffDirectory.title'),
-            icon: <Users className="h-3.5 w-3.5" />,
-            onClick: goStaff,
-          },
-          {
-            label: t('staffDirectory.addStaff'),
-            icon: <UserPlus className="h-3.5 w-3.5" />,
-            primary: true,
-            onClick: () => modal.openCreate(),
-          },
-        ]}
-      />
+      {/* ---- ⑧ Header zone — attention pill left, actions right ---- */}
+      <div className="mb-4">
+        <AttentionCorner
+          signals={signals}
+          acked={acked}
+          onAck={ack}
+          onUnack={unack}
+          labels={{
+            needAttention: t('headerZone.needAttention'),
+            allClear: t('headerZone.allClear'),
+            region: t('headerZone.region'),
+            minimize: t('headerZone.minimize'),
+            acknowledge: t('headerZone.acknowledge'),
+            acknowledged: t('headerZone.acknowledged'),
+            acknowledgedHint: t('headerZone.acknowledgedHint'),
+            dismiss: t('headerZone.dismiss'),
+            emptyTitle: t('headerZone.emptyTitle'),
+          }}
+        >
+          <PageHeader
+            mode="pagebar"
+            attention={<AttentionCornerPill data-testid="attention-pill" />}
+            actions={[
+              {
+                label: t('staffDirectory.title'),
+                icon: <Users className="h-3.5 w-3.5" />,
+                onClick: goStaff,
+              },
+              {
+                label: t('staffDirectory.addStaff'),
+                icon: <UserPlus className="h-3.5 w-3.5" />,
+                primary: true,
+                onClick: () => modal.openCreate(),
+              },
+            ]}
+          />
+          <AttentionCornerShade />
+        </AttentionCorner>
+      </div>
 
       {/* ---- StatBand — staff KPIs ---- */}
       <div className="mb-4">
