@@ -562,7 +562,7 @@ export default function StudentAccountsPage() {
 
   const { data: accounts, isLoading } = useStudentAccounts(schoolId ?? '')
 
-  const accountList: StudentAccount[] = accounts ?? []
+  const accountList: StudentAccount[] = useMemo(() => accounts ?? [], [accounts])
 
   const kpi = useMemo(() => {
     const totalStudents = accountList.length

@@ -737,7 +737,7 @@ export default function PaymentsPage() {
   const refundMutation = useCreateRefund(schoolId ?? '')
   const exportCsvMutation = useExportPaymentsCsv()
 
-  const paymentList = Array.isArray(payments) ? payments : []
+  const paymentList = useMemo(() => (Array.isArray(payments) ? payments : []), [payments])
 
   // KPI computation
   const kpi = useMemo(() => {

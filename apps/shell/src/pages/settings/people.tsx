@@ -417,7 +417,7 @@ export default function PeopleSettingsPage() {
 
   const { data, isLoading } = useUsers(queryParams, !!hasPermission)
 
-  const users = data?.items || []
+  const users = useMemo(() => data?.items || [], [data])
 
   // Compute stats from data
   const stats = useMemo(() => {
