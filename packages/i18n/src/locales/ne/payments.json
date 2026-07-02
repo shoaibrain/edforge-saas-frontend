@@ -1198,5 +1198,21 @@
       "selectAll": "सबै {{count}} चयन गर्नुहोस्",
       "clear": "चयन खाली गर्नुहोस्"
     }
+  },
+  "receiptDetail": {
+    "print": "प्रिन्ट",
+    "stamp": {
+      "paid": "भुक्तानी भयो",
+      "partialRefund": "आंशिक फिर्ता"
+    },
+    "fields": {
+      "invoice": "बीजक"
+    },
+    "amountInWords": "रकम अक्षरमा —",
+    "refund": {
+      "title": "फिर्ता जारी — {{amount}}",
+      "net": "कायम रहेको खुद रकम: {{amount}}"
+    },
+    "fine": "कम्प्युटरद्वारा तयार रसिद — हस्ताक्षरबिना मान्य। Edforge द्वारा {{date}} मा तयार।"
   }
 }
