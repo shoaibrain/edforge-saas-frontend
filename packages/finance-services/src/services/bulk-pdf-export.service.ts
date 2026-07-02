@@ -89,3 +89,37 @@ export async function bulkInvoicePdfExport(
 export async function getFinanceJob(jobId: string): Promise<FinanceJobRow> {
   return apiGet<FinanceJobRow>(`/finance/jobs/${jobId}`)
 }
+
+// ============================================================================
+// Sprint G.3/G.4 — bulk RECEIPT PDF export
+// ============================================================================
+
+/**
+ * Sprint G.3 request body for `POST /finance/schools/:schoolId/payments/bulk-pdf-export`.
+ * Mirror of `BulkInvoicePdfExportDto` with `paymentIds` instead of `invoiceIds`.
+ */
+export interface BulkReceiptPdfExportDto {
+  paymentIds: string[]
+  format: 'zip' // 'merged_pdf' enables in Sprint H.3
+}
+
+/**
+ * 202 ack from the Sprint G.3 endpoint. Same shape as the invoice ack —
+ * only jobType on the resulting FinanceJob differs.
+ */
+export type BulkReceiptPdfExportAck = BulkInvoicePdfExportAck
+
+export async function bulkReceiptPdfExport(
+  schoolId: string,
+  dto: BulkReceiptPdfExportDto,
+): Promise<BulkReceiptPdfExportAck> {
+  return apiPost<BulkReceiptPdfExportAck, BulkReceiptPdfExportDto>(
+    `/finance/schools/${schoolId}/payments/bulk-pdf-export`,
+    dto,
+    {
+      headers: {
+        'Idempotency-Key': crypto.randomUUID(),
+      },
+    },
+  )
+}

@@ -186,15 +186,19 @@ export {
 // D.3 backend 404-not-403 enumerability contract.
 export {
   bulkInvoicePdfExport,
+  bulkReceiptPdfExport,
   getFinanceJob,
 } from './services/bulk-pdf-export.service'
 export type {
   BulkInvoicePdfExportAck,
   BulkInvoicePdfExportDto,
+  BulkReceiptPdfExportAck,
+  BulkReceiptPdfExportDto,
   FinanceJobRow,
 } from './services/bulk-pdf-export.service'
 export { useFinanceJob } from './hooks/useFinanceJob'
 export { useBulkInvoicePdfExport } from './hooks/useBulkInvoicePdfExport'
+export { useBulkReceiptPdfExport } from './hooks/useBulkReceiptPdfExport'
 
 // Pagination foundation (Sprint 0)
 export { useFinancePaginatedQuery } from './hooks/useFinancePaginatedQuery'
