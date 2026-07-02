@@ -39,6 +39,8 @@ import {
   Send,
   ToggleLeft,
   ToggleRight,
+  Building2,
+  Gauge,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import {
@@ -52,7 +54,12 @@ import {
   SegmentedControl,
   TablePresetTabs,
   DataTableMoreFilters,
-  type BulkAction,
+  AttentionCorner,
+  AttentionCornerPill,
+  AttentionCornerShade,
+  SelectionContextBar,
+  type Signal,
+  type SelectionAction,
 } from '@edforge/ui'
 import type { RowSelectionState } from '@tanstack/react-table'
 import { useActiveSchoolId } from '../../stores/app.store'
@@ -77,6 +84,8 @@ import { ClassroomCardGrid } from '../../components/classrooms/ClassroomCardGrid
 // --- Grades imports ---
 import { useGradesStore } from '../../stores/grades.store'
 import { useCurrentAcademicYear, useGradingPeriods } from '../../hooks'
+import { useAttendanceOverview } from '../../hooks/useAttendance'
+import { useSignalAcks } from '../../hooks/useSignalAcks'
 import { useSectionGrades, useGradingPolicies } from '../../hooks/useGrades'
 import { GradebookGrid } from '../../components/grades/GradebookGrid'
 import { GradebookLaunchpad } from '../../components/grades/GradebookLaunchpad'
@@ -239,29 +248,86 @@ function OverviewTab() {
     targetActive: boolean
   } | null>(null)
 
-  const bulkActions = useMemo<BulkAction<SectionResponseDto>[]>(
-    () => [
+  // ⑨ Selection Context Bar — state-aware matrix (retires the floating pill).
+  // Activate applies only to selected INACTIVE sections, Deactivate only to
+  // ACTIVE ones (subset chips + confirm-on-subset); both lock visibly without
+  // scheduling:edit. Notify stays a coming-soon toast.
+  const selectedSections = useMemo(() => {
+    const ids = new Set(Object.keys(rowSelection))
+    return sections.filter((s) => ids.has(s.sectionId))
+  }, [rowSelection, sections])
+
+  const selectionActions = useMemo<SelectionAction[]>(() => {
+    const byId = new Map(selectedSections.map((s) => [s.sectionId, s]))
+    const rowsFor = (ids: string[]) =>
+      ids.map((id) => byId.get(id)).filter((s): s is SectionResponseDto => !!s)
+    const inactiveIds = selectedSections.filter((s) => !s.isActive).map((s) => s.sectionId)
+    const activeIds = selectedSections.filter((s) => s.isActive).map((s) => s.sectionId)
+    return [
       {
         id: 'activate',
         label: t('classrooms.actions.activate'),
-        icon: <ToggleRight className="w-4 h-4" />,
-        onRun: (rows) => setBulkStatusTarget({ rows, targetActive: true }),
+        icon: <ToggleRight className="h-3.5 w-3.5" />,
+        applicableIds: inactiveIds,
+        locked: !schedPerms.edit,
+        lockedReason: t('studentsModule.bulk.requiresAdmin'),
+        disabledReason: t('classrooms.selection.noInactive'),
+        onAction: (ids) => setBulkStatusTarget({ rows: rowsFor(ids), targetActive: true }),
       },
       {
         id: 'deactivate',
         label: t('classrooms.actions.deactivate'),
-        icon: <ToggleLeft className="w-4 h-4" />,
-        onRun: (rows) => setBulkStatusTarget({ rows, targetActive: false }),
+        icon: <ToggleLeft className="h-3.5 w-3.5" />,
+        applicableIds: activeIds,
+        locked: !schedPerms.edit,
+        lockedReason: t('studentsModule.bulk.requiresAdmin'),
+        disabledReason: t('classrooms.selection.noActive'),
+        onAction: (ids) => setBulkStatusTarget({ rows: rowsFor(ids), targetActive: false }),
       },
       {
         id: 'notify',
         label: t('classrooms.actions.sendNotification'),
-        icon: <Send className="w-4 h-4" />,
-        onRun: (rows) =>
-          toast.info(t('classrooms.toast.notifyComingSoon', { count: rows.length })),
+        icon: <Send className="h-3.5 w-3.5" />,
+        applicableIds: selectedSections.map((s) => s.sectionId),
+        onAction: (ids) => toast.info(t('classrooms.toast.notifyComingSoon', { count: ids.length })),
       },
-    ],
-    [t],
+    ]
+  }, [selectedSections, schedPerms.edit, t])
+
+  const singleSection = selectedSections.length === 1 ? selectedSections[0] : null
+  const selectionBar = (
+    <SelectionContextBar
+      selectedCount={selectedSections.length}
+      totalCount={sections.length}
+      onClear={() => setRowSelection({})}
+      onSelectAll={() =>
+        setRowSelection(Object.fromEntries(sections.map((s) => [s.sectionId, true])))
+      }
+      actions={selectionActions}
+      aria-label={t('dataTable.selection.aria')}
+      labels={{
+        selected: (count) => t('dataTable.selection.selected', { count: formatNumber(count) }),
+        selectAll: (total) => t('dataTable.selection.selectAll', { count: formatNumber(total) }),
+        clear: t('dataTable.selection.clear'),
+      }}
+      peek={
+        singleSection ? (
+          <div className="min-w-0">
+            <div className="truncate text-sm font-semibold text-[rgb(var(--text-primary))]">
+              {singleSection.courseName ?? singleSection.courseCode} — {singleSection.sectionNumber}
+            </div>
+            <div className="truncate text-2xs text-[rgb(var(--text-tertiary))]">
+              {t('classrooms.selection.peekSeats', {
+                enrolled: formatNumber(singleSection.currentEnrollment),
+                cap: formatNumber(singleSection.maxEnrollment),
+              })}
+              {' · '}
+              {singleSection.isActive ? t('common.active') : t('common.inactive')}
+            </div>
+          </div>
+        ) : undefined
+      }
+    />
   )
 
   const handleNavigateToDetail = (section: SectionResponseDto) => {
@@ -306,7 +372,14 @@ function OverviewTab() {
 
       {/* Unified toolbar + body — one connected container (toolbar row → content) */}
       <div>
-        {/* Toolbar: one row drives both the card grid and the table */}
+        {/* ⑨ Selecting rows morphs this row into the selection bar in place
+            (same container chrome — zero layout shift); ✕/Esc restores it. */}
+        {selectedSections.length > 0 ? (
+          <div className="rounded-t-xl border border-b-0 border-[rgb(var(--border-primary)/0.5)] bg-[rgb(var(--background-secondary))] px-3 py-2.5">
+            {selectionBar}
+          </div>
+        ) : (
+        /* Toolbar: one row drives both the card grid and the table */
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-t-xl border border-b-0 border-[rgb(var(--border-primary)/0.5)] bg-[rgb(var(--background-secondary))] px-3 py-2.5">
           {/* Search — canonical unified-toolbar field */}
           <ToolbarSearch
@@ -415,6 +488,7 @@ function OverviewTab() {
             </button>
           </div>
         </div>
+        )}
 
         {/* Body — connects to the toolbar above (shared bordered container) */}
         {viewMode === 'grid' ? (
@@ -441,7 +515,7 @@ function OverviewTab() {
             onEditSection={schedPerms.edit ? handleNavigateToEdit : undefined}
             onToggleActive={schedPerms.edit ? handleToggleActive : undefined}
             onViewRoster={handleNavigateToDetail}
-            bulkActions={schedPerms.edit ? bulkActions : undefined}
+            selectionBar={selectionBar}
             rowSelection={rowSelection}
             onRowSelectionChange={setRowSelection}
           />
@@ -796,7 +870,7 @@ export function ClassroomsModule() {
   const navigate = useNavigate()
   const schedPerms = useResourcePermissions('scheduling')
   const schoolId = useActiveSchoolId() || ''
-  const { t } = useAcademicsI18n()
+  const { t, formatNumber } = useAcademicsI18n()
 
   // Lightweight section count for tab badge
   const { data: sectionPages } = useSections({ schoolId, enabled: !!schoolId, limit: 1 })
@@ -813,6 +887,82 @@ export function ClassroomsModule() {
     },
     [navigate]
   )
+
+  // ── ⑧ Attention Corner signals — page-scoped, spanning all four tabs.
+  // Derived from queries the tabs already run (identical react-query keys, so
+  // no duplicate fetches once a tab is open): the active-sections list
+  // (capacity signals) and today's attendance overview (recording coverage —
+  // recording attendance in the drawer invalidates the key, which refetches
+  // and auto-resolves the signal live).
+  const { acked, ack, unack } = useSignalAcks()
+  const { data: currentYear } = useCurrentAcademicYear(schoolId)
+  const { data: allSectionPages } = useSections({
+    schoolId,
+    filters: { isActive: true, academicYearId: currentYear?.yearId },
+    enabled: !!schoolId && !!currentYear?.yearId,
+  })
+  const activeSections = useMemo(() => flattenSectionPages(allSectionPages), [allSectionPages])
+  const today = useMemo(() => new Date().toISOString().split('T')[0], [])
+  const { data: attnOverview } = useAttendanceOverview({
+    schoolId,
+    academicYearId: currentYear?.yearId ?? '',
+    date: today,
+    enabled: !!schoolId && !!currentYear?.yearId,
+  })
+
+  const signals: Signal[] = useMemo(() => {
+    const list: Signal[] = []
+    const atCapacity = activeSections.filter(
+      (s) => s.maxEnrollment > 0 && s.currentEnrollment >= s.maxEnrollment,
+    ).length
+    const lowUtil = activeSections.filter(
+      (s) => s.maxEnrollment > 0 && s.currentEnrollment / s.maxEnrollment < 0.4,
+    ).length
+    const unrecorded = attnOverview?.sectionCompletion
+      ? Math.max(
+          0,
+          attnOverview.sectionCompletion.totalSections -
+            attnOverview.sectionCompletion.sectionsWithAttendance,
+        )
+      : 0
+    if (atCapacity > 0) {
+      list.push({
+        id: 'classrooms.at-capacity',
+        severity: 'critical',
+        domain: t('moduleOverview.signals.domains.capacity'),
+        icon: <Building2 className="h-4 w-4" aria-hidden="true" />,
+        title: t('classrooms.signals.atCapacityTitle', { count: formatNumber(atCapacity) }),
+        description: t('classrooms.signals.atCapacitySub'),
+        fix: { label: t('classrooms.signals.reviewSections'), onAction: () => setActiveTab('overview') },
+      })
+    }
+    if (lowUtil > 0) {
+      list.push({
+        id: 'classrooms.low-utilization',
+        severity: 'warn',
+        domain: t('moduleOverview.signals.domains.capacity'),
+        icon: <Gauge className="h-4 w-4" aria-hidden="true" />,
+        title: t('classrooms.signals.lowUtilTitle', { count: formatNumber(lowUtil) }),
+        description: t('classrooms.signals.lowUtilSub'),
+        fix: { label: t('classrooms.signals.reviewSections'), onAction: () => setActiveTab('overview') },
+      })
+    }
+    if (unrecorded > 0) {
+      list.push({
+        id: 'classrooms.attendance-unrecorded',
+        severity: 'info',
+        domain: t('moduleOverview.signals.domains.attendance'),
+        icon: <ClipboardCheck className="h-4 w-4" aria-hidden="true" />,
+        title: t('classrooms.signals.unrecordedTitle', { count: formatNumber(unrecorded) }),
+        description: t('classrooms.signals.unrecordedSub', {
+          done: formatNumber(attnOverview?.sectionCompletion?.sectionsWithAttendance ?? 0),
+          total: formatNumber(attnOverview?.sectionCompletion?.totalSections ?? 0),
+        }),
+        fix: { label: t('classrooms.actions.openAttendance'), onAction: () => setActiveTab('attendance') },
+      })
+    }
+    return list
+  }, [activeSections, attnOverview, t, formatNumber, setActiveTab])
 
   // Canonical tab bar (icon + label + count). Label is a ReactNode so the
   // per-tab AnimatedIcon rides inside it; the `?tab=` URL stays the source of truth.
@@ -839,23 +989,44 @@ export function ClassroomsModule() {
       {/* Screen-reader page heading (breadcrumb names the page visually) */}
       <h1 className="sr-only">{t('classrooms.pageTitle')}</h1>
 
-      {/* Page header (pagebar) + canonical tab bar */}
+      {/* ⑧ Header zone: pagebar (attention pill left · actions right) + shade
+          above the tab strip — signals span all four tabs */}
       <div className="border-b border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-secondary))] px-6 pt-4">
-        <PageHeader
-          mode="pagebar"
-          actions={
-            schedPerms.create
-              ? [
-                  {
-                    label: t('classrooms.actions.newClassroom'),
-                    icon: <Plus className="h-3.5 w-3.5" />,
-                    primary: true,
-                    onClick: () => navigate({ to: '/classrooms/create' }),
-                  },
-                ]
-              : undefined
-          }
-        />
+        <AttentionCorner
+          signals={signals}
+          acked={acked}
+          onAck={ack}
+          onUnack={unack}
+          labels={{
+            needAttention: t('moduleOverview.signals.needAttention'),
+            allClear: t('moduleOverview.signals.allClear'),
+            region: t('moduleOverview.needsAttention.title'),
+            minimize: t('moduleOverview.signals.minimize'),
+            acknowledge: t('moduleOverview.signals.acknowledge'),
+            acknowledged: t('moduleOverview.signals.acknowledged'),
+            acknowledgedHint: t('moduleOverview.signals.acknowledgedHint'),
+            dismiss: t('moduleOverview.signals.dismiss'),
+            emptyTitle: t('moduleOverview.signals.emptyTitle'),
+          }}
+        >
+          <PageHeader
+            mode="pagebar"
+            attention={<AttentionCornerPill />}
+            actions={
+              schedPerms.create
+                ? [
+                    {
+                      label: t('classrooms.actions.newClassroom'),
+                      icon: <Plus className="h-3.5 w-3.5" />,
+                      primary: true,
+                      onClick: () => navigate({ to: '/classrooms/create' }),
+                    },
+                  ]
+                : undefined
+            }
+          />
+          <AttentionCornerShade className="mt-3" />
+        </AttentionCorner>
         <Tabs
           className="mt-4"
           variant="line"
