@@ -20,10 +20,13 @@ test.describe('Academics overview', () => {
     await page.goto('/academics')
     // Remote mounted inside the authenticated shell (not the "Loading…"
     // Suspense fallback, not RemoteModuleError).
-    await expect(page.getByRole('navigation', { name: 'Sidebar navigation' })).toBeVisible()
+    const nav = page.getByRole('navigation', { name: 'Sidebar navigation' })
+    await expect(nav).toBeVisible()
     await expect(page.getByText(/could not be loaded|module error|try again/i)).toHaveCount(0)
-    // The Academics nav entry is marked current (shell sidebar reflects route).
-    await expect(page.getByRole('link', { name: 'Academics', exact: true })).toBeVisible()
+    // On /academics the shell sidebar switches to the academics module sub-nav
+    // (Overview / Students / Classrooms / Curriculum / Exams) — its presence
+    // confirms the remote mounted and the shell recognized the route context.
+    await expect(nav.getByRole('link', { name: 'Students' })).toBeVisible()
     await expectNoConsoleErrors(errors.filter((e) => !e.includes('Failed to load resource')))
   })
 })

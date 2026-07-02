@@ -26,11 +26,15 @@ function json(body: unknown) {
   return { status: 200, contentType: 'application/json', body: JSON.stringify(body) }
 }
 
-/** Deterministic roster shared across students/sections mocks. */
+/**
+ * Deterministic roster shared across students/sections mocks. `fullName` is the
+ * field StudentTable actually renders (accessorKey 'fullName') — include it
+ * alongside first/last so both consumers resolve.
+ */
 export const ACADEMICS_ROSTER = [
-  { id: 'stu-aarav', studentId: 'stu-aarav', firstName: 'Aarav', lastName: 'Sharma', gradeLevel: '9', status: 'active', studentNumber: '001' },
-  { id: 'stu-bhavna', studentId: 'stu-bhavna', firstName: 'Bhavna', lastName: 'Poudel', gradeLevel: '9', status: 'active', studentNumber: '002' },
-  { id: 'stu-chandra', studentId: 'stu-chandra', firstName: 'Chandra', lastName: 'Thapa', gradeLevel: '10', status: 'active', studentNumber: '003' },
+  { id: 'stu-aarav', studentId: 'stu-aarav', firstName: 'Aarav', lastName: 'Sharma', fullName: 'Aarav Sharma', gradeLevel: '9', status: 'active', studentNumber: '001' },
+  { id: 'stu-bhavna', studentId: 'stu-bhavna', firstName: 'Bhavna', lastName: 'Poudel', fullName: 'Bhavna Poudel', gradeLevel: '9', status: 'active', studentNumber: '002' },
+  { id: 'stu-chandra', studentId: 'stu-chandra', firstName: 'Chandra', lastName: 'Thapa', fullName: 'Chandra Thapa', gradeLevel: '10', status: 'active', studentNumber: '003' },
 ]
 
 const SECTION = {
@@ -53,6 +57,8 @@ const COURSE = {
   id: 'course-math',
   schoolId: SCHOOL_ID,
   name: 'Mathematics',
+  // CourseTable renders `courseName` (accessorKey 'courseName').
+  courseName: 'Mathematics',
   courseCode: 'MATH-9',
   subjectArea: 'mathematics',
   courseType: 'core',
