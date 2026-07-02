@@ -1,49 +1,88 @@
 /**
- * Bulk activate / deactivate sections — E2E.
+ * Bulk activate / deactivate sections — E2E (#224 / #237).
  *
- * Opt-in:
- *   BULK_E2E=1 PLAYWRIGHT_START_SERVER=1 \
- *     pnpm playwright test e2e/tests/sections-bulk-status.spec.ts
+ * Academics is a federated remote — run against served remotes:
+ *   PLAYWRIGHT_START_SERVER=1 pnpm test:e2e:full e2e/tests/sections-bulk-status.spec.ts
+ * (or the consolidated build-deploy output in CI).
  *
- * Backs the unit-tested `BulkSectionStatusModal` from PR closes #224.
- * Fan-out goes through the existing single-row `updateSection` service.
- *
- * Fixture seeding for the Sections list isn't in this PR — specs are
- * `test.fixme()` until the Sections fixture lands (tracked alongside
- * #237).
+ * Drives the real BulkSectionStatusModal: it splits selected rows into eligible
+ * (isActive !== target) vs already-in-target (skipped), fires one
+ * PATCH /academics/sections/:id?schoolId= {isActive} per eligible section, and
+ * toasts an aggregate. Note (verified against the component): the "… · N skipped"
+ * case is an ERROR-tone toast; only a fully-clean run is success-tone.
  */
 
-import { test, expect } from '@playwright/test'
+import { test, expect } from '../fixtures/test'
+import { mockAcademicsApi, captureBulkWrites, section } from '../fixtures/academics'
 
-const BULK_E2E = process.env.BULK_E2E === '1'
+async function openListView(page: import('@playwright/test').Page) {
+  await page.goto('/academics/classrooms')
+  // OverviewTab defaults to grid; only list view renders the selectable SectionTable.
+  await page.getByRole('button', { name: 'List view' }).click()
+}
 
-test.describe('Bulk section activate / deactivate (#224)', () => {
-  test.skip(!BULK_E2E, 'Set BULK_E2E=1 (+ dev server or preview URL) to run.')
+test.describe('Bulk section activate', () => {
+  // 3 inactive + 1 active → activating all four leaves 3 eligible, 1 skipped.
+  const SECTIONS = [
+    section({ sectionId: 'sec-a', sectionName: 'Grade 10 Science', isActive: false }),
+    section({ sectionId: 'sec-b', sectionName: 'Grade 9 English', isActive: false }),
+    section({ sectionId: 'sec-c', sectionName: 'Grade 8 Nepali', isActive: false }),
+    section({ sectionId: 'sec-d', sectionName: 'Grade 9 Math', isActive: true }),
+  ]
 
-  test.fixme(
-    'activate path — select 3 inactive sections, activate, see success toast',
-    async ({ page }) => {
-      // 1. Visit /academics/classrooms (Overview tab) in list view.
-      // 2. Seed 3 inactive + 1 active section via page.route mock.
-      // 3. Select all 4 → bulk bar shows "4 selected".
-      // 4. Click Activate → modal opens, header says "Activate 3 sections?"
-      //    and the already-active section appears as "Skipped".
-      // 5. Mock PUT /sections/:id × 3 to 200.
-      // 6. Confirm → toast "Activated 3 sections · 1 skipped".
-      await page.goto('/academics/classrooms')
-      await expect(page.getByRole('button', { name: /list/i })).toBeVisible()
-    },
-  )
+  test.beforeEach(async ({ page }) => {
+    await mockAcademicsApi(page, { sections: SECTIONS })
+  })
 
-  test.fixme(
-    'deactivate path — non-zero enrollment shows the warning slot',
-    async ({ page }) => {
-      // 1. Seed 2 active sections with currentEnrollment = 12 and 0.
-      // 2. Select both → Deactivate → modal warning reads
-      //    "12 students currently enrolled across these sections —
-      //    deactivating doesn't unenroll them."
-      // 3. Confirm → toast "Deactivated 2 sections".
-      await page.goto('/academics/classrooms')
-    },
-  )
+  test('select all 4 → activate 3, skip 1, PATCH the 3 inactive @smoke', async ({ page }) => {
+    const captured = await captureBulkWrites(page)
+    await openListView(page)
+    await expect(page.getByText('Grade 10 Science')).toBeVisible()
+
+    await page.getByRole('checkbox', { name: 'Select all rows' }).check()
+    await expect(page.getByText('4 selected')).toBeVisible()
+    // exact: true — the bulk bar has both "Activate" and "Deactivate"; substring
+    // matching would resolve "Activate" to both (strict-mode violation).
+    await page.getByRole('button', { name: 'Activate', exact: true }).click()
+
+    // Modal counts eligible, not selected, and surfaces the skipped active one.
+    await expect(page.getByRole('heading', { name: 'Activate 3 sections?' })).toBeVisible()
+    await expect(page.getByText(/1 already active/)).toBeVisible()
+    await page.getByRole('button', { name: 'Activate 3' }).click()
+
+    await expect(page.getByText(/Activated 3 sections.*1 skipped/)).toBeVisible()
+    // Exactly the 3 inactive sections were PATCHed to isActive:true (not sec-d).
+    expect(captured.sectionPatches.map((p) => p.id).sort()).toEqual(['sec-a', 'sec-b', 'sec-c'])
+    expect(captured.sectionPatches.every((p) => p.isActive === true)).toBe(true)
+  })
+})
+
+test.describe('Bulk section deactivate', () => {
+  // 2 active sections, 12 enrolled across them → the enrollment warning shows.
+  const SECTIONS = [
+    section({ sectionId: 'sec-e', sectionName: 'Grade 9 Math', isActive: true, currentEnrollment: 12 }),
+    section({ sectionId: 'sec-f', sectionName: 'Grade 10 Science', isActive: true, currentEnrollment: 0 }),
+  ]
+
+  test.beforeEach(async ({ page }) => {
+    await mockAcademicsApi(page, { sections: SECTIONS })
+  })
+
+  test('deactivate shows the non-zero-enrollment warning + PATCHes both', async ({ page }) => {
+    const captured = await captureBulkWrites(page)
+    await openListView(page)
+    await expect(page.getByText('Grade 9 Math')).toBeVisible()
+
+    await page.getByRole('checkbox', { name: 'Select all rows' }).check()
+    await expect(page.getByText('2 selected')).toBeVisible()
+    await page.getByRole('button', { name: 'Deactivate', exact: true }).click()
+
+    await expect(page.getByRole('heading', { name: 'Deactivate 2 sections?' })).toBeVisible()
+    await expect(page.getByText(/12 students currently enrolled across these sections/)).toBeVisible()
+    await page.getByRole('button', { name: 'Deactivate 2' }).click()
+
+    await expect(page.getByText('Deactivated 2 sections')).toBeVisible()
+    expect(captured.sectionPatches.map((p) => p.id).sort()).toEqual(['sec-e', 'sec-f'])
+    expect(captured.sectionPatches.every((p) => p.isActive === false)).toBe(true)
+  })
 })
