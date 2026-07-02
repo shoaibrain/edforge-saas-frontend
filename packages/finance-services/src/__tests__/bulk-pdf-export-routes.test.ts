@@ -81,6 +81,13 @@ describe('bulk-pdf-export.service route shapes (F.6)', () => {
     expect((body as { format: string }).format).toBe('zip')
   })
 
+  it('passes format=merged_pdf verbatim (Sprint H.4)', async () => {
+    await bulkInvoicePdfExport(SCHOOL, { invoiceIds: ['inv-1'], format: 'merged_pdf' })
+
+    const [, body] = mockApiPost.mock.calls[0]
+    expect((body as { format: string }).format).toBe('merged_pdf')
+  })
+
   // ────────────────────────────────────────────────────────────────
   // GET shape — getFinanceJob
   //
@@ -144,5 +151,11 @@ describe('bulk-pdf-export.service route shapes (F.6)', () => {
     await bulkReceiptPdfExport(SCHOOL, { paymentIds: ['pay-1'], format: 'zip' })
     const [, body] = mockApiPost.mock.calls[0]
     expect((body as { format: string }).format).toBe('zip')
+  })
+
+  it('receipt: passes format=merged_pdf verbatim (Sprint H.4)', async () => {
+    await bulkReceiptPdfExport(SCHOOL, { paymentIds: ['pay-1'], format: 'merged_pdf' })
+    const [, body] = mockApiPost.mock.calls[0]
+    expect((body as { format: string }).format).toBe('merged_pdf')
   })
 })

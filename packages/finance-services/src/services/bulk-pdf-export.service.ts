@@ -24,16 +24,27 @@
  *   409 ACTIVE_EXPORT_ALREADY_RUNNING — sentinel collision; the body
  *       carries `runningJobId` so the modal can deep-link to the
  *       in-flight job's status.
- *   413 PAYLOAD_TOO_LARGE — invoiceIds > 2000; body carries
- *       `{limit: 2000, requested: N}`.
- *   501 FORMAT_NOT_SUPPORTED — `format='merged_pdf'` (deferred to H.3).
+ *   413 PAYLOAD_TOO_LARGE — ids above the per-format cap (see
+ *       `BULK_PDF_EXPORT_LIMITS`); body carries `{limit, requested}`.
  */
 
 import { apiGet, apiPost } from '@edforge/api-client'
 
+/**
+ * Output formats accepted by both bulk-PDF-export endpoints (Sprint H.3/H.4).
+ * The merged-PDF cap is lower because pdf-lib holds the concatenated output
+ * in memory on the worker — mirror of the backend `BULK_EXPORT_CAPS`.
+ */
+export type BulkPdfExportFormat = 'zip' | 'merged_pdf'
+
+export const BULK_PDF_EXPORT_LIMITS: Record<BulkPdfExportFormat, number> = {
+  zip: 2000,
+  merged_pdf: 1000,
+}
+
 export interface BulkInvoicePdfExportDto {
   invoiceIds: string[]
-  format: 'zip' // 'merged_pdf' enables in Sprint H.3
+  format: BulkPdfExportFormat
 }
 
 export interface BulkInvoicePdfExportAck {
@@ -44,7 +55,10 @@ export interface BulkInvoicePdfExportAck {
 /**
  * F.3 worker job-row shape — read from the Sprint D.3 `GET /finance/jobs/:jobId`
  * endpoint. Mirrors the backend `FinanceJobEntity` projection; the modal
- * watches `status` (transitions to `succeeded` / `failed`) and `output.zipUrl`.
+ * watches `status` (transitions to `succeeded` / `failed`) and the
+ * format-matching `output` URL (`zipUrl` / `mergedPdfUrl`). Presigned URLs
+ * are re-minted by the backend on poll when within 60s of expiry, so a
+ * manual refetch after `urlExpiresAt` yields a fresh link.
  */
 export interface FinanceJobRow {
   jobId: string
@@ -57,10 +71,12 @@ export interface FinanceJobRow {
     failed: number
     skipped: number
   }
-  outputFormat?: 'zip' | 'merged_pdf' | null
+  outputFormat?: BulkPdfExportFormat | null
   output?: {
     zipKey?: string
     zipUrl?: string
+    mergedPdfKey?: string
+    mergedPdfUrl?: string
     urlExpiresAt?: string
   }
   failedInvoiceIds?: string[]
@@ -100,7 +116,7 @@ export async function getFinanceJob(jobId: string): Promise<FinanceJobRow> {
  */
 export interface BulkReceiptPdfExportDto {
   paymentIds: string[]
-  format: 'zip' // 'merged_pdf' enables in Sprint H.3
+  format: BulkPdfExportFormat
 }
 
 /**
