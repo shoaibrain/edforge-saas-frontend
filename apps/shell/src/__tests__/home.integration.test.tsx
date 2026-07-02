@@ -14,7 +14,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { http, HttpResponse } from 'msw'
 import { server } from '../../../../test-utils/mocks/server'
@@ -369,12 +369,26 @@ describe('AdminCommandCenter integration', () => {
     expect(pendingBadges.length).toBeGreaterThanOrEqual(1) // English
   })
 
-  it('renders alert row when thresholds are breached', async () => {
+  it('renders attention signals when thresholds are breached', async () => {
     await renderAdminCommandCenter()
 
+    // ⑧ The Attention Corner is collapsed by default — expand the pill first.
     await waitFor(
       () => {
-        // Finance overdue alert
+        // Both alert queries must have landed (critical + warning counts) —
+        // the corner remounts collapsed while alerts are still loading.
+        expect(screen.getByTestId('attention-pill').textContent ?? '').toMatch(/\d[^\d]+\d/)
+      },
+      { timeout: 5000 },
+    )
+    // The corner remounts (collapsed) if a late alert query flips its loading
+    // flag — re-open inside the retry until the shade holds both signals.
+    await waitFor(
+      () => {
+        const pill = screen.getByTestId('attention-pill')
+        if (pill.getAttribute('aria-expanded') === 'false') fireEvent.click(pill)
+        expect(screen.getByRole('region')).toBeInTheDocument()
+        // Finance overdue signal
         expect(screen.getByText(/Overdue invoices/i)).toBeInTheDocument()
       },
       { timeout: 5000 },
@@ -383,9 +397,12 @@ describe('AdminCommandCenter integration', () => {
     // Finance overdue alert should appear since overdue > 0
     expect(screen.getAllByText(/Rs\. 50,000/).length).toBeGreaterThan(0)
 
-    // Attendance alert — 2 students below 80% threshold
+    // Attendance alert — 2 students below 80% threshold (re-open if a late
+    // query remounted the corner collapsed)
     await waitFor(
       () => {
+        const pill = screen.getByTestId('attention-pill')
+        if (pill.getAttribute('aria-expanded') === 'false') fireEvent.click(pill)
         expect(screen.getByText(/below 80% attendance/i)).toBeInTheDocument()
       },
       { timeout: 5000 },
@@ -505,13 +522,23 @@ describe('AdminCommandCenter a11y', () => {
     expect(pendingLabels.length).toBeGreaterThan(0)
   })
 
-  it('alert items have role="alert"', async () => {
+  it('attention corner exposes an expandable pill and a labelled signals region', async () => {
     await renderAdminCommandCenter()
 
+    // ⑧ Collapsed pill is a real button with aria-expanded; expanding reveals
+    // the labelled region with the signal rows as list items.
     await waitFor(
       () => {
-        const alerts = document.querySelectorAll('[role="alert"]')
-        expect(alerts.length).toBeGreaterThan(0)
+        // Pill shows severity counts once alerts load (not the all-clear state).
+        expect(screen.getByTestId('attention-pill').textContent ?? '').toMatch(/\d/)
+      },
+      { timeout: 5000 },
+    )
+    fireEvent.click(screen.getByTestId('attention-pill'))
+    await waitFor(
+      () => {
+        expect(screen.getByRole('region')).toBeInTheDocument()
+        expect(screen.getAllByRole('listitem').length).toBeGreaterThan(0)
       },
       { timeout: 5000 },
     )

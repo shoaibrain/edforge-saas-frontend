@@ -184,7 +184,19 @@
     "bulkIssueTitle_plural": "Issue {{count}} invoices?",
     "bulkIssueDescription": "Students will be able to see and pay these invoices once issued. This action cannot be undone.",
     "issueCountInvoices": "Issue {{count}} Invoice",
-    "issueCountInvoices_plural": "Issue {{count}} Invoices"
+    "issueCountInvoices_plural": "Issue {{count}} Invoices",
+    "signals": {
+      "overdueTitle": "{{amount}} overdue across {{count}} invoices",
+      "overdueSub": "Follow up before dues age further",
+      "viewOverdue": "View overdue",
+      "draftsTitle": "{{count}} draft invoices are ready to issue",
+      "draftsSub": "Families can’t pay until drafts are issued",
+      "viewDrafts": "View drafts"
+    },
+    "selection": {
+      "noDrafts": "No drafts in selection",
+      "noneRemindable": "Paid invoices don’t need reminders"
+    }
   },
   "invoiceDetail": {
     "backToInvoices": "Back to Invoices",
@@ -1079,5 +1091,25 @@
     "outstandingFees": "Outstanding Fees",
     "recentPayments": "Recent Payments",
     "paymentHistory": "Payment History"
+  },
+  "headerZone": {
+    "needAttention": "need attention",
+    "allClear": "All clear",
+    "region": "Needs attention",
+    "minimize": "Minimize",
+    "acknowledge": "Got it",
+    "acknowledged": "Acknowledged",
+    "acknowledgedHint": "Acknowledged — click to undo",
+    "dismiss": "Dismiss",
+    "emptyTitle": "You’re all caught up.",
+    "domains": {
+      "finance": "Finance"
+    },
+    "selection": {
+      "aria": "Selection actions",
+      "selected": "{{count}} selected",
+      "selectAll": "Select all {{count}}",
+      "clear": "Clear selection"
+    }
   }
 }
