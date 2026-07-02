@@ -160,16 +160,10 @@ export function Overview() {
       {/* Screen-reader page heading (breadcrumb names the page visually) */}
       <h1 className="sr-only">{t('title')}</h1>
 
-      {/* ---- Page header (pagebar, date-only) ---- */}
+      {/* ---- Page header (pagebar) ---- */}
       <PageHeader
         className="mb-4"
         mode="pagebar"
-        date={new Date().toLocaleDateString('en-US', {
-          weekday: 'long',
-          month: 'short',
-          day: 'numeric',
-          year: 'numeric',
-        })}
         actions={[
           {
             label: t('staffDirectory.title'),

@@ -22,7 +22,7 @@ import {
   WidgetErrorBoundaryV2,
 } from "@edforge/ui";
 import { useCurrency } from "@edforge/types/use-currency";
-import { normalizePlatformLanguage, useTranslation } from "@edforge/i18n";
+import { useTranslation } from "@edforge/i18n";
 import { useFinanceSettings } from "../layouts/FinanceLayout";
 import { useAppStore } from "../stores/app.store";
 import { useFinanceOverviewV2 } from "../hooks/useFinanceOverviewV2";
@@ -127,10 +127,6 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
   const overdueCount = invoicesByStatus["overdue"] ?? 0;
   const draftCount = invoicesByStatus["draft"] ?? 0;
 
-  const today = new Date().toLocaleDateString(
-    normalizePlatformLanguage(i18n.language) === "ne" ? "ne-NP" : "en-US",
-    { weekday: "long", month: "short", day: "numeric", year: "numeric" },
-  );
 
   // ── StatBand metrics (calm; attention only via state) ────────────────────
   const metrics: StatMetric[] = [
@@ -218,8 +214,6 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
       <motion.div variants={fadeInUp} initial="hidden" animate="visible">
         <PageHeader
           mode="pagebar"
-          year={filters.academicYear || academicYears[0] || ""}
-          date={today}
           actions={[
             {
               label: t("overview.actions.bulkInvoice"),

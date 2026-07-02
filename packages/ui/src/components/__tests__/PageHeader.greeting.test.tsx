@@ -35,16 +35,14 @@ describe('PageHeader greeting mode', () => {
     expect(document.querySelectorAll('h1')).toHaveLength(1)
   })
 
-  it('keeps pagebar mode rendering the year and no <h1>', () => {
-    render(<PageHeader mode="pagebar" year="2083" date="Wednesday, Jul 1" />)
-    expect(screen.getByText('2083')).toBeTruthy()
+  it('keeps pagebar mode free of any <h1> (actions only)', () => {
+    render(<PageHeader mode="pagebar" actions={[{ label: 'New', primary: true }]} />)
+    expect(screen.getByRole('button', { name: 'New' })).toBeTruthy()
     expect(document.querySelector('h1')).toBeNull()
   })
 
-  it('renders a date-only pagebar (no year chip) when year is omitted', () => {
-    render(<PageHeader mode="pagebar" date="Wednesday, Jul 1" />)
-    expect(screen.getByText('Wednesday, Jul 1')).toBeTruthy()
-    // no academic-year chip label when year is not provided
+  it('renders no year chip or date in pagebar mode', () => {
+    render(<PageHeader mode="pagebar" actions={[{ label: 'New' }]} />)
     expect(screen.queryByText(/academic year/i)).toBeNull()
     expect(document.querySelector('h1')).toBeNull()
   })

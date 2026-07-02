@@ -1,8 +1,9 @@
 /**
- * PageHeader pagebar mode — unit tests (S1).
+ * PageHeader pagebar mode — unit tests.
  *
- * Pagebar mode renders a year switcher + date + actions and NO <h1>. Titled
- * mode is unchanged (still exactly one <h1>) so existing consumers keep working.
+ * Pagebar mode renders right-aligned actions (+ optional breadcrumbs) and NO
+ * <h1> — no year chip / date (the app is always scoped to the current academic
+ * year). Titled mode is unchanged (still exactly one <h1>).
  */
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
@@ -10,14 +11,7 @@ import { PageHeader } from '../layout/PageHeader'
 
 describe('PageHeader pagebar mode', () => {
   it('renders zero <h1> in pagebar mode', () => {
-    render(
-      <PageHeader
-        mode="pagebar"
-        year="2083"
-        date="Tuesday, Jun 30"
-        actions={[{ label: 'Enroll student', primary: true }]}
-      />,
-    )
+    render(<PageHeader mode="pagebar" actions={[{ label: 'Enroll student', primary: true }]} />)
     expect(screen.queryByRole('heading', { level: 1 })).toBeNull()
   })
 
@@ -27,20 +21,16 @@ describe('PageHeader pagebar mode', () => {
     expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('Students')
   })
 
-  it('renders the year switcher chip and date in pagebar mode', () => {
-    render(<PageHeader mode="pagebar" year="2083" date="Tuesday, Jun 30" onYearClick={() => {}} />)
-    expect(screen.getByText('2083')).toBeTruthy()
-    expect(screen.getByText('Academic Year')).toBeTruthy()
-    expect(screen.getByText('Tuesday, Jun 30')).toBeTruthy()
-    // year chip is a switcher button when onYearClick is provided
-    expect(screen.getByRole('button', { name: /academic year/i })).toBeTruthy()
+  it('renders no year chip or date in pagebar mode', () => {
+    render(<PageHeader mode="pagebar" actions={[{ label: 'Create Exam', primary: true }]} />)
+    expect(screen.queryByText('Academic Year')).toBeNull()
+    expect(screen.queryByText(/\d{4}/)).toBeNull()
   })
 
   it('renders right-aligned actions with the primary action styled distinctly', () => {
     render(
       <PageHeader
         mode="pagebar"
-        year="2083"
         actions={[
           { label: 'Govt. Reports' },
           { label: 'Enroll student', primary: true },
@@ -53,16 +43,18 @@ describe('PageHeader pagebar mode', () => {
     expect(secondary.className).not.toContain('action-primary-bg')
   })
 
-  it('applies the shared focusRing to the year switcher and actions', () => {
-    render(
-      <PageHeader
-        mode="pagebar"
-        year="2083"
-        onYearClick={() => {}}
-        actions={[{ label: 'Create Exam', primary: true }]}
-      />,
-    )
-    expect(screen.getByRole('button', { name: /academic year/i }).className).toContain('focus-visible:ring-2')
+  it('applies the shared focusRing to actions', () => {
+    render(<PageHeader mode="pagebar" actions={[{ label: 'Create Exam', primary: true }]} />)
     expect(screen.getByRole('button', { name: 'Create Exam' }).className).toContain('focus-visible:ring-2')
+  })
+
+  it('renders breadcrumbs when provided', () => {
+    render(<PageHeader mode="pagebar" breadcrumbs={<span>Academics / Students</span>} />)
+    expect(screen.getByText('Academics / Students')).toBeTruthy()
+  })
+
+  it('renders nothing when it has neither breadcrumbs nor actions', () => {
+    const { container } = render(<PageHeader mode="pagebar" />)
+    expect(container.firstChild).toBeNull()
   })
 })

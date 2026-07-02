@@ -36,7 +36,7 @@ import {
 } from 'lucide-react'
 import type { RowSelectionState } from '@tanstack/react-table'
 import { useNavigate } from '@tanstack/react-router'
-import { normalizePlatformLanguage, useTranslation } from '@edforge/i18n'
+import { useTranslation } from '@edforge/i18n'
 import { useSchoolGradeOptions } from '../../../hooks/useSchoolGradeOptions'
 import { useAppStore } from '../../../stores/app.store'
 import {
@@ -119,7 +119,7 @@ function InvoiceDownloadIconButton({
 }
 
 export default function InvoicesPage() {
-  const { t, i18n } = useTranslation('payments')
+  const { t } = useTranslation('payments')
   const navigate = useNavigate()
   const schoolId = useAppStore((s) => s.activeSchoolId)
   const settings = useFinanceSettings()
@@ -407,10 +407,6 @@ export default function InvoicesPage() {
     { label: t('status.cancelled'), value: 'cancelled' },
   ]
 
-  const today = new Date().toLocaleDateString(
-    normalizePlatformLanguage(i18n.language) === 'ne' ? 'ne-NP' : 'en-US',
-    { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' },
-  )
 
   // ── StatBand metrics (calm; attention only via state) ────────────────────
   const metrics: StatMetric[] = [
@@ -463,7 +459,6 @@ export default function InvoicesPage() {
       {/* ---- Page header (pagebar) ---- */}
       <PageHeader
         mode="pagebar"
-        date={today}
         actions={[
           {
             label: t('bulkGenerate.title'),

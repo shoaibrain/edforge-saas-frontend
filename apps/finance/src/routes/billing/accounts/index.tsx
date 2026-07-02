@@ -16,7 +16,7 @@ import {
   Pencil,
 } from 'lucide-react'
 import { useNavigate } from '@tanstack/react-router'
-import { normalizePlatformLanguage, useTranslation } from '@edforge/i18n'
+import { useTranslation } from '@edforge/i18n'
 import {
   TanstackDataTable,
   createExpandColumn,
@@ -25,7 +25,6 @@ import {
   IdentityCell,
   type BulkAction,
   type ColumnDef,
-  PageHeader,
   StatBand,
   type StatMetric,
 } from '@edforge/ui'
@@ -554,7 +553,7 @@ function buildColumns(
 // ============================================================================
 
 export default function StudentAccountsPage() {
-  const { t, i18n } = useTranslation('payments')
+  const { t } = useTranslation('payments')
   const schoolId = useAppStore((s) => s.activeSchoolId)
   const settings = useFinanceSettings()
   const { format, formatCompact } = useCurrency(settings)
@@ -610,10 +609,6 @@ export default function StudentAccountsPage() {
     )
   }
 
-  const today = new Date().toLocaleDateString(
-    normalizePlatformLanguage(i18n.language) === 'ne' ? 'ne-NP' : 'en-US',
-    { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' },
-  )
 
   // ── StatBand metrics (calm; the numbers carry the signal) ────────────────
   const metrics: StatMetric[] = [
@@ -652,9 +647,6 @@ export default function StudentAccountsPage() {
     <div className="p-6 space-y-5">
       {/* Screen-reader page heading (breadcrumb names the page visually) */}
       <h1 className="sr-only">{t('studentAccount.pageTitle')}</h1>
-
-      {/* ---- Page header (pagebar) ---- */}
-      <PageHeader mode="pagebar" date={today} />
 
       {/* ---- StatBand — KPI summary ---- */}
       <StatBand metrics={metrics} ariaLabel={t('studentAccount.kpi.region')} />
