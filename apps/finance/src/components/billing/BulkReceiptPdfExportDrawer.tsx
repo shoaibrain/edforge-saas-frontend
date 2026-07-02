@@ -74,6 +74,7 @@ import {
   useFinanceJob,
   type FinanceJobRow,
 } from '@edforge/finance-services'
+import { RadioGroup } from '@edforge/ui'
 import { AsyncJobProgress } from './AsyncJobProgress'
 import { financeJobToAsyncBulkJob } from './finance-job-adapter'
 
@@ -121,6 +122,9 @@ export function BulkReceiptPdfExportDrawer({
   const queryClient = useQueryClient()
   const [jobId, setJobId] = useState<string | null>(null)
   const [terminalLogged, setTerminalLogged] = useState(false)
+  // Sprint H.4 — same shape as the invoice drawer. See its comment for the
+  // 2000/1000 cap + all-skipped-merged (P2) rationale.
+  const [format, setFormat] = useState<'zip' | 'merged_pdf'>('zip')
 
   const startExport = useBulkReceiptPdfExport(schoolId)
   const job = useFinanceJob(jobId)
@@ -133,6 +137,7 @@ export function BulkReceiptPdfExportDrawer({
     if (!open) {
       setJobId(null)
       setTerminalLogged(false)
+      setFormat('zip')
       startExport.reset()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -162,7 +167,7 @@ export function BulkReceiptPdfExportDrawer({
   const handleStart = async () => {
     if (paymentIds.length === 0) return
     try {
-      const ack = await startExport.mutateAsync({ paymentIds, format: 'zip' })
+      const ack = await startExport.mutateAsync({ paymentIds, format })
       setJobId(ack.jobId)
     } catch (err) {
       // MVP.5 sentinel conflict: pivot to poll the existing in-flight job.
@@ -212,8 +217,19 @@ export function BulkReceiptPdfExportDrawer({
   )
 
   const status = job.data?.status ?? (isKickingOff ? 'queued' : null)
-  const canDownload =
-    job.data?.status === 'succeeded' && !!job.data.output?.zipUrl
+  // Sprint H.4 — see invoice drawer for the rationale on resolvedFormat +
+  // downloadUrl. Same pattern; different URL keys and different `t`
+  // namespace (receiptPdfExport vs pdfExport).
+  const resolvedFormat: 'zip' | 'merged_pdf' =
+    (job.data?.outputFormat as 'zip' | 'merged_pdf' | undefined) ?? format
+  const downloadUrl =
+    resolvedFormat === 'merged_pdf'
+      ? job.data?.output?.mergedPdfUrl
+      : job.data?.output?.zipUrl
+  // Sprint H.3 P2 fix — all-skipped merged_pdf: succeeded + counters.skipped
+  // > 0 + output artifact absent. canDownload correctly stays false;
+  // AsyncJobProgress renders the skipped counter for operator context.
+  const canDownload = job.data?.status === 'succeeded' && !!downloadUrl
 
   return (
     <AnimatePresence>
@@ -286,27 +302,66 @@ export function BulkReceiptPdfExportDrawer({
                       />
                       {canDownload && (
                         <a
-                          href={job.data!.output!.zipUrl}
+                          href={downloadUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           className={/* allow-hardcoded-color: contrast text on --action-primary-bg button */ "inline-flex items-center gap-2 rounded-md bg-[rgb(var(--action-primary-bg))] px-3 py-2 text-sm font-medium text-white hover:bg-[rgb(var(--action-primary-bg-hover))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"}
                           data-testid="bulk-receipt-pdf-export-download-link"
+                          data-format={resolvedFormat}
                         >
                           <Download className="w-4 h-4" />
-                          {t('asyncJobs.receiptPdfExport.downloadZip')}
+                          {resolvedFormat === 'merged_pdf'
+                            ? t('asyncJobs.receiptPdfExport.downloadMergedPdf')
+                            : t('asyncJobs.receiptPdfExport.downloadZip')}
                         </a>
                       )}
                     </>
                   ) : (
-                    <section>
-                      <h3 className="text-sm font-medium text-[rgb(var(--text-primary))] mb-2">
-                        {t('asyncJobs.receiptPdfExport.readyTitle', {
-                          count: paymentIds.length,
-                        })}
-                      </h3>
-                      <p className="text-sm text-[rgb(var(--text-secondary))]">
-                        {t('asyncJobs.receiptPdfExport.readyBody')}
-                      </p>
+                    <section className="space-y-4">
+                      <div>
+                        <h3 className="text-sm font-medium text-[rgb(var(--text-primary))] mb-2">
+                          {t(
+                            format === 'merged_pdf'
+                              ? 'asyncJobs.receiptPdfExport.readyTitleMerged'
+                              : 'asyncJobs.receiptPdfExport.readyTitle',
+                            { count: paymentIds.length },
+                          )}
+                        </h3>
+                        <p className="text-sm text-[rgb(var(--text-secondary))]">
+                          {t(
+                            format === 'merged_pdf'
+                              ? 'asyncJobs.receiptPdfExport.readyBodyMerged'
+                              : 'asyncJobs.receiptPdfExport.readyBody',
+                          )}
+                        </p>
+                      </div>
+                      {/* Sprint H.4 — format picker mirror of invoice drawer. */}
+                      <div className="border-t border-[rgb(var(--border-primary))] pt-4">
+                        <p
+                          id="bulk-receipt-pdf-export-format-label"
+                          className="text-sm font-medium text-[rgb(var(--text-primary))] mb-2"
+                        >
+                          {t('asyncJobs.receiptPdfExport.formatPickerLabel')}
+                        </p>
+                        <RadioGroup
+                          aria-labelledby="bulk-receipt-pdf-export-format-label"
+                          name="bulk-receipt-pdf-export-format"
+                          value={format}
+                          onChange={(v) => setFormat(v as 'zip' | 'merged_pdf')}
+                          disabled={isKickingOff}
+                          data-testid="bulk-receipt-pdf-export-format-picker"
+                          options={[
+                            {
+                              value: 'zip',
+                              label: t('asyncJobs.receiptPdfExport.formatZip'),
+                            },
+                            {
+                              value: 'merged_pdf',
+                              label: t('asyncJobs.receiptPdfExport.formatMergedPdf'),
+                            },
+                          ]}
+                        />
+                      </div>
                     </section>
                   )}
                 </div>
