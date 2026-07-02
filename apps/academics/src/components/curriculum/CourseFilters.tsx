@@ -11,7 +11,7 @@
 
 import { useEffect, useState, type ReactNode } from 'react'
 import { Download } from 'lucide-react'
-import { Select, Button, DataTableMoreFilters } from '@edforge/ui'
+import { Select, Button } from '@edforge/ui'
 import { useCourseFilters, useCourseFilterActions } from '../../stores/courses.store'
 import {
   SUBJECT_AREA_OPTIONS,
@@ -38,7 +38,10 @@ export interface CourseToolbar {
   activePreset: string
   onPresetChange: (value: string) => void
   primaryFilter: ReactNode
-  moreFilters: ReactNode
+  overflowFilters: ReactNode
+  overflowActiveCount: number
+  onOverflowClear: () => void
+  overflowLabel: string
   toolbarExtra: ReactNode
 }
 
@@ -92,16 +95,9 @@ export function useCourseToolbar(
     />
   )
 
-  const moreFilters = (
-    <DataTableMoreFilters
-      label={t('dataTable.moreFilters')}
-      activeCount={secondaryActive}
-      onClear={() => {
-        actions.setCourseType(null)
-        actions.setCreditType(null)
-        actions.setGradeLevel(null)
-      }}
-    >
+  // Secondary filters folded into the toolbar's own "More filters" overflow.
+  const overflowFilters = (
+    <>
       <Select
         aria-label={t('curriculumModule.filters.courseType')}
         size="sm"
@@ -129,7 +125,7 @@ export function useCourseToolbar(
           ...gradeOptions.map((o) => ({ value: o.value, label: o.label })),
         ]}
       />
-    </DataTableMoreFilters>
+    </>
   )
 
   const toolbarExtra = (
@@ -160,7 +156,14 @@ export function useCourseToolbar(
     activePreset,
     onPresetChange,
     primaryFilter,
-    moreFilters,
+    overflowFilters,
+    overflowActiveCount: secondaryActive,
+    onOverflowClear: () => {
+      actions.setCourseType(null)
+      actions.setCreditType(null)
+      actions.setGradeLevel(null)
+    },
+    overflowLabel: t('dataTable.moreFilters'),
     toolbarExtra,
   }
 }

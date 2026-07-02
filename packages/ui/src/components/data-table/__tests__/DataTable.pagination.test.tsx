@@ -91,10 +91,12 @@ describe('DataTable pagination — client-side', () => {
     expect(getByText('2 प्रति पृष्ठ')).toBeTruthy()
     expect(getByText('अघिल्लो')).toBeTruthy()
     expect(getByText('अर्को')).toBeTruthy()
-    expect(getByLabelText('पङ्क्ति घनत्व')).toBeTruthy()
-    expect(getByLabelText('आरामदायी')).toBeTruthy()
     expect(getByText('दृश्य')).toBeTruthy()
     expect(getByText('निर्यात')).toBeTruthy()
+    // Density is folded into the "View" menu — open it to reach the controls.
+    fireEvent.click(getByText('दृश्य'))
+    expect(getByLabelText('पङ्क्ति घनत्व')).toBeTruthy()
+    expect(getByLabelText('आरामदायी')).toBeTruthy()
 
     fireEvent.change(getByPlaceholderText('विद्यार्थी खोज्नुहोस्'), {
       target: { value: 'Row 1' },

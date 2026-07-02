@@ -44,7 +44,11 @@ interface CourseTableProps {
   activePreset?: string
   onPresetChange?: (value: string) => void
   primaryFilter?: ReactNode
-  moreFilters?: ReactNode
+  overflowFilters?: ReactNode
+  overflowActiveCount?: number
+  onOverflowClear?: () => void
+  overflowLabel?: string
+  overflowClearLabel?: string
   toolbarExtra?: ReactNode
 }
 
@@ -222,7 +226,11 @@ export function CourseTable({
   activePreset,
   onPresetChange,
   primaryFilter,
-  moreFilters,
+  overflowFilters,
+  overflowActiveCount,
+  onOverflowClear,
+  overflowLabel,
+  overflowClearLabel,
   toolbarExtra,
 }: CourseTableProps) {
   const { t, dataTableLabels } = useAcademicsI18n()
@@ -370,7 +378,11 @@ export function CourseTable({
       activePreset={activePreset}
       onPresetChange={onPresetChange}
       primaryFilter={primaryFilter}
-      moreFilters={moreFilters}
+      overflowFilters={overflowFilters}
+      overflowActiveCount={overflowActiveCount}
+      onOverflowClear={onOverflowClear}
+      overflowLabel={overflowLabel}
+      overflowClearLabel={overflowClearLabel}
       toolbarExtra={toolbarExtra}
       maxHeight="calc(100vh - 24rem)"
     />

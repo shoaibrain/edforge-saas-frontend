@@ -47,6 +47,7 @@ export function DataTable<TData>({
   searchPlaceholder,
   facetedFilters,
   facets,
+  foldFacets,
   toolbarStart,
   toolbarExtra,
   rightToolbarSlot,
@@ -57,6 +58,11 @@ export function DataTable<TData>({
   onSearchChange,
   primaryFilter,
   moreFilters,
+  overflowFilters,
+  overflowActiveCount,
+  onOverflowClear,
+  overflowLabel,
+  overflowClearLabel,
   density: densityProp,
   enableDensityToggle,
   bulkActions,
@@ -158,6 +164,7 @@ export function DataTable<TData>({
     presets ||
     primaryFilter ||
     moreFilters ||
+    overflowFilters ||
     showDensityToggle ||
     exportOptions
   const hasBulkActions = bulkActions && selectedRowCount > 0
@@ -205,6 +212,7 @@ export function DataTable<TData>({
             searchValue={searchValue}
             onSearchChange={onSearchChange}
             facetedFilters={resolvedFacets}
+            foldFacets={foldFacets}
             enableColumnVisibility={enableColumnVisibility}
             toolbarStart={toolbarStart}
             toolbarExtra={resolvedToolbarExtra}
@@ -213,6 +221,11 @@ export function DataTable<TData>({
             onPresetChange={onPresetChange}
             primaryFilter={primaryFilter}
             moreFilters={moreFilters}
+            overflowFilters={overflowFilters}
+            overflowActiveCount={overflowActiveCount}
+            onOverflowClear={onOverflowClear}
+            overflowLabel={overflowLabel}
+            overflowClearLabel={overflowClearLabel}
             density={density}
             onDensityChange={setDensity}
             enableDensityToggle={showDensityToggle}

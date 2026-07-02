@@ -13,7 +13,12 @@ export interface ToolbarSearchProps
   clearLabel?: string
   /** Show the `/` keyboard hint while empty (default true). */
   showKbd?: boolean
-  /** Override the wrapper layout/width (default `w-72 max-w-full flex-none`). */
+  /**
+   * Override the wrapper layout/width. Default is fluid — `flex-1 min-w-44
+   * max-w-xs` — so the search absorbs slack and shrinks gracefully instead of
+   * forcing the toolbar row to wrap. Pass a fixed width (e.g. `w-72 flex-none`)
+   * for standalone bars that want a pinned search.
+   */
   className?: string
 }
 
@@ -32,7 +37,7 @@ export const ToolbarSearch = forwardRef<HTMLInputElement, ToolbarSearchProps>(
     ref,
   ) => {
     return (
-      <div className={cn('relative w-72 max-w-full flex-none', className)}>
+      <div className={cn('relative flex-1 min-w-44 max-w-xs', className)}>
         <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[rgb(var(--text-tertiary))]" />
         <input
           ref={ref}

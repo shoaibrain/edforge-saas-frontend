@@ -159,6 +159,7 @@ export function useAcademicsI18n() {
       compactDensityTitle: t('dataTable.compactDensityTitle'),
       viewOptions: t('dataTable.viewOptions'),
       toggleColumns: t('dataTable.toggleColumns'),
+      moreFilters: t('dataTable.moreFilters'),
       export: t('dataTable.export'),
       exportFormat: (format: DataTableExportFormat) =>
         t(`dataTable.exportFormats.${format}`),

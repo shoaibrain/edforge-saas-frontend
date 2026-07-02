@@ -10,7 +10,7 @@
  */
 
 import { useState, useEffect, type ReactNode } from 'react'
-import { Select, DataTableMoreFilters } from '@edforge/ui'
+import { Select } from '@edforge/ui'
 import type { StudentStatus } from '@aibrains/shared-types'
 import { useDebounce } from '../../hooks'
 import { useSchoolEnabledGradeOptions } from '../../hooks/useGradeOptions'
@@ -53,7 +53,11 @@ export interface StudentsToolbar {
   activePreset: string
   onPresetChange: (value: string) => void
   primaryFilter: ReactNode
-  moreFilters: ReactNode
+  overflowFilters: ReactNode
+  overflowActiveCount: number
+  onOverflowClear: () => void
+  overflowLabel: string
+  overflowClearLabel: string
 }
 
 export function useStudentsToolbar(
@@ -105,25 +109,19 @@ export function useStudentsToolbar(
     />
   )
 
-  const moreFilters = (
-    <DataTableMoreFilters
-      label={t('dataTable.moreFilters')}
-      activeCount={filters.status ? 1 : 0}
-      onClear={() => setStatus(null)}
-      clearLabel={t('studentsModule.filters.clear')}
-    >
-      <Select
-        aria-label={t('studentsModule.filters.statusAria')}
-        size="sm"
-        buttonClassName={subtleBorder}
-        value={filters.status ?? ''}
-        onChange={(v) => setStatus((v || null) as StudentStatus | null)}
-        options={[
-          { value: '', label: t('studentsModule.filters.allStatus') },
-          ...STATUS_OPTIONS.map((s) => ({ value: s.value, label: t(s.labelKey) })),
-        ]}
-      />
-    </DataTableMoreFilters>
+  // Secondary filters folded into the toolbar's own "More filters" overflow.
+  const overflowFilters = (
+    <Select
+      aria-label={t('studentsModule.filters.statusAria')}
+      size="sm"
+      buttonClassName={subtleBorder}
+      value={filters.status ?? ''}
+      onChange={(v) => setStatus((v || null) as StudentStatus | null)}
+      options={[
+        { value: '', label: t('studentsModule.filters.allStatus') },
+        ...STATUS_OPTIONS.map((s) => ({ value: s.value, label: t(s.labelKey) })),
+      ]}
+    />
   )
 
   return {
@@ -138,6 +136,10 @@ export function useStudentsToolbar(
     activePreset: filters.filterMode,
     onPresetChange: (value) => setFilterMode(value as StudentFilterMode),
     primaryFilter,
-    moreFilters,
+    overflowFilters,
+    overflowActiveCount: filters.status ? 1 : 0,
+    onOverflowClear: () => setStatus(null),
+    overflowLabel: t('dataTable.moreFilters'),
+    overflowClearLabel: t('studentsModule.filters.clear'),
   }
 }
