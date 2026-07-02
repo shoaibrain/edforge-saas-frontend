@@ -1751,7 +1751,40 @@
       "noDefaultPolicyDescription": "You have {{count}} grading policy, but none is marked as default.",
       "noDefaultPolicyDescription_plural": "You have {{count}} grading policies, but none is marked as default.",
       "setAcademicYearBeforeGrades": "Set up an academic year before recording grades.",
-      "classAverage": "class average"
+      "classAverage": "class average",
+      "gradedChip": "{{pct}}% graded · avg {{avg}}%",
+      "launchpad": {
+        "helper": "Choose a section to record and review grades, or open school-wide analytics.",
+        "noSectionsTitle": "No sections assigned",
+        "backToSections": "Sections",
+        "summary": {
+          "sections": "sections",
+          "withGrades": "with grades",
+          "needAttention": "need attention",
+          "notStarted": "not started"
+        },
+        "resume": {
+          "title": "Jump back in",
+          "action": "Resume"
+        },
+        "status": {
+          "attention": "Needs attention",
+          "inProgress": "In progress",
+          "notStarted": "Not started",
+          "onTrack": "On track"
+        },
+        "card": {
+          "classAvg": "Class avg",
+          "avgGpa": "Avg GPA",
+          "atRisk": "At-risk",
+          "noGradesYet": "No grades recorded yet ·",
+          "startGrading": "Start grading",
+          "gradedAvg": "{{pct}}% graded · avg {{avg}}%",
+          "gradedProgress": "{{graded}}/{{total}} graded · {{pct}}%",
+          "progressAria": "{{pct}}% graded",
+          "students": "{{count}} students"
+        }
+      }
     },
     "context": {
       "activeSections": "active sections",
@@ -2497,7 +2530,8 @@
       "actions": {
         "more": "More actions",
         "exportGradebookCsv": "Export Gradebook CSV",
-        "exportAtRiskCsv": "Export At-Risk CSV"
+        "exportAtRiskCsv": "Export At-Risk CSV",
+        "export": "Export"
       },
       "kpis": {
         "studentsGraded": "STUDENTS GRADED",
@@ -2506,7 +2540,9 @@
         "atRisk": "AT RISK",
         "avgGradeHint": "Avg grade: {{grade}}%",
         "passRateHint": "Students scoring 60%+",
-        "atRiskHint": "Below 60% threshold"
+        "atRiskHint": "Below 60% threshold",
+        "belowThreshold": "below 60%",
+        "needSupport": "need support"
       },
       "completion": {
         "title": "Grading Completion",
@@ -2514,7 +2550,10 @@
         "gradedShort": "graded",
         "graded": "Graded",
         "remaining": "Remaining",
-        "totalEntries": "{{total}} total assignment entries"
+        "totalEntries": "{{total}} total assignment entries",
+        "gradedCount": "{{count}} graded",
+        "remainingCount": "{{count}} awaiting grades",
+        "total": "{{count}} total assignment entries"
       },
       "assessment": {
         "title": "Assessment Performance",
@@ -2526,7 +2565,12 @@
         "summativeHigher": "Summative {{diff}}% higher",
         "summativeHigherSuffix": "than formative.",
         "equal": "Formative and summative scores are equal — well balanced.",
-        "unclassified": "+{{value}} unclassified (avg {{avg}}%)"
+        "unclassified": "+{{value}} unclassified (avg {{avg}}%)",
+        "formative": "Formative — quizzes, homework ({{count}} items)",
+        "summative": "Summative — tests, exams ({{count}} items)",
+        "noneYet": "— · none yet",
+        "noteBalanced": "Grading is well balanced toward ongoing work.",
+        "noteNoSummative": "All graded items are formative — no summative assessments recorded yet."
       },
       "distribution": {
         "title": "Grade Distribution",
@@ -2535,7 +2579,9 @@
         "b": "B (80–89)",
         "c": "C (70–79)",
         "d": "D (60–69)",
-        "f": "F (0–59)"
+        "f": "F (0–59)",
+        "metric": "{{count}} graded",
+        "note": "The F count includes students still awaiting grades (they read as 0%)."
       },
       "category": {
         "title": "Category Performance",
@@ -2569,7 +2615,43 @@
           "course": "Course",
           "grade": "Grade",
           "letter": "Letter"
-        }
+        },
+        "dedupeSubtitle": "Unique students below the 60% pass threshold — deduped from {{raw}} flagged entries",
+        "export": "Export at-risk",
+        "filterAria": "Filter at-risk students",
+        "filterAll": "All",
+        "filterGraded": "Graded",
+        "filterPending": "Awaiting grades",
+        "pendingNote": "{{count}} flagged only because grades aren't entered yet",
+        "tagFailing": "Failing",
+        "tagBelowPass": "Below pass",
+        "tagNotGraded": "Not graded yet"
+      },
+      "backToGradebook": "Back to gradebook",
+      "scope": "School-wide · {{graded}} of {{total}} sections graded",
+      "noData": "No data available",
+      "emptyState": {
+        "title": "No grades recorded yet",
+        "description": "Grade some assignments to see school-wide analytics."
+      },
+      "insight": {
+        "body": "{{pending}} of {{unique}} at-risk flags are pending grades, not failing students. {{ungraded}} of {{totalEntries}} assignment entries are ungraded, so those students read as 0% — which deflates the {{passRate}}% pass rate and inflates the at-risk count. Grade the pending work for a true picture.",
+        "reviewPending": "Review pending grades"
+      },
+      "courses": {
+        "title": "Course Performance",
+        "subtitle": "Aggregated grade metrics per course",
+        "course": "Course",
+        "sections": "Sec.",
+        "students": "Students",
+        "avg": "Avg",
+        "gpa": "GPA",
+        "pass": "Pass %"
+      },
+      "categories": {
+        "title": "Category Performance",
+        "subtitle": "Average score by grading-policy category",
+        "empty": "No category data yet"
       }
     }
   },

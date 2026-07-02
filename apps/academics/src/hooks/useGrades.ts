@@ -6,6 +6,7 @@
 
 import {
   useQuery,
+  useQueries,
   useMutation,
   useQueryClient,
 } from '@tanstack/react-query'
@@ -153,6 +154,28 @@ export function useSectionGrades(
     queryFn: () => getSectionGrades(sectionId, params),
     enabled: enabled && !!sectionId && !!params.schoolId,
     staleTime: 60 * 1000,
+  })
+}
+
+/**
+ * Batch-fetch gradebooks for multiple sections (the Gradebook launchpad needs a
+ * per-section rollup, and the aggregate overview endpoint stops at course
+ * granularity). Mirrors `useBulkSectionRosters` — one query per section via
+ * `useQueries`; results are index-aligned to `sectionIds`. Presentation-only
+ * derivation (avg / GPA / at-risk / completion) is computed by the caller.
+ */
+export function useBulkSectionGrades(
+  sectionIds: string[],
+  params: { schoolId: string; termId?: string },
+  enabled = true
+) {
+  return useQueries({
+    queries: sectionIds.map((sectionId) => ({
+      queryKey: gradeKeys.sectionGrade(sectionId, params),
+      queryFn: () => getSectionGrades(sectionId, params),
+      enabled: enabled && !!sectionId && !!params.schoolId,
+      staleTime: 60 * 1000,
+    })),
   })
 }
 
