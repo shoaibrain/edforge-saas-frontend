@@ -283,7 +283,7 @@ export function BulkPdfExportDrawer({
                           href={job.data!.output!.zipUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 rounded-md bg-[rgb(var(--action-primary-bg))] px-3 py-2 text-sm font-medium text-white hover:bg-[rgb(var(--action-primary-bg-hover))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
+                          className={/* allow-hardcoded-color: contrast text on --action-primary-bg button */ "inline-flex items-center gap-2 rounded-md bg-[rgb(var(--action-primary-bg))] px-3 py-2 text-sm font-medium text-white hover:bg-[rgb(var(--action-primary-bg-hover))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"}
                           data-testid="bulk-pdf-export-download-link"
                         >
                           <Download className="w-4 h-4" />
@@ -323,7 +323,7 @@ export function BulkPdfExportDrawer({
                       type="button"
                       onClick={handleStart}
                       disabled={isKickingOff || invoiceIds.length === 0}
-                      className="rounded-md bg-[rgb(var(--action-primary-bg))] px-3 py-1.5 text-sm font-medium text-white hover:bg-[rgb(var(--action-primary-bg-hover))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] disabled:opacity-40 disabled:cursor-not-allowed"
+                      className={/* allow-hardcoded-color: contrast text on --action-primary-bg button */ "rounded-md bg-[rgb(var(--action-primary-bg))] px-3 py-1.5 text-sm font-medium text-white hover:bg-[rgb(var(--action-primary-bg-hover))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] disabled:opacity-40 disabled:cursor-not-allowed"}
                       data-testid="bulk-pdf-export-start"
                     >
                       {isKickingOff
