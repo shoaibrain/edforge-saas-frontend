@@ -48,6 +48,23 @@ describe('StatBand', () => {
     expect(seg.querySelector('[aria-hidden="true"].absolute.inset-x-4.top-0')).toBeNull()
   })
 
+  it('keeps a neutral value for state="good" unless emphasizeValue opts in', () => {
+    render(
+      <StatBand
+        metrics={[
+          { label: 'Collected', value: 'NPR 8,000', state: 'good' },
+          { label: 'Paid', value: 'NPR 20,000', state: 'good', emphasizeValue: true },
+        ]}
+      />,
+    )
+    const plain = screen.getByRole('status', { name: 'Collected: NPR 8,000' })
+    expect(plain.querySelector('.text-3xl')?.className).toContain('text-[rgb(var(--text-primary))]')
+    const emphasized = screen.getByRole('status', { name: 'Paid: NPR 20,000' })
+    expect(emphasized.querySelector('.text-3xl')?.className).toContain(
+      'text-[rgb(var(--state-success-fg))]',
+    )
+  })
+
   it('renders exactly one micro-viz per metric (delta only, no pill)', () => {
     render(<StatBand metrics={[{ label: 'Enrolled', value: '255', delta: { dir: 'up', val: '+6' } }]} />)
     expect(screen.getByText('+6')).toBeTruthy()

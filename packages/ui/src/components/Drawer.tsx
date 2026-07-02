@@ -65,6 +65,8 @@ export interface DrawerProps {
   title: string
   /** Optional description below the title */
   description?: string
+  /** Optional leading element (e.g. a tinted icon tile) rendered left of the title */
+  icon?: ReactNode
   /** Drawer content */
   children: ReactNode
   /**
@@ -77,6 +79,17 @@ export interface DrawerProps {
    * @default true
    */
   showCloseButton?: boolean
+  /**
+   * Pinned footer rendered below the scrollable body (unlike DrawerFooter,
+   * which scrolls with the content).
+   */
+  footer?: ReactNode
+  /**
+   * Suppress every close path (Esc, backdrop, X button) — for the brief
+   * window where closing would abandon an in-flight submission.
+   * @default false
+   */
+  closeDisabled?: boolean
   /** Additional className for the drawer panel */
   className?: string
 }
@@ -106,14 +119,18 @@ export function Drawer({
   onClose,
   title,
   description,
+  icon,
   children,
   size = 'md',
   showCloseButton = true,
+  footer,
+  closeDisabled = false,
   className,
 }: DrawerProps) {
+  const handleClose = closeDisabled ? () => undefined : onClose
   return (
     <Transition show={open} as={Fragment}>
-      <Dialog onClose={onClose} className="relative z-50">
+      <Dialog onClose={handleClose} className="relative z-50">
         {/* Backdrop */}
         <TransitionChild
           as={Fragment}
@@ -154,23 +171,28 @@ export function Drawer({
             >
               {/* Header */}
               <div className="flex items-start justify-between px-6 py-5 border-b border-border-secondary flex-shrink-0">
-                <div className="min-w-0 pr-4">
-                  <DialogTitle className="text-base font-semibold text-text-primary truncate">
-                    {title}
-                  </DialogTitle>
-                  {description && (
-                    <p className="mt-1 text-sm text-text-secondary">
-                      {description}
-                    </p>
-                  )}
+                <div className="flex items-center gap-3 min-w-0 pr-4">
+                  {icon && <div className="flex-shrink-0">{icon}</div>}
+                  <div className="min-w-0">
+                    <DialogTitle className="text-base font-semibold text-text-primary truncate">
+                      {title}
+                    </DialogTitle>
+                    {description && (
+                      <p className="mt-1 text-sm text-text-secondary">
+                        {description}
+                      </p>
+                    )}
+                  </div>
                 </div>
                 {showCloseButton && (
                   <button
                     type="button"
                     onClick={onClose}
+                    disabled={closeDisabled}
                     className={cn(
                       'p-1.5 rounded-lg text-text-tertiary flex-shrink-0',
                       'hover:text-text-primary hover:bg-surface-secondary',
+                      'disabled:opacity-50 disabled:pointer-events-none',
                       focusRingInset,
                       'transition-colors'
                     )}
@@ -185,6 +207,13 @@ export function Drawer({
               <div className="flex-1 overflow-y-auto px-6 py-5">
                 {children}
               </div>
+
+              {/* Pinned footer */}
+              {footer && (
+                <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-border-secondary bg-surface-secondary/50 flex-shrink-0">
+                  {footer}
+                </div>
+              )}
             </DialogPanel>
           </TransitionChild>
         </div>
