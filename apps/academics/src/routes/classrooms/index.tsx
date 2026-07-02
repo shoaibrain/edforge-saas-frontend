@@ -744,8 +744,7 @@ export function ClassroomsModule() {
   const navigate = useNavigate()
   const schedPerms = useResourcePermissions('scheduling')
   const schoolId = useActiveSchoolId() || ''
-  const { t, formatDate } = useAcademicsI18n()
-  const { data: currentYear } = useCurrentAcademicYear(schoolId)
+  const { t } = useAcademicsI18n()
 
   // Lightweight section count for tab badge
   const { data: sectionPages } = useSections({ schoolId, enabled: !!schoolId, limit: 1 })
@@ -792,8 +791,6 @@ export function ClassroomsModule() {
       <div className="border-b border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-secondary))] px-6 pt-4">
         <PageHeader
           mode="pagebar"
-          year={currentYear?.name}
-          date={formatDate(new Date(), { weekday: 'long', month: 'short', day: 'numeric' })}
           actions={
             schedPerms.create
               ? [
