@@ -104,6 +104,20 @@ export function outputUrlFor(job: FinanceJobRow): string | undefined {
 }
 
 /**
+ * Whether the job produced a downloadable artifact at all. The H.3 P2
+ * all-skipped merged case (succeeded=0 + skipped=N) completes WITHOUT an
+ * artifact — no key, no URL — so neither a download link nor a
+ * "get a fresh link" refetch makes sense.
+ */
+export function hasArtifact(job: FinanceJobRow): boolean {
+  const output = job.output
+  if (!output) return false
+  return job.outputFormat === 'merged_pdf'
+    ? Boolean(output.mergedPdfKey || output.mergedPdfUrl)
+    : Boolean(output.zipKey || output.zipUrl)
+}
+
+/**
  * Failed document ids, read defensively: the row field is invoice-named
  * but the G.3 receipt worker writes payment ids into the same field.
  */

@@ -1,6 +1,7 @@
-import { describe, it, expect, afterEach } from 'vitest'
+import { describe, it, expect, afterEach, vi } from 'vitest'
 import { render, cleanup, fireEvent } from '@testing-library/react'
 import { DataTable } from '../DataTable'
+import { DataTableToolbar } from '../DataTableToolbar'
 import type { ColumnDef } from '@tanstack/react-table'
 
 interface Row {
@@ -107,5 +108,78 @@ describe('DataTableToolbar — responsive layout', () => {
     expect(getByText('Grade control')).toBeTruthy()
     // A single overflow trigger exists to absorb it on narrow widths.
     expect(getAllByText('More filters')).toHaveLength(1)
+  })
+})
+
+describe('DataTableToolbar — standalone mode (no table instance)', () => {
+  it('renders controlled search, presets, primary + overflow filters, and extras', () => {
+    const onSearchChange = vi.fn()
+    const { container, getByPlaceholderText, getByText } = render(
+      <DataTableToolbar
+        searchPlaceholder="Search sections"
+        searchValue="alg"
+        onSearchChange={onSearchChange}
+        presets={[
+          { value: 'all', label: 'All' },
+          { value: 'active', label: 'Active' },
+        ]}
+        activePreset="all"
+        onPresetChange={() => {}}
+        primaryFilter={<div>Course control</div>}
+        overflowFilters={<div>Teacher control</div>}
+        overflowLabel="More filters"
+        toolbarExtra={<button type="button">Export</button>}
+      />,
+    )
+    // Same responsive shell as the table-coupled toolbar.
+    expect(container.querySelector('[class*="@container"]')).toBeTruthy()
+    const search = getByPlaceholderText('Search sections') as HTMLInputElement
+    expect(search.value).toBe('alg')
+    fireEvent.change(search, { target: { value: 'geom' } })
+    expect(onSearchChange).toHaveBeenCalledWith('geom')
+    expect(getByText('Active')).toBeTruthy()
+    expect(getByText('Course control')).toBeTruthy()
+    expect(getByText('Export')).toBeTruthy()
+    // Overflow content stays behind the single trigger.
+    fireEvent.click(getByText('More filters'))
+    expect(getByText('Teacher control')).toBeTruthy()
+  })
+
+  it('swaps in the bulk bar with the same footprint when active', () => {
+    const { getByText, queryByPlaceholderText, rerender } = render(
+      <DataTableToolbar
+        searchPlaceholder="Search sections"
+        searchValue=""
+        onSearchChange={() => {}}
+        bulkBar={<div>2 selected</div>}
+        bulkActive={false}
+      />,
+    )
+    expect(queryByPlaceholderText('Search sections')).toBeTruthy()
+    rerender(
+      <DataTableToolbar
+        searchPlaceholder="Search sections"
+        searchValue=""
+        onSearchChange={() => {}}
+        bulkBar={<div>2 selected</div>}
+        bulkActive
+      />,
+    )
+    expect(getByText('2 selected')).toBeTruthy()
+    expect(queryByPlaceholderText('Search sections')).toBeNull()
+  })
+
+  it('hides table-coupled features (View · built-in export) without an instance', () => {
+    const { queryByText } = render(
+      <DataTableToolbar
+        searchPlaceholder="Search"
+        searchValue=""
+        onSearchChange={() => {}}
+        enableColumnVisibility
+        exportOptions={{ filename: 'x', formats: ['csv'] }}
+      />,
+    )
+    expect(queryByText('View')).toBeNull()
+    expect(queryByText('Export')).toBeNull()
   })
 })

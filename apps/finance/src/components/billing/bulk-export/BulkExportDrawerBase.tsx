@@ -45,6 +45,7 @@ import { ExportFailed } from './ExportFailed'
 import {
   buildExportManifest,
   bundleNameFor,
+  hasArtifact,
   outputUrlFor,
   type ExportDocType,
   type ExportRowSummary,
@@ -256,7 +257,13 @@ export function BulkExportDrawerBase({
         <Undo2 className="mr-1.5 h-4 w-4" />
         {t('asyncJobs.pdfExportShared.exportAgain')}
       </Button>
-      {linkExpired || !downloadUrl ? (
+      {/* H.3 P2: an all-skipped merged job completes with NO artifact —
+          neither a download nor a fresh-link refetch can help there. */}
+      {job.data && !hasArtifact(job.data) ? (
+        <Button variant="outline" onClick={handleClose}>
+          {t('asyncJobs.common.close')}
+        </Button>
+      ) : linkExpired || !downloadUrl ? (
         <Button onClick={() => void handleFreshLink()} disabled={refreshingLink}>
           <RefreshCw className={refreshingLink ? 'mr-1.5 h-4 w-4 animate-spin' : 'mr-1.5 h-4 w-4'} />
           {refreshingLink

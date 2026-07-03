@@ -19,7 +19,6 @@ import {
   StatBand,
   type StatMetric,
   Select,
-  DataTableMoreFilters,
   SelectionContextBar,
   type SelectionAction,
 } from '@edforge/ui'
@@ -1007,22 +1006,20 @@ export default function PaymentsPage() {
             buttonClassName="border-[rgb(var(--border-primary)/0.35)]"
           />
         }
-        moreFilters={
-          <DataTableMoreFilters
-            activeCount={gradeFilter ? 1 : 0}
-            onClear={() => setGradeFilter('')}
-          >
-            {/* Sprint B.5 — grade filter routes through GSI14 (sparse) */}
-            <Select
-              size="sm"
-              className="w-full"
-              label={t('feeStructure.gradeLevels')}
-              value={gradeFilter}
-              onChange={(v) => setGradeFilter(v ?? '')}
-              options={gradeOptions}
-            />
-          </DataTableMoreFilters>
+        overflowFilters={
+          /* Sprint B.5 — grade filter routes through GSI14 (sparse). Lives in
+             the toolbar-owned overflow so it folds with the primary filter. */
+          <Select
+            size="sm"
+            className="w-full"
+            label={t('feeStructure.gradeLevels')}
+            value={gradeFilter}
+            onChange={(v) => setGradeFilter(v ?? '')}
+            options={gradeOptions}
+          />
         }
+        overflowActiveCount={gradeFilter ? 1 : 0}
+        onOverflowClear={() => setGradeFilter('')}
         toolbarExtra={
           <ExportCsvButton
             onClick={() => {

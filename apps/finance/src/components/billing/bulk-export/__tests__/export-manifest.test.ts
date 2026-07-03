@@ -7,6 +7,7 @@ import {
   failedIdsOf,
   fileNameFor,
   formatBytes,
+  hasArtifact,
   outputUrlFor,
   willBeSkipped,
   type ExportRowSummary,
@@ -99,6 +100,31 @@ describe('outputUrlFor (format-aware, #305)', () => {
         })
       )
     ).toBe('https://x/merged')
+  })
+})
+
+describe('hasArtifact (H.3 P2 all-skipped guard)', () => {
+  it('is false for an all-skipped merged job (no key, no url)', () => {
+    expect(
+      hasArtifact(
+        makeJob({
+          outputFormat: 'merged_pdf',
+          counters: { requested: 3, succeeded: 0, failed: 0, skipped: 3 },
+          output: { urlExpiresAt: '2026-07-02T11:00:00Z' },
+        })
+      )
+    ).toBe(false)
+  })
+
+  it('is true when the format-matching key exists even after the url expired', () => {
+    expect(
+      hasArtifact(makeJob({ outputFormat: 'merged_pdf', output: { mergedPdfKey: 'k' } }))
+    ).toBe(true)
+    expect(hasArtifact(makeJob({ output: { zipKey: 'k' } }))).toBe(true)
+  })
+
+  it('is false without any output', () => {
+    expect(hasArtifact(makeJob({}))).toBe(false)
   })
 })
 

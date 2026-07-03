@@ -44,6 +44,10 @@ export const BULK_PDF_EXPORT_LIMITS: Record<BulkPdfExportFormat, number> = {
 
 export interface BulkInvoicePdfExportDto {
   invoiceIds: string[]
+  /**
+   * Sprint H.4 — both formats supported. Backend F.4 controller enforces
+   * the per-format caps in `BULK_PDF_EXPORT_LIMITS` (surfaces as 413).
+   */
   format: BulkPdfExportFormat
 }
 
@@ -75,6 +79,12 @@ export interface FinanceJobRow {
   output?: {
     zipKey?: string
     zipUrl?: string
+    /**
+     * Sprint H.3 — populated on merged_pdf jobs. Absent when
+     * `outputFormat === 'zip'` AND absent for the P2 all-skipped merged
+     * case (succeeded=0 + skipped=N → markCompleted without an artifact).
+     * Consumers MUST guard for undefined before rendering a download link.
+     */
     mergedPdfKey?: string
     mergedPdfUrl?: string
     urlExpiresAt?: string
@@ -116,6 +126,7 @@ export async function getFinanceJob(jobId: string): Promise<FinanceJobRow> {
  */
 export interface BulkReceiptPdfExportDto {
   paymentIds: string[]
+  /** Sprint H.4 — see BulkInvoicePdfExportDto.format for cap details. */
   format: BulkPdfExportFormat
 }
 

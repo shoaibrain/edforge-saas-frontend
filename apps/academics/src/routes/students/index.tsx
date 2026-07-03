@@ -571,8 +571,8 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
         >
           <motion.div variants={fadeInUp}>
             <PageHeader mode="pagebar" attention={<AttentionCornerPill />} actions={headerActions} />
+            <AttentionCornerShade className="pt-5" />
           </motion.div>
-          <AttentionCornerShade />
         </AttentionCorner>
 
         {/* ---- Error State ---- */}
