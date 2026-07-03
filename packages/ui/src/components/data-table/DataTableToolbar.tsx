@@ -17,7 +17,16 @@ import type {
 } from './types'
 
 interface DataTableToolbarProps<TData> {
-  table: Table<TData>
+  /**
+   * TanStack table instance. Optional — without it the toolbar runs in
+   * STANDALONE mode: the same responsive shell (controlled search · presets ·
+   * primary/overflow filters · trailing extras · bulk-bar swap) for pages
+   * whose one bar drives non-table views too (e.g. the classrooms cards⇄table
+   * toggle). Table-coupled features (global-filter fallback, client faceted
+   * filters, Clear-N, View/columns, built-in export) need the instance and
+   * stay hidden without it.
+   */
+  table?: Table<TData>
   searchPlaceholder?: string
   facetedFilters?: FacetedFilterConfig[]
   /** Keep the first faceted filter inline and move the rest into "More filters". */
@@ -56,7 +65,7 @@ interface DataTableToolbarProps<TData> {
   moreFilters?: ReactNode
 }
 
-export function DataTableToolbar<TData>({
+export function DataTableToolbar<TData = unknown>({
   table,
   searchPlaceholder,
   facetedFilters,
@@ -92,33 +101,35 @@ export function DataTableToolbar<TData>({
     return <div className="min-h-9">{bulkBar}</div>
   }
 
-  // Search can be controlled (server-side pages) or drive the table's global
-  // filter (client-side pages).
+  // Search can be controlled (server-side + standalone pages) or drive the
+  // table's global filter (client-side pages).
   const controlledSearch = typeof onSearchChange === 'function'
-  const globalFilter = (table.getState().globalFilter as string) ?? ''
+  const globalFilter = table ? ((table.getState().globalFilter as string) ?? '') : ''
   const searchVal = controlledSearch ? (searchValue ?? '') : globalFilter
   const setSearch = (value: string) => {
     if (controlledSearch) {
       onSearchChange?.(value)
-    } else {
+    } else if (table) {
       table.setGlobalFilter(value)
       table.setPageIndex(0)
     }
   }
 
-  const activeFilterCount =
-    table.getState().columnFilters.length + (globalFilter ? 1 : 0)
+  const activeFilterCount = table
+    ? table.getState().columnFilters.length + (globalFilter ? 1 : 0)
+    : 0
   const isFiltered = activeFilterCount > 0
 
   const handleClearAll = () => {
+    if (!table) return
     table.resetColumnFilters()
     table.setGlobalFilter('')
     table.setPageIndex(0)
   }
 
   const showDensity = !!(enableDensityToggle && density && onDensityChange)
-  const showView = enableColumnVisibility || showDensity
-  const showRightCluster = showView || toolbarExtra || exportOptions
+  const showView = !!table && (enableColumnVisibility || showDensity)
+  const showRightCluster = showView || toolbarExtra || (exportOptions && table)
 
   // The toolbar owns ONE "More filters" overflow when there are secondary
   // controls and/or a primary filter that folds in on narrow widths. The
@@ -166,7 +177,7 @@ export function DataTableToolbar<TData>({
 
         {/* Client-side faceted filters (TanStack columns), shown inline */}
         {inlineFacets.map((filter) => {
-          const column = table.getColumn(filter.columnId)
+          const column = table?.getColumn(filter.columnId)
           if (!column) return null
           return (
             <DataTableFacetedFilter
@@ -192,7 +203,7 @@ export function DataTableToolbar<TData>({
               {hasPrimary && <div className="flex @4xl:hidden">{primaryFilter}</div>}
               {/* Folded faceted filters (kept out of the inline row) */}
               {overflowFacets.map((filter) => {
-                const column = table.getColumn(filter.columnId)
+                const column = table?.getColumn(filter.columnId)
                 if (!column) return null
                 return (
                   <DataTableFacetedFilter
@@ -232,7 +243,7 @@ export function DataTableToolbar<TData>({
       {/* Trailing cluster — View (density + columns) · Export · consumer extras */}
       {showRightCluster && (
         <div className="ml-auto flex flex-shrink-0 items-center gap-2">
-          {showView && (
+          {showView && table && (
             <DataTableViewOptions
               table={table}
               labels={resolvedLabels}
@@ -241,7 +252,7 @@ export function DataTableToolbar<TData>({
               enableDensityToggle={showDensity}
             />
           )}
-          {exportOptions && (
+          {exportOptions && table && (
             <DataTableExport table={table} options={exportOptions} labels={resolvedLabels} />
           )}
           {toolbarExtra}
