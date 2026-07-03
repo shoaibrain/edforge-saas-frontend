@@ -985,6 +985,8 @@
       "student": "विद्यार्थी",
       "grade": "ग्रेड",
       "score": "अङ्क",
+      "scoreForStudent": "{{studentName}} का लागि अङ्क",
+      "componentScoreForStudent": "{{studentName}} का लागि {{component}} अङ्क",
       "subjectFallback": "विषय",
       "maxMarks": "{{marks}} अधिकतम",
       "summary": "{{students}} · अधिकतम {{max}}",
@@ -1427,6 +1429,34 @@
       "generateComingSoon": "{{count}} exam को result generation queue हुनेछ — चाँडै आउँदैछ",
       "onlyClosed": "Result card closed exams बाट मात्र बनाउन सकिन्छ।"
     },
+    "bulkDrawer": {
+      "title": "Exam स्थिति परिवर्तन गर्नुहोस्",
+      "selectedCount": "{{value}} exam चयन गरिएको",
+      "selectedCount_plural": "{{value}} exams चयन गरिएको",
+      "moveTo": "यसमा सार्नुहोस्",
+      "noSharedTarget": "चयन गरिएका सबै exam बाट एउटै status मा जान मिल्दैन — selection घटाउनुहोस् वा group मा सार्नुहोस्।",
+      "targetStatusAria": "लक्षित स्थिति",
+      "notes": "नोटहरू",
+      "optional": "(वैकल्पिक)",
+      "notesPlaceholder": "हरेक transition सँग जाने कारण वा context थप्नुहोस्...",
+      "selection": "Selection ({{count}})",
+      "statusCount": "{{value}} exam",
+      "statusCount_plural": "{{value}} exams",
+      "pickTarget": "लक्ष्य छान्नुहोस्",
+      "targetPreview": "→ {{target}}",
+      "skippedPreview": "— skipped ({{target}} मा जाने बाटो छैन)",
+      "applying": "लागू गर्दै...",
+      "applyTo": "{{count}} मा लागू गर्नुहोस्",
+      "toast": {
+        "movedAll": "{{value}} exam {{target}} मा सारियो",
+        "movedAll_plural": "{{value}} exams {{target}} मा सारिए",
+        "noneMoved": "कुनै exam सारिएन — {{error}}",
+        "movedPartial": "{{value}} {{target}} मा सारियो",
+        "skipped": "{{value}} skipped",
+        "failed": "{{value}} failed",
+        "separator": " · "
+      }
+    },
     "filter": {
       "filteredBy": "Filter:",
       "clear": "Clear (1)"
@@ -1604,7 +1634,23 @@
       "generationFailedDescription": "Result cards बनाउन समस्या भयो। Exam फेरि खोल्दै र बन्द गर्दै retry गर्न सकिन्छ।",
       "emptyTitle": "Result Cards अझै छैन",
       "emptyDescription": "Exam closed भएपछि result cards स्वचालित रूपमा बनिन्छन्। सबै scores प्रविष्ट भएपछि exam close गर्नुहोस्।",
-      "student": "विद्यार्थी"
+      "student": "विद्यार्थी",
+      "print": {
+        "reportCard": "रिपोर्ट कार्ड",
+        "progressReport": "प्रगति रिपोर्ट",
+        "printSavePdf": "प्रिन्ट / PDF रूपमा सेभ",
+        "printed": "प्रिन्ट गरिएको",
+        "full": "पूर्णाङ्क",
+        "obtained": "प्राप्ताङ्क",
+        "highestMarks": "उच्चतम",
+        "classTeacher": "कक्षा शिक्षक",
+        "principal": "प्रधानाध्यापक",
+        "parentGuardian": "अभिभावक",
+        "generatedBy": "EdForge द्वारा सिर्जना गरिएको",
+        "draftNotPublished": "मस्यौदा (अझै प्रकाशित छैन)",
+        "gradePrefix": "ग्रेड",
+        "emisPrefix": "EMIS"
+      }
     }
   },
   "classrooms": {
@@ -2319,6 +2365,10 @@
       "noStudentsTitle": "विद्यार्थी भर्ना छैन",
       "noStudentsDescription": "ग्रेड रेकर्ड गर्न यो सेक्सनमा विद्यार्थी भर्ना गर्नुहोस्।",
       "student": "विद्यार्थी",
+      "transferredStudent": "विद्यार्थी (स्थानान्तरित)",
+      "assignmentTooltip": "{{name}}\nअङ्क: {{points}}",
+      "assignmentTooltipWithCategory": "{{name}}\nश्रेणी: {{category}}\nअङ्क: {{points}}",
+      "scoreForStudent": "{{studentName}} का लागि अङ्क",
       "addAssignment": "असाइनमेन्ट थप्नुहोस्",
       "overall": "समग्र",
       "pointsShort": "{{points}} अङ्क",

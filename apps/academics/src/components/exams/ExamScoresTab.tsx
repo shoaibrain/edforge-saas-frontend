@@ -103,6 +103,7 @@ const ScoreEntryContext = createContext<ScoreEntryCtxValue | null>(null)
 
 function ScoreCell({ enrollmentId, studentName }: { enrollmentId: string; studentName: string }) {
   const ctx = useContext(ScoreEntryContext)
+  const { t, formatNumber } = useAcademicsI18n()
   if (!ctx) return null
   const { edits, setRow, setComponent, maxMarks, writable, components } = ctx
   const row = edits[enrollmentId] ?? { text: '', value: null }
@@ -115,9 +116,9 @@ function ScoreCell({ enrollmentId, studentName }: { enrollmentId: string; studen
     return (
       <div className="flex items-center justify-end gap-2 flex-wrap">
         {components.map((d) => {
-          const t = row.components?.[d.code] ?? ''
-          const n = Number(t)
-          const err = t.trim() !== '' && (!Number.isFinite(n) || n < 0 || n > d.fullMarks)
+          const componentText = row.components?.[d.code] ?? ''
+          const n = Number(componentText)
+          const err = componentText.trim() !== '' && (!Number.isFinite(n) || n < 0 || n > d.fullMarks)
           return (
             <div key={d.code} className="flex items-center gap-1">
               <span className="text-xs text-text-tertiary">{d.label ?? d.code}</span>
@@ -127,23 +128,26 @@ function ScoreCell({ enrollmentId, studentName }: { enrollmentId: string; studen
                 min={0}
                 max={d.fullMarks}
                 step="any"
-                value={t}
+                value={componentText}
                 disabled={!writable}
                 onChange={(e) => setComponent(enrollmentId, d.code, e.target.value)}
                 className={`w-16 rounded-lg border bg-surface-primary px-2 py-1 text-sm tabular-nums text-right ${
                   err ? 'border-[rgb(var(--state-danger-border))] text-[rgb(var(--state-danger-fg))]' : 'border-border-secondary text-text-primary'
                 } disabled:opacity-50`}
-                aria-label={`${d.label ?? d.code} for ${studentName}`}
+                aria-label={t('examScores.componentScoreForStudent', {
+                  component: d.label ?? d.code,
+                  studentName,
+                })}
                 aria-invalid={err || undefined}
               />
-              <span className="text-xs text-text-tertiary">/{d.fullMarks}</span>
+              <span className="text-xs text-text-tertiary">/{formatNumber(d.fullMarks)}</span>
             </div>
           )
         })}
         <span
           className={`text-xs tabular-nums w-16 text-right ${partial ? 'text-[rgb(var(--state-danger-fg))]' : 'text-text-secondary'}`}
         >
-          = {ev.anyFilled ? ev.sum : '—'}/{maxMarks}
+          = {ev.anyFilled ? formatNumber(ev.sum) : '—'}/{formatNumber(maxMarks)}
         </span>
       </div>
     )
@@ -167,10 +171,10 @@ function ScoreCell({ enrollmentId, studentName }: { enrollmentId: string; studen
         className={`w-24 rounded-lg border bg-surface-primary px-2 py-1 text-sm tabular-nums text-right ${
           showError ? 'border-[rgb(var(--state-danger-border))] text-[rgb(var(--state-danger-fg))]' : 'border-border-secondary text-text-primary'
         } disabled:opacity-50`}
-        aria-label={`Score for ${studentName}`}
+        aria-label={t('examScores.scoreForStudent', { studentName })}
         aria-invalid={showError || undefined}
       />
-      <span className="text-xs text-text-tertiary tabular-nums w-12">/ {maxMarks}</span>
+      <span className="text-xs text-text-tertiary tabular-nums w-12">/ {formatNumber(maxMarks)}</span>
     </div>
   )
 }

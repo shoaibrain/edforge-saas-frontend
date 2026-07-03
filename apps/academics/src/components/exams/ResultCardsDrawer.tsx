@@ -145,7 +145,7 @@ function ReportCardDetail({
   onBack: () => void
   onCardUpdated: (card: ResultCardResponseDto) => void
 }) {
-  const { t } = useAcademicsI18n()
+  const { t, formatDate, locale } = useAcademicsI18n()
   const isDraft = card.status === 'draft'
   const division = isDivisionCard(card)
   const [conduct, setConduct] = useState(card.conduct ?? '')
@@ -370,7 +370,49 @@ function ReportCardDetail({
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => openReportCardPrint(card, exam, schoolName)}
+            onClick={() =>
+              openReportCardPrint(card, exam, schoolName, {
+                printedOn: formatDate(new Date()),
+                examTypeLabel: t(`examModule.types.${exam.examType}`, { defaultValue: humanizeExamType(exam.examType) }),
+                labels: {
+                  reportCard: t('examModule.resultCards.print.reportCard'),
+                  progressReport: t('examModule.resultCards.print.progressReport'),
+                  printSavePdf: t('examModule.resultCards.print.printSavePdf'),
+                  printed: t('examModule.resultCards.print.printed'),
+                  subject: t('examModule.resultCards.subject'),
+                  full: t('examModule.resultCards.print.full'),
+                  passMarks: t('examModule.resultCards.passMarksShort'),
+                  obtained: t('examModule.resultCards.print.obtained'),
+                  highestMarks: t('examModule.resultCards.print.highestMarks'),
+                  result: t('examModule.resultCards.result'),
+                  score: t('examModule.resultCards.score'),
+                  grade: t('examModule.resultCards.grade'),
+                  gpa: 'GPA',
+                  pass: t('examModule.resultCards.pass'),
+                  fail: t('examModule.resultCards.fail'),
+                  passUpper: t('examModule.resultCards.passUpper'),
+                  failUpper: t('examModule.resultCards.failUpper'),
+                  absent: 'AB',
+                  total: t('examModule.resultCards.total'),
+                  percentage: t('examModule.resultCards.percentage'),
+                  division: t('examModule.resultCards.division'),
+                  position: t('examModule.resultCards.position'),
+                  termGpa: t('examModule.resultCards.termGpa'),
+                  overall: t('examModule.resultCards.overall'),
+                  conduct: t('examModule.resultCards.conduct'),
+                  classTeacherRemark: t('examModule.resultCards.classTeacherRemark'),
+                  classTeacher: t('examModule.resultCards.print.classTeacher'),
+                  principal: t('examModule.resultCards.print.principal'),
+                  parentGuardian: t('examModule.resultCards.print.parentGuardian'),
+                  generatedBy: t('examModule.resultCards.print.generatedBy'),
+                  published: t('examModule.resultCards.published'),
+                  draftNotPublished: t('examModule.resultCards.print.draftNotPublished'),
+                  gradePrefix: t('examModule.resultCards.print.gradePrefix'),
+                  emisPrefix: t('examModule.resultCards.print.emisPrefix'),
+                  lang: locale,
+                },
+              })
+            }
             className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-text-secondary border border-border-secondary rounded-lg hover:bg-surface-secondary transition-colors"
           >
             <Printer className="w-4 h-4" />
