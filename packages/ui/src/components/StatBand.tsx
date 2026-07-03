@@ -51,6 +51,12 @@ interface StatMetricBase {
   iconSignature?: IconName
   /** Drives the single accent color. Default "normal" (neutral). */
   state?: StatBandState
+  /**
+   * Opt-in: color the big value itself for `good` (success green).
+   * `warn`/`critical` values are always colored; `good` stays neutral by
+   * default so routine positive metrics don't shout.
+   */
+  emphasizeValue?: boolean
   /** Widen + enlarge this segment as the band's lead metric. */
   primary?: boolean
   /** Sub line shown at rest (hidden on hover when `detail` is present). */
@@ -279,7 +285,9 @@ function Segment({ metric }: { metric: StatMetric }) {
           className={cn(
             'font-semibold leading-none tabular-nums tracking-tight',
             metric.primary ? 'text-4xl' : 'text-3xl',
-            VALUE[state],
+            metric.emphasizeValue && state === 'good'
+              ? 'text-[rgb(var(--state-success-fg))]'
+              : VALUE[state],
           )}
         >
           {metric.value}

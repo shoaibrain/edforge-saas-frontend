@@ -170,7 +170,7 @@
     "issueSelected": "Issue Selected ({{count}})",
     "sendReminder": "Send reminder",
     "bulkPdfExport": {
-      "menuLabel": "Download PDF (ZIP)"
+      "menuLabel": "Download PDFs"
     },
     "cancelTitle": "Cancel Invoice {{invoiceNumber}}?",
     "cancelDescriptionPrefix": "This action is",
@@ -204,7 +204,10 @@
     "student": "Student: {{name}}",
     "due": "Due: {{date}}",
     "actions": {
-      "issueInvoice": "Issue Invoice"
+      "issueInvoice": "Issue Invoice",
+      "sendReminder": "Send reminder",
+      "cancelDraft": "Cancel draft",
+      "moreActions": "More actions"
     },
     "sections": {
       "lineItems": "Line Items",
@@ -215,12 +218,65 @@
     },
     "paymentHistory": {
       "payment": "Payment",
-      "via": "via {{gateway}}"
+      "via": "via {{gateway}}",
+      "empty": "No payments recorded on this invoice yet.",
+      "recordFirst": "Record the first payment"
     },
     "metadata": {
       "created": "Created: {{date}}",
       "issued": "Issued: {{date}}",
       "notes": "Notes: {{notes}}"
+    },
+    "banner": {
+      "draftTitle": "This invoice is a draft.",
+      "draftBody": "It isn't visible on the student account and no payments can be recorded until it's issued.",
+      "cancelledTitle": "This invoice was cancelled",
+      "cancelledOn": "on {{date}}",
+      "cancelledBy": "by {{name}}",
+      "cancelledBody": "It no longer affects the student's balance."
+    },
+    "band": {
+      "region": "Invoice summary",
+      "lineItemCount": "{{count}} line items",
+      "lineItemCount_one": "{{count}} line item",
+      "lineItemCount_other": "{{count}} line items",
+      "noPaymentsYet": "no payments yet",
+      "invoiceCancelled": "invoice cancelled",
+      "settledInFull": "settled in full",
+      "outstandingBalance": "outstanding balance",
+      "dueDate": "Due Date",
+      "daysLate": "{{days}}d late"
+    },
+    "lineItems": {
+      "qtyAt": "{{quantity}} × {{amount}}"
+    },
+    "aside": {
+      "details": "Details",
+      "status": "Status",
+      "issued": "Issued",
+      "notIssuedYet": "Not issued yet",
+      "due": "Due",
+      "billingPeriod": "Billing period",
+      "academicYear": "Academic year",
+      "viewStudentAccount": "View student account",
+      "activity": "Activity"
+    },
+    "timeline": {
+      "created": "Invoice created",
+      "issued": "Issued to student account",
+      "overdue": "Marked overdue",
+      "overdueSub": "Automatic · past due date",
+      "payment": "Payment received — {{amount}}",
+      "paymentSub": "{{gateway}} · Receipt {{receipt}}",
+      "paid": "Paid in full",
+      "paidSub": "Balance settled",
+      "cancelled": "Invoice cancelled",
+      "writtenOff": "Written off",
+      "by": "by {{name}}"
+    },
+    "error": {
+      "forbidden": "You don't have permission to view this invoice.",
+      "notFound": "We couldn't find this invoice. It may have been deleted."
     }
   },
   "lineItems": {
@@ -719,7 +775,7 @@
     "exportFailed": "Failed to export payments CSV",
     "recordManualPayment": "Record Manual Payment",
     "bulkReceiptPdfExport": {
-      "menuLabel": "Download PDF (ZIP)"
+      "menuLabel": "Download PDFs"
     },
     "selection": {
       "noneVoidable": "No selected payments can be voided — only completed payments with a receipt qualify.",
@@ -753,7 +809,34 @@
     "notesPlaceholder": "Optional notes about this payment...",
     "preview": "Preview",
     "method": "Method",
-    "reference": "Reference #"
+    "reference": "Reference #",
+    "drawer": {
+      "amountLabel": "Amount received",
+      "dueHint": "due {{amount}}",
+      "overpayError": "More than the amount due — overpayment isn't allowed. Max {{max}}.",
+      "overCapError": "Amount exceeds the {{max}} per-payment limit.",
+      "partialHint": "Partial payment — {{amount}} will remain due.",
+      "chipFull": "Full amount due",
+      "chipHalf": "Half",
+      "methodLabel": "Payment method",
+      "referenceLabel": "Transaction reference",
+      "referenceHint": "required for {{method}}",
+      "dateLabel": "Payment date",
+      "receivedBy": "Received by",
+      "noteLabel": "Note",
+      "noteHint": "optional — appears on the receipt",
+      "notePlaceholder": "e.g. Paid in cash at counter by guardian",
+      "infoNote": "A receipt is generated automatically and the student account balance updates immediately.",
+      "recording": "Recording…",
+      "recordAmount": "Record {{amount}}",
+      "toastRecorded": "Payment recorded — receipt {{receipt}}",
+      "view": "View",
+      "done": "Done",
+      "viewReceipt": "View receipt",
+      "doneVia": "Payment recorded via {{method}} · {{date}}",
+      "donePaidInFull": "This invoice is now paid in full.",
+      "doneRemains": "{{amount}} remains due on this invoice."
+    }
   },
   "asyncJobs": {
     "common": {
@@ -893,13 +976,16 @@
       "toastSucceeded": "Bulk export complete: {{succeeded}} succeeded, {{failed}} failed.",
       "toastFailed": "Bulk export failed. Check the drawer for details.",
       "readyTitle_plural": "Ready to export {{count}} invoices as ZIP",
-      "formatPickerLabel": "Output format",
-      "formatZip": "ZIP of individual PDFs (one file per invoice)",
-      "formatMergedPdf": "Single merged PDF (all invoices concatenated)",
-      "readyTitleMerged": "Ready to export {{count}} invoice as merged PDF",
-      "readyTitle_pluralMerged": "Ready to export {{count}} invoices as merged PDF",
-      "readyBodyMerged": "The generated PDF concatenates all invoices in the order they were selected. The merged output is capped at 1,000 invoices per export (ZIP allows up to 2,000). This may take a few minutes for larger batches; you can close the drawer and the job will keep running in the background.",
-      "downloadMergedPdf": "Download invoices-merged.pdf"
+      "totalValueLabel": "Total value",
+      "skippedNote": "{{count}} cancelled invoices in your selection will be skipped — cancelled documents aren’t exported.",
+      "skippedNote_one": "{{count}} cancelled invoice in your selection will be skipped — cancelled documents aren’t exported.",
+      "skippedNote_other": "{{count}} cancelled invoices in your selection will be skipped — cancelled documents aren’t exported.",
+      "format": {
+        "zip": "ZIP of PDFs",
+        "zipSub": "ZIP · one PDF per invoice",
+        "merged": "Merged PDF",
+        "mergedSub": "One combined PDF, in order"
+      }
     },
     "receiptPdfExport": {
       "title": "Bulk receipt export",
@@ -914,13 +1000,80 @@
       "payloadTooLarge": "Cannot export {{requested}} receipts in one batch (limit is {{limit}}). Please narrow the selection.",
       "toastSucceeded": "Bulk export complete: {{succeeded}} succeeded, {{failed}} failed.",
       "toastFailed": "Bulk export failed. Check the drawer for details.",
-      "formatPickerLabel": "Output format",
-      "formatZip": "ZIP of individual PDFs (one file per receipt)",
-      "formatMergedPdf": "Single merged PDF (all receipts concatenated)",
-      "readyTitleMerged": "Ready to export {{count}} receipt as merged PDF",
-      "readyTitle_pluralMerged": "Ready to export {{count}} receipts as merged PDF",
-      "readyBodyMerged": "The generated PDF concatenates all completed-payment receipts in the order they were selected. Non-completed payments (voided / refunded / failed) are skipped automatically. The merged output is capped at 1,000 receipts per export (ZIP allows up to 2,000).",
-      "downloadMergedPdf": "Download receipts-merged.pdf"
+      "totalValueLabel": "Amount received",
+      "skippedNote": "{{count}} non-completed payments in your selection will be skipped — receipts exist only for completed payments.",
+      "skippedNote_one": "{{count}} non-completed payment in your selection will be skipped — receipts exist only for completed payments.",
+      "skippedNote_other": "{{count}} non-completed payments in your selection will be skipped — receipts exist only for completed payments.",
+      "format": {
+        "zip": "ZIP of PDFs",
+        "zipSub": "ZIP · one PDF per receipt",
+        "merged": "Merged PDF",
+        "mergedSub": "One combined PDF, in order"
+      }
+    },
+    "pdfExportShared": {
+      "documents": "Documents",
+      "students": "Students",
+      "studentCount": "{{count}} students",
+      "studentCount_one": "{{count}} student",
+      "studentCount_other": "{{count}} students",
+      "grades": "Grades {{grades}}",
+      "bundle": "Bundle",
+      "estimateSeconds": "about {{seconds}} sec",
+      "morePdfs": "+ {{count}} more PDFs",
+      "backgroundNote": "Runs in the background — you can close this panel and keep working. We'll let you know the moment it's ready.",
+      "synced": "live · synced {{seconds}}s ago",
+      "preparingExport": "Preparing export…",
+      "generatingPdfs": "Generating PDFs…",
+      "prepared": "{{current}} of {{total}} PDFs prepared",
+      "docTotal": "{{count}} documents",
+      "docTotal_one": "{{count}} document",
+      "docTotal_other": "{{count}} documents",
+      "toastDownload": "Download",
+      "generated": "Generated",
+      "skipped": "Skipped",
+      "failed": "Failed",
+      "safeToClose": "Safe to close — the export keeps running on the server.",
+      "inProgress": "Export in progress…",
+      "complete": "Complete",
+      "completeWithFailures": "Complete, with failures",
+      "wentWrong": "Something went wrong",
+      "runInBackground": "Run in background",
+      "exportAgain": "Export again",
+      "freshLink": "Get a fresh link",
+      "gettingFreshLink": "Getting a fresh link…",
+      "tryAgain": "Try again",
+      "download": "Download {{bundle}}",
+      "readyTitle": "Export ready",
+      "partialTitle": "{{succeeded}} of {{requested}} exported",
+      "succeededChip": "{{count}} succeeded",
+      "skippedChip": "{{count}} skipped",
+      "failedChip": "{{count}} failed",
+      "bundleMeta": "{{count}} PDFs",
+      "expiresIn": "Link expires in",
+      "linkExpired": "Download link expired — your files are safe on the server.",
+      "whatsInside": "What's inside · {{count}} files",
+      "failedBoxTitle": "{{count}} couldn't be generated",
+      "retryFailed": "Retry {{count}} failed",
+      "failedBoxFoot": "You can still download the {{count}} that succeeded.",
+      "completedAt": "Completed {{time}}",
+      "took": "took {{seconds}}s",
+      "jobIdCopied": "Job ID copied",
+      "copyJobId": "Copy job ID for support",
+      "jobShort": "job {{id}}",
+      "failedTitle": "Export failed",
+      "failedBody": "None of the {{count}} PDFs could be generated. Nothing was changed on any account.",
+      "supportNote": "If this keeps happening, share this job id with support:",
+      "format": {
+        "label": "Output format",
+        "overCap": "Up to {{limit}} documents"
+      },
+      "whatsInside_one": "What's inside · {{count}} file",
+      "whatsInside_other": "What's inside · {{count}} files",
+      "bundleMeta_one": "{{count}} PDF",
+      "bundleMeta_other": "{{count}} PDFs",
+      "morePdfs_one": "+ {{count}} more PDF",
+      "morePdfs_other": "+ {{count}} more PDFs"
     }
   },
   "financeLayout": {
@@ -1129,5 +1282,21 @@
       "selectAll": "Select all {{count}}",
       "clear": "Clear selection"
     }
+  },
+  "receiptDetail": {
+    "print": "Print",
+    "stamp": {
+      "paid": "PAID",
+      "partialRefund": "PARTIAL REFUND"
+    },
+    "fields": {
+      "invoice": "Invoice"
+    },
+    "amountInWords": "Amount in words —",
+    "refund": {
+      "title": "Refund issued — {{amount}}",
+      "net": "Net amount retained: {{amount}}"
+    },
+    "fine": "Computer-generated receipt — valid without signature. Generated by Edforge on {{date}}."
   }
 }

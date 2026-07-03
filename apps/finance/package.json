@@ -17,6 +17,7 @@
     "@edforge/abac": "workspace:*",
     "@edforge/api-client": "workspace:*",
     "@edforge/archetype": "workspace:*",
+    "@edforge/auth": "workspace:*",
     "@edforge/finance-services": "workspace:*",
     "@edforge/i18n": "workspace:*",
     "@edforge/theme": "workspace:*",

@@ -166,6 +166,19 @@ export interface InvoiceLineItem {
 }
 
 /**
+ * One status transition on an invoice, recorded server-side. `from` is null
+ * for the creation entry on older rows; `changedBy` is a display name or
+ * user id depending on backend resolution.
+ */
+export interface InvoiceStatusHistoryEntry {
+  from: InvoiceStatus | null
+  to: InvoiceStatus
+  changedAt: string // ISO datetime
+  changedBy?: string
+  reason?: string
+}
+
+/**
  * Invoice represents a bill sent to a student/parent.
  * Contains line items, supports partial payments, and tracks status.
  */
@@ -190,6 +203,8 @@ export interface Invoice {
   dueDate: string // ISO date
   issuedDate: string // ISO date
   status: InvoiceStatus
+  /** Status-transition audit trail; present on detail reads, absent on older rows. */
+  statusHistory?: InvoiceStatusHistoryEntry[]
   notes?: string
   createdAt: string
   updatedAt: string

@@ -315,6 +315,9 @@ importers:
       '@edforge/archetype':
         specifier: workspace:*
         version: link:../../packages/archetype
+      '@edforge/auth':
+        specifier: workspace:*
+        version: link:../../packages/auth
       '@edforge/finance-services':
         specifier: workspace:*
         version: link:../../packages/finance-services

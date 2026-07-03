@@ -83,11 +83,16 @@ const recordPaymentRoute = createRoute({
     component: RecordPaymentPage,
 })
 
-// Receipt Detail (M1.5-FU.2 — moved from shell)
+// Receipt Detail (M1.5-FU.2 — moved from shell). The optional `invoiceId`
+// search param carries the originating invoice so the page can render a
+// "Back to invoice" link + invoice deep-link on the paper document.
 const receiptRoute = createRoute({
     getParentRoute: () => rootRoute,
     path: '/payments/$paymentId/receipt',
     component: FinanceReceiptPage,
+    validateSearch: (search: Record<string, unknown>): { invoiceId?: string } => ({
+        invoiceId: typeof search.invoiceId === 'string' ? search.invoiceId : undefined,
+    }),
 })
 
 // Student Accounts

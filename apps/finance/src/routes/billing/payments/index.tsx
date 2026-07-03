@@ -797,21 +797,21 @@ export default function PaymentsPage() {
   // Bulk surfaces on the Payments list:
   //   - Void (#229, cheap-path fan-out)
   //   - Send receipt (#230, D1 of the async-job framework, PR #339)
-  //   - Download PDF (ZIP) — Sprint G.4, wires G.2 backend worker via
+  //   - Download PDFs — Sprint G.4, wires G.2 backend worker via
   //     the shared BulkReceiptPdfExportDrawer
   const [bulkVoidTarget, setBulkVoidTarget] = useState<Payment[] | null>(null)
   const [bulkReceiptTarget, setBulkReceiptTarget] = useState<Payment[] | null>(null)
   // Sprint G.4 — receipt-side counterpart of the invoice-list
-  // bulkPdfExportTarget state. Stored as string[] because the drawer
-  // takes flat paymentIds (not full Payment objects — no client-side
-  // eligibility branching; the G.2 worker's status='completed' filter
+  // bulkPdfExportTarget state. Holds full Payment rows so the drawer's
+  // preflight manifest can aggregate without refetching; server-side
+  // eligibility still rules (the G.2 worker's status='completed' filter
   // is the source of truth).
-  const [bulkPdfExportTarget, setBulkPdfExportTarget] = useState<string[] | null>(null)
+  const [bulkPdfExportTarget, setBulkPdfExportTarget] = useState<Payment[] | null>(null)
 
   // ── ⑨ Selection Context Bar — state-aware action matrix (retires the
   // legacy floating pill). Void / Send receipt mirror the drawers' own
   // eligibility splits (`splitEligibleVoid` / `splitEligibleReceipts`:
-  // completed + receipted); Download PDF (ZIP) applies to completed
+  // completed + receipted); Download PDFs applies to completed
   // payments — the G.2 worker's status filter surfaced as the subset chip
   // up front instead of a post-hoc skip. Handlers receive `applicableIds`
   // only, so the drawers open with exactly the qualifying rows.
@@ -855,7 +855,7 @@ export default function PaymentsPage() {
         icon: <Download className="h-3.5 w-3.5" />,
         applicableIds: completedIds,
         disabledReason: t('paymentsList.selection.noneCompleted'),
-        onAction: (ids) => setBulkPdfExportTarget(Array.from(new Set(ids))),
+        onAction: (ids) => setBulkPdfExportTarget(rowsFor(Array.from(new Set(ids)))),
       },
     ]
   }, [selectedPayments, t])
@@ -1088,18 +1088,18 @@ export default function PaymentsPage() {
       />
 
       {/* Sprint G.4 — Bulk Receipt PDF Export Drawer (mirror of the
-          invoice-side drawer from PR #266). Conditionally mounted so the
-          exit animation runs; onClose only clears the target, onComplete
-          clears row selection per sibling-drawer convention. */}
-      {bulkPdfExportTarget && (
-        <BulkReceiptPdfExportDrawer
-          open={!!bulkPdfExportTarget}
-          onClose={() => setBulkPdfExportTarget(null)}
-          onComplete={() => setRowSelection({})}
-          schoolId={schoolId}
-          paymentIds={bulkPdfExportTarget}
-        />
-      )}
+          invoice-side drawer from PR #266). Mounted unconditionally: the
+          drawer keeps polling a backgrounded export after close and toasts
+          on completion — unmounting here would kill the poll and break the
+          runs-in-background promise. onClose only clears the target,
+          onComplete clears row selection per sibling-drawer convention. */}
+      <BulkReceiptPdfExportDrawer
+        open={!!bulkPdfExportTarget}
+        onClose={() => setBulkPdfExportTarget(null)}
+        onComplete={() => setRowSelection({})}
+        schoolId={schoolId}
+        payments={bulkPdfExportTarget ?? []}
+      />
     </div>
   )
 }
