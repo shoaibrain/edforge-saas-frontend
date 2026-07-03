@@ -352,6 +352,14 @@
     footer .wrap { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
     footer code { font-family: var(--mono); color: var(--t2); background: var(--surface); padding: 2px 7px; border-radius: 6px; border: 1px solid var(--line); font-size: 12px; }
     .divider { height: 1px; background: var(--line); margin: 0; }
+
+    /* Respect reduced-motion — the system preaches it, so the board practices it. */
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+      .card:hover { transform: none; }
+      .icon-tile:hover svg { transform: none; }
+      .sb-item:hover .ico { transform: none; }
+    }
   </style>
 </head>
 <body>
