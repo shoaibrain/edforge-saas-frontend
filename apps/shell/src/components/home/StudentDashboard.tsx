@@ -21,6 +21,7 @@ import {
   BookOpen,
   ArrowRight,
 } from 'lucide-react'
+import { WidgetGrid, WidgetCard } from '@edforge/ui'
 import { useTranslation } from '@edforge/i18n'
 import { SectionErrorBoundary } from './SectionErrorBoundary'
 
@@ -97,55 +98,51 @@ export function StudentDashboard({ schoolId }: StudentDashboardProps) {
       initial={prefersReducedMotion ? undefined : 'hidden'}
       animate="visible"
     >
-      {/* Welcome Card */}
+      {/* ⑤ WidgetCard — student welcome + quick links */}
       <SectionErrorBoundary fallbackMessage={t('homeV2.errors.unableToLoadDashboard')}>
-        <motion.div
-          variants={sectionVariants}
-          transition={{ duration: 0.2 }}
-          // allow-presentation-style: card padding (18px) is off the 4px scale
-          className="rounded-xl border bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]"
-          style={{ padding: 18 }}
-        >
-          <h2 className="text-sm font-medium mb-1 text-[rgb(var(--text-secondary))]">
-            {t('homeV2.student.welcomeTitle')}
-          </h2>
-          <p className="text-xs mb-4 text-[rgb(var(--text-tertiary))]">
-            {t('homeV2.student.welcomeDescription')}
-          </p>
-
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            {studentLinks.map((link) => {
-              const Icon = link.icon
-              return (
-                <Link
-                  key={link.label}
-                  to={link.href as any}
-                  className="flex flex-col gap-2 p-3 rounded-lg transition-colors bg-[rgb(var(--background-tertiary))]"
-                >
-                  <div
-                    // allow-presentation-style: per-link accent tint
-                    className="w-8 h-8 rounded-lg flex items-center justify-center"
-                    style={{ background: `${link.color}15` }}
-                  >
-                    <Icon
-                      // allow-presentation-style: per-link accent color
-                      className="w-4 h-4"
-                      style={{ color: link.color }}
-                    />
-                  </div>
-                  <div>
-                    <p className="text-xs font-medium text-[rgb(var(--text-tertiary))]">
-                      {link.label}
-                    </p>
-                    <p className="text-xs mt-0.5 text-[rgb(var(--text-tertiary))]">
-                      {link.description}
-                    </p>
-                  </div>
-                  <ArrowRight className="w-3 h-3 mt-auto text-[rgb(var(--text-disabled))]" />
-                </Link>
-              )
-            })}
-          </div>
+        <motion.div variants={sectionVariants} transition={{ duration: 0.2 }}>
+          <WidgetGrid>
+            <WidgetCard
+              title={t('homeV2.student.welcomeTitle')}
+              subtitle={t('homeV2.student.welcomeDescription')}
+              iconSignature="overview"
+              span={12}
+            >
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                {studentLinks.map((link) => {
+                  const Icon = link.icon
+                  return (
+                    <Link
+                      key={link.label}
+                      to={link.href as any}
+                      className="flex flex-col gap-2 p-3 rounded-lg transition-colors bg-[rgb(var(--background-tertiary))]"
+                    >
+                      <div
+                        // allow-presentation-style: per-link accent tint
+                        className="w-8 h-8 rounded-lg flex items-center justify-center"
+                        style={{ background: `${link.color}15` }}
+                      >
+                        <Icon
+                          // allow-presentation-style: per-link accent color
+                          className="w-4 h-4"
+                          style={{ color: link.color }}
+                        />
+                      </div>
+                      <div>
+                        <p className="text-xs font-medium text-[rgb(var(--text-tertiary))]">
+                          {link.label}
+                        </p>
+                        <p className="text-xs mt-0.5 text-[rgb(var(--text-tertiary))]">
+                          {link.description}
+                        </p>
+                      </div>
+                      <ArrowRight className="w-3 h-3 mt-auto text-[rgb(var(--text-disabled))]" />
+                    </Link>
+                  )
+                })}
+              </div>
+            </WidgetCard>
+          </WidgetGrid>
         </motion.div>
       </SectionErrorBoundary>
     </motion.div>

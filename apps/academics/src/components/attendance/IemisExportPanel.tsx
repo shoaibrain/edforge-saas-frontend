@@ -82,9 +82,15 @@ function downloadCsv(filename: string, csv: string) {
 interface IemisExportPanelProps {
   schoolId: string
   academicYearId: string
+  /**
+   * When rendered inside the export dialog (Modal), the dialog already supplies
+   * the title/description chrome — drop the panel's own heading to avoid the
+   * duplicate. Default (false) keeps the standalone heading.
+   */
+  embedded?: boolean
 }
 
-export function IemisExportPanel({ schoolId, academicYearId }: IemisExportPanelProps) {
+export function IemisExportPanel({ schoolId, academicYearId, embedded = false }: IemisExportPanelProps) {
   const { t, dataTableLabels, formatDateTime, formatNumber } = useAcademicsI18n()
   const [yearMonth, setYearMonth] = useState<string>(currentYearMonth())
   const exportMutation = useExportIemisAttendance()
@@ -154,13 +160,17 @@ export function IemisExportPanel({ schoolId, academicYearId }: IemisExportPanelP
     <div className="space-y-4">
       {/* Controls */}
       <div className="bg-surface-secondary border border-border-secondary rounded-xl p-4">
-        <div className="flex items-center gap-2 mb-3">
-          <FileSpreadsheet className="w-4 h-4 text-[rgb(var(--accent-attendance-text))]" />
-          <h4 className="text-sm font-semibold text-text-primary">{t('iemisExport.title')}</h4>
-        </div>
-        <p className="text-xs text-text-tertiary mb-4 max-w-2xl">
-          {t('iemisExport.description')}
-        </p>
+        {!embedded && (
+          <>
+            <div className="flex items-center gap-2 mb-3">
+              <FileSpreadsheet className="w-4 h-4 text-[rgb(var(--accent-attendance-text))]" />
+              <h4 className="text-sm font-semibold text-text-primary">{t('iemisExport.title')}</h4>
+            </div>
+            <p className="text-xs text-text-tertiary mb-4 max-w-2xl">
+              {t('iemisExport.description')}
+            </p>
+          </>
+        )}
         <div className="flex flex-wrap items-end gap-3">
           <div>
             <label htmlFor="iemis-year-month" className="block text-xs font-medium text-text-secondary mb-1">

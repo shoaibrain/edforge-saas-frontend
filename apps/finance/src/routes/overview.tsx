@@ -1,41 +1,40 @@
 /**
- * Finance Overview Page — V2
+ * Finance Overview Page — dashboard recipe
  *
- * Redesigned finance overview with V2 design tokens, animated KPI tiles,
- * collection performance, billing health (unified status + aging), and recent activity.
+ * PageHeader (pagebar, ⑧ AttentionCorner pill in the attention slot) → StatBand
+ * → WidgetCard grid (⑤), the same canonical structure as Home + Academics
+ * Overview. Reuses `useFinanceOverviewV2` and the existing overview-v2 cards in
+ * `bare` mode; preserves the filters/export row, no-school guard, per-widget
+ * error boundaries, and reduced-motion stagger.
  */
 
 import { useNavigate } from "@tanstack/react-router";
 import { motion, useReducedMotion } from "framer-motion";
+import { Wallet, FileStack, CreditCard } from "lucide-react";
 import {
-  Wallet,
-  TrendingUp,
-  Receipt,
-  AlertTriangle,
-  FileStack,
-  CreditCard,
-  Inbox,
-} from "lucide-react";
-import { StatCard, WidgetErrorBoundaryV2, ContextBar } from "@edforge/ui";
+  PageHeader,
+  StatBand,
+  type StatMetric,
+  AttentionCorner,
+  AttentionCornerPill,
+  AttentionCornerShade,
+  useSignalAcks,
+  type Signal,
+  WidgetGrid,
+  WidgetCard,
+  WidgetErrorBoundaryV2,
+} from "@edforge/ui";
 import { useCurrency } from "@edforge/types/use-currency";
-import { normalizePlatformLanguage, useTranslation } from "@edforge/i18n";
+import { useTranslation } from "@edforge/i18n";
 import { useFinanceSettings } from "../layouts/FinanceLayout";
-
-// Helper to build tag pill props for StatCard
-function tagPill(
-  text: string,
-  hex: string,
-): { text: string; color: string; bg: string } {
-  return { text, color: hex, bg: `${hex}18` };
-}
 import { useAppStore } from "../stores/app.store";
 import { useFinanceOverviewV2 } from "../hooks/useFinanceOverviewV2";
 import { FilterRow } from "../components/overview-v2/FilterRow";
-import { OverdueAlertBanner } from "../components/overview-v2/OverdueAlertBanner";
 import { CollectionPerformanceCard } from "../components/overview-v2/CollectionPerformanceCard";
 import { BillingHealthCard } from "../components/overview-v2/BillingHealthCard";
 import { RecentPaymentsCard } from "../components/overview-v2/RecentPaymentsCard";
 import { RecentInvoicesCard } from "../components/overview-v2/RecentInvoicesCard";
+import { localizeAgingBucketLabel } from "../components/overview-v2/aging-i18n";
 
 // ============================================================================
 // ANIMATION
@@ -66,83 +65,6 @@ function useMotionVariants() {
       },
     },
   };
-}
-
-// ============================================================================
-// INSIGHT STRIP (E-01)
-// ============================================================================
-
-function InsightStrip({
-  totalInvoiced,
-  collectionRate,
-  overdueCount,
-  isLoading,
-  formatShort,
-}: {
-  totalInvoiced: number;
-  collectionRate: number;
-  overdueCount: number;
-  isLoading: boolean;
-  formatShort: (amount: number) => string;
-}) {
-  const { t } = useTranslation("payments");
-
-  if (isLoading) {
-    return (
-      <div className="h-5 w-3/5 rounded-lg v2-skeleton-pulse bg-[rgb(var(--background-tertiary))]" />
-    );
-  }
-
-  if (totalInvoiced === 0) return null;
-
-  const parts: string[] = [
-    t("overview.insight.invoiced", { amount: formatShort(totalInvoiced) }),
-    t("overview.insight.collected", { rate: collectionRate.toFixed(1) }),
-  ];
-  if (overdueCount > 0) {
-    parts.push(
-      t(
-        overdueCount === 1
-          ? "overview.insight.invoiceOverdue"
-          : "overview.insight.invoiceOverdue_plural",
-        { count: overdueCount },
-      ),
-    );
-  } else {
-    parts.push(t("overview.insight.noOverdue"));
-  }
-
-  return (
-    <p className="text-xs leading-relaxed text-[rgb(var(--text-tertiary))]">
-      {parts.join(" · ")}
-    </p>
-  );
-}
-
-// ============================================================================
-// EMPTY STATE (E-05)
-// ============================================================================
-
-function EmptyRecentSection({
-  title,
-  message,
-}: {
-  title: string;
-  message: string;
-}) {
-  return (
-    <div
-      // allow-presentation-style: card padding (18px) is off the 4px scale
-      className="rounded-xl border flex flex-col items-center justify-center py-8 bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]"
-      style={{ padding: 18 }}
-    >
-      <Inbox className="w-7 h-7 mb-2 opacity-35 text-[rgb(var(--text-tertiary))]" />
-      <h3 className="text-xs font-medium mb-0.5 text-[rgb(var(--text-tertiary))]">
-        {title}
-      </h3>
-      <p className="text-xs text-[rgb(var(--text-disabled))]">{message}</p>
-    </div>
-  );
 }
 
 // ============================================================================
@@ -206,60 +128,137 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
   } = data;
 
   const overdueCount = invoicesByStatus["overdue"] ?? 0;
+  const draftCount = invoicesByStatus["draft"] ?? 0;
+
+
+  // ── StatBand metrics (calm; attention only via state) ────────────────────
+  const metrics: StatMetric[] = [
+    {
+      label: t("overview.kpi.totalInvoiced"),
+      value: formatCompact(kpi.totalInvoiced),
+      iconSignature: "finance",
+      state: "normal",
+      primary: true,
+      sub: t("overview.kpi.invoiceCount", { count: kpi.totalInvoiceCount }),
+    },
+    {
+      label: t("overview.kpi.collected"),
+      value: formatCompact(kpi.totalCollected),
+      iconSignature: "finance",
+      state: "normal",
+      sub: t("overview.kpi.paymentCount", { count: kpi.currentMonthPaymentCount }),
+    },
+    {
+      label: t("overview.kpi.outstanding"),
+      value: formatCompact(kpi.outstanding),
+      iconSignature: "finance_receipt",
+      state: "normal",
+      sub: t("overview.kpi.awaiting", { count: kpi.outstandingInvoiceCount }),
+    },
+    kpi.overdue > 0
+      ? {
+          label: t("overview.kpi.overdue"),
+          value: formatCompact(kpi.overdue),
+          iconSignature: "atrisk",
+          state: "critical",
+          pill: { tone: "critical", text: t("overview.kpi.invoiceCount", { count: overdueCount }) },
+        }
+      : {
+          label: t("overview.kpi.overdue"),
+          value: formatCompact(kpi.overdue),
+          iconSignature: "atrisk",
+          state: "normal",
+        },
+  ];
+
+  // ── ⑧ Attention Corner signals (replaces the AlertLane stack) ────────────
+  // Derived from the same overview-v2 query on every render, so collecting the
+  // overdue amount auto-resolves the signal. `[]` while the query loads.
+  const { acked, ack, unack } = useSignalAcks();
+  const signals: Signal[] = [];
+  if (!isLoading && kpi.overdue > 0) {
+    const largestBucket = agingReport
+      .filter((b) => b.count > 0)
+      .sort((a, b) => b.count - a.count)[0];
+    const agingLabel = largestBucket
+      ? t("overview.alert.agingBucket", {
+          count: largestBucket.count,
+          bucket: localizeAgingBucketLabel(largestBucket, t),
+        })
+      : "";
+    const description =
+      [
+        t("overview.alert.collectionRate", { rate: kpi.collectionRate.toFixed(1) }),
+        agingLabel,
+        draftCount > 0 ? t("overview.alert.drafts", { count: draftCount }) : "",
+      ]
+        .filter(Boolean)
+        .join(". ") + ".";
+    signals.push({
+      id: "finance.overdue",
+      severity: "critical",
+      domain: t("headerZone.domains.finance"),
+      title: t("overview.alert.title", {
+        count: overdueCount,
+        amount: formatShort(kpi.overdue),
+      }),
+      description,
+      fix: {
+        label: t("overview.alert.reviewBilling"),
+        onAction: () =>
+          navigate({ to: "/invoices", search: { status: "overdue" } as never }),
+      },
+    });
+  }
 
   return (
     <div className="p-6 space-y-5" style={{ minHeight: "100vh" }}>
-      {/* Context Bar (operating context, not a page title — the shell breadcrumb
-          carries "Finance") + Insight Strip */}
+      {/* Screen-reader page heading (breadcrumb names the page visually) */}
       <h1 className="sr-only">{t("overview.finance")}</h1>
-      <ContextBar
-        meta={
-          <span>
-            {new Date().toLocaleDateString(
-              normalizePlatformLanguage(i18n.language) === "ne"
-                ? "ne-NP"
-                : "en-US",
-              {
-                weekday: "long",
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-              },
-            )}
-          </span>
-        }
-        description={
-          <InsightStrip
-            totalInvoiced={kpi.totalInvoiced}
-            collectionRate={kpi.collectionRate}
-            overdueCount={overdueCount}
-            isLoading={isLoading}
-            formatShort={formatShort}
-          />
-        }
-        actions={
-          <>
-            <button
-              onClick={() => navigate({ to: "/invoices/bulk-generate" })}
-              aria-label={t("overview.actions.bulkInvoiceAria")}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))]/40 bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
-            >
-              <FileStack className="w-3.5 h-3.5" />
-              {t("overview.actions.bulkInvoice")}
-            </button>
-            <button
-              onClick={() => navigate({ to: "/payments/record" })}
-              aria-label={t("overview.actions.recordPaymentAria")}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))]/40 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
-            >
-              <CreditCard className="w-3.5 h-3.5" />
-              {t("overview.actions.recordPayment")}
-            </button>
-          </>
-        }
-      />
 
-      {/* Filters & Export (with E-04 quick-select pills) */}
+      {/* ---- ⑧ Header zone — attention pill left, actions right ---- */}
+      <motion.div variants={fadeInUp} initial="hidden" animate="visible">
+        <AttentionCorner
+          signals={signals}
+          acked={acked}
+          onAck={ack}
+          onUnack={unack}
+          labels={{
+            needAttention: t("headerZone.needAttention"),
+            allClear: t("headerZone.allClear"),
+            region: t("headerZone.region"),
+            minimize: t("headerZone.minimize"),
+            acknowledge: t("headerZone.acknowledge"),
+            acknowledged: t("headerZone.acknowledged"),
+            acknowledgedHint: t("headerZone.acknowledgedHint"),
+            dismiss: t("headerZone.dismiss"),
+            emptyTitle: t("headerZone.emptyTitle"),
+          }}
+        >
+          <PageHeader
+            mode="pagebar"
+            attention={<AttentionCornerPill />}
+            actions={[
+              {
+                label: t("overview.actions.bulkInvoice"),
+                icon: <FileStack className="h-3.5 w-3.5" />,
+                ariaLabel: t("overview.actions.bulkInvoiceAria"),
+                onClick: () => navigate({ to: "/invoices/bulk-generate" }),
+              },
+              {
+                label: t("overview.actions.recordPayment"),
+                icon: <CreditCard className="h-3.5 w-3.5" />,
+                primary: true,
+                ariaLabel: t("overview.actions.recordPaymentAria"),
+                onClick: () => navigate({ to: "/payments/record" }),
+              },
+            ]}
+          />
+          <AttentionCornerShade className="pt-5" />
+        </AttentionCorner>
+      </motion.div>
+
+      {/* ---- Filters & Export ---- */}
       <FilterRow
         fromDate={filters.from || ""}
         toDate={filters.to || ""}
@@ -274,166 +273,60 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
         onExport={handleExportCSV}
       />
 
-      {/* Overdue Alert */}
-      <WidgetErrorBoundaryV2>
-        <OverdueAlertBanner
-          overdue={kpi.overdue}
-          overdueCount={overdueCount}
-          collectionRate={kpi.collectionRate}
-          draftCount={invoicesByStatus["draft"] ?? 0}
-          agingReport={agingReport}
-        />
-      </WidgetErrorBoundaryV2>
-
-      {/* KPI Grid (4 tiles) */}
-      <motion.div
-        variants={stagger}
-        initial="hidden"
-        animate="visible"
-        className="grid gap-3 grid-cols-2 lg:grid-cols-4"
-      >
-        <motion.div variants={fadeInUp}>
-          <StatCard
-            label={t("overview.kpi.totalInvoiced")}
-            value={formatCompact(kpi.totalInvoiced)}
-            icon={Wallet}
-            signature="finance"
-            accentColor="rgba(29, 158, 117, 0.12)"
-            iconColor="#1D9E75"
-            barColor="#1D9E75"
-            tag={tagPill(
-              t("overview.kpi.invoiceCount", { count: kpi.totalInvoiceCount }),
-              "#1D9E75",
-            )}
-            loading={isLoading}
-          />
-        </motion.div>
-        <motion.div variants={fadeInUp}>
-          <StatCard
-            label={t("overview.kpi.collected")}
-            value={formatCompact(kpi.totalCollected)}
-            icon={TrendingUp}
-            accentColor="rgba(29, 158, 117, 0.12)"
-            iconColor="#1D9E75"
-            barColor="#1D9E75"
-            tag={tagPill(
-              t("overview.kpi.paymentCount", {
-                count: kpi.currentMonthPaymentCount,
-              }),
-              "#1D9E75",
-            )}
-            hint={t("overview.kpi.thisMonth")}
-            loading={isLoading}
-          />
-        </motion.div>
-        <motion.div variants={fadeInUp}>
-          <StatCard
-            label={t("overview.kpi.outstanding")}
-            value={formatCompact(kpi.outstanding)}
-            icon={Receipt}
-            signature="finance_receipt"
-            accentColor="rgba(239, 159, 39, 0.12)"
-            iconColor="#EF9F27"
-            barColor="#EF9F27"
-            tag={tagPill(
-              t("overview.kpi.awaiting", {
-                count: kpi.outstandingInvoiceCount,
-              }),
-              "#EF9F27",
-            )}
-            loading={isLoading}
-          />
-        </motion.div>
-        <motion.div variants={fadeInUp}>
-          <StatCard
-            label={t("overview.kpi.overdue")}
-            value={formatCompact(kpi.overdue)}
-            icon={AlertTriangle}
-            signature="atrisk"
-            accentColor="rgba(226, 75, 74, 0.12)"
-            iconColor="#E24B4A"
-            barColor="#E24B4A"
-            tag={tagPill(
-              t("overview.kpi.invoiceCount", { count: overdueCount }),
-              "#E24B4A",
-            )}
-            loading={isLoading}
-            valueColor={kpi.overdue > 0 ? "#E24B4A" : undefined}
-          />
-        </motion.div>
+      {/* ---- StatBand — KPI summary ---- */}
+      <motion.div variants={fadeInUp} initial="hidden" animate="visible">
+        <StatBand metrics={metrics} ariaLabel={t("overview.kpi.region")} />
       </motion.div>
 
-      {/* 2-col: Billing Health (primary) + Collection Performance */}
-      <motion.div
-        variants={stagger}
-        initial="hidden"
-        animate="visible"
-        className="grid gap-4 grid-cols-1 md:grid-cols-[1fr_1.2fr]"
-      >
-        <motion.div variants={fadeInUp}>
-          <WidgetErrorBoundaryV2>
-            <BillingHealthCard
-              invoicesByStatus={invoicesByStatus}
-              totalInvoiceCount={totalInvoiceCount}
-              paymentsByGateway={paymentsByGateway}
-              totalPaymentCount={totalPaymentCount}
-              agingReport={agingReport}
-              isLoading={isLoading}
-            />
-          </WidgetErrorBoundaryV2>
-        </motion.div>
-        <motion.div variants={fadeInUp}>
-          <WidgetErrorBoundaryV2>
-            <CollectionPerformanceCard
-              totalInvoiced={kpi.totalInvoiced}
-              totalCollected={kpi.totalCollected}
-              outstanding={kpi.outstanding}
-              overdue={kpi.overdue}
-              collectionRate={kpi.collectionRate}
-              byFeeType={byFeeType}
-              isLoading={isLoading}
-            />
-          </WidgetErrorBoundaryV2>
-        </motion.div>
-      </motion.div>
+      {/* ---- ⑤ WidgetCard grid ---- */}
+      <motion.div variants={stagger} initial="hidden" animate="visible">
+        <WidgetGrid>
+          <WidgetCard title={t("overview.billingHealth.title")} iconSignature="finance" span={5}>
+            <WidgetErrorBoundaryV2>
+              <BillingHealthCard
+                invoicesByStatus={invoicesByStatus}
+                totalInvoiceCount={totalInvoiceCount}
+                paymentsByGateway={paymentsByGateway}
+                totalPaymentCount={totalPaymentCount}
+                agingReport={agingReport}
+                isLoading={isLoading}
+                bare
+              />
+            </WidgetErrorBoundaryV2>
+          </WidgetCard>
 
-      {/* 2-col: Recent Payments + Recent Invoices */}
-      <motion.div
-        variants={stagger}
-        initial="hidden"
-        animate="visible"
-        className="grid gap-4 grid-cols-1 md:grid-cols-2"
-      >
-        <motion.div variants={fadeInUp}>
-          <WidgetErrorBoundaryV2>
-            {!isLoading && recentPayments.length === 0 ? (
-              <EmptyRecentSection
-                title={t("overview.empty.noPaymentsTitle")}
-                message={t("overview.empty.noPaymentsMessage")}
-              />
-            ) : (
-              <RecentPaymentsCard
-                payments={recentPayments}
+          <WidgetCard
+            title={t("overview.collection.title")}
+            iconSignature="finance"
+            span={7}
+            metric={t("overview.collection.percentCollected", { rate: kpi.collectionRate.toFixed(1) })}
+          >
+            <WidgetErrorBoundaryV2>
+              <CollectionPerformanceCard
+                totalInvoiced={kpi.totalInvoiced}
+                totalCollected={kpi.totalCollected}
+                outstanding={kpi.outstanding}
+                overdue={kpi.overdue}
+                collectionRate={kpi.collectionRate}
+                byFeeType={byFeeType}
                 isLoading={isLoading}
+                bare
               />
-            )}
-          </WidgetErrorBoundaryV2>
-        </motion.div>
-        <motion.div variants={fadeInUp}>
-          <WidgetErrorBoundaryV2>
-            {!isLoading && recentInvoices.length === 0 ? (
-              <EmptyRecentSection
-                title={t("overview.empty.noInvoicesTitle")}
-                message={t("overview.empty.noInvoicesMessage")}
-              />
-            ) : (
-              <RecentInvoicesCard
-                invoices={recentInvoices}
-                isLoading={isLoading}
-              />
-            )}
-          </WidgetErrorBoundaryV2>
-        </motion.div>
+            </WidgetErrorBoundaryV2>
+          </WidgetCard>
+
+          <WidgetCard title={t("overview.recent.payments")} iconSignature="finance_note" span={6}>
+            <WidgetErrorBoundaryV2>
+              <RecentPaymentsCard payments={recentPayments} isLoading={isLoading} bare />
+            </WidgetErrorBoundaryV2>
+          </WidgetCard>
+
+          <WidgetCard title={t("overview.recent.invoices")} iconSignature="finance_receipt" span={6}>
+            <WidgetErrorBoundaryV2>
+              <RecentInvoicesCard invoices={recentInvoices} isLoading={isLoading} bare />
+            </WidgetErrorBoundaryV2>
+          </WidgetCard>
+        </WidgetGrid>
       </motion.div>
     </div>
   );

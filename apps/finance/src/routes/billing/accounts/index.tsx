@@ -11,9 +11,6 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Loader2,
   Users,
-  TrendingUp,
-  Receipt,
-  AlertTriangle,
   Wallet,
   Mail,
   Pencil,
@@ -26,10 +23,11 @@ import {
   createSelectColumn,
   FilterTabs,
   IdentityCell,
-  type BulkAction,
+  SelectionContextBar,
+  type SelectionAction,
   type ColumnDef,
-  StatCard,
-  WidgetErrorBoundaryV2,
+  StatBand,
+  type StatMetric,
 } from '@edforge/ui'
 import { UuidBadge } from '@edforge/archetype'
 import { useAppStore } from '../../../stores/app.store'
@@ -41,7 +39,7 @@ import {
 import type { StudentAccount, StudentLedgerEntry, Invoice } from '@edforge/types'
 import { useCurrency } from '@edforge/types/use-currency'
 import { useFinanceSettings } from '../../../layouts/FinanceLayout'
-import { FinancePageHeader, FinanceStatusChip } from '../../../components/shared'
+import { FinanceStatusChip } from '../../../components/shared'
 import { formatDate, formatDateDual } from '../../../utils/format-date'
 import { BulkSendStatementsDrawer } from '../../../components/billing/BulkSendStatementsDrawer'
 import { BulkAdjustBalanceDrawer } from '../../../components/billing/BulkAdjustBalanceDrawer'
@@ -564,7 +562,7 @@ export default function StudentAccountsPage() {
 
   const { data: accounts, isLoading } = useStudentAccounts(schoolId ?? '')
 
-  const accountList: StudentAccount[] = accounts ?? []
+  const accountList: StudentAccount[] = useMemo(() => accounts ?? [], [accounts])
 
   const kpi = useMemo(() => {
     const totalStudents = accountList.length
@@ -579,30 +577,44 @@ export default function StudentAccountsPage() {
     return { totalStudents, totalOutstanding, fullyPaidCount, overdueCount }
   }, [accountList])
 
-  // Both bulk actions now drive real drawers backed by the D1–D4 finance
+  // Both bulk actions drive real drawers backed by the D1–D4 finance
   // async-job framework (PR #339): D3 send-statement (#231) and D4
   // adjust-balance (#232).
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const [bulkStatementsTarget, setBulkStatementsTarget] = useState<StudentAccount[] | null>(null)
   const [bulkAdjustTarget, setBulkAdjustTarget] = useState<StudentAccount[] | null>(null)
 
-  const accountBulkActions = useMemo<BulkAction<StudentAccount>[]>(
-    () => [
+  // ── ⑨ Selection Context Bar — retires the legacy floating pill. Accounts
+  // have no disqualifying state today, so both actions apply to the full
+  // selection; handlers still receive `applicableIds` and map them back to
+  // rows for the existing D3/D4 drawers.
+  const selectedAccounts = useMemo(() => {
+    const ids = new Set(Object.keys(rowSelection).filter((id) => rowSelection[id]))
+    return accountList.filter((a) => ids.has(a.id))
+  }, [rowSelection, accountList])
+
+  const selectionActions = useMemo<SelectionAction[]>(() => {
+    const byId = new Map(selectedAccounts.map((a) => [a.id, a]))
+    const rowsFor = (ids: string[]) =>
+      ids.map((id) => byId.get(id)).filter((a): a is StudentAccount => !!a)
+    const allIds = selectedAccounts.map((a) => a.id)
+    return [
       {
         id: 'send-statement',
         label: t('studentAccount.actions.sendStatement'),
-        icon: <Mail className="w-4 h-4" />,
-        onRun: (rows) => setBulkStatementsTarget(rows),
+        icon: <Mail className="h-3.5 w-3.5" />,
+        applicableIds: allIds,
+        onAction: (ids) => setBulkStatementsTarget(rowsFor(ids)),
       },
       {
         id: 'adjust-balance',
         label: t('studentAccount.actions.adjustBalance'),
-        icon: <Pencil className="w-4 h-4" />,
-        onRun: (rows) => setBulkAdjustTarget(rows),
+        icon: <Pencil className="h-3.5 w-3.5" />,
+        applicableIds: allIds,
+        onAction: (ids) => setBulkAdjustTarget(rowsFor(ids)),
       },
-    ],
-    [t],
-  )
+    ]
+  }, [selectedAccounts, t])
 
   if (!schoolId) {
     return (
@@ -612,62 +624,84 @@ export default function StudentAccountsPage() {
     )
   }
 
+
+  // ── StatBand metrics (calm; the numbers carry the signal) ────────────────
+  const metrics: StatMetric[] = [
+    {
+      label: t('studentAccount.summary.totalStudents'),
+      value: String(kpi.totalStudents),
+      iconSignature: 'students',
+      state: 'normal',
+      primary: true,
+      sub: t('studentAccount.summary.accounts', { count: kpi.totalStudents }),
+    },
+    {
+      label: t('studentAccount.summary.outstanding'),
+      value: formatCompact(kpi.totalOutstanding),
+      iconSignature: 'finance_receipt',
+      state: 'normal',
+      sub: t('studentAccount.summary.withBalanceCount', { count: kpi.overdueCount }),
+    },
+    {
+      label: t('studentAccount.summary.fullyPaid'),
+      value: String(kpi.fullyPaidCount),
+      iconSignature: 'finance',
+      state: 'normal',
+      sub: t('studentAccount.summary.noBalance'),
+    },
+    {
+      label: t('studentAccount.summary.withBalance'),
+      value: String(kpi.overdueCount),
+      iconSignature: 'atrisk',
+      state: 'normal',
+      sub: t('studentAccount.summary.withBalanceCount', { count: kpi.overdueCount }),
+    },
+  ]
+
+  const singleAccount = selectedAccounts.length === 1 ? selectedAccounts[0] : null
+  const selectionBar = (
+    <SelectionContextBar
+      selectedCount={selectedAccounts.length}
+      totalCount={accountList.length}
+      onClear={() => setRowSelection({})}
+      onSelectAll={() =>
+        setRowSelection(Object.fromEntries(accountList.map((a) => [a.id, true])))
+      }
+      actions={selectionActions}
+      aria-label={t('headerZone.selection.aria')}
+      labels={{
+        selected: (count) => t('headerZone.selection.selected', { count }),
+        selectAll: (total) => t('headerZone.selection.selectAll', { count: total }),
+        clear: t('headerZone.selection.clear'),
+      }}
+      peek={
+        singleAccount ? (
+          <div className="min-w-0">
+            <div className="truncate text-sm font-semibold text-[rgb(var(--text-primary))]">
+              {singleAccount.studentName ?? singleAccount.studentId}
+            </div>
+            <div
+              className={`truncate text-2xs ${
+                singleAccount.balance > 0
+                  ? 'text-[rgb(var(--state-danger-fg))]'
+                  : 'text-[rgb(var(--state-success-fg))]'
+              }`}
+            >
+              {format(singleAccount.balance)}
+            </div>
+          </div>
+        ) : undefined
+      }
+    />
+  )
+
   return (
     <div className="p-6 space-y-5">
-      {/* Header */}
-      <FinancePageHeader
-        title={t('studentAccount.pageTitle')}
-        subtitle={t('studentAccount.description')}
-      />
+      {/* Screen-reader page heading (breadcrumb names the page visually) */}
+      <h1 className="sr-only">{t('studentAccount.pageTitle')}</h1>
 
-      {/* KPI Tiles */}
-      <WidgetErrorBoundaryV2>
-        <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
-          <StatCard
-            label={t('studentAccount.summary.totalStudents')}
-            value={String(kpi.totalStudents)}
-            icon={Users}
-            accentColor="rgba(29, 158, 117, 0.12)"
-            iconColor="#1D9E75"
-            barColor="#1D9E75"
-            tag={{ text: t('studentAccount.summary.accounts', { count: kpi.totalStudents }), color: '#1D9E75', bg: 'rgba(29,158,117,0.10)' }}
-            loading={isLoading}
-          />
-          <StatCard
-            label={t('studentAccount.summary.outstanding')}
-            value={formatCompact(kpi.totalOutstanding)}
-            icon={Receipt}
-            signature="finance_receipt"
-            accentColor="rgba(239, 159, 39, 0.12)"
-            iconColor="#EF9F27"
-            barColor="#EF9F27"
-            tag={{ text: t('studentAccount.summary.withBalanceCount', { count: kpi.overdueCount }), color: '#EF9F27', bg: 'rgba(239,159,39,0.10)' }}
-            valueColor="#EF9F27"
-            loading={isLoading}
-          />
-          <StatCard
-            label={t('studentAccount.summary.fullyPaid')}
-            value={String(kpi.fullyPaidCount)}
-            icon={TrendingUp}
-            accentColor="rgba(29, 158, 117, 0.12)"
-            iconColor="#1D9E75"
-            barColor="#1D9E75"
-            tag={{ text: t('studentAccount.summary.noBalance'), color: '#1D9E75', bg: 'rgba(29,158,117,0.10)' }}
-            loading={isLoading}
-          />
-          <StatCard
-            label={t('studentAccount.summary.withBalance')}
-            value={String(kpi.overdueCount)}
-            icon={AlertTriangle}
-            signature="atrisk"
-            accentColor="rgba(226, 75, 74, 0.12)"
-            iconColor="#E24B4A"
-            barColor="#E24B4A"
-            tag={{ text: t('studentAccount.summary.withBalanceCount', { count: kpi.overdueCount }), color: '#E24B4A', bg: 'rgba(226,75,74,0.10)' }}
-            loading={isLoading}
-          />
-        </div>
-      </WidgetErrorBoundaryV2>
+      {/* ---- StatBand — KPI summary ---- */}
+      <StatBand metrics={metrics} ariaLabel={t('studentAccount.kpi.region')} />
 
       {/* Data Table */}
       <TanstackDataTable<StudentAccount>
@@ -697,7 +731,7 @@ export default function StudentAccountsPage() {
           },
         ]}
         initialColumnVisibility={{ balanceBucket: false }}
-        bulkActions={accountBulkActions}
+        selectionBar={selectionBar}
         exportOptions={{ filename: 'student-accounts', formats: ['csv'] }}
         renderSubComponent={({ row }) => (
           <AccountDetail account={row.original} schoolId={schoolId} />

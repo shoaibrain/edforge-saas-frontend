@@ -180,8 +180,9 @@ export function TeacherTable({ staff, isLoading, onSelect }: TeacherTableProps) 
 
   // Row selection + bulk actions intentionally omitted — the staff
   // bulk endpoints (#226 change role, #228 update status) aren't built
-  // yet. Re-add `enableRowSelection` + a real `bulkActions` array once
-  // either backend slice lands; until then the table stays chrome-only.
+  // yet. Re-add `enableRowSelection` + a page-built `<SelectionContextBar/>`
+  // (via the `selectionBar` prop) once either backend slice lands; until
+  // then the table stays chrome-only.
 
   return (
     <TanstackDataTable<StaffMember>

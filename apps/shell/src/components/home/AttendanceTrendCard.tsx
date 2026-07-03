@@ -98,12 +98,31 @@ interface AttendanceTrendCardProps {
   chartData: TrendPoint[]
   summary: { min: number; max: number; avg: number } | null
   isLoading: boolean
+  /** When true, render only the legend + chart (no card chrome / title / footer)
+   *  so a WidgetCard can frame it. */
+  bare?: boolean
+}
+
+/** Reusable footer link → the attendance view (also usable as a WidgetCard footer). */
+export function AttendanceTrendFooter() {
+  const { t } = useTranslation('dashboard')
+  return (
+    <Link
+      to="/academics/$"
+      params={{ _splat: 'classrooms?tab=attendance' }}
+      className="inline-flex items-center gap-1.5 text-xs font-medium transition-opacity hover:opacity-80 text-[#1D9E75]"
+    >
+      {t('homeV2.trend.viewAttendance')}
+      <ArrowRight className="w-3 h-3" />
+    </Link>
+  )
 }
 
 export function AttendanceTrendCard({
   chartData,
   summary,
   isLoading,
+  bare,
 }: AttendanceTrendCardProps) {
   const colors = useV2ChartColors()
   const { t } = useTranslation('dashboard')
@@ -113,6 +132,130 @@ export function AttendanceTrendCard({
       return 'No attendance trend data available.'
     return `Attendance rate ranged from ${summary.min.toFixed(1)}% to ${summary.max.toFixed(1)}% over the past 30 days, with an average of ${summary.avg.toFixed(1)}%, compared to the ${ATTENDANCE_THRESHOLD}% target.`
   }, [summary, chartData])
+
+  const legend = (
+    <div className="flex items-center gap-4">
+      {/* Actual swatch */}
+      <div className="flex items-center gap-1.5">
+        <div className="rounded-sm w-2 h-0.5 bg-[#1D9E75]" />
+        <span className="text-xs text-[rgb(var(--text-disabled))]">
+          {t('homeV2.trend.actual')}
+        </span>
+      </div>
+      {/* Target swatch */}
+      <div className="flex items-center gap-1.5">
+        <div
+          style={{
+            width: 8,
+            height: 0,
+            borderTop: '1px dashed rgba(239, 159, 39, 0.6)',
+          }}
+        />
+        <span className="text-xs text-[rgb(var(--text-disabled))]">
+          {t('homeV2.trend.target', { threshold: ATTENDANCE_THRESHOLD })}
+        </span>
+      </div>
+      {/* Average */}
+      {summary && (
+        <span className="text-xs font-semibold text-[#1D9E75]">
+          {t('homeV2.trend.avg', { avg: summary.avg.toFixed(1) })}
+        </span>
+      )}
+    </div>
+  )
+
+  const chartRegion = (
+    <div className="flex-1 min-h-0">
+      {isLoading ? (
+        <TrendSkeleton />
+      ) : chartData.length === 0 ? (
+        <div
+          // allow-presentation-style: fixed 148px empty-state height (matches chart)
+          className="flex items-center justify-center text-sm text-[rgb(var(--text-tertiary))]"
+          style={{ height: 148 }}
+        >
+          {t('homeV2.trend.noData')}
+        </div>
+      ) : (
+        <figure
+          role="img"
+          aria-label="Attendance trend over 30 days"
+          aria-describedby="home-v2-trend-desc"
+        >
+          <figcaption id="home-v2-trend-desc" className="sr-only">
+            {srSummary}
+          </figcaption>
+          <ResponsiveContainer width="100%" height={148}>
+            <AreaChart
+              data={chartData}
+              margin={{ top: 4, right: 8, left: -16, bottom: 0 }}
+            >
+              <defs>
+                <linearGradient id="v2AttGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={colors.line} stopOpacity={0.08} />
+                  <stop offset="95%" stopColor={colors.line} stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke={colors.grid}
+                vertical={false}
+              />
+              <XAxis
+                dataKey="displayDate"
+                tick={{ fontSize: 10, fill: colors.tick }}
+                tickLine={false}
+                axisLine={false}
+                interval="preserveStartEnd"
+              />
+              <YAxis
+                domain={[40, 110]}
+                tick={{ fontSize: 10, fill: colors.tick }}
+                tickLine={false}
+                axisLine={false}
+                tickFormatter={(v: number) => `${v}%`}
+              />
+              <Tooltip content={<ChartTooltip />} />
+              <ReferenceLine
+                y={ATTENDANCE_THRESHOLD}
+                stroke={colors.threshold}
+                strokeDasharray="4 4"
+                strokeWidth={1}
+              />
+              <Area
+                type="monotone"
+                dataKey="rate"
+                stroke={colors.line}
+                strokeWidth={1.5}
+                fill="url(#v2AttGradient)"
+                dot={{
+                  r: 2.5,
+                  fill: colors.line,
+                  stroke: colors.pointBorder,
+                  strokeWidth: 1.5,
+                }}
+                activeDot={{
+                  r: 4,
+                  fill: colors.line,
+                  stroke: colors.pointBorder,
+                  strokeWidth: 2,
+                }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </figure>
+      )}
+    </div>
+  )
+
+  if (bare) {
+    return (
+      <div className="flex flex-col">
+        <div className="mb-3 flex justify-end">{legend}</div>
+        {chartRegion}
+      </div>
+    )
+  }
 
   return (
     <div
@@ -130,129 +273,15 @@ export function AttendanceTrendCard({
             {t('homeV2.trend.rollingAverage')}
           </p>
         </div>
-        <div className="flex items-center gap-4">
-          {/* Actual swatch */}
-          <div className="flex items-center gap-1.5">
-            <div className="rounded-sm w-2 h-0.5 bg-[#1D9E75]" />
-            <span className="text-xs text-[rgb(var(--text-disabled))]">
-              {t('homeV2.trend.actual')}
-            </span>
-          </div>
-          {/* Target swatch */}
-          <div className="flex items-center gap-1.5">
-            <div
-              style={{
-                width: 8,
-                height: 0,
-                borderTop: '1px dashed rgba(239, 159, 39, 0.6)',
-              }}
-            />
-            <span className="text-xs text-[rgb(var(--text-disabled))]">
-              {t('homeV2.trend.target', { threshold: ATTENDANCE_THRESHOLD })}
-            </span>
-          </div>
-          {/* Average */}
-          {summary && (
-            <span className="text-xs font-semibold text-[#1D9E75]">
-              {t('homeV2.trend.avg', { avg: summary.avg.toFixed(1) })}
-            </span>
-          )}
-        </div>
+        {legend}
       </div>
 
       {/* Chart */}
-      <div className="flex-1 min-h-0">
-        {isLoading ? (
-          <TrendSkeleton />
-        ) : chartData.length === 0 ? (
-          <div
-            // allow-presentation-style: fixed 148px empty-state height (matches chart)
-            className="flex items-center justify-center text-sm text-[rgb(var(--text-tertiary))]"
-            style={{ height: 148 }}
-          >
-            {t('homeV2.trend.noData')}
-          </div>
-        ) : (
-          <figure
-            role="img"
-            aria-label="Attendance trend over 30 days"
-            aria-describedby="home-v2-trend-desc"
-          >
-            <figcaption id="home-v2-trend-desc" className="sr-only">
-              {srSummary}
-            </figcaption>
-            <ResponsiveContainer width="100%" height={148}>
-              <AreaChart
-                data={chartData}
-                margin={{ top: 4, right: 8, left: -16, bottom: 0 }}
-              >
-                <defs>
-                  <linearGradient id="v2AttGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={colors.line} stopOpacity={0.08} />
-                    <stop offset="95%" stopColor={colors.line} stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  stroke={colors.grid}
-                  vertical={false}
-                />
-                <XAxis
-                  dataKey="displayDate"
-                  tick={{ fontSize: 10, fill: colors.tick }}
-                  tickLine={false}
-                  axisLine={false}
-                  interval="preserveStartEnd"
-                />
-                <YAxis
-                  domain={[40, 110]}
-                  tick={{ fontSize: 10, fill: colors.tick }}
-                  tickLine={false}
-                  axisLine={false}
-                  tickFormatter={(v: number) => `${v}%`}
-                />
-                <Tooltip content={<ChartTooltip />} />
-                <ReferenceLine
-                  y={ATTENDANCE_THRESHOLD}
-                  stroke={colors.threshold}
-                  strokeDasharray="4 4"
-                  strokeWidth={1}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="rate"
-                  stroke={colors.line}
-                  strokeWidth={1.5}
-                  fill="url(#v2AttGradient)"
-                  dot={{
-                    r: 2.5,
-                    fill: colors.line,
-                    stroke: colors.pointBorder,
-                    strokeWidth: 1.5,
-                  }}
-                  activeDot={{
-                    r: 4,
-                    fill: colors.line,
-                    stroke: colors.pointBorder,
-                    strokeWidth: 2,
-                  }}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </figure>
-        )}
-      </div>
+      {chartRegion}
 
       {/* Footer link */}
       <div className="pt-3 mt-3 border-t border-[rgb(var(--border-primary)/0.35)]">
-        <Link
-          to="/academics/$"
-          params={{ _splat: 'classrooms?tab=attendance' }}
-          className="inline-flex items-center gap-1.5 text-xs font-medium transition-opacity hover:opacity-80 text-[#1D9E75]"
-        >
-          {t('homeV2.trend.viewAttendance')}
-          <ArrowRight className="w-3 h-3" />
-        </Link>
+        <AttendanceTrendFooter />
       </div>
     </div>
   )

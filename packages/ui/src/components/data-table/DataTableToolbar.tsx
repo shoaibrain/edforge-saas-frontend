@@ -1,11 +1,13 @@
+import { X } from 'lucide-react'
 import { type ReactNode } from 'react'
 import type { Table } from '@tanstack/react-table'
-import { X } from 'lucide-react'
-import { cn, focusRingInset } from '../../utils'
+import { cn } from '../../utils'
+import { ToolbarSearch } from './ToolbarSearch'
 import { DataTableFacetedFilter } from './DataTableFacetedFilter'
 import { DataTableViewOptions } from './DataTableViewOptions'
-import { DataTableDensityToggle } from './DataTableDensityToggle'
 import { DataTableExport } from './DataTableExport'
+import { DataTableMoreFilters } from './DataTableMoreFilters'
+import { TablePresetTabs, type TablePreset } from './TablePresetTabs'
 import { DEFAULT_DATA_TABLE_LABELS } from './labels'
 import type {
   DataTableDensity,
@@ -15,9 +17,20 @@ import type {
 } from './types'
 
 interface DataTableToolbarProps<TData> {
-  table: Table<TData>
+  /**
+   * TanStack table instance. Optional — without it the toolbar runs in
+   * STANDALONE mode: the same responsive shell (controlled search · presets ·
+   * primary/overflow filters · trailing extras · bulk-bar swap) for pages
+   * whose one bar drives non-table views too (e.g. the classrooms cards⇄table
+   * toggle). Table-coupled features (global-filter fallback, client faceted
+   * filters, Clear-N, View/columns, built-in export) need the instance and
+   * stay hidden without it.
+   */
+  table?: Table<TData>
   searchPlaceholder?: string
   facetedFilters?: FacetedFilterConfig[]
+  /** Keep the first faceted filter inline and move the rest into "More filters". */
+  foldFacets?: boolean
   enableColumnVisibility?: boolean
   toolbarStart?: ReactNode
   toolbarExtra?: ReactNode
@@ -26,12 +39,37 @@ interface DataTableToolbarProps<TData> {
   enableDensityToggle?: boolean
   exportOptions?: DataTableExportOptions
   labels?: DataTableLabels
+  /** Docked status presets (handoff ③). When set, renders TablePresetTabs. */
+  presets?: TablePreset[]
+  activePreset?: string
+  onPresetChange?: (value: string) => void
+  /** Bulk-action bar node; swaps in (same footprint) when `bulkActive`. */
+  bulkBar?: ReactNode
+  bulkActive?: boolean
+  /**
+   * Controlled search. When `onSearchChange` is provided the input is
+   * controlled (server-side-filtered pages wire it to their store); otherwise
+   * the input drives the table's global filter (client-side pages).
+   */
+  searchValue?: string
+  onSearchChange?: (value: string) => void
+  /** Primary facet control shown inline; folds into the overflow below @4xl. */
+  primaryFilter?: ReactNode
+  /** Secondary controls the toolbar places in its OWN "More filters" overflow. */
+  overflowFilters?: ReactNode
+  overflowActiveCount?: number
+  onOverflowClear?: () => void
+  overflowLabel?: string
+  overflowClearLabel?: string
+  /** @deprecated Prefer `overflowFilters`; a pre-built popover is rendered inline. */
+  moreFilters?: ReactNode
 }
 
-export function DataTableToolbar<TData>({
+export function DataTableToolbar<TData = unknown>({
   table,
   searchPlaceholder,
   facetedFilters,
+  foldFacets,
   enableColumnVisibility,
   toolbarStart,
   toolbarExtra,
@@ -40,80 +78,106 @@ export function DataTableToolbar<TData>({
   enableDensityToggle,
   exportOptions,
   labels,
+  presets,
+  activePreset,
+  onPresetChange,
+  bulkBar,
+  bulkActive,
+  searchValue,
+  onSearchChange,
+  primaryFilter,
+  overflowFilters,
+  overflowActiveCount,
+  onOverflowClear,
+  overflowLabel,
+  overflowClearLabel,
+  moreFilters,
 }: DataTableToolbarProps<TData>) {
   const resolvedLabels = labels ?? DEFAULT_DATA_TABLE_LABELS
-  const globalFilter = (table.getState().globalFilter as string) ?? ''
-  const activeFilterCount =
-    table.getState().columnFilters.length + (globalFilter ? 1 : 0)
+
+  // Bulk-action bar swaps in on selection with the same min-height footprint,
+  // so there is no layout shift between the two states.
+  if (bulkActive && bulkBar) {
+    return <div className="min-h-9">{bulkBar}</div>
+  }
+
+  // Search can be controlled (server-side + standalone pages) or drive the
+  // table's global filter (client-side pages).
+  const controlledSearch = typeof onSearchChange === 'function'
+  const globalFilter = table ? ((table.getState().globalFilter as string) ?? '') : ''
+  const searchVal = controlledSearch ? (searchValue ?? '') : globalFilter
+  const setSearch = (value: string) => {
+    if (controlledSearch) {
+      onSearchChange?.(value)
+    } else if (table) {
+      table.setGlobalFilter(value)
+      table.setPageIndex(0)
+    }
+  }
+
+  const activeFilterCount = table
+    ? table.getState().columnFilters.length + (globalFilter ? 1 : 0)
+    : 0
   const isFiltered = activeFilterCount > 0
 
   const handleClearAll = () => {
+    if (!table) return
     table.resetColumnFilters()
     table.setGlobalFilter('')
     table.setPageIndex(0)
   }
 
   const showDensity = !!(enableDensityToggle && density && onDensityChange)
-  const showRightCluster =
-    enableColumnVisibility || toolbarExtra || showDensity || exportOptions
+  const showView = !!table && (enableColumnVisibility || showDensity)
+  const showRightCluster = showView || toolbarExtra || (exportOptions && table)
+
+  // The toolbar owns ONE "More filters" overflow when there are secondary
+  // controls and/or a primary filter that folds in on narrow widths. The
+  // primary filter is rendered inline (@4xl+) AND inside the overflow panel
+  // (< @4xl) — both are controlled and mirror the same state. The overflow
+  // trigger stays hidden while everything it holds is shown inline.
+  // With `foldFacets`, the first faceted filter stays inline; the rest move
+  // into the overflow so the toolbar shows "one facet + More filters".
+  const facets = facetedFilters ?? []
+  const inlineFacets = foldFacets ? facets.slice(0, 1) : facets
+  const overflowFacets = foldFacets ? facets.slice(1) : []
+  const hasPrimary = !!primaryFilter
+  const hasOverflowContent = !!overflowFilters || overflowFacets.length > 0
+  const showOverflow = hasPrimary || hasOverflowContent
+  // Trigger visibility: always when it permanently holds overflow content;
+  // otherwise only below @4xl (when the folded primary appears in the panel).
+  const overflowTriggerClass = hasOverflowContent ? '' : '@4xl:hidden'
 
   return (
-    <div className="flex items-center gap-x-3 gap-y-2 flex-wrap">
-      {/* Leading cluster — filters/search/facets grow and wrap among themselves */}
-      <div className="flex flex-1 min-w-0 items-center gap-x-3 gap-y-2 flex-wrap">
-        {/* Leading slot (e.g. filter chips / search / selects) */}
+    <div className="@container flex min-h-9 flex-wrap items-center gap-x-3 gap-y-2">
+      {/* Leading cluster — search · presets · primary facet · More filters */}
+      <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-3 gap-y-2">
         {toolbarStart}
 
-        {/* Search */}
+        {/* Unified search — fluid: absorbs slack, shrinks instead of wrapping */}
         {searchPlaceholder && (
-          <div className="relative flex-1 max-w-sm min-w-40">
-            <svg
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[rgb(var(--text-tertiary))]"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-            <input
-              type="text"
-              placeholder={searchPlaceholder}
-              value={globalFilter}
-              onChange={(e) => {
-                table.setGlobalFilter(e.target.value)
-                table.setPageIndex(0)
-              }}
-              className={cn(
-                'w-full pl-9 pr-8 py-2 h-9 text-sm rounded-lg',
-                'border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))]',
-                'text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))]',
-                focusRingInset
-              )}
-            />
-            {globalFilter && (
-              <button
-                type="button"
-                onClick={() => {
-                  table.setGlobalFilter('')
-                  table.setPageIndex(0)
-                }}
-                aria-label={resolvedLabels.clearSearch}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-secondary))]"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            )}
-          </div>
+          <ToolbarSearch
+            value={searchVal}
+            onChange={setSearch}
+            onClear={() => setSearch('')}
+            placeholder={searchPlaceholder}
+            clearLabel={resolvedLabels.clearSearch}
+          />
         )}
 
-        {/* Faceted Filters */}
-        {facetedFilters?.map((filter) => {
-          const column = table.getColumn(filter.columnId)
+        {/* Docked status presets — scroll horizontally rather than wrap */}
+        {presets && activePreset != null && onPresetChange ? (
+          <div className="min-w-0 max-w-full overflow-x-auto">
+            <TablePresetTabs presets={presets} active={activePreset} onChange={onPresetChange} />
+          </div>
+        ) : null}
+
+        {/* Primary facet — inline at @4xl+, folded into the overflow below */}
+        {hasPrimary && <div className="hidden @4xl:flex">{primaryFilter}</div>}
+
+        {/* Client-side faceted filters (TanStack columns), shown inline */}
+        {inlineFacets.map((filter) => {
+          const column = table?.getColumn(filter.columnId)
           if (!column) return null
           return (
             <DataTableFacetedFilter
@@ -126,45 +190,70 @@ export function DataTableToolbar<TData>({
           )
         })}
 
-        {/* Clear (N) — replaces the older "Reset" pill */}
+        {/* Toolbar-owned "More filters" overflow (single trigger) */}
+        {showOverflow && (
+          <div className={overflowTriggerClass}>
+            <DataTableMoreFilters
+              label={overflowLabel ?? resolvedLabels.moreFilters}
+              clearLabel={overflowClearLabel ?? resolvedLabels.clearFilters}
+              activeCount={overflowActiveCount ?? 0}
+              onClear={onOverflowClear}
+            >
+              {/* Folded primary — only visible in the panel below @4xl */}
+              {hasPrimary && <div className="flex @4xl:hidden">{primaryFilter}</div>}
+              {/* Folded faceted filters (kept out of the inline row) */}
+              {overflowFacets.map((filter) => {
+                const column = table?.getColumn(filter.columnId)
+                if (!column) return null
+                return (
+                  <DataTableFacetedFilter
+                    key={filter.columnId}
+                    column={column}
+                    title={filter.title}
+                    options={filter.options}
+                    labels={resolvedLabels}
+                  />
+                )
+              })}
+              {overflowFilters}
+            </DataTableMoreFilters>
+          </div>
+        )}
+
+        {/* Deprecated: pre-built popover passed inline (back-compat) */}
+        {moreFilters}
+
+        {/* Clear (N) — client-side facet/search reset */}
         {isFiltered && (
           <button
             type="button"
             onClick={handleClearAll}
             className={cn(
-              'inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md',
-              'text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))]',
-              'hover:bg-[rgb(var(--background-secondary))] transition-colors'
+              'inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium',
+              'text-[rgb(var(--text-secondary))] transition-colors hover:text-[rgb(var(--text-primary))]',
+              'hover:bg-[rgb(var(--background-secondary))]',
             )}
           >
-            <X className="w-3 h-3" />
-            <span className="tabular-nums">
-              {resolvedLabels.clearActiveFilters(activeFilterCount)}
-            </span>
+            <X className="h-3 w-3" />
+            <span className="tabular-nums">{resolvedLabels.clearActiveFilters(activeFilterCount)}</span>
           </button>
         )}
       </div>
 
-      {/* Trailing cluster — Density / View / Export / consumer extras.
-          On narrow widths this cluster stays grouped and wraps as a unit. */}
+      {/* Trailing cluster — View (density + columns) · Export · consumer extras */}
       {showRightCluster && (
-        <div className="flex items-center gap-2 ml-auto flex-shrink-0">
-          {showDensity && (
-            <DataTableDensityToggle
-              density={density}
-              onChange={onDensityChange}
-              labels={resolvedLabels}
-            />
-          )}
-          {enableColumnVisibility && (
-            <DataTableViewOptions table={table} labels={resolvedLabels} />
-          )}
-          {exportOptions && (
-            <DataTableExport
+        <div className="ml-auto flex flex-shrink-0 items-center gap-2">
+          {showView && table && (
+            <DataTableViewOptions
               table={table}
-              options={exportOptions}
               labels={resolvedLabels}
+              density={density}
+              onDensityChange={onDensityChange}
+              enableDensityToggle={showDensity}
             />
+          )}
+          {exportOptions && table && (
+            <DataTableExport table={table} options={exportOptions} labels={resolvedLabels} />
           )}
           {toolbarExtra}
         </div>

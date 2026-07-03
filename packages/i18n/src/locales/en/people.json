@@ -51,7 +51,32 @@
       "staffFallback": "staff",
       "empty": "No recent staff activity"
     },
-    "directoryShortcutDescription": "Search, filter, and manage complete staff profiles."
+    "directoryShortcutDescription": "Search, filter, and manage complete staff profiles.",
+    "kpi": {
+      "region": "Key metrics"
+    },
+    "signals": {
+      "unassignedTitle": "{{count}} staff not assigned to a department",
+      "unassignedDescription": "Department coverage and reporting depend on assignments. Assign these staff from the directory.",
+      "noAccessTitle": "{{count}} staff have no system access",
+      "noAccessDescription": "These staff cannot sign in to EdForge yet. Create their user accounts from the directory.",
+      "openDirectory": "Open staff directory"
+    }
+  },
+  "headerZone": {
+    "needAttention": "need attention",
+    "allClear": "All clear",
+    "region": "Needs attention",
+    "minimize": "Minimize",
+    "acknowledge": "Got it",
+    "acknowledged": "Acknowledged",
+    "acknowledgedHint": "Acknowledged — click to undo",
+    "dismiss": "Dismiss",
+    "emptyTitle": "You’re all caught up.",
+    "domains": {
+      "capacity": "Capacity",
+      "dataQuality": "Data quality"
+    }
   },
   "quickAccess": {
     "addNew": "Add New Person",

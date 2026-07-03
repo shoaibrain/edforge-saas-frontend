@@ -8,15 +8,24 @@
 
 import { useMemo, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { ClipboardList, Flag, Plus, RefreshCw, X } from 'lucide-react'
+import { ClipboardList, Flag, Plus, RefreshCw, X, AlertTriangle, CalendarDays, Clock } from 'lucide-react'
 import { toast } from 'sonner'
 import type { RowSelectionState } from '@tanstack/react-table'
 import { usePermission } from '@edforge/abac'
-import { ContextBar, ContextBarSep, ContextBarYear, type BulkAction } from '@edforge/ui'
+import {
+  PageHeader,
+  AttentionCorner,
+  AttentionCornerPill,
+  AttentionCornerShade,
+  SelectionContextBar,
+  type Signal,
+  type SelectionAction,
+} from '@edforge/ui'
 import type { ExamResponseDto } from '@aibrains/shared-types'
 import { useActiveSchoolId } from '../../stores/app.store'
 import { useCurrentAcademicYear, useGradingPeriods } from '../../hooks/useSchool'
 import { useExams, useExamPattern } from '../../hooks/useExams'
+import { useSignalAcks } from '../../hooks/useSignalAcks'
 import { useAcademicsI18n } from '../../lib/i18n'
 import { ExamTable } from '../../components/exams/ExamTable'
 import { ExamDrawer } from '../../components/exams/ExamDrawer'
@@ -33,10 +42,11 @@ interface TermOption {
 }
 
 export function ExamsModule() {
-  const { t, formatDate } = useAcademicsI18n()
+  const { t, formatNumber } = useAcademicsI18n()
   const schoolId = useActiveSchoolId() || ''
   const navigate = useNavigate()
   const canCreateExam = usePermission('create', 'assessments')
+  const canEditExam = usePermission('edit', 'assessments')
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [activeBucket, setActiveBucket] = useState<ExamBucket>('total')
   // Lifted so the BulkExamStatusDrawer can clear selection after a
@@ -70,7 +80,7 @@ export function ExamsModule() {
     { schoolId, academicYearId },
     !!schoolId && !!academicYearId
   )
-  const exams = examList?.items ?? []
+  const exams = useMemo(() => examList?.items ?? [], [examList])
 
   // The summary strip and the table see the same dataset, but the table
   // narrows when a bucket is active so its faceted counts, Clear (N), and
@@ -83,76 +93,179 @@ export function ExamsModule() {
 
   const canOpenDrawer = canCreateExam && terms.length > 0 && examPattern.length > 0
 
-  // Change status → BulkExamStatusDrawer (issue #238). Generate results
-  // is still a toast — the result-batch backend doesn't expose a bulk
-  // surface yet and is filed as a separate follow-up.
-  const bulkActions: BulkAction<ExamResponseDto>[] = useMemo(
-    () => [
+  // ── ⑧ Attention Corner signals — page-scoped, from the exam list already
+  // fetched (they auto-resolve as statuses/results move on). Fixes deep-link
+  // into this page's own lifecycle buckets.
+  const { acked, ack, unack } = useSignalAcks()
+  const todayStr = useMemo(() => new Date().toISOString().split('T')[0], [])
+  const signals: Signal[] = useMemo(() => {
+    const list: Signal[] = []
+    const endingToday = exams.filter(
+      (e) => e.status === 'in_progress' && !!e.endDate && e.endDate <= todayStr,
+    ).length
+    const awaiting = exams.filter(
+      (e) => e.status === 'closed' && e.resultGenerationStatus !== 'generated',
+    ).length
+    const startingSoon = exams.filter((e) => {
+      if (e.status !== 'scheduled' || !e.startDate) return false
+      const inSevenDays = new Date(Date.parse(todayStr) + 7 * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .split('T')[0]
+      return e.startDate >= todayStr && e.startDate <= inSevenDays
+    }).length
+    if (endingToday > 0) {
+      list.push({
+        id: 'exams.live-ending-today',
+        severity: 'critical',
+        domain: t('moduleOverview.signals.domains.assessment'),
+        icon: <AlertTriangle className="h-4 w-4" aria-hidden="true" />,
+        title: t('examModule.signals.endingTodayTitle', { count: formatNumber(endingToday) }),
+        description: t('examModule.signals.endingTodaySub'),
+        fix: { label: t('examModule.signals.viewLive'), onAction: () => setActiveBucket('live') },
+      })
+    }
+    if (awaiting > 0) {
+      list.push({
+        id: 'exams.awaiting-results',
+        severity: 'warn',
+        domain: t('moduleOverview.signals.domains.assessment'),
+        icon: <Clock className="h-4 w-4" aria-hidden="true" />,
+        title: t('examModule.signals.awaitingTitle', { count: formatNumber(awaiting) }),
+        description: t('examModule.signals.awaitingSub'),
+        fix: { label: t('examModule.signals.viewAwaiting'), onAction: () => setActiveBucket('awaiting') },
+      })
+    }
+    if (startingSoon > 0) {
+      list.push({
+        id: 'exams.starting-soon',
+        severity: 'info',
+        domain: t('moduleOverview.signals.domains.assessment'),
+        icon: <CalendarDays className="h-4 w-4" aria-hidden="true" />,
+        title: t('examModule.signals.startingSoonTitle', { count: formatNumber(startingSoon) }),
+        description: t('examModule.signals.startingSoonSub'),
+        fix: { label: t('examModule.signals.viewUpcoming'), onAction: () => setActiveBucket('upcoming') },
+      })
+    }
+    return list
+  }, [exams, todayStr, t, formatNumber])
+
+  // ── ⑨ Selection Context Bar — state-aware matrix (retires the floating
+  // pill). Change status opens the real BulkExamStatusDrawer (it computes
+  // per-row eligible transitions); Generate results applies only to Closed
+  // exams without results (subset chip) and stays a coming-soon toast — the
+  // result-batch backend has no bulk surface yet (follow-up on file).
+  const selectedExams = useMemo(() => {
+    const ids = new Set(Object.keys(rowSelection))
+    return filteredExams.filter((e) => ids.has(e.examId))
+  }, [rowSelection, filteredExams])
+
+  const selectionActions = useMemo<SelectionAction[]>(() => {
+    const byId = new Map(selectedExams.map((e) => [e.examId, e]))
+    const rowsFor = (ids: string[]) =>
+      ids.map((id) => byId.get(id)).filter((e): e is ExamResponseDto => !!e)
+    const genableIds = selectedExams
+      .filter((e) => e.status === 'closed' && e.resultGenerationStatus !== 'generated')
+      .map((e) => e.examId)
+    return [
       {
         id: 'change-status',
         label: t('examModule.bulk.changeStatus'),
-        icon: <Flag className="w-4 h-4" />,
-        onRun: (rows) => setBulkStatusTarget(rows),
+        icon: <Flag className="h-3.5 w-3.5" />,
+        applicableIds: selectedExams.map((e) => e.examId),
+        locked: !canEditExam,
+        lockedReason: t('studentsModule.bulk.requiresAdmin'),
+        onAction: (ids) => setBulkStatusTarget(rowsFor(ids)),
       },
       {
         id: 'generate-results',
         label: t('examModule.bulk.generateResults'),
-        icon: <RefreshCw className="w-4 h-4" />,
-        onRun: (rows) => {
-          const closable = rows.filter((r) => r.status === 'closed')
-          if (closable.length === 0) {
-            toast.error(t('examModule.bulk.onlyClosed'))
-            return
-          }
-          toast.info(t('examModule.bulk.generateComingSoon', { count: closable.length }))
-        },
+        icon: <RefreshCw className="h-3.5 w-3.5" />,
+        applicableIds: genableIds,
+        disabledReason: t('examModule.bulk.onlyClosed'),
+        onAction: (ids) =>
+          toast.info(t('examModule.bulk.generateComingSoon', { count: ids.length })),
       },
-    ],
-    [t]
+    ]
+  }, [selectedExams, canEditExam, t])
+
+  const singleExam = selectedExams.length === 1 ? selectedExams[0] : null
+  const selectionBar = (
+    <SelectionContextBar
+      selectedCount={selectedExams.length}
+      totalCount={filteredExams.length}
+      onClear={() => setRowSelection({})}
+      onSelectAll={() =>
+        setRowSelection(Object.fromEntries(filteredExams.map((e) => [e.examId, true])))
+      }
+      actions={selectionActions}
+      aria-label={t('dataTable.selection.aria')}
+      labels={{
+        selected: (count) => t('dataTable.selection.selected', { count: formatNumber(count) }),
+        selectAll: (total) => t('dataTable.selection.selectAll', { count: formatNumber(total) }),
+        clear: t('dataTable.selection.clear'),
+      }}
+      peek={
+        singleExam ? (
+          <div className="min-w-0">
+            <div className="truncate text-sm font-semibold text-[rgb(var(--text-primary))]">
+              {singleExam.examName}
+            </div>
+            <div className="truncate text-2xs text-[rgb(var(--text-tertiary))]">
+              {termNameById[singleExam.termId ?? ''] ?? ''}
+              {' · '}
+              {t(`examModule.status.${singleExam.status}`)}
+            </div>
+          </div>
+        ) : undefined
+      }
+    />
   )
 
   const showFilterChip = activeBucket !== 'total'
 
   return (
     <div className="min-h-full p-6 space-y-5">
-      <ContextBar
-        meta={
-          <>
-            {currentYear?.name ? (
-              <ContextBarYear>{currentYear.name}</ContextBarYear>
-            ) : null}
-            {currentYear?.name ? <ContextBarSep /> : null}
-            <span>
-                  {formatDate(new Date(), {
-                    weekday: 'long',
-                    month: 'short',
-                    day: 'numeric',
-              })}
-            </span>
-          </>
-        }
-        description={
-          <p className="text-sm text-[rgb(var(--text-tertiary))]">
-            {currentYear?.name
-              ? t('examModule.descriptionWithYear', { yearName: currentYear.name })
-              : t('examModule.description')}
-          </p>
-        }
-        actions={
-          canCreateExam ? (
-            <button
-              type="button"
-              onClick={() => setDrawerOpen(true)}
-              disabled={!canOpenDrawer}
-              title={!canOpenDrawer ? t('examModule.createDisabledTitle') : undefined}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-sm font-semibold rounded-lg bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors disabled:opacity-50"
-            >
-              <Plus className="w-4 h-4" />
-              {t('examModule.createExam')}
-            </button>
-          ) : undefined
-        }
-      />
+      {/* ⑧ Header zone — attention pill left, actions right; shade in flow */}
+      <AttentionCorner
+        signals={isLoading ? [] : signals}
+        acked={acked}
+        onAck={ack}
+        onUnack={unack}
+        labels={{
+          needAttention: t('moduleOverview.signals.needAttention'),
+          allClear: t('moduleOverview.signals.allClear'),
+          region: t('moduleOverview.needsAttention.title'),
+          minimize: t('moduleOverview.signals.minimize'),
+          acknowledge: t('moduleOverview.signals.acknowledge'),
+          acknowledged: t('moduleOverview.signals.acknowledged'),
+          acknowledgedHint: t('moduleOverview.signals.acknowledgedHint'),
+          dismiss: t('moduleOverview.signals.dismiss'),
+          emptyTitle: t('moduleOverview.signals.emptyTitle'),
+        }}
+      >
+        {/* One space-y child: the shade's gap lives inside its animated height */}
+        <div>
+          <PageHeader
+            mode="pagebar"
+            attention={<AttentionCornerPill />}
+            actions={
+              canCreateExam
+                ? [
+                    {
+                      label: t('examModule.createExam'),
+                      icon: <Plus className="h-3.5 w-3.5" />,
+                      primary: true,
+                      disabled: !canOpenDrawer,
+                      ariaLabel: !canOpenDrawer ? t('examModule.createDisabledTitle') : t('examModule.createExam'),
+                      onClick: () => setDrawerOpen(true),
+                    },
+                  ]
+                : undefined
+            }
+          />
+          <AttentionCornerShade className="pt-5" />
+        </div>
+      </AttentionCorner>
 
       {!academicYearId ? (
         <div className="bg-surface-secondary rounded-xl border border-border-secondary p-12 text-center">
@@ -197,7 +310,7 @@ export function ExamsModule() {
             termNameById={termNameById}
             isLoading={isLoading}
             onSelectExam={(exam) => navigate({ to: '/exams/$examId', params: { examId: exam.examId } })}
-            bulkActions={bulkActions}
+            selectionBar={selectionBar}
             rowSelection={rowSelection}
             onRowSelectionChange={setRowSelection}
           />

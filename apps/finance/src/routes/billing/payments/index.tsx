@@ -15,11 +15,14 @@ import {
   createActionsColumn,
   createSelectColumn,
   IdentityCell,
-  StatCard,
-  WidgetErrorBoundaryV2,
+  PageHeader,
+  StatBand,
+  type StatMetric,
   Select,
+  SelectionContextBar,
+  type SelectionAction,
 } from '@edforge/ui'
-import type { BulkAction, ColumnDef } from '@edforge/ui'
+import type { ColumnDef } from '@edforge/ui'
 import type { RowSelectionState } from '@tanstack/react-table'
 import { EntityIdDisplay } from '@edforge/archetype'
 import {
@@ -30,8 +33,6 @@ import {
   RotateCcw,
   X,
   AlertTriangle,
-  Wallet,
-  TrendingUp,
   Receipt,
   Download,
 } from 'lucide-react'
@@ -50,11 +51,7 @@ import type { Payment } from '@edforge/types'
 import { useCurrency } from '@edforge/types/use-currency'
 import { useFinanceSettings } from '../../../layouts/FinanceLayout'
 import { formatDate, formatDateDual } from '../../../utils/format-date'
-import {
-  FinancePageHeader,
-  FinanceStatusChip,
-  ExportCsvButton,
-} from '../../../components/shared'
+import { FinanceStatusChip, ExportCsvButton } from '../../../components/shared'
 import { BulkVoidPaymentsDrawer } from '../../../components/billing/BulkVoidPaymentsDrawer'
 import { BulkSendReceiptsDrawer } from '../../../components/billing/BulkSendReceiptsDrawer'
 import { BulkReceiptPdfExportDrawer } from '../../../components/billing/BulkReceiptPdfExportDrawer'
@@ -739,7 +736,7 @@ export default function PaymentsPage() {
   const refundMutation = useCreateRefund(schoolId ?? '')
   const exportCsvMutation = useExportPaymentsCsv()
 
-  const paymentList = Array.isArray(payments) ? payments : []
+  const paymentList = useMemo(() => (Array.isArray(payments) ? payments : []), [payments])
 
   // KPI computation
   const kpi = useMemo(() => {
@@ -797,52 +794,71 @@ export default function PaymentsPage() {
     format,
   )
 
-  // Bulk actions on the Payments list:
+  // Bulk surfaces on the Payments list:
   //   - Void (#229, cheap-path fan-out)
   //   - Send receipt (#230, D1 of the async-job framework, PR #339)
-  //   - Download PDF (ZIP) — Sprint G.4, wires G.2 backend worker via
+  //   - Download PDFs — Sprint G.4, wires G.2 backend worker via
   //     the shared BulkReceiptPdfExportDrawer
   const [bulkVoidTarget, setBulkVoidTarget] = useState<Payment[] | null>(null)
   const [bulkReceiptTarget, setBulkReceiptTarget] = useState<Payment[] | null>(null)
   // Sprint G.4 — receipt-side counterpart of the invoice-list
-  // bulkPdfExportTarget state. Stored as string[] because the drawer
-  // takes flat paymentIds (not full Payment objects — no client-side
-  // eligibility branching; the G.2 worker's status='completed' filter
+  // bulkPdfExportTarget state. Holds full Payment rows so the drawer's
+  // preflight manifest can aggregate without refetching; server-side
+  // eligibility still rules (the G.2 worker's status='completed' filter
   // is the source of truth).
-  const [bulkPdfExportTarget, setBulkPdfExportTarget] = useState<string[] | null>(null)
+  const [bulkPdfExportTarget, setBulkPdfExportTarget] = useState<Payment[] | null>(null)
 
-  const paymentBulkActions = useMemo<BulkAction<Payment>[]>(
-    () => [
+  // ── ⑨ Selection Context Bar — state-aware action matrix (retires the
+  // legacy floating pill). Void / Send receipt mirror the drawers' own
+  // eligibility splits (`splitEligibleVoid` / `splitEligibleReceipts`:
+  // completed + receipted); Download PDFs applies to completed
+  // payments — the G.2 worker's status filter surfaced as the subset chip
+  // up front instead of a post-hoc skip. Handlers receive `applicableIds`
+  // only, so the drawers open with exactly the qualifying rows.
+  const selectedPayments = useMemo(() => {
+    const ids = new Set(Object.keys(rowSelection).filter((id) => rowSelection[id]))
+    return paymentList.filter((p) => ids.has(p.id))
+  }, [rowSelection, paymentList])
+
+  const selectionActions = useMemo<SelectionAction[]>(() => {
+    const byId = new Map(selectedPayments.map((p) => [p.id, p]))
+    const rowsFor = (ids: string[]) =>
+      ids.map((id) => byId.get(id)).filter((p): p is Payment => !!p)
+    // Same predicate as splitEligibleVoid / splitEligibleReceipts.
+    const receiptedCompletedIds = selectedPayments
+      .filter((p) => p.status === 'completed' && p.receiptNumber)
+      .map((p) => p.id)
+    const completedIds = selectedPayments
+      .filter((p) => p.status === 'completed')
+      .map((p) => p.id)
+    return [
       {
         id: 'void',
         label: t('paymentsList.voidSelected'),
-        icon: <Ban className="w-4 h-4" />,
-        tone: 'critical',
-        onRun: (rows) => setBulkVoidTarget(rows),
+        icon: <Ban className="h-3.5 w-3.5" />,
+        danger: true,
+        applicableIds: receiptedCompletedIds,
+        disabledReason: t('paymentsList.selection.noneVoidable'),
+        onAction: (ids) => setBulkVoidTarget(rowsFor(ids)),
       },
       {
         id: 'send-receipt',
         label: t('paymentsList.sendReceipt'),
-        icon: <Receipt className="w-4 h-4" />,
-        onRun: (rows) => setBulkReceiptTarget(rows),
+        icon: <Receipt className="h-3.5 w-3.5" />,
+        applicableIds: receiptedCompletedIds,
+        disabledReason: t('paymentsList.selection.noneCompleted'),
+        onAction: (ids) => setBulkReceiptTarget(rowsFor(ids)),
       },
       {
-        // Sprint G.4 — bulk PDF (ZIP) export of RECEIPTS.
-        // Symmetric to the invoice-list `pdf-export` action.
-        // Selection set comes from row checkboxes; the G.2 worker
-        // filters non-completed payments as `skipped` (not `failed`).
-        // Backend dedupes at the schema layer; we still pass an
-        // Array.from(new Set()) here to keep any per-page duplication
-        // out of the initial ID array.
         id: 'pdf-export',
         label: t('paymentsList.bulkReceiptPdfExport.menuLabel'),
-        icon: <Download className="w-4 h-4" />,
-        onRun: (rows) =>
-          setBulkPdfExportTarget(Array.from(new Set(rows.map((r) => r.id)))),
+        icon: <Download className="h-3.5 w-3.5" />,
+        applicableIds: completedIds,
+        disabledReason: t('paymentsList.selection.noneCompleted'),
+        onAction: (ids) => setBulkPdfExportTarget(rowsFor(Array.from(new Set(ids)))),
       },
-    ],
-    [t],
-  )
+    ]
+  }, [selectedPayments, t])
 
   if (!schoolId) {
     return (
@@ -852,80 +868,107 @@ export default function PaymentsPage() {
     )
   }
 
+
+  const STATUS_PRESETS = [
+    { label: t('filters.allStatuses'), value: '' },
+    { label: t('status.completed'), value: 'completed' },
+    { label: t('status.failed'), value: 'failed' },
+    { label: t('status.cancelled'), value: 'cancelled' },
+    { label: t('status.refunded'), value: 'refunded' },
+    { label: t('status.pending'), value: 'pending' },
+  ]
+
+  // ── StatBand metrics (calm; attention only via state) ────────────────────
+  const metrics: StatMetric[] = [
+    {
+      label: t('overview.kpi.collected'),
+      value: formatCompact(kpi.totalCollected),
+      iconSignature: 'finance',
+      state: 'normal',
+      primary: true,
+      sub: t('paymentsList.paymentCount', { count: paymentList.length }),
+    },
+    {
+      label: t('status.completed'),
+      value: String(kpi.completedCount),
+      iconSignature: 'finance_note',
+      state: 'normal',
+      sub: t('paymentsList.processed'),
+    },
+    {
+      label: t('paymentsList.partialRefunds'),
+      value: String(kpi.partialRefundCount),
+      iconSignature: 'finance_receipt',
+      state: 'normal',
+      sub: t('status.pending'),
+    },
+    {
+      label: t('status.cancelled'),
+      value: String(kpi.cancelledCount),
+      iconSignature: 'atrisk',
+      state: kpi.cancelledCount > 0 ? 'normal' : 'muted',
+    },
+  ]
+
+  const singlePayment = selectedPayments.length === 1 ? selectedPayments[0] : null
+  const selectionBar = (
+    <SelectionContextBar
+      selectedCount={selectedPayments.length}
+      totalCount={paymentList.length}
+      onClear={() => setRowSelection({})}
+      onSelectAll={() =>
+        setRowSelection(Object.fromEntries(paymentList.map((p) => [p.id, true])))
+      }
+      actions={selectionActions}
+      aria-label={t('headerZone.selection.aria')}
+      labels={{
+        selected: (count) => t('headerZone.selection.selected', { count }),
+        selectAll: (total) => t('headerZone.selection.selectAll', { count: total }),
+        clear: t('headerZone.selection.clear'),
+      }}
+      peek={
+        singlePayment ? (
+          <div className="min-w-0">
+            <div className="truncate text-sm font-semibold text-[rgb(var(--text-primary))]">
+              {singlePayment.studentName ?? singlePayment.receiptNumber ?? '—'}
+            </div>
+            <div className="truncate text-2xs text-[rgb(var(--text-tertiary))]">
+              {format(singlePayment.amount)} ·{' '}
+              {t(`status.${singlePayment.status}`, { defaultValue: singlePayment.status })}
+            </div>
+          </div>
+        ) : undefined
+      }
+    />
+  )
+
   return (
     <div className="p-6 space-y-5">
-      {/* Header */}
-      <FinancePageHeader
-        title={t('paymentsList.title')}
-        subtitle={t('paymentsList.description')}
-        actions={
-          <button
-            type="button"
-            onClick={() => navigate({ to: '/payments/record' })}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
-          >
-            {t('overview.actions.recordPayment')}
-          </button>
-        }
+      {/* Screen-reader page heading (breadcrumb names the page visually) */}
+      <h1 className="sr-only">{t('paymentsList.title')}</h1>
+
+      {/* ---- Page header (pagebar) ---- */}
+      <PageHeader
+        mode="pagebar"
+        actions={[
+          {
+            label: t('overview.actions.recordPayment'),
+            icon: <CreditCard className="h-3.5 w-3.5" />,
+            primary: true,
+            onClick: () => navigate({ to: '/payments/record' }),
+          },
+        ]}
       />
 
-      {/* KPI Tiles */}
-      <WidgetErrorBoundaryV2>
-        <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
-          <StatCard
-            label={t('overview.kpi.collected')}
-            value={formatCompact(kpi.totalCollected)}
-            icon={Wallet}
-            signature="finance"
-            accentColor="rgba(29, 158, 117, 0.12)"
-            iconColor="#1D9E75"
-            barColor="#1D9E75"
-            tag={{ text: t('paymentsList.paymentCount', { count: paymentList.length }), color: '#1D9E75', bg: 'rgba(29,158,117,0.10)' }}
-            loading={isLoading}
-            valueColor="#1D9E75"
-          />
-          <StatCard
-            label={t('status.completed')}
-            value={String(kpi.completedCount)}
-            icon={TrendingUp}
-            accentColor="rgba(55, 138, 221, 0.12)"
-            iconColor="#378ADD"
-            barColor="#378ADD"
-            tag={{ text: t('paymentsList.processed'), color: '#378ADD', bg: 'rgba(55,138,221,0.10)' }}
-            loading={isLoading}
-          />
-          <StatCard
-            label={t('paymentsList.partialRefunds')}
-            value={String(kpi.partialRefundCount)}
-            icon={Receipt}
-            signature="finance_receipt"
-            accentColor="rgba(239, 159, 39, 0.12)"
-            iconColor="#EF9F27"
-            barColor="#EF9F27"
-            tag={{ text: t('status.pending'), color: '#EF9F27', bg: 'rgba(239,159,39,0.10)' }}
-            loading={isLoading}
-          />
-          <StatCard
-            label={t('status.cancelled')}
-            value={String(kpi.cancelledCount)}
-            icon={AlertTriangle}
-            signature="atrisk"
-            accentColor="rgba(128, 128, 128, 0.12)"
-            iconColor="rgb(var(--text-tertiary))"
-            barColor="rgb(var(--text-tertiary))"
-            loading={isLoading}
-          />
-        </div>
-      </WidgetErrorBoundaryV2>
+      {/* ---- StatBand — KPI summary (Cancelled → muted when 0) ---- */}
+      <StatBand metrics={metrics} ariaLabel={t('paymentsList.kpi.region')} />
 
-      {/* Data Table — status / gateway / grade Selects stay in `toolbarStart`
-          because they drive the server `useSchoolPayments` query (GSI14 for
-          grade, indexed lookups for status / gateway). Reshaping them into
-          client-side `facets` would double-filter the already-narrowed
-          payment list, so we keep them as-is and only bring in tableId
-          persistence, density, the built-in CSV export (full-school via
-          useExportPaymentsCsv lives in `toolbarExtra`), and a bulk action
-          shell. */}
+      {/* Data Table — status presets + gateway facet + grade "More filters"
+          drive the server `useSchoolPayments` query (GSI14 for grade, indexed
+          lookups for status / gateway) via the unified toolbar slots, NOT the
+          client-side `facets` prop (which would double-filter the already-
+          narrowed list). Search stays the built-in client filter; the
+          full-school CSV export (useExportPaymentsCsv) lives in `toolbarExtra`. */}
       <TanstackDataTable<Payment>
         className="min-h-96"
         columns={columns}
@@ -942,47 +985,41 @@ export default function PaymentsPage() {
         pageSizes={[10, 20, 50]}
         defaultSort={[{ id: 'date', desc: true }]}
         searchPlaceholder={t('paymentsList.searchPlaceholder')}
-        toolbarStart={
-          <div className="flex items-center gap-2 flex-wrap">
-            <Select
-              size="sm"
-              className="w-44"
-              value={statusFilter}
-              onChange={(v) => setStatusFilter(v ?? '')}
-              options={[
-                { label: t('filters.allStatuses'), value: '' },
-                { label: t('status.completed'), value: 'completed' },
-                { label: t('status.failed'), value: 'failed' },
-                { label: t('status.cancelled'), value: 'cancelled' },
-                { label: t('status.refunded'), value: 'refunded' },
-                { label: t('status.pending'), value: 'pending' },
-              ]}
-            />
-            <Select
-              size="sm"
-              className="w-48"
-              value={gatewayFilter}
-              onChange={(v) => setGatewayFilter(v ?? '')}
-              options={[
-                { label: t('paymentsList.allGateways'), value: '' },
-                { label: t('gateway.cash'), value: 'cash' },
-                { label: t('gateway.bankTransfer'), value: 'bank_transfer' },
-                { label: t('gateway.cheque'), value: 'cheque' },
-                { label: t('gateway.esewa'), value: 'esewa' },
-                { label: t('gateway.khalti'), value: 'khalti' },
-                { label: t('gateway.fonepay'), value: 'fonepay' },
-              ]}
-            />
-            {/* Sprint B.5 — grade filter routes through GSI14 (sparse) */}
-            <Select
-              size="sm"
-              className="w-40"
-              value={gradeFilter}
-              onChange={(v) => setGradeFilter(v ?? '')}
-              options={gradeOptions}
-            />
-          </div>
+        presets={STATUS_PRESETS}
+        activePreset={statusFilter}
+        onPresetChange={(v) => setStatusFilter(v)}
+        primaryFilter={
+          <Select
+            size="sm"
+            className="w-48"
+            value={gatewayFilter}
+            onChange={(v) => setGatewayFilter(v ?? '')}
+            options={[
+              { label: t('paymentsList.allGateways'), value: '' },
+              { label: t('gateway.cash'), value: 'cash' },
+              { label: t('gateway.bankTransfer'), value: 'bank_transfer' },
+              { label: t('gateway.cheque'), value: 'cheque' },
+              { label: t('gateway.esewa'), value: 'esewa' },
+              { label: t('gateway.khalti'), value: 'khalti' },
+              { label: t('gateway.fonepay'), value: 'fonepay' },
+            ]}
+            buttonClassName="border-[rgb(var(--border-primary)/0.35)]"
+          />
         }
+        overflowFilters={
+          /* Sprint B.5 — grade filter routes through GSI14 (sparse). Lives in
+             the toolbar-owned overflow so it folds with the primary filter. */
+          <Select
+            size="sm"
+            className="w-full"
+            label={t('feeStructure.gradeLevels')}
+            value={gradeFilter}
+            onChange={(v) => setGradeFilter(v ?? '')}
+            options={gradeOptions}
+          />
+        }
+        overflowActiveCount={gradeFilter ? 1 : 0}
+        onOverflowClear={() => setGradeFilter('')}
         toolbarExtra={
           <ExportCsvButton
             onClick={() => {
@@ -995,7 +1032,7 @@ export default function PaymentsPage() {
             isExporting={exportCsvMutation.isPending}
           />
         }
-        bulkActions={paymentBulkActions}
+        selectionBar={selectionBar}
         emptyState={{
           icon: <CreditCard className="w-10 h-10" />,
           title: t('empty.noPayments'),
@@ -1051,18 +1088,18 @@ export default function PaymentsPage() {
       />
 
       {/* Sprint G.4 — Bulk Receipt PDF Export Drawer (mirror of the
-          invoice-side drawer from PR #266). Conditionally mounted so the
-          exit animation runs; onClose only clears the target, onComplete
-          clears row selection per sibling-drawer convention. */}
-      {bulkPdfExportTarget && (
-        <BulkReceiptPdfExportDrawer
-          open={!!bulkPdfExportTarget}
-          onClose={() => setBulkPdfExportTarget(null)}
-          onComplete={() => setRowSelection({})}
-          schoolId={schoolId}
-          paymentIds={bulkPdfExportTarget}
-        />
-      )}
+          invoice-side drawer from PR #266). Mounted unconditionally: the
+          drawer keeps polling a backgrounded export after close and toasts
+          on completion — unmounting here would kill the poll and break the
+          runs-in-background promise. onClose only clears the target,
+          onComplete clears row selection per sibling-drawer convention. */}
+      <BulkReceiptPdfExportDrawer
+        open={!!bulkPdfExportTarget}
+        onClose={() => setBulkPdfExportTarget(null)}
+        onComplete={() => setRowSelection({})}
+        schoolId={schoolId}
+        payments={bulkPdfExportTarget ?? []}
+      />
     </div>
   )
 }

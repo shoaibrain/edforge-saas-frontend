@@ -296,7 +296,8 @@
     "bulk": {
       "message": "Message",
       "moveSection": "Move section",
-      "archive": "Archive"
+      "archive": "Archive",
+      "requiresAdmin": "Requires an administrator role"
     },
     "filters": {
       "modes": {
@@ -446,6 +447,12 @@
         "pendingStart": "Imports create",
         "pendingEnd": "enrollments"
       }
+    },
+    "signals": {
+      "showAtRisk": "Show at-risk"
+    },
+    "selection": {
+      "peekAttendance": "{{rate}}% attendance"
     }
   },
   "privacy": {
@@ -492,7 +499,14 @@
     },
     "xlsxUnavailable": "XLSX export ships in a follow-up",
     "filterAriaLabel": "{{title}} filter",
-    "clearFilter": "Clear filter"
+    "clearFilter": "Clear filter",
+    "moreFilters": "More filters",
+    "selection": {
+      "aria": "Selection actions",
+      "selected": "{{count}} selected",
+      "selectAll": "Select all {{count}}",
+      "clear": "Clear selection"
+    }
   },
   "attendance": {
     "title": "Attendance",
@@ -506,13 +520,34 @@
       "aria": "Attendance tabs"
     },
     "status": {
-      "present": { "label": "Present", "short": "P" },
-      "absent": { "label": "Absent", "short": "A" },
-      "late": { "label": "Tardy", "short": "T" },
-      "excused": { "label": "Excused", "short": "E" },
-      "remote": { "label": "Remote", "short": "R" },
-      "half_day": { "label": "Half Day", "short": "H" },
-      "early_departure": { "label": "Early Dep.", "short": "ED" }
+      "present": {
+        "label": "Present",
+        "short": "P"
+      },
+      "absent": {
+        "label": "Absent",
+        "short": "A"
+      },
+      "late": {
+        "label": "Tardy",
+        "short": "T"
+      },
+      "excused": {
+        "label": "Excused",
+        "short": "E"
+      },
+      "remote": {
+        "label": "Remote",
+        "short": "R"
+      },
+      "half_day": {
+        "label": "Half Day",
+        "short": "H"
+      },
+      "early_departure": {
+        "label": "Early Dep.",
+        "short": "ED"
+      }
     },
     "dateSelector": {
       "previousDay": "Previous day",
@@ -715,7 +750,90 @@
       },
       "scopeSections": "Showing data for your sections ({{value}} students)",
       "loadFailed": "Failed to load attendance overview",
-      "loadFailedDescription": "Please try refreshing the page. If the issue persists, contact support."
+      "loadFailedDescription": "Please try refreshing the page. If the issue persists, contact support.",
+      "commandBar": {
+        "policyTooltip": "{{attending}} count as attending · {{excused}}",
+        "excusedAbsent": "excused counts as absent for the rate",
+        "excusedPresent": "excused counts as present for the rate",
+        "atRiskShort": "at-risk <{{pct}}%",
+        "scopeTooltip": "Attendance data is scoped to your role",
+        "scopeSchool": "School-wide",
+        "scopeMine": "My sections",
+        "export": "Export"
+      },
+      "reframe": {
+        "headline": "The {{pct}}% “school average” is a recording-coverage artifact — not real absence.",
+        "body": "Attendance is entered for only a fraction of section-days, so the blended average collapses. Among sessions actually recorded, attendance runs ~{{rate}}%. Track coverage and the recorded rate as separate signals.",
+        "record": "Record a section",
+        "ack": "Got it",
+        "ackAria": "Acknowledge and dismiss this notice"
+      },
+      "sections": {
+        "title": "Sections to record",
+        "complete": "{{done}}/{{total}} complete",
+        "coveredToday": "covered today",
+        "pickToRecord": "{{parts}} — pick one to record",
+        "allRecorded": "all sections recorded today",
+        "notStartedCount": "{{count}} not started",
+        "inProgressCount": "{{count}} in progress",
+        "trackerAria": "Coverage tracker: {{full}} fully recorded, {{partial}} partial, {{none}} not started",
+        "legendFull": "{{count}} fully",
+        "legendPartial": "{{count}} partial",
+        "legendNone": "{{count}} not started",
+        "studentsCovered": "students covered",
+        "rateAmongRecorded": "rate among recorded",
+        "statusRecorded": "fully recorded",
+        "statusPartial": "partial {{pct}}%",
+        "statusNotRecorded": "not recorded",
+        "enrolledCount": "{{count}} students",
+        "recordedBadge": "Recorded",
+        "viewEdit": "View / edit",
+        "partialCounts": "{{done}}/{{total}} marked · {{left}} left",
+        "partialBadge": "{{pct}}% done",
+        "continue": "Continue",
+        "notStartedBadge": "Not started",
+        "record": "Record",
+        "emptyScope": "No sections in your scope for this day."
+      },
+      "insight": {
+        "chronicLabel": "Chronic absence",
+        "chronicSub": "below 70% · act now",
+        "atRiskLabel": "At-risk",
+        "atRiskSub": "70–90% attendance",
+        "decliningLabel": "Declining",
+        "decliningSub": "flagged & trending down",
+        "lowestLabel": "Lowest cohort",
+        "lowestSub": "Grade {{grade}}"
+      },
+      "atRisk": {
+        "title": "At-Risk & Chronic Absence",
+        "subtitle": "Below the 90% threshold · worst first, with 30-day trend",
+        "export": "Export",
+        "filterAll": "All",
+        "filterChronic": "Chronic",
+        "filterAtRisk": "At-risk",
+        "filterAria": "Filter at-risk students by band",
+        "empty": "No students in this band."
+      },
+      "drawer": {
+        "section": "Section",
+        "subRecorded": "{{date}} · {{count}} recorded",
+        "subPartial": "{{date}} · {{done}}/{{total}} marked so far",
+        "subNew": "{{date}} · {{count}} students",
+        "editNote": "Editing a saved record — changes are logged with your name and time."
+      },
+      "gradeLevel": "Grade level",
+      "dowInsightShort": "{{day}} is the lowest weekday",
+      "gradeCompareTitle": "Grade-level comparison",
+      "gradeCompareSubtitle": "Recorded rate by grade level · worst first",
+      "gradeCompareEmpty": "No grade-level data yet.",
+      "gradeLabel": "Grade {{grade}}",
+      "trendRateNote": "Among sections that recorded · a rate, not coverage",
+      "trendAvgTarget": "avg {{avg}}% · target {{target}}%",
+      "trendAria": "30-day recorded attendance rate, averaging {{avg}} percent",
+      "updating": "Updating…",
+      "staleWarning": "Couldn’t refresh for {{date}} — showing the last loaded data.",
+      "retry": "Retry"
     },
     "modal": {
       "trendTitle": "Trend over the window (recent vs earlier)",
@@ -740,6 +858,7 @@
     "actions": "Actions",
     "active": "Active",
     "inactive": "Inactive",
+    "current": "Current",
     "teacher": "Teacher",
     "primaryInstructor": "Primary Instructor",
     "student": "Student",
@@ -882,6 +1001,12 @@
       "empty": {
         "title": "No grade levels found",
         "description": "Grade levels will appear once courses are configured."
+      },
+      "searchPlaceholder": "Search grade name or code…",
+      "presets": {
+        "all": "All",
+        "withCourses": "With courses",
+        "empty": "Empty"
       },
       "noCurrentYearTitle": "No active academic year — enrollment counts will appear once an academic year is set as current."
     },
@@ -1321,7 +1446,8 @@
       "atRiskStudents": "At-Risk Students",
       "below80": "{{count}} below 80%",
       "riskBreakdown": "{{critical}} critical · {{warning}} warning",
-      "below90Threshold": "below 90% threshold"
+      "below90Threshold": "below 90% threshold",
+      "region": "Key metrics"
     },
     "needsAttention": {
       "title": "Needs Attention"
@@ -1411,6 +1537,24 @@
       "insights": "Insights",
       "insightsCharts": "Insights & Charts",
       "activityAlerts": "Activity & Alerts"
+    },
+    "signals": {
+      "needAttention": "need attention",
+      "allClear": "All clear",
+      "minimize": "Minimize",
+      "acknowledge": "Got it",
+      "acknowledged": "Acknowledged",
+      "acknowledgedHint": "Acknowledged — click to undo",
+      "dismiss": "Dismiss",
+      "emptyTitle": "You’re all caught up.",
+      "domains": {
+        "attendance": "Attendance",
+        "assessment": "Assessment",
+        "finance": "Finance",
+        "enrollment": "Enrollment",
+        "capacity": "Capacity",
+        "dataQuality": "Data quality"
+      }
     }
   },
   "examModule": {
@@ -1651,9 +1795,33 @@
         "gradePrefix": "Grade",
         "emisPrefix": "EMIS"
       }
+    },
+    "signals": {
+      "endingTodayTitle": "{{count}} live exams end today",
+      "endingTodaySub": "Enter marks before they close",
+      "awaitingTitle": "{{count}} closed exams are awaiting results",
+      "awaitingSub": "Report cards are blocked until results generate",
+      "startingSoonTitle": "{{count}} exams start within 7 days",
+      "startingSoonSub": "Confirm schedules and readiness",
+      "viewLive": "View live",
+      "viewAwaiting": "View awaiting",
+      "viewUpcoming": "View upcoming"
     }
   },
   "classrooms": {
+    "pageTitle": "Classrooms",
+    "toolbar": {
+      "searchPlaceholder": "Search sections…",
+      "all": "All",
+      "statusPresets": "Status presets",
+      "course": "Course",
+      "teacher": "Teacher",
+      "year": "Year",
+      "viewToggle": "View",
+      "cards": "Cards",
+      "table": "Table",
+      "export": "Export"
+    },
     "tabs": {
       "overview": "Overview",
       "gradebook": "Gradebook",
@@ -1716,6 +1884,7 @@
       "attachments": "Attachments:"
     },
     "stats": {
+      "region": "Key metrics",
       "totalSections": "Total Sections",
       "totalStudents": "Total Students",
       "avgUtilization": "Avg Utilization",
@@ -1753,7 +1922,40 @@
       "noDefaultPolicyDescription": "You have {{count}} grading policy, but none is marked as default.",
       "noDefaultPolicyDescription_plural": "You have {{count}} grading policies, but none is marked as default.",
       "setAcademicYearBeforeGrades": "Set up an academic year before recording grades.",
-      "classAverage": "class average"
+      "classAverage": "class average",
+      "gradedChip": "{{pct}}% graded · avg {{avg}}%",
+      "launchpad": {
+        "helper": "Choose a section to record and review grades, or open school-wide analytics.",
+        "noSectionsTitle": "No sections assigned",
+        "backToSections": "Sections",
+        "summary": {
+          "sections": "sections",
+          "withGrades": "with grades",
+          "needAttention": "need attention",
+          "notStarted": "not started"
+        },
+        "resume": {
+          "title": "Jump back in",
+          "action": "Resume"
+        },
+        "status": {
+          "attention": "Needs attention",
+          "inProgress": "In progress",
+          "notStarted": "Not started",
+          "onTrack": "On track"
+        },
+        "card": {
+          "classAvg": "Class avg",
+          "avgGpa": "Avg GPA",
+          "atRisk": "At-risk",
+          "noGradesYet": "No grades recorded yet ·",
+          "startGrading": "Start grading",
+          "gradedAvg": "{{pct}}% graded · avg {{avg}}%",
+          "gradedProgress": "{{graded}}/{{total}} graded · {{pct}}%",
+          "progressAria": "{{pct}}% graded",
+          "students": "{{count}} students"
+        }
+      }
     },
     "context": {
       "activeSections": "active sections",
@@ -1846,6 +2048,20 @@
     "toast": {
       "notifyComingSoon": "Notify {{count}} section - coming soon",
       "notifyComingSoon_plural": "Notify {{count}} sections - coming soon"
+    },
+    "signals": {
+      "atCapacityTitle": "{{count}} sections are at seat capacity",
+      "atCapacitySub": "Incoming placements have no seat — consider rebalancing",
+      "lowUtilTitle": "{{count}} sections are below 40% seat utilization",
+      "lowUtilSub": "Consider merging under-filled sections",
+      "unrecordedTitle": "{{count}} sections haven’t recorded attendance today",
+      "unrecordedSub": "{{done}} of {{total}} recorded so far",
+      "reviewSections": "Review sections"
+    },
+    "selection": {
+      "noInactive": "No inactive sections in the selection",
+      "noActive": "No active sections in the selection",
+      "peekSeats": "{{enrolled}}/{{cap}} seated"
     }
   },
   "enrollmentModule": {
@@ -2488,10 +2704,19 @@
       "editPolicy": "Edit policy",
       "gradeScale": "Grade Scale",
       "categoryWeights": "Category Weights ({{total}}%)",
-      "rounding": "Rounding: {{rule}}",
       "newPolicy": "New Policy",
       "emptyTitle": "No grading policies configured",
-      "emptyDescription": "Create a grading policy to define grade scales, category weights, and rounding rules."
+      "emptyDescription": "Create a grading policy to define grade scales, category weights, and rounding rules.",
+      "gradeChip": "{{letter}} · {{min}}–{{max}}% · {{gpa}} GPA",
+      "weightAria": "{{category}} weight: {{weight}}%",
+      "scheme": "Scheme",
+      "schemeValue": "{{scheme}} · {{scale}}",
+      "schemeType": {
+        "letter_gpa": "Letter + GPA",
+        "division": "Division"
+      },
+      "minimumPassing": "Minimum passing",
+      "roundingLabel": "Rounding"
     },
     "overview": {
       "title": "Grade Analytics",
@@ -2503,7 +2728,8 @@
       "actions": {
         "more": "More actions",
         "exportGradebookCsv": "Export Gradebook CSV",
-        "exportAtRiskCsv": "Export At-Risk CSV"
+        "exportAtRiskCsv": "Export At-Risk CSV",
+        "export": "Export"
       },
       "kpis": {
         "studentsGraded": "STUDENTS GRADED",
@@ -2512,7 +2738,9 @@
         "atRisk": "AT RISK",
         "avgGradeHint": "Avg grade: {{grade}}%",
         "passRateHint": "Students scoring 60%+",
-        "atRiskHint": "Below 60% threshold"
+        "atRiskHint": "Below 60% threshold",
+        "belowThreshold": "below 60%",
+        "needSupport": "need support"
       },
       "completion": {
         "title": "Grading Completion",
@@ -2520,7 +2748,10 @@
         "gradedShort": "graded",
         "graded": "Graded",
         "remaining": "Remaining",
-        "totalEntries": "{{total}} total assignment entries"
+        "totalEntries": "{{total}} total assignment entries",
+        "gradedCount": "{{count}} graded",
+        "remainingCount": "{{count}} awaiting grades",
+        "total": "{{count}} total assignment entries"
       },
       "assessment": {
         "title": "Assessment Performance",
@@ -2532,7 +2763,12 @@
         "summativeHigher": "Summative {{diff}}% higher",
         "summativeHigherSuffix": "than formative.",
         "equal": "Formative and summative scores are equal — well balanced.",
-        "unclassified": "+{{value}} unclassified (avg {{avg}}%)"
+        "unclassified": "+{{value}} unclassified (avg {{avg}}%)",
+        "formative": "Formative — quizzes, homework ({{count}} items)",
+        "summative": "Summative — tests, exams ({{count}} items)",
+        "noneYet": "— · none yet",
+        "noteBalanced": "Grading is well balanced toward ongoing work.",
+        "noteNoSummative": "All graded items are formative — no summative assessments recorded yet."
       },
       "distribution": {
         "title": "Grade Distribution",
@@ -2541,7 +2777,9 @@
         "b": "B (80–89)",
         "c": "C (70–79)",
         "d": "D (60–69)",
-        "f": "F (0–59)"
+        "f": "F (0–59)",
+        "metric": "{{count}} graded",
+        "note": "The F count includes students still awaiting grades (they read as 0%)."
       },
       "category": {
         "title": "Category Performance",
@@ -2575,7 +2813,43 @@
           "course": "Course",
           "grade": "Grade",
           "letter": "Letter"
-        }
+        },
+        "dedupeSubtitle": "Unique students below the 60% pass threshold — deduped from {{raw}} flagged entries",
+        "export": "Export at-risk",
+        "filterAria": "Filter at-risk students",
+        "filterAll": "All",
+        "filterGraded": "Graded",
+        "filterPending": "Awaiting grades",
+        "pendingNote": "{{count}} flagged only because grades aren't entered yet",
+        "tagFailing": "Failing",
+        "tagBelowPass": "Below pass",
+        "tagNotGraded": "Not graded yet"
+      },
+      "backToGradebook": "Back to gradebook",
+      "scope": "School-wide · {{graded}} of {{total}} sections graded",
+      "noData": "No data available",
+      "emptyState": {
+        "title": "No grades recorded yet",
+        "description": "Grade some assignments to see school-wide analytics."
+      },
+      "insight": {
+        "body": "{{pending}} of {{unique}} at-risk flags are pending grades, not failing students. {{ungraded}} of {{totalEntries}} assignment entries are ungraded, so those students read as 0% — which deflates the {{passRate}}% pass rate and inflates the at-risk count. Grade the pending work for a true picture.",
+        "reviewPending": "Review pending grades"
+      },
+      "courses": {
+        "title": "Course Performance",
+        "subtitle": "Aggregated grade metrics per course",
+        "course": "Course",
+        "sections": "Sec.",
+        "students": "Students",
+        "avg": "Avg",
+        "gpa": "GPA",
+        "pass": "Pass %"
+      },
+      "categories": {
+        "title": "Category Performance",
+        "subtitle": "Average score by grading-policy category",
+        "empty": "No category data yet"
       }
     }
   },

@@ -2,19 +2,18 @@
  * ExamTable — list of exams for a school + academic year.
  *
  * Built on the shared `<DataTable />` from `@edforge/ui`, this wrapper just
- * declares the columns / facets / bulk actions specific to exams; everything
- * else (search, sort, density, persistence, floating bulk bar, export, etc.)
- * lives in the shared component.
+ * declares the columns / facets specific to exams; everything else (search,
+ * sort, density, persistence, selection-bar morph, export, etc.) lives in
+ * the shared component.
  */
 
-import { useMemo } from 'react'
+import { useMemo, type ReactNode } from 'react'
 import { ClipboardList, CheckCircle2, Clock } from 'lucide-react'
 import type { ExamResponseDto, ExamStatus } from '@aibrains/shared-types'
 import type { OnChangeFn, RowSelectionState } from '@tanstack/react-table'
 import {
   DataTable,
   createSelectColumn,
-  type BulkAction,
   type ColumnDef,
   type FacetedFilterConfig,
 } from '@edforge/ui'
@@ -26,8 +25,8 @@ interface ExamTableProps {
   termNameById: Record<string, string>
   isLoading: boolean
   onSelectExam?: (exam: ExamResponseDto) => void
-  /** Optional bulk actions wired from the page (status drawer, generate, etc). */
-  bulkActions?: BulkAction<ExamResponseDto>[]
+  /** ⑨ Selection Context Bar node — morphs the toolbar in place on selection. */
+  selectionBar?: ReactNode
   /** Controlled row selection — lift state into the page when an action
    *  needs to clear selection (e.g. after a bulk status apply). */
   rowSelection?: RowSelectionState
@@ -51,7 +50,7 @@ export function ExamTable({
   termNameById,
   isLoading,
   onSelectExam,
-  bulkActions,
+  selectionBar,
   rowSelection,
   onRowSelectionChange,
 }: ExamTableProps) {
@@ -299,18 +298,19 @@ export function ExamTable({
       getRowId={(row) => row.examId}
       isLoading={isLoading}
       enableSorting
-      enableRowSelection={!!bulkActions?.length || !!onRowSelectionChange}
+      enableRowSelection={!!selectionBar || !!onRowSelectionChange}
       rowSelection={rowSelection}
       onRowSelectionChange={onRowSelectionChange}
       enableColumnVisibility
       facets={facets}
+      foldFacets
       searchPlaceholder={t('tables.exams.search')}
       defaultSort={[{ id: 'schedule', desc: true }]}
       pagination={{ pageSize: 8 }}
       pageSizes={[8, 12, 20]}
       density="comfortable"
       onRowClick={onSelectExam}
-      bulkActions={bulkActions}
+      selectionBar={selectionBar}
       exportOptions={{ filename: 'exams', formats: ['csv'] }}
       labels={dataTableLabels}
       emptyState={{

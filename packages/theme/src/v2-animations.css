@@ -44,11 +44,31 @@
   animation: details-in 160ms ease-out;
 }
 
+@keyframes v2-indeterminate-sweep {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(250%); }
+}
+
+/* Indeterminate progress segment: 40% of the track, sweeping left→right.
+   translateX is relative to the segment's own width, so 250% exits fully. */
+.v2-indeterminate-sweep {
+  width: 40%;
+  animation: v2-indeterminate-sweep 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
 /* Respect reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .v2-skeleton-pulse {
     animation: none;
     opacity: 0.5;
+  }
+
+  /* Static full-width low-opacity fill — reads as "active", never as a
+     frozen 40% of determinate progress. */
+  .v2-indeterminate-sweep {
+    animation: none;
+    width: 100%;
+    opacity: 0.35;
   }
 
   .v2-bar-fill {

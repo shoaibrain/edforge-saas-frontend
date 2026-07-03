@@ -372,7 +372,7 @@ export function useAttendanceStudentTrends({
   const sortedIds = [...studentIds].sort()
   return useQuery<Record<string, StudentAttendanceTrend>, Error>({
     queryKey: attendanceKeys.studentTrends(schoolId, sortedIds.join(','), startDate, endDate),
-    queryFn: () => getAttendanceStudentTrends(schoolId, sortedIds, startDate, endDate),
+    queryFn: ({ signal }) => getAttendanceStudentTrends(schoolId, sortedIds, startDate, endDate, signal),
     enabled: enabled && !!schoolId && sortedIds.length > 0 && !!startDate && !!endDate,
     staleTime: 10 * 60 * 1000,
   })
@@ -429,7 +429,9 @@ export function useAttendanceOverview({
 }) {
   return useQuery<AttendanceOverviewResponse, Error>({
     queryKey: attendanceKeys.overview(schoolId, academicYearId, date),
-    queryFn: () => getAttendanceOverview({ schoolId, academicYearId, date }),
+    // Forward react-query's abort signal so a superseded date's fetch is
+    // cancelled instead of stacking heavy aggregates on the server.
+    queryFn: ({ signal }) => getAttendanceOverview({ schoolId, academicYearId, date }, signal),
     enabled: enabled && !!schoolId && !!academicYearId && !!date,
     staleTime: 60 * 1000, // 60 seconds - matches backend cache
     placeholderData: keepPreviousData, // Prevents loading flicker on date change

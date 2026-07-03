@@ -189,9 +189,11 @@ export {
   bulkReceiptPdfExport,
   getFinanceJob,
 } from './services/bulk-pdf-export.service'
+export { BULK_PDF_EXPORT_LIMITS } from './services/bulk-pdf-export.service'
 export type {
   BulkInvoicePdfExportAck,
   BulkInvoicePdfExportDto,
+  BulkPdfExportFormat,
   BulkReceiptPdfExportAck,
   BulkReceiptPdfExportDto,
   FinanceJobRow,

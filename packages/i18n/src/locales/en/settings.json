@@ -405,6 +405,9 @@
       "success": "Deleted {{count}} department",
       "success_plural": "Deleted {{count}} departments",
       "partial": "Deleted {{deleted}}; {{failed}} failed"
+    },
+    "selection": {
+      "lockedDelete": "Requires permission to delete departments"
     }
   },
   "schoolDetail": {
@@ -1444,7 +1447,22 @@
   },
   "people": {
     "title": "People Management",
-    "description": "Manage staff access and roles"
+    "description": "Manage staff access and roles",
+    "selection": {
+      "changeRole": "Change role",
+      "suspend": "Suspend",
+      "requiresAdmin": "Requires Tenant Admin",
+      "noneEligibleRole": "You can't change your own role.",
+      "noneSuspendable": "No selected users can be suspended — already-suspended users and your own account are skipped."
+    }
+  },
+  "headerZone": {
+    "selection": {
+      "aria": "Selection actions",
+      "selected": "{{count}} selected",
+      "selectAll": "Select all {{count}}",
+      "clear": "Clear selection"
+    }
   },
   "quickActions": {
     "title": "Quick Actions",

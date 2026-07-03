@@ -141,10 +141,14 @@ function unwrapResponse<T>(response: unknown): T {
   return response as T
 }
 
-export async function apiGet<T>(url: string, params?: Record<string, unknown>): Promise<T> {
+export async function apiGet<T>(
+  url: string,
+  params?: Record<string, unknown>,
+  options?: { signal?: AbortSignal },
+): Promise<T> {
   const start = performance.now()
   try {
-    const response = await api.get<T>(url, { params })
+    const response = await api.get<T>(url, { params, signal: options?.signal })
     if (DEBUG) {
       console.debug('[Academics API] GET', url, {
         params: params ? Object.keys(params) : [],

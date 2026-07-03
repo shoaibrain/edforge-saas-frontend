@@ -133,6 +133,44 @@ function collectSupportedMatrixFailures(): ContrastFailure[] {
         })
       }
     }
+
+    // StatBand introduces new token pairs on the band surface (background-secondary):
+    // the value text colors driven by `state`, plus the muted value. All must clear AA.
+    const statBandTextPairs = [
+      ['text-primary', 'background-secondary'],
+      ['text-tertiary', 'background-secondary'],
+      ['state-warning-fg', 'background-secondary'],
+      ['state-danger-fg', 'background-secondary'],
+      ['state-success-fg', 'background-secondary'],
+      ['state-info-fg', 'background-secondary'],
+    ] as const
+    for (const [fg, bg] of statBandTextPairs) {
+      const value = Number(ratio(tokens[fg], tokens[bg]))
+      if (value < 4.5) {
+        failures.push({
+          theme,
+          kind: 'text',
+          pair: `${fg} on ${bg}`,
+          ratio: value.toFixed(2),
+          required: 4.5,
+        })
+      }
+    }
+
+    // StatBand `live` accent (border-focus) used as a UI element on the band surface.
+    const statBandUiPairs = [['border-focus', 'background-secondary']] as const
+    for (const [fg, bg] of statBandUiPairs) {
+      const value = Number(ratio(tokens[fg], tokens[bg]))
+      if (value < 3) {
+        failures.push({
+          theme,
+          kind: 'ui',
+          pair: `${fg} on ${bg}`,
+          ratio: value.toFixed(2),
+          required: 3,
+        })
+      }
+    }
   }
 
   return failures

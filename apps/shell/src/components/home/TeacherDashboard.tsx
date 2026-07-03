@@ -1,18 +1,21 @@
 /**
- * TeacherDashboard — V2
+ * TeacherDashboard — dashboard recipe
  *
- * Home page layout for teachers/educators, migrated to V2 design system.
- *
- * Sprint 3 enhancements:
- * - 3.1: V2 layout wrapper with motion container + reduced-motion check
- * - 3.3: KPI tiles (My Sections, Total Students, Today's Attendance)
- * - 3.4: Section attendance detail using AttendanceBySectionCard
+ * Teacher/educator Home on the canonical surfaces: StatBand (KPIs) → WidgetCard
+ * grid (My sections + section attendance). No teacher-scoped signal source yet,
+ * so the ⑧ AttentionCorner is omitted. Greeting lives in the shell topbar. All
+ * live hooks + section error boundaries + reduced-motion stagger are preserved.
  */
 
 import { useMemo } from 'react'
 import { motion } from 'framer-motion'
-import { CalendarDays, Users, ClipboardCheck } from 'lucide-react'
-import { HomeStatCard } from './HomeStatCard'
+import {
+  StatBand,
+  type StatMetric,
+  type StatBandState,
+  WidgetGrid,
+  WidgetCard,
+} from '@edforge/ui'
 import { MySectionsCard } from './MySectionsCard'
 import { AttendanceBySectionCard } from './AttendanceBySectionCard'
 import { SectionErrorBoundary } from './SectionErrorBoundary'
@@ -20,6 +23,7 @@ import {
   useHomeAcademicYear,
   useHomeTeacherSections,
   useSectionAttendanceItems,
+  ATTENDANCE_THRESHOLD,
 } from '../../hooks/useHomeData'
 import { useTranslation } from '@edforge/i18n'
 
@@ -52,10 +56,7 @@ export function TeacherDashboard({ schoolId }: TeacherDashboardProps) {
   const { t } = useTranslation('dashboard')
   const academicYearId = academicYear?.yearId
 
-  const { sections, isLoading } = useHomeTeacherSections(
-    schoolId,
-    academicYearId,
-  )
+  const { sections, isLoading } = useHomeTeacherSections(schoolId, academicYearId)
 
   // Ticket 3.4: section attendance data for teacher's sections
   const sectionAttendance = useSectionAttendanceItems(schoolId, academicYearId)
@@ -76,6 +77,49 @@ export function TeacherDashboard({ schoolId }: TeacherDashboardProps) {
     return (totalRecorded / totalStudentCount) * 100
   }, [sectionAttendance.sections])
 
+  const attendanceState: StatBandState =
+    todayAttendanceRate == null
+      ? 'normal'
+      : todayAttendanceRate >= 90
+        ? 'good'
+        : todayAttendanceRate >= 75
+          ? 'warn'
+          : 'critical'
+
+  const metrics: StatMetric[] = [
+    {
+      label: t('homeV2.teacher.mySections'),
+      value: isLoading ? '—' : String(sections.length),
+      iconSignature: 'sections',
+      state: 'normal',
+      primary: true,
+      sub: t('homeV2.teacher.assignedClasses'),
+    },
+    {
+      label: t('homeV2.teacher.totalStudents'),
+      value: isLoading ? '—' : totalStudents.toLocaleString(),
+      iconSignature: 'students',
+      state: 'normal',
+      sub: t('homeV2.teacher.acrossAllSections'),
+    },
+    todayAttendanceRate != null
+      ? {
+          label: t('homeV2.kpi.todaysAttendance'),
+          value: `${todayAttendanceRate.toFixed(1)}%`,
+          iconSignature: 'metric_attendance',
+          state: attendanceState,
+          meter: { pct: todayAttendanceRate, target: ATTENDANCE_THRESHOLD },
+          sub: t('homeV2.teacher.completionRate'),
+        }
+      : {
+          label: t('homeV2.kpi.todaysAttendance'),
+          value: '—',
+          iconSignature: 'metric_attendance',
+          state: 'normal',
+          sub: t('homeV2.teacher.completionRate'),
+        },
+  ]
+
   if (!schoolId) {
     return (
       <div className="py-16 text-center">
@@ -93,72 +137,44 @@ export function TeacherDashboard({ schoolId }: TeacherDashboardProps) {
       initial={prefersReducedMotion ? undefined : 'hidden'}
       animate="visible"
     >
-      {/* ================================================================ */}
-      {/* SECTION 1: KPI Tiles (Ticket 3.3) */}
-      {/* ================================================================ */}
+      {/* SECTION 1: StatBand — teacher KPIs */}
       <SectionErrorBoundary fallbackMessage={t('homeV2.errors.unableToLoadKpi')}>
-        <motion.div
-          variants={sectionVariants}
-          transition={{ duration: 0.2 }}
-          className="grid grid-cols-1 sm:grid-cols-3 gap-3"
-        >
-          <HomeStatCard
-            label={t('homeV2.teacher.mySections')}
-            value={isLoading ? '—' : sections.length.toString()}
-            icon={CalendarDays}
-            accentColor="rgb(var(--accent-academics) / 0.12)"
-            iconColor="#378ADD"
-            barColor="#378ADD"
-            hint={t('homeV2.teacher.assignedClasses')}
-            loading={isLoading}
-          />
-          <HomeStatCard
-            label={t('homeV2.teacher.totalStudents')}
-            value={isLoading ? '—' : totalStudents.toLocaleString()}
-            icon={Users}
-            accentColor="rgb(var(--accent-enrollment) / 0.12)"
-            iconColor="#1D9E75"
-            barColor="#1D9E75"
-            hint={t('homeV2.teacher.acrossAllSections')}
-            loading={isLoading}
-          />
-          <HomeStatCard
-            label={t('homeV2.kpi.todaysAttendance')}
-            value={
-              todayAttendanceRate != null
-                ? `${todayAttendanceRate.toFixed(1)}%`
-                : '—'
-            }
-            icon={ClipboardCheck}
-            accentColor="rgb(var(--accent-attendance) / 0.12)"
-            iconColor="#EF9F27"
-            barColor="#EF9F27"
-            hint={t('homeV2.teacher.completionRate')}
-            loading={sectionAttendance.isLoading}
-          />
+        <motion.div variants={sectionVariants} transition={{ duration: 0.2 }}>
+          <StatBand metrics={metrics} ariaLabel={t('homeV2.kpi.region')} />
         </motion.div>
       </SectionErrorBoundary>
 
-      {/* ================================================================ */}
-      {/* SECTION 2: My Sections (Ticket 3.2 — card uses V2 tokens) */}
-      {/* ================================================================ */}
+      {/* SECTION 2: ⑤ WidgetCard grid — my sections + section attendance */}
       <SectionErrorBoundary fallbackMessage={t('homeV2.errors.unableToLoadSections')}>
         <motion.div variants={sectionVariants} transition={{ duration: 0.2 }}>
-          <MySectionsCard sections={sections} isLoading={isLoading} />
-        </motion.div>
-      </SectionErrorBoundary>
+          <WidgetGrid>
+            <WidgetCard
+              title={t('homeV2.teacher.mySections')}
+              iconSignature="sections"
+              subtitle={t('homeV2.teacher.assignedClasses')}
+              span={6}
+              link={{ label: t('homeV2.teacher.viewAll'), href: '/academics/classrooms' }}
+            >
+              <MySectionsCard sections={sections} isLoading={isLoading} bare />
+            </WidgetCard>
 
-      {/* ================================================================ */}
-      {/* SECTION 3: Section Attendance Detail (Ticket 3.4) */}
-      {/* ================================================================ */}
-      <SectionErrorBoundary fallbackMessage={t('homeV2.errors.unableToLoadAttendance')}>
-        <motion.div variants={sectionVariants} transition={{ duration: 0.2 }}>
-          <AttendanceBySectionCard
-            sections={sectionAttendance.sections}
-            todayRate={todayAttendanceRate}
-            isLoading={sectionAttendance.isLoading}
-            academicYearId={academicYearId}
-          />
+            <WidgetCard
+              title={t('homeV2.attendance.classroomAttendance')}
+              iconSignature="metric_attendance"
+              span={6}
+              metric={
+                todayAttendanceRate != null ? `${todayAttendanceRate.toFixed(1)}% today` : undefined
+              }
+            >
+              <AttendanceBySectionCard
+                sections={sectionAttendance.sections}
+                todayRate={todayAttendanceRate}
+                isLoading={sectionAttendance.isLoading}
+                academicYearId={academicYearId}
+                bare
+              />
+            </WidgetCard>
+          </WidgetGrid>
         </motion.div>
       </SectionErrorBoundary>
     </motion.div>

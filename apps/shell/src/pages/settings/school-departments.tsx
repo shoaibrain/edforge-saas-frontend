@@ -22,9 +22,12 @@ import {
   X,
   AlertTriangle,
 } from 'lucide-react'
+import type { RowSelectionState } from '@tanstack/react-table'
 import { tenantService } from '@/services/tenant.service'
+import { useAuthStore } from '@/stores/auth.store'
+import { can } from '@edforge/abac'
 import type { Department, CreateDepartmentDto } from '@edforge/types'
-import { Button, TanstackDataTable, createActionsColumn, createSelectColumn, type BulkAction, type ColumnDef, type FacetedFilterConfig } from '@edforge/ui'
+import { Button, TanstackDataTable, createActionsColumn, createSelectColumn, SelectionContextBar, type SelectionAction, type ColumnDef, type FacetedFilterConfig } from '@edforge/ui'
 
 // ============================================================================
 // DEPARTMENT FORM MODAL
@@ -262,6 +265,8 @@ export default function SchoolDepartmentsPage({ schoolId }: SchoolDepartmentsPag
     department: Department | null
   }>({ mode: null, department: null })
   const [bulkDeleteTarget, setBulkDeleteTarget] = useState<Department[] | null>(null)
+  // Lifted selection state so the bulk-delete confirm can clear it (⑨).
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
   // Fetch departments
   const { data: departments, isLoading } = useQuery({
@@ -313,15 +318,69 @@ export default function SchoolDepartmentsPage({ schoolId }: SchoolDepartmentsPag
     ],
   }
 
-  const departmentBulkActions: BulkAction<Department>[] = [
-    {
-      id: 'delete',
-      label: t('schoolDepartments.actions.deleteSelected'),
-      icon: <Trash2 className="w-4 h-4" />,
-      tone: 'critical',
-      onRun: (rows) => setBulkDeleteTarget(rows),
-    },
-  ]
+  // ── ⑨ Selection Context Bar — retires the legacy floating pill. Every
+  // selected department is deletable today (no disqualifying state), so the
+  // action applies to the full selection; it renders locked (visible, not
+  // hidden) for roles without `departments:delete`.
+  const { user } = useAuthStore.getState()
+  const canDeleteDepartments = user
+    ? can(user, { action: 'delete', resource: 'departments', schoolId })
+    : false
+
+  const selectedDepartments = useMemo(() => {
+    const all = departments ?? []
+    const ids = new Set(Object.keys(rowSelection).filter((id) => rowSelection[id]))
+    return all.filter((d) => ids.has(d.id))
+  }, [departments, rowSelection])
+
+  const selectionActions = useMemo<SelectionAction[]>(() => {
+    const byId = new Map(selectedDepartments.map((d) => [d.id, d]))
+    const rowsFor = (ids: string[]) =>
+      ids.map((id) => byId.get(id)).filter((d): d is Department => !!d)
+    return [
+      {
+        id: 'delete',
+        label: t('schoolDepartments.actions.deleteSelected'),
+        icon: <Trash2 className="h-3.5 w-3.5" />,
+        danger: true,
+        applicableIds: selectedDepartments.map((d) => d.id),
+        locked: !canDeleteDepartments,
+        lockedReason: t('schoolDepartments.selection.lockedDelete'),
+        onAction: (ids) => setBulkDeleteTarget(rowsFor(ids)),
+      },
+    ]
+  }, [selectedDepartments, canDeleteDepartments, t])
+
+  const singleDepartment = selectedDepartments.length === 1 ? selectedDepartments[0] : null
+  const selectionBar = (
+    <SelectionContextBar
+      selectedCount={selectedDepartments.length}
+      totalCount={filteredDepartments.length}
+      onClear={() => setRowSelection({})}
+      onSelectAll={() =>
+        setRowSelection(Object.fromEntries(filteredDepartments.map((d) => [d.id, true])))
+      }
+      actions={selectionActions}
+      aria-label={t('headerZone.selection.aria')}
+      labels={{
+        selected: (count) => t('headerZone.selection.selected', { count }),
+        selectAll: (total) => t('headerZone.selection.selectAll', { count: total }),
+        clear: t('headerZone.selection.clear'),
+      }}
+      peek={
+        singleDepartment ? (
+          <div className="min-w-0">
+            <div className="truncate text-sm font-semibold text-[rgb(var(--text-primary))]">
+              {singleDepartment.name}
+            </div>
+            <div className="truncate font-mono text-2xs text-[rgb(var(--text-tertiary))]">
+              {singleDepartment.code}
+            </div>
+          </div>
+        ) : undefined
+      }
+    />
+  )
 
   // Table columns
   const columns: ColumnDef<Department, unknown>[] = useMemo(() => [
@@ -436,9 +495,11 @@ export default function SchoolDepartmentsPage({ schoolId }: SchoolDepartmentsPag
         tableId="shell.departments"
         enableSorting
         enableRowSelection
+        rowSelection={rowSelection}
+        onRowSelectionChange={setRowSelection}
         enableColumnVisibility
         facets={[scopeFacet]}
-        bulkActions={departmentBulkActions}
+        selectionBar={selectionBar}
         exportOptions={{ filename: 'departments', formats: ['csv'] }}
         defaultSort={[{ id: 'name', desc: false }]}
         pagination={{ pageSize: 20 }}
@@ -502,6 +563,7 @@ export default function SchoolDepartmentsPage({ schoolId }: SchoolDepartmentsPag
               )
               const failures = results.filter((r) => r.status === 'rejected').length
               setBulkDeleteTarget(null)
+              setRowSelection({})
               if (failures === 0) {
                 toast.success(t('schoolDepartments.bulkDelete.success', { count: results.length }))
               } else {

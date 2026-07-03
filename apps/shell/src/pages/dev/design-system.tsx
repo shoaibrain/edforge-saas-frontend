@@ -23,15 +23,28 @@ import {
   SectionCard,
   Select,
   Stack,
+  StatBand,
+  AttentionCorner,
+  AttentionCornerPill,
+  AttentionCornerShade,
+  SelectionContextBar,
+  type Signal,
+  WidgetCard,
+  WidgetGrid,
   Switch,
+  DataTableMoreFilters,
+  TableBulkBar,
+  TablePresetTabs,
   Tag,
   Tabs,
   Text,
   Textarea,
   type FilterTab,
+  type StatMetric,
   type TabItem,
 } from '@edforge/ui'
 import { useState } from 'react'
+import { Archive, Upload, UserPlus } from 'lucide-react'
 
 const surfaceTokens = [
   ['background.primary', 'var(--background-primary)'],
@@ -64,6 +77,73 @@ const pageTabs: TabItem[] = [
   { id: 'hierarchy', label: 'Hierarchy', count: 3 },
   { id: 'networks', label: 'Networks' },
   { id: 'details', label: 'Details' },
+]
+
+// Handoff surface ② — exercises every state + micro-viz + animated-icon variant.
+const bandMetrics: StatMetric[] = [
+  {
+    label: 'Total Enrolled',
+    value: '255',
+    iconSignature: 'students',
+    state: 'normal',
+    primary: true,
+    delta: { dir: 'up', val: '+6' },
+    sub: 'across 13 grades',
+    detail: '6 enrolled in the last 30 days',
+  },
+  {
+    label: 'At-risk Students',
+    value: '20',
+    iconSignature: 'atrisk',
+    state: 'critical',
+    pill: { tone: 'critical', text: '20 critical' },
+    sub: 'below 90% attendance',
+  },
+  {
+    label: "Today's Attendance",
+    value: '0%',
+    iconSignature: 'metric_attendance',
+    state: 'warn',
+    meter: { pct: 0, target: 90 },
+    sub: 'Partial data · 0 marked',
+  },
+  {
+    label: 'Result Readiness',
+    value: '50%',
+    iconSignature: 'gpa',
+    state: 'normal',
+    donut: { pct: 50 },
+    sub: '1 / 2 generated',
+  },
+  {
+    label: 'Live Now',
+    value: '1',
+    iconSignature: 'overview',
+    state: 'live',
+    sub: 'in session',
+  },
+  {
+    label: 'Grade Levels',
+    value: '13',
+    iconSignature: 'gradelevels',
+    state: 'muted',
+    sub: 'covered this year',
+  },
+]
+
+const examBandMetrics: StatMetric[] = [
+  { label: 'Total Exams', value: '10', iconSignature: 'exams', state: 'normal', primary: true, sub: '5 types · 4 terms' },
+  { label: 'Live Now', value: '1', iconSignature: 'metric_attendance', state: 'live', sub: 'in session' },
+  { label: 'Upcoming', value: '1', iconSignature: 'attendance', state: 'info', sub: 'Next: Second Term Exam' },
+  { label: 'Awaiting Results', value: '1', iconSignature: 'atrisk', state: 'warn', pill: { tone: 'warn', text: 'Action needed' }, sub: 'result not generated' },
+  { label: 'Result Readiness', value: '50%', iconSignature: 'gpa', state: 'normal', donut: { pct: 50 }, sub: '1 / 2 generated' },
+]
+
+const bandPresets = [
+  { value: 'all', label: 'All', count: 255 },
+  { value: 'active', label: 'Active', count: 235 },
+  { value: 'atrisk', label: 'At-risk', count: 20 },
+  { value: 'pending', label: 'Pending', count: 0 },
 ]
 
 function TokenSwatch({
@@ -103,6 +183,9 @@ export default function DesignSystemDevPage() {
   const [comboboxValue, setComboboxValue] = useState<string | null>(null)
   const [radioValue, setRadioValue] = useState('high')
   const [switchValue, setSwitchValue] = useState(true)
+  const [bandPreset, setBandPreset] = useState('all')
+  const [showBulk, setShowBulk] = useState(false)
+  const [hzAcked, setHzAcked] = useState<Set<string>>(new Set())
 
   if (!import.meta.env.DEV) {
     return (
@@ -295,7 +378,256 @@ export default function DesignSystemDevPage() {
             />
           </div>
         </SectionCard>
+
+        <SectionCard
+          title="Handoff surfaces"
+          description="The three canonical, config-driven operator surfaces: PageHeader (pagebar), StatBand, and the unified table toolbar. See docs/design-system/handoff-token-map.md."
+        >
+          <Stack space="lg">
+            {/* ① PageHeader — pagebar mode */}
+            <div>
+              <Text variant="label" className="mb-2 block">
+                ① PageHeader · pagebar mode
+              </Text>
+              <div className="rounded-xl border border-border-subtle bg-background-secondary p-4">
+                <PageHeader
+                  mode="pagebar"
+                  actions={[
+                    { label: 'Import IEMIS', icon: <Upload className="h-3.5 w-3.5" /> },
+                    { label: 'Enroll student', icon: <UserPlus className="h-3.5 w-3.5" />, primary: true },
+                  ]}
+                />
+              </div>
+            </div>
+
+            {/* ② StatBand — every state + micro-viz */}
+            <div>
+              <Text variant="label" className="mb-2 block">
+                ② StatBand · delta · pill · meter · donut · live · muted (calm by default)
+              </Text>
+              <StatBand metrics={bandMetrics} ariaLabel="Students key metrics" />
+            </div>
+
+            <div>
+              <Text variant="label" className="mb-2 block">
+                ② StatBand · five-segment Exams band
+              </Text>
+              <StatBand metrics={examBandMetrics} ariaLabel="Exams key metrics" />
+            </div>
+
+            {/* ③ Table toolbar pieces */}
+            <div>
+              <Text variant="label" className="mb-2 block">
+                ③ Table toolbar · docked presets ↔ bulk bar (same footprint)
+              </Text>
+              <div className="rounded-xl border border-border-subtle bg-background-secondary p-3">
+                {showBulk ? (
+                  <TableBulkBar
+                    count={3}
+                    selectedRows={[{ id: 'a' }, { id: 'b' }, { id: 'c' }]}
+                    onClear={() => setShowBulk(false)}
+                    actions={[
+                      { id: 'archive', label: 'Archive', tone: 'critical', icon: <Archive className="h-4 w-4" />, onRun: () => setShowBulk(false) },
+                    ]}
+                  />
+                ) : (
+                  <div className="flex min-h-9 flex-wrap items-center gap-3">
+                    <TablePresetTabs presets={bandPresets} active={bandPreset} onChange={setBandPreset} />
+                    <DataTableMoreFilters label="More filters" activeCount={0}>
+                      <Select
+                        aria-label="Status"
+                        size="sm"
+                        value={selectValue ?? ''}
+                        onChange={setSelectValue}
+                        options={[
+                          { value: '', label: 'All status' },
+                          { value: 'active', label: 'Active' },
+                          { value: 'inactive', label: 'Inactive' },
+                        ]}
+                      />
+                    </DataTableMoreFilters>
+                    <Button variant="outline" size="sm" onClick={() => setShowBulk(true)}>
+                      Simulate selection
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </Stack>
+        </SectionCard>
+
+        <SectionCard
+          title="Dashboard surfaces"
+          description="The canonical recipes for Home + module Overview: ⑤ WidgetCard grid plus the PageHeader greeting mode (page-scoped alerts live in the ⑧ AttentionCorner — see the Header Zone section). See docs/design-system/retrospective-s0-s2-academics.md."
+        >
+          <Stack space="lg">
+            {/* PageHeader — greeting mode (Home) */}
+            <div>
+              <Text variant="label" className="mb-2 block">
+                PageHeader · greeting mode (Home)
+              </Text>
+              <div className="rounded-xl border border-border-subtle bg-background-secondary p-4">
+                <PageHeader
+                  mode="greeting"
+                  greeting="Good morning, Shoaib"
+                  actions={[
+                    { label: 'Enroll student', icon: <UserPlus className="h-3.5 w-3.5" /> },
+                    { label: 'Record payment', icon: <Upload className="h-3.5 w-3.5" />, primary: true },
+                  ]}
+                />
+              </div>
+            </div>
+
+            {/* ⑤ WidgetCard grid — spans + ready/empty/loading states */}
+            <div>
+              <Text variant="label" className="mb-2 block">
+                ⑤ WidgetCard · 12-col spans · one-of metric|link · ready / empty / loading
+              </Text>
+              <WidgetGrid>
+                <WidgetCard
+                  title="Attendance trend"
+                  iconSignature="attendance"
+                  subtitle="30-day rolling average · school-wide"
+                  span={8}
+                  footer={<Text variant="secondary">View Attendance →</Text>}
+                >
+                  <div className="flex h-32 items-center justify-center rounded-lg bg-background-tertiary text-text-tertiary">
+                    <Text variant="secondary">line chart body</Text>
+                  </div>
+                </WidgetCard>
+                <WidgetCard title="Financial overview" iconSignature="fees" subtitle="18.1% collected" span={4} metric="NPR 10.1L due">
+                  <div className="flex h-32 items-center justify-center rounded-lg bg-background-tertiary text-text-tertiary">
+                    <Text variant="secondary">progress rows</Text>
+                  </div>
+                </WidgetCard>
+                <WidgetCard
+                  title="At-risk students"
+                  iconSignature="atrisk"
+                  span={4}
+                  link={{ label: 'View all', href: '#' }}
+                  state="empty"
+                  empty={{ iconSignature: 'students', title: 'No at-risk students', subtitle: 'Everyone is above 80% attendance' }}
+                >
+                  placeholder
+                </WidgetCard>
+                <WidgetCard title="Recent activity" iconSignature="overview" span={4} state="loading">
+                  placeholder
+                </WidgetCard>
+                <WidgetCard title="Quick actions" iconSignature="create" span={4}>
+                  <div className="flex h-32 items-center justify-center rounded-lg bg-background-tertiary text-text-tertiary">
+                    <Text variant="secondary">action grid</Text>
+                  </div>
+                </WidgetCard>
+              </WidgetGrid>
+            </div>
+          </Stack>
+        </SectionCard>
+
+        <SectionCard
+          title="Header Zone"
+          description="⑧ AttentionCorner — page-scoped, severity-segmented signals in the header's top-left (expand the pill; acknowledge the critical, dismiss the rest to reach all-clear) · ⑨ SelectionContextBar — state-aware selection actions with subset counts, disabled reasons, and role locks."
+        >
+          <Stack space="lg">
+            <div>
+              <Text variant="label" className="mb-2 block">
+                ⑧ AttentionCorner · pill in the pagebar's left slot · shade pushes content
+              </Text>
+              <div className="rounded-xl border border-border-subtle bg-background-secondary p-4">
+                <AttentionCorner
+                  signals={hzSignals}
+                  acked={hzAcked}
+                  onAck={(id) => setHzAcked((prev) => new Set(prev).add(id))}
+                  onUnack={(id) =>
+                    setHzAcked((prev) => {
+                      const next = new Set(prev)
+                      next.delete(id)
+                      return next
+                    })
+                  }
+                >
+                  <PageHeader
+                    mode="pagebar"
+                    attention={<AttentionCornerPill />}
+                    actions={[
+                      { label: 'Enroll student', icon: <UserPlus className="h-3.5 w-3.5" /> },
+                      { label: 'Take attendance', primary: true },
+                    ]}
+                  />
+                  <AttentionCornerShade className="pt-3" />
+                </AttentionCorner>
+              </div>
+            </div>
+
+            <div>
+              <Text variant="label" className="mb-2 block">
+                ⑨ SelectionContextBar · subset count chips · disabled reasons · role locks · Esc clears
+              </Text>
+              <SelectionContextBar
+                selectedCount={5}
+                totalCount={255}
+                onClear={() => undefined}
+                onSelectAll={() => undefined}
+                actions={[
+                  {
+                    id: 'remind',
+                    label: 'Send reminder',
+                    applicableIds: ['a', 'b', 'c'],
+                    onAction: () => undefined,
+                  },
+                  {
+                    id: 'issue',
+                    label: 'Issue',
+                    applicableIds: [],
+                    disabledReason: 'No drafts in selection',
+                  },
+                  {
+                    id: 'move',
+                    label: 'Change section',
+                    applicableIds: ['a', 'b', 'c', 'd', 'e'],
+                    locked: true,
+                    lockedReason: 'Requires Admin',
+                  },
+                  {
+                    id: 'close',
+                    label: 'Close exam',
+                    applicableIds: ['a'],
+                    danger: true,
+                    onAction: () => undefined,
+                  },
+                ]}
+              />
+            </div>
+          </Stack>
+        </SectionCard>
       </Stack>
     </PageShell>
   )
 }
+
+/** Header Zone showcase fixtures — hoisted so the section reads clean. */
+const hzSignals: Signal[] = [
+  {
+    id: 'hz-crit',
+    severity: 'critical',
+    domain: 'Attendance',
+    title: '16 students below 80% attendance — intervention needed',
+    description: '30-day period · 20 total at-risk',
+    fix: { label: 'View details', onAction: () => undefined },
+  },
+  {
+    id: 'hz-warn',
+    severity: 'warn',
+    domain: 'Capacity',
+    title: '3 sections are below 40% seat utilization',
+    description: 'Avg utilization 42% — consider merging',
+    fix: { label: 'Review sections', onAction: () => undefined },
+  },
+  {
+    id: 'hz-info',
+    severity: 'info',
+    domain: 'Data quality',
+    title: '6 sections haven’t recorded attendance today',
+    description: '2 of 8 recorded so far',
+    fix: { label: 'Open attendance', onAction: () => undefined },
+  },
+]

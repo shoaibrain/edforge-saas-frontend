@@ -12,29 +12,34 @@ import { toast } from 'sonner'
 import {
   Button,
   TanstackDataTable,
+  AttentionCorner,
+  AttentionCornerPill,
+  AttentionCornerShade,
+  SelectionContextBar,
+  useSignalAcks,
+  type Signal,
+  type SelectionAction,
   createSelectColumn,
   createActionsColumn,
-  StatCard,
-  WidgetErrorBoundaryV2,
+  PageHeader,
+  StatBand,
+  type StatMetric,
   Select,
   type ColumnDef,
 } from '@edforge/ui'
 import { EntityIdDisplay, UuidBadge } from '@edforge/archetype'
 import {
   Plus,
+  FileStack,
   FileText,
   Loader2,
   Check,
   X,
   Eye,
   Download,
-  Users,
   Send,
   Clock,
   AlertTriangle,
-  Wallet,
-  TrendingUp,
-  Receipt,
 } from 'lucide-react'
 import type { RowSelectionState } from '@tanstack/react-table'
 import { useNavigate } from '@tanstack/react-router'
@@ -60,14 +65,12 @@ import { formatDateDual } from '../../../utils/format-date'
 import { StudentSearchInput } from '../../../components/billing/StudentSearchInput'
 import { BulkSendInvoiceReminderDrawer } from '../../../components/billing/BulkSendInvoiceReminderDrawer'
 import { BulkPdfExportDrawer } from '../../../components/billing/BulkPdfExportDrawer'
-import {
-  FinancePageHeader,
-  FinanceInfoBanner,
-  FinanceStatusChip,
-  FinanceFilterChips,
-} from '../../../components/shared'
+import { FinanceStatusChip } from '../../../components/shared'
 
 type InvoiceStatusFilter = '' | 'draft' | 'issued' | 'partially_paid' | 'paid' | 'overdue' | 'cancelled'
+
+/** Statuses the dues reminder applies to — paid/draft/cancelled are skipped. */
+const REMINDABLE_STATUSES: Invoice['status'][] = ['overdue', 'issued', 'partially_paid']
 
 /** Calculate how many days overdue an invoice is */
 function getOverdueDays(dueDate: string | undefined): number {
@@ -141,8 +144,10 @@ export default function InvoicesPage() {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const [showBulkIssueConfirm, setShowBulkIssueConfirm] = useState(false)
   const [bulkReminderTarget, setBulkReminderTarget] = useState<Invoice[] | null>(null)
-  // Sprint F.5 — bulk PDF export target (selected invoice IDs); null = modal closed.
-  const [bulkPdfExportTarget, setBulkPdfExportTarget] = useState<string[] | null>(null)
+  // Sprint F.5 — bulk PDF export target (selected invoice rows, so the
+  // drawer's preflight manifest can aggregate without refetching);
+  // null = drawer closed.
+  const [bulkPdfExportTarget, setBulkPdfExportTarget] = useState<Invoice[] | null>(null)
 
   // Cancel dialog state
   const [cancelTarget, setCancelTarget] = useState<{ id: string; invoiceNumber: string } | null>(null)
@@ -171,7 +176,7 @@ export default function InvoicesPage() {
     totalLoaded,
   } = useInvoicesInfinite(schoolId ?? '', invoiceFilters)
 
-  const { data: dashboard, isLoading: dashboardLoading } = useDashboardSummary(schoolId ?? '')
+  const { data: dashboard } = useDashboardSummary(schoolId ?? '')
 
   const { serverPagination, isFetching } = buildServerPaginationProps({
     hasMore,
@@ -396,6 +401,83 @@ export default function InvoicesPage() {
     [navigate, issueMutation.isPending, cancelMutation.isPending, t, format, settings, schoolId]
   )
 
+  // ── ⑧ Attention Corner signals — page-scoped, from the dashboard summary
+  // already fetched (auto-resolve as invoices are issued/collected). Fixes
+  // deep-link into this page's own status presets.
+  const { acked, ack, unack } = useSignalAcks()
+  const signals: Signal[] = useMemo(() => {
+    const list: Signal[] = []
+    if (kpi.overdueCount > 0) {
+      list.push({
+        id: 'invoices.overdue',
+        severity: 'critical',
+        domain: t('headerZone.domains.finance'),
+        icon: <Clock className="h-4 w-4" aria-hidden="true" />,
+        title: t('invoices.signals.overdueTitle', {
+          amount: formatCompact(kpi.overdue),
+          count: kpi.overdueCount,
+        }),
+        description: t('invoices.signals.overdueSub'),
+        fix: { label: t('invoices.signals.viewOverdue'), onAction: () => setStatusFilter('overdue') },
+      })
+    }
+    if (kpi.draftCount > 0) {
+      list.push({
+        id: 'invoices.drafts-ready',
+        severity: 'info',
+        domain: t('headerZone.domains.finance'),
+        icon: <FileText className="h-4 w-4" aria-hidden="true" />,
+        title: t('invoices.signals.draftsTitle', { count: kpi.draftCount }),
+        description: t('invoices.signals.draftsSub'),
+        fix: { label: t('invoices.signals.viewDrafts'), onAction: () => setStatusFilter('draft') },
+      })
+    }
+    return list
+  }, [kpi, t, formatCompact])
+
+  // ── ⑨ Selection Context Bar — state-aware money matrix (retires the pill).
+  // Issue applies only to selected DRAFTS; Send reminder only to Overdue /
+  // Issued / Partially Paid; Download PDFs to everything. Confirm
+  // handlers receive the applicable ids and feed the existing drawers/confirm.
+  const selectedInvoices = useMemo(() => {
+    const ids = new Set(Object.keys(rowSelection).filter((id) => rowSelection[id]))
+    return invoices.filter((i) => ids.has(i.id))
+  }, [rowSelection, invoices])
+
+  const selectionActions = useMemo<SelectionAction[]>(() => {
+    const byId = new Map(selectedInvoices.map((i) => [i.id, i]))
+    const rowsFor = (ids: string[]) => ids.map((id) => byId.get(id)).filter((i): i is Invoice => !!i)
+    const draftIds = selectedInvoices.filter((i) => i.status === 'draft').map((i) => i.id)
+    const remindableIds = selectedInvoices
+      .filter((i) => REMINDABLE_STATUSES.includes(i.status))
+      .map((i) => i.id)
+    return [
+      {
+        id: 'issue',
+        label: t('invoices.issue'),
+        icon: <Send className="h-3.5 w-3.5" />,
+        applicableIds: draftIds,
+        disabledReason: t('invoices.selection.noDrafts'),
+        onAction: () => setShowBulkIssueConfirm(true),
+      },
+      {
+        id: 'send-reminder',
+        label: t('invoices.sendReminder'),
+        icon: <Clock className="h-3.5 w-3.5" />,
+        applicableIds: remindableIds,
+        disabledReason: t('invoices.selection.noneRemindable'),
+        onAction: (ids) => setBulkReminderTarget(rowsFor(ids)),
+      },
+      {
+        id: 'pdf-export',
+        label: t('invoices.bulkPdfExport.menuLabel'),
+        icon: <Download className="h-3.5 w-3.5" />,
+        applicableIds: selectedInvoices.map((i) => i.id),
+        onAction: (ids) => setBulkPdfExportTarget(rowsFor(Array.from(new Set(ids)))),
+      },
+    ]
+  }, [selectedInvoices, t])
+
   if (!schoolId) {
     return (
       <div className="p-6 text-center text-sm text-[rgb(var(--text-tertiary))]">
@@ -414,123 +496,131 @@ export default function InvoicesPage() {
     { label: t('status.cancelled'), value: 'cancelled' },
   ]
 
+
+  // ── StatBand metrics (calm; attention only via state) ────────────────────
+  const metrics: StatMetric[] = [
+    {
+      label: t('overview.kpi.totalInvoiced'),
+      value: formatCompact(kpi.totalInvoiced),
+      iconSignature: 'finance',
+      state: 'normal',
+      primary: true,
+      sub: t('invoices.loadedInvoices', { count: `${totalLoaded}${countSuffix}` }),
+    },
+    {
+      label: t('overview.kpi.collected'),
+      value: formatCompact(kpi.totalCollected),
+      iconSignature: 'finance',
+      state: 'normal',
+      sub: t('invoices.paidCount', { count: kpi.paidCount }),
+    },
+    {
+      label: t('overview.kpi.outstanding'),
+      value: formatCompact(kpi.outstanding),
+      iconSignature: 'finance_receipt',
+      state: 'normal',
+      sub: t('invoices.loadedCount', { count: `${totalLoaded}${countSuffix}` }),
+    },
+    kpi.overdueCount > 0
+      ? {
+          label: t('overview.kpi.overdue'),
+          value: formatCompact(kpi.overdue),
+          iconSignature: 'atrisk',
+          state: 'critical',
+          pill: {
+            tone: 'critical',
+            text: t('overview.insight.invoiceOverdue', { count: kpi.overdueCount }),
+          },
+        }
+      : {
+          label: t('overview.kpi.overdue'),
+          value: formatCompact(kpi.overdue),
+          iconSignature: 'atrisk',
+          state: 'normal',
+        },
+  ]
+
+
+
+  const singleInvoice = selectedInvoices.length === 1 ? selectedInvoices[0] : null
+  const selectionBar = (
+    <SelectionContextBar
+      selectedCount={selectedInvoices.length}
+      totalCount={invoices.length}
+      onClear={() => setRowSelection({})}
+      onSelectAll={() =>
+        setRowSelection(Object.fromEntries(invoices.map((i) => [i.id, true])))
+      }
+      actions={selectionActions}
+      aria-label={t('headerZone.selection.aria')}
+      labels={{
+        selected: (count) => t('headerZone.selection.selected', { count }),
+        selectAll: (total) => t('headerZone.selection.selectAll', { count: total }),
+        clear: t('headerZone.selection.clear'),
+      }}
+      peek={
+        singleInvoice ? (
+          <div className="min-w-0">
+            <div className="truncate text-sm font-semibold text-[rgb(var(--text-primary))]">
+              {singleInvoice.invoiceNumber}
+            </div>
+            <div className="truncate text-2xs text-[rgb(var(--text-tertiary))]">
+              {STATUS_FILTER_OPTIONS.find((o) => o.value === singleInvoice.status)?.label ?? singleInvoice.status}
+            </div>
+          </div>
+        ) : undefined
+      }
+    />
+  )
+
   return (
     <div className="p-6 space-y-5">
-      {/* V2 Page Header */}
-      <FinancePageHeader
-        title={t('invoices.title')}
-        subtitle={t('invoices.manageDescription')}
-        actions={
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => navigate({ to: '/invoices/bulk-generate' })}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] border transition-colors hover:opacity-80 bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))]"
-            >
-              <Users className="w-3.5 h-3.5" />
-              {t('bulkGenerate.title')}
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowGenerateForm(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-[7px] transition-colors hover:opacity-90 bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              {t('invoices.generateInvoice')}
-            </button>
-          </div>
-        }
-      />
+      {/* Screen-reader page heading (breadcrumb names the page visually) */}
+      <h1 className="sr-only">{t('invoices.title')}</h1>
 
-      {/* Overdue Info Banner */}
-      {!isLoading && kpi.overdueCount > 0 && (
-        <FinanceInfoBanner
-          variant="danger"
-          message={t('invoices.overdueBanner', {
-            count: kpi.overdueCount,
-            amount: formatCompact(kpi.overdue),
-          })}
-          subtitle={t(
-            kpi.draftCount > 0
-              ? 'invoices.overdueBannerWithDrafts'
-              : 'invoices.overdueBannerRate',
-            {
-              rate: kpi.collectionRate.toFixed(1),
-              drafts: kpi.draftCount,
-            },
-          )}
-        />
-      )}
-
-      {/* KPI Grid */}
-      <WidgetErrorBoundaryV2>
-        <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
-          <StatCard
-            label={t('overview.kpi.totalInvoiced')}
-            value={formatCompact(kpi.totalInvoiced)}
-            icon={Wallet}
-            signature="finance"
-            accentColor="rgba(55, 138, 221, 0.12)"
-            iconColor="#378ADD"
-            barColor="#378ADD"
-            tag={{ text: t('invoices.loadedInvoices', { count: `${totalLoaded}${countSuffix}` }), color: '#378ADD', bg: 'rgba(55,138,221,0.10)' }}
-            loading={isLoading || dashboardLoading}
+      {/* ---- ⑧ Header zone — attention pill left, actions right ---- */}
+      <AttentionCorner
+        signals={signals}
+        acked={acked}
+        onAck={ack}
+        onUnack={unack}
+        labels={{
+          needAttention: t('headerZone.needAttention'),
+          allClear: t('headerZone.allClear'),
+          region: t('headerZone.region'),
+          minimize: t('headerZone.minimize'),
+          acknowledge: t('headerZone.acknowledge'),
+          acknowledged: t('headerZone.acknowledged'),
+          acknowledgedHint: t('headerZone.acknowledgedHint'),
+          dismiss: t('headerZone.dismiss'),
+          emptyTitle: t('headerZone.emptyTitle'),
+        }}
+      >
+        {/* One space-y child: the shade's gap lives inside its animated height */}
+        <div>
+          <PageHeader
+            mode="pagebar"
+            attention={<AttentionCornerPill />}
+            actions={[
+              {
+                label: t('bulkGenerate.title'),
+                icon: <FileStack className="h-3.5 w-3.5" />,
+                onClick: () => navigate({ to: '/invoices/bulk-generate' }),
+              },
+              {
+                label: t('invoices.generateInvoice'),
+                icon: <Plus className="h-3.5 w-3.5" />,
+                primary: true,
+                onClick: () => setShowGenerateForm(true),
+              },
+            ]}
           />
-          <StatCard
-            label={t('overview.kpi.collected')}
-            value={formatCompact(kpi.totalCollected)}
-            icon={TrendingUp}
-            accentColor="rgba(29, 158, 117, 0.12)"
-            iconColor="#1D9E75"
-            barColor="#1D9E75"
-            tag={{ text: t('invoices.paidCount', { count: kpi.paidCount }), color: '#1D9E75', bg: 'rgba(29,158,117,0.10)' }}
-            loading={isLoading || dashboardLoading}
-            valueColor="#1D9E75"
-          />
-          <StatCard
-            label={t('overview.kpi.outstanding')}
-            value={formatCompact(kpi.outstanding)}
-            icon={Receipt}
-            signature="finance_receipt"
-            accentColor="rgba(239, 159, 39, 0.12)"
-            iconColor="#EF9F27"
-            barColor="#EF9F27"
-            tag={{ text: t('invoices.loadedCount', { count: `${totalLoaded}${countSuffix}` }), color: '#EF9F27', bg: 'rgba(239,159,39,0.10)' }}
-            loading={isLoading || dashboardLoading}
-          />
-          <StatCard
-            label={t('overview.kpi.overdue')}
-            value={formatCompact(kpi.overdue)}
-            icon={AlertTriangle}
-            signature="atrisk"
-            accentColor="rgba(226, 75, 74, 0.12)"
-            iconColor="#E24B4A"
-            barColor="#E24B4A"
-            tag={{ text: t('overview.insight.invoiceOverdue', { count: kpi.overdueCount }), color: '#E24B4A', bg: 'rgba(226,75,74,0.10)' }}
-            loading={isLoading || dashboardLoading}
-          />
+          <AttentionCornerShade className="pt-5" />
         </div>
-      </WidgetErrorBoundaryV2>
+      </AttentionCorner>
 
-      {/* Filter Chips */}
-      <div className="flex items-center justify-between flex-wrap gap-2">
-        <div className="flex items-center gap-3 flex-wrap">
-          <FinanceFilterChips
-            options={STATUS_FILTER_OPTIONS}
-            value={statusFilter}
-            onChange={(v) => setStatusFilter(v as InvoiceStatusFilter)}
-            accentColor="#EF9F27"
-          />
-          {/* Sprint B.4 — grade filter chip */}
-          <Select
-            size="sm"
-            className="w-40"
-            value={gradeFilter}
-            onChange={(v) => setGradeFilter(v ?? '')}
-            options={gradeOptions}
-          />
-        </div>
-      </div>
+      {/* ---- StatBand — KPI summary (Overdue → critical pill) ---- */}
+      <StatBand metrics={metrics} ariaLabel={t('invoices.kpi.region')} />
 
       {/* DataTable */}
       {Object.keys(rowSelection).some((id) => rowSelection[id]) && hasMore && (
@@ -548,11 +638,10 @@ export default function InvoicesPage() {
         getRowId={(row) => row.id}
         isLoading={isLoading}
         isFetching={isFetching}
-        // Status / grade live as page-level chips above the table because
-        // they drive the server's GSI-backed pagination (`useInvoicesInfinite`).
-        // Promoting them into client-side `facets` would double-filter and
-        // break the infinite-load contract, so we keep them out and only
-        // adopt tableId persistence + a built-in Export + bulk action shell.
+        // Status presets + Grade facet drive the server's GSI-backed pagination
+        // (`useInvoicesInfinite`) via the unified toolbar's `presets`/`primaryFilter`
+        // slots — NOT the client-side `facets` prop, which would double-filter and
+        // break the infinite-load contract. Search stays the built-in client filter.
         tableId="finance.invoices"
         enableRowSelection={true}
         enableColumnVisibility
@@ -564,35 +653,20 @@ export default function InvoicesPage() {
         defaultSort={[{ id: 'dueDate', desc: false }]}
         serverPagination={serverPagination}
         searchPlaceholder={t('invoices.searchPlaceholder')}
-        bulkActions={[
-          {
-            id: 'issue',
-            label: t('invoices.issueSelected', { count: selectedDraftIds.length }),
-            onClick: () => setShowBulkIssueConfirm(true),
-            icon: <Send className="w-4 h-4" />,
-            variant: 'primary',
-            disabled: selectedDraftIds.length === 0 || bulkIssueMutation.isPending,
-          },
-          {
-            id: 'send-reminder',
-            label: t('invoices.sendReminder'),
-            icon: <Clock className="w-4 h-4" />,
-            onRun: (rows) => setBulkReminderTarget(rows),
-          },
-          {
-            // Sprint F.5 — bulk PDF (ZIP) export.
-            // Selection set comes from row checkboxes (selected-all-filtered
-            // works because the data-table's `rowSelection` state is keyed
-            // by row id even across paged loads). The F.4 backend dedupes
-            // at the schema layer; we still pass an Array.from(new Set())
-            // here to keep "Download (N)" label honest.
-            id: 'pdf-export',
-            label: t('invoices.bulkPdfExport.menuLabel'),
-            icon: <Download className="w-4 h-4" />,
-            onRun: (rows) =>
-              setBulkPdfExportTarget(Array.from(new Set(rows.map((r) => r.id)))),
-          },
-        ]}
+        presets={STATUS_FILTER_OPTIONS}
+        activePreset={statusFilter}
+        onPresetChange={(v) => setStatusFilter(v as InvoiceStatusFilter)}
+        primaryFilter={
+          <Select
+            size="sm"
+            className="w-40"
+            value={gradeFilter}
+            onChange={(v) => setGradeFilter(v ?? '')}
+            options={gradeOptions}
+            buttonClassName="border-[rgb(var(--border-primary)/0.35)]"
+          />
+        }
+        selectionBar={selectionBar}
         exportOptions={{ filename: 'invoices', formats: ['csv'] }}
         emptyState={{
           icon: <FileText className="w-10 h-10 text-[rgb(var(--text-tertiary))] opacity-40" />,
@@ -624,16 +698,17 @@ export default function InvoicesPage() {
       />
 
       {/* Sprint F.5 — Bulk PDF Export Drawer (right-side sibling of
-          BulkSendInvoiceReminderDrawer + BulkSendReceiptsDrawer et al) */}
-      {bulkPdfExportTarget && (
-        <BulkPdfExportDrawer
-          open={!!bulkPdfExportTarget}
-          onClose={() => setBulkPdfExportTarget(null)}
-          onComplete={() => setRowSelection({})}
-          schoolId={schoolId ?? ''}
-          invoiceIds={bulkPdfExportTarget}
-        />
-      )}
+          BulkSendInvoiceReminderDrawer + BulkSendReceiptsDrawer et al).
+          Mounted unconditionally: the drawer keeps polling a backgrounded
+          export after close and toasts on completion — unmounting here
+          would kill the poll and break the runs-in-background promise. */}
+      <BulkPdfExportDrawer
+        open={!!bulkPdfExportTarget}
+        onClose={() => setBulkPdfExportTarget(null)}
+        onComplete={() => setRowSelection({})}
+        schoolId={schoolId ?? ''}
+        invoices={bulkPdfExportTarget ?? []}
+      />
 
       {/* Bulk Issue Confirmation Modal */}
       <AnimatePresence>

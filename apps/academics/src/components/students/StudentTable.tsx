@@ -9,8 +9,7 @@
  */
 
 import { useMemo, useState, type ReactNode } from 'react'
-import { User, MoreVertical, UserMinus, ExternalLink, Archive } from 'lucide-react'
-import { toast } from 'sonner'
+import { User, MoreVertical, UserMinus, ExternalLink } from 'lucide-react'
 import type { OnChangeFn, RowSelectionState } from '@tanstack/react-table'
 import {
   TanstackDataTable,
@@ -18,9 +17,9 @@ import {
   createSelectColumn,
   IdentityCell,
   type AttendanceTrendDirection,
-  type BulkAction,
   type ColumnDef,
   type DataTableColumnMeta,
+  type TablePreset,
 } from '@edforge/ui'
 import { getStudentAvatar } from '../../lib/avatar'
 import { gradeSort } from '@edforge/types'
@@ -58,13 +57,26 @@ interface StudentTableProps {
   /** Toolbar content: filter presets/search/selects (left) and Export (right). */
   toolbarStart?: ReactNode
   toolbarExtra?: ReactNode
+  /** Unified toolbar wiring (from useStudentsToolbar). */
+  searchPlaceholder?: string
+  searchValue?: string
+  onSearchChange?: (value: string) => void
+  presets?: TablePreset[]
+  activePreset?: string
+  onPresetChange?: (value: string) => void
+  primaryFilter?: ReactNode
+  overflowFilters?: ReactNode
+  overflowActiveCount?: number
+  onOverflowClear?: () => void
+  overflowLabel?: string
+  overflowClearLabel?: string
   hasMore?: boolean
   isFetchingMore?: boolean
   onLoadMore?: () => void
   serverTotalHint?: number
-  /** Override the internal toast-placeholder bulk actions. Pass from the route
-   *  when wiring a real bulk drawer (e.g. BulkArchiveStudentsModal). */
-  bulkActions?: BulkAction<StudentResponseDto>[]
+  /** ⑨ Selection Context Bar node — morphs the toolbar in place on selection.
+   *  Row ids are studentIds, so the page can map its selection state to rows. */
+  selectionBar?: ReactNode
   /** Controlled row selection — lift state into the page when an action
    *  needs to clear selection (e.g. after a bulk archive). */
   rowSelection?: RowSelectionState
@@ -156,11 +168,23 @@ export function StudentTable({
   canViewLocation = true,
   toolbarStart,
   toolbarExtra,
+  searchPlaceholder,
+  searchValue,
+  onSearchChange,
+  presets,
+  activePreset,
+  onPresetChange,
+  primaryFilter,
+  overflowFilters,
+  overflowActiveCount,
+  onOverflowClear,
+  overflowLabel,
+  overflowClearLabel,
   hasMore,
   isFetchingMore,
   onLoadMore,
   serverTotalHint,
-  bulkActions: bulkActionsProp,
+  selectionBar,
   rowSelection,
   onRowSelectionChange,
 }: StudentTableProps) {
@@ -273,30 +297,6 @@ export function StudentTable({
     ? { hasMore: Boolean(hasMore), isFetching: Boolean(isFetchingMore), onLoadMore, serverTotalHint }
     : undefined
 
-  // Fallback bulk actions used when the route doesn't pass `bulkActionsProp`.
-  // Only Archive is included — the per-row mutation already exists, so the
-  // route at /students upgrades this to a real `BulkArchiveStudentsModal`.
-  // Earlier `Message` and `Move section` placeholders were dropped: their
-  // backend slices (#221, #222) aren't built, and shipping toast placeholders
-  // for unsupported flows confuses operators. Re-add here once those land.
-  const defaultBulkActions = useMemo<BulkAction<StudentResponseDto>[]>(
-    () => [
-      {
-        id: 'archive',
-        label: t('tables.students.actions.archive'),
-        icon: <Archive className="w-4 h-4" />,
-        tone: 'critical',
-        onRun: (rows) => toast.info(t('common.comingSoon', {
-          action: t('tables.students.bulk.archive'),
-          countLabel: t('common.students', { count: rows.length }),
-        })),
-      },
-    ],
-    [t],
-  )
-
-  const bulkActions = bulkActionsProp ?? defaultBulkActions
-
   return (
     <TanstackDataTable
       columns={columns}
@@ -309,11 +309,24 @@ export function StudentTable({
       initialColumnVisibility={initialColumnVisibility}
       toolbarStart={toolbarStart}
       toolbarExtra={toolbarExtra}
+      searchPlaceholder={searchPlaceholder}
+      searchValue={searchValue}
+      onSearchChange={onSearchChange}
+      presets={presets}
+      activePreset={activePreset}
+      onPresetChange={onPresetChange}
+      primaryFilter={primaryFilter}
+      overflowFilters={overflowFilters}
+      overflowActiveCount={overflowActiveCount}
+      onOverflowClear={onOverflowClear}
+      overflowLabel={overflowLabel}
+      overflowClearLabel={overflowClearLabel}
       pagination={{ pageSize: 50 }}
       pageSizes={[25, 50, 100]}
       defaultSort={[{ id: 'fullName', desc: false }]}
       serverPagination={serverPagination}
-      bulkActions={bulkActions}
+      selectionBar={selectionBar}
+      getRowId={(s) => s.studentId}
       rowSelection={rowSelection}
       onRowSelectionChange={onRowSelectionChange}
       emptyState={{

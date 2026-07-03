@@ -7,6 +7,7 @@ import type {
   RowSelectionState,
   VisibilityState,
 } from '@tanstack/react-table'
+import type { TablePreset } from './TablePresetTabs'
 
 // ============================================================================
 // COLUMN META
@@ -69,6 +70,12 @@ export interface FacetedFilterConfig {
 // BULK ACTIONS
 // ============================================================================
 
+/**
+ * @deprecated Contract of the legacy floating bulk pill, which was removed
+ * from `DataTable` (issue #303a) — build a page-level `<SelectionContextBar/>`
+ * with `SelectionAction[]` and pass it via the `selectionBar` prop instead.
+ * Kept exported for one release for `TableBulkBar` and external consumers.
+ */
 export interface BulkAction<TData> {
   /** Stable id (used for React keys + analytics). Optional for back-compat. */
   id?: string
@@ -167,6 +174,7 @@ export interface DataTableLabels {
   compactDensityTitle: string
   viewOptions: string
   toggleColumns: string
+  moreFilters: string
   export: string
   exportFormat: (format: DataTableExportFormat) => string
   xlsxUnavailable: string
@@ -247,9 +255,44 @@ export interface DataTableProps<TData> {
 
   // -- Toolbar --
   searchPlaceholder?: string
+  /**
+   * Controlled search. Provide `onSearchChange` (and `searchValue`) to wire the
+   * toolbar search to a server-side store; omit for client-side global filter.
+   */
+  searchValue?: string
+  onSearchChange?: (value: string) => void
   /** Faceted filters. `facets` is the prototype name; `facetedFilters` kept for back-compat. */
   facetedFilters?: FacetedFilterConfig[]
   facets?: FacetedFilterConfig[]
+  /** Keep the first faceted filter inline and fold the rest into "More filters". */
+  foldFacets?: boolean
+  /** Docked status presets (with counts) for the unified toolbar. */
+  presets?: TablePreset[]
+  activePreset?: string
+  onPresetChange?: (value: string) => void
+  /** Primary facet control shown inline (e.g. a Grade/Subject/Type dropdown). Folds into the toolbar's built-in "More filters" overflow on narrow container widths. */
+  primaryFilter?: ReactNode
+  /**
+   * Secondary filter controls the toolbar places in its OWN built-in "More
+   * filters" overflow popover (preferred). The toolbar renders a single
+   * overflow trigger that also absorbs the primary filter when the pane is
+   * narrow — the responsive "move controls into More filters" behavior.
+   */
+  overflowFilters?: ReactNode
+  /** Active-secondary-filter count for the overflow badge. */
+  overflowActiveCount?: number
+  /** Clears the overflow filters (renders a "Clear" footer when active). */
+  onOverflowClear?: () => void
+  /** Overflow trigger label (i18n). Defaults to the "More filters" label. */
+  overflowLabel?: string
+  /** Overflow "Clear" footer label (i18n). */
+  overflowClearLabel?: string
+  /**
+   * @deprecated Pass `overflowFilters` instead so the toolbar owns a single,
+   * responsive overflow. A pre-built `<DataTableMoreFilters>` passed here is
+   * still rendered inline (back-compat) but won't participate in the fold.
+   */
+  moreFilters?: ReactNode
   /** Extra element rendered at the START (left) of the toolbar — e.g. filter chips. */
   toolbarStart?: ReactNode
   /** Extra element to render in the toolbar right cluster.
@@ -260,11 +303,18 @@ export interface DataTableProps<TData> {
   // -- Density --
   /** Initial density. Persisted state takes precedence when `tableId` is set. */
   density?: DataTableDensity
-  /** Show the toolbar density toggle. Defaults to true when bulkActions/facets exist. */
+  /** Show the toolbar density toggle. Defaults to true when facets/search/selectionBar exist. */
   enableDensityToggle?: boolean
 
   // -- Bulk Actions --
-  bulkActions?: BulkAction<TData>[]
+  /**
+   * ⑨ Selection Context Bar node (e.g. `<SelectionContextBar/>`). When provided
+   * and rows are selected, it swaps into the toolbar's footprint in place
+   * (zero layout shift). This is the only bulk surface — the legacy
+   * `bulkActions` floating pill was removed (issue #303a).
+   * Requires the toolbar to be rendered (any toolbar prop present).
+   */
+  selectionBar?: ReactNode
 
   // -- Export --
   /** Surfaces a built-in Export button in the toolbar right cluster. */

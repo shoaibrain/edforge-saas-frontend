@@ -1,6 +1,3 @@
-export { FinancePageHeader } from './FinancePageHeader'
-export type { FinancePageHeaderProps } from './FinancePageHeader'
-
 export { FinanceInfoBanner } from './FinanceInfoBanner'
 export type { FinanceInfoBannerProps } from './FinanceInfoBanner'
 
@@ -15,3 +12,9 @@ export type { FinanceFilterChipsProps } from './FinanceFilterChips'
 
 export { ExportCsvButton } from './ExportCsvButton'
 export type { ExportCsvButtonProps } from './ExportCsvButton'
+
+export { FinanceDrawerShell } from './FinanceDrawerShell'
+export type { FinanceDrawerShellProps } from './FinanceDrawerShell'
+
+export { ActionsMenu } from './ActionsMenu'
+export type { ActionsMenuProps, ActionsMenuItem } from './ActionsMenu'

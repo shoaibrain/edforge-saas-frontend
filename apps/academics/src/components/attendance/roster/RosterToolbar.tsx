@@ -30,6 +30,12 @@ export interface RosterToolbarProps {
   /** Non-null when a non-All filter is active: how many rows bulk will affect. */
   bulkScopeCount: number | null
   markedCount: number
+  /**
+   * Narrow-container mode (recording drawer): the search shares one line with
+   * the chips instead of taking a whole row, so the toolbar stays calm at
+   * drawer width instead of stacking three rows.
+   */
+  compact?: boolean
 }
 
 const CHIP_KEYS: RosterFilter[] = ['all', 'unmarked', 'absent', 'flagged', 'locked']
@@ -47,6 +53,7 @@ export function RosterToolbar({
   onClearAll,
   bulkScopeCount,
   markedCount,
+  compact = false,
 }: RosterToolbarProps) {
   const { t, formatNumber, formatCount } = useAcademicsI18n()
   const chips = CHIP_KEYS.filter((key) => key !== 'locked' || showLockedChip)
@@ -59,8 +66,8 @@ export function RosterToolbar({
 
   return (
     <div className="flex flex-shrink-0 flex-wrap items-center gap-x-3 gap-y-2 border-b border-border-secondary bg-surface-primary px-3 py-2.5">
-      {/* Search */}
-      <div className="w-full sm:w-56">
+      {/* Search — in compact mode it flexes on the same line as the chips. */}
+      <div className={compact ? 'min-w-36 flex-1' : 'w-full sm:w-56'}>
         <Input
           type="text"
           value={search}

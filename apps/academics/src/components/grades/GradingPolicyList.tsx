@@ -13,6 +13,7 @@ import {
   Scale,
 } from 'lucide-react'
 import { useResourcePermissions } from '@edforge/abac'
+import { AnimatedProgressBar } from '@edforge/ui'
 import type { LetterGradeEntryDto } from '@aibrains/shared-types'
 import { useGradingPolicies } from '../../hooks/useGrades'
 import { useCurrentAcademicYear } from '../../hooks/useSchool'
@@ -73,14 +74,28 @@ function PolicyCard({
           {t('gradesModule.policyList.gradeScale')}
         </p>
         <div className="flex flex-wrap gap-1">
-          {policy.letterGrades.map((entry: LetterGradeEntryDto, idx: number) => (
-            <span
-              key={`${entry.letter}-${idx}`}
-              className="px-2 py-0.5 text-xs font-medium bg-surface-hover rounded text-text-secondary"
-            >
-              {entry.letter}: {entry.minPercentage}-{entry.maxPercentage}%
-            </span>
-          ))}
+          {policy.letterGrades.map((entry: LetterGradeEntryDto, idx: number) => {
+            // Failing bands (incl. terminal fails like NG) get the danger tint;
+            // the range + GPA text carries the same info without relying on color.
+            const failing = !entry.isPassing || entry.isTerminalFail
+            return (
+              <span
+                key={`${entry.letter}-${idx}`}
+                className={`px-2 py-0.5 text-xs font-medium rounded ${
+                  failing
+                    ? 'text-[rgb(var(--state-danger-fg))] bg-[rgb(var(--state-danger-bg)/0.18)]'
+                    : 'bg-surface-hover text-text-secondary'
+                }`}
+              >
+                {t('gradesModule.policyList.gradeChip', {
+                  letter: entry.letter,
+                  min: formatNumber(entry.minPercentage),
+                  max: formatNumber(entry.maxPercentage),
+                  gpa: formatNumber(entry.gpaPoints),
+                })}
+              </span>
+            )
+          })}
         </div>
       </div>
 
@@ -94,27 +109,53 @@ function PolicyCard({
         <div className="space-y-1.5">
           {policy.categoryWeights.map((cat) => (
             <div key={cat.categoryId} className="flex items-center gap-2">
-              <div className="flex-1 h-2 bg-surface-hover rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-[rgb(var(--state-info-fg))] rounded-full"
-                  style={{ width: `${cat.weight}%` }}
+              <div className="flex-1">
+                <AnimatedProgressBar
+                  percentage={cat.weight}
+                  color="rgb(var(--state-info-fg))"
+                  label={t('gradesModule.policyList.weightAria', {
+                    category: cat.categoryName,
+                    weight: formatNumber(cat.weight),
+                  })}
+                  height={5}
                 />
               </div>
               <span className="text-xs text-text-secondary w-24 text-right">
-                {cat.categoryName} ({cat.weight}%)
+                {cat.categoryName} ({formatNumber(cat.weight)}%)
               </span>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="mt-3 pt-3 border-t border-border-secondary flex items-center justify-between">
-        <span className="text-xs text-text-tertiary">
-          {t('gradesModule.policyList.rounding', {
-            rule: t(`gradesModule.policyForm.rounding.${policy.roundingRule}`),
+      {/* Meta row: scheme / minimum passing / rounding */}
+      <div className="mt-3 pt-3 border-t border-border-secondary grid grid-cols-3 gap-2">
+        <PolicyMeta
+          label={t('gradesModule.policyList.scheme')}
+          value={t('gradesModule.policyList.schemeValue', {
+            scheme: t(`gradesModule.policyList.schemeType.${policy.schemeType}`),
+            scale: policy.gpaScale,
           })}
-        </span>
+        />
+        <PolicyMeta
+          label={t('gradesModule.policyList.minimumPassing')}
+          value={`${formatNumber(policy.minimumPassingGrade)}%`}
+        />
+        <PolicyMeta
+          label={t('gradesModule.policyList.roundingLabel')}
+          value={t(`gradesModule.policyForm.rounding.${policy.roundingRule}`)}
+        />
       </div>
+    </div>
+  )
+}
+
+/** Quiet label/value pair for the card's meta row. */
+function PolicyMeta({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="min-w-0">
+      <p className="text-xs text-text-tertiary truncate">{label}</p>
+      <p className="text-xs font-medium text-text-primary truncate">{value}</p>
     </div>
   )
 }

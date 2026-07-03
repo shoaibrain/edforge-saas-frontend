@@ -99,12 +99,14 @@
       "aboveTarget": "+{{diff}}% लक्ष्यभन्दा माथि",
       "belowThreshold": "सीमाभन्दा तल",
       "critical": "गम्भीर",
-      "dayAvg": "३०-दिन औसत {{avg}}%"
+      "dayAvg": "३०-दिन औसत {{avg}}%",
+      "region": "मुख्य मेट्रिक्स"
     },
     "alerts": {
       "unableToLoad": "अलर्टहरू लोड गर्न असमर्थ",
       "reviewBilling": "बिलिङ समीक्षा गर्नुहोस्",
-      "viewStudents": "विद्यार्थीहरू हेर्नुहोस्"
+      "viewStudents": "विद्यार्थीहरू हेर्नुहोस्",
+      "region": "अलर्टहरू"
     },
     "attendance": {
       "classroomAttendance": "कक्षा उपस्थिति",
@@ -182,6 +184,20 @@
       "unableToLoadAttendance": "उपस्थिति डाटा लोड गर्न असमर्थ",
       "unableToLoadDashboard": "ड्यासबोर्ड लोड गर्न असमर्थ",
       "somethingWentWrong": "केही गलत भयो"
+    },
+    "headerZone": {
+      "needAttention": "ध्यान चाहिन्छ",
+      "allClear": "सबै ठीक छ",
+      "minimize": "सानो बनाउनुहोस्",
+      "acknowledge": "बुझेँ",
+      "acknowledged": "स्वीकार गरियो",
+      "acknowledgedHint": "स्वीकार गरियो — उल्टाउन क्लिक गर्नुहोस्",
+      "dismiss": "हटाउनुहोस्",
+      "emptyTitle": "तपाईं पूर्ण रूपमा अद्यावधिक हुनुहुन्छ।",
+      "domains": {
+        "finance": "वित्त",
+        "attendance": "उपस्थिति"
+      }
     }
   }
 }

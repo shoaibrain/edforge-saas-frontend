@@ -5,7 +5,7 @@
  */
 
 export { CourseTable } from './CourseTable'
-export { CourseFilters } from './CourseFilters'
+export { useCourseToolbar, type CourseToolbar, type CoursePresetCounts } from './CourseFilters'
 export { CourseForm } from './CourseForm'
 export { CourseDrawer, type DrawerMode } from './CourseDrawer'
 export { GradeLevelsTab } from './GradeLevelsTab'

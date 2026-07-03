@@ -69,7 +69,14 @@ export { Accordion, type AccordionItem, type AccordionProps } from './components
 export { Container, containerVariants, type ContainerProps } from './components/layout/Container'
 export { Inline, inlineVariants, type InlineProps } from './components/layout/Inline'
 export { PageShell, pageShellVariants, type PageShellProps } from './components/layout/PageShell'
-export { PageHeader, type PageHeaderProps } from './components/layout/PageHeader'
+export {
+  PageHeader,
+  type PageHeaderProps,
+  type PageHeaderAction,
+  type PageHeaderTitledProps,
+  type PageHeaderPagebarProps,
+  type PageHeaderGreetingProps,
+} from './components/layout/PageHeader'
 export {
   ContextBar,
   ContextBarSep,
@@ -138,6 +145,8 @@ export {
   DataTableColumnHeader,
   DataTablePagination,
   DataTableToolbar,
+  ToolbarSearch,
+  type ToolbarSearchProps,
   DataTableFacetedFilter,
   DataTableViewOptions,
   DataTableRowActions,
@@ -146,6 +155,13 @@ export {
   DataTableEmpty,
   DataTableDensityToggle,
   DataTableExport,
+  TablePresetTabs,
+  TableBulkBar,
+  DataTableMoreFilters,
+  type TablePreset,
+  type TablePresetTabsProps,
+  type TableBulkBarProps,
+  type DataTableMoreFiltersProps,
   DEFAULT_DATA_TABLE_LABELS,
   resolveDataTableLabels,
   useDataTable,
@@ -202,6 +218,15 @@ export { ContentSection, type ContentSectionProps } from './components/ContentSe
 export { DashedDivider, type DashedDividerProps } from './components/DashedDivider'
 export { StatusPill, type StatusPillProps, type StatusPillVariant } from './components/StatusPill'
 export { StatStrip, type StatStripProps, type StatStripItem } from './components/StatStrip'
+export {
+  StatBand,
+  type StatBandProps,
+  type StatMetric,
+  type StatBandState,
+  type StatBandPillTone,
+  type IconName,
+} from './components/StatBand'
+export { Ring, type RingProps } from './components/Ring'
 export { GpaRing, type GpaRingProps, type GpaRingSize } from './components/GpaRing'
 export { CategoryBar, type CategoryBarProps } from './components/CategoryBar'
 export { CourseCard, type CourseCardProps, type CourseCardCategory } from './components/CourseCard'
@@ -224,6 +249,16 @@ export { StatCard, type StatCardProps } from './components/StatCard'
 export { AnimatedProgressBar, type AnimatedProgressBarProps } from './components/AnimatedProgressBar'
 export { WidgetErrorBoundaryV2 } from './components/SectionErrorBoundary'
 export { V2AlertItem, type V2AlertItemProps } from './components/V2AlertItem'
+
+// Dashboard recipes (⑤ WidgetCard — ④ AlertLane retired in favor of the
+// Header Zone AttentionCorner; DashboardLayout deleted with it)
+export {
+  WidgetCard,
+  WidgetGrid,
+  type WidgetCardProps,
+  type WidgetSpan,
+  type WidgetState,
+} from './components/dashboard'
 
 // V2 Hooks
 export { useCountUp, parseFormattedValue, formatAnimatedValue } from './hooks/useCountUp'
@@ -249,8 +284,26 @@ export {
   type QuickDrawerFooterProps,
 } from './components/QuickDrawer'
 
+// Header Zone (⑧ AttentionCorner · ⑨ SelectionContextBar)
+export {
+  AttentionCorner,
+  AttentionCornerPill,
+  AttentionCornerShade,
+  SelectionContextBar,
+  DEFAULT_ATTENTION_LABELS,
+  DEFAULT_SELECTION_LABELS,
+  type AttentionCornerProps,
+  type AttentionCornerLabels,
+  type Signal,
+  type SignalSeverity,
+  type SelectionContextBarProps,
+  type SelectionContextBarLabels,
+  type SelectionAction,
+} from './components/header-zone'
+
 // Hooks
 export { useFocusTrap } from './hooks/useFocusTrap'
+export { useSignalAcks } from './hooks/useSignalAcks'
 
 // MFE infrastructure
 export {

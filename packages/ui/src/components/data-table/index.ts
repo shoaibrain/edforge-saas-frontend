@@ -5,6 +5,7 @@ export { DataTable } from './DataTable'
 export { DataTableColumnHeader } from './DataTableColumnHeader'
 export { DataTablePagination } from './DataTablePagination'
 export { DataTableToolbar } from './DataTableToolbar'
+export { ToolbarSearch, type ToolbarSearchProps } from './ToolbarSearch'
 export { DataTableFacetedFilter } from './DataTableFacetedFilter'
 export { DataTableViewOptions } from './DataTableViewOptions'
 export { DataTableRowActions } from './DataTableRowActions'
@@ -12,6 +13,9 @@ export { DataTableSkeleton } from './DataTableSkeleton'
 export { DataTableEmpty } from './DataTableEmpty'
 export { DataTableDensityToggle } from './DataTableDensityToggle'
 export { DataTableExport } from './DataTableExport'
+export { TablePresetTabs, type TablePreset, type TablePresetTabsProps } from './TablePresetTabs'
+export { TableBulkBar, type TableBulkBarProps } from './TableBulkBar'
+export { DataTableMoreFilters, type DataTableMoreFiltersProps } from './DataTableMoreFilters'
 export {
   DEFAULT_DATA_TABLE_LABELS,
   resolveDataTableLabels,

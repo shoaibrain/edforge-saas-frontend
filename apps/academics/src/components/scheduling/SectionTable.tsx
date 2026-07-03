@@ -5,7 +5,7 @@
  * teacher assignments, and row actions.
  */
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type ReactNode } from 'react'
 import {
   CalendarDays,
   MoreVertical,
@@ -15,14 +15,12 @@ import {
   ToggleRight,
   Users,
 } from 'lucide-react'
-import { toast } from 'sonner'
 import type { OnChangeFn, RowSelectionState } from '@tanstack/react-table'
 import {
   TanstackDataTable,
   createActionsColumn,
   createSelectColumn,
   StatusBadge,
-  type BulkAction,
   type ColumnDef,
   type FacetedFilterConfig,
 } from '@edforge/ui'
@@ -46,13 +44,20 @@ interface SectionTableProps {
   onEditSection?: (section: SectionResponseDto) => void
   onToggleActive?: (section: SectionResponseDto) => void
   onViewRoster?: (section: SectionResponseDto) => void
-  /** Override the internal toast-placeholder bulk actions. Pass from the route
-   *  when wiring real bulk drawers (e.g. BulkSectionStatusModal). */
-  bulkActions?: BulkAction<SectionResponseDto>[]
+  /** ⑨ Selection Context Bar node — the page renders the bar in its own
+   *  toolbar and passes the same node here for the table view. */
+  selectionBar?: ReactNode
   /** Controlled row selection — lift state into the page when an action
    *  needs to clear selection (e.g. after a bulk activate/deactivate). */
   rowSelection?: RowSelectionState
   onRowSelectionChange?: OnChangeFn<RowSelectionState>
+  /** Suppress the DataTable's built-in toolbar (search · facets · columns ·
+   *  export · density) so a single page-level unified toolbar can drive both
+   *  the card grid and the table. */
+  hideToolbar?: boolean
+  /** Extra classes for the DataTable's outer container (e.g. to connect it to a
+   *  page-level toolbar above via `!rounded-t-none !border-t-0`). */
+  className?: string
 }
 
 // ============================================================================
@@ -196,9 +201,11 @@ export function SectionTable({
   onEditSection,
   onToggleActive,
   onViewRoster,
-  bulkActions: bulkActionsProp,
+  selectionBar,
   rowSelection,
   onRowSelectionChange,
+  hideToolbar = false,
+  className,
 }: SectionTableProps) {
   const { t, dataTableLabels } = useAcademicsI18n()
   const columns: ColumnDef<SectionResponseDto, unknown>[] = useMemo(
@@ -347,39 +354,9 @@ export function SectionTable({
     [courseOptions, periodOptions, t],
   )
 
-  // Fallback bulk actions used when the route doesn't pass `bulkActionsProp`.
-  // Activate / Deactivate are upgraded to a real `BulkSectionStatusModal`
-  // by the /classrooms route. The earlier `Send notification` entry was
-  // dropped — its backend slice (#225) isn't built, and shipping a toast
-  // placeholder for an unsupported flow confuses operators.
-  const defaultBulkActions = useMemo<BulkAction<SectionResponseDto>[]>(
-    () => [
-      {
-        id: 'activate',
-        label: t('tables.sections.actions.activate'),
-        icon: <ToggleRight className="w-4 h-4" />,
-        onRun: (rows) => toast.info(t('common.comingSoon', {
-          action: t('tables.sections.actions.activate'),
-          countLabel: t('common.sections', { count: rows.length }),
-        })),
-      },
-      {
-        id: 'deactivate',
-        label: t('tables.sections.actions.deactivate'),
-        icon: <ToggleLeft className="w-4 h-4" />,
-        onRun: (rows) => toast.info(t('common.comingSoon', {
-          action: t('tables.sections.actions.deactivate'),
-          countLabel: t('common.sections', { count: rows.length }),
-        })),
-      },
-    ],
-    [t],
-  )
-
-  const bulkActions = bulkActionsProp ?? defaultBulkActions
-
   return (
     <TanstackDataTable
+      className={className}
       columns={columns}
       data={sections}
       getRowId={(section) => section.sectionId}
@@ -387,13 +364,14 @@ export function SectionTable({
       tableId="academics.sections"
       enableSorting
       enableRowSelection
-      enableColumnVisibility
-      searchPlaceholder={t('tables.sections.search')}
-      facets={facets}
-      bulkActions={bulkActions}
+      enableColumnVisibility={!hideToolbar}
+      enableDensityToggle={hideToolbar ? false : undefined}
+      searchPlaceholder={hideToolbar ? undefined : t('tables.sections.search')}
+      facets={hideToolbar ? undefined : facets}
+      selectionBar={selectionBar}
       rowSelection={rowSelection}
       onRowSelectionChange={onRowSelectionChange}
-      exportOptions={{ filename: 'sections', formats: ['csv'] }}
+      exportOptions={hideToolbar ? undefined : { filename: 'sections', formats: ['csv'] }}
       defaultSort={[{ id: 'sectionNumber', desc: false }]}
       pagination={{ pageSize: 20 }}
       pageSizes={[10, 20, 50]}

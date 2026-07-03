@@ -84,6 +84,8 @@ interface StaffRosterCardProps {
   activeCount: number
   isLoading: boolean
   isError: boolean
+  /** Render only the roster + department coverage (no card chrome / title) for WidgetCard framing. */
+  bare?: boolean
 }
 
 function StaffSkeleton() {
@@ -108,6 +110,7 @@ export function StaffRosterCard({
   activeCount,
   isLoading,
   isError,
+  bare,
 }: StaffRosterCardProps) {
   const { t } = useTranslation('academics')
   const unknownLabel = t('moduleOverview.staffRoster.unknown')
@@ -131,22 +134,8 @@ export function StaffRosterCard({
 
   const displayStaff = staff.slice(0, 5)
 
-  return (
-    <div
-      // allow-presentation-style: card padding (18px) is off the 4px scale
-      className="rounded-xl border flex flex-col bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]"
-      style={{ padding: 18 }}
-    >
-      {/* Header */}
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-medium text-[rgb(var(--text-secondary))]">
-          {t('moduleOverview.staffRoster.title')}
-        </h3>
-        <span className="text-xs font-medium text-[rgb(var(--text-tertiary))]">
-          {t('moduleOverview.staffRoster.active', { count: activeCount })}
-        </span>
-      </div>
-
+  const body = (
+    <>
       {/* Staff list */}
       <div className="flex-1 min-h-0">
         {isLoading ? (
@@ -212,6 +201,27 @@ export function StaffRosterCard({
           </div>
         </>
       )}
+    </>
+  )
+
+  if (bare) return body
+
+  return (
+    <div
+      // allow-presentation-style: card padding (18px) is off the 4px scale
+      className="rounded-xl border flex flex-col bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.35)]"
+      style={{ padding: 18 }}
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-sm font-medium text-[rgb(var(--text-secondary))]">
+          {t('moduleOverview.staffRoster.title')}
+        </h3>
+        <span className="text-xs font-medium text-[rgb(var(--text-tertiary))]">
+          {t('moduleOverview.staffRoster.active', { count: activeCount })}
+        </span>
+      </div>
+      {body}
     </div>
   )
 }

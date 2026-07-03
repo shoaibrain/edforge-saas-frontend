@@ -1,21 +1,22 @@
 /// <reference types="@testing-library/jest-dom" />
 /**
- * AttendanceModule — entry-level gate tests (Sprint 1 / Ticket 1.3a)
+ * AttendanceModule — entry-level gate + single-dashboard smoke tests.
  *
- * Covers the gate that prevents AttendanceDashboard's permanent-skeleton
- * bug when a school has no current academic year. The downstream content
- * component is heavily stubbed because the gate is the only thing under
- * test here.
+ * Covers the current-AY gate (which prevents the permanent-skeleton bug when a
+ * school has no current academic year) and that, once past the gate, the
+ * redesigned single dashboard mounts and surfaces its load-failure state. The
+ * dashboard's per-widget maths are unit-tested separately in
+ * components/attendance/dashboard/__tests__/coverage.test.ts.
  */
 
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { render, cleanup } from '@testing-library/react'
 
 // ----------------------------------------------------------------------------
-// Mocks
+// Mocks — everything below the module is stubbed; the gate + dashboard shell are
+// the units under test.
 // ----------------------------------------------------------------------------
 
-// We only care about the gate. Stub everything below it.
 vi.mock('@edforge/abac', () => ({
   usePermission: () => true,
 }))
@@ -51,22 +52,19 @@ vi.mock('../../hooks', async () => {
   }
 })
 
+const mockUseAttendanceOverview = vi.fn()
 vi.mock('../../hooks/useAttendance', () => ({
-  useAttendanceSummary: () => ({ data: undefined, isLoading: false }),
-  useCalendarDate: () => ({ data: undefined }),
-  useAttendanceOverview: () => ({ data: undefined, isLoading: false }),
+  useAttendanceOverview: (args: unknown) => mockUseAttendanceOverview(args),
   useAttendancePolicy: () => ({ data: undefined }),
+  useAttendanceStudentTrends: () => ({ data: {} }),
+  useCalendarDate: () => ({ data: undefined }),
   usePresenceLocks: () => ({ data: undefined }),
   useExportIemisAttendance: () => ({ mutate: vi.fn(), isPending: false, data: undefined, isError: false }),
 }))
 
 vi.mock('../../hooks/useSectionAttendance', () => ({
   useSectionAttendanceRecords: () => ({ data: undefined }),
-  useRecordBulkSectionAttendance: () => ({
-    mutate: vi.fn(),
-    mutateAsync: vi.fn(),
-    isPending: false,
-  }),
+  useRecordBulkSectionAttendance: () => ({ mutate: vi.fn(), mutateAsync: vi.fn(), isPending: false }),
   useUpdateSectionAttendance: () => ({ mutate: vi.fn(), isPending: false }),
 }))
 
@@ -79,21 +77,46 @@ vi.mock('../../hooks/useOfflineAttendance', () => ({
   }),
 }))
 
-vi.mock('./dashboard', () => ({
-  AttendanceDashboard: () => <div data-testid="attendance-dashboard" />,
-}))
-
+// Keep the BS-calendar date UI + heavy roster grid out of these smoke tests.
 vi.mock('../../components/attendance/DateSelector', () => ({
   DateSelector: () => <div data-testid="date-selector" />,
 }))
 vi.mock('../../components/attendance/AttendanceGrid', () => ({
   AttendanceGrid: () => <div data-testid="attendance-grid" />,
 }))
+
 import { AttendanceModule } from './index'
+
+const OVERVIEW = {
+  todaySummary: { totalStudents: 100, totalRecorded: 50, attendanceRate: 87, byGradeLevel: {} },
+  sectionCompletion: {
+    totalSections: 2,
+    sectionsWithAttendance: 1,
+    sections: [
+      { sectionId: 's1', sectionNumber: 'A', courseName: 'Math', studentCount: 20, recordedCount: 20, isComplete: true },
+      { sectionId: 's2', sectionNumber: 'B', courseName: 'Science', studentCount: 20, recordedCount: 0, isComplete: false },
+    ],
+  },
+  trend: [{ date: '2026-06-01', attendanceRate: 90 }],
+  periodAverages: { last7Days: 88, last30Days: 85, academicYear: 60 },
+  atRiskStudents: [],
+  totalAtRiskCount: 0,
+  absenceBreakdown: { unexcused: 0, excused: 0, late: 0, halfDay: 0, remote: 0 },
+  dayOfWeekPattern: {},
+}
+
+const idleOverview = {
+  data: undefined,
+  isLoading: false,
+  isFetching: false,
+  error: undefined,
+  refetch: vi.fn(),
+}
 
 afterEach(() => {
   cleanup()
   vi.clearAllMocks()
+  mockUseAttendanceOverview.mockReturnValue(idleOverview)
 })
 
 describe('AttendanceModule — entry-level current-AY gate', () => {
@@ -106,19 +129,32 @@ describe('AttendanceModule — entry-level current-AY gate', () => {
 
   it('renders the shared empty state when no current academic year exists', () => {
     mockUseCurrentAcademicYear.mockReturnValue({ data: undefined, isLoading: false })
-    const { getByText, queryByTestId } = render(<AttendanceModule />)
+    const { getByText } = render(<AttendanceModule />)
     expect(getByText('No Academic Year Configured')).toBeInTheDocument()
-    // Dashboard never mounts → no permanent-skeleton bug.
-    expect(queryByTestId('attendance-dashboard')).toBeNull()
   })
+})
 
-  it('mounts the dashboard inner content when a current academic year exists', () => {
+describe('AttendanceModule — single dashboard', () => {
+  it('mounts the dashboard (Sections to record) when a current AY exists', () => {
     mockUseCurrentAcademicYear.mockReturnValue({
       data: { yearId: 'year-1', name: '2026-2027' },
       isLoading: false,
     })
-    const { getByTestId, queryByText } = render(<AttendanceModule />)
-    expect(getByTestId('attendance-dashboard')).toBeInTheDocument()
-    expect(queryByText('No Academic Year Configured')).toBeNull()
+    mockUseAttendanceOverview.mockReturnValue({ data: OVERVIEW, isLoading: false, error: undefined })
+    const { getByText, queryByText } = render(<AttendanceModule />)
+    // The operational core renders, and no legacy sub-tabs remain.
+    expect(getByText('Sections to record')).toBeInTheDocument()
+    expect(queryByText('Daily Entry')).toBeNull()
+    expect(queryByText('IEMIS Export')).toBeNull()
+  })
+
+  it('renders the load-failure card when the overview query errors', () => {
+    mockUseCurrentAcademicYear.mockReturnValue({
+      data: { yearId: 'year-1', name: '2026-2027' },
+      isLoading: false,
+    })
+    mockUseAttendanceOverview.mockReturnValue({ data: undefined, isLoading: false, error: new Error('boom') })
+    const { getByText } = render(<AttendanceModule />)
+    expect(getByText('Failed to load attendance overview')).toBeInTheDocument()
   })
 })
