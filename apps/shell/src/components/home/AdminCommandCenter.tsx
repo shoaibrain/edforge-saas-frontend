@@ -42,7 +42,6 @@ import {
   useFinanceSummary,
   useSectionAttendanceItems,
   useRecentActivityItems,
-  useHomeCacheInvalidation,
   useOnlineStatus,
   useDayChangeDetection,
   ATTENDANCE_THRESHOLD,
@@ -88,9 +87,6 @@ export function AdminCommandCenter({ schoolId }: AdminCommandCenterProps) {
 
   // ── Ticket 4.4: Day-change detection ───────────────────────────────────
   useDayChangeDetection()
-
-  // ── Cache invalidation on school switch (Ticket 1.5) ──────────────────
-  useHomeCacheInvalidation(schoolId)
 
   // ── Data fetching (parallel) ────────────────────────────────────────────
   const { data: academicYear } = useHomeAcademicYear(schoolId)

@@ -76,7 +76,8 @@ test.describe('Bulk archive students', () => {
     await page.getByRole('button', { name: 'Withdraw 2' }).click()
 
     // Both requests were attempted; aggregate reflects the one failure.
-    await expect(page.getByText('Withdrew 1; 1 failed')).toBeVisible()
+    // Toast renders twice (visible + aria-live) → scope with .first().
+    await expect(page.getByText('Withdrew 1; 1 failed').first()).toBeVisible()
     expect(captured.studentDeletes.sort()).toEqual(['stu-aarav', 'stu-bhavna'])
   })
 })

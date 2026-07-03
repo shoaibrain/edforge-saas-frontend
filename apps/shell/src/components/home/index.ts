@@ -2,9 +2,6 @@
  * Home Components Export
  */
 
-export { RecentlyVisitedCarousel } from './RecentlyVisitedCarousel'
-export { UpcomingEventsSection, type UpcomingEvent } from './UpcomingEventsSection'
-
 // Command Center components
 export { AdminCommandCenter } from './AdminCommandCenter'
 export { TeacherDashboard } from './TeacherDashboard'

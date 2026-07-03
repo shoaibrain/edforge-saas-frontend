@@ -626,7 +626,6 @@ export function ClassroomDetailPage() {
   const search = useSearch({ strict: false }) as { tab?: string; view?: string }
   const rawTab = search?.tab || 'overview'
   let resolvedTab = rawTab
-  if (resolvedTab === 'stream') resolvedTab = 'overview'
   if (resolvedTab === 'grades') resolvedTab = 'progress'
   if (resolvedTab === 'attendance') resolvedTab = 'progress'
   const activeTab: ClassroomDetailTab = VALID_TABS.has(resolvedTab) ? (resolvedTab as ClassroomDetailTab) : 'overview'

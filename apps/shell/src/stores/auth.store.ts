@@ -18,6 +18,7 @@ import {
   type CognitoIdTokenPayload,
   type SchoolAssignment,
 } from '@edforge/auth'
+import { useAppStore } from './app.store'
 
 // ============================================================================
 // TYPES
@@ -179,6 +180,9 @@ export const useAuthStore = create<AuthStore>()(
             tenantTier: null,
             error: null,
           })
+          // Next login must resolve the school fresh (default-school
+          // preference first) and never inherit this session's context
+          useAppStore.getState().clearSchoolContext()
           // Full page reload to clear all in-memory state and navigate to root
           window.location.href = '/'
         }
@@ -257,6 +261,7 @@ if (typeof window !== 'undefined') {
           tenantName: null,
           tenantTier: null,
         })
+        useAppStore.getState().clearSchoolContext()
         break
       case 'tokenRefresh_failure':
         // Token refresh failed, logout the user

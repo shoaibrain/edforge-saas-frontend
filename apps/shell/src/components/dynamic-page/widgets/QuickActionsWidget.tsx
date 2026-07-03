@@ -224,8 +224,9 @@ export function getQuickActionsForRole(roleCategory: RoleCategory | null): Quick
     case 'student': return STUDENT_QUICK_ACTIONS
     case 'parent': return PARENT_QUICK_ACTIONS
     case 'educator': return TEACHER_QUICK_ACTIONS
-    case 'administrator':
-    default: return ADMIN_QUICK_ACTIONS
+    case 'administrator': return ADMIN_QUICK_ACTIONS
+    // Fail closed: an unresolved role must never see privileged actions
+    default: return []
   }
 }
 

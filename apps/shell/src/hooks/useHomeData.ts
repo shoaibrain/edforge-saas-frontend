@@ -583,29 +583,6 @@ export function useSectionAttendanceItems(
 }
 
 // ============================================================================
-// HOOK: useHomeCacheInvalidation — Ticket 1.5
-// Invalidates all home queries when activeSchoolId changes
-// ============================================================================
-
-export function useHomeCacheInvalidation(activeSchoolId: string | null) {
-  const queryClient = useQueryClient()
-  const prevSchoolIdRef = useRef<string | null>(null)
-
-  useEffect(() => {
-    const prev = prevSchoolIdRef.current
-    prevSchoolIdRef.current = activeSchoolId
-
-    // Skip on initial mount
-    if (prev === null) return
-    // Skip if school hasn't changed
-    if (prev === activeSchoolId) return
-
-    debugLog('cache', `School changed: ${prev} → ${activeSchoolId}`)
-    queryClient.removeQueries({ queryKey: homeKeys.all })
-  }, [activeSchoolId, queryClient])
-}
-
-// ============================================================================
 // HOOK: useRecentActivityItems — Build activity feed from finance data
 // ============================================================================
 

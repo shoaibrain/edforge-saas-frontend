@@ -83,7 +83,8 @@ test.describe('Bulk section deactivate', () => {
     await expect(page.getByText(/12 students currently enrolled across these sections/)).toBeVisible()
     await page.getByRole('button', { name: 'Deactivate 2' }).click()
 
-    await expect(page.getByText('Deactivated 2 sections')).toBeVisible()
+    // Toast renders twice (visible + aria-live) → scope with .first().
+    await expect(page.getByText('Deactivated 2 sections').first()).toBeVisible()
     expect(captured.sectionPatches.map((p) => p.id).sort()).toEqual(['sec-e', 'sec-f'])
     expect(captured.sectionPatches.every((p) => p.isActive === false)).toBe(true)
   })

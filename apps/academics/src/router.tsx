@@ -195,7 +195,7 @@ const classroomDetailRoute = createRoute({
     component: ClassroomDetailPage,
     validateSearch: (search: Record<string, unknown>) => ({
         tab: z
-            .enum(['stream', 'classwork', 'people', 'progress', 'grades', 'attendance'])
+            .enum(['classwork', 'people', 'progress', 'grades', 'attendance'])
             .optional()
             .catch(undefined)
             .parse(search.tab),

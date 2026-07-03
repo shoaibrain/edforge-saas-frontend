@@ -16,7 +16,7 @@ import {
   type ErrorComponentProps,
 } from '@tanstack/react-router'
 import { Toaster } from 'sonner'
-import { ShellProvider } from './lib/shell-context'
+import { ShellProvider, useShell } from './lib/shell-context'
 import { AppShell } from './components/layout/AppShell'
 import { LoadingScreen } from './components/layout/LoadingScreen'
 import { NotFound } from './components/layout/NotFound'
@@ -166,8 +166,18 @@ function RootLayout() {
 // ============================================================================
 
 function ProtectedLayout() {
+  const { isBootstrapping, isAuthenticated } = useShell()
+  const isAuthLoading = useAuthStore((s) => s.isLoading)
   const { onboardingRequired, isLoading: onboardingLoading } = useOnboardingRequired()
   const navigate = useNavigate()
+
+  // The cookie-rehydrated isAuthenticated:true passes beforeLoad at t0;
+  // if the async Cognito check then fails, this is the recovery path.
+  useEffect(() => {
+    if (!isAuthLoading && !isAuthenticated) {
+      navigate({ to: '/login', replace: true })
+    }
+  }, [isAuthLoading, isAuthenticated, navigate])
 
   useEffect(() => {
     if (!onboardingLoading && onboardingRequired) {
@@ -175,7 +185,10 @@ function ProtectedLayout() {
     }
   }, [onboardingRequired, onboardingLoading, navigate])
 
-  if (onboardingLoading || onboardingRequired) {
+  // Hold the branded loader until identity, assignments, and the active
+  // school are resolved — role/school-derived UI (Sidebar, Header,
+  // dashboards) must never paint with unresolved context.
+  if (isBootstrapping || onboardingLoading || onboardingRequired) {
     return <LoadingScreen message="Loading..." />
   }
 

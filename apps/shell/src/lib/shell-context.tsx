@@ -10,16 +10,17 @@
  * Integrates with AWS Cognito and backend APIs for real data.
  */
 
-import { createContext, useContext, useEffect, useMemo, useRef, type ReactNode } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useQuery, useQueryClient, useIsFetching } from '@tanstack/react-query'
 import { ABACContext, type ABACContextValue } from '@edforge/abac'
 import type { UserIdentity, Tenant, School, SchoolYear, WorkspaceSettings, SchoolConfiguration } from '@edforge/types'
 import type { ResolvedSettings } from '@edforge/config/resolved-settings'
 import { useAuthStore, type AuthStore } from '../stores/auth.store'
-import { useAppStore } from '../stores/app.store'
+import { useAppStore, getSchoolSessionOwner, setSchoolSessionOwner } from '../stores/app.store'
 import { tenantService } from '../services/tenant.service'
 import { useResolvedSettings } from '../hooks/useResolvedSettings'
 import { broadcastSchoolChange } from '@edforge/config/school-context-channel'
+import { queryMatchesSchool } from './school-queries'
 
 // ============================================================================
 // SHELL CONTEXT TYPES
@@ -30,6 +31,13 @@ export interface ShellContextValue {
   user: UserIdentity | null
   isAuthenticated: boolean
   isLoading: boolean
+  /**
+   * True until identity, assignments, schools, and the active-school
+   * resolution have all settled. ProtectedLayout holds a full-screen
+   * loading state while this is true so role/school-derived UI never
+   * paints with unresolved context.
+   */
+  isBootstrapping: boolean
   logout: () => Promise<void>
 
   // Tenant
@@ -49,6 +57,7 @@ export interface ShellContextValue {
 
   // Workspace Settings
   workspaceSettings: WorkspaceSettings['regional'] | null
+  workspaceSettingsError: boolean
   workspaceIsLocked: boolean
   workspaceLockReason: string | null
   workspaceLockHolders: NonNullable<WorkspaceSettings['lockHolders']>
@@ -118,7 +127,11 @@ export function ShellProvider({ children }: ShellProviderProps) {
   // ============================================================================
 
   // Fetch user profile with school assignments
-  const { data: userProfile, isLoading: isUserProfileLoading } = useQuery({
+  const {
+    data: userProfile,
+    isLoading: isUserProfileLoading,
+    isError: isUserProfileError,
+  } = useQuery({
     queryKey: ['userProfile'],
     queryFn: () => tenantService.getCurrentUser(),
     enabled: isAuthenticated && !!user,
@@ -130,9 +143,15 @@ export function ShellProvider({ children }: ShellProviderProps) {
   const lastSyncedAssignmentsRef = useRef<string | null>(null)
   const lastSyncedNameRef = useRef<string | null>(null)
 
+  // True once the fetched profile has been merged into the auth store —
+  // the bootstrap gate must not open on the paint where /users/me has
+  // resolved but user.assignments is still the empty login placeholder.
+  const [profileSynced, setProfileSynced] = useState(false)
+
   // Update user with fetched profile — merges name fields + assignments
   useEffect(() => {
     if (!userProfile || !user) return
+    setProfileSynced(true)
 
     const assignmentsKey = userProfile.assignments
       ? JSON.stringify(userProfile.assignments.map(a => `${a.schoolId}:${a.role}`).sort())
@@ -211,7 +230,7 @@ export function ShellProvider({ children }: ShellProviderProps) {
   // fall back to SYSTEM_DEFAULTS via useResolvedSettings, which is correct behavior.
   // School-level configuration (fetched via a separate non-admin endpoint) provides
   // school-specific overrides for currency, timezone, calendar system, etc.
-  const { data: workspaceSettingsData } = useQuery({
+  const { data: workspaceSettingsData, isError: isWorkspaceSettingsError } = useQuery({
     queryKey: ['workspaceSettings', user?.tenantId],
     queryFn: () => tenantService.getWorkspaceSettings(user!.tenantId),
     enabled: isAuthenticated && !!user?.tenantId && user?.globalRole === 'TenantAdmin',
@@ -285,26 +304,63 @@ export function ShellProvider({ children }: ShellProviderProps) {
     )
   }, [activeSchoolId, activeSchool?.status, resolvedSettings, tenantId, tenantArchetype, tenantCountry])
 
-  // Consolidated auto-select: restore from localStorage or pick first available
-  useEffect(() => {
-    if (!user || availableSchools.length === 0) return
-    if (activeSchoolId && availableSchools.some((s) => s.id === activeSchoolId)) return
+  // Per-tab session owner, mirrored into React state so setting it
+  // re-renders (sessionStorage itself is not reactive).
+  const [sessionOwner, setSessionOwner] = useState<string | null>(getSchoolSessionOwner)
 
-    // Try to restore user's last-used school
-    const savedId = localStorage.getItem(`edforge-active-school-${user.id}`)
-    if (savedId && availableSchools.some((s) => s.id === savedId)) {
-      setActiveSchoolId(savedId)
-    } else {
-      setActiveSchoolId(availableSchools[0].id)
-    }
-  }, [user, activeSchoolId, availableSchools, setActiveSchoolId])
-
-  // Persist school selection to localStorage for restore on next login
+  // Active-school resolution.
+  //
+  // Same-tab reload (session marker matches this user + persisted school
+  // still valid): keep the working context. Anything else — fresh login,
+  // new tab, logout→login, another user's residue — resolves fresh:
+  //   server default (Settings → Preferences) → last explicitly-chosen
+  //   school → first of the (name-sorted) list.
+  //
+  // Invariant: whenever availableSchools is non-empty and the context is
+  // fresh, this effect sets a valid school in the same pass — the
+  // bootstrap gate (schoolPending) waits on it.
   useEffect(() => {
-    if (activeSchoolId && user?.id) {
-      localStorage.setItem(`edforge-active-school-${user.id}`, activeSchoolId)
+    if (!user || isUserProfileLoading || isSchoolsLoading) return
+    if (availableSchools.length === 0) return
+
+    const isValid = (id: string | null | undefined): id is string =>
+      !!id && availableSchools.some((s) => s.id === id)
+
+    if (getSchoolSessionOwner() === user.id && isValid(activeSchoolId)) {
+      setSessionOwner(user.id)
+      return
     }
-  }, [activeSchoolId, user?.id])
+
+    const preferredId = userProfile?.defaultSchoolId
+    const lastUsed = localStorage.getItem(`edforge-active-school-${user.id}`)
+    const next = isValid(preferredId)
+      ? preferredId
+      : isValid(lastUsed)
+        ? lastUsed
+        : availableSchools[0].id
+
+    setSchoolSessionOwner(user.id)
+    setSessionOwner(user.id)
+    setActiveSchoolId(next, { silent: true })
+  }, [user, activeSchoolId, availableSchools, isUserProfileLoading, isSchoolsLoading, userProfile, setActiveSchoolId])
+
+  // Explicit school switch: the only path that records "last used".
+  // Auto-select must not write it, or the default would overwrite the
+  // user's actual last choice.
+  const setActiveSchool = useCallback(
+    (schoolId: string) => {
+      const userId = useAuthStore.getState().user?.id
+      if (userId) {
+        try {
+          localStorage.setItem(`edforge-active-school-${userId}`, schoolId)
+        } catch {
+          // ignore
+        }
+      }
+      setActiveSchoolId(schoolId)
+    },
+    [setActiveSchoolId]
+  )
 
   // Sync activeSchoolStatus to cookie store so MFEs can read it
   useEffect(() => {
@@ -326,40 +382,56 @@ export function ShellProvider({ children }: ShellProviderProps) {
     // Skip on initial mount or when school hasn't actually changed
     if (prevId === activeSchoolId) return
 
-    // Deep-search predicate: finds schoolId at any position in the query key
-    // array, or inside a filter/params object.
-    const matchesSchool = (schoolId: string) => (query: { queryKey: readonly unknown[] }) => {
-      return query.queryKey.some((segment) => {
-        if (typeof segment === 'string' && segment === schoolId) return true
-        if (typeof segment === 'object' && segment !== null) {
-          const obj = segment as Record<string, unknown>
-          if (obj.schoolId === schoolId) return true
-        }
-        return false
-      })
-    }
-
     // 1. Cancel any in-flight requests for the old school
     if (prevId) {
-      queryClient.cancelQueries({ predicate: matchesSchool(prevId) })
+      queryClient.cancelQueries({ predicate: queryMatchesSchool(prevId) })
       // 2. Remove stale cache for the old school
-      queryClient.removeQueries({ predicate: matchesSchool(prevId) })
+      queryClient.removeQueries({ predicate: queryMatchesSchool(prevId) })
     }
 
     // 3. If switching to a real school, invalidate existing cache (force refetch)
     if (activeSchoolId) {
-      queryClient.invalidateQueries({ predicate: matchesSchool(activeSchoolId) })
+      queryClient.invalidateQueries({ predicate: queryMatchesSchool(activeSchoolId) })
     }
   }, [activeSchoolId, queryClient])
 
-  // Clear the transition flag once all queries have settled
-  const fetchingCount = useIsFetching()
+  // ============================================================================
+  // TRANSITION SETTLE SIGNAL
+  // Clear the transition flag when the new school's queries settle — scoped
+  // to school-matching queries only, so an unrelated slow query elsewhere
+  // can't hold the overlay open. A fetch must have been OBSERVED before a
+  // zero count clears (guards the paint before invalidation-triggered
+  // refetches register); if none appears shortly after the switch, there is
+  // nothing to wait for and the overlay clears immediately.
+  // ============================================================================
+
+  const isSchoolTransitioning = useAppStore((s) => s.isSchoolTransitioning)
+  const schoolFetchCount = useIsFetching({
+    predicate: activeSchoolId ? queryMatchesSchool(activeSchoolId) : () => false,
+  })
+  const hasSeenSchoolFetchRef = useRef(false)
 
   useEffect(() => {
-    if (fetchingCount === 0) {
+    if (!isSchoolTransitioning) return
+    hasSeenSchoolFetchRef.current = false
+    const timer = setTimeout(() => {
+      if (!hasSeenSchoolFetchRef.current) {
+        setSchoolTransitioning(false)
+      }
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [isSchoolTransitioning, setSchoolTransitioning])
+
+  useEffect(() => {
+    if (!isSchoolTransitioning) return
+    if (schoolFetchCount > 0) {
+      hasSeenSchoolFetchRef.current = true
+      return
+    }
+    if (hasSeenSchoolFetchRef.current) {
       setSchoolTransitioning(false)
     }
-  }, [fetchingCount, setSchoolTransitioning])
+  }, [schoolFetchCount, isSchoolTransitioning, setSchoolTransitioning])
 
   // ============================================================================
   // NAVIGATION
@@ -376,6 +448,25 @@ export function ShellProvider({ children }: ShellProviderProps) {
 
   const isLoading = isAuthLoading || (isAuthenticated && (isUserProfileLoading || isTenantLoading || isSchoolsLoading))
 
+  // Bootstrap readiness — see ShellContextValue.isBootstrapping.
+  // profileSettled: assignments merged into the auth store (or the profile
+  // fetch failed — degrade rather than hang).
+  // schoolResolved: this tab's session owner resolved a school that is
+  // still valid; anything else keeps the gate up through re-resolution.
+  // A user with zero available schools is ready with activeSchoolId null.
+  // The tenant query is retry:false, so errors settle isTenantLoading and
+  // the gate never hangs on it (403 for non-admins is expected).
+  const profileSettled = profileSynced || isUserProfileError
+  const schoolResolved =
+    !!activeSchoolId &&
+    availableSchools.some((s) => s.id === activeSchoolId) &&
+    sessionOwner === user?.id
+  const schoolPending = availableSchools.length > 0 && !schoolResolved
+  const isBootstrapping =
+    isAuthLoading ||
+    (isAuthenticated &&
+      (isUserProfileLoading || !profileSettled || isSchoolsLoading || isTenantLoading || schoolPending))
+
   // ============================================================================
   // CONTEXT VALUES
   // ============================================================================
@@ -385,6 +476,7 @@ export function ShellProvider({ children }: ShellProviderProps) {
       user,
       isAuthenticated,
       isLoading,
+      isBootstrapping,
       logout,
       tenant: effectiveTenant,
       tenantId: user?.tenantId ?? effectiveTenant?.id ?? null,
@@ -392,10 +484,11 @@ export function ShellProvider({ children }: ShellProviderProps) {
       tenantTier,
       activeSchoolId,
       activeSchool,
-      setActiveSchool: setActiveSchoolId,
+      setActiveSchool,
       availableSchools,
       activeSchoolYear: effectiveSchoolYear,
       workspaceSettings: effectiveWorkspaceSettings,
+      workspaceSettingsError: isWorkspaceSettingsError,
       workspaceIsLocked: workspaceSettingsData?.isLocked ?? false,
       workspaceLockReason: workspaceSettingsData?.lockReason ?? null,
       workspaceLockHolders: effectiveLockHolders,
@@ -413,16 +506,18 @@ export function ShellProvider({ children }: ShellProviderProps) {
       user,
       isAuthenticated,
       isLoading,
+      isBootstrapping,
       logout,
       effectiveTenant,
       tenantName,
       tenantTier,
       activeSchoolId,
       activeSchool,
-      setActiveSchoolId,
+      setActiveSchool,
       availableSchools,
       effectiveSchoolYear,
       effectiveWorkspaceSettings,
+      isWorkspaceSettingsError,
       workspaceSettingsData?.isLocked,
       workspaceSettingsData?.lockReason,
       effectiveLockHolders,
