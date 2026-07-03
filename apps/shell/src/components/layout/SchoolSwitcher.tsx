@@ -23,6 +23,7 @@ import {
 import { useAppStore } from '../../stores/app.store'
 import { useAuthStore } from '../../stores/auth.store'
 import { tenantService } from '../../services/tenant.service'
+import { useShell } from '../../lib/shell-context'
 import { getRoleCategory } from '@edforge/types'
 import type { School as SchoolType } from '@edforge/types'
 import { getSchoolAvatar } from '../../lib/avatar'
@@ -32,7 +33,8 @@ export function SchoolSwitcher() {
   const navigate = useNavigate()
   const user = useAuthStore((s) => s.user)
   const activeSchoolId = useAppStore((s) => s.activeSchoolId)
-  const setActiveSchoolId = useAppStore((s) => s.setActiveSchoolId)
+  // Explicit switches go through the shell wrapper so "last used" is recorded
+  const { setActiveSchool } = useShell()
   const isTransitioning = useAppStore((s) => s.isSchoolTransitioning)
   const [query, setQuery] = useState('')
 
@@ -120,11 +122,15 @@ export function SchoolSwitcher() {
   }
 
   // ── LOADING ──
-  if (isLoading) {
+  // Also covers the window where schools have loaded but the active school
+  // is still resolving (auto-select pending or mid-session invalidation) —
+  // never show a "Select School" empty label for a resolvable state.
+  if (isLoading || (schoolsArray.length > 0 && !activeSchool)) {
     return (
-      <div className="flex items-center gap-2 h-10 px-2">
-        <div className="w-8 h-8 rounded-lg bg-[rgb(var(--background-tertiary))] animate-pulse flex-shrink-0" />
-        <div className="space-y-1">
+      <div className="flex items-center gap-2 h-10 px-2" role="status" aria-live="polite">
+        <span className="sr-only">Loading schools</span>
+        <div aria-hidden="true" className="w-8 h-8 rounded-lg bg-[rgb(var(--background-tertiary))] animate-pulse flex-shrink-0" />
+        <div aria-hidden="true" className="space-y-1">
           <div className="h-3 w-20 bg-[rgb(var(--background-tertiary))] rounded animate-pulse" />
           <div className="h-2 w-12 bg-[rgb(var(--background-tertiary))] rounded animate-pulse" />
         </div>
@@ -142,6 +148,7 @@ export function SchoolSwitcher() {
             <input
               type="text"
               placeholder="Find School..."
+              aria-label="Find school"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-2.5 text-sm bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))] rounded-xl text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.50)] focus:border-[rgb(var(--border-focus))] transition-all"
@@ -172,7 +179,7 @@ export function SchoolSwitcher() {
                     disabled={isTransitioning}
                     onClick={() => {
                       if (isTransitioning) return
-                      setActiveSchoolId(school.id)
+                      setActiveSchool(school.id)
                       setQuery('')
                     }}
                     className={cn(
