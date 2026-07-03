@@ -405,17 +405,23 @@ Each page = **one atomic ticket** applying the T0.5 recipe:
 
 ## Sprint 6 — Shell fan-out (home, dashboards, settings, widgets, landing; portals deferred)
 
-- **T6.1 Authenticated Home** (`components/layout/pages/HomePage.tsx`) — header + bands.
+- **T6.1 Authenticated Home** (`pages/HomePage.tsx` — the routed home; the old
+  `components/layout/pages/HomePage.tsx` mock dashboard was unrouted residue and has been **deleted**
+  in the school-context/loading-states cleanup) — header + bands.
 - **T6.2 Admin/Teacher/Student dashboards** (`home/AdminCommandCenter.tsx`, `home/TeacherDashboard.tsx`,
   `home/StudentDashboard.tsx`, `home/HomeStatCard.tsx`) — bands + header.
-- **T6.3 Dynamic-page widgets** (`components/dynamic-page/widgets/*` — Carousel/QuickActions/UpcomingEvents/
-  WelcomeTip) — align widget presentation to shared primitives.
-- **T6.4 Placeholder pages** (`components/layout/pages/*Placeholder.tsx`) — shared empty/placeholder recipe.
+- **T6.3 Dynamic-page widgets** (`components/dynamic-page/widgets/*`) — align widget presentation to
+  shared primitives. Scope shrunk: only `QuickActionsWidget` remains — Carousel/UpcomingEvents/WelcomeTip
+  were never rendered by any live page config and were **deleted** (with their `widget-registry.ts`
+  definitions and the `module-overview` page type) in the school-context/loading-states cleanup.
+- **T6.4 Placeholder pages** — **obsolete**: `components/layout/pages/*Placeholder.tsx` were unimported
+  residue and have been deleted; no migration needed.
 - **T6.5 Settings sweep** (`pages/settings/*`, `pages/settings/tabs/*`, `components/settings/*`) — settings
   recipe; this path already errors `prefer-ui-select`/`no-local-form-style-constants` — keep green. (Multiple
   atomic sub-tickets, one per settings tab group, to respect the ~15-file cap.)
 - **T6.6 Onboarding** (`components/onboarding/*`) — wizard recipe.
-- **T6.7 Shell `ModuleOverviewPage`** (`packages/shell-components`, `apps/shell`) — shared overview recipe.
+- **T6.7 Shell `ModuleOverviewPage`** — **obsolete**: the shell copy (`components/layout/ModuleOverviewPage.tsx`)
+  was unimported residue and has been deleted; MFE-local ModuleOverviewPage files are unaffected.
 - **T6.8 Landing v2** (`components/landing-v2/*`) — align presentation, respecting its distinct marketing tokens.
 - **T6.9 Portals** (`pages/parent-portal/*`, `student-portal/*`, `portal-shared/*`) — **recorded deferral**
   per existing eslint policy: confirm still intentionally deferred (they still consume `StatStrip`), record the

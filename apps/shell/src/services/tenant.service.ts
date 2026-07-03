@@ -44,6 +44,7 @@ export interface UserProfile {
   tenantName: string
   globalRole: 'TenantAdmin' | 'StandardUser'
   assignments: SchoolAssignment[]
+  defaultSchoolId?: string
   createdAt: string
   updatedAt: string
 }
@@ -141,7 +142,11 @@ export interface SchoolListResponse {
  */
 export async function getSchools(tenantId: string): Promise<School[]> {
   const response = await apiGet<SchoolResponse>(`/schools`, { tenantId })
-  return (response.items || []).map(item => mapApiSchool(item, tenantId))
+  // The API returns DynamoDB sort-key (UUID) order — sort by name so
+  // "first school" fallbacks and the switcher list are deterministic.
+  return (response.items || [])
+    .map(item => mapApiSchool(item, tenantId))
+    .sort((a, b) => a.name.localeCompare(b.name))
 }
 
 /**

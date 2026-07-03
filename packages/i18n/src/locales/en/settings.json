@@ -8,8 +8,7 @@
       "paymentGateways": "Payment Gateways"
     },
     "fallbackName": "Your Name",
-    "fallbackEmail": "your@email.com",
-    "searchComingSoon": "Search settings (coming soon)"
+    "fallbackEmail": "your@email.com"
   },
   "account": {
     "title": "Account",

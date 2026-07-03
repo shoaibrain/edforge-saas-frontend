@@ -4,6 +4,7 @@
  * Provides animated placeholder content while data is loading.
  */
 
+import type { ReactNode } from 'react'
 import { cn } from '../utils'
 
 interface SkeletonProps {
@@ -11,16 +12,39 @@ interface SkeletonProps {
 }
 
 /**
- * Base skeleton element with shimmer animation
+ * Base skeleton element with shimmer animation.
+ * Hidden from assistive tech — the container announcing the loading state
+ * is SkeletonStatus (or a role="status" wrapper at the call site).
  */
 export function Skeleton({ className }: SkeletonProps) {
   return (
     <div
+      aria-hidden="true"
       className={cn(
         'animate-pulse rounded-lg bg-[rgb(var(--background-tertiary))]',
         className
       )}
     />
+  )
+}
+
+interface SkeletonStatusProps {
+  label?: string
+  className?: string
+  children: ReactNode
+}
+
+/**
+ * Accessible wrapper for a group of skeleton placeholders: announces a
+ * polite loading status to screen readers while the visual shimmer
+ * (aria-hidden) carries the sighted affordance.
+ */
+export function SkeletonStatus({ label = 'Loading', className, children }: SkeletonStatusProps) {
+  return (
+    <div role="status" aria-live="polite" aria-busy="true" className={className}>
+      <span className="sr-only">{label}</span>
+      {children}
+    </div>
   )
 }
 

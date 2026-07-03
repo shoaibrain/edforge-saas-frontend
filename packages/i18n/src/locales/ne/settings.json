@@ -8,8 +8,7 @@
       "paymentGateways": "भुक्तानी गेटवेहरू"
     },
     "fallbackName": "तपाईंको नाम",
-    "fallbackEmail": "your@email.com",
-    "searchComingSoon": "सेटिङ्हरू खोज्नुहोस् (छिट्टै आउँदै)"
+    "fallbackEmail": "your@email.com"
   },
   "account": {
     "title": "खाता",

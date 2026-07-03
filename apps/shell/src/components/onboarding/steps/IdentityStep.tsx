@@ -100,14 +100,11 @@ export function IdentityStep({ data, setData, onNext, onSkip }: OnboardingStepPr
 
       {/* Avatar */}
       <div className="flex flex-col items-center mb-8">
-        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[rgb(var(--action-primary-bg))]/20 to-[rgb(var(--action-primary-bg-hover))]/20 border-2 border-[rgb(var(--border-primary))] flex items-center justify-center mb-2">
+        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[rgb(var(--action-primary-bg))]/20 to-[rgb(var(--action-primary-bg-hover))]/20 border-2 border-[rgb(var(--border-primary))] flex items-center justify-center">
           <span className="text-2xl font-bold text-[rgb(var(--action-secondary-fg))] ">
             {initials || '?'}
           </span>
         </div>
-        <span className="text-xs px-2 py-0.5 rounded-full bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]">
-          Photo upload coming soon
-        </span>
       </div>
 
       {/* Fields */}
