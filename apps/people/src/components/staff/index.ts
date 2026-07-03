@@ -5,6 +5,7 @@
 export { CreateUserModal, type CreateUserModalProps } from './CreateUserModal'
 export { EditStaffModal, type EditStaffModalProps } from './EditStaffModal'
 export { DeleteConfirmDialog, type DeleteConfirmDialogProps } from './DeleteConfirmDialog'
+export { BulkDeleteStaffModal, type BulkDeleteStaffModalProps } from './BulkDeleteStaffModal'
 export { StaffWizard } from './wizard'
 export { StaffTable } from './StaffTable'
 export { StaffDrawer } from './StaffDrawer'
