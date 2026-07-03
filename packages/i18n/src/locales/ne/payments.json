@@ -1061,7 +1061,13 @@
       "format": {
         "label": "आउटपुट ढाँचा",
         "overCap": "बढीमा {{limit}} कागजात"
-      }
+      },
+      "whatsInside_one": "भित्र के छ · {{count}} फाइल",
+      "whatsInside_other": "भित्र के छ · {{count}} फाइल",
+      "bundleMeta_one": "{{count}} PDF",
+      "bundleMeta_other": "{{count}} PDF",
+      "morePdfs_one": "+ थप {{count}} PDF",
+      "morePdfs_other": "+ थप {{count}} PDF"
     }
   },
   "financeLayout": {

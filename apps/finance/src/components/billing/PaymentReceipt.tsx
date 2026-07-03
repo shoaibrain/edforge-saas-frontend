@@ -153,10 +153,10 @@ export function PaymentReceipt({ receipt, onBack, invoiceId }: PaymentReceiptPro
           <div className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-full border-2 border-[#0E9F6E] text-[#0E9F6E]">
             <Check className="h-5 w-5" strokeWidth={2.4} />
           </div>
-          <h2 className="text-center font-display text-2xl font-medium tracking-tight">
+          <h2 className="text-center font-display text-2xl font-medium tracking-tight !text-[#262B33]">
             {t('receipt.title')}
           </h2>
-          <p className="mt-1.5 text-center font-mono text-xs text-[#6B7280]">
+          <p className="mt-1.5 text-center font-mono text-xs !text-[#6B7280]">
             {t('receipt.receiptNumber')}
             {receipt.receiptNumber}
           </p>
@@ -165,9 +165,9 @@ export function PaymentReceipt({ receipt, onBack, invoiceId }: PaymentReceiptPro
 
           {/* School */}
           <div className="text-center">
-            <p className="font-display text-lg font-medium">{receipt.schoolName}</p>
+            <p className="font-display text-lg font-medium !text-[#262B33]">{receipt.schoolName}</p>
             {(receipt.schoolAddress || receipt.taxBreakdown.panNumber) && (
-              <p className="mt-1 text-xs text-[#6B7280]">
+              <p className="mt-1 text-xs !text-[#6B7280]">
                 {[
                   receipt.schoolAddress,
                   receipt.taxBreakdown.panNumber
@@ -253,7 +253,7 @@ export function PaymentReceipt({ receipt, onBack, invoiceId }: PaymentReceiptPro
           </div>
 
           {/* Amount in words */}
-          <p className="mt-3.5 rounded-md bg-[#F3EEE1] px-3 py-2.5 text-xs text-[#6B7280]">
+          <p className="mt-3.5 rounded-md bg-[#F3EEE1] px-3 py-2.5 text-xs !text-[#6B7280]">
             {t('receiptDetail.amountInWords')}{' '}
             <b className="font-semibold text-[#262B33]">{amountInWords(receipt.grandTotal)}</b>
           </p>
@@ -261,14 +261,14 @@ export function PaymentReceipt({ receipt, onBack, invoiceId }: PaymentReceiptPro
           {/* Refund block — dormant until the API carries refund fields */}
           {refund && (
             <div className="mt-3.5 rounded-lg border border-[#F3C6C6] bg-[#FBEDED] px-3.5 py-3 text-xs text-[#8C2F2F]">
-              <p className="mb-1 flex items-center gap-1.5 font-semibold">
+              <p className="mb-1 flex items-center gap-1.5 font-semibold !text-[#8C2F2F]">
                 <Undo2 className="h-3.5 w-3.5" />
                 {t('receiptDetail.refund.title', { amount: fmt(refund.amount) })}
               </p>
               {[refund.reason, refund.date ? formatDate(refund.date, settings) : null, refund.by]
                 .filter(Boolean)
                 .join(' · ')}
-              <p className="mt-1.5 font-semibold">
+              <p className="mt-1.5 font-semibold !text-[#8C2F2F]">
                 {t('receiptDetail.refund.net', { amount: fmt(netTotal) })}
               </p>
             </div>
@@ -276,8 +276,8 @@ export function PaymentReceipt({ receipt, onBack, invoiceId }: PaymentReceiptPro
 
           <DashRule />
 
-          <p className="text-center text-sm text-[#4B5563]">{t('receipt.thankYou')}</p>
-          <p className="mt-2 text-center text-2xs text-[#9CA3AF]">
+          <p className="text-center text-sm !text-[#4B5563]">{t('receipt.thankYou')}</p>
+          <p className="mt-2 text-center text-2xs !text-[#9CA3AF]">
             {t('receiptDetail.fine', { date: formatDate(receipt.paidDate, settings) })}
           </p>
         </div>

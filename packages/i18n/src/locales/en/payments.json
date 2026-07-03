@@ -1061,7 +1061,13 @@
       "format": {
         "label": "Output format",
         "overCap": "Up to {{limit}} documents"
-      }
+      },
+      "whatsInside_one": "What's inside · {{count}} file",
+      "whatsInside_other": "What's inside · {{count}} files",
+      "bundleMeta_one": "{{count}} PDF",
+      "bundleMeta_other": "{{count}} PDFs",
+      "morePdfs_one": "+ {{count}} more PDF",
+      "morePdfs_other": "+ {{count}} more PDFs"
     }
   },
   "financeLayout": {
