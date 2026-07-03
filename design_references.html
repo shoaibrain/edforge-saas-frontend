@@ -1,0 +1,720 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EdForge · Design References</title>
+  <meta name="description" content="Canonical visual reference board for EdForge's design language — references A through H, live and screenshot-ready." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ============================================================
+       EdForge Design References — tokens transcribed from the real
+       theme layer (packages/theme/src/base.css · dark theme).
+       This board is dark-themed and is itself an example of the system.
+       ============================================================ */
+    :root {
+      /* portal dark surfaces */
+      --bg: #0f1117;
+      --surface: #161b27;
+      --surface-2: #1e2436;
+      --surface-3: #242d3e;
+      --line: rgba(255,255,255,.10);
+      --line-strong: rgba(255,255,255,.16);
+      /* text */
+      --t1: #e8eaf0;
+      --t2: #c8ccd8;
+      --t3: #969cb2;
+      --t-dis: #4a5068;
+      /* brand + action */
+      --green: #1d9e75;         /* enrollment / focus green */
+      --green-deep: #0f6e56;    /* action-primary */
+      --green-deep-hover: #148264;
+      --teal: #005f73;
+      --cyan: #0a9396;
+      --golden: #ee9b00;
+      --caramel: #ca6702;
+      --rust: #ae2012;
+      /* module accents */
+      --a-academics: #378add;
+      --a-finance: #e24b4a;
+      --a-attendance: #ef9f27;
+      --a-enrollment: #1d9e75;
+      --a-coral: #d85a30;
+      --a-reports: #7f77dd;
+      --a-slate: #5a6070;
+      /* states (dark fg) */
+      --s-success: #6ee7b7;
+      --s-warning: #fdd04d;
+      --s-danger: #fca5a5;
+      --s-info: #7df4f7;
+      /* radius */
+      --r-sm: 8px;
+      --r: 12px;
+      --r-lg: 18px;
+      --r-xl: 24px;
+      --r-pill: 999px;
+      /* elevation (dark) */
+      --e-raised: 0 1px 2px rgba(0,0,0,.18), 0 1px 3px rgba(233,216,166,.04);
+      --e-overlay: 0 10px 28px rgba(0,0,0,.32);
+      --e-modal: 0 28px 72px rgba(0,0,0,.42);
+      /* motion */
+      --d-instant: 80ms;
+      --d-fast: 150ms;
+      --d-base: 220ms;
+      --d-slow: 320ms;
+      --ease-standard: cubic-bezier(.4,0,.2,1);
+      --ease-enter: cubic-bezier(.16,1,.3,1);
+      --ease-exit: cubic-bezier(.4,0,1,1);
+      --ease-out: cubic-bezier(.22,.61,.36,1);
+      --ease-spring: cubic-bezier(.34,1.56,.64,1);
+      /* type */
+      --sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --serif: 'Fraunces', Georgia, serif;
+      --serif-mkt: 'Instrument Serif', Georgia, serif;
+      --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      background:
+        radial-gradient(1200px 600px at 80% -10%, rgba(29,158,117,.10), transparent 60%),
+        radial-gradient(900px 500px at 0% 0%, rgba(10,147,150,.08), transparent 55%),
+        var(--bg);
+      color: var(--t1);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+    a { color: inherit; }
+    ::selection { background: rgba(29,158,117,.28); }
+
+    .wrap { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
+
+    /* ---------- top bar ---------- */
+    header.topbar {
+      position: sticky; top: 0; z-index: 40;
+      backdrop-filter: saturate(140%) blur(12px);
+      background: rgba(15,17,23,.72);
+      border-bottom: 1px solid var(--line);
+    }
+    .topbar-inner { display: flex; align-items: center; gap: 16px; height: 62px; }
+    .brand { display: flex; align-items: center; gap: 11px; font-weight: 600; letter-spacing: -.02em; font-size: 17px; }
+    .logo {
+      width: 34px; height: 34px; border-radius: 9px; display: grid; place-items: center;
+      background: linear-gradient(135deg, #005f73 0%, #0a9396 100%);
+      box-shadow: 0 4px 14px rgba(10,147,150,.35), inset 0 1px 0 rgba(255,255,255,.18);
+      flex: none;
+    }
+    .logo svg { width: 19px; height: 19px; }
+    .brand small { display: block; font-weight: 500; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--t3); }
+    .jump { margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap; }
+    .jump a {
+      width: 30px; height: 30px; display: grid; place-items: center; text-decoration: none;
+      border-radius: 8px; border: 1px solid var(--line); color: var(--t2);
+      font-weight: 600; font-size: 13px; transition: all var(--d-fast) var(--ease-standard);
+    }
+    .jump a:hover { border-color: var(--green); color: var(--green); transform: translateY(-1px); background: rgba(29,158,117,.08); }
+    .spec-link {
+      display: inline-flex; align-items: center; gap: 7px; text-decoration: none;
+      padding: 7px 13px; border-radius: 8px; font-size: 13px; font-weight: 600;
+      border: 1px solid var(--line-strong); color: var(--t1);
+      transition: all var(--d-fast) var(--ease-standard);
+    }
+    .spec-link:hover { background: var(--surface-2); border-color: var(--green); }
+
+    /* ---------- hero ---------- */
+    .hero { padding: 64px 0 30px; }
+    .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; color: var(--green); margin-bottom: 14px; }
+    .hero h1 { font-family: var(--serif); font-weight: 600; font-size: clamp(34px, 5vw, 54px); line-height: 1.04; letter-spacing: -.02em; margin: 0 0 16px; }
+    .hero h1 em { font-family: var(--serif-mkt); font-style: italic; color: var(--green); font-weight: 500; }
+    .hero p { max-width: 660px; color: var(--t2); font-size: 17px; margin: 0; }
+
+    /* ---------- token legend ---------- */
+    .legend { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin: 34px 0 10px; }
+    .legend .chip {
+      border: 1px solid var(--line); border-radius: var(--r); padding: 15px 16px; background: var(--surface);
+      box-shadow: var(--e-raised);
+    }
+    .legend .chip .k { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--t3); margin-bottom: 8px; }
+    .legend .chip .v { font-size: 13.5px; color: var(--t1); font-family: var(--mono); line-height: 1.7; }
+    .legend .chip .v b { color: var(--green); font-weight: 500; }
+
+    /* ---------- reference section ---------- */
+    .refs { padding: 26px 0 40px; display: flex; flex-direction: column; gap: 26px; }
+    .ref {
+      border: 1px solid var(--line); border-radius: var(--r-lg); overflow: clip;
+      background: var(--surface); box-shadow: var(--e-raised);
+      display: grid; grid-template-columns: 1.35fr 1fr;
+    }
+    @media (max-width: 860px) { .ref { grid-template-columns: 1fr; } }
+
+    .ref .stage {
+      padding: 26px; border-right: 1px solid var(--line);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.015), transparent 40%),
+        repeating-linear-gradient(45deg, rgba(255,255,255,.012) 0 1px, transparent 1px 22px),
+        var(--surface);
+      display: flex; flex-direction: column; gap: 18px; justify-content: center;
+    }
+    @media (max-width: 860px) { .ref .stage { border-right: none; border-bottom: 1px solid var(--line); } }
+    .ref .meta { padding: 26px; display: flex; flex-direction: column; gap: 14px; }
+
+    .ref-head { display: flex; align-items: center; gap: 13px; }
+    .badge-letter {
+      width: 44px; height: 44px; flex: none; border-radius: 12px; display: grid; place-items: center;
+      font-family: var(--serif); font-weight: 600; font-size: 22px; color: #eafff7;
+      background: linear-gradient(135deg, var(--green-deep), var(--green));
+      box-shadow: 0 6px 18px rgba(29,158,117,.30), inset 0 1px 0 rgba(255,255,255,.22);
+    }
+    .ref-head h2 { font-size: 18px; margin: 0; letter-spacing: -.01em; }
+    .ref-head .tag {
+      margin-left: auto; font-size: 10.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+      color: var(--s-success); border: 1px solid rgba(110,231,183,.32); background: rgba(110,231,183,.08);
+      padding: 4px 9px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px;
+    }
+    .tag .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--s-success); box-shadow: 0 0 0 3px rgba(110,231,183,.18); }
+    .ref .caption { color: var(--t2); font-size: 14.5px; }
+    .ref .caption b { color: var(--t1); font-weight: 600; }
+    .ref .why { font-size: 13px; color: var(--t3); border-left: 2px solid var(--green); padding-left: 12px; }
+    .ref .why b { color: var(--green); font-weight: 600; }
+
+    /* screenshot slot */
+    .slot {
+      margin-top: auto; border: 1px dashed var(--line-strong); border-radius: 10px;
+      padding: 13px; display: flex; align-items: center; gap: 11px; color: var(--t3);
+      font-size: 12.5px; background: rgba(255,255,255,.015);
+    }
+    .slot svg { width: 18px; height: 18px; flex: none; opacity: .7; }
+    .slot b { color: var(--t2); font-weight: 600; }
+
+    /* ---------- shared demo primitives ---------- */
+    .card {
+      background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r);
+      box-shadow: var(--e-raised); transition: transform var(--d-base) var(--ease-standard), box-shadow var(--d-base) var(--ease-standard), border-color var(--d-base) var(--ease-standard);
+    }
+    .card:hover { transform: translateY(-3px); box-shadow: var(--e-overlay); border-color: rgba(29,158,117,.45); }
+
+    .avatar { width: 36px; height: 36px; border-radius: 50%; flex: none; display: grid; place-items: center; font-weight: 600; font-size: 13px; color: #0f1117; }
+    .mono { font-family: var(--mono); font-size: 11px; color: var(--t3); }
+    .pill-status {
+      font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 999px;
+      background: rgba(110,231,183,.12); color: var(--s-success); border: 1px solid rgba(110,231,183,.22);
+    }
+    .grade { font-family: var(--mono); font-size: 11px; font-weight: 500; padding: 3px 7px; border-radius: 6px; background: var(--surface-3); color: var(--t2); border: 1px solid var(--line); }
+
+    /* A — student row cards */
+    .student-row { display: flex; align-items: center; gap: 13px; padding: 12px 14px; }
+    .student-row .who { min-width: 0; }
+    .student-row .who .nm { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .student-row .spark { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+    .student-row .rate { font-size: 12.5px; font-weight: 600; }
+    .stat-card { padding: 16px 18px; position: relative; overflow: hidden; }
+    .stat-card::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 3px; background: var(--a-finance); }
+    .stat-card .lbl { font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--t3); display: flex; align-items: center; gap: 7px; }
+    .stat-card .big { font-size: 30px; font-weight: 700; letter-spacing: -.02em; margin: 8px 0 2px; }
+    .stat-card .sub { font-size: 12px; color: var(--t3); }
+
+    /* B — sidebar */
+    .sb-demo { display: flex; gap: 14px; align-items: flex-start; }
+    .sidebar {
+      width: 210px; background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r);
+      padding: 10px; overflow: hidden; transition: width var(--d-base) var(--ease-standard); flex: none;
+    }
+    .sidebar.collapsed { width: 62px; }
+    .sb-item {
+      display: flex; align-items: center; gap: 12px; padding: 9px 10px; border-radius: 9px; color: var(--t2);
+      cursor: pointer; transition: background var(--d-fast) var(--ease-standard), color var(--d-fast) var(--ease-standard); white-space: nowrap;
+    }
+    .sb-item:hover { background: rgba(255,255,255,.04); }
+    .sb-item.active { background: rgba(29,158,117,.15); color: var(--green); border: 1px solid rgba(29,158,117,.30); }
+    .sb-item .ico { width: 20px; height: 20px; flex: none; display: grid; place-items: center; transition: transform var(--d-fast) var(--ease-out); }
+    .sb-item:hover .ico { transform: scale(1.14); }
+    .sb-item .lab { font-size: 13.5px; font-weight: 500; transition: opacity var(--d-fast) var(--ease-standard); }
+    .sidebar.collapsed .lab { opacity: 0; }
+
+    /* C — icon motion */
+    .icon-grid { display: flex; flex-wrap: wrap; gap: 12px; }
+    .icon-tile {
+      position: relative; width: 62px; height: 62px; border-radius: 14px; display: grid; place-items: center;
+      background: var(--surface-2); border: 1px solid var(--line); cursor: pointer;
+      transition: border-color var(--d-fast) var(--ease-standard), background var(--d-fast) var(--ease-standard);
+    }
+    .icon-tile svg { width: 26px; height: 26px; color: var(--t2); transition: transform var(--d-fast) var(--ease-out), color var(--d-fast) var(--ease-standard); z-index: 1; }
+    .icon-tile::after {
+      content: ""; position: absolute; width: 34px; height: 34px; border-radius: 50%;
+      background: radial-gradient(circle, var(--acc, var(--green)) 0%, transparent 68%);
+      opacity: 0; transform: scale(.5); transition: opacity var(--d-slow) var(--ease-standard), transform var(--d-slow) var(--ease-spring);
+    }
+    .icon-tile:hover { border-color: color-mix(in srgb, var(--acc, var(--green)) 55%, transparent); }
+    .icon-tile:hover::after { opacity: .18; transform: scale(1); }
+    .icon-tile:hover svg { transform: scale(1.15); color: var(--acc, var(--green)); }
+
+    /* D — buttons */
+    .btn { font-family: var(--sans); font-size: 13.5px; font-weight: 600; border-radius: var(--r-sm); padding: 9px 16px; border: 1px solid transparent; cursor: pointer; transition: all var(--d-fast) var(--ease-standard); display: inline-flex; align-items: center; gap: 8px; }
+    .btn:active { transform: translateY(1px); }
+    .btn-primary { background: var(--green-deep); color: #f4fbf8; box-shadow: 0 2px 8px rgba(15,110,86,.4); }
+    .btn-primary:hover { background: var(--green-deep-hover); }
+    .btn-gradient { background: linear-gradient(135deg, #005f73 0%, #0a9396 100%); color: #eafeff; box-shadow: 0 4px 14px rgba(10,147,150,.35); }
+    .btn-gradient:hover { filter: brightness(1.08); }
+    .btn-secondary { background: transparent; color: var(--t1); border-color: var(--line-strong); }
+    .btn-secondary:hover { background: var(--surface-2); border-color: var(--green); }
+    .btn-danger { background: var(--rust); color: #fff; }
+    .btn-danger:hover { filter: brightness(1.1); }
+    .btn-ghost { background: transparent; color: var(--t2); }
+    .btn-ghost:hover { background: rgba(255,255,255,.05); color: var(--t1); }
+    .btn-pill { border-radius: 999px; }
+    .btn[disabled] { background: var(--surface-2); color: var(--t-dis); border-color: var(--line); box-shadow: none; cursor: not-allowed; }
+    .btn-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .btn-full { width: 100%; justify-content: center; }
+
+    /* E — modal */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 60; display: none; place-items: center; padding: 20px;
+      background: rgba(6,8,12,.62); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    }
+    .modal-overlay.open { display: grid; animation: fadeIn var(--d-base) var(--ease-standard); }
+    .modal {
+      width: min(420px, 100%); background: var(--surface); border: 1px solid var(--line-strong);
+      border-radius: var(--r-lg); box-shadow: var(--e-modal); padding: 24px; position: relative;
+      animation: slideUp var(--d-slow) var(--ease-enter);
+    }
+    .modal h3 { margin: 0 0 8px; font-size: 18px; font-family: var(--serif); font-weight: 600; }
+    .modal p { margin: 0 0 20px; color: var(--t2); font-size: 14px; }
+    .modal .x {
+      position: absolute; top: 14px; right: 14px; width: 30px; height: 30px; border-radius: 8px; border: none;
+      background: transparent; color: var(--t3); cursor: pointer; font-size: 17px; transition: all var(--d-fast) var(--ease-standard);
+    }
+    .modal .x:hover { background: var(--surface-2); color: var(--t1); }
+    .modal .actions { display: flex; gap: 10px; justify-content: flex-end; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* F — palette */
+    .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(74px, 1fr)); gap: 8px; }
+    .sw { border-radius: 9px; border: 1px solid var(--line); overflow: hidden; }
+    .sw .cap { font-size: 10px; padding: 5px 7px; background: var(--surface-2); color: var(--t3); font-family: var(--mono); }
+    .sw .band { height: 40px; }
+    .split { display: grid; grid-template-columns: 1fr 1fr; border-radius: 12px; overflow: hidden; border: 1px solid var(--line); }
+    @media (max-width: 480px) { .split { grid-template-columns: 1fr; } }
+    .split .side { padding: 16px; }
+    .split .light { background: #faf7f2; color: #1a1f2e; }
+    .split .dark { background: #0f1117; color: #e8eaf0; }
+    .split .side .h { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; opacity: .6; margin-bottom: 10px; }
+    .split .side .row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+    .ctx-chip { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 999px; }
+    .split .light .btn-ctx { background: #0f6e56; color: #fff; }
+    .split .dark .btn-ctx { background: #0f6e56; color: #f4fbf8; }
+    .btn-ctx { font-size: 12px; font-weight: 600; padding: 7px 14px; border-radius: 8px; border: none; }
+
+    /* G — form inputs */
+    .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+    .field label { font-size: 12.5px; font-weight: 500; color: var(--t2); }
+    .field label .req { color: var(--s-danger); }
+    .inp {
+      width: 100%; padding: 10px 13px; border-radius: var(--r-sm); font-family: var(--sans); font-size: 14px;
+      background: var(--surface-2); border: 1px solid var(--line-strong); color: var(--t1);
+      transition: border-color var(--d-base) var(--ease-standard), box-shadow var(--d-base) var(--ease-standard);
+    }
+    .inp::placeholder { color: var(--t3); }
+    .inp:focus { outline: none; border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(10,147,150,.22); }
+    .inp.is-focus { border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(10,147,150,.22); }
+    .inp.is-error { border-color: var(--rust); box-shadow: 0 0 0 3px rgba(174,32,18,.20); }
+    .inp[disabled] { background: rgba(255,255,255,.02); color: var(--t-dis); border-color: var(--line); cursor: not-allowed; }
+    .help { font-size: 11.5px; color: var(--t3); }
+    .help.err { color: var(--s-danger); display: flex; align-items: center; gap: 5px; }
+    .state-tag { font-size: 10px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; padding: 2px 7px; border-radius: 5px; margin-left: 8px; }
+    .state-tag.f { background: rgba(10,147,150,.18); color: var(--s-info); }
+    .state-tag.e { background: rgba(174,32,18,.2); color: var(--s-danger); }
+    .state-tag.d { background: var(--surface-3); color: var(--t3); }
+
+    /* H — nav pills */
+    .seg { display: inline-flex; gap: 4px; padding: 4px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px; flex-wrap: wrap; }
+    .seg button {
+      border: none; background: transparent; color: var(--t2); font-family: var(--sans); font-size: 13px; font-weight: 600;
+      padding: 7px 15px; border-radius: 999px; cursor: pointer; display: inline-flex; align-items: center; gap: 7px;
+      transition: background var(--d-base) var(--ease-standard), color var(--d-base) var(--ease-standard);
+    }
+    .seg button .count { font-size: 11px; padding: 1px 7px; border-radius: 999px; background: var(--surface-3); color: var(--t3); transition: all var(--d-base) var(--ease-standard); }
+    .seg button:hover { color: var(--t1); }
+    .seg button.active { background: var(--green-deep); color: #f4fbf8; box-shadow: 0 2px 8px rgba(15,110,86,.35); }
+    .seg button.active .count { background: rgba(255,255,255,.18); color: #eafff7; }
+    .chip-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+    .fchip { font-size: 12.5px; font-weight: 500; padding: 6px 13px; border-radius: 999px; border: 1px solid var(--line); color: var(--t2); background: transparent; cursor: pointer; transition: all var(--d-fast) var(--ease-standard); }
+    .fchip:hover { border-color: var(--green); color: var(--t1); }
+    .fchip.on { background: rgba(29,158,117,.15); border-color: rgba(29,158,117,.4); color: var(--green); }
+
+    /* footer */
+    footer { border-top: 1px solid var(--line); padding: 30px 0 60px; color: var(--t3); font-size: 13px; }
+    footer .wrap { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
+    footer code { font-family: var(--mono); color: var(--t2); background: var(--surface); padding: 2px 7px; border-radius: 6px; border: 1px solid var(--line); font-size: 12px; }
+    .divider { height: 1px; background: var(--line); margin: 0; }
+  </style>
+</head>
+<body>
+  <!-- ===================== TOP BAR ===================== -->
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <div class="brand">
+        <span class="logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#eafeff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 6 L19 6" /><path d="M5 12 L15 12" /><path d="M5 18 L19 18" /><path d="M5 6 L5 18" opacity=".5"/>
+          </svg>
+        </span>
+        <span>EdForge<small>Design references</small></span>
+      </div>
+      <nav class="jump" aria-label="Jump to reference">
+        <a href="#ref-a">A</a><a href="#ref-b">B</a><a href="#ref-c">C</a><a href="#ref-d">D</a>
+        <a href="#ref-e">E</a><a href="#ref-f">F</a><a href="#ref-g">G</a><a href="#ref-h">H</a>
+      </nav>
+      <a class="spec-link" href="./DESIGN_SYSTEM.md">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        DESIGN_SYSTEM.md
+      </a>
+    </div>
+  </header>
+
+  <!-- ===================== HERO ===================== -->
+  <section class="hero">
+    <div class="wrap">
+      <div class="eyebrow">Canonical visual reference board</div>
+      <h1>The way EdForge <em>looks</em>, feels, and moves.</h1>
+      <p>Eight living references — A through H — that fix EdForge's design language in place: the radius, the soft
+        elevation, the deep-green primary, the quarter-second transitions. Each panel below is a real, interactive
+        example built from the shipping theme tokens, and each has a slot ready for a production screenshot. This is
+        the board every design task is measured against.</p>
+
+      <div class="legend">
+        <div class="chip"><div class="k">Radius</div><div class="v"><b>12px</b> cards · <b>8px</b> buttons · <b>999px</b> pills</div></div>
+        <div class="chip"><div class="k">Motion</div><div class="v"><b>220ms</b> major · <b>150ms</b> micro<br>ease <b>(.4,0,.2,1)</b></div></div>
+        <div class="chip"><div class="k">Primary</div><div class="v"><b>#0F6E56</b> green<br>gradient <b>#005f73→#0a9396</b></div></div>
+        <div class="chip"><div class="k">Elevation</div><div class="v">soft &amp; subtle<br><b>raised → overlay</b> on hover</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== REFERENCES ===================== -->
+  <main class="wrap refs">
+
+    <!-- ============ A — Cards ============ -->
+    <section class="ref" id="ref-a">
+      <div class="stage">
+        <div class="card student-row">
+          <span class="avatar" style="background:#8fd6bd">AC</span>
+          <div class="who"><div class="nm">Aadesh Chaudhary</div><div class="mono">#DPPSW-2026-00008</div></div>
+          <span class="grade">3</span>
+          <div class="spark">
+            <svg width="54" height="20" viewBox="0 0 54 20" fill="none"><polyline points="0,14 9,13 18,13 27,12 36,12 45,11 54,11" stroke="#6ee7b7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="rate" style="color:#6ee7b7">100%</span>
+          </div>
+          <span class="pill-status">Active</span>
+        </div>
+        <div class="card student-row">
+          <span class="avatar" style="background:#f6c66a">AA</span>
+          <div class="who"><div class="nm">Aahil Ansari</div><div class="mono">#DPPSW-2026-00016</div></div>
+          <span class="grade">3</span>
+          <div class="spark">
+            <svg width="54" height="20" viewBox="0 0 54 20" fill="none"><polyline points="0,7 9,15 18,6 27,16 36,8 45,15 54,9" stroke="#fca5a5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="rate" style="color:#fca5a5">75%</span>
+          </div>
+          <span class="pill-status">Active</span>
+        </div>
+        <div class="card stat-card" style="max-width:240px">
+          <div class="lbl">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e24b4a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
+            At-risk students
+          </div>
+          <div class="big">20 <span style="font-size:12px;font-weight:600;color:#fca5a5;background:rgba(174,32,18,.2);padding:3px 8px;border-radius:999px;vertical-align:middle">20 critical</span></div>
+          <div class="sub">20 critical · 0 warning</div>
+        </div>
+      </div>
+      <div class="meta">
+        <div class="ref-head"><span class="badge-letter">A</span><h2>Cards &amp; list rows</h2><span class="tag"><span class="dot"></span>Live · hover me</span></div>
+        <div class="caption"><b>Reference A: Homeroom student-list cards &amp; KPI cards.</b> Note the <b>12px border radius</b>,
+          the <b>soft raised shadow</b>, and the subtle hover state — a 3px lift into the overlay shadow over 220ms
+          ease-in-out. Rows pack an avatar, monospace ID, grade badge, direction-colored attendance sparkline, and a
+          status pill. Stat cards carry a colored top-accent line in the module hue.</div>
+        <div class="why"><b>Why it matters:</b> the card is the atom of every EdForge dashboard. Get its radius, padding,
+          shadow, and hover exactly right and 90% of the product inherits it.</div>
+        <div class="slot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span><b>Screenshot slot</b> — drop the Students list capture here.</span></div>
+      </div>
+    </section>
+
+    <!-- ============ B — Sidebar ============ -->
+    <section class="ref" id="ref-b">
+      <div class="stage">
+        <div class="sb-demo">
+          <div class="sidebar" id="sb">
+            <div class="sb-item active"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span><span class="lab">Home</span></div>
+            <div class="sb-item"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1 2.7 2.5 6 2.5s6-1.5 6-2.5v-5"/></svg></span><span class="lab">Academics</span></div>
+            <div class="sb-item"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M17 5.2a3.2 3.2 0 0 1 0 5.6M18.5 20a6.4 6.4 0 0 0-3-5.4"/></svg></span><span class="lab">People</span></div>
+            <div class="sb-item"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="13" rx="2"/><path d="M2.5 10h19M7 15h4"/></svg></span><span class="lab">Finance</span></div>
+            <div class="sb-item"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-2.7 1.1V21a2 2 0 0 1-4 0v-.1A1.6 1.6 0 0 0 6.6 19l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1A1.6 1.6 0 0 0 3 12.6H3a2 2 0 0 1 0-4h.1A1.6 1.6 0 0 0 4.6 6l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1A1.6 1.6 0 0 0 11 3.6V3a2 2 0 0 1 4 0v.1A1.6 1.6 0 0 0 18 4.6l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8z"/></svg></span><span class="lab">Settings</span></div>
+          </div>
+          <button class="btn btn-secondary btn-pill" id="sb-toggle" style="font-size:13px">Collapse ⟨⟩</button>
+        </div>
+      </div>
+      <div class="meta">
+        <div class="ref-head"><span class="badge-letter">B</span><h2>Sidebar expand / collapse</h2><span class="tag"><span class="dot"></span>Live · toggle it</span></div>
+        <div class="caption"><b>Reference B: Sidebar animation on expand/collapse.</b> Width animates over <b>220ms
+          ease-in-out</b> — lively but never jarring. Labels fade on a shorter 150ms opacity step so text never smears
+          during the width change. The active item is a filled green pill; icons scale on hover.</div>
+        <div class="why"><b>Why it matters:</b> the rail is on screen the entire session. A janky or over-eager collapse
+          reads as cheap; the calibrated 220ms glide reads as infrastructure.</div>
+        <div class="slot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span><b>Screenshot slot</b> — capture the expanded &amp; collapsed states.</span></div>
+      </div>
+    </section>
+
+    <!-- ============ C — Icon motion ============ -->
+    <section class="ref" id="ref-c">
+      <div class="stage">
+        <div class="icon-grid">
+          <div class="icon-tile" style="--acc:#1d9e75"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></div>
+          <div class="icon-tile" style="--acc:#378add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c0 1 2.7 2.5 6 2.5s6-1.5 6-2.5v-5"/></svg></div>
+          <div class="icon-tile" style="--acc:#ef9f27"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4M9 14l2 2 4-4"/></svg></div>
+          <div class="icon-tile" style="--acc:#e24b4a"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="13" rx="2"/><path d="M2.5 10h19M7 15h4"/></svg></div>
+          <div class="icon-tile" style="--acc:#7f77dd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></div>
+          <div class="icon-tile" style="--acc:#d85a30"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M17 5.2a3.2 3.2 0 0 1 0 5.6M18.5 20a6.4 6.4 0 0 0-3-5.4"/></svg></div>
+        </div>
+      </div>
+      <div class="meta">
+        <div class="ref-head"><span class="badge-letter">C</span><h2>Icon animations on hover</h2><span class="tag"><span class="dot"></span>Live · hover me</span></div>
+        <div class="caption"><b>Reference C: Icon hover motion.</b> <b>150ms scale</b> (to 1.15) on smooth <code style="font-family:var(--mono);font-size:12px">ease-out</code>,
+          the glyph adopts its <b>module accent</b> color, and a faint accent glow blooms behind it. This is the
+          lightweight sibling of the signature icon-motion engine (<code style="font-family:var(--mono);font-size:12px">--icon-dur .52s</code>) used on nav.</div>
+        <div class="why"><b>Why it matters:</b> the accent-per-module hover is EdForge's signature — it makes the product
+          feel <em>alive</em> without a single distracting movement while the operator is reading.</div>
+        <div class="slot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span><b>Screenshot slot</b> — GIF/capture of the nav icon bloom.</span></div>
+      </div>
+    </section>
+
+    <!-- ============ D — Buttons ============ -->
+    <section class="ref" id="ref-d">
+      <div class="stage">
+        <div class="btn-row">
+          <button class="btn btn-gradient">Get started</button>
+          <button class="btn btn-primary">Take Attendance</button>
+          <button class="btn btn-secondary">Enroll Student</button>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-danger">Delete</button>
+          <button class="btn btn-ghost">Cancel</button>
+          <button class="btn btn-secondary btn-pill">All grades ⌄</button>
+          <button class="btn btn-primary" disabled>Disabled</button>
+        </div>
+        <button class="btn btn-primary btn-full">Save changes &nbsp;— full-width in forms</button>
+      </div>
+      <div class="meta">
+        <div class="ref-head"><span class="badge-letter">D</span><h2>Button hierarchy</h2><span class="tag"><span class="dot"></span>Live · hover me</span></div>
+        <div class="caption"><b>Reference D: Button hierarchy.</b> <b>Primary</b> is deep-green solid (<code style="font-family:var(--mono);font-size:12px">#0F6E56</code>);
+          hero/brand CTAs use the <b>teal→cyan gradient</b>. <b>Secondary</b> is outlined. <b>Danger</b> is rust.
+          <b>Pill</b> buttons carry navigation &amp; filters. In forms, primary buttons go <b>full-width</b>. All at 8px
+          radius with 150ms feedback; disabled drops to muted fill and loses elevation.</div>
+        <div class="why"><b>Why it matters:</b> one clear primary per view keeps operators certain of the next action.
+          Ambiguous button weight is how school software gets people lost.</div>
+        <div class="slot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span><b>Screenshot slot</b> — the toolbar button set in context.</span></div>
+      </div>
+    </section>
+
+    <!-- ============ E — Modal ============ -->
+    <section class="ref" id="ref-e">
+      <div class="stage">
+        <button class="btn btn-primary" id="open-modal">Open modal preview</button>
+        <div class="card" style="padding:14px 16px; font-size:13px; color:var(--t3)">
+          Centered · backdrop-blur · minimal chrome · one quiet <b style="color:var(--t2)">×</b> · enters with fade-in + slide-up.
+        </div>
+      </div>
+      <div class="meta">
+        <div class="ref-head"><span class="badge-letter">E</span><h2>Modal card treatment</h2><span class="tag"><span class="dot"></span>Live · open it</span></div>
+        <div class="caption"><b>Reference E: Modal treatment.</b> Centered on screen, dimmed backdrop with a <b>12px blur</b>,
+          the dialog on the <b>modal elevation</b> at 18px radius. <b>Minimal chrome</b> — one title, generous padding,
+          a single quiet close affordance top-right. Enters with fade-in + a 16px slide-up; no bounce.</div>
+        <div class="why"><b>Why it matters:</b> modals interrupt. The blur focuses attention, the restraint respects it —
+          the operator is one glance from knowing what's being asked and one click from resolving it.</div>
+        <div class="slot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span><b>Screenshot slot</b> — a real confirm/enroll modal over the app.</span></div>
+      </div>
+    </section>
+
+    <!-- ============ F — Palette in context ============ -->
+    <section class="ref" id="ref-f">
+      <div class="stage">
+        <div class="swatches">
+          <div class="sw"><div class="band" style="background:#005f73"></div><div class="cap">teal 500</div></div>
+          <div class="sw"><div class="band" style="background:#0a9396"></div><div class="cap">cyan 500</div></div>
+          <div class="sw"><div class="band" style="background:#0f6e56"></div><div class="cap">action</div></div>
+          <div class="sw"><div class="band" style="background:#94d2bd"></div><div class="cap">aqua</div></div>
+          <div class="sw"><div class="band" style="background:#ee9b00"></div><div class="cap">golden</div></div>
+          <div class="sw"><div class="band" style="background:#ca6702"></div><div class="cap">caramel</div></div>
+          <div class="sw"><div class="band" style="background:#ae2012"></div><div class="cap">rust</div></div>
+          <div class="sw"><div class="band" style="background:#378add"></div><div class="cap">academics</div></div>
+          <div class="sw"><div class="band" style="background:#7f77dd"></div><div class="cap">reports</div></div>
+          <div class="sw"><div class="band" style="background:#d85a30"></div><div class="cap">coral</div></div>
+        </div>
+        <div class="split">
+          <div class="side light">
+            <div class="h">Light region · #FAF7F2</div>
+            <div class="row">
+              <span class="ctx-chip" style="background:rgba(0,95,73,.12);color:#005f49">Active</span>
+              <span class="ctx-chip" style="background:rgba(127,67,0,.12);color:#7f4300">Warning</span>
+              <span class="ctx-chip" style="background:rgba(105,19,11,.1);color:#69130b">Overdue</span>
+            </div>
+            <button class="btn-ctx">Take Attendance</button>
+          </div>
+          <div class="side dark">
+            <div class="h">Dark region · #0F1117</div>
+            <div class="row">
+              <span class="ctx-chip" style="background:rgba(110,231,183,.12);color:#6ee7b7">Active</span>
+              <span class="ctx-chip" style="background:rgba(253,208,77,.12);color:#fdd04d">Warning</span>
+              <span class="ctx-chip" style="background:rgba(252,165,165,.12);color:#fca5a5">Overdue</span>
+            </div>
+            <button class="btn-ctx">Take Attendance</button>
+          </div>
+        </div>
+      </div>
+      <div class="meta">
+        <div class="ref-head"><span class="badge-letter">F</span><h2>Color palette in context</h2><span class="tag"><span class="dot"></span>Reference</span></div>
+        <div class="caption"><b>Reference F: The palette across light and dark regions.</b> The Coolors brand ramp
+          (teal → cyan → aqua → golden → caramel → rust) plus module accents. The split panel shows how the same
+          semantic roles — Active / Warning / Overdue and the green primary — re-tint per theme: deep, AA-safe
+          foregrounds on the warm light canvas; bright foregrounds on the navy dark surface.</div>
+        <div class="why"><b>Why it matters:</b> EdForge is vibrant but never garish. Colors must stay legible and
+          consistent whether they land on <code style="font-family:var(--mono);font-size:12px">#FAF7F2</code> or
+          <code style="font-family:var(--mono);font-size:12px">#0F1117</code> — always via semantic tokens, never raw hex.</div>
+        <div class="slot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span><b>Screenshot slot</b> — light dashboard beside dark students table.</span></div>
+      </div>
+    </section>
+
+    <!-- ============ G — Form inputs ============ -->
+    <section class="ref" id="ref-g">
+      <div class="stage">
+        <div class="field">
+          <label>Student name</label>
+          <input class="inp" placeholder="e.g. Aastha Gupta" value="Aastha Gupta" />
+        </div>
+        <div class="field">
+          <label>Guardian email <span class="state-tag f">Focused</span></label>
+          <input class="inp is-focus" value="guardian@example.com" />
+          <span class="help">Focus ring: cyan border + 3px soft glow.</span>
+        </div>
+        <div class="field">
+          <label>Student ID <span class="state-tag e">Error</span></label>
+          <input class="inp is-error" value="DPPSW-00" />
+          <span class="help err"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>ID must match #DPPSW-YYYY-NNNNN.</span>
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <label>Section <span class="state-tag d">Disabled</span></label>
+          <input class="inp" value="Locked until enrollment" disabled />
+        </div>
+      </div>
+      <div class="meta">
+        <div class="ref-head"><span class="badge-letter">G</span><h2>Form input states</h2><span class="tag"><span class="dot"></span>Live · focus a field</span></div>
+        <div class="caption"><b>Reference G: Input states.</b> One consistent field at 8px radius. <b>Focused</b> = cyan
+          border + a 3px soft ring (220ms). <b>Error</b> = rust border, rust ring, and helper text with an icon.
+          <b>Disabled</b> = muted fill, disabled text, no ring. Labels sit above; help/error text sits below.</div>
+        <div class="why"><b>Why it matters:</b> data entry is where operators live. Unmistakable, uniform state feedback
+          prevents the silent bad-record entry that plagues school systems.</div>
+        <div class="slot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span><b>Screenshot slot</b> — the Enroll Student form with a live error.</span></div>
+      </div>
+    </section>
+
+    <!-- ============ H — Nav pills ============ -->
+    <section class="ref" id="ref-h">
+      <div class="stage">
+        <div class="seg" id="seg">
+          <button class="active">All <span class="count">255</span></button>
+          <button>Active</button>
+          <button>At-risk <span class="count">20</span></button>
+          <button>Pending</button>
+        </div>
+        <div class="chip-row" id="chips">
+          <button class="fchip">Last 7 days</button>
+          <button class="fchip on">Last 30 days</button>
+          <button class="fchip">This semester</button>
+          <button class="fchip">This year</button>
+        </div>
+      </div>
+      <div class="meta">
+        <div class="ref-head"><span class="badge-letter">H</span><h2>Navigation pill buttons</h2><span class="tag"><span class="dot"></span>Live · click a pill</span></div>
+        <div class="caption"><b>Reference H: Navigation &amp; filter pills.</b> Segmented control with a fully-rounded
+          track; the <b>active pill</b> fills deep-green with a soft glow, its count badge inverts, and the swap
+          transitions over <b>220ms ease-in-out</b>. Filter chips are quiet outlines that tint green when on.</div>
+        <div class="why"><b>Why it matters:</b> these pills are the primary way operators slice a roster of hundreds.
+          The active state must be instantly unambiguous and the transition calm, never a flicker.</div>
+        <div class="slot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span><b>Screenshot slot</b> — the All / Active / At-risk / Pending row.</span></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===================== MODAL (for E) ===================== -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <button class="x" id="close-modal" aria-label="Close">✕</button>
+      <h3 id="modal-title">Confirm enrollment</h3>
+      <p>Enroll <b style="color:var(--t1)">Aastha Gupta</b> into Grade 7 · Section A for the 2083 BS academic year?
+        A Cognito invite will be sent to the guardian on file.</p>
+      <div class="actions">
+        <button class="btn btn-ghost" id="cancel-modal">Cancel</button>
+        <button class="btn btn-primary" id="confirm-modal">Enroll student</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <footer>
+    <div class="wrap">
+      <span>EdForge design references · A–H</span>
+      <span>·</span>
+      <span>Tokens transcribed from <code>packages/theme/src/base.css</code></span>
+      <span>·</span>
+      <span>Spec: <code>DESIGN_SYSTEM.md</code></span>
+      <span style="margin-left:auto;color:var(--t-dis)">Living document — update swatches when the theme layer changes.</span>
+    </div>
+  </footer>
+
+  <script>
+    // B — sidebar collapse toggle
+    (function () {
+      var sb = document.getElementById('sb');
+      var btn = document.getElementById('sb-toggle');
+      if (sb && btn) btn.addEventListener('click', function () {
+        var collapsed = sb.classList.toggle('collapsed');
+        btn.textContent = collapsed ? 'Expand ⟩⟨' : 'Collapse ⟨⟩';
+      });
+    })();
+
+    // E — modal open/close
+    (function () {
+      var ov = document.getElementById('modal-overlay');
+      function close() { ov.classList.remove('open'); }
+      function open() { ov.classList.add('open'); }
+      var openBtn = document.getElementById('open-modal');
+      if (openBtn) openBtn.addEventListener('click', open);
+      ['close-modal', 'cancel-modal', 'confirm-modal'].forEach(function (id) {
+        var el = document.getElementById(id); if (el) el.addEventListener('click', close);
+      });
+      ov.addEventListener('click', function (e) { if (e.target === ov) close(); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+    })();
+
+    // H — segmented control + filter chips
+    (function () {
+      var seg = document.getElementById('seg');
+      if (seg) seg.addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b) return;
+        seg.querySelectorAll('button').forEach(function (x) { x.classList.remove('active'); });
+        b.classList.add('active');
+      });
+      var chips = document.getElementById('chips');
+      if (chips) chips.addEventListener('click', function (e) {
+        var b = e.target.closest('button'); if (!b) return;
+        chips.querySelectorAll('button').forEach(function (x) { x.classList.remove('on'); });
+        b.classList.add('on');
+      });
+    })();
+  </script>
+</body>
+</html>
