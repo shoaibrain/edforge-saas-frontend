@@ -17,16 +17,17 @@ test.describe('Academics classrooms', () => {
     await expect(page.getByRole('navigation', { name: 'Sidebar navigation' })).toBeVisible()
     await expect(page.getByText(/could not be loaded|module error/i)).toHaveCount(0)
     // ClassroomsModule renders a real ARIA tablist with 4 tabs (overview /
-    // gradebook / policies / attendance). Assert the count, resilient to the
-    // i18n label wording.
-    const tabs = page.getByRole('tab')
+    // gradebook / policies / attendance). Scope to the module tablist —
+    // since #308 the shared DataTableToolbar's FilterTabs render their own
+    // role=tab elements, so an unscoped getByRole('tab') over-counts.
+    const tabs = page.getByRole('tablist', { name: 'Classrooms tabs' }).getByRole('tab')
     await expect(tabs).toHaveCount(4)
     await expectNoConsoleErrors(errors.filter((e) => !e.includes('Failed to load resource')))
   })
 
   test('switching to the gradebook tab updates the URL + panel', async ({ page }) => {
     await page.goto('/academics/classrooms')
-    const tabs = page.getByRole('tab')
+    const tabs = page.getByRole('tablist', { name: 'Classrooms tabs' }).getByRole('tab')
     await expect(tabs).toHaveCount(4)
     // Second tab is Gradebook (order: overview, gradebook, policies, attendance).
     await tabs.nth(1).click()

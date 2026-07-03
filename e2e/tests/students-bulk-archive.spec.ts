@@ -38,8 +38,11 @@ test.describe('Bulk archive students', () => {
     await rowChecks.nth(0).check()
     await rowChecks.nth(1).check()
 
-    // Floating bulk bar shows the count + Archive action.
-    await expect(page.getByText('2 selected')).toBeVisible()
+    // Selection toolbar shows the count + Archive action. SelectionContextBar
+    // (post-#303) renders the count twice — visible span + sr-only aria-live
+    // copy — so .first() picks the visible one (same pattern as the sonner
+    // toast assertion below).
+    await expect(page.getByText('2 selected').first()).toBeVisible()
     await page.getByRole('button', { name: 'Archive' }).click()
 
     // Modal opens with the exact (hardcoded) copy. Scope the roster assertion to

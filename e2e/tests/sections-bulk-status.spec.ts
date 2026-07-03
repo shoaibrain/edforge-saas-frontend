@@ -5,11 +5,12 @@
  *   PLAYWRIGHT_START_SERVER=1 pnpm test:e2e:full e2e/tests/sections-bulk-status.spec.ts
  * (or the consolidated build-deploy output in CI).
  *
- * Drives the real BulkSectionStatusModal: it splits selected rows into eligible
- * (isActive !== target) vs already-in-target (skipped), fires one
- * PATCH /academics/sections/:id?schoolId= {isActive} per eligible section, and
- * toasts an aggregate. Note (verified against the component): the "… · N skipped"
- * case is an ERROR-tone toast; only a fully-clean run is success-tone.
+ * Drives the real BulkSectionStatusModal. Since the #303 SelectionContextBar
+ * migration, the TOOLBAR pre-filters to eligible rows (the action button
+ * carries the subset count, e.g. "Activate 3" with 4 selected) — the modal
+ * receives only eligible sections, fires one
+ * PATCH /academics/sections/:id?schoolId= {isActive} per section, and toasts
+ * a clean success ("Activated 3 sections"); the skipped row never reaches it.
  */
 
 import { test, expect } from '../fixtures/test'
@@ -40,19 +41,28 @@ test.describe('Bulk section activate', () => {
     await expect(page.getByText('Grade 10 Science')).toBeVisible()
 
     await page.getByRole('checkbox', { name: 'Select all rows' }).check()
-    await expect(page.getByText('4 selected')).toBeVisible()
-    // exact: true — the bulk bar has both "Activate" and "Deactivate"; substring
-    // matching would resolve "Activate" to both (strict-mode violation).
-    await page.getByRole('button', { name: 'Activate', exact: true }).click()
+    // SelectionContextBar renders the count twice (visible + sr-only
+    // aria-live) — .first() picks the visible one.
+    await expect(page.getByText('4 selected').first()).toBeVisible()
+    // SelectionContextBar names the action button with its eligible-subset
+    // count ("Activate 3", not "Activate") — scope to the toolbar so the
+    // modal's identically-named confirm can't collide.
+    await page
+      .getByRole('toolbar', { name: 'Selection actions' })
+      .getByRole('button', { name: 'Activate 3' })
+      .click()
 
-    // Modal counts eligible, not selected, and surfaces the skipped active one.
+    // Modal counts eligible, not selected: it lists only the 3 inactive
+    // sections (the already-active one is excluded; the "1 skipped" summary
+    // now lives in the aggregate toast asserted below).
     await expect(page.getByRole('heading', { name: 'Activate 3 sections?' })).toBeVisible()
-    await expect(page.getByText(/1 already active/)).toBeVisible()
-    await page.getByRole('button', { name: 'Activate 3' }).click()
+    await expect(page.getByRole('dialog').getByRole('listitem')).toHaveCount(3)
+    await page.getByRole('dialog').getByRole('button', { name: 'Activate 3' }).click()
 
-    // Sonner emits both a visible toast and an aria-live sr-only copy — both
-    // match the text, tripping strict-mode. .first() picks the visible toast.
-    await expect(page.getByText(/Activated 3 sections.*1 skipped/).first()).toBeVisible()
+    // Toolbar pre-filtered to the 3 eligible rows, so the modal's run is
+    // clean → success toast without a skipped clause. Sonner emits a visible
+    // toast + an aria-live sr-only copy — .first() picks the visible one.
+    await expect(page.getByText('Activated 3 sections').first()).toBeVisible()
     // Exactly the 3 inactive sections were PATCHed to isActive:true (not sec-d).
     expect(captured.sectionPatches.map((p) => p.id).sort()).toEqual(['sec-a', 'sec-b', 'sec-c'])
     expect(captured.sectionPatches.every((p) => p.isActive === true)).toBe(true)
@@ -76,12 +86,16 @@ test.describe('Bulk section deactivate', () => {
     await expect(page.getByText('Grade 9 Math')).toBeVisible()
 
     await page.getByRole('checkbox', { name: 'Select all rows' }).check()
-    await expect(page.getByText('2 selected')).toBeVisible()
-    await page.getByRole('button', { name: 'Deactivate', exact: true }).click()
+    // Visible + sr-only copies of the count — see above.
+    await expect(page.getByText('2 selected').first()).toBeVisible()
+    await page
+      .getByRole('toolbar', { name: 'Selection actions' })
+      .getByRole('button', { name: 'Deactivate 2' })
+      .click()
 
     await expect(page.getByRole('heading', { name: 'Deactivate 2 sections?' })).toBeVisible()
     await expect(page.getByText(/12 students currently enrolled across these sections/)).toBeVisible()
-    await page.getByRole('button', { name: 'Deactivate 2' }).click()
+    await page.getByRole('dialog').getByRole('button', { name: 'Deactivate 2' }).click()
 
     await expect(page.getByText('Deactivated 2 sections')).toBeVisible()
     expect(captured.sectionPatches.map((p) => p.id).sort()).toEqual(['sec-e', 'sec-f'])
