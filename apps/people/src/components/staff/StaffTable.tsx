@@ -1,16 +1,26 @@
 /**
- * StaffTable Component — V2
+ * StaffTable Component
  *
- * Displays a paginated table of staff with V2 styling.
- * DiceBear avatars, V2 role chips, access chips, status chips.
- * Row click opens a quick-info drawer (managed by parent).
+ * Paginated staff roster on the shared DataTable with the unified toolbar
+ * (search · role presets · primary facet · export) and ⑨ selection support.
+ * Row click opens the quick-info drawer (managed by parent); row-level edit
+ * and delete live in that drawer.
  */
 
 import { useMemo, type MouseEvent, type ReactNode } from 'react'
-import { UsersRound, Eye, Pencil, MoreVertical } from 'lucide-react'
-import { AnimatedIcon } from '@edforge/ui/motion'
+import { UsersRound, Eye } from 'lucide-react'
 import { useTranslation } from '@edforge/i18n'
-import { focusRingInset, IdentityCell, StatusBadge, TanstackDataTable, type ColumnDef, type StatusTone } from '@edforge/ui'
+import type { OnChangeFn, RowSelectionState } from '@tanstack/react-table'
+import {
+  createSelectColumn,
+  focusRingInset,
+  IdentityCell,
+  StatusBadge,
+  TanstackDataTable,
+  type ColumnDef,
+  type DataTableLabels,
+  type TablePreset,
+} from '@edforge/ui'
 import type { StaffResponseDto } from '@aibrains/shared-types'
 import { StaffRoleChip } from './StaffRoleChip'
 import { getStatusI18nKey } from './StaffStatusBadge'
@@ -27,24 +37,24 @@ interface StaffTableProps {
   isLoading?: boolean
   onAddStaff?: () => void
   onViewStaff?: (staff: StaffResponseDto) => void
-}
-
-// ============================================================================
-// EMPLOYMENT TYPE BADGE COLORS
-// ============================================================================
-
-const EMPLOYMENT_TONE: Record<string, StatusTone> = {
-  active: 'neutral',
-  on_leave: 'warning',
-  suspended: 'warning',
-  terminated: 'danger',
-  retired: 'neutral',
-  resigned: 'neutral',
-}
-
-function getEmploymentLabel(status: string | undefined, t: ReturnType<typeof useTranslation>['t']): string {
-  if (!status) return t('employmentTypes.fullTime')
-  return t(`employmentStatus.${getStatusI18nKey(status)}`, { defaultValue: status.replace('_', ' ') })
+  /** Unified toolbar wiring (search is controlled by the page's debounce). */
+  searchPlaceholder?: string
+  searchValue?: string
+  onSearchChange?: (value: string) => void
+  presets?: TablePreset[]
+  activePreset?: string
+  onPresetChange?: (value: string) => void
+  primaryFilter?: ReactNode
+  toolbarExtra?: ReactNode
+  /** Cursor pagination (usePaginatedQuery) — staff #21+ are reachable now. */
+  hasMore?: boolean
+  isFetchingMore?: boolean
+  onLoadMore?: () => void
+  /** ⑨ Selection Context Bar node — morphs the toolbar in place on selection.
+   *  Row ids are staffIds, so the page can map its selection state to rows. */
+  selectionBar?: ReactNode
+  rowSelection?: RowSelectionState
+  onRowSelectionChange?: OnChangeFn<RowSelectionState>
 }
 
 // ============================================================================
@@ -56,11 +66,62 @@ export function StaffTable({
   isLoading = false,
   onAddStaff,
   onViewStaff,
+  searchPlaceholder,
+  searchValue,
+  onSearchChange,
+  presets,
+  activePreset,
+  onPresetChange,
+  primaryFilter,
+  toolbarExtra,
+  hasMore,
+  isFetchingMore,
+  onLoadMore,
+  selectionBar,
+  rowSelection,
+  onRowSelectionChange,
 }: StaffTableProps) {
   const { t } = useTranslation('people')
 
+  // People has no i18n lib module (unlike academics' useAcademicsI18n) —
+  // this is the namespace's only DataTable consumer, so the label map
+  // lives here, built from the shared dataTable.* vocabulary.
+  const labels = useMemo<DataTableLabels>(
+    () => ({
+      errorTitle: t('dataTable.errorTitle'),
+      errorDescription: t('dataTable.errorDescription'),
+      retry: t('dataTable.retry'),
+      clearSearch: t('dataTable.clearSearch'),
+      clearFilters: t('dataTable.clearFilters'),
+      clearActiveFilters: (count) => t('dataTable.clearActiveFilters', { count }),
+      clearSelection: t('dataTable.clearSelection'),
+      selectedRows: (count) => t('dataTable.selectedRows', { count }),
+      paginationShowing: (start, end, total) =>
+        t('dataTable.paginationShowing', { start, end, total }),
+      rowsPerPage: (size) => t('dataTable.rowsPerPage', { size }),
+      previousPage: t('dataTable.previousPage'),
+      nextPage: t('dataTable.nextPage'),
+      loadingPage: t('dataTable.loadingPage'),
+      rowDensity: t('dataTable.rowDensity'),
+      comfortableDensity: t('dataTable.comfortableDensity'),
+      comfortableDensityTitle: t('dataTable.comfortableDensityTitle'),
+      compactDensity: t('dataTable.compactDensity'),
+      compactDensityTitle: t('dataTable.compactDensityTitle'),
+      viewOptions: t('dataTable.viewOptions'),
+      toggleColumns: t('dataTable.toggleColumns'),
+      moreFilters: t('dataTable.moreFilters'),
+      export: t('dataTable.export'),
+      exportFormat: (format) => t(`dataTable.exportFormats.${format}`),
+      xlsxUnavailable: t('dataTable.xlsxUnavailable'),
+      filterAriaLabel: (title) => t('dataTable.filterAriaLabel', { title }),
+      clearFilter: t('dataTable.clearFilter'),
+    }),
+    [t],
+  )
+
   const columns: ColumnDef<StaffResponseDto, unknown>[] = useMemo(
     () => [
+      createSelectColumn<StaffResponseDto>(),
       {
         id: 'name',
         accessorFn: (row) => `${row.firstName} ${row.lastSurname}`,
@@ -68,13 +129,11 @@ export function StaffTable({
         size: 280,
         cell: ({ row }) => {
           const s = row.original
-          const empTone = EMPLOYMENT_TONE[s.employmentStatus] ?? 'neutral'
           return (
             <IdentityCell
               name={`${s.firstName} ${s.lastSurname}`}
               avatarSrc={getStaffAvatar(s.staffId)}
               secondary={s.email}
-              trailing={<StatusBadge tone={empTone}>{getEmploymentLabel(s.employmentStatus, t)}</StatusBadge>}
             />
           )
         },
@@ -133,10 +192,10 @@ export function StaffTable({
       {
         id: 'actions',
         header: '',
-        size: 100,
+        size: 56,
         enableSorting: false,
         cell: ({ row }) => (
-          <div className="flex items-center justify-end gap-1">
+          <div className="flex items-center justify-end">
             <ActionBtn
               icon={<Eye className="h-3.5 w-3.5" />}
               title={t('actions.view')}
@@ -145,22 +204,16 @@ export function StaffTable({
                 onViewStaff?.(row.original)
               }}
             />
-            <ActionBtn
-              icon={<AnimatedIcon name="edit" icon={Pencil} size={14} applyAccent={false} />}
-              title={t('actions.edit')}
-              onClick={(e) => e.stopPropagation()}
-            />
-            <ActionBtn
-              icon={<AnimatedIcon name="more" icon={MoreVertical} size={14} applyAccent={false} />}
-              title={t('actions.more')}
-              onClick={(e) => e.stopPropagation()}
-            />
           </div>
         ),
       },
     ],
     [t, onViewStaff],
   )
+
+  const serverPagination = onLoadMore
+    ? { hasMore: Boolean(hasMore), isFetching: Boolean(isFetchingMore), onLoadMore }
+    : undefined
 
   return (
     <TanstackDataTable
@@ -170,8 +223,22 @@ export function StaffTable({
       isLoading={isLoading}
       tableId="people.staff"
       enableSorting={true}
+      enableRowSelection
+      searchPlaceholder={searchPlaceholder}
+      searchValue={searchValue}
+      onSearchChange={onSearchChange}
+      presets={presets}
+      activePreset={activePreset}
+      onPresetChange={onPresetChange}
+      primaryFilter={primaryFilter}
+      toolbarExtra={toolbarExtra}
+      selectionBar={selectionBar}
+      rowSelection={rowSelection}
+      onRowSelectionChange={onRowSelectionChange}
       pagination={{ pageSize: 20 }}
+      serverPagination={serverPagination}
       maxHeight="calc(100vh - 22rem)"
+      labels={labels}
       emptyState={{
         icon: <UsersRound className="w-10 h-10" />,
         title: t('empty.noStaff'),
