@@ -55,6 +55,15 @@ textarea::placeholder {
   color: rgb(var(--text-disabled));
 }
 
+/* Content-pane focus ring — the card sits flush under the fixed topbar (the
+   body wrap has pt-0), so the platform outside ring ([tabindex]:focus-visible,
+   utilities.css) paints its top segment underneath the opaque z-45 header and
+   the top edge disappears. Draw this pane's ring inset instead; width/color
+   still come from the platform rule. */
+#main-content:focus-visible {
+  outline-offset: -2px;
+}
+
 /* Landing V2 tokens are imported from @edforge/theme (packages/theme/src/index.css).
    They are scoped to html[data-surface="landing"] so they're inert unless LandingRoot mounts. */
 

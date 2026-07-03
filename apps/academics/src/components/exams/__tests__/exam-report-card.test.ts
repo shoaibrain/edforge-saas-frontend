@@ -193,6 +193,27 @@ describe('buildReportCardHtml', () => {
     expect(html).not.toContain('Division')
   })
 
+  it('uses localized print labels when provided', () => {
+    const html = buildReportCardHtml(letterCard(), exam, undefined, {
+      printedOn: '२०८३ असार १६',
+      examTypeLabel: 'अन्तिम',
+      labels: {
+        reportCard: 'रिपोर्ट कार्ड',
+        progressReport: 'प्रगति रिपोर्ट',
+        printSavePdf: 'प्रिन्ट / PDF रूपमा सेभ',
+        printed: 'प्रिन्ट गरिएको',
+        generatedBy: 'EdForge द्वारा सिर्जना गरिएको',
+        lang: 'ne-NP',
+      },
+    })
+    expect(html).toContain('<html lang="ne-NP">')
+    expect(html).toContain('रिपोर्ट कार्ड')
+    expect(html).toContain('प्रगति रिपोर्ट')
+    expect(html).toContain('Final Term &middot; अन्तिम')
+    expect(html).toContain('प्रिन्ट गरिएको २०८३ असार १६')
+    expect(html).toContain('EdForge द्वारा सिर्जना गरिएको')
+  })
+
   it('HTML-escapes dynamic text (no injection)', () => {
     const html = buildReportCardHtml(
       divisionCard({
