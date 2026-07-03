@@ -16,14 +16,19 @@ export function LoadingScreen({ message }: LoadingScreenProps) {
   const displayMessage = message || t('loadingModule')
 
   return (
-    <div className="min-h-[60vh] flex items-center justify-center">
+    <div
+      className="min-h-[60vh] flex items-center justify-center"
+      role="status"
+      aria-live="polite"
+      aria-busy="true"
+    >
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         className="flex flex-col items-center gap-4"
       >
         {/* Animated Logo */}
-        <div className="relative w-16 h-16">
+        <div className="relative w-16 h-16" aria-hidden="true">
           <motion.div
             className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[rgb(var(--action-primary-bg))] to-[rgb(var(--action-primary-bg-hover))]"
             animate={{
@@ -57,7 +62,7 @@ export function LoadingScreen({ message }: LoadingScreenProps) {
         <p className="text-text-secondary text-sm">{displayMessage}</p>
 
         {/* Progress Dots */}
-        <div className="flex gap-1.5">
+        <div className="flex gap-1.5" aria-hidden="true">
           {[0, 1, 2].map((i) => (
             <motion.div
               key={i}

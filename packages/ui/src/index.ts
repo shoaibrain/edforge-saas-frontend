@@ -34,6 +34,7 @@ export {
 } from './components/IdentityCell'
 export {
   Skeleton,
+  SkeletonStatus,
   SkeletonText,
   SkeletonAvatar,
   SkeletonCard,

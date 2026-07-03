@@ -14,6 +14,7 @@ interface AppShellProps {
 export function AppShell({ children }: AppShellProps) {
   const collapsed = useAppStore((s) => s.sidebarCollapsed)
   const toggleSidebar = useAppStore((s) => s.toggleSidebar)
+  const isSchoolTransitioning = useAppStore((s) => s.isSchoolTransitioning)
 
   // Accessibility: Focus management on route changes
   useRouteFocus()
@@ -56,6 +57,7 @@ export function AppShell({ children }: AppShellProps) {
           <main
             id="main-content"
             tabIndex={-1}
+            aria-busy={isSchoolTransitioning || undefined}
             className="h-full overflow-y-auto overflow-x-hidden outline-none bg-[var(--shell-cp-bg)] rounded-[var(--shell-cp-radius)] shadow-[var(--shell-cp-shadow)]"
             style={{
               position: 'relative',  // LOAD-BEARING: drawer absolute positioning
