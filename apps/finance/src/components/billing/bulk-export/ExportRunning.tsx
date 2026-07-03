@@ -1,6 +1,11 @@
 /**
- * In-flight body of the bulk-export drawer: big percentage, live-sync
- * indicator, progress bar, current-file line, and the counters card.
+ * In-flight body of the bulk-export drawer.
+ *
+ * Progress honesty: the worker flushes counters to the job row in batches
+ * of 25 (COUNTER_BATCH_SIZE), so a small export polls `succeeded: 0` until
+ * the job goes terminal. Until the first real counter lands this renders an
+ * INDETERMINATE bar + stage text (never a frozen "0%"); once processed > 0
+ * the display switches to a real percentage and document counts.
  */
 
 import { useEffect, useState } from 'react'
@@ -8,7 +13,7 @@ import { CheckCircle2, Circle, Info, Minus, XCircle } from 'lucide-react'
 import { cn } from '@edforge/ui'
 import { useTranslation } from '@edforge/i18n'
 import type { FinanceJobRow } from '@edforge/finance-services'
-import { fileNameFor, type ExportRowSummary } from './export-manifest'
+import type { ExportRowSummary } from './export-manifest'
 
 export interface ExportRunningProps {
   job: FinanceJobRow | undefined
@@ -29,7 +34,7 @@ function CounterRow({
   danger?: boolean
 }) {
   return (
-    <div className="flex items-center gap-3 border-b border-[rgb(var(--border-primary))] px-3.5 py-2.5 last:border-b-0">
+    <div className="flex items-center gap-3 border-b border-[rgb(var(--border-primary)/0.35)] px-3.5 py-2.5 last:border-b-0">
       <span className="grid h-7 w-7 flex-none place-items-center rounded-md bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]">
         {icon}
       </span>
@@ -61,18 +66,28 @@ export function ExportRunning({ job, dataUpdatedAt, rows }: ExportRunningProps) 
   const processed = counters
     ? counters.succeeded + counters.failed + counters.skipped
     : 0
+  const hasRealProgress = processed > 0
   const pct = requested > 0 ? Math.min(100, Math.round((processed / requested) * 100)) : 0
   const sincePoll = dataUpdatedAt ? Math.max(0, Math.round((now - dataUpdatedAt) / 1000)) : 0
-  const currentRow = rows[Math.min(processed, Math.max(0, rows.length - 1))]
+  const stageLabel =
+    !job || job.status === 'queued'
+      ? t('asyncJobs.pdfExportShared.preparingExport')
+      : t('asyncJobs.pdfExportShared.generatingPdfs')
 
   return (
     <div className="space-y-4">
       <div>
-        <div className="mb-2.5 flex items-baseline justify-between">
-          <span className="font-mono text-3xl font-semibold tabular-nums tracking-tight text-[rgb(var(--text-primary))]">
-            {pct}
-            <em className="not-italic text-base text-[rgb(var(--text-tertiary))]">%</em>
-          </span>
+        <div className="mb-2.5 flex items-baseline justify-between gap-3">
+          {hasRealProgress ? (
+            <span className="font-mono text-3xl font-semibold tabular-nums tracking-tight text-[rgb(var(--text-primary))]">
+              {pct}
+              <em className="not-italic text-base text-[rgb(var(--text-tertiary))]">%</em>
+            </span>
+          ) : (
+            <span className="text-base font-medium text-[rgb(var(--text-primary))]">
+              {stageLabel}
+            </span>
+          )}
           <span className="flex items-center gap-1.5 text-xs text-[rgb(var(--text-tertiary))]">
             <span
               className="h-1.5 w-1.5 rounded-full bg-[rgb(var(--state-success-border))] motion-safe:animate-pulse"
@@ -84,32 +99,35 @@ export function ExportRunning({ job, dataUpdatedAt, rows }: ExportRunningProps) 
         <div
           className="h-2 overflow-hidden rounded-full bg-[rgb(var(--background-tertiary))]"
           role="progressbar"
-          aria-valuenow={pct}
           aria-valuemin={0}
           aria-valuemax={100}
+          {...(hasRealProgress
+            ? { 'aria-valuenow': pct }
+            : { 'aria-valuetext': stageLabel })}
         >
-          <div
-            className="h-full rounded-full bg-[rgb(var(--state-success-border))] transition-[width] duration-500"
-            style={{ width: `${pct}%` }}
-          />
+          {hasRealProgress ? (
+            <div
+              className="h-full rounded-full bg-[rgb(var(--state-success-border))] transition-[width] duration-500"
+              style={{ width: `${pct}%` }}
+            />
+          ) : (
+            <div className="v2-indeterminate-sweep h-full rounded-full bg-[rgb(var(--state-success-border))]" />
+          )}
         </div>
-        <div className="mt-2 flex items-baseline justify-between text-sm text-[rgb(var(--text-secondary))]">
-          <span>
-            {t('asyncJobs.pdfExportShared.preparing', {
-              current: Math.min(processed + 1, requested),
-              total: requested,
-            })}
-          </span>
-        </div>
-        {currentRow && (
-          <p className="mt-2 truncate rounded-md bg-[rgb(var(--background-secondary))] px-3 py-2 font-mono text-xs text-[rgb(var(--text-tertiary))]">
-            {fileNameFor(currentRow)}
+        {(hasRealProgress || requested > 0) && (
+          <p className="mt-2 text-sm text-[rgb(var(--text-secondary))]">
+            {hasRealProgress
+              ? t('asyncJobs.pdfExportShared.prepared', {
+                  current: processed,
+                  total: requested,
+                })
+              : t('asyncJobs.pdfExportShared.docTotal', { count: requested })}
           </p>
         )}
       </div>
 
-      {counters && (
-        <div className="overflow-hidden rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))]">
+      {hasRealProgress && counters && (
+        <div className="overflow-hidden rounded-xl border border-[rgb(var(--border-primary)/0.5)] bg-[rgb(var(--background-primary))]">
           <CounterRow
             icon={<CheckCircle2 className="h-3.5 w-3.5" />}
             label={t('asyncJobs.pdfExportShared.generated')}

@@ -170,7 +170,7 @@
     "issueSelected": "चयनित जारी गर्नुहोस् ({{count}})",
     "sendReminder": "रिमाइन्डर पठाउनुहोस्",
     "bulkPdfExport": {
-      "menuLabel": "PDF डाउनलोड (ZIP)"
+      "menuLabel": "PDF हरू डाउनलोड"
     },
     "cancelTitle": "बीजक {{invoiceNumber}} रद्द गर्ने?",
     "cancelDescriptionPrefix": "यो कार्य",
@@ -775,7 +775,7 @@
     "exportFailed": "भुक्तानी CSV निर्यात गर्न असफल भयो",
     "recordManualPayment": "म्यानुअल भुक्तानी रेकर्ड गर्नुहोस्",
     "bulkReceiptPdfExport": {
-      "menuLabel": "PDF डाउनलोड (ZIP)"
+      "menuLabel": "PDF हरू डाउनलोड"
     },
     "selection": {
       "noneVoidable": "चयन गरिएका कुनै पनि भुक्तानी भोइड गर्न मिल्दैन — रसिद भएका पूरा भुक्तानीहरू मात्र योग्य हुन्छन्।",
@@ -1023,7 +1023,13 @@
       "morePdfs": "+ थप {{count}} PDF",
       "backgroundNote": "पृष्ठभूमिमा चल्छ — यो प्यानल बन्द गरेर काम जारी राख्न सक्नुहुन्छ। तयार हुनेबित्तिकै हामी जानकारी दिनेछौँ।",
       "synced": "प्रत्यक्ष · {{seconds}} सेकेन्ड अघि सिंक भयो",
-      "preparing": "{{total}} मध्ये PDF {{current}} तयार हुँदैछ",
+      "preparingExport": "निर्यात तयारी हुँदैछ…",
+      "generatingPdfs": "PDF हरू बनाइँदैछन्…",
+      "prepared": "{{total}} मध्ये {{current}} PDF तयार भयो",
+      "docTotal": "{{count}} कागजातहरू",
+      "docTotal_one": "{{count}} कागजात",
+      "docTotal_other": "{{count}} कागजातहरू",
+      "toastDownload": "डाउनलोड",
       "generated": "तयार भयो",
       "skipped": "छाडियो",
       "failed": "असफल",

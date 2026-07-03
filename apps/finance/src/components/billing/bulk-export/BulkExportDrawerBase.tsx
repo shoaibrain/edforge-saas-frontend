@@ -14,17 +14,26 @@
  *    polling to the body's runningJobId instead of erroring.
  *  - 413 PAYLOAD_TOO_LARGE surfaces the operator copy (now format-aware
  *    via BULK_PDF_EXPORT_LIMITS) and closes — retry isn't the answer.
- *  - Terminal toast fires once; succeeded also invalidates the list
+ *  - Terminal handling fires once; succeeded also invalidates the list
  *    query (owner: this component, NOT useFinanceJob — see hook JSDoc).
+ *    The toast only fires when the drawer is CLOSED (backgrounded run) —
+ *    while open, the result view IS the completion feedback, and a toast
+ *    would compete with the footer's download action.
  *  - Close blocked only during the brief kickoff window; once a jobId
- *    exists the drawer is a viewer and the worker keeps running.
+ *    exists the drawer is a viewer and the worker keeps running. Closing
+ *    does NOT drop the job: polling continues while the component stays
+ *    mounted (callers must render it unconditionally), which is what makes
+ *    the "runs in background — we'll let you know" note true. State resets
+ *    on the open TRANSITION instead, and only when the tracked job is
+ *    already terminal.
  *
  * "Get a fresh link": presigned URLs are re-minted by the backend on
  * poll when within 60s of expiry, so a single manual refetch after
  * expiry returns a fresh `output.urlExpiresAt`.
  */
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { Download, FileArchive, RefreshCw, Undo2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { useQueryClient } from '@tanstack/react-query'
@@ -114,39 +123,62 @@ export function BulkExportDrawerBase({
 
   const job = useFinanceJob(jobId)
   const manifest = useMemo(() => buildExportManifest(rows, docType), [rows, docType])
+  const reduceMotion = useReducedMotion()
 
-  // Reset when the drawer closes.
+  // Reset on the open TRANSITION, not on close — closing must keep a
+  // running job's poll alive (background run). A still-running job stays
+  // attached across reopen (mirrors the backend's one-active-export rule);
+  // a terminal one is cleared so the new selection gets a fresh preflight.
+  const wasOpen = useRef(open)
+  const jobStatus = job.data?.status
   useEffect(() => {
-    if (!open) {
-      setJobId(null)
-      setExportFormat('zip')
-      setTerminalLogged(false)
-      setRefreshingLink(false)
-      setRetryPending(false)
-      resetKickoff()
-    }
+    const justOpened = open && !wasOpen.current
+    wasOpen.current = open
+    if (!justOpened) return
+    if (jobId && jobStatus !== 'succeeded' && jobStatus !== 'failed') return
+    setJobId(null)
+    setExportFormat('zip')
+    setTerminalLogged(false)
+    setRefreshingLink(false)
+    setRetryPending(false)
+    resetKickoff()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open])
+  }, [open, jobId, jobStatus])
 
-  // Toast on terminal — once. Invalidate the list on succeeded (owner:
-  // drawer, not useFinanceJob — see hook JSDoc for the bug class).
+  // Terminal handling — once per job. Invalidate the list on succeeded
+  // (owner: drawer, not useFinanceJob — see hook JSDoc for the bug class).
+  // The toast fires only when the drawer is closed: while open, the result
+  // view already announces completion next to the download action.
   useEffect(() => {
     if (!job.data || terminalLogged) return
-    if (job.data.status === 'succeeded') {
+    const status = job.data.status
+    if (status !== 'succeeded' && status !== 'failed') return
+    setTerminalLogged(true)
+    if (status === 'succeeded') {
+      queryClient.invalidateQueries({ queryKey: invalidateKey })
+    }
+    if (open) return
+    if (status === 'succeeded') {
+      const url = hasArtifact(job.data) ? outputUrlFor(job.data) : undefined
       toast.success(
         t(`${i18nRoot}.toastSucceeded`, {
           succeeded: job.data.counters.succeeded,
           failed: job.data.counters.failed,
-        })
+        }),
+        url
+          ? {
+              action: {
+                label: t('asyncJobs.pdfExportShared.toastDownload'),
+                onClick: () => window.open(url, '_blank', 'noopener,noreferrer'),
+              },
+            }
+          : undefined
       )
-      queryClient.invalidateQueries({ queryKey: invalidateKey })
-      setTerminalLogged(true)
-    } else if (job.data.status === 'failed') {
+    } else {
       toast.error(t(`${i18nRoot}.toastFailed`))
-      setTerminalLogged(true)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [job.data, terminalLogged])
+  }, [job.data, terminalLogged, open])
 
   const startExport = async (ids: string[]) => {
     if (ids.length === 0) return
@@ -215,6 +247,7 @@ export function BulkExportDrawerBase({
   const running = status === 'queued' || status === 'running'
   const succeeded = status === 'succeeded'
   const failed = status === 'failed'
+  const phase = !jobId ? 'preflight' : running ? 'running' : succeeded ? 'result' : 'failed'
   const downloadUrl = job.data ? outputUrlFor(job.data) : undefined
   const linkExpired =
     succeeded &&
@@ -308,28 +341,38 @@ export function BulkExportDrawerBase({
       footer={footer}
       closeDisabled={kickoffPending}
     >
-      {!jobId ? (
-        <ExportPreflight
-          manifest={manifest}
-          docType={docType}
-          i18nRoot={i18nRoot}
-          format={exportFormat}
-          onFormatChange={setExportFormat}
-          formatMoney={formatMoney}
-        />
-      ) : running ? (
-        <ExportRunning job={job.data} dataUpdatedAt={job.dataUpdatedAt} rows={rows} />
-      ) : succeeded && job.data ? (
-        <ExportResult
-          job={job.data}
-          rows={rows}
-          docType={docType}
-          onRetryFailed={(ids) => void handleRetryFailed(ids)}
-          retryPending={retryPending}
-        />
-      ) : failed && job.data ? (
-        <ExportFailed job={job.data} />
-      ) : null}
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={phase}
+          initial={{ opacity: 0, y: reduceMotion ? 0 : 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: reduceMotion ? 0 : -8 }}
+          transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] }}
+        >
+          {!jobId ? (
+            <ExportPreflight
+              manifest={manifest}
+              docType={docType}
+              i18nRoot={i18nRoot}
+              format={exportFormat}
+              onFormatChange={setExportFormat}
+              formatMoney={formatMoney}
+            />
+          ) : running ? (
+            <ExportRunning job={job.data} dataUpdatedAt={job.dataUpdatedAt} rows={rows} />
+          ) : succeeded && job.data ? (
+            <ExportResult
+              job={job.data}
+              rows={rows}
+              docType={docType}
+              onRetryFailed={(ids) => void handleRetryFailed(ids)}
+              retryPending={retryPending}
+            />
+          ) : failed && job.data ? (
+            <ExportFailed job={job.data} />
+          ) : null}
+        </motion.div>
+      </AnimatePresence>
     </FinanceDrawerShell>
   )
 }

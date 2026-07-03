@@ -164,13 +164,13 @@ export function Drawer({
                 sizeClasses[size],
                 'h-full flex flex-col',
                 'bg-surface-primary shadow-modal',
-                'border-l border-border-secondary',
+                'border-l border-[rgb(var(--border-secondary)/0.5)]',
                 'transform transition-all',
                 className
               )}
             >
               {/* Header */}
-              <div className="flex items-start justify-between px-6 py-5 border-b border-border-secondary flex-shrink-0">
+              <div className="flex items-start justify-between px-6 py-5 border-b border-[rgb(var(--border-secondary)/0.4)] flex-shrink-0">
                 <div className="flex items-center gap-3 min-w-0 pr-4">
                   {icon && <div className="flex-shrink-0">{icon}</div>}
                   <div className="min-w-0">
@@ -210,7 +210,7 @@ export function Drawer({
 
               {/* Pinned footer */}
               {footer && (
-                <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-border-secondary bg-surface-secondary/50 flex-shrink-0">
+                <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-[rgb(var(--border-secondary)/0.4)] bg-surface-secondary/50 flex-shrink-0">
                   {footer}
                 </div>
               )}
@@ -232,7 +232,7 @@ export function DrawerFooter({ children, className }: DrawerFooterProps) {
       className={cn(
         'flex items-center justify-end gap-3',
         'px-6 py-4 -mx-6 -mb-5 mt-4',
-        'border-t border-border-secondary',
+        'border-t border-[rgb(var(--border-secondary)/0.4)]',
         'bg-surface-secondary/50',
         className
       )}

@@ -38,7 +38,7 @@ function ManifestRow({
   children: ReactNode
 }) {
   return (
-    <div className="flex items-center gap-3 border-b border-[rgb(var(--border-primary))] px-3.5 py-3 last:border-b-0">
+    <div className="flex items-center gap-3 border-b border-[rgb(var(--border-primary)/0.35)] px-3.5 py-3 last:border-b-0">
       <span className="grid h-8 w-8 flex-none place-items-center rounded-md bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]">
         {icon}
       </span>
@@ -79,7 +79,7 @@ export function ExportPreflight({
           'flex flex-col gap-0.5 rounded-lg border px-3 py-2.5 text-left transition-colors',
           on
             ? 'border-[rgb(var(--state-success-border))] bg-[rgb(var(--state-success-bg))]'
-            : 'border-[rgb(var(--border-secondary))] bg-[rgb(var(--background-primary))] hover:border-[rgb(var(--border-strong))]',
+            : 'border-[rgb(var(--border-secondary)/0.5)] bg-[rgb(var(--background-primary))] hover:border-[rgb(var(--border-strong)/0.7)]',
           overCap && 'cursor-not-allowed opacity-50'
         )}
       >
@@ -103,7 +103,7 @@ export function ExportPreflight({
   return (
     <div className="space-y-4">
       {/* Manifest card */}
-      <div className="overflow-hidden rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))]">
+      <div className="overflow-hidden rounded-xl border border-[rgb(var(--border-primary)/0.5)] bg-[rgb(var(--background-primary))]">
         <ManifestRow
           icon={<FileText className="h-4 w-4" />}
           label={t('asyncJobs.pdfExportShared.documents')}
@@ -114,7 +114,7 @@ export function ExportPreflight({
               {manifest.byStatus.map(({ status, count: n }) => (
                 <span
                   key={status}
-                  className="rounded-full border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary))] px-2 py-px text-2xs font-normal capitalize text-[rgb(var(--text-tertiary))]"
+                  className="rounded-full border border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-tertiary))] px-2 py-px text-2xs font-normal capitalize text-[rgb(var(--text-tertiary))]"
                 >
                   {n} {t(`status.${status}`, { defaultValue: status.replace(/_/g, ' ') })}
                 </span>
@@ -172,7 +172,7 @@ export function ExportPreflight({
       </div>
 
       {/* Filename preview */}
-      <div className="rounded-lg border border-dashed border-[rgb(var(--border-secondary))] bg-[rgb(var(--background-primary))] px-3.5 py-2.5 font-mono text-xs text-[rgb(var(--text-tertiary))]">
+      <div className="rounded-lg border border-dashed border-[rgb(var(--border-secondary)/0.5)] bg-[rgb(var(--background-primary))] px-3.5 py-2.5 font-mono text-xs text-[rgb(var(--text-tertiary))]">
         <p className="mb-1.5 flex items-center gap-2 text-xs font-medium text-[rgb(var(--text-primary))]">
           <FileArchive className="h-3.5 w-3.5" />
           {bundleNameFor(docType, format)}

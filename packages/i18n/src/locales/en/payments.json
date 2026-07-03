@@ -170,7 +170,7 @@
     "issueSelected": "Issue Selected ({{count}})",
     "sendReminder": "Send reminder",
     "bulkPdfExport": {
-      "menuLabel": "Download PDF (ZIP)"
+      "menuLabel": "Download PDFs"
     },
     "cancelTitle": "Cancel Invoice {{invoiceNumber}}?",
     "cancelDescriptionPrefix": "This action is",
@@ -775,7 +775,7 @@
     "exportFailed": "Failed to export payments CSV",
     "recordManualPayment": "Record Manual Payment",
     "bulkReceiptPdfExport": {
-      "menuLabel": "Download PDF (ZIP)"
+      "menuLabel": "Download PDFs"
     },
     "selection": {
       "noneVoidable": "No selected payments can be voided — only completed payments with a receipt qualify.",
@@ -1023,7 +1023,13 @@
       "morePdfs": "+ {{count}} more PDFs",
       "backgroundNote": "Runs in the background — you can close this panel and keep working. We'll let you know the moment it's ready.",
       "synced": "live · synced {{seconds}}s ago",
-      "preparing": "Preparing PDF {{current}} of {{total}}",
+      "preparingExport": "Preparing export…",
+      "generatingPdfs": "Generating PDFs…",
+      "prepared": "{{current}} of {{total}} PDFs prepared",
+      "docTotal": "{{count}} documents",
+      "docTotal_one": "{{count}} document",
+      "docTotal_other": "{{count}} documents",
+      "toastDownload": "Download",
       "generated": "Generated",
       "skipped": "Skipped",
       "failed": "Failed",

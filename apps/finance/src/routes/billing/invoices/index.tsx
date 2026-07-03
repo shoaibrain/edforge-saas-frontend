@@ -437,7 +437,7 @@ export default function InvoicesPage() {
 
   // ── ⑨ Selection Context Bar — state-aware money matrix (retires the pill).
   // Issue applies only to selected DRAFTS; Send reminder only to Overdue /
-  // Issued / Partially Paid; Download PDF (ZIP) to everything. Confirm
+  // Issued / Partially Paid; Download PDFs to everything. Confirm
   // handlers receive the applicable ids and feed the existing drawers/confirm.
   const selectedInvoices = useMemo(() => {
     const ids = new Set(Object.keys(rowSelection).filter((id) => rowSelection[id]))
@@ -698,16 +698,17 @@ export default function InvoicesPage() {
       />
 
       {/* Sprint F.5 — Bulk PDF Export Drawer (right-side sibling of
-          BulkSendInvoiceReminderDrawer + BulkSendReceiptsDrawer et al) */}
-      {bulkPdfExportTarget && (
-        <BulkPdfExportDrawer
-          open={!!bulkPdfExportTarget}
-          onClose={() => setBulkPdfExportTarget(null)}
-          onComplete={() => setRowSelection({})}
-          schoolId={schoolId ?? ''}
-          invoices={bulkPdfExportTarget}
-        />
-      )}
+          BulkSendInvoiceReminderDrawer + BulkSendReceiptsDrawer et al).
+          Mounted unconditionally: the drawer keeps polling a backgrounded
+          export after close and toasts on completion — unmounting here
+          would kill the poll and break the runs-in-background promise. */}
+      <BulkPdfExportDrawer
+        open={!!bulkPdfExportTarget}
+        onClose={() => setBulkPdfExportTarget(null)}
+        onComplete={() => setRowSelection({})}
+        schoolId={schoolId ?? ''}
+        invoices={bulkPdfExportTarget ?? []}
+      />
 
       {/* Bulk Issue Confirmation Modal */}
       <AnimatePresence>

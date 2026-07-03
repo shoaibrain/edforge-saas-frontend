@@ -127,8 +127,8 @@ export function ExportResult({
         className={cn(
           'rounded-xl border bg-[rgb(var(--background-primary))]',
           expired
-            ? 'border-dashed border-[rgb(var(--border-secondary))]'
-            : 'border-[rgb(var(--border-primary))]'
+            ? 'border-dashed border-[rgb(var(--border-secondary)/0.5)]'
+            : 'border-[rgb(var(--border-primary)/0.5)]'
         )}
       >
         <div className="flex items-center gap-3 px-3.5 py-3">
@@ -154,7 +154,7 @@ export function ExportResult({
           </div>
         </div>
         {job.output?.urlExpiresAt && (
-          <div className="border-t border-[rgb(var(--border-primary))] px-3.5 py-2.5 text-xs">
+          <div className="border-t border-[rgb(var(--border-primary)/0.35)] px-3.5 py-2.5 text-xs">
             {expired ? (
               <span className="flex items-center gap-1.5 text-[rgb(var(--text-tertiary))]">
                 <Timer className="h-3.5 w-3.5" />
@@ -181,7 +181,7 @@ export function ExportResult({
       {/* Failed rows + retry */}
       {partial && failedRows.length > 0 && (
         <div className="overflow-hidden rounded-xl border border-[rgb(var(--state-danger-border)/0.3)] bg-[rgb(var(--background-primary))]">
-          <div className="flex items-center justify-between gap-2 border-b border-[rgb(var(--border-primary))] bg-[rgb(var(--state-danger-bg)/0.35)] px-3.5 py-2.5">
+          <div className="flex items-center justify-between gap-2 border-b border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--state-danger-bg)/0.35)] px-3.5 py-2.5">
             <span className="flex items-center gap-1.5 text-sm font-medium text-[rgb(var(--state-danger-fg))]">
               <XCircle className="h-4 w-4" />
               {t('asyncJobs.pdfExportShared.failedBoxTitle', { count: failedRows.length })}
@@ -200,7 +200,7 @@ export function ExportResult({
             {failedRows.map((row) => (
               <div
                 key={row.id}
-                className="flex items-center gap-2.5 border-b border-[rgb(var(--border-primary))] px-3.5 py-2 text-sm last:border-b-0"
+                className="flex items-center gap-2.5 border-b border-[rgb(var(--border-primary)/0.35)] px-3.5 py-2 text-sm last:border-b-0"
               >
                 <span className="min-w-0 flex-1">
                   <span className="block truncate font-mono text-xs text-[rgb(var(--text-primary))]">
@@ -215,7 +215,7 @@ export function ExportResult({
               </div>
             ))}
           </div>
-          <p className="border-t border-[rgb(var(--border-primary))] px-3.5 py-2 text-xs text-[rgb(var(--text-tertiary))]">
+          <p className="border-t border-[rgb(var(--border-primary)/0.35)] px-3.5 py-2 text-xs text-[rgb(var(--text-tertiary))]">
             {t('asyncJobs.pdfExportShared.failedBoxFoot', { count: counters.succeeded })}
           </p>
         </div>
@@ -223,7 +223,7 @@ export function ExportResult({
 
       {/* Collapsible file list */}
       {okRows.length > 0 && format === 'zip' && (
-        <div className="overflow-hidden rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))]">
+        <div className="overflow-hidden rounded-xl border border-[rgb(var(--border-primary)/0.5)] bg-[rgb(var(--background-primary))]">
           <button
             type="button"
             onClick={() => setListOpen((o) => !o)}
@@ -239,7 +239,7 @@ export function ExportResult({
             )}
           </button>
           {listOpen && (
-            <div className="max-h-48 overflow-y-auto border-t border-[rgb(var(--border-primary))]">
+            <div className="max-h-48 overflow-y-auto border-t border-[rgb(var(--border-primary)/0.35)]">
               {okRows.map((row) => (
                 <div
                   key={row.id}
@@ -299,7 +299,7 @@ function ResultChip({
         tone === 'danger' &&
           'border-[rgb(var(--state-danger-border)/0.4)] bg-[rgb(var(--state-danger-bg))] text-[rgb(var(--state-danger-fg))]',
         !tone &&
-          'border-[rgb(var(--border-primary))] bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]'
+          'border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))]'
       )}
     >
       {children}

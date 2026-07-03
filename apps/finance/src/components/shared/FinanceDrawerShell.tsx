@@ -58,7 +58,7 @@ export function FinanceDrawerShell({
           {icon}
           {iconBusy && (
             <span
-              className="absolute -inset-0.5 rounded-lg border-2 border-transparent border-t-[rgb(var(--state-success-border))] motion-safe:animate-spin motion-reduce:hidden"
+              className="absolute inset-0.5 rounded-full border-2 border-[rgb(var(--state-success-border)/0.2)] border-t-[rgb(var(--state-success-border))] motion-safe:animate-spin motion-reduce:hidden"
               aria-hidden="true"
             />
           )}
