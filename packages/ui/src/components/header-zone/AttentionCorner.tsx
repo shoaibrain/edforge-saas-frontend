@@ -4,14 +4,17 @@
  * Compound component:
  *   <AttentionCorner signals acked onAck onUnack>          ← provider (no DOM)
  *     <PageHeader mode="pagebar" attention={<AttentionCornerPill/>} … />
- *     <AttentionCornerShade />                             ← full-width, in flow
+ *     <AttentionCornerShade className="pt-3" />            ← full-width, in flow
  *   </AttentionCorner>
  *
  * Collapsed: a severity-segmented pill (●2 ●1 ●3 + "need attention"; mint
  * "✓ All clear" when empty; critical dot pulses). Expanded on desktop: a shade
  * slides down in flow, pushing content (measured-height animation — never an
- * auto-height jump). On mobile (<768px) the same content presents as a
- * focus-trapped bottom sheet with a scrim.
+ * auto-height jump). Express the gap above the shade as pt-* via `className`
+ * (applied INSIDE the measured height) — never a margin on/around the shade or
+ * a `space-y-*` slot: margins sit outside the animated box and pop at
+ * mount/unmount instead of animating. On mobile (<768px) the same content
+ * presents as a focus-trapped bottom sheet with a scrim.
  *
  * Signal rows are severity-ranked and carry: icon chip · SABER domain tag ·
  * title/sub · a deep-link fix (primary on critical) · 👍 acknowledge on
@@ -244,7 +247,14 @@ export function AttentionCornerPill({
   )
 }
 
-/** The expanding region — render full-width directly below the page header. */
+/**
+ * The expanding region — render full-width directly below the page header.
+ *
+ * `className` lands on the inner content layer, inside the animated height.
+ * Pass the header gap as padding (`pt-3` / `pt-5`) — never `mt-*`, and never
+ * let the shade be a direct `space-y-*` child: margins live outside the
+ * measured box and pop in/out at mount/unmount instead of animating.
+ */
 export function AttentionCornerShade({ className }: { className?: string }) {
   const ctx = useAttentionContext('AttentionCornerShade')
   const { open, setOpen, pillRef, labels, visible } = ctx
@@ -329,19 +339,47 @@ export function AttentionCornerShade({ className }: { className?: string }) {
   }
 
   // Desktop: an in-flow shade that pushes content (measured-height animation).
+  // Two layers, deliberately split:
+  //  - OUTER animates height only (symmetric standard ease both directions) and
+  //    clips via overflow-hidden. It must never carry padding or margins — with
+  //    border-box sizing, padding puts a floor under `height: 0`, and margins
+  //    sit outside the animated box, so both pop at mount/unmount.
+  //  - INNER carries the caller's gap as padding (className, e.g. `pt-3`)
+  //    INSIDE the measured height, and cross-fades on its own timing: in after
+  //    a short delay, out fast — content is gone before the box finishes
+  //    closing (no ghost) and the gap grows/shrinks with the height.
+  // Eases mirror the theme tokens (base.css): standard (0.4,0,0.2,1),
+  // enter (0.16,1,0.3,1), exit (0.4,0,1,1) — framer needs literal arrays.
   return (
     <AnimatePresence initial={false}>
       {open && (
         <motion.div
           role="region"
           aria-label={labels.region}
-          className={cn('overflow-hidden', className)}
-          initial={{ height: 0, opacity: 0, y: -6 }}
-          animate={{ height: 'auto', opacity: 1, y: 0 }}
-          exit={{ height: 0, opacity: 0, y: -6 }}
-          transition={{ duration: reduce ? 0 : 0.34, ease: [0.32, 0.72, 0, 1] }}
+          className="overflow-hidden"
+          initial={{ height: 0 }}
+          animate={{ height: 'auto' }}
+          exit={{ height: 0 }}
+          transition={{ duration: reduce ? 0 : 0.3, ease: [0.4, 0, 0.2, 1] }}
         >
-          {body}
+          <motion.div
+            className={className}
+            initial={{ opacity: 0, y: -6 }}
+            animate={{
+              opacity: 1,
+              y: 0,
+              transition: reduce
+                ? { duration: 0 }
+                : { duration: 0.2, delay: 0.1, ease: [0.16, 1, 0.3, 1] },
+            }}
+            exit={{
+              opacity: 0,
+              y: -6,
+              transition: reduce ? { duration: 0 } : { duration: 0.15, ease: [0.4, 0, 1, 1] },
+            }}
+          >
+            {body}
+          </motion.div>
         </motion.div>
       )}
     </AnimatePresence>

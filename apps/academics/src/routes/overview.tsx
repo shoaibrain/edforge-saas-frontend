@@ -326,8 +326,8 @@ function OverviewContent({ schoolId }: { schoolId: string }) {
                 },
               ]}
             />
+            <AttentionCornerShade className="pt-5" />
           </motion.div>
-          <AttentionCornerShade />
         </AttentionCorner>
 
         {/* ---- Filters & Export ---- */}

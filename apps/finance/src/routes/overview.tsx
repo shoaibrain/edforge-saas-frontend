@@ -254,7 +254,7 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
               },
             ]}
           />
-          <AttentionCornerShade />
+          <AttentionCornerShade className="pt-5" />
         </AttentionCorner>
       </motion.div>
 

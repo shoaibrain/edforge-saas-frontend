@@ -243,25 +243,28 @@ export function ExamsModule() {
           emptyTitle: t('moduleOverview.signals.emptyTitle'),
         }}
       >
-        <PageHeader
-          mode="pagebar"
-          attention={<AttentionCornerPill />}
-          actions={
-            canCreateExam
-              ? [
-                  {
-                    label: t('examModule.createExam'),
-                    icon: <Plus className="h-3.5 w-3.5" />,
-                    primary: true,
-                    disabled: !canOpenDrawer,
-                    ariaLabel: !canOpenDrawer ? t('examModule.createDisabledTitle') : t('examModule.createExam'),
-                    onClick: () => setDrawerOpen(true),
-                  },
-                ]
-              : undefined
-          }
-        />
-        <AttentionCornerShade />
+        {/* One space-y child: the shade's gap lives inside its animated height */}
+        <div>
+          <PageHeader
+            mode="pagebar"
+            attention={<AttentionCornerPill />}
+            actions={
+              canCreateExam
+                ? [
+                    {
+                      label: t('examModule.createExam'),
+                      icon: <Plus className="h-3.5 w-3.5" />,
+                      primary: true,
+                      disabled: !canOpenDrawer,
+                      ariaLabel: !canOpenDrawer ? t('examModule.createDisabledTitle') : t('examModule.createExam'),
+                      onClick: () => setDrawerOpen(true),
+                    },
+                  ]
+                : undefined
+            }
+          />
+          <AttentionCornerShade className="pt-5" />
+        </div>
       </AttentionCorner>
 
       {!academicYearId ? (
