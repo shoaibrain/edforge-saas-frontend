@@ -28,9 +28,28 @@ test.describe('People staff directory', () => {
     await expectNoConsoleErrors(errors.filter((e) => !e.includes('Failed to load resource')))
   })
 
-  test('search box is present with its aria-label', async ({ page }) => {
+  test('unified toolbar: search + role presets + Role facet + Export CSV', async ({ page }) => {
     await page.goto('/people/staff')
-    await expect(page.getByRole('textbox', { name: 'Search staff by name or email' })).toBeVisible()
+    // Unified ToolbarSearch — accessible name comes from its placeholder.
+    await expect(page.getByPlaceholder('Search by name or email...')).toBeVisible()
+    // Quick filters are docked toolbar preset tabs now.
+    await expect(page.getByRole('tab', { name: 'Teachers' })).toBeVisible()
+    await expect(page.getByRole('tab', { name: 'Principal' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Export CSV' })).toBeVisible()
+  })
+
+  test('selecting rows morphs the toolbar into the selection bar', async ({ page }) => {
+    await page.goto('/people/staff')
+    await expect(page.getByText('Anita Gurung').first()).toBeVisible()
+
+    await page.getByRole('checkbox', { name: 'Select all rows' }).check()
+    const bar = page.getByRole('toolbar', { name: 'Selection actions' })
+    await expect(bar).toBeVisible()
+    await expect(bar.getByText('3 selected')).toBeVisible()
+    await expect(bar.getByRole('button', { name: 'Export selected' })).toBeVisible()
+    await expect(bar.getByRole('button', { name: 'Delete selected' })).toBeVisible()
+    // Search is replaced in place (same footprint, no stacking).
+    await expect(page.getByPlaceholder('Search by name or email...')).toHaveCount(0)
   })
 })
 
