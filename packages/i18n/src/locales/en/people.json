@@ -5,16 +5,11 @@
     "title": "Staff Directory",
     "description": "Manage your organization's staff members and their access",
     "searchPlaceholder": "Search by name or email...",
-    "searchAria": "Search staff by name or email",
     "addStaff": "Add Staff Member",
-    "summary": {
-      "activeStaff": "{{count}} active staff member",
-      "activeStaff_plural": "{{count}} active staff members",
-      "teachers": "{{count}} teacher",
-      "teachers_plural": "{{count}} teachers",
-      "principals": "{{count}} principal",
-      "principals_plural": "{{count}} principals",
-      "systemAccess": "{{count}} with system access enabled"
+    "bulk": {
+      "exportSelected": "Export selected",
+      "deleteSelected": "Delete selected",
+      "requiresDelete": "Requires staff delete permission"
     }
   },
   "layout": {
@@ -76,6 +71,58 @@
     "domains": {
       "capacity": "Capacity",
       "dataQuality": "Data quality"
+    }
+  },
+  "dataTable": {
+    "errorTitle": "Failed to load data",
+    "errorDescription": "An unexpected error occurred.",
+    "retry": "Retry",
+    "clearSearch": "Clear search",
+    "clearFilters": "Clear filters",
+    "clearActiveFilters": "Clear ({{count}})",
+    "clearSelection": "Clear selection",
+    "selectedRows": "{{count}} selected",
+    "selectedRows_plural": "{{count}} selected",
+    "paginationShowing": "Showing {{start}}-{{end}} of {{total}} results",
+    "rowsPerPage": "{{size}} / page",
+    "previousPage": "Prev",
+    "nextPage": "Next",
+    "loadingPage": "Loading...",
+    "rowDensity": "Row density",
+    "comfortableDensity": "Comfortable",
+    "comfortableDensityTitle": "Comfortable rows",
+    "compactDensity": "Compact",
+    "compactDensityTitle": "Compact rows",
+    "viewOptions": "View",
+    "toggleColumns": "Toggle columns",
+    "export": "Export",
+    "exportFormats": {
+      "csv": "Export as CSV",
+      "xlsx": "Export as XLSX"
+    },
+    "xlsxUnavailable": "XLSX export ships in a follow-up",
+    "filterAriaLabel": "{{title}} filter",
+    "clearFilter": "Clear filter",
+    "moreFilters": "More filters",
+    "selection": {
+      "aria": "Selection actions",
+      "selected": "{{count}} selected",
+      "selectAll": "Select all {{count}}",
+      "clear": "Clear selection"
+    }
+  },
+  "bulkDelete": {
+    "title": "Delete {{count}} staff member?",
+    "title_plural": "Delete {{count}} staff members?",
+    "description": "This removes their staff records from the roster.",
+    "fanOutNote": "Each row is a separate request. A failure on one staff member doesn't roll back the others.",
+    "confirm": "Delete {{count}}",
+    "deleting": "Deleting…",
+    "toasts": {
+      "success": "Deleted {{count}} staff member",
+      "success_plural": "Deleted {{count}} staff members",
+      "allFailed": "No staff deleted — every request failed",
+      "partial": "Deleted {{ok}}; {{failed}} failed"
     }
   },
   "quickAccess": {
@@ -397,7 +444,6 @@
     "actions": "Actions",
     "closeDrawer": "Close drawer",
     "copyToClipboard": "Copy to clipboard",
-    "moreAddOptions": "More add options",
     "updateStatus": "Update Status",
     "assignToSchool": "Assign to School",
     "addCredential": "Add Credential"
@@ -430,9 +476,7 @@
     "role": "Role",
     "employmentStatus": "Employment Status",
     "department": "Department",
-    "allDepartments": "All Departments",
-    "roleAria": "Filter by role",
-    "departmentAria": "Filter by department"
+    "roleAria": "Filter by role"
   },
   "quickAdd": {
     "title": "Quick Add User",

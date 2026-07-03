@@ -5,16 +5,11 @@
     "title": "कर्मचारी निर्देशिका",
     "description": "तपाईंको संस्थाका कर्मचारी सदस्यहरू र तिनीहरूको पहुँच व्यवस्थापन गर्नुहोस्",
     "searchPlaceholder": "नाम वा इमेलले खोज्नुहोस्...",
-    "searchAria": "नाम वा इमेलले कर्मचारी खोज्नुहोस्",
     "addStaff": "कर्मचारी सदस्य थप्नुहोस्",
-    "summary": {
-      "activeStaff": "{{count}} सक्रिय कर्मचारी सदस्य",
-      "activeStaff_plural": "{{count}} सक्रिय कर्मचारी सदस्यहरू",
-      "teachers": "{{count}} शिक्षक",
-      "teachers_plural": "{{count}} शिक्षकहरू",
-      "principals": "{{count}} प्रधानाध्यापक",
-      "principals_plural": "{{count}} प्रधानाध्यापकहरू",
-      "systemAccess": "{{count}} जनाको प्रणाली पहुँच सक्षम"
+    "bulk": {
+      "exportSelected": "चयन गरिएका निर्यात गर्नुहोस्",
+      "deleteSelected": "चयन गरिएका हटाउनुहोस्",
+      "requiresDelete": "कर्मचारी हटाउने अनुमति आवश्यक छ"
     }
   },
   "layout": {
@@ -76,6 +71,58 @@
     "domains": {
       "capacity": "क्षमता",
       "dataQuality": "डेटा गुणस्तर"
+    }
+  },
+  "dataTable": {
+    "errorTitle": "डाटा लोड गर्न असफल",
+    "errorDescription": "अनपेक्षित त्रुटि भयो।",
+    "retry": "पुन: प्रयास गर्नुहोस्",
+    "clearSearch": "खोज खाली गर्नुहोस्",
+    "clearFilters": "फिल्टरहरू हटाउनुहोस्",
+    "clearActiveFilters": "हटाउनुहोस् ({{count}})",
+    "clearSelection": "छनोट हटाउनुहोस्",
+    "selectedRows": "{{count}} चयन गरिएको",
+    "selectedRows_plural": "{{count}} चयन गरिएको",
+    "paginationShowing": "{{start}}-{{end}} / {{total}} नतिजा",
+    "rowsPerPage": "{{size}} / पृष्ठ",
+    "previousPage": "अघिल्लो",
+    "nextPage": "अर्को",
+    "loadingPage": "लोड हुँदै...",
+    "rowDensity": "पङ्क्ति घनत्व",
+    "comfortableDensity": "आरामदायी",
+    "comfortableDensityTitle": "आरामदायी पङ्क्तिहरू",
+    "compactDensity": "सघन",
+    "compactDensityTitle": "सघन पङ्क्तिहरू",
+    "viewOptions": "दृश्य",
+    "toggleColumns": "स्तम्भहरू देखाउने/लुकाउने",
+    "export": "निर्यात",
+    "exportFormats": {
+      "csv": "CSV निर्यात गर्नुहोस्",
+      "xlsx": "XLSX निर्यात गर्नुहोस्"
+    },
+    "xlsxUnavailable": "XLSX निर्यात अर्को चरणमा आउनेछ",
+    "filterAriaLabel": "{{title}} फिल्टर",
+    "clearFilter": "फिल्टर हटाउनुहोस्",
+    "moreFilters": "थप फिल्टरहरू",
+    "selection": {
+      "aria": "चयन कारबाहीहरू",
+      "selected": "{{count}} चयन गरियो",
+      "selectAll": "सबै {{count}} चयन गर्नुहोस्",
+      "clear": "चयन खाली गर्नुहोस्"
+    }
+  },
+  "bulkDelete": {
+    "title": "{{count}} कर्मचारी हटाउने हो?",
+    "title_plural": "{{count}} कर्मचारीहरू हटाउने हो?",
+    "description": "यसले उनीहरूको कर्मचारी रेकर्ड रोस्टरबाट हटाउँछ।",
+    "fanOutNote": "प्रत्येक पङ्क्ति छुट्टै अनुरोध हो। एउटामा असफलता भए अरूलाई फिर्ता गर्दैन।",
+    "confirm": "{{count}} हटाउनुहोस्",
+    "deleting": "हटाउँदै…",
+    "toasts": {
+      "success": "{{count}} कर्मचारी हटाइयो",
+      "success_plural": "{{count}} कर्मचारीहरू हटाइए",
+      "allFailed": "कुनै कर्मचारी हटाइएन — सबै अनुरोध असफल भए",
+      "partial": "{{ok}} हटाइयो; {{failed}} असफल"
     }
   },
   "quickAccess": {
@@ -397,7 +444,6 @@
     "actions": "कार्यहरू",
     "closeDrawer": "ड्रअर बन्द गर्नुहोस्",
     "copyToClipboard": "क्लिपबोर्डमा प्रतिलिपि गर्नुहोस्",
-    "moreAddOptions": "थप विकल्पहरू",
     "updateStatus": "स्थिति अद्यावधिक गर्नुहोस्",
     "assignToSchool": "विद्यालयमा नियुक्त गर्नुहोस्",
     "addCredential": "प्रमाणपत्र थप्नुहोस्"
@@ -430,9 +476,7 @@
     "role": "भूमिका",
     "employmentStatus": "रोजगारी स्थिति",
     "department": "विभाग",
-    "allDepartments": "सबै विभागहरू",
-    "roleAria": "भूमिकाद्वारा फिल्टर गर्नुहोस्",
-    "departmentAria": "विभागद्वारा फिल्टर गर्नुहोस्"
+    "roleAria": "भूमिकाद्वारा फिल्टर गर्नुहोस्"
   },
   "quickAdd": {
     "title": "द्रुत प्रयोगकर्ता थप्नुहोस्",
