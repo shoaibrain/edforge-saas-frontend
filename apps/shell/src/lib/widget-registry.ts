@@ -13,11 +13,8 @@
 
 import type { LucideIcon } from 'lucide-react'
 import {
-  Clock,
   Calendar,
   Sparkles,
-  LayoutGrid,
-  BarChart3,
   Lightbulb,
   CheckSquare,
   Layers,
@@ -44,9 +41,7 @@ export type WidgetCategory =
 /**
  * Page type for widget configuration
  */
-export type DynamicPageType = 
-  | 'home'              // Main home/dashboard page
-  | 'module-overview'   // Module landing pages (academics, finance, etc.)
+export type DynamicPageType = 'home'
 
 /**
  * Widget definition with all metadata
@@ -95,45 +90,6 @@ export interface PageWidgetConfig {
 // ============================================================================
 
 /**
- * Recently Visited carousel widget (home page)
- */
-export const RECENTLY_VISITED_WIDGET: WidgetDefinition = {
-  id: 'recently-visited',
-  label: 'Recently visited',
-  icon: Clock,
-  category: 'content',
-  defaultVisible: true,
-  order: 10,
-  description: 'Pages you visited recently',
-}
-
-/**
- * Quick Stats carousel widget (module overview pages)
- */
-export const QUICK_STATS_WIDGET: WidgetDefinition = {
-  id: 'quick-stats',
-  label: 'Quick stats',
-  icon: BarChart3,
-  category: 'content',
-  defaultVisible: true,
-  order: 10,
-  description: 'Key metrics at a glance',
-}
-
-/**
- * Upcoming Events widget
- */
-export const UPCOMING_EVENTS_WIDGET: WidgetDefinition = {
-  id: 'upcoming-events',
-  label: 'Upcoming events',
-  icon: Calendar,
-  category: 'calendar',
-  defaultVisible: true,
-  order: 20,
-  description: 'Calendar events and deadlines',
-}
-
-/**
  * Quick Actions grid widget
  */
 export const QUICK_ACTIONS_WIDGET: WidgetDefinition = {
@@ -144,45 +100,6 @@ export const QUICK_ACTIONS_WIDGET: WidgetDefinition = {
   defaultVisible: true,
   order: 30,
   description: 'Frequently used actions',
-}
-
-/**
- * Module Quick Access cards widget (overview pages)
- */
-export const QUICK_ACCESS_WIDGET: WidgetDefinition = {
-  id: 'quick-access',
-  label: 'Quick access',
-  icon: LayoutGrid,
-  category: 'content',
-  defaultVisible: true,
-  order: 40,
-  description: 'Navigate to sub-sections',
-}
-
-/**
- * Welcome Tip / Learn widget
- */
-export const WELCOME_TIP_WIDGET: WidgetDefinition = {
-  id: 'welcome-tip',
-  label: 'Tips & guidance',
-  icon: Lightbulb,
-  category: 'insights',
-  defaultVisible: true,
-  order: 50,
-  description: 'Helpful tips and onboarding',
-}
-
-/**
- * My Tasks widget (future feature)
- */
-export const MY_TASKS_WIDGET: WidgetDefinition = {
-  id: 'my-tasks',
-  label: 'My tasks',
-  icon: CheckSquare,
-  category: 'tasks',
-  defaultVisible: false, // Disabled by default until implemented
-  order: 25,
-  description: 'Your pending tasks',
 }
 
 /**
@@ -211,19 +128,6 @@ export const HOME_TEACHER_SECTIONS_WIDGET: WidgetDefinition = {
   description: 'Your assigned class sections',
 }
 
-/**
- * Database Views widget (future feature)
- */
-export const DATABASE_VIEWS_WIDGET: WidgetDefinition = {
-  id: 'database-views',
-  label: 'Database views',
-  icon: Layers,
-  category: 'views',
-  defaultVisible: false, // Disabled by default until implemented
-  order: 60,
-  description: 'Custom data views',
-}
-
 // ============================================================================
 // PAGE CONFIGURATIONS
 // ============================================================================
@@ -244,24 +148,6 @@ export const HOME_PAGE_CONFIG: PageWidgetConfig = {
   },
 }
 
-/**
- * Module Overview page widget configuration
- * Used by Academics, Finance, People, Analytics, Communications
- */
-export const MODULE_OVERVIEW_CONFIG: PageWidgetConfig = {
-  pageType: 'module-overview',
-  widgets: [
-    QUICK_STATS_WIDGET,
-    UPCOMING_EVENTS_WIDGET,
-    QUICK_ACCESS_WIDGET,
-    WELCOME_TIP_WIDGET,
-  ],
-  settings: {
-    showGreeting: false,
-    showTitle: true,
-  },
-}
-
 // ============================================================================
 // REGISTRY FUNCTIONS
 // ============================================================================
@@ -272,9 +158,6 @@ export const MODULE_OVERVIEW_CONFIG: PageWidgetConfig = {
 export function getPageConfig(pageType: DynamicPageType): PageWidgetConfig {
   switch (pageType) {
     case 'home':
-      return HOME_PAGE_CONFIG
-    case 'module-overview':
-      return MODULE_OVERVIEW_CONFIG
     default:
       return HOME_PAGE_CONFIG
   }

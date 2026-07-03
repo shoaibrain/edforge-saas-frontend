@@ -18,10 +18,6 @@ import StaffPage from './routes/staff'
 import StaffDetailPage from './routes/staff/detail'
 import StaffNewPage from './routes/staff/new'
 import NewPersonPage from './routes/new'
-import { DepartmentsModule } from './routes/departments'
-import { RolesModule } from './routes/roles'
-import { SettingsModule } from './routes/settings'
-import { AnalyticsModule } from './routes/analytics'
 
 // ============================================================================
 // ROOT ROUTE
@@ -70,40 +66,12 @@ const newPersonRoute = createRoute({
     component: NewPersonPage,
 })
 
-const departmentsRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: '/departments',
-    component: DepartmentsModule,
-})
-
-const rolesRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: '/roles',
-    component: RolesModule,
-})
-
-const settingsRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: '/settings',
-    component: SettingsModule,
-})
-
-const analyticsRoute = createRoute({
-    getParentRoute: () => rootRoute,
-    path: '/analytics',
-    component: AnalyticsModule,
-})
-
 const routeTree = rootRoute.addChildren([
     indexRoute,
     staffRoute,
     staffNewRoute,
     staffDetailRoute,
     newPersonRoute,
-    departmentsRoute,
-    rolesRoute,
-    settingsRoute,
-    analyticsRoute,
 ])
 
 export const router = createRouter({
