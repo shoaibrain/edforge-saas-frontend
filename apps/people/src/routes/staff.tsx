@@ -1,48 +1,52 @@
 /**
- * Staff Directory Page — V2
+ * Staff Directory Page — canonical list recipe (T5.2)
  *
- * Complete employee roster with V2 design system.
- * Features: V2 header, KPI tiles, filter strip with chips,
- * restyled TanStack table, split button, empty states.
+ * PageHeader (pagebar, ⑧ AttentionCorner pill in the attention slot) →
+ * StatBand → shared DataTable with the unified toolbar (search · role
+ * presets · Role facet · Export CSV) and ⑨ SelectionContextBar
+ * (Export selected · Delete selected).
+ *
+ * Corner signals + StatBand derive from an UNFILTERED staff query (the same
+ * hook the People Overview uses, so the ids/acks mean the same thing on both
+ * pages and the KPIs don't churn while searching/filtering); the table runs
+ * on the filtered, cursor-paginated query.
  */
 
-import { useState, useRef, useEffect } from 'react'
+import { useMemo, useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
-import {
-  Users,
-  Search,
-  BookOpen,
-  Briefcase,
-  Lock,
-  ChevronDown,
-  UserPlus,
-  Download,
-} from 'lucide-react'
+import { Download, Trash2, UserPlus } from 'lucide-react'
 import { useTranslation } from '@edforge/i18n'
 import {
+  AttentionCorner,
+  AttentionCornerPill,
+  AttentionCornerShade,
+  Button,
   Container,
-  ContextBar,
   ErrorState,
   focusRing,
-  focusRingInset,
-  Inline,
-  Input,
+  PageHeader,
   Select,
-  StatCard,
-  Text,
-  WidgetErrorBoundaryV2,
+  SelectionContextBar,
+  StatBand,
+  useSignalAcks,
+  type SelectionAction,
   type SelectOption,
+  type Signal,
+  type StatMetric,
 } from '@edforge/ui'
+import type { RowSelectionState } from '@tanstack/react-table'
 import type { StaffResponseDto } from '@aibrains/shared-types'
 import type { StaffRole, EmploymentStatus } from '@aibrains/shared-types'
 import { usePermission } from '@edforge/abac'
 import { getRoleI18nKey } from '../components/staff/StaffRoleBadge'
 
-import { usePaginatedQuery, useDebounce, useModalState } from '../hooks'
+import { usePaginatedQuery, useDebounce, useModalState, useStaffList } from '../hooks'
 import { useActiveSchoolId } from '../stores/app.store'
+import { getStaffAvatar } from '../lib/avatar'
 import {
+  BulkDeleteStaffModal,
   CreateUserModal,
   EditStaffModal,
   DeleteConfirmDialog,
@@ -70,6 +74,42 @@ type QuickFilter = 'all' | 'teacher' | 'principal' | 'support'
 interface StaffFilters {
   role?: StaffRole
   employmentStatus?: EmploymentStatus
+}
+
+// ============================================================================
+// CSV EXPORT (shared by the toolbar button and the selection-bar action)
+// ============================================================================
+
+type Translate = ReturnType<typeof useTranslation>['t']
+
+function exportStaffCsv(rows: StaffResponseDto[], t: Translate) {
+  if (rows.length === 0) return
+  const headers = [
+    t('export.headers.name'),
+    t('export.headers.email'),
+    t('export.headers.role'),
+    t('export.headers.status'),
+    t('export.headers.phone'),
+    t('export.headers.hireDate'),
+  ]
+  const body = rows.map((s) => [
+    `${s.firstName} ${s.lastSurname}`,
+    s.email || '',
+    s.role || '',
+    s.employmentStatus || '',
+    s.phone || '',
+    s.hireDate ? new Date(s.hireDate).toLocaleDateString() : '',
+  ])
+  const csvContent = [headers, ...body]
+    .map((r) => r.map((c) => `"${c.replace(/"/g, '""')}"`).join(','))
+    .join('\n')
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `staff-directory-${new Date().toISOString().slice(0, 10)}.csv`
+  link.click()
+  URL.revokeObjectURL(url)
 }
 
 // ============================================================================
@@ -107,7 +147,7 @@ export default function StaffPage() {
     })
   }
 
-  // Quick filter chip handler
+  // Quick filter preset handler (unified-toolbar presets)
   const handleQuickFilter = (chip: QuickFilter) => {
     setQuickFilter(chip)
     if (chip === 'all') {
@@ -121,32 +161,18 @@ export default function StaffPage() {
     }
   }
 
-  // Split button dropdown state
-  const [addDropdownOpen, setAddDropdownOpen] = useState(false)
-  const dropdownRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setAddDropdownOpen(false)
-      }
-    }
-    if (addDropdownOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
-      return () => document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [addDropdownOpen])
-
   // Modal state management
   const modal = useModalState<StaffResponseDto>()
 
-  // Paginated data fetching
+  // Filtered, cursor-paginated table data
   const {
     items: staffMembers,
     isLoading,
     error,
     refetch,
-    totalLoaded,
+    hasMore,
+    isFetchingNextPage,
+    loadMore,
   } = usePaginatedQuery<StaffResponseDto>({
     queryKey: ['staff', schoolId, debouncedSearch, filters],
     queryFn: ({ limit, cursor }) =>
@@ -162,7 +188,14 @@ export default function StaffPage() {
 
   const staffQueryKey = ['staff', schoolId, debouncedSearch, filters]
 
-  // Optimistic delete mutation
+  // Unfiltered roster — feeds the ⑧ corner signals and the StatBand so they
+  // stay stable under search/role filters and match the Overview's numbers
+  // (same hook + key as overview.tsx → TanStack shares the cache entry).
+  const { items: allStaff, isLoading: rosterLoading } = useStaffList(
+    schoolId ? { schoolId } : undefined,
+  )
+
+  // Optimistic delete mutation (single-row flow via the drawer)
   const deleteMutation = useMutation({
     mutationFn: (staffId: string) => staffService.deleteStaff(staffId),
     onMutate: async (staffId) => {
@@ -201,60 +234,170 @@ export default function StaffPage() {
     await deleteMutation.mutateAsync(modal.data.staffId)
   }
 
-  // Quick stats derived from loaded data
-  const teacherCount = staffMembers.filter((s) => s.role === 'teacher').length
-  const principalCount = staffMembers.filter(
-    (s) => s.role === 'principal' || s.role === 'vice_principal',
-  ).length
-  const supportCount = staffMembers.filter(
-    (s) => s.role === 'support_staff' || s.role === 'admin_staff' || s.role === 'it_staff',
-  ).length
-  const accessCount = staffMembers.filter((s) => !!s.userId).length
-  const noAccessCount = staffMembers.length - accessCount
+  // Roster stats (unfiltered — StatBand + corner)
+  const stats = useMemo(() => {
+    const teachers = allStaff.filter((s) => s.role === 'teacher').length
+    const support = allStaff.filter(
+      (s) => s.role === 'support_staff' || s.role === 'admin_staff' || s.role === 'it_staff',
+    ).length
+    const withAccess = allStaff.filter((s) => !!s.userId).length
+    return {
+      total: allStaff.length,
+      teachers,
+      support,
+      withAccess,
+      noAccess: allStaff.length - withAccess,
+      unassigned: allStaff.filter((s) => !s.departmentName).length,
+    }
+  }, [allStaff])
 
-  // CSV export
-  const handleExportCsv = () => {
-    if (staffMembers.length === 0) return
-    const headers = [
-      t('export.headers.name'),
-      t('export.headers.email'),
-      t('export.headers.role'),
-      t('export.headers.status'),
-      t('export.headers.phone'),
-      t('export.headers.hireDate'),
-    ]
-    const rows = staffMembers.map((s) => [
-      `${s.firstName} ${s.lastSurname}`,
-      s.email || '',
-      s.role || '',
-      s.employmentStatus || '',
-      s.phone || '',
-      s.hireDate ? new Date(s.hireDate).toLocaleDateString() : '',
-    ])
-    const csvContent = [headers, ...rows]
-      .map((r) => r.map((c) => `"${c.replace(/"/g, '""')}"`).join(','))
-      .join('\n')
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `staff-directory-${new Date().toISOString().slice(0, 10)}.csv`
-    link.click()
-    URL.revokeObjectURL(url)
+  // ── ⑧ Attention Corner signals (spec §7b) — same ids as the Overview so
+  // acknowledgements roam between the two pages. No `fix` link: this page IS
+  // the fixing surface.
+  const { acked, ack, unack } = useSignalAcks()
+  const signals: Signal[] = []
+  if (!rosterLoading) {
+    if (stats.unassigned > 0) {
+      signals.push({
+        id: 'people.unassignedDepartment',
+        severity: 'warn',
+        domain: t('headerZone.domains.capacity'),
+        title: t('overview.signals.unassignedTitle', { count: stats.unassigned }),
+        description: t('overview.signals.unassignedDescription'),
+      })
+    }
+    if (stats.noAccess > 0) {
+      signals.push({
+        id: 'people.noSystemAccess',
+        severity: 'info',
+        domain: t('headerZone.domains.dataQuality'),
+        title: t('overview.signals.noAccessTitle', { count: stats.noAccess }),
+        description: t('overview.signals.noAccessDescription'),
+      })
+    }
   }
+
+  // ── StatBand metrics (calm; mirror the Overview's signatures) ────────────
+  const metrics: StatMetric[] = [
+    {
+      label: t('stats.totalStaff'),
+      value: rosterLoading ? '—' : String(stats.total),
+      iconSignature: 'people',
+      state: 'normal',
+      primary: true,
+      sub: t('stats.tags.allActive'),
+    },
+    {
+      label: t('stats.teachers'),
+      value: rosterLoading ? '—' : String(stats.teachers),
+      iconSignature: 'academics',
+      state: 'normal',
+      sub: t('stats.tags.active'),
+    },
+    {
+      label: t('stats.supportStaff'),
+      value: rosterLoading ? '—' : String(stats.support),
+      iconSignature: 'staff',
+      state: stats.support > 0 ? 'normal' : 'muted',
+      sub: stats.support > 0 ? t('stats.tags.active') : t('stats.tags.noneYet'),
+    },
+    {
+      label: t('stats.systemAccess'),
+      value: rosterLoading ? '—' : String(stats.withAccess),
+      iconSignature: 'security',
+      state: 'normal',
+      sub: t('stats.tags.noAccess', { count: stats.noAccess }),
+    },
+  ]
+
+  // ── ⑨ Selection Context Bar ───────────────────────────────────────────────
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+  const [bulkDeleteTarget, setBulkDeleteTarget] = useState<StaffResponseDto[] | null>(null)
+
+  const selectedStaff = useMemo(() => {
+    const ids = new Set(Object.keys(rowSelection).filter((id) => rowSelection[id]))
+    return staffMembers.filter((s) => ids.has(s.staffId))
+  }, [rowSelection, staffMembers])
+
+  const selectionActions = useMemo<SelectionAction[]>(() => {
+    const byId = new Map(selectedStaff.map((s) => [s.staffId, s]))
+    const rowsFor = (ids: string[]) =>
+      ids.map((id) => byId.get(id)).filter((s): s is StaffResponseDto => !!s)
+    const allIds = selectedStaff.map((s) => s.staffId)
+    return [
+      {
+        id: 'export-selected',
+        label: t('staffDirectory.bulk.exportSelected'),
+        icon: <Download className="h-3.5 w-3.5" />,
+        applicableIds: allIds,
+        onAction: (ids) => exportStaffCsv(rowsFor(ids), t),
+      },
+      {
+        id: 'delete',
+        label: t('staffDirectory.bulk.deleteSelected'),
+        icon: <Trash2 className="h-3.5 w-3.5" />,
+        danger: true,
+        applicableIds: allIds,
+        locked: !canDelete,
+        lockedReason: t('staffDirectory.bulk.requiresDelete'),
+        onAction: (ids) => setBulkDeleteTarget(rowsFor(ids)),
+      },
+    ]
+  }, [selectedStaff, canDelete, t])
+
+  const singleSelected = selectedStaff.length === 1 ? selectedStaff[0] : null
+  const selectionBar = (
+    <SelectionContextBar
+      selectedCount={selectedStaff.length}
+      totalCount={staffMembers.length}
+      onClear={() => setRowSelection({})}
+      onSelectAll={() =>
+        setRowSelection(Object.fromEntries(staffMembers.map((s) => [s.staffId, true])))
+      }
+      actions={selectionActions}
+      aria-label={t('dataTable.selection.aria')}
+      labels={{
+        selected: (count) => t('dataTable.selection.selected', { count }),
+        selectAll: (total) => t('dataTable.selection.selectAll', { count: total }),
+        clear: t('dataTable.selection.clear'),
+      }}
+      peek={
+        singleSelected ? (
+          <div className="flex min-w-0 items-center gap-2.5">
+            <img
+              src={getStaffAvatar(singleSelected.staffId)}
+              alt=""
+              className="h-8 w-8 flex-shrink-0 rounded-full object-cover"
+            />
+            <div className="min-w-0">
+              <div className="truncate text-sm font-semibold text-[rgb(var(--text-primary))]">
+                {singleSelected.firstName} {singleSelected.lastSurname}
+              </div>
+              <div className="truncate text-2xs text-[rgb(var(--text-tertiary))]">
+                {singleSelected.role
+                  ? t(`roles.${getRoleI18nKey(singleSelected.role)}`, { defaultValue: singleSelected.role })
+                  : t('common.unknown')}
+                {singleSelected.email ? ` · ${singleSelected.email}` : ''}
+              </div>
+            </div>
+          </div>
+        ) : undefined
+      }
+    />
+  )
 
   // Drawer state
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const [selectedStaff, setSelectedStaff] = useState<StaffResponseDto | null>(null)
+  const [selectedForDrawer, setSelectedForDrawer] = useState<StaffResponseDto | null>(null)
 
   const handleViewStaff = (staff: StaffResponseDto) => {
-    setSelectedStaff(staff)
+    setSelectedForDrawer(staff)
     setDrawerOpen(true)
   }
 
   const handleCloseDrawer = () => {
     setDrawerOpen(false)
-    setSelectedStaff(null)
+    setSelectedForDrawer(null)
   }
 
   // Error state
@@ -286,169 +429,81 @@ export default function StaffPage() {
     label: t(`roles.${getRoleI18nKey(role)}`, { defaultValue: role }),
   }))
 
-  const pageActions = canCreate ? (
-    <div className="relative" ref={dropdownRef}>
-      <Inline gap="none" className="h-9">
-        <button
-          type="button"
-          onClick={() => navigate({ to: '/staff/new' })}
-          className={`inline-flex h-9 items-center gap-1.5 rounded-l-lg border-r border-[rgb(var(--background-primary)/0.18)] bg-[rgb(var(--action-primary-bg))] px-3.5 text-xs font-medium text-[rgb(var(--text-inverted))] transition-colors hover:bg-[rgb(var(--state-info-fg))] ${focusRing}`}
-        >
-          <UserPlus className="h-3.5 w-3.5" />
-          {t('staffDirectory.addStaff')}
-        </button>
-        <button
-          type="button"
-          onClick={() => setAddDropdownOpen(!addDropdownOpen)}
-          className={`inline-flex h-9 w-8 items-center justify-center rounded-r-lg bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--text-inverted))] transition-colors hover:bg-[rgb(var(--state-info-fg))] ${focusRing}`}
-          aria-label={t('actions.moreAddOptions')}
-        >
-          <ChevronDown className="h-3 w-3" />
-        </button>
-      </Inline>
-      {addDropdownOpen && (
-        <div className="absolute right-0 z-30 mt-1 w-44 rounded-lg border border-border-primary bg-surface-primary py-1 shadow-xl">
-          <button
-            type="button"
-            onClick={() => {
-              setAddDropdownOpen(false)
-              modal.openCreate()
-            }}
-            className={`w-full px-3 py-2 text-left text-xs text-text-secondary transition-colors hover:bg-surface-secondary ${focusRingInset}`}
-          >
-            {t('quickAdd.menuLabel')}
-          </button>
-        </div>
-      )}
-    </div>
-  ) : undefined
-
   return (
     <Container size="full" padding="lg" className="overflow-auto py-6">
-      {/* Context Bar (operating context, not a page title — the shell breadcrumb
-          carries "People › Staff") */}
+      {/* Screen-reader page heading (breadcrumb names the page visually) */}
       <h1 className="sr-only">{t('staffDirectory.title')}</h1>
-      <ContextBar
-        className="mb-2"
-        meta={
-          <span>
-            {new Date().toLocaleDateString('en-US', {
-              weekday: 'long',
-              month: 'short',
-              day: 'numeric',
-              year: 'numeric',
-            })}
-          </span>
-        }
-        actions={pageActions}
-      />
 
-      {/* CONTEXT BANNER */}
-      <Text variant="caption" className="mb-5">
-        <em className="font-medium not-italic text-[rgb(var(--accent-coral-text))]">
-          {t('staffDirectory.summary.activeStaff', { count: totalLoaded })}
-        </em>
-        {' · '}
-        <span className="font-medium text-[rgb(var(--state-success-fg))]">
-          {t('staffDirectory.summary.teachers', { count: teacherCount })}
-        </span>
-        {' · '}
-        <span className="font-medium text-[rgb(var(--state-info-fg))]">
-          {t('staffDirectory.summary.principals', { count: principalCount })}
-        </span>
-        {' · '}
-        <span className="font-medium text-[rgb(var(--action-primary-bg))]">
-          {t('staffDirectory.summary.systemAccess', { count: accessCount })}
-        </span>
-      </Text>
+      {/* ---- ⑧ Header zone — attention pill left, actions right ---- */}
+      <div className="mb-4">
+        <AttentionCorner
+          signals={signals}
+          acked={acked}
+          onAck={ack}
+          onUnack={unack}
+          labels={{
+            needAttention: t('headerZone.needAttention'),
+            allClear: t('headerZone.allClear'),
+            region: t('headerZone.region'),
+            minimize: t('headerZone.minimize'),
+            acknowledge: t('headerZone.acknowledge'),
+            acknowledged: t('headerZone.acknowledged'),
+            acknowledgedHint: t('headerZone.acknowledgedHint'),
+            dismiss: t('headerZone.dismiss'),
+            emptyTitle: t('headerZone.emptyTitle'),
+          }}
+        >
+          <PageHeader
+            mode="pagebar"
+            attention={<AttentionCornerPill data-testid="attention-pill" />}
+            actions={
+              canCreate
+                ? [
+                    {
+                      label: t('quickAdd.menuLabel'),
+                      icon: <UserPlus className="h-3.5 w-3.5" />,
+                      onClick: () => modal.openCreate(),
+                    },
+                    {
+                      label: t('staffDirectory.addStaff'),
+                      icon: <UserPlus className="h-3.5 w-3.5" />,
+                      primary: true,
+                      onClick: () => navigate({ to: '/staff/new' }),
+                    },
+                  ]
+                : []
+            }
+          />
+          <AttentionCornerShade />
+        </AttentionCorner>
+      </div>
 
-      {/* KPI TILES */}
-      <WidgetErrorBoundaryV2>
-        <div className="grid grid-cols-4 gap-2.5 mb-4">
-          <StatCard
-            label={t('stats.totalStaff')}
-            value={isLoading ? '—' : totalLoaded.toString()}
-            icon={Users}
-            signature="people"
-            accentColor="rgba(216,90,48,0.10)"
-            iconColor="#D85A30"
-            barColor="#D85A30"
-            valueColor="#D85A30"
-            tag={{ text: t('stats.tags.allActive'), color: '#D85A30', bg: 'rgba(216,90,48,0.10)' }}
-            loading={isLoading}
-          />
-          <StatCard
-            label={t('stats.teachers')}
-            value={isLoading ? '—' : teacherCount.toString()}
-            icon={BookOpen}
-            signature="curriculum"
-            accentColor="rgba(29,158,117,0.10)"
-            iconColor="#1D9E75"
-            barColor="#1D9E75"
-            valueColor="#1D9E75"
-            tag={{ text: t('stats.tags.active'), color: '#1D9E75', bg: 'rgba(29,158,117,0.10)' }}
-            loading={isLoading}
-          />
-          <StatCard
-            label={t('stats.supportStaff')}
-            value={isLoading ? '—' : supportCount.toString()}
-            icon={Briefcase}
-            signature="staff"
-            accentColor={supportCount > 0 ? 'rgba(55,138,221,0.10)' : 'rgba(255,255,255,0.06)'}
-            iconColor={supportCount > 0 ? '#378ADD' : 'rgb(var(--text-tertiary))'}
-            barColor={supportCount > 0 ? '#378ADD' : 'rgb(var(--text-disabled))'}
-            valueColor={supportCount > 0 ? '#378ADD' : 'rgb(var(--text-tertiary))'}
-            tag={{
-              text: supportCount > 0 ? t('stats.tags.active') : t('stats.tags.noneYet'),
-              color: supportCount > 0 ? '#378ADD' : 'rgb(var(--text-tertiary))',
-              bg: supportCount > 0 ? 'rgba(55,138,221,0.10)' : 'rgba(255,255,255,0.05)',
-            }}
-            loading={isLoading}
-          />
-          <StatCard
-            label={t('stats.systemAccess')}
-            value={isLoading ? '—' : accessCount.toString()}
-            icon={Lock}
-            accentColor="rgba(55,138,221,0.10)"
-            iconColor="#378ADD"
-            barColor="#378ADD"
-            valueColor="#378ADD"
-            tag={{ text: t('stats.tags.noAccess', { count: noAccessCount }), color: '#378ADD', bg: 'rgba(55,138,221,0.10)' }}
-            loading={isLoading}
-          />
-        </div>
-      </WidgetErrorBoundaryV2>
+      {/* ---- StatBand — roster KPIs (unfiltered) ---- */}
+      <div className="mb-4">
+        <StatBand metrics={metrics} ariaLabel={t('overview.kpi.region')} />
+      </div>
 
-      {/* FILTER STRIP */}
-      <Inline gap="sm" className="mb-3">
-        {(['all', 'teacher', 'principal', 'support'] as QuickFilter[]).map((chip) => (
-          <button
-            key={chip}
-            type="button"
-            onClick={() => handleQuickFilter(chip)}
-            className={`inline-flex h-8 items-center whitespace-nowrap rounded-lg border px-3 text-xs font-medium transition-colors ${focusRingInset} ${quickFilter === chip ? 'border-[rgb(var(--action-primary-bg)/0.35)] bg-[rgb(var(--action-primary-bg)/0.10)] text-[rgb(var(--action-primary-bg))]' : 'border-border-secondary bg-surface-secondary text-text-tertiary hover:bg-surface-tertiary hover:text-text-primary'}`}
-          >
-            {t(`quickFilters.${chip}`)}
-          </button>
-        ))}
-
-        {/* Search input */}
-        <div className="flex min-w-52 flex-1 items-center">
-          <Input
-            size="sm"
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder={t('staffDirectory.searchPlaceholder')}
-            prefix={<Search className="h-3.5 w-3.5" />}
-            aria-label={t('staffDirectory.searchAria')}
-          />
-        </div>
-
-        {/* Role dropdown */}
-        <div className="w-44">
+      {/* ---- Staff table — unified toolbar + ⑨ selection ---- */}
+      <StaffTable
+        staff={staffMembers}
+        isLoading={isLoading}
+        onAddStaff={canCreate ? () => navigate({ to: '/staff/new' }) : undefined}
+        onViewStaff={handleViewStaff}
+        searchPlaceholder={t('staffDirectory.searchPlaceholder')}
+        searchValue={search}
+        onSearchChange={setSearch}
+        presets={(['all', 'teacher', 'principal', 'support'] as QuickFilter[]).map((chip) => ({
+          value: chip,
+          label: t(`quickFilters.${chip}`),
+        }))}
+        activePreset={quickFilter}
+        onPresetChange={(v) => handleQuickFilter(v as QuickFilter)}
+        primaryFilter={
+          /* Department facet returns when the people app productizes a
+             departments source (useDepartments in the staff wizard). */
           <Select
             size="sm"
+            className="w-44"
             aria-label={t('filters.roleAria')}
             options={roleOptions}
             value={filters.role ?? null}
@@ -458,47 +513,34 @@ export default function StaffPage() {
             }}
             placeholder={t('filters.allRoles')}
             clearable
+            buttonClassName="border-[rgb(var(--border-primary)/0.35)]"
           />
-        </div>
-
-        {/* Department dropdown */}
-        <div className="w-44">
-          <Select
+        }
+        toolbarExtra={
+          <Button
+            variant="outline"
             size="sm"
-            aria-label={t('filters.departmentAria')}
-            options={[]}
-            value={null}
-            onChange={() => {}}
-            placeholder={t('filters.allDepartments')}
-            disabled
-          />
-        </div>
-
-        {/* Export CSV */}
-        <button
-          type="button"
-          onClick={handleExportCsv}
-          disabled={staffMembers.length === 0}
-          className={`ml-auto inline-flex h-8 items-center gap-1.5 whitespace-nowrap rounded-lg border border-border-secondary bg-surface-secondary px-3 text-xs text-text-tertiary transition-colors hover:bg-surface-tertiary hover:text-text-primary disabled:cursor-not-allowed disabled:opacity-50 ${focusRingInset}`}
-        >
-          <Download className="h-3.5 w-3.5" />
-          {t('filters.exportCsv')}
-        </button>
-      </Inline>
-
-      {/* STAFF TABLE */}
-      <StaffTable
-        staff={staffMembers}
-        isLoading={isLoading}
-        onAddStaff={canCreate ? () => navigate({ to: '/staff/new' }) : undefined}
-        onViewStaff={handleViewStaff}
+            onClick={() => exportStaffCsv(staffMembers, t)}
+            disabled={staffMembers.length === 0}
+            className="border-[rgb(var(--border-primary)/0.35)]"
+          >
+            <Download className="h-3.5 w-3.5" />
+            {t('filters.exportCsv')}
+          </Button>
+        }
+        hasMore={hasMore}
+        isFetchingMore={isFetchingNextPage}
+        onLoadMore={loadMore}
+        selectionBar={selectionBar}
+        rowSelection={rowSelection}
+        onRowSelectionChange={setRowSelection}
       />
 
       {/* STAFF DRAWER */}
       <StaffDrawer
         open={drawerOpen}
         onClose={handleCloseDrawer}
-        staff={selectedStaff}
+        staff={selectedForDrawer}
         onEdit={canEdit ? (s: StaffResponseDto) => modal.openEdit(s) : undefined}
         onDelete={canDelete ? (s: StaffResponseDto) => modal.openDelete(s) : undefined}
       />
@@ -516,13 +558,21 @@ export default function StaffPage() {
         staff={modal.data}
       />
 
-      {/* DELETE CONFIRMATION */}
+      {/* DELETE CONFIRMATION (single-row, via drawer) */}
       <DeleteConfirmDialog
         open={modal.mode === 'delete'}
         onClose={modal.close}
         staff={modal.data}
         onConfirm={handleDelete}
         isDeleting={deleteMutation.isPending}
+      />
+
+      {/* ⑨ BULK DELETE (selection bar) */}
+      <BulkDeleteStaffModal
+        open={!!bulkDeleteTarget}
+        staff={bulkDeleteTarget ?? []}
+        onClose={() => setBulkDeleteTarget(null)}
+        onComplete={() => setRowSelection({})}
       />
     </Container>
   )

@@ -160,3 +160,38 @@ export async function captureStaffWrites(page: Page): Promise<StaffWriteCapture>
 
   return captured
 }
+
+// ---------------------------------------------------------------------------
+// Staff bulk-delete write capture (⑨ selection bar → BulkDeleteStaffModal)
+// ---------------------------------------------------------------------------
+
+export interface StaffDeleteCapture {
+  /** staffIds hit by DELETE /api/staff/:id (one per selected record). */
+  staffDeletes: string[]
+}
+
+/**
+ * Capture the bulk-delete fan-out. Register AFTER mockPeopleApi (later routes
+ * win; its /staff/:id route only handles GET and falls back otherwise).
+ * `failStaffIds` return 409 instead of 204 so specs can drive the partial-
+ * failure aggregate toast.
+ */
+export async function captureStaffDeletes(
+  page: Page,
+  opts: { failStaffIds?: string[] } = {},
+): Promise<StaffDeleteCapture> {
+  const fail = new Set(opts.failStaffIds ?? [])
+  const captured: StaffDeleteCapture = { staffDeletes: [] }
+
+  await page.route('**/api/staff/*', (r) => {
+    if (r.request().method() !== 'DELETE') return r.fallback()
+    const id = new URL(r.request().url()).pathname.split('/').pop()!.split('?')[0]
+    captured.staffDeletes.push(id)
+    if (fail.has(id)) {
+      return r.fulfill({ status: 409, contentType: 'application/json', body: JSON.stringify({ error: 'Conflict' }) })
+    }
+    return r.fulfill({ status: 204, body: '' })
+  })
+
+  return captured
+}
