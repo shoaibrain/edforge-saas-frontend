@@ -80,7 +80,7 @@ export class SectionErrorBoundary extends Component<Props, State> {
           </div>
           {/* Ticket 4.3: debug mode — show error stack */}
           {DEBUG && this.state.error && (
-            <details className="w-full max-w-lg text-left mt-2">
+            <details className="w-full max-w-lg text-start mt-2">
               <summary className="text-xs cursor-pointer text-[rgb(var(--text-disabled))]">
                 Error details (debug mode)
               </summary>

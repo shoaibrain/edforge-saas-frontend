@@ -102,7 +102,7 @@ export function InvoiceList({
           >
             {tab.label}
             {tab.count > 0 && (
-              <span className="ml-1.5 text-xs opacity-60">({tab.count})</span>
+              <span className="ms-1.5 text-xs opacity-60">({tab.count})</span>
             )}
           </button>
         ))}
@@ -164,7 +164,7 @@ function InvoiceCard({
           </p>
         </div>
 
-        <div className="text-right shrink-0">
+        <div className="text-end shrink-0">
           <p className="text-lg font-bold text-[rgb(var(--text-primary))]">
             {format(invoice.amountDue)}
           </p>
@@ -190,7 +190,7 @@ function InvoiceCard({
           <button
             type="button"
             onClick={onPay}
-            className="ml-auto flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-medium
+            className="ms-auto flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-xs font-medium
               bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] hover:bg-[rgb(var(--action-primary-bg-hover))] transition-colors"
           >
             {t('actions.payNow')}

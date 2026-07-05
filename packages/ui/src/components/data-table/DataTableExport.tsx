@@ -68,7 +68,7 @@ export function DataTableExport<TData>({
                     disabled={disabled}
                     title={disabled ? resolvedLabels.xlsxUnavailable : undefined}
                     className={cn(
-                      'block w-full px-3 py-2 text-left text-sm transition-colors',
+                      'block w-full px-3 py-2 text-start text-sm transition-colors',
                       'text-[rgb(var(--text-primary))]',
                       disabled
                         ? 'opacity-50 cursor-not-allowed'

@@ -147,16 +147,16 @@ export function Drawer({
           />
         </TransitionChild>
 
-        {/* Drawer container — anchored to right */}
+        {/* Drawer container — anchored to the inline-end (right in LTR, left in RTL) */}
         <div className="fixed inset-0 flex justify-end">
           <TransitionChild
             as={Fragment}
             enter="ease-enter duration-slow"
-            enterFrom="translate-x-full"
+            enterFrom="translate-x-full rtl:-translate-x-full"
             enterTo="translate-x-0"
             leave="ease-exit duration-base"
             leaveFrom="translate-x-0"
-            leaveTo="translate-x-full"
+            leaveTo="translate-x-full rtl:-translate-x-full"
           >
             <DialogPanel
               className={cn(
@@ -164,14 +164,14 @@ export function Drawer({
                 sizeClasses[size],
                 'h-full flex flex-col',
                 'bg-surface-primary shadow-modal',
-                'border-l border-[rgb(var(--border-secondary)/0.5)]',
+                'border-s border-[rgb(var(--border-secondary)/0.5)]',
                 'transform transition-all',
                 className
               )}
             >
               {/* Header */}
               <div className="flex items-start justify-between px-6 py-5 border-b border-[rgb(var(--border-secondary)/0.4)] flex-shrink-0">
-                <div className="flex items-center gap-3 min-w-0 pr-4">
+                <div className="flex items-center gap-3 min-w-0 pe-4">
                   {icon && <div className="flex-shrink-0">{icon}</div>}
                   <div className="min-w-0">
                     <DialogTitle className="text-base font-semibold text-text-primary truncate">

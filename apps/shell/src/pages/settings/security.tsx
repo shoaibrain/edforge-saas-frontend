@@ -396,7 +396,7 @@ function SecurityOverviewCard({
             </p>
           </div>
           <Button variant="outline" size="sm" onClick={onRetry}>
-            <RotateCcw className="w-4 h-4 mr-2" />
+            <RotateCcw className="w-4 h-4 me-2" />
             {t('common.retry')}
           </Button>
         </div>

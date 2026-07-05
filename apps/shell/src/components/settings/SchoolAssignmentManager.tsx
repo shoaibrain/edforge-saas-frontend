@@ -235,7 +235,7 @@ export function SchoolAssignmentManager({
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className={cn(
-                'w-full pl-9 pr-3 py-2 text-sm rounded-lg border',
+                'w-full ps-9 pe-3 py-2 text-sm rounded-lg border',
                 'bg-[rgb(var(--background-primary))] border-[rgb(var(--border-primary))]',
                 'text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))]',
                 'focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]'
@@ -261,7 +261,7 @@ export function SchoolAssignmentManager({
 
           {/* Bulk Actions */}
           {selectedCount > 0 && (
-            <div className="flex items-center gap-2 ml-auto">
+            <div className="flex items-center gap-2 ms-auto">
               <span className="text-xs text-[rgb(var(--text-tertiary))]">
                 {t('organization.assignmentManager.selectedCount', { count: selectedCount })}
               </span>
@@ -300,7 +300,7 @@ export function SchoolAssignmentManager({
             <table className="w-full">
               <thead className="sticky top-0 bg-[rgb(var(--background-secondary))] border-b border-[rgb(var(--border-primary))]">
                 <tr>
-                  <th className="text-left p-3 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase tracking-wider">
+                  <th className="text-start p-3 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase tracking-wider">
                     <input
                       type="checkbox"
                       checked={allFilteredSelected}
@@ -308,13 +308,13 @@ export function SchoolAssignmentManager({
                       className="rounded border-[rgb(var(--border-primary))] text-[rgb(var(--action-secondary-fg))] focus:ring-[rgb(var(--border-focus)/0.35)]"
                     />
                   </th>
-                  <th className="text-left p-3 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase tracking-wider">
+                  <th className="text-start p-3 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase tracking-wider">
                     {t('organization.assignmentManager.table.schoolName')}
                   </th>
-                  <th className="text-left p-3 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase tracking-wider">
+                  <th className="text-start p-3 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase tracking-wider">
                     {t('organization.assignmentManager.table.currentDistrict')}
                   </th>
-                  <th className="text-left p-3 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase tracking-wider">
+                  <th className="text-start p-3 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase tracking-wider">
                     {t('organization.assignmentManager.table.newAssignment')}
                   </th>
                   <th className="w-12"></th>

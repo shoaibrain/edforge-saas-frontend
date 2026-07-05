@@ -283,7 +283,7 @@ export function ModalHeader({ title, subtitle, icon, className }: ModalHeaderPro
             {icon}
           </div>
         )}
-        <div className="flex-1 min-w-0 pr-8">
+        <div className="flex-1 min-w-0 pe-8">
           <h2
             id="modal-title"
             className="text-xl font-semibold text-[rgb(var(--text-primary))] tracking-tight"

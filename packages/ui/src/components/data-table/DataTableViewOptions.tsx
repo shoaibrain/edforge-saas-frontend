@@ -95,7 +95,7 @@ export function DataTableViewOptions<TData>({
                       type="checkbox"
                       checked={column.getIsVisible()}
                       onChange={column.getToggleVisibilityHandler()}
-                      className={`w-3.5 h-3.5 rounded border-[rgb(var(--border-primary))] text-[rgb(var(--action-secondary-fg))] mr-2.5 ${focusRingInset}`}
+                      className={`w-3.5 h-3.5 rounded border-[rgb(var(--border-primary))] text-[rgb(var(--action-secondary-fg))] me-2.5 ${focusRingInset}`}
                     />
                     <span className="text-[rgb(var(--text-primary))] capitalize">
                       {typeof column.columnDef.header === 'string' ? column.columnDef.header : column.id}

@@ -126,7 +126,7 @@ function ChildOrgItem({ node, onNavigate }: { node: HierarchyNode; onNavigate: (
   return (
     <button
       onClick={() => onNavigate(node)}
-      className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-[rgb(var(--background-tertiary))] transition-colors text-left"
+      className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-[rgb(var(--background-tertiary))] transition-colors text-start"
     >
       <span
         className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold uppercase tracking-wider border ${typeColors[node.type] || ''}`}

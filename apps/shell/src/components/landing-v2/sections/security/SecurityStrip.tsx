@@ -125,7 +125,7 @@ export function SecurityStrip() {
 
           {/* Frameworks row */}
           <div
-            className="lp-frameworks-row bg-[rgba(255,255,255,0.04)] pt-[20px] pb-[20px] pl-[24px] pr-[24px] gap-6"
+            className="lp-frameworks-row bg-[rgba(255,255,255,0.04)] pt-[20px] pb-[20px] ps-[24px] pe-[24px] gap-6"
             style={{
               border: '1px solid rgba(255,255,255,0.1)',
               borderRadius: 16,
@@ -218,7 +218,7 @@ function PromiseCard({
 }) {
   return (
     <div
-      className="pt-[22px] pb-[22px] pl-[22px] pr-[22px] bg-[rgba(255,255,255,0.04)]"
+      className="pt-[22px] pb-[22px] ps-[22px] pe-[22px] bg-[rgba(255,255,255,0.04)]"
       style={{
         borderRadius: 16,
         border: '1px solid rgba(255,255,255,0.1)',

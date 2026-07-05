@@ -49,11 +49,11 @@ const inputElementVariants = cva(
         lg: 'px-4 py-3 text-base',
       },
       hasPrefix: {
-        true: 'pl-2',
+        true: 'ps-2',
         false: '',
       },
       hasSuffix: {
-        true: 'pr-2',
+        true: 'pe-2',
         false: '',
       },
     },
@@ -117,7 +117,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         data-readonly={resolvedReadOnly || undefined}
       >
         {prefix ? (
-          <span className="flex shrink-0 items-center pl-3 text-[rgb(var(--text-tertiary))]">
+          <span className="flex shrink-0 items-center ps-3 text-[rgb(var(--text-tertiary))]">
             {prefix}
           </span>
         ) : null}
@@ -140,12 +140,12 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         />
         {isLoading ? (
           <span
-            className="mr-3 h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-[rgb(var(--border-secondary))] border-t-[rgb(var(--border-focus))]"
+            className="me-3 h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-[rgb(var(--border-secondary))] border-t-[rgb(var(--border-focus))]"
             aria-hidden="true"
           />
         ) : isSuccess ? (
           <span
-            className="mr-3 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--state-success-bg))] text-[rgb(var(--state-success-fg))]"
+            className="me-3 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[rgb(var(--state-success-bg))] text-[rgb(var(--state-success-fg))]"
             aria-hidden="true"
           >
             <svg viewBox="0 0 16 16" fill="none" className="h-3 w-3">
@@ -159,7 +159,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             </svg>
           </span>
         ) : suffix ? (
-          <span className="flex shrink-0 items-center pr-3 text-[rgb(var(--text-tertiary))]">
+          <span className="flex shrink-0 items-center pe-3 text-[rgb(var(--text-tertiary))]">
             {suffix}
           </span>
         ) : null}

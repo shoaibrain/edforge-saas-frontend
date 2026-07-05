@@ -33,7 +33,7 @@ export function TimeRangePicker({ startTime, endTime, onChange, disabled }: Time
           onChange={(e) => handleStartChange(e.target.value)}
           disabled={disabled}
           className={`
-            w-full pl-10 pr-3 py-2.5 rounded-xl
+            w-full ps-10 pe-3 py-2.5 rounded-xl
             border border-[rgb(var(--border-primary))]
             bg-[rgb(var(--background-secondary))]
             text-sm text-[rgb(var(--text-primary))]
@@ -54,7 +54,7 @@ export function TimeRangePicker({ startTime, endTime, onChange, disabled }: Time
           onChange={(e) => handleEndChange(e.target.value)}
           disabled={disabled}
           className={`
-            w-full pl-10 pr-3 py-2.5 rounded-xl
+            w-full ps-10 pe-3 py-2.5 rounded-xl
             border border-[rgb(var(--border-primary))]
             bg-[rgb(var(--background-secondary))]
             text-sm text-[rgb(var(--text-primary))]

@@ -279,7 +279,7 @@ function BrandingFileFieldInner({
         rel="noopener noreferrer"
         className="aspect-video rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] hover:bg-[rgb(var(--bg-tertiary))] transition-colors flex items-center justify-center text-xs text-[rgb(var(--text-secondary))] font-medium"
       >
-        <FileText className="w-4 h-4 mr-1" /> PDF
+        <FileText className="w-4 h-4 me-1" /> PDF
       </a>
     ) : (
       <img

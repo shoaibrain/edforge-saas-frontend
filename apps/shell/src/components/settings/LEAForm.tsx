@@ -200,7 +200,7 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
                   <>
                     {t('organization.fields.edFiId')}
                     <Tooltip content={t('organization.form.edFiIdHelp')} side="top">
-                      <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
+                      <Info className="inline w-3.5 h-3.5 ms-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
                     </Tooltip>
                   </>
                 }
@@ -238,7 +238,7 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
                   <>
                     {t('organization.fields.leaCategory')}
                     <Tooltip content={t('organization.form.leaCategoryHelp')} side="top">
-                      <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
+                      <Info className="inline w-3.5 h-3.5 ms-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
                     </Tooltip>
                   </>
                 }
@@ -250,7 +250,7 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
                   <>
                     {t('organization.fields.operationalStatus')}
                     <Tooltip content={t('organization.form.operationalStatusHelp')} side="top">
-                      <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
+                      <Info className="inline w-3.5 h-3.5 ms-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
                     </Tooltip>
                   </>
                 }
@@ -266,7 +266,7 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
                     <>
                       {t('organization.fields.charterStatus')}
                       <Tooltip content={t('organization.form.charterStatusHelp')} side="top">
-                        <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
+                        <Info className="inline w-3.5 h-3.5 ms-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
                       </Tooltip>
                     </>
                   }
@@ -310,7 +310,7 @@ export function LEAForm({ open, onClose, mode, editId, defaultSeaId, defaultEscI
                   <>
                     {t('organization.fields.parentLea')}
                     <Tooltip content={t('organization.form.parentLeaHelp')} side="top">
-                      <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
+                      <Info className="inline w-3.5 h-3.5 ms-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
                     </Tooltip>
                   </>
                 }

@@ -95,7 +95,7 @@ function ThemeSelector({ value, onChange }: ThemeSelectorProps) {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             className={`
-              relative p-4 rounded-xl border-2 transition-all text-left
+              relative p-4 rounded-xl border-2 transition-all text-start
               ${isSelected 
                 ? 'border-[rgb(var(--border-focus))] bg-[rgb(var(--action-primary-bg))]/5' 
                 : 'border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] hover:border-[rgb(var(--border-secondary))]'

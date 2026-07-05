@@ -219,7 +219,7 @@ export function LoginPage() {
                           onChange={(e) => setPassword(e.target.value)}
                           autoComplete="current-password"
                           required
-                          className={`${AUTH_INPUT} pr-10`}
+                          className={`${AUTH_INPUT} pe-10`}
                         />
                         <button
                           type="button"
@@ -234,7 +234,7 @@ export function LoginPage() {
                     </div>
 
                     {/* Forgot password */}
-                    <div className="text-right">
+                    <div className="text-end">
                       <Link
                         to="/forgot-password"
                         className="text-sm font-medium transition-colors hover:underline text-[rgb(var(--action-primary-bg))]"
@@ -302,7 +302,7 @@ export function LoginPage() {
                           onChange={(e) => setNewPassword(e.target.value)}
                           autoComplete="new-password"
                           required
-                          className={`${AUTH_INPUT} pr-10`}
+                          className={`${AUTH_INPUT} pe-10`}
                         />
                         <button
                           type="button"
@@ -329,7 +329,7 @@ export function LoginPage() {
                           onChange={(e) => setConfirmNewPassword(e.target.value)}
                           autoComplete="new-password"
                           required
-                          className={`${AUTH_INPUT} pr-10`}
+                          className={`${AUTH_INPUT} pe-10`}
                         />
                       </div>
                     </div>

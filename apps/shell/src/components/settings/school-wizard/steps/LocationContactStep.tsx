@@ -194,9 +194,9 @@ export function LocationContactStep({ data, updateData, errors, clearError }: Wi
           <div className="mt-3 px-3 py-2 rounded-md bg-[rgb(var(--bg-secondary))] text-sm text-[rgb(var(--text-secondary))]">
             Calendar System: <span className="font-medium capitalize">{countryConfig.defaultCalendarSystem.replace('_', ' ')}</span>
             {(data.calendarSystem as string) === resolvedSettings.calendarSystem ? (
-              <span className="text-xs ml-2">(inherited from organization settings)</span>
+              <span className="text-xs ms-2">(inherited from organization settings)</span>
             ) : (
-              <span className="text-xs ml-2">(auto-set from country)</span>
+              <span className="text-xs ms-2">(auto-set from country)</span>
             )}
           </div>
         )}

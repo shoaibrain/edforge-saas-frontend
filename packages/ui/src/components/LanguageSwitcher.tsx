@@ -39,7 +39,7 @@ export function LanguageSwitcher({
   }
 
   return (
-    <Menu as="div" className={cn('relative inline-block text-left', className)}>
+    <Menu as="div" className={cn('relative inline-block text-start', className)}>
       <MenuButton
         className={cn(
           'inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium transition-colors',
@@ -86,7 +86,7 @@ export function LanguageSwitcher({
                     <span className="text-xs font-bold w-5 text-center">{lang.flag}</span>
                     <span>{lang.label}</span>
                     {i18n.language === lang.code && (
-                      <svg className="ml-auto w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                      <svg className="ms-auto w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                       </svg>
                     )}

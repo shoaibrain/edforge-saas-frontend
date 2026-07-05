@@ -106,13 +106,13 @@ export function WidgetVisibilityMenu() {
               className={`
                 w-full px-3 py-2 flex items-center gap-3
                 hover:bg-[rgb(var(--background-tertiary))]
-                transition-colors text-left text-sm
+                transition-colors text-start text-sm
                 text-[rgb(var(--text-primary))]
               `}
             >
               <Eye className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
               <span>Show/hide widgets</span>
-              <span className="ml-auto text-[rgb(var(--text-tertiary))]">›</span>
+              <span className="ms-auto text-[rgb(var(--text-tertiary))]">›</span>
             </button>
             
             {/* Divider */}
@@ -126,7 +126,7 @@ export function WidgetVisibilityMenu() {
               }}
               className={`
                 w-full px-3 py-2 flex items-center gap-3
-                text-left text-sm
+                text-start text-sm
                 text-[rgb(var(--text-secondary))]
                 hover:bg-[rgb(var(--background-tertiary))]
                 transition-colors
@@ -163,7 +163,7 @@ export function WidgetVisibilityMenu() {
               className={`
                 w-full px-3 py-2 flex items-center gap-2
                 hover:bg-[rgb(var(--background-tertiary))]
-                transition-colors text-left text-sm
+                transition-colors text-start text-sm
                 text-[rgb(var(--text-tertiary))]
                 border-b border-[rgb(var(--border-secondary))]
                 mb-1
@@ -184,7 +184,7 @@ export function WidgetVisibilityMenu() {
                   className={`
                     w-full px-3 py-2 flex items-center gap-3
                     hover:bg-[rgb(var(--background-tertiary))]
-                    transition-colors text-left text-sm
+                    transition-colors text-start text-sm
                   `}
                   role="menuitemcheckbox"
                   aria-checked={visible}

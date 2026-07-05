@@ -212,7 +212,7 @@ export function Navbar() {
       } : undefined}
     >
       <div className="max-w-7xl mx-auto px-6 md:px-8 h-full flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-3 group z-50 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#F97316] p-1 -ml-1">
+        <Link to="/" className="flex items-center gap-3 group z-50 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#F97316] p-1 -ms-1">
           <div className="relative w-10 h-10 flex items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-105 overflow-hidden">
             <img src="/logo.svg" alt="EdForge Logo" className="w-full h-full object-contain" />
           </div>

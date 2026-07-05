@@ -80,7 +80,7 @@ export function DataTablePagination<TData>({
             table.setPageIndex(0)
           }}
           className={cn(
-            'mr-3 px-2 py-1 text-xs border border-[rgb(var(--border-primary)/0.6)] rounded-md bg-[rgb(var(--background-primary))] text-[rgb(var(--text-secondary))]',
+            'me-3 px-2 py-1 text-xs border border-[rgb(var(--border-primary)/0.6)] rounded-md bg-[rgb(var(--background-primary))] text-[rgb(var(--text-secondary))]',
             focusRingInset
           )}
         >

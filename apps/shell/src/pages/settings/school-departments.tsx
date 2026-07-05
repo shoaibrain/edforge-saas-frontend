@@ -216,7 +216,7 @@ function DeleteConfirmModal({ isOpen, department, onClose, onConfirm, isDeleting
             {t('common.cancel')}
           </Button>
           <Button variant="danger" onClick={onConfirm} isLoading={isDeleting}>
-            <Trash2 className="w-4 h-4 mr-1.5" />
+            <Trash2 className="w-4 h-4 me-1.5" />
             {t('common.delete')}
           </Button>
         </div>
@@ -465,7 +465,7 @@ export default function SchoolDepartmentsPage({ schoolId }: SchoolDepartmentsPag
           </p>
         </div>
         <Button variant={'outline'} onClick={() => setModalState({ mode: 'create', department: null })}>
-          <Plus className="w-4 h-4 mr-1.5" />
+          <Plus className="w-4 h-4 me-1.5" />
           {t('schoolDepartments.actions.add')}
         </Button>
       </div>
@@ -481,7 +481,7 @@ export default function SchoolDepartmentsPage({ schoolId }: SchoolDepartmentsPag
             placeholder={t('schoolDepartments.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all"
+            className="w-full ps-10 pe-4 py-2.5 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.40)] focus:border-[rgb(var(--border-focus))] transition-all"
           />
         </div>
       </div>
@@ -618,7 +618,7 @@ function BulkDeleteConfirmModal({
         <ul className="mb-6 max-h-40 overflow-y-auto rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] p-2 space-y-1">
           {departments.map((d) => (
             <li key={d.id} className="text-sm text-[rgb(var(--text-primary))]">
-              <span className="font-mono text-xs text-[rgb(var(--text-tertiary))] mr-2">{d.code}</span>
+              <span className="font-mono text-xs text-[rgb(var(--text-tertiary))] me-2">{d.code}</span>
               {d.name}
             </li>
           ))}
@@ -629,7 +629,7 @@ function BulkDeleteConfirmModal({
             {t('common.cancel')}
           </Button>
           <Button variant="danger" onClick={onConfirm} isLoading={isDeleting}>
-            <Trash2 className="w-4 h-4 mr-1.5" />
+            <Trash2 className="w-4 h-4 me-1.5" />
             {t('schoolDepartments.bulkDelete.confirm', { count: departments.length })}
           </Button>
         </div>

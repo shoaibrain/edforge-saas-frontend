@@ -144,7 +144,7 @@ export function EdFiPreview({ formData }: EdFiPreviewProps) {
           <div className="w-8 h-8 rounded-lg bg-[rgb(var(--state-info-bg)/0.18)] flex items-center justify-center">
             <span className="text-sm font-mono font-bold text-[rgb(var(--state-info-fg))] ">{'{}'}</span>
           </div>
-          <div className="text-left">
+          <div className="text-start">
             <h4 className="text-sm font-medium text-[rgb(var(--text-primary))]">
               {t('organization.edfiPreview.title')}
             </h4>

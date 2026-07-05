@@ -83,7 +83,7 @@ export function AttendanceRecordsList({
                  </div>
 
                  {/* Middle Content */}
-                 <div className="fp-t-body pl-2">
+                 <div className="fp-t-body ps-2">
                    <strong>{rec.status === 'present' ? 'Arrived on time' : rec.status === 'absent' ? 'Full day absent' : rec.status.charAt(0).toUpperCase() + rec.status.slice(1)}</strong>
                    <span style={{ textTransform: 'none', letterSpacing: '0', fontSize: '12px' }}>{explainText}</span>
                  </div>

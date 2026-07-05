@@ -28,7 +28,7 @@ export function DataTableSkeleton({
             {Array.from({ length: totalCols }).map((_, i) => (
               <th
                 key={i}
-                className="px-4 py-2.5 text-left bg-[rgb(var(--background-tertiary))]"
+                className="px-4 py-2.5 text-start bg-[rgb(var(--background-tertiary))]"
               >
                 <div
                   className="h-2.5 bg-[rgb(var(--border-secondary))] rounded animate-pulse"

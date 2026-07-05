@@ -151,7 +151,7 @@ export function SchoolSwitcher() {
               aria-label="Find school"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 text-sm bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))] rounded-xl text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.50)] focus:border-[rgb(var(--border-focus))] transition-all"
+              className="w-full ps-10 pe-4 py-2.5 text-sm bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))] rounded-xl text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.50)] focus:border-[rgb(var(--border-focus))] transition-all"
             />
           </div>
         </div>
@@ -199,7 +199,7 @@ export function SchoolSwitcher() {
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    <div className="flex-1 min-w-0 text-left">
+                    <div className="flex-1 min-w-0 text-start">
                       <div className="flex items-center gap-1.5">
                         <p className={cn(
                           'text-sm font-medium truncate',
@@ -264,7 +264,7 @@ export function SchoolSwitcher() {
             isTransitioning && 'animate-pulse'
           )}
         />
-        <div className="min-w-0 text-left" style={{ lineHeight: 1.2 }}>
+        <div className="min-w-0 text-start" style={{ lineHeight: 1.2 }}>
           <p className="text-[12.5px] font-semibold truncate max-w-40 text-[color:var(--shell-school-name)]" style={{ transition: 'color 0.3s' }}>
             {activeSchool?.name || 'Select School'}
           </p>
@@ -272,7 +272,7 @@ export function SchoolSwitcher() {
             {isTransitioning ? 'Switching...' : activeSchool?.code || 'Choose school'}
           </p>
         </div>
-        <svg className="flex-shrink-0 -ml-0.5" width="12" height="12" viewBox="0 0 12 12" fill="none">
+        <svg className="flex-shrink-0 -ms-0.5" width="12" height="12" viewBox="0 0 12 12" fill="none">
           <path d="M3 4.5l3 3 3-3" stroke="var(--shell-school-code)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </MenuButton>

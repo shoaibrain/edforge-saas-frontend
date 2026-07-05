@@ -22,7 +22,7 @@ export function DataTableColumnHeader<TData, TValue>({
       <div
         className={cn(
           'text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider',
-          align === 'right' && 'text-right',
+          align === 'right' && 'text-end',
           align === 'center' && 'text-center',
           className
         )}
@@ -43,7 +43,7 @@ export function DataTableColumnHeader<TData, TValue>({
         'text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--text-primary))]',
         'transition-colors select-none cursor-pointer',
         focusRingInset,
-        align === 'right' && 'ml-auto flex-row-reverse',
+        align === 'right' && 'ms-auto flex-row-reverse',
         align === 'center' && 'mx-auto',
         className
       )}

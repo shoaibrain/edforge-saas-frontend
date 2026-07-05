@@ -500,7 +500,7 @@ export function OrganizationHierarchyTree({
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className={cn(
-              'w-full pl-9 pr-3 py-2 text-sm rounded-lg',
+              'w-full ps-9 pe-3 py-2 text-sm rounded-lg',
               'bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))]',
               'text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))]',
               'focus:outline-none focus:border-[rgb(var(--border-focus))] focus:ring-1 focus:ring-[rgb(var(--border-focus)/0.35)]',

@@ -150,7 +150,7 @@ export const ToolbarSearch = forwardRef<HTMLInputElement, ToolbarSearchProps>(
           // Borderless, transparent, flush 12px left inset. NO compensating
           // padding — nothing overlays the text, so nothing can collide with it.
           className={cn(
-            'h-full min-w-0 flex-1 rounded-l-lg border-0 bg-transparent pl-3 pr-1 text-sm',
+            'h-full min-w-0 flex-1 rounded-l-lg border-0 bg-transparent ps-3 pe-1 text-sm',
             'text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))]',
             'outline-none focus:outline-none focus:ring-0',
           )}
@@ -170,7 +170,7 @@ export const ToolbarSearch = forwardRef<HTMLInputElement, ToolbarSearchProps>(
             innerRef.current?.focus()
           }}
           className={cn(
-            'mr-px grid h-8 w-8 flex-none place-items-center rounded-md border-0 bg-transparent',
+            'me-px grid h-8 w-8 flex-none place-items-center rounded-md border-0 bg-transparent',
             'text-[rgb(var(--text-tertiary))] transition-colors motion-reduce:transition-none',
             hasValue
               ? 'cursor-pointer hover:bg-[rgb(var(--background-secondary))] hover:text-[rgb(var(--text-primary))]'

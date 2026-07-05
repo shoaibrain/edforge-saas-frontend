@@ -38,7 +38,7 @@ export function AppShell({ children }: AppShellProps) {
   return (
     <div
       className="h-screen overflow-hidden bg-[var(--shell-page-bg)]"
-      dir="ltr"
+      dir={contentDirection}
       style={{ transition: 'background 0.3s' }}
     >
       {/* Skip link for keyboard/screen reader users */}
@@ -52,8 +52,8 @@ export function AppShell({ children }: AppShellProps) {
 
       {/* Right column: content card (below fixed header) */}
       <div
-        className={`flex flex-col h-screen pt-[var(--shell-topbar-h)] ${collapsed ? 'ml-[var(--shell-sidebar-w-collapsed)]' : 'ml-[var(--shell-sidebar-w)]'}`}
-        style={{ transition: 'margin-left var(--shell-transition)' }}
+        className={`flex flex-col h-screen pt-[var(--shell-topbar-h)] ${collapsed ? 'ms-[var(--shell-sidebar-w-collapsed)]' : 'ms-[var(--shell-sidebar-w)]'}`}
+        style={{ transition: 'margin-inline-start var(--shell-transition)' }}
       >
         {/* Body wrap — padding creates the inset gap */}
         <div className="flex-1 min-h-0 pt-0 px-[var(--shell-cp-gap)] pb-[var(--shell-cp-gap)]">
@@ -61,7 +61,6 @@ export function AppShell({ children }: AppShellProps) {
           <main
             id="main-content"
             tabIndex={-1}
-            dir="ltr"
             data-testid="app-scroll-frame"
             aria-busy={isSchoolTransitioning || undefined}
             className="h-full overflow-y-auto overflow-x-hidden outline-none bg-[var(--shell-cp-bg)] rounded-[var(--shell-cp-radius)] shadow-[var(--shell-cp-shadow)]"

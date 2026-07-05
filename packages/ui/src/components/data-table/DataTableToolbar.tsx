@@ -279,7 +279,7 @@ export function DataTableToolbar<TData = unknown>({
 
       {/* Trailing cluster — View (density + columns) · Export · consumer extras */}
       {showRightCluster && (
-        <div className="ml-auto flex flex-shrink-0 items-center gap-2">
+        <div className="ms-auto flex flex-shrink-0 items-center gap-2">
           {showView && table && (
             <DataTableViewOptions
               table={table}

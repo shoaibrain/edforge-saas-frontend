@@ -162,7 +162,7 @@ function FinancialChart() {
   ]
   return (
     <div
-      className="pt-[14px] pb-[14px] pl-[14px] pr-[14px]"
+      className="pt-[14px] pb-[14px] ps-[14px] pe-[14px]"
       style={{
         border: '1px solid var(--lp-border)',
         borderRadius: 12,
@@ -256,7 +256,7 @@ function ActionItems() {
   ]
   return (
     <div
-      className="pt-[14px] pb-[14px] pl-[14px] pr-[14px]"
+      className="pt-[14px] pb-[14px] ps-[14px] pe-[14px]"
       style={{
         border: '1px solid var(--lp-border)',
         borderRadius: 12,

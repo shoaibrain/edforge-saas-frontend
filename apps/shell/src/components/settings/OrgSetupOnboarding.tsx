@@ -85,7 +85,7 @@ function StepCard({
         stiffness: 300,
         damping: 25,
       }}
-      className={`relative w-full text-left p-5 rounded-xl border transition-all group ${step.isComplete ? 'border-[rgb(var(--state-success-border)/0.35)] bg-[rgb(var(--state-success-fg))]/5' : isActive ? 'border-[rgb(var(--border-focus)/0.40)] bg-[rgb(var(--action-primary-bg))]/5 shadow-lg shadow-teal-500/10 ring-1 ring-[rgb(var(--border-focus))]/20' : 'border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] opacity-60'}`}
+      className={`relative w-full text-start p-5 rounded-xl border transition-all group ${step.isComplete ? 'border-[rgb(var(--state-success-border)/0.35)] bg-[rgb(var(--state-success-fg))]/5' : isActive ? 'border-[rgb(var(--border-focus)/0.40)] bg-[rgb(var(--action-primary-bg))]/5 shadow-lg shadow-teal-500/10 ring-1 ring-[rgb(var(--border-focus))]/20' : 'border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] opacity-60'}`}
     >
       <div className="flex items-start gap-4">
         {/* Step number / check */}

@@ -147,7 +147,7 @@ function ChildSelector({
                     onSelect(child.studentId)
                     setIsOpen(false)
                   }}
-                  className={`w-full text-left px-4 py-3 hover:bg-[rgb(var(--background-secondary))] transition-colors first:rounded-t-lg last:rounded-b-lg ${
+                  className={`w-full text-start px-4 py-3 hover:bg-[rgb(var(--background-secondary))] transition-colors first:rounded-t-lg last:rounded-b-lg ${
                     child.studentId === activeChildId
                       ? 'bg-[rgb(var(--background-secondary))]'
                       : ''

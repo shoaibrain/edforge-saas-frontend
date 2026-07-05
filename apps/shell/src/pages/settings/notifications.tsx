@@ -133,7 +133,7 @@ function DigestSelector({ value, onChange, disabled }: DigestSelectorProps) {
             whileHover={!disabled ? { scale: 1.02 } : undefined}
             whileTap={!disabled ? { scale: 0.98 } : undefined}
             className={`
-              p-3 rounded-xl border text-left transition-all
+              p-3 rounded-xl border text-start transition-all
               ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
               ${isSelected 
                 ? 'border-[rgb(var(--border-focus))] bg-[rgb(var(--action-primary-bg))]/5' 

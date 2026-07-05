@@ -354,7 +354,7 @@ export function InviteButton({
         onClick={() => setIsOpen(true)}
         className={className}
       >
-        <UserPlus className="w-4 h-4 mr-2" />
+        <UserPlus className="w-4 h-4 me-2" />
         Invite Team
       </Button>
 

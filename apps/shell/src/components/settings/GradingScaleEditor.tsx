@@ -97,17 +97,17 @@ export function GradingScaleEditor({
           <thead className="bg-[rgb(var(--background-secondary))]">
             <tr>
               <th className="w-8" />
-              <th className="px-4 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
+              <th className="px-4 py-3 text-start text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
                 Grade
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
+              <th className="px-4 py-3 text-start text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
                 Min Score
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
+              <th className="px-4 py-3 text-start text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
                 Max Score
               </th>
               {scaleType === 'letter' && (
-                <th className="px-4 py-3 text-left text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
+                <th className="px-4 py-3 text-start text-xs font-medium text-[rgb(var(--text-secondary))] uppercase tracking-wider">
                   GPA
                 </th>
               )}

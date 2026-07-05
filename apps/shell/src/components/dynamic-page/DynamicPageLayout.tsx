@@ -72,7 +72,7 @@ function DynamicPageLayoutInner({
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
-          className="pt-4 pr-12"
+          className="pt-4 pe-12"
         >
           {header}
         </motion.header>

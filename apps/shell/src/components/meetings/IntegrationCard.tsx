@@ -107,7 +107,7 @@ export function IntegrationCard({
           </div>
           
           {/* Info */}
-          <div className="flex-1 min-w-0 pr-16">
+          <div className="flex-1 min-w-0 pe-16">
             <h3 className="font-semibold text-[rgb(var(--text-primary))] mb-1">
               {platform.name}
             </h3>
@@ -226,7 +226,7 @@ export function IntegrationCardCompact({
       onClick={isConnected ? undefined : onConnect}
       disabled={isConnected}
       className={`
-        group flex items-center gap-3 p-3 rounded-xl border w-full text-left
+        group flex items-center gap-3 p-3 rounded-xl border w-full text-start
         transition-all duration-200
         ${isConnected 
           ? 'bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary))] cursor-default' 

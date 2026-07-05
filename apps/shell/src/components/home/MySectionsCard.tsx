@@ -98,7 +98,7 @@ export function MySectionsCard({ sections, isLoading, bare }: MySectionsCardProp
                   </p>
                 </div>
 
-                <div className="flex items-center gap-1.5 ml-3 flex-shrink-0">
+                <div className="flex items-center gap-1.5 ms-3 flex-shrink-0">
                   <Link
                     to="/academics/$"
                     params={{ _splat: `classrooms/${section.sectionId}?tab=attendance` }}

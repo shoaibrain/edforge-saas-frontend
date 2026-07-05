@@ -22,7 +22,7 @@ export interface SelectOption {
 const selectButtonVariants = cva(
   cn(
     'flex w-full items-center justify-between border bg-[rgb(var(--background-secondary))]',
-    'text-left text-[rgb(var(--text-primary))] shadow-sm transition-colors duration-fast ease-standard',
+    'text-start text-[rgb(var(--text-primary))] shadow-sm transition-colors duration-fast ease-standard',
     'hover:bg-[rgb(var(--background-tertiary))] disabled:cursor-not-allowed disabled:opacity-60',
     focusRing
   ),
@@ -144,7 +144,7 @@ const SelectControl = forwardRef<HTMLButtonElement, SelectControlProps>(
                 {loading ? 'Loading…' : selectedOption?.label ?? placeholder}
               </span>
             </span>
-            <span className="ml-2 flex shrink-0 items-center gap-1 text-[rgb(var(--text-tertiary))]">
+            <span className="ms-2 flex shrink-0 items-center gap-1 text-[rgb(var(--text-tertiary))]">
               {clearable && selectedOption && !resolvedDisabled ? (
                 <span
                   role="button"

@@ -155,7 +155,7 @@ function RoleRail({
               // allow-presentation-style: selected-role accent border is data-driven (per-role hue)
               style={isSelected ? { borderColor: meta.accent } : undefined}
               className={cn(
-                'w-full rounded-xl border p-3 text-left transition-all',
+                'w-full rounded-xl border p-3 text-start transition-all',
                 isSelected
                   ? 'bg-[rgb(var(--background-primary))] shadow-sm ring-1'
                   : 'border-[rgb(var(--border-primary)/0.4)] hover:border-[rgb(var(--border-primary)/0.7)] hover:bg-[rgb(var(--background-primary)/0.5)]',
@@ -257,7 +257,7 @@ function MatrixPanel({ role }: { role: SchoolRole }) {
         <table className="w-full border-collapse text-sm">
           <thead>
             <tr>
-              <th className="sticky left-0 top-0 z-30 min-w-56 bg-[rgb(var(--background-secondary))] px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))]">
+              <th className="sticky left-0 top-0 z-30 min-w-56 bg-[rgb(var(--background-secondary))] px-4 py-3 text-start text-xs font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))]">
                 Resource
               </th>
               {MATRIX_ACTIONS.map((action) => {
@@ -290,7 +290,7 @@ function MatrixPanel({ role }: { role: SchoolRole }) {
                       <button
                         type="button"
                         onClick={() => toggleCategory(category.label)}
-                        className="flex w-full items-center gap-2 px-4 py-2 text-left"
+                        className="flex w-full items-center gap-2 px-4 py-2 text-start"
                       >
                         <ChevronDown
                           className={cn('h-4 w-4 text-[rgb(var(--text-tertiary))] transition-transform', !isOpen && '-rotate-90')}
@@ -404,7 +404,7 @@ function DistributionRow({
       type="button"
       onClick={onClick}
       className={cn(
-        'w-full rounded-lg px-2 py-1.5 text-left transition-colors',
+        'w-full rounded-lg px-2 py-1.5 text-start transition-colors',
         active ? 'bg-[rgb(var(--background-tertiary))]' : 'hover:bg-[rgb(var(--background-tertiary)/0.6)]',
       )}
     >

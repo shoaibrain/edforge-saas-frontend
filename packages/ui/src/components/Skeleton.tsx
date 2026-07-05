@@ -171,7 +171,7 @@ export function SkeletonTable({
             <thead className="border-b border-[rgb(var(--border-secondary))] bg-[rgb(var(--background-tertiary))]">
               <tr>
                 {Array.from({ length: columns }).map((_, i) => (
-                  <th key={i} className="px-6 py-3 text-left">
+                  <th key={i} className="px-6 py-3 text-start">
                     <Skeleton className="h-4 w-20" />
                   </th>
                 ))}

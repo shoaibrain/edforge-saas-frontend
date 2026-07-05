@@ -72,19 +72,19 @@ export function InvoiceDetail({ invoice, onBack, onPay }: InvoiceDetailProps) {
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-[rgb(var(--bg-secondary))]">
-              <th className="text-left px-4 py-2.5 text-xs font-medium text-[rgb(var(--text-tertiary))]">
+              <th className="text-start px-4 py-2.5 text-xs font-medium text-[rgb(var(--text-tertiary))]">
                 {t('lineItems.description')}
               </th>
-              <th className="text-right px-4 py-2.5 text-xs font-medium text-[rgb(var(--text-tertiary))]">
+              <th className="text-end px-4 py-2.5 text-xs font-medium text-[rgb(var(--text-tertiary))]">
                 {t('lineItems.amount')}
               </th>
-              <th className="text-right px-4 py-2.5 text-xs font-medium text-[rgb(var(--text-tertiary))]">
+              <th className="text-end px-4 py-2.5 text-xs font-medium text-[rgb(var(--text-tertiary))]">
                 {t('lineItems.discount')}
               </th>
-              <th className="text-right px-4 py-2.5 text-xs font-medium text-[rgb(var(--text-tertiary))]">
+              <th className="text-end px-4 py-2.5 text-xs font-medium text-[rgb(var(--text-tertiary))]">
                 {t('lineItems.tax')}
               </th>
-              <th className="text-right px-4 py-2.5 text-xs font-medium text-[rgb(var(--text-tertiary))]">
+              <th className="text-end px-4 py-2.5 text-xs font-medium text-[rgb(var(--text-tertiary))]">
                 {t('lineItems.total')}
               </th>
             </tr>
@@ -98,25 +98,25 @@ export function InvoiceDetail({ invoice, onBack, onPay }: InvoiceDetailProps) {
                 <td className="px-4 py-3 text-[rgb(var(--text-primary))]">
                   {item.description}
                   {item.quantity > 1 && (
-                    <span className="text-xs text-[rgb(var(--text-tertiary))] ml-1">
+                    <span className="text-xs text-[rgb(var(--text-tertiary))] ms-1">
                       x{item.quantity}
                     </span>
                   )}
                 </td>
-                <td className="px-4 py-3 text-right text-[rgb(var(--text-primary))]">
+                <td className="px-4 py-3 text-end text-[rgb(var(--text-primary))]">
                   {format(item.amount * item.quantity)}
                 </td>
-                <td className="px-4 py-3 text-right text-[rgb(var(--text-tertiary))]">
+                <td className="px-4 py-3 text-end text-[rgb(var(--text-tertiary))]">
                   {item.discount > 0
                     ? `-${format(item.discount)}`
                     : '-'}
                 </td>
-                <td className="px-4 py-3 text-right text-[rgb(var(--text-tertiary))]">
+                <td className="px-4 py-3 text-end text-[rgb(var(--text-tertiary))]">
                   {item.taxAmount > 0
                     ? format(item.taxAmount)
                     : '-'}
                 </td>
-                <td className="px-4 py-3 text-right font-medium text-[rgb(var(--text-primary))]">
+                <td className="px-4 py-3 text-end font-medium text-[rgb(var(--text-primary))]">
                   {format(item.total)}
                 </td>
               </tr>

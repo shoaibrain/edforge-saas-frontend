@@ -54,7 +54,7 @@ export function QuickReferenceTable({
               {['Course', 'Section', 'Teacher', 'Period', 'Time', 'Room'].map((h) => (
                 <th
                   key={h}
-                  className="text-left px-3 py-2.5 font-medium uppercase tracking-[0.04em]"
+                  className="text-start px-3 py-2.5 font-medium uppercase tracking-[0.04em]"
                   style={{ color: 'rgb(var(--text-tertiary))' }}
                 >
                   {h}

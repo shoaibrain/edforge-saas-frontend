@@ -753,7 +753,7 @@ function PortalPageError({ error, reset }: ErrorComponentProps) {
           </a>
         </div>
         {import.meta.env.DEV && error && (
-          <details className="mt-6 text-left p-4 rounded-xl bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))]">
+          <details className="mt-6 text-start p-4 rounded-xl bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary))]">
             <summary className="text-xs text-[rgb(var(--text-tertiary))] cursor-pointer">{t('developerInfo')}</summary>
             <pre className="mt-2 p-3 rounded-lg bg-[rgb(var(--background-secondary))] text-xs text-[rgb(var(--state-danger-fg))] font-mono overflow-x-auto max-h-40">
               {error.message}

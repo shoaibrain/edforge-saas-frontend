@@ -220,7 +220,7 @@ export function EdFiComplianceStep({ data, updateData, clearError }: WizardStepP
                     {isSelected && <Check className="w-3 h-3" />}
                     {cat.label}
                     {isSuggested && !isSelected && (
-                      <span className="text-xs text-[rgb(var(--action-secondary-fg))] ml-1">(suggested)</span>
+                      <span className="text-xs text-[rgb(var(--action-secondary-fg))] ms-1">(suggested)</span>
                     )}
                   </button>
                 )
@@ -287,7 +287,7 @@ export function EdFiComplianceStep({ data, updateData, clearError }: WizardStepP
                             : 'bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary))] text-[rgb(var(--text-tertiary))] hover:border-[rgb(var(--state-info-border)/0.35)] hover:text-[rgb(var(--text-secondary))]'
                         }`}
                       >
-                        {isSelected && <Check className="w-3 h-3 mr-1" />}
+                        {isSelected && <Check className="w-3 h-3 me-1" />}
                         {d.label}
                       </button>
                     )

@@ -20,10 +20,10 @@ export function ApiVisual(_props: VisualProps) {
       <div className="text-[#7BE0B7]">POST</div>
       <div className="text-[#fff]" style={{ opacity: 0.8 }}>/v1/students</div>
       <div className="text-[#F47E3E] mt-1.5">{'{'}</div>
-      <div className="text-[#fff] pl-2.5" style={{ opacity: 0.7 }}>
+      <div className="text-[#fff] ps-2.5" style={{ opacity: 0.7 }}>
         "grade": <span className="text-[#FFD78A]">"3"</span>,
       </div>
-      <div className="text-[#fff] pl-2.5" style={{ opacity: 0.7 }}>
+      <div className="text-[#fff] ps-2.5" style={{ opacity: 0.7 }}>
         "active": <span className="text-[#9AE6B4]">true</span>
       </div>
       <div className="text-[#F47E3E]">{'}'}</div>

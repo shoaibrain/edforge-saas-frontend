@@ -456,7 +456,7 @@ export default function ConfigurationTab({ schoolId, school }: ConfigurationTabP
           {/* School Days picker */}
           <div className="space-y-1.5">
             <label className="block text-sm font-medium text-[rgb(var(--text-secondary))]">
-              School Days <span className="text-xs text-[rgb(var(--text-tertiary))] ml-1">— tap to toggle</span>
+              School Days <span className="text-xs text-[rgb(var(--text-tertiary))] ms-1">— tap to toggle</span>
             </label>
             <div className="flex gap-1.5">
               {DAY_LABELS.map((day, i) => {

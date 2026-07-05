@@ -96,7 +96,7 @@ export function SelectField({
           )}
         >
           {label}
-          {required && <span className="text-rust-500 ml-0.5">*</span>}
+          {required && <span className="text-rust-500 ms-0.5">*</span>}
         </label>
       )}
 
@@ -110,7 +110,7 @@ export function SelectField({
         disabled={disabled}
         className={cn(
           'relative w-full flex items-center gap-2 px-3 py-2.5 rounded-xl border',
-          'bg-[rgb(var(--background-secondary))] text-left transition-all duration-200',
+          'bg-[rgb(var(--background-secondary))] text-start transition-all duration-200',
           'focus:outline-none',
           hasError 
             ? 'border-rust-500 shadow-[0_0_0_3px_rgba(239,68,68,0.1)]'
@@ -171,7 +171,7 @@ export function SelectField({
                   onClick={() => handleSelect(option.value)}
                   disabled={option.disabled}
                   className={cn(
-                    'w-full flex items-center gap-3 px-3 py-2.5 text-sm text-left',
+                    'w-full flex items-center gap-3 px-3 py-2.5 text-sm text-start',
                     'transition-colors duration-150',
                     isSelected 
                       ? 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] ' 

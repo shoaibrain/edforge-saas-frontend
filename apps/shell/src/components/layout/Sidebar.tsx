@@ -189,7 +189,7 @@ function NavItemLink({
         className={cn(
           'relative flex items-center rounded-3xl',
           'mx-2 my-px',
-          collapsed ? 'justify-center h-14' : 'gap-3 h-11 pl-[7px] pr-[14px]',
+          collapsed ? 'justify-center h-14' : 'gap-3 h-11 ps-[7px] pe-[14px]',
         )}
       >
         {/* Sliding pill — EXPANDED ONLY (collapsed active handled by icon container) */}
@@ -260,7 +260,7 @@ function NavItemLink({
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
-              className="ml-auto px-2 py-0.5 text-xs font-semibold rounded-full bg-golden-400/20 text-golden-600 dark:text-golden-400 relative z-10"
+              className="ms-auto px-2 py-0.5 text-xs font-semibold rounded-full bg-golden-400/20 text-golden-600 dark:text-golden-400 relative z-10"
             >
               {item.badge}
             </motion.span>
@@ -391,7 +391,7 @@ function HomeNavButton({
         className={cn(
           'relative flex items-center rounded-3xl',
           'mx-2 my-px',
-          collapsed ? 'justify-center h-14' : 'gap-3 h-11 pl-[7px] pr-[14px]',
+          collapsed ? 'justify-center h-14' : 'gap-3 h-11 ps-[7px] pe-[14px]',
         )}
       >
         {/* Sliding pill — EXPANDED ONLY (collapsed active handled by icon container) */}
@@ -481,7 +481,7 @@ export function Sidebar() {
 
   return (
     <aside
-      className="fixed left-0 top-0 bottom-0 z-40 flex flex-col overflow-hidden bg-[var(--shell-page-bg)]"
+      className="fixed start-0 top-0 bottom-0 z-40 flex flex-col overflow-hidden bg-[var(--shell-page-bg)]"
       style={{
         width: collapsed
           ? 'var(--shell-sidebar-w-collapsed)'

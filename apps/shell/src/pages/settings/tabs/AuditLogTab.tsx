@@ -137,7 +137,7 @@ export default function AuditLogTab({ schoolId }: AuditLogTabProps) {
                       </div>
                     )}
                   </div>
-                  <div className="flex-shrink-0 text-right">
+                  <div className="flex-shrink-0 text-end">
                     <div className="text-xs text-[rgb(var(--text-tertiary))]">{entry.actorName || entry.actor || 'System'}</div>
                     <div className="text-xs text-[rgb(var(--text-tertiary))]">
                       {entry.timestamp || entry.createdAt

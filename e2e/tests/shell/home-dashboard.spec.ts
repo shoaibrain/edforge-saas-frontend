@@ -21,14 +21,16 @@ test.describe('Dashboard data', () => {
     await expectNoConsoleErrors(errors.filter((e) => !e.includes('Failed to load resource')))
   })
 
-  test('Arabic keeps the fixed shell chrome and profile menu within the viewport @smoke', async ({ page }) => {
+  test('Arabic fully mirrors the shell and keeps the profile menu within the viewport @smoke', async ({ page }) => {
     await page.addInitScript(() => {
       window.localStorage.setItem('edforge-language', 'ar')
     })
 
     await page.goto('/home')
+    // Full RTL mirror: document, shell frame, and content all flow right-to-left
+    // (the scroll frame is no longer force-pinned to LTR).
     await expect(page.locator('html')).toHaveAttribute('dir', 'rtl')
-    await expect(page.getByTestId('app-scroll-frame')).toHaveAttribute('dir', 'ltr')
+    await expect(page.getByTestId('app-scroll-frame')).not.toHaveAttribute('dir', 'ltr')
     await expect(page.getByTestId('app-content')).toHaveAttribute('dir', 'rtl')
 
     await page.getByRole('button', { name: /My Profile|ملفي الشخصي/ }).click()
