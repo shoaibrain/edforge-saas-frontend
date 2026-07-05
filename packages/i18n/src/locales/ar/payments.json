@@ -1,0 +1,1302 @@
+{
+  "title": "دفع الرسوم",
+  "description": "عرض الفواتير، وإجراء الدفعات، وتنزيل الإيصالات",
+  "overview": {
+    "finance": "تمويل",
+    "selectSchoolTitle": "اختر مدرسة",
+    "selectSchoolDescription": "اختر مدرسة من شريط التنقل العلوي لعرض البيانات المالية.",
+    "actions": {
+      "bulkInvoice": "فاتورة بالجملة",
+      "bulkInvoiceAria": "توليد الفواتير بالجملة",
+      "recordPayment": "سجل الدفع",
+      "recordPaymentAria": "سجل الدفع"
+    },
+    "insight": {
+      "invoiced": "{{amount}} مفوترة",
+      "collected": "{{rate}}% تم جمعها",
+      "invoiceOverdue": "{{count}} الفاتورة متأخرة",
+      "invoiceOverdue_plural": "{{count}} الفواتير المتأخرة",
+      "noOverdue": "لا المتأخرة"
+    },
+    "filters": {
+      "today": "اليوم",
+      "week": "هذا الاسبوع",
+      "month": "هذا الشهر",
+      "year": "هذا العام",
+      "or": "أو",
+      "fromDate": "من تاريخ",
+      "toDate": "حتى الآن",
+      "allYears": "كل السنوات",
+      "clear": "واضح",
+      "exportCsv": "تصدير CSV",
+      "exportCsvAria": "تصدير الفواتير كـ CSV"
+    },
+    "export": {
+      "success": "CSV تم تنزيل التصدير",
+      "failed": "فشل تصدير CSV"
+    },
+    "alert": {
+      "title": "{{count}} الفواتير المتأخرة - {{amount}} غير محصلة",
+      "collectionRate": "معدل التحصيل هو {{rate}}%",
+      "agingBucket": "{{count}} الفواتير في {{bucket}} دلو",
+      "drafts": "{{count}} يجب إصدار مسودات إضافية",
+      "reviewBilling": "مراجعة الفواتير",
+      "region": "التنبيهات"
+    },
+    "kpi": {
+      "totalInvoiced": "إجمالي الفاتورة",
+      "collected": "تم جمعها",
+      "outstanding": "متميز",
+      "overdue": "تأخرت",
+      "invoiceCount": "{{count}} الفواتير",
+      "paymentCount": "{{count}} المدفوعات",
+      "awaiting": "{{count}} في انتظار",
+      "thisMonth": "هذا الشهر",
+      "region": "المقاييس الرئيسية"
+    },
+    "empty": {
+      "noPaymentsTitle": "لا توجد مدفوعات حتى الآن",
+      "noPaymentsMessage": "ستظهر المدفوعات هنا بمجرد أن يبدأ الطلاب في الدفع.",
+      "noInvoicesTitle": "لا توجد فواتير بعد",
+      "noInvoicesMessage": "قم بإنشاء فواتير لبدء تتبع نشاط الفوترة."
+    },
+    "collection": {
+      "title": "أداء التجميع",
+      "percentCollected": "{{rate}}% تم جمعها",
+      "collected": "تم جمعها",
+      "outstanding": "متميز",
+      "overdue": "تأخرت",
+      "byFeeType": "حسب نوع الرسوم",
+      "typeCount": "{{count}} النوع",
+      "typeCount_plural": "{{count}} أنواع",
+      "showLess": "عرض أقل",
+      "showAll": "إظهار الكل ({{count}})",
+      "totalInvoicedThisYear": "إجمالي الفواتير هذا العام"
+    },
+    "billingHealth": {
+      "title": "صحة الفواتير",
+      "allAccountsCurrent": "جميع الحسابات جارية",
+      "noInvoicesTitle": "لا توجد فواتير بعد",
+      "noInvoicesDescription": "أنشئ فاتورتك الأولى للاطلاع على بيانات صحة الفواتير.",
+      "invoices": "الفواتير",
+      "invoiceCount": "{{count}} الفاتورة",
+      "invoiceCount_plural": "{{count}} الفواتير",
+      "agingOverview": "نظرة عامة على الشيخوخة",
+      "overdueCount": "{{count}} متأخرة",
+      "agingBucketTitle": "{{bucket}}: {{count}} الفواتير ({{amount}})",
+      "agingBuckets": {
+        "current": "حاضِر",
+        "days1To30": "1-30 يوما",
+        "days31To60": "31-60 يوما",
+        "days61To90": "61-90 يوما",
+        "days90Plus": "أكثر من 90 يومًا"
+      },
+      "agingInsight": {
+        "singleBucket": "{{count}} متأخرة · {{amount}}، كل ذلك داخل نافذة {{bucket}}.",
+        "multipleBuckets": "{{count}} متأخرة بإجمالي {{amount}}. {{worstCount}} في {{bucket}} بحاجة إلى اهتمام فوري."
+      },
+      "noOverdue": "لا توجد فواتير متأخرة - جميع الحسابات جارية.",
+      "paymentMethods": "طرق الدفع",
+      "noPaymentsRecorded": "لم تسجل أي مدفوعات حتى الآن."
+    },
+    "recent": {
+      "payments": "المدفوعات الأخيرة",
+      "invoices": "الفواتير الأخيرة",
+      "noPayments": "لا توجد مدفوعات حتى الآن.",
+      "noInvoices": "لا توجد فواتير بعد.",
+      "unknown": "مجهول",
+      "due": "حق",
+      "today": "اليوم",
+      "yesterday": "أمس",
+      "daysAgo": "{{count}} منذ أيام"
+    }
+  },
+  "invoices": {
+    "kpi": {
+      "region": "المقاييس الرئيسية"
+    },
+    "title": "الفواتير",
+    "description": "عرض وإدارة فواتير الرسوم",
+    "manageDescription": "إنشاء وإصدار وإدارة فواتير الطلاب.",
+    "outstanding": "متميز",
+    "paid": "مدفوع",
+    "overdue": "تأخرت",
+    "all": "جميع الفواتير",
+    "invoiceNumber": "فاتورة #",
+    "status": "حالة",
+    "dueDate": "تاريخ الاستحقاق",
+    "dueDateRequired": "تاريخ الاستحقاق *",
+    "issuedDate": "تاريخ الإصدار",
+    "billingPeriod": "فترة الفاتورة",
+    "billingPeriodPlaceholder": "على سبيل المثال، الفصل الدراسي الأول، القبول",
+    "notes": "ملاحظات",
+    "amountDue": "المبلغ المستحق",
+    "grandTotal": "المجموع",
+    "noInvoices": "لم يتم العثور على فواتير",
+    "noInvoicesDescription": "لا توجد فواتير للفترة المحددة.",
+    "generateFirstInvoice": "أنشئ فاتورتك الأولى للبدء.",
+    "noOutstanding": "جميع المحاصرين!",
+    "noOutstandingDescription": "لا توجد فواتير مستحقة في هذا الوقت.",
+    "generateInvoice": "إنشاء الفاتورة",
+    "selectFees": "حدد الرسوم المراد تضمينها",
+    "selectStudent": "اختر الطالب",
+    "selectSchool": "اختر مدرسة لإدارة الفواتير.",
+    "selectAcademicYear": "اختر العام الدراسي",
+    "studentRequired": "طالب *",
+    "feeStructuresRequired": "هياكل الرسوم *",
+    "generated": "تم إنشاء الفاتورة بنجاح",
+    "generateFailed": "فشل في إنشاء الفاتورة",
+    "requiredFields": "يرجى ملء كافة الحقول المطلوبة",
+    "issue": "مشكلة",
+    "issueSuccess": "تم إصدار الفاتورة بنجاح",
+    "issueFailed": "فشل في إصدار الفاتورة",
+    "cancelSuccess": "تم إلغاء الفاتورة",
+    "cancelFailed": "فشل في إلغاء الفاتورة",
+    "bulkIssueSuccess": "تم إصدار فاتورة {{count}}.",
+    "bulkIssueSuccess_plural": "تم إصدار الفواتير {{count}}.",
+    "bulkIssueSuccessWithSkipped": "تم إصدار فاتورة {{count}}. {{skipped}} تم تخطيه.",
+    "bulkIssueSuccessWithSkipped_plural": "تم إصدار الفواتير {{count}}. {{skipped}} تم تخطيه.",
+    "bulkIssueFailed": "فشل في إصدار الفواتير",
+    "overdueByDays": "متأخرة بحلول {{count}}د",
+    "overdueBanner": "{{count}} الفاتورة متأخرة - {{amount}} غير محصلة",
+    "overdueBanner_plural": "{{count}} الفواتير المتأخرة - {{amount}} غير محصلة",
+    "overdueBannerRate": "معدل التحصيل هو {{rate}}%.",
+    "overdueBannerWithDrafts": "معدل التحصيل هو {{rate}}%. {{drafts}} يجب إصدار المسودات.",
+    "loadedInvoices": "{{count}} الفواتير",
+    "loadedCount": "{{count}} محملة",
+    "paidCount": "{{count}} مدفوعة",
+    "loadedSelectionOnly": "ينطبق التحديد على السجلات المحملة فقط ({{count}} موضح). قم بتحميل المزيد من الصفحات لتشمل فواتير إضافية.",
+    "searchPlaceholder": "البحث عن طريق رقم الفاتورة أو الطالب...",
+    "issueSelected": "العدد المحدد ({{count}})",
+    "sendReminder": "إرسال تذكير",
+    "bulkPdfExport": {
+      "menuLabel": "تحميل PDFs"
+    },
+    "cancelTitle": "إلغاء الفاتورة {{invoiceNumber}}؟",
+    "cancelDescriptionPrefix": "هذا العمل هو",
+    "irreversible": "لا رجعة فيه",
+    "cancelDescriptionSuffix": "سيتم إلغاء الفاتورة نهائيًا ولا يمكن إعادة إصدارها.",
+    "cancelReason": "سبب الإلغاء *",
+    "cancelReasonPlaceholder": "أدخل سبب إلغاء هذه الفاتورة...",
+    "keepInvoice": "احتفظ بالفاتورة",
+    "cancelInvoice": "إلغاء الفاتورة",
+    "bulkIssueTitle": "إصدار {{count}} الفاتورة؟",
+    "bulkIssueTitle_plural": "إصدار {{count}} الفواتير؟",
+    "bulkIssueDescription": "سيتمكن الطلاب من رؤية هذه الفواتير ودفعها بمجرد إصدارها. لا يمكن التراجع عن هذا الإجراء.",
+    "issueCountInvoices": "إصدار {{count}} الفاتورة",
+    "issueCountInvoices_plural": "إصدار {{count}} الفواتير",
+    "signals": {
+      "overdueTitle": "{{amount}} متأخرة عبر {{count}} الفواتير",
+      "overdueSub": "المتابعة قبل سن المستحقات أبعد من ذلك",
+      "viewOverdue": "عرض متأخر",
+      "draftsTitle": "{{count}} مسودة الفواتير جاهزة للإصدار",
+      "draftsSub": "لا تستطيع العائلات الدفع حتى يتم إصدار المسودات",
+      "viewDrafts": "عرض المسودات"
+    },
+    "selection": {
+      "noDrafts": "لا توجد مسودات في الاختيار",
+      "noneRemindable": "الفواتير المدفوعة لا تحتاج إلى تذكير"
+    }
+  },
+  "invoiceDetail": {
+    "backToInvoices": "العودة إلى الفواتير",
+    "invoice": "فاتورة",
+    "student": "الطالب: {{name}}",
+    "due": "المستحق: {{date}}",
+    "actions": {
+      "issueInvoice": "إصدار الفاتورة",
+      "sendReminder": "إرسال تذكير",
+      "cancelDraft": "إلغاء المسودة",
+      "moreActions": "المزيد من الإجراءات"
+    },
+    "sections": {
+      "lineItems": "عناصر الخط",
+      "paymentHistory": "تاريخ الدفع"
+    },
+    "empty": {
+      "noLineItems": "لا توجد عناصر"
+    },
+    "paymentHistory": {
+      "payment": "قسط",
+      "via": "عبر {{gateway}}",
+      "empty": "لم يتم تسجيل أي دفعات في هذه الفاتورة حتى الآن.",
+      "recordFirst": "سجل الدفعة الأولى"
+    },
+    "metadata": {
+      "created": "تم الإنشاء: {{date}}",
+      "issued": "صدر: {{date}}",
+      "notes": "ملاحظات: {{notes}}"
+    },
+    "banner": {
+      "draftTitle": "هذه الفاتورة عبارة عن مسودة.",
+      "draftBody": "إنه غير مرئي في حساب الطالب ولا يمكن تسجيل أي دفعات حتى يتم إصداره.",
+      "cancelledTitle": "تم إلغاء هذه الفاتورة",
+      "cancelledOn": "على {{date}}",
+      "cancelledBy": "بواسطة {{name}}",
+      "cancelledBody": "ولم يعد يؤثر على رصيد الطالب."
+    },
+    "band": {
+      "region": "ملخص الفاتورة",
+      "lineItemCount": "{{count}} البنود",
+      "lineItemCount_one": "{{count}} البند",
+      "lineItemCount_other": "{{count}} البنود",
+      "noPaymentsYet": "لا توجد مدفوعات حتى الآن",
+      "invoiceCancelled": "تم إلغاء الفاتورة",
+      "settledInFull": "استقر بالكامل",
+      "outstandingBalance": "الرصيد المتميز",
+      "dueDate": "تاريخ الاستحقاق",
+      "daysLate": "{{days}}د متأخرا"
+    },
+    "lineItems": {
+      "qtyAt": "{{quantity}} × {{amount}}"
+    },
+    "aside": {
+      "details": "تفاصيل",
+      "status": "حالة",
+      "issued": "صادر",
+      "notIssuedYet": "لم تصدر بعد",
+      "due": "حق",
+      "billingPeriod": "فترة الفاتورة",
+      "academicYear": "العام الدراسي",
+      "viewStudentAccount": "عرض حساب الطالب",
+      "activity": "نشاط"
+    },
+    "timeline": {
+      "created": "تم إنشاء الفاتورة",
+      "issued": "صدر لحساب الطالب",
+      "overdue": "تم وضع علامة متأخرة",
+      "overdueSub": "تلقائي · تاريخ الاستحقاق الماضي",
+      "payment": "تم استلام الدفعة — {{amount}}",
+      "paymentSub": "{{gateway}} · الاستلام {{receipt}}",
+      "paid": "دفعت بالكامل",
+      "paidSub": "استقر الرصيد",
+      "cancelled": "تم إلغاء الفاتورة",
+      "writtenOff": "شطب",
+      "by": "بواسطة {{name}}"
+    },
+    "error": {
+      "forbidden": "ليس لديك إذن لعرض هذه الفاتورة.",
+      "notFound": "لم نتمكن من العثور على هذه الفاتورة. ربما تم حذفه."
+    }
+  },
+  "lineItems": {
+    "description": "وصف",
+    "amount": "المبلغ",
+    "quantity": "الكمية",
+    "discount": "تخفيض",
+    "tax": "ضريبة",
+    "total": "المجموع"
+  },
+  "summary": {
+    "subtotal": "المجموع الفرعي",
+    "taxTotal": "ضريبة",
+    "discountTotal": "تخفيض",
+    "grandTotal": "المجموع الإجمالي",
+    "amountPaid": "المبلغ المدفوع",
+    "amountDue": "المبلغ المستحق",
+    "balanceDue": "الرصيد المستحق"
+  },
+  "gateway": {
+    "selectMethod": "حدد طريقة الدفع",
+    "selectMethodDescription": "اختر الطريقة التي ترغب في الدفع بها",
+    "esewa": "eSewa",
+    "esewaDescription": "ادفع باستخدام محفظتك الرقمية eSewa",
+    "khalti": "خالتي",
+    "khaltiDescription": "ادفع باستخدام محفظتك الرقمية في خالتي",
+    "fonepay": "فونباي",
+    "fonepayDescription": "ادفع عبر Fonepay QR أو الخدمات المصرفية عبر الهاتف المحمول",
+    "connectips": "كونيكتIPS",
+    "connectipsDescription": "ادفع مباشرة من حسابك البنكي",
+    "stripe": "الدفع بالبطاقة",
+    "stripeDescription": "ادفع باستخدام بطاقات Visa أو Mastercard أو أي بطاقات أخرى",
+    "cash": "نقدي",
+    "cashDescription": "الدفع في مكتب المدرسة",
+    "bankTransfer": "التحويل البنكي",
+    "bankTransferDescription": "التحويل إلى الحساب البنكي للمدرسة",
+    "cheque": "يفحص",
+    "chequeDescription": "الدفع عن طريق الشيكات في مكتب المدرسة",
+    "testMode": "وضع الاختبار",
+    "productionMode": "إنتاج",
+    "configured": "تم تكوينه",
+    "notConfigured": "لم يتم تكوينه"
+  },
+  "flow": {
+    "confirmPayment": "تأكيد الدفع",
+    "confirmDescription": "أنت على وشك دفع {{amount}} عبر {{gateway}}",
+    "redirecting": "إعادة التوجيه إلى {{gateway}}...",
+    "redirectDescription": "ستتم إعادة توجيهك إلى {{gateway}} لإكمال دفعتك",
+    "verifying": "التحقق من الدفع...",
+    "verifyDescription": "يرجى الانتظار حتى نتحقق من دفعتك باستخدام {{gateway}}",
+    "processingPayment": "جارٍ معالجة الدفع...",
+    "paymentSuccessful": "تم الدفع بنجاح!",
+    "paymentFailed": "فشل الدفع",
+    "paymentCancelled": "تم إلغاء الدفع",
+    "failedDescription": "لا يمكن معالجة دفعتك. لم يتم تحصيل أي مبلغ.",
+    "cancelledDescription": "لقد ألغيت الدفع. لم يتم تحصيل أي مبلغ.",
+    "tryAgain": "حاول ثانية",
+    "returnToInvoices": "العودة إلى الفواتير",
+    "returnToPayments": "العودة إلى المدفوعات",
+    "sessionExpired": "انتهت صلاحية جلسة الدفع. يرجى المحاولة مرة أخرى.",
+    "paymentInProgress": "الدفع قيد التقدم",
+    "paymentInProgressDescription": "أكمل دفعتك في علامة التبويب {{gateway}} التي فتحت للتو. انقر فوق \"التحقق من الحالة\" بمجرد الانتهاء.",
+    "checkStatus": "التحقق من الحالة"
+  },
+  "receipt": {
+    "title": "إيصال الدفع",
+    "receiptNumber": "إيصال #",
+    "transactionId": "المعاملة ID",
+    "paymentDate": "تاريخ الدفع",
+    "paymentMethod": "طريقة الدفع",
+    "paidBy": "تم التسجيل بواسطة",
+    "studentName": "طالب",
+    "studentNumber": "رقم الطالب",
+    "emisStudentId": "EMIS ID",
+    "schoolName": "مدرسة",
+    "downloadPdf": "تحميل PDF",
+    "emailReceipt": "إيصال البريد الإلكتروني",
+    "taxInvoice": "الفاتورة الضريبية",
+    "panNumber": "PAN",
+    "vatNumber": "تسجيل ضريبة القيمة المضافة",
+    "taxableAmount": "المبلغ الخاضع للضريبة",
+    "taxAmount": "مبلغ الضريبة",
+    "thankYou": "شكرا لك على الدفع الخاص بك!"
+  },
+  "status": {
+    "draft": "مسودة",
+    "issued": "صادر",
+    "partially_paid": "مدفوعة جزئيا",
+    "paid": "مدفوع",
+    "overdue": "تأخرت",
+    "cancelled": "تم الإلغاء",
+    "written_off": "شطب",
+    "pending": "في انتظار",
+    "processing": "يعالج",
+    "completed": "مكتمل",
+    "failed": "فشل",
+    "refunded": "ردها",
+    "partially_refunded": "مستردة جزئيا",
+    "debit": "دَين",
+    "credit": "ائتمان"
+  },
+  "feeStructure": {
+    "kpi": {
+      "region": "المقاييس الرئيسية"
+    },
+    "title": "هياكل الرسوم",
+    "description": "تكوين أنواع الرسوم والمبالغ لمدرستك",
+    "addFee": "إضافة هيكل الرسوم",
+    "editFee": "تحرير هيكل الرسوم",
+    "deleteFee": "حذف هيكل الرسوم",
+    "deleteConfirmation": "هل أنت متأكد أنك تريد حذف هيكل الرسوم هذا؟ لا يمكن التراجع عن هذا.",
+    "name": "اسم الرسوم",
+    "type": "نوع الرسوم",
+    "amount": "المبلغ",
+    "frequency": "تكرار",
+    "taxRate": "معدل الضريبة (%)",
+    "taxType": "نوع الضريبة",
+    "gradeLevels": "مستويات الصف",
+    "allGrades": "جميع الدرجات",
+    "effectiveFrom": "فعالة من",
+    "effectiveTo": "فعالة حتى",
+    "academicYear": "العام الدراسي",
+    "noFeeStructures": "لم يتم تكوين هياكل الرسوم",
+    "noFeeStructuresDescription": "أضف هياكل رسوم مدرستك لبدء إنشاء الفواتير.",
+    "created": "تم إنشاء هيكل الرسوم بنجاح",
+    "updated": "تم تحديث هيكل الرسوم بنجاح",
+    "deleted": "تم حذف هيكل الرسوم بنجاح",
+    "createFailed": "فشل في إنشاء هيكل الرسوم",
+    "updateFailed": "فشل في تحديث هيكل الرسوم",
+    "deleteFailed": "فشل في حذف هيكل الرسوم",
+    "selectSchool": "اختر مدرسة لإدارة هياكل الرسوم.",
+    "loadFailed": "فشل تحميل بنيات الرسوم",
+    "connectionRetry": "يرجى التحقق من اتصالك والمحاولة مرة أخرى.",
+    "autoApplyBanner": "ستؤدي هياكل الرسوم التي يتم تطبيقها تلقائيًا عند التسجيل إلى إنشاء التزامات تلقائيًا عند تسجيل الطالب.",
+    "stats": {
+      "totalStructures": "مجموع الهياكل",
+      "autoApply": "التطبيق التلقائي",
+      "feeTypes": "أنواع الرسوم",
+      "maxFee": "الحد الأقصى للرسوم"
+    },
+    "filters": {
+      "all": "الجميع",
+      "active": "نشط",
+      "inactive": "غير نشط"
+    },
+    "autoApplyOnEnrollment": "التقديم التلقائي عند التسجيل",
+    "closeForm": "إغلاق نموذج هيكل الرسوم",
+    "sections": {
+      "basicInfo": "معلومات أساسية",
+      "pricing": "التسعير",
+      "scope": "نِطَاق",
+      "enrollmentRules": "قواعد التسجيل",
+      "effectivePeriod": "الفترة الفعالة"
+    },
+    "fields": {
+      "name": "اسم",
+      "description": "وصف",
+      "type": "يكتب",
+      "academicYear": "العام الدراسي",
+      "amount": "كمية",
+      "frequency": "تكرار",
+      "taxType": "نوع الضريبة",
+      "taxRate": "معدل الضريبة (%)",
+      "gradeLevels": "مستويات الصف",
+      "effectiveFrom": "فعالة من",
+      "effectiveTo": "فعالة ل"
+    },
+    "placeholders": {
+      "name": "على سبيل المثال الرسوم الدراسية السنوية",
+      "description": "وصف اختياري",
+      "selectYear": "اختر سنة..."
+    },
+    "academicYearStatus": {
+      "current": "حاضِر",
+      "planning": "تخطيط",
+      "noneConfigured": "لم يتم تكوين سنوات دراسية."
+    },
+    "taxTypes": {
+      "none": "لا أحد"
+    },
+    "enrollment": {
+      "proRateOnMidTermEntry": "معدل تناسبي عند الدخول في منتصف المدة",
+      "proRateHelp": "عند التمكين، يتم احتساب الرسوم تلقائيًا بشكل متناسب للطلاب المسجلين في منتصف الفصل الدراسي."
+    },
+    "dateHelp": {
+      "gregorianStorage": "يتم عرض التواريخ بالميلادي (AD). يقوم النظام بتخزين كافة التواريخ بتنسيق AD.",
+      "dualBs": "يتم عرض معادلات بيكرام سامبات عند الاقتضاء."
+    },
+    "gradeSelect": {
+      "placeholder": "تحديد المستويات الدراسية...",
+      "selectedCount": "{{count}} تم اختيار الدرجة",
+      "selectedCount_plural": "{{count}} الدرجات المختارة",
+      "gradeLabel": "الصف {{grade}}",
+      "removeGradeAria": "إزالة الدرجة {{grade}}"
+    },
+    "validation": {
+      "nameRequired": "الاسم مطلوب",
+      "nameMax": "يجب أن يكون الاسم 100 حرف أو أقل",
+      "descriptionMax": "يجب أن يكون الوصف 255 حرفًا أو أقل",
+      "amountRequired": "المبلغ مطلوب",
+      "amountMin": "لا يمكن أن يكون المبلغ سالبًا",
+      "amountMax": "لا يمكن أن يتجاوز المبلغ 10,000,000",
+      "taxRateMin": "لا يمكن أن يكون معدل الضريبة سالبًا",
+      "taxRateMax": "لا يمكن أن يتجاوز معدل الضريبة 100%",
+      "effectiveFromRequired": "مطلوب تاريخ البدء الفعلي",
+      "academicYearRequired": "يشترط العام الدراسي",
+      "effectiveToAfterFrom": "يجب أن يكون تاريخ الانتهاء الفعلي بعد تاريخ البدء"
+    },
+    "editAria": "تحرير هيكل الرسوم",
+    "deleteAria": "حذف هيكل الرسوم",
+    "deleteTitle": "حذف هيكل الرسوم",
+    "deleteMessage": "هل أنت متأكد أنك تريد حذف {{feeName}}؟ هذا الإجراء لا رجعة فيه ولا يمكن التراجع عنه.",
+    "deleting": "جارٍ الحذف...",
+    "confirmDelete": "تأكيد الحذف",
+    "types": {
+      "tuition": "تدريس",
+      "admission": "قبول",
+      "exam": "فحص",
+      "transport": "ينقل",
+      "library": "مكتبة",
+      "lab": "معمل",
+      "hostel": "نزل",
+      "uniform": "زي مُوحد",
+      "miscellaneous": "متنوع",
+      "custom": "مخصص"
+    },
+    "frequencies": {
+      "one_time": "لمرة واحدة",
+      "monthly": "شهريا",
+      "quarterly": "ربع سنوية",
+      "annual": "سنوي"
+    }
+  },
+  "bulkGenerate": {
+    "title": "إنشاء الفواتير بالجملة",
+    "description": "إنشاء فواتير لعدة طلاب في وقت واحد - حسب الصف أو الطالب أو الشريحة الذكية.",
+    "selectSchool": "حدد مدرسة لإنشاء فواتير مجمعة.",
+    "loadingRoster": "جارٍ تحميل قائمة المدارس...",
+    "steps": {
+      "selectRecipients": "حدد المستلمين",
+      "feeStructures": "هياكل الرسوم",
+      "invoiceDetails": "تفاصيل الفاتورة",
+      "reviewConfirm": "مراجعة وتأكيد"
+    },
+    "actions": {
+      "generating": "جارٍ الإنشاء...",
+      "generateInvoices": "إنشاء الفواتير"
+    },
+    "toast": {
+      "generated": "{{count}} تم إنشاء الفاتورة",
+      "generated_plural": "{{count}} الفواتير التي تم إنشاؤها",
+      "generatedWithSkipped": "{{count}} الفاتورة التي تم إنشاؤها · {{skipped}} تم تخطيها",
+      "generatedWithSkipped_plural": "{{count}} الفواتير التي تم إنشاؤها · {{skipped}} تم تخطيها",
+      "syncLimitExceeded": "هناك عدد كبير جدًا من الطلاب (> 25) للإنشاء المتزامن. في الوقت الحالي، قم بتضييق نطاق التحديد أو اختر درجة واحدة وحاول مرة أخرى.",
+      "failed": "فشل التوليد بالجملة."
+    },
+    "confirm": {
+      "title": "توليد الفواتير؟",
+      "description": "إنشاء فاتورة {{count}}؟ لا يمكن التراجع عن هذا.",
+      "description_plural": "إنشاء {{count}} الفواتير؟ لا يمكن التراجع عن هذا.",
+      "body": "سيتم إنشاء فواتير الطالب {{count}} كمسودات. يمكنك مراجعتها وإصدارها من قائمة الفواتير.",
+      "body_plural": "سيتم إنشاء فواتير طلاب {{count}} كمسودات. يمكنك مراجعتها وإصدارها من قائمة الفواتير.",
+      "generateCount": "توليد {{count}}",
+      "generateCount_plural": "توليد {{count}}"
+    },
+    "async": {
+      "inProgressTitle": "توليد الفواتير...",
+      "failedTitle": "فشل التوليد بالجملة",
+      "failedDescription": "أبلغ العامل عن فشل على مستوى الوظيفة قبل إنشاء أي فواتير أو جميعها.",
+      "runningDescription": "إنشاء مسودة الفواتير للطالب {{count}}. يكتمل هذا عادةً في أقل من 90 ثانية.",
+      "runningDescription_plural": "إنشاء مسودة الفواتير لطلاب {{count}}. يكتمل هذا عادةً في أقل من 90 ثانية.",
+      "progressVerb": "توليد الفواتير",
+      "startOver": "ابدأ من جديد",
+      "runInBackground": "تشغيل في الخلفية",
+      "toastSucceeded": "{{count}} تم إنشاء مسودة الفاتورة",
+      "toastSucceeded_plural": "{{count}} تم إنشاء مسودة الفواتير",
+      "toastSkipped": "{{count}} تم تخطيه",
+      "toastFailed": "{{count}} فشل"
+    },
+    "asyncSuccess": {
+      "title": "{{count}} الفاتورة التي تم إنشاؤها كمسودات",
+      "title_plural": "{{count}} الفواتير التي تم إنشاؤها كمسودات",
+      "notice": "انقر فوق \"إصدار\" في كل فاتورة، أو استخدم إصدارًا مجمعًا، لإرسالها إلى العائلات.",
+      "periodNotice": "ل {{billingPeriod}}. انقر فوق \"إصدار\" في كل فاتورة، أو استخدم إصدارًا مجمعًا، لإرسالها إلى العائلات.",
+      "created": "مخلوق",
+      "skipped": "تم تخطيه",
+      "failed": "فشل",
+      "retryFailed": "فشلت إعادة المحاولة ({{count}})",
+      "failureCount": "{{count}} الفشل",
+      "failureCount_plural": "{{count}} الفشل",
+      "showingFirst": "(عرض أول {{count}})",
+      "noReasons": "لم يتم إرجاع أي أسباب لكل سجل بواسطة العامل."
+    },
+    "footer": {
+      "selectStudent": "حدد طالبًا واحدًا على الأقل للمتابعة",
+      "studentsSelected": "{{count}} تم اختيار الطالب",
+      "studentsSelected_plural": "{{count}} تم اختيار الطلاب",
+      "addFeeOrLine": "أضف رسومًا أو سطرًا مخصصًا واحدًا على الأقل",
+      "lineItemsAndStudents": "{{lineCount}} {{lineLabel}} · {{studentCount}} {{studentLabel}}",
+      "invoicesConfigured": "{{count}} سيتم تكوين الفاتورة",
+      "invoicesConfigured_plural": "{{count}} سيتم تكوين الفواتير",
+      "resolvingPreview": "جارٍ حل المعاينة...",
+      "readyToGenerate": "جاهز لإنشاء فاتورة {{count}}",
+      "readyToGenerate_plural": "جاهز لإنشاء فواتير {{count}}"
+    },
+    "common": {
+      "unknown": "مجهول",
+      "grade": "درجة",
+      "grade_plural": "الدرجات",
+      "gradeLabel": "الصف {{grade}}",
+      "gradesList": "الدرجات {{grades}}",
+      "student": "طالب",
+      "student_plural": "طلاب",
+      "studentCount": "{{count}} طالب",
+      "studentCount_plural": "{{count}} الطلاب",
+      "selectedCount": "{{count}} مختارة",
+      "notSelectedCount": "{{count}} غير محدد",
+      "noneSelected": "لم يتم تحديد أي شيء",
+      "lineItem": "عنصر السطر",
+      "lineItem_plural": "عناصر الخط",
+      "optional": "(خياري)"
+    },
+    "step1": {
+      "byGrade": "حسب الصف",
+      "byStudent": "بواسطة الطالب",
+      "searchPlaceholder": "اسم البحث، الطالب ID، أو رقم الطالب...",
+      "quickSegments": "مقاطع سريعة",
+      "studentTotalCount": "{{count}} مجموع الطلاب",
+      "studentTotalCount_plural": "{{count}} مجموع الطلاب",
+      "studentMatchCount": "{{count}} مباراة الطالب",
+      "studentMatchCount_plural": "{{count}} تطابق الطلاب",
+      "selectAll": "حدد الكل",
+      "selectAllMatching": "حدد كل المطابقة",
+      "clear": "واضح",
+      "phase1Tooltip": "أراضي الأسلاك المضادة مع تكامل المعاينة المجمعة ؛ يتبع تصفية الرقائق متابعة العلاقات العامة",
+      "phase2Tooltip": "القادمة في المرحلة الثانية - تتطلب البيانات الديموغرافية للطلاب",
+      "segments": {
+        "outstanding": "رصيد متميز",
+        "new": "قبولات جديدة",
+        "not-billed-this-period": "لم يتم إصدار فاتورة لهذه الفترة بعد",
+        "transport": "مستخدمي النقل",
+        "boarders": "الحدود",
+        "scholarship": "منحة دراسية / BPL"
+      },
+      "noStudentsMatch": "لا يوجد طلاب يطابقون البحث الحالي.",
+      "recipientsSelected": "تم اختيار المستلمين",
+      "gradesCovered": "الدرجات المغطاة",
+      "emptyRailPrefix": "لم يتم اختيار أحد بعد. حدد أحد التقديرات لإضافة الجميع فيه، ثم قم بإلغاء تحديد الطلاب الفرديين الذين تريد تخطيهم - أو التبديل إليهم",
+      "emptyRailSuffix": "لاختيار الكرز."
+    },
+    "step2": {
+      "coverageIntro": "يتم التحقق من كل رسوم مقابل الطالب الذي اخترته {{count}}. يتم تخطي الرسوم التي لا تنطبق على الطالب في تلك الفاتورة تلقائيًا.",
+      "coverageIntro_plural": "يتم فحص كل رسوم مقابل الطلاب الذين تم اختيارهم في {{count}}. يتم تخطي الرسوم التي لا تنطبق على الطالب في تلك الفاتورة تلقائيًا.",
+      "estimatedGrandTotal": "الإجمالي المقدر",
+      "avgPerStudent": "{{amount}} متوسط ​​/ طالب",
+      "students": "طلاب",
+      "feeStructures": "هياكل الرسوم",
+      "customLines": "خطوط مخصصة",
+      "grossSubtotal": "المجموع الفرعي الإجمالي",
+      "feeDiscounts": "تخفيضات الرسوم",
+      "zeroTotalWarning": "{{count}} المجموع المتوقع للطالب هو 0. قم بتشغيل تخطي الإجمالي الصفري في الخطوة 3 لاستبعادهم.",
+      "zeroTotalWarning_plural": "{{count}} الإجمالي المتوقع للطلاب هو 0. قم بتشغيل تخطي الإجمالي الصفري في الخطوة 3 لاستبعادهم.",
+      "perFeeDiscount": "خصم لكل رسوم ٪",
+      "appliesToAll": "ينطبق على جميع {{count}}",
+      "appliesToZero": "ينطبق على 0 - غير قابل للتحديد",
+      "partialCoverage": "{{covered}} من {{total}} · {{skipped}} تم تخطيه",
+      "customLineItems": "عناصر سطر مخصصة",
+      "addLine": "إضافة خط",
+      "customLineHelp": "يتم إضافة رسوم اختيارية لمرة واحدة إلى فاتورة كل طالب محدد (على سبيل المثال، النزهة السنوية - تطوعية).",
+      "customLinePlaceholder": "على سبيل المثال نزهة سنوية - تطوعية",
+      "customLineFallback": "بند مخصص",
+      "removeLine": "إزالة الخط"
+    },
+    "step3": {
+      "academicYear": "العام الدراسي",
+      "academicYearHelp": "السنة النشطة - تدفع الفاتورة + تثبيت دفتر الأستاذ.",
+      "noAcademicYears": "لم يتم تكوين سنوات دراسية",
+      "billingPeriod": "فترة الفوترة / المدة",
+      "billingPeriodHelp": "نافذة الفوترة المتوافقة مع فترة التقدير.",
+      "selectPeriod": "- يختار -",
+      "terms": {
+        "first": "الفصل الدراسي الأول",
+        "second": "الفصل الدراسي الثاني",
+        "third": "الفصل الثالث",
+        "fourth": "الفصل الدراسي الرابع"
+      },
+      "issueDate": "تاريخ الإصدار",
+      "dueDate": "تاريخ الاستحقاق",
+      "numberPreview": "معاينة رقم الفاتورة",
+      "sequentialNumbers": "{{count}} رقم تسلسلي",
+      "sequentialNumbers_plural": "{{count}} أرقام متسلسلة",
+      "numberPreviewHelp": "التنسيق فقط - يتم حجز الأرقام الفعلية في وقت الإنشاء. شكل:",
+      "note": "ملاحظة على كل فاتورة",
+      "notePlaceholder": "على سبيل المثال يرجى الدفع في شباك الحسابات أو عبر eSewa قبل الموعد المحدد.",
+      "reviewEveryInvoice": "قم بمراجعة كل فاتورة قبل الإنشاء",
+      "reviewEveryInvoiceHelp": "قم بعرض معاينة عنصر لكل طالب في الخطوة التالية.",
+      "skipZeroTotal": "تخطي الطلاب الذين يصل مجموعهم إلى الصفر",
+      "skipZeroTotalHelp": "لا تقم بإصدار فواتير بقيمة صفر (مثل الطلاب الحاصلين على خصم كامل)."
+    },
+    "step4": {
+      "verifyIntro": "التحقق من كل شيء أدناه. {{count}} سيتم إنشاء الفاتورة",
+      "verifyIntro_plural": "التحقق من كل شيء أدناه. {{count}} سيتم إنشاء الفواتير",
+      "skippedZeroParenthetical": "(تم تخطي {{count}} - إجمالي صفر)",
+      "recipients": "المستلمون",
+      "recipientSummary": "{{studentCount}} {{studentLabel}} · {{gradeCount}} {{gradeLabel}}",
+      "feeStructures": "هياكل الرسوم",
+      "noFeesSelected": "لم يتم تحديد أي رسوم.",
+      "period": "فترة",
+      "issueDue": "العدد {{issueDate}} · مستحق {{dueDate}}",
+      "perStudentPreview": "معاينة لكل طالب",
+      "tapToExpand": "اضغط على صف للتوسيع",
+      "noBillableStudents": "لا يوجد طلاب قابلين للفوترة.",
+      "allProjectedZero": "جميع المجاميع المتوقعة هي 0.",
+      "invoices": "الفواتير",
+      "avgPerStudent": "متوسط ​​/ طالب",
+      "grandTotal": "المجموع الإجمالي",
+      "postingNotice": "المشاركات في دفتر الأستاذ العام بشأن القضية. يتم إرسال الإخطارات حسب تفضيلات قناة الوصي.",
+      "resolvingServerPreview": "جارٍ حل معاينة الخادم...",
+      "serverPreviewUnavailable": "معاينة الخادم غير متاحة - سيظل الإنشاء يعمل، ولكن لن يتم عرض أعداد التكرارات/الشرائح.",
+      "serverPreview": "معاينة الخادم",
+      "duplicateSkip": "تخطي مكررة",
+      "hasBalanceDue": "لديه رصيد مستحق",
+      "newAdmissions": "قبولات جديدة",
+      "notBilledThisPeriod": "لم يتم إصدار فاتورة هذه الفترة",
+      "estimatedDuration": "المدة المقدرة ≈ {{seconds}}s",
+      "lineItemCount": "{{count}} البند",
+      "lineItemCount_plural": "{{count}} البنود",
+      "customBadge": "مخصص",
+      "invoiceTotal": "إجمالي الفاتورة"
+    },
+    "success": {
+      "generatedTitle": "{{count}} تم إنشاء الفاتورة",
+      "generatedTitle_plural": "{{count}} الفواتير التي تم إنشاؤها",
+      "notice": "سيتم إخطار الأوصياء حسب تفضيلات قناتهم.",
+      "periodNotice": "ل {{billingPeriod}}. سيتم إخطار الأوصياء حسب تفضيلات قناتهم.",
+      "invoices": "الفواتير",
+      "totalBilled": "إجمالي الفاتورة",
+      "skipped": "تم تخطيه",
+      "downloadAll": "تنزيل الكل (PDF)",
+      "downloadAllTooltip": "يتم تنزيل الجزء الأكبر من PDF في سباق لاحق",
+      "newBatch": "دفعة جديدة"
+    }
+  },
+  "gatewayConfig": {
+    "title": "بوابات الدفع",
+    "description": "تكوين بوابات الدفع لمدرستك",
+    "enable": "يُمكَِن",
+    "disable": "إبطال",
+    "merchantCode": "رمز التاجر",
+    "apiKey": "API مفتاح",
+    "secretKey": "المفتاح السري",
+    "publicKey": "المفتاح العام",
+    "saveConfig": "حفظ التكوين",
+    "testPayment": "اختبار الدفع",
+    "testPaymentDescription": "قم بإجراء معاملة اختبار NPR 1 للتحقق من التكوين",
+    "saved": "تم حفظ تكوين البوابة بنجاح",
+    "credentialsMasked": "يتم إخفاء بيانات الاعتماد للأمان"
+  },
+  "paymentsList": {
+    "kpi": {
+      "region": "المقاييس الرئيسية"
+    },
+    "title": "المدفوعات",
+    "description": "عرض وإدارة جميع معاملات الدفع.",
+    "selectSchool": "اختر مدرسة لعرض المدفوعات.",
+    "gateway": "بوابة",
+    "date": "تاريخ",
+    "allGateways": "جميع البوابات",
+    "viewReceipt": "عرض الإيصال",
+    "voidPayment": "الدفع باطل",
+    "voidDescription": "سيؤدي هذا إلى عكس إدخال دفتر الأستاذ واستعادة المبلغ المستحق على الفاتورة. لا يمكن التراجع عن هذا الإجراء.",
+    "voidReason": "سبب الإلغاء *",
+    "voidReasonPlaceholder": "على سبيل المثال دفع مكرر، خطأ في إدخال البيانات",
+    "refundPayment": "استرداد المبلغ",
+    "refundPartial": "استرداد (جزئي)",
+    "originalAmount": "المبلغ الأصلي",
+    "alreadyRefunded": "تم ردها بالفعل",
+    "maxRefundable": "الحد الأقصى قابل للاسترداد",
+    "refundAmount": "مبلغ الاسترداد ({{currency}}) *",
+    "reasonRequired": "سبب *",
+    "refundReasonPlaceholder": "سبب استرجاع...",
+    "amountGreaterThanZero": "يجب أن يكون المبلغ أكبر من 0",
+    "exceedsRefundable": "يتجاوز المبلغ القابل للاسترداد ({{amount}})",
+    "voidSuccess": "تم إبطال الدفع بنجاح",
+    "voidFailed": "فشل في إبطال الدفع",
+    "refundSuccess": "تم بدء عملية استرداد الأموال بنجاح",
+    "refundFailed": "فشل في إنشاء رد الأموال",
+    "voidSelected": "تم تحديد الفراغ",
+    "sendReceipt": "إرسال الإيصال",
+    "paymentCount": "{{count}} الدفع",
+    "paymentCount_plural": "{{count}} المدفوعات",
+    "processed": "معالجتها",
+    "partialRefunds": "المبالغ المستردة الجزئية",
+    "searchPlaceholder": "البحث عن طريق رقم الإيصال، رقم الفاتورة، أو الطالب...",
+    "exportSuccess": "المدفوعات CSV المصدرة",
+    "exportFailed": "فشل تصدير المدفوعات CSV",
+    "recordManualPayment": "سجل الدفع اليدوي",
+    "bulkReceiptPdfExport": {
+      "menuLabel": "تحميل PDFs"
+    },
+    "selection": {
+      "noneVoidable": "لا يمكن إبطال أي دفعات محددة — فقط الدفعات المكتملة بإيصال هي المؤهلة.",
+      "noneCompleted": "لا توجد دفعات مكتملة في التحديد."
+    }
+  },
+  "recordPayment": {
+    "title": "سجل الدفع",
+    "description": "تسجيل الدفع نقدًا أو تحويلًا مصرفيًا أو شيكًا يدويًا.",
+    "selectSchool": "اختر مدرسة لتسجيل المدفوعات.",
+    "loadingInvoices": "جارٍ تحميل الفواتير...",
+    "noUnpaidInvoices": "لا توجد فواتير غير مدفوعة لهذا الطالب.",
+    "dueDate": "بسبب {{date}}",
+    "selectInvoiceError": "الرجاء تحديد فاتورة",
+    "validAmountError": "الرجاء إدخال مبلغ صالح",
+    "referenceRequired": "الرقم المرجعي مطلوب للتحويل البنكي / الشيك",
+    "recordSuccess": "تم تسجيل الدفع بنجاح",
+    "recordFailed": "فشل في تسجيل الدفع",
+    "successTitle": "تم تسجيل الدفع",
+    "successDescription": "تم تسجيل الدفع اليدوي وتحديث حساب الطالب.",
+    "recordAnother": "سجل دفعة أخرى",
+    "studentRequired": "طالب *",
+    "studentSearchPlaceholder": "البحث عن الطالب بالاسم...",
+    "invoiceRequired": "فاتورة *",
+    "paymentMethodRequired": "طريقة الدفع *",
+    "amountRequired": "المبلغ ({{currency}}) *",
+    "referenceRequiredLabel": "مرجع # *",
+    "bankReferencePlaceholder": "الرقم المرجعي للبنك",
+    "chequeReferencePlaceholder": "رقم التحقق",
+    "datePaid": "تاريخ الدفع",
+    "notesPlaceholder": "ملاحظات اختيارية حول هذه الدفعة...",
+    "preview": "معاينة",
+    "method": "طريقة",
+    "reference": "مرجع #",
+    "drawer": {
+      "amountLabel": "المبلغ المستلم",
+      "dueHint": "بسبب {{amount}}",
+      "overpayError": "أكثر من المبلغ المستحق — لا يُسمح بالدفع الزائد. ماكس {{max}}.",
+      "overCapError": "يتجاوز المبلغ حد {{max}} لكل دفعة.",
+      "partialHint": "الدفع الجزئي - سيظل {{amount}} مستحقًا.",
+      "chipFull": "كامل المبلغ المستحق",
+      "chipHalf": "نصف",
+      "methodLabel": "طريقة الدفع",
+      "referenceLabel": "مرجع المعاملة",
+      "referenceHint": "مطلوب ل {{method}}",
+      "dateLabel": "تاريخ الدفع",
+      "receivedBy": "تم الاستلام بواسطة",
+      "noteLabel": "ملحوظة",
+      "noteHint": "اختياري — يظهر في الإيصال",
+      "notePlaceholder": "على سبيل المثال يتم الدفع نقدًا عند العداد من قبل ولي الأمر",
+      "infoNote": "يتم إنشاء إيصال تلقائيًا ويتم تحديث رصيد حساب الطالب على الفور.",
+      "recording": "تسجيل…",
+      "recordAmount": "سجل {{amount}}",
+      "toastRecorded": "تم تسجيل الدفع - الاستلام {{receipt}}",
+      "view": "عرض",
+      "done": "منتهي",
+      "viewReceipt": "عرض الإيصال",
+      "doneVia": "تم تسجيل الدفع عبر {{method}} · {{date}}",
+      "donePaidInFull": "تم الآن دفع هذه الفاتورة بالكامل.",
+      "doneRemains": "{{amount}} يظل مستحقًا على هذه الفاتورة."
+    }
+  },
+  "asyncJobs": {
+    "common": {
+      "closeDrawer": "إغلاق الدرج",
+      "starting": "جارٍ البدء...",
+      "channel": "قناة",
+      "optional": "(خياري)",
+      "unknownStudent": "طالب غير معروف",
+      "recipients": "المستلمون ({{count}})",
+      "willSkip": "سوف تخطي ({{count}})",
+      "balance": "التوازن {{amount}}",
+      "selected": {
+        "accounts": "{{count}} تم تحديد الحساب",
+        "accounts_plural": "{{count}} حسابات مختارة",
+        "payments": "{{count}} تم تحديد الدفع",
+        "payments_plural": "{{count}} المدفوعات مختارة",
+        "invoices": "{{count}} الفاتورة مختارة",
+        "invoices_plural": "{{count}} الفواتير مختارة"
+      },
+      "channels": {
+        "email": "بريد إلكتروني",
+        "sms": "SMS",
+        "both": "كلاهما"
+      },
+      "cancel": "إلغاء",
+      "close": "يغلق"
+    },
+    "progress": {
+      "queued": "في قائمة الانتظار - انتظار العامل لاستلام الوظيفة.",
+      "processed": "{{done}} / {{total}} تمت معالجتها",
+      "done": "منتهي",
+      "summary": "{{succeeded}} نجح · {{skipped}} تم تخطيه · {{failed}} فشل",
+      "failed": "فشلت المهمة",
+      "failureFallback": "انتهت المهمة بخطأ غير قابل للاسترداد."
+    },
+    "toast": {
+      "skipped": "{{count}} تم تخطيه",
+      "failed": "{{count}} فشل",
+      "statements": {
+        "success": "تم إرسال بيان {{count}}",
+        "success_plural": "أرسلت {{count}} البيانات",
+        "none": "لم يتم إرسال أي بيانات - فشل {{failed}}؛ {{skipped}} تم تخطيه"
+      },
+      "receipts": {
+        "success": "إرسال {{count}} إيصال",
+        "success_plural": "إرسال {{count}} الإيصالات",
+        "none": "لم يتم إرسال أي إيصالات - فشل {{failed}}؛ {{skipped}} تم تخطيه"
+      },
+      "reminders": {
+        "success": "تم إرسال {{count}} تذكير",
+        "success_plural": "تم إرسال تذكيرات {{count}}",
+        "none": "لم يتم إرسال أي تذكيرات - فشل {{failed}}؛ {{skipped}} تم تخطيه"
+      },
+      "adjustments": {
+        "success": "تعديل {{count}} الحساب",
+        "success_plural": "حسابات {{count}} المعدلة",
+        "none": "لم يتم تطبيق أي تعديلات - فشل {{failed}}؛ {{skipped}} تم تخطيه"
+      },
+      "voidPayments": {
+        "success": "تم إلغاء الدفع {{count}}",
+        "success_plural": "مدفوعات {{count}} باطلة",
+        "none": "لم يتم إبطال أي دفعات - فشل {{failed}}؛ {{skipped}} تم تخطيه"
+      }
+    },
+    "skip": {
+      "noReceiptNumber": "لا يوجد رقم الإيصال",
+      "notCompleted": "لم يكتمل ({{status}})",
+      "notOutstanding": "غير معلقة ({{status}})"
+    },
+    "statements": {
+      "title": "إرسال البيانات",
+      "progress": "إرسال البيانات",
+      "description": "يتلقى كل ولي أمر مسجل الرصيد الحالي ونشاط دفتر الأستاذ الأخير كمرفق PDF. يتم تسليمها عن طريق البريد الإلكتروني فقط.",
+      "send": "إرسال {{count}}",
+      "jobFailed": "فشلت مهمة إرسال البيانات.",
+      "failedToStart": "فشل في بدء مهمة إرسال كشوفات الحساب."
+    },
+    "receipts": {
+      "title": "إرسال الإيصالات",
+      "progress": "إرسال الإيصالات",
+      "willSend": "سوف ترسل ({{count}})",
+      "noneEligible": "لا تعد أي من الدفعات المحددة مؤهلة - تتطلب الإيصالات دفعة كاملة برقم إيصال.",
+      "send": "إرسال {{count}}",
+      "jobFailed": "فشلت مهمة إرسال الإيصالات.",
+      "failedToStart": "فشل في بدء مهمة إرسال الإيصالات."
+    },
+    "reminders": {
+      "title": "أرسل تذكيرات",
+      "progress": "إرسال التذكيرات",
+      "customNote": "ملاحظة مخصصة",
+      "customNotePlaceholder": "على سبيل المثال تذكير ودي - يرجى التسوية قبل نهاية الفصل الدراسي.",
+      "willRemind": "سوف أذكر ({{count}})",
+      "noneEligible": "لا تحتوي أي من الفواتير المحددة على رصيد مستحق.",
+      "send": "إرسال {{count}}",
+      "jobFailed": "فشلت مهمة إرسال التذكيرات.",
+      "failedToStart": "فشل بدء مهمة إرسال التذكيرات."
+    },
+    "adjustments": {
+      "title": "ضبط التوازن",
+      "progress": "ترحيل إدخالات دفتر الأستاذ",
+      "warning": "تتم كتابة نفس التعديل في دفتر الأستاذ لكل حساب محدد. استخدم مفتاح التجاوز لتخطي حارس عتبة التوقيع، على سبيل المثال إضافة رصيد إلى حساب فائض بالفعل.",
+      "type": "يكتب",
+      "types": {
+        "debit": "الخصم (الزيادة المستحقة)",
+        "credit": "الائتمان (تخفيض المستحق)"
+      },
+      "amount": "كمية",
+      "effectiveDate": "تاريخ النفاذ",
+      "reason": "سبب",
+      "reasonPlaceholder": "على سبيل المثال يتم تطبيق رصيد المنحة الدراسية في بداية الفصل الدراسي",
+      "override": "تجاوز واقي عتبة الإشارة - ينطبق حتى على الحسابات التي يتجاوز فيها التعديل حدود علامة التوازن.",
+      "apply": "تنطبق على {{count}}",
+      "jobFailed": "فشلت مهمة ضبط التوازن.",
+      "failedToStart": "فشل في بدء مهمة ضبط التوازن."
+    },
+    "voidPayments": {
+      "title": "المدفوعات الباطلة",
+      "warning": "يؤدي الإبطال إلى عكس إدخال دفتر الأستاذ في كل دفعة واستعادة المبلغ المستحق على الفاتورة المرتبطة. كل صف عبارة عن طلب منفصل ولا يتم التراجع عن حالات الفشل الجزئي.",
+      "reason": "سبب الإفراغ",
+      "reasonPlaceholder": "على سبيل المثال دفع مكرر، خطأ في إدخال البيانات",
+      "reasonHelp": "ويتم تسجيل نفس السبب مقابل كل دفعة ملغاة.",
+      "willVoid": "سوف باطلا ({{count}})",
+      "noneEligible": "لا تعتبر أي من الدفعات المحددة مؤهلة للإبطال.",
+      "voiding": "إبطال...",
+      "apply": "باطل {{count}}"
+    },
+    "pdfExport": {
+      "title": "تصدير PDF بالجملة",
+      "progress": "توليد PDFs",
+      "readyTitle": "جاهز لتصدير فاتورة {{count}} كـ ZIP",
+      "readyBody": "يحتوي ZIP الذي تم إنشاؤه على PDF واحد لكل فاتورة. قد يستغرق هذا بضع دقائق للدفعات الأكبر؛ يمكنك إغلاق الدرج وستستمر المهمة في الخلفية.",
+      "startExport": "ابدأ التصدير",
+      "starting": "بدء التصدير...",
+      "downloadZip": "تحميل الفواتير.zip",
+      "alreadyRunning": "يتم بالفعل تنفيذ عملية تصدير مجمعة أخرى لهذه المدرسة. تظهر تقدمها.",
+      "payloadTooLarge": "لا يمكن تصدير فواتير {{requested}} دفعة واحدة (الحد الأقصى هو {{limit}}). يرجى تضييق نطاق الاختيار.",
+      "toastSucceeded": "اكتمل التصدير المجمع: نجح {{succeeded}}، وفشل {{failed}}.",
+      "toastFailed": "فشل التصدير المجمع. تحقق من الدرج للحصول على التفاصيل.",
+      "readyTitle_plural": "جاهز لتصدير فواتير {{count}} كـ ZIP",
+      "totalValueLabel": "القيمة الإجمالية",
+      "skippedNote": "{{count}} سيتم تخطي الفواتير الملغاة في اختيارك - لا يتم تصدير المستندات الملغاة.",
+      "skippedNote_one": "{{count}} سيتم تخطي الفاتورة الملغاة في اختيارك - لا يتم تصدير المستندات الملغاة.",
+      "skippedNote_other": "{{count}} سيتم تخطي الفواتير الملغاة في اختيارك - لا يتم تصدير المستندات الملغاة.",
+      "format": {
+        "zip": "ZIP من PDFs",
+        "zipSub": "ZIP · PDF واحد لكل فاتورة",
+        "merged": "دمج PDF",
+        "mergedSub": "واحد PDF مجتمعة، بالترتيب"
+      }
+    },
+    "receiptPdfExport": {
+      "title": "تصدير الإيصالات بالجملة",
+      "progress": "توليد الإيصالات",
+      "readyTitle": "جاهز لتصدير إيصال {{count}} كـ ZIP",
+      "readyTitle_plural": "جاهز لتصدير إيصالات {{count}} كـ ZIP",
+      "readyBody": "يحتوي ZIP الذي تم إنشاؤه على PDF واحد لكل إيصال. يتم تخطي الدفعات غير المكتملة (المُلغاة / المستردة / الفاشلة) تلقائيًا. قد يستغرق هذا بضع دقائق للدفعات الأكبر؛ يمكنك إغلاق الدرج وستستمر المهمة في الخلفية.",
+      "startExport": "ابدأ التصدير",
+      "starting": "بدء التصدير...",
+      "downloadZip": "تحميل الإيصالات.zip",
+      "alreadyRunning": "يتم بالفعل تنفيذ عملية تصدير مجمعة أخرى لهذه المدرسة. تظهر تقدمها.",
+      "payloadTooLarge": "لا يمكن تصدير إيصالات {{requested}} دفعة واحدة (الحد هو {{limit}}). يرجى تضييق نطاق الاختيار.",
+      "toastSucceeded": "اكتمل التصدير المجمع: نجح {{succeeded}}، وفشل {{failed}}.",
+      "toastFailed": "فشل التصدير المجمع. تحقق من الدرج للحصول على التفاصيل.",
+      "totalValueLabel": "المبلغ المستلم",
+      "skippedNote": "{{count}} سيتم تخطي الدفعات غير المكتملة في اختيارك - الإيصالات موجودة فقط للدفعات المكتملة.",
+      "skippedNote_one": "{{count}} سيتم تخطي الدفعة غير المكتملة في اختيارك - الإيصالات موجودة فقط للدفعات المكتملة.",
+      "skippedNote_other": "{{count}} سيتم تخطي الدفعات غير المكتملة في اختيارك - الإيصالات موجودة فقط للدفعات المكتملة.",
+      "format": {
+        "zip": "ZIP من PDFs",
+        "zipSub": "ZIP · PDF واحد لكل إيصال",
+        "merged": "دمج PDF",
+        "mergedSub": "واحد PDF مجتمعة، بالترتيب"
+      }
+    },
+    "pdfExportShared": {
+      "documents": "وثائق",
+      "students": "طلاب",
+      "studentCount": "{{count}} الطلاب",
+      "studentCount_one": "{{count}} طالب",
+      "studentCount_other": "{{count}} الطلاب",
+      "grades": "الدرجات {{grades}}",
+      "bundle": "باقة",
+      "estimateSeconds": "حول {{seconds}} ثانية",
+      "morePdfs": "+ {{count}} المزيد PDFs",
+      "backgroundNote": "يعمل في الخلفية - يمكنك إغلاق هذه اللوحة ومواصلة العمل. سنخبرك عندما يصبح جاهزًا.",
+      "synced": "مباشر · تمت مزامنته منذ {{seconds}}s",
+      "preparingExport": "جارٍ تحضير التصدير…",
+      "generatingPdfs": "جارٍ إنشاء PDFs...",
+      "prepared": "{{current}} من {{total}} PDFs معد",
+      "docTotal": "{{count}} الوثائق",
+      "docTotal_one": "{{count}} وثيقة",
+      "docTotal_other": "{{count}} الوثائق",
+      "toastDownload": "تحميل",
+      "generated": "تم إنشاؤها",
+      "skipped": "تم تخطيه",
+      "failed": "فشل",
+      "safeToClose": "الإغلاق آمن - يستمر تشغيل التصدير على الخادم.",
+      "inProgress": "جاري التصدير…",
+      "complete": "مكتمل",
+      "completeWithFailures": "كاملة، مع الفشل",
+      "wentWrong": "حدث خطأ ما",
+      "runInBackground": "تشغيل في الخلفية",
+      "exportAgain": "تصدير مرة أخرى",
+      "freshLink": "احصل على رابط جديد",
+      "gettingFreshLink": "جارٍ الحصول على رابط جديد...",
+      "tryAgain": "حاول ثانية",
+      "download": "تحميل {{bundle}}",
+      "readyTitle": "التصدير جاهز",
+      "partialTitle": "{{succeeded}} من {{requested}} تم تصديرها",
+      "succeededChip": "{{count}} نجح",
+      "skippedChip": "{{count}} تم تخطيه",
+      "failedChip": "{{count}} فشل",
+      "bundleMeta": "{{count}} PDFs",
+      "expiresIn": "تنتهي صلاحية الرابط في",
+      "linkExpired": "انتهت صلاحية رابط التنزيل — ملفاتك آمنة على الخادم.",
+      "whatsInside": "ماذا يوجد بالداخل · {{count}} الملفات",
+      "failedBoxTitle": "لا يمكن إنشاء {{count}}",
+      "retryFailed": "فشلت إعادة المحاولة {{count}}",
+      "failedBoxFoot": "لا يزال بإمكانك تنزيل {{count}} الذي نجح.",
+      "completedAt": "مكتمل {{time}}",
+      "took": "استغرق {{seconds}}s",
+      "jobIdCopied": "الوظيفة ID منقول",
+      "copyJobId": "انسخ المهمة ID للحصول على الدعم",
+      "jobShort": "الوظيفة {{id}}",
+      "failedTitle": "فشل التصدير",
+      "failedBody": "لا يمكن إنشاء أي من {{count}} PDFs. لم يتغير شيء على أي حساب.",
+      "supportNote": "إذا استمر هذا الأمر، قم بمشاركة معرف الوظيفة هذا مع الدعم:",
+      "format": {
+        "label": "تنسيق الإخراج",
+        "overCap": "ما يصل إلى {{limit}} الوثائق"
+      },
+      "whatsInside_one": "ماذا يوجد بالداخل · ملف {{count}}",
+      "whatsInside_other": "ماذا يوجد بالداخل · {{count}} الملفات",
+      "bundleMeta_one": "{{count}} PDF",
+      "bundleMeta_other": "{{count}} PDFs",
+      "morePdfs_one": "+ {{count}} المزيد PDF",
+      "morePdfs_other": "+ {{count}} المزيد PDFs"
+    }
+  },
+  "financeLayout": {
+    "error": {
+      "title": "حدث خطأ ما",
+      "description": "حدث خطأ غير متوقع في الوحدة المالية. يمكنك محاولة إعادة تحميل الصفحة أو العودة إلى النظرة العامة.",
+      "reload": "إعادة تحميل",
+      "overview": "انتقل إلى نظرة عامة"
+    },
+    "noSchools": {
+      "title": "لم يتم تكوين أي مدارس",
+      "description": "قم بإعداد مؤسستك في الإعدادات > المؤسسة قبل استخدام الشؤون المالية.",
+      "goToSettings": "انتقل إلى الإعدادات"
+    }
+  },
+  "paymentGateways": {
+    "title": "بوابات الدفع",
+    "description": "قم بتكوين بوابات الدفع المتاحة لمدرستك.",
+    "selectSchool": "اختر مدرسة لإدارة بوابات الدفع.",
+    "saved": "تم حفظ تكوين البوابة",
+    "saveFailed": "فشل حفظ تكوين البوابة",
+    "loadFailed": "فشل تحميل تكوينات البوابة",
+    "enable": "يُمكَِن",
+    "saveConfiguration": "حفظ التكوين",
+    "securityNote": "يتم تشفير بيانات الاعتماد وتخزينها بشكل آمن. بعد الحفظ، سيتم إخفاء القيم.",
+    "showSecret": "إظهار القيمة السرية",
+    "hideSecret": "إخفاء القيمة السرية",
+    "gatewayLabels": {
+      "esewa": "eSewa",
+      "khalti": "خالتي",
+      "fonepay": "فونباي",
+      "connectips": "كونيكتIPS",
+      "stripe": "شريط",
+      "cash": "نقدي",
+      "bank_transfer": "التحويل البنكي",
+      "cheque": "يفحص"
+    },
+    "descriptions": {
+      "esewa": "المحفظة الرقمية الرائدة في نيبال للمدفوعات عبر الإنترنت",
+      "khalti": "المحفظة الرقمية وبوابة الدفع لنيبال",
+      "fonepay": "QR شبكة الدفع بين البنوك القائمة",
+      "connectips": "نظام الدفع المصرفي عبر الإنترنت من قبل NCHL",
+      "stripe": "معالجة المدفوعات العالمية للبطاقات والمحافظ",
+      "cash": "المدفوعات النقدية اليدوية",
+      "bank_transfer": "مدفوعات التحويل البنكي المباشر",
+      "cheque": "الدفع عن طريق الشيك"
+    },
+    "credentials": {
+      "merchantCode": "رمز التاجر",
+      "secretKey": "المفتاح السري",
+      "publicKey": "المفتاح العام",
+      "apiKey": "API مفتاح"
+    }
+  },
+  "studentSearch": {
+    "placeholder": "البحث بالاسم أو رقم الطالب...",
+    "searching": "جارٍ البحث...",
+    "noStudents": "لم يتم العثور على أي طلاب.",
+    "grade": "الصف {{grade}}"
+  },
+  "studentAccount": {
+    "kpi": {
+      "region": "المقاييس الرئيسية"
+    },
+    "title": "حساب الطالب",
+    "pageTitle": "حسابات الطلاب",
+    "description": "عرض حسابات فواتير الطلاب والفواتير والمدفوعات وسجل دفتر الأستاذ.",
+    "selectSchool": "اختر مدرسة لعرض حسابات الطلاب.",
+    "balance": "الرصيد المتميز",
+    "totalPaid": "إجمالي المبلغ المدفوع",
+    "lastPayment": "الدفعة الأخيرة",
+    "ledger": "دفتر الحسابات",
+    "noTransactions": "لا توجد معاملات حتى الآن",
+    "never": "أبداً",
+    "searchPlaceholder": "البحث باسم الطالب...",
+    "tabs": {
+      "ledger": "دفتر الأستاذ",
+      "invoices": "الفواتير",
+      "payments": "المدفوعات"
+    },
+    "summary": {
+      "totalStudents": "إجمالي الطلاب",
+      "outstanding": "متميز",
+      "fullyPaid": "مدفوعة بالكامل",
+      "withBalance": "مع الرصيد",
+      "accounts": "{{count}} الحساب",
+      "accounts_plural": "{{count}} الحسابات",
+      "withBalanceCount": "{{count}} مع التوازن",
+      "noBalance": "لا يوجد توازن"
+    },
+    "actions": {
+      "sendStatement": "إرسال البيان",
+      "adjustBalance": "ضبط التوازن"
+    },
+    "columns": {
+      "student": "طالب",
+      "studentName": "اسم الطالب",
+      "date": "تاريخ",
+      "type": "يكتب",
+      "description": "وصف",
+      "debit": "دَين",
+      "credit": "ائتمان",
+      "balance": "توازن",
+      "balanceBucket": "دلو التوازن",
+      "invoiceNumber": "فاتورة #",
+      "status": "حالة",
+      "total": "المجموع",
+      "due": "حق",
+      "dueDate": "تاريخ الاستحقاق",
+      "amountPaid": "المبلغ المدفوع",
+      "grandTotal": "المجموع الإجمالي"
+    },
+    "balanceBuckets": {
+      "noBalance": "لا يوجد توازن"
+    },
+    "openingBalance": {
+      "title": "الرصيد الافتتاحي (المستحقات السابقة)",
+      "amount": "كمية",
+      "asOf": "اعتبارا من",
+      "remaining": "متبقي",
+      "settled": "{{amount}} استقر",
+      "note": "ملحوظة",
+      "showMore": "عرض المزيد",
+      "showLess": "عرض أقل"
+    },
+    "empty": {
+      "noAccounts": "لم يتم العثور على حسابات الطلاب",
+      "noAccountsDescription": "يتم إنشاء حسابات الطلاب تلقائيًا عند إنشاء الفواتير.",
+      "noLedger": "لا توجد إدخالات دفتر الأستاذ حتى الآن.",
+      "noInvoices": "لا توجد فواتير لهذا الطالب.",
+      "noPayments": "لم يتم تسجيل أي دفعات لهذا الطالب."
+    },
+    "error": {
+      "ledgerLoadFailed": "فشل تحميل إدخالات دفتر الأستاذ.",
+      "unknown": "خطأ غير معروف"
+    }
+  },
+  "currency": {
+    "npr": "NPR",
+    "symbol": "رو"
+  },
+  "actions": {
+    "payNow": "ادفع الآن",
+    "viewReceipt": "عرض الإيصال",
+    "viewInvoice": "عرض الفاتورة",
+    "downloadPdf": "تحميل PDF",
+    "exportCsv": "تصدير CSV",
+    "cancel": "إلغاء",
+    "confirm": "يتأكد",
+    "save": "يحفظ",
+    "saving": "جارٍ الحفظ...",
+    "close": "يغلق",
+    "back": "خلف",
+    "next": "التالي",
+    "retry": "أعد المحاولة"
+  },
+  "filters": {
+    "label": "المرشحات",
+    "allStatuses": "جميع الحالات",
+    "dateRange": "النطاق الزمني",
+    "academicYear": "العام الدراسي",
+    "clearAll": "مسح الكل"
+  },
+  "empty": {
+    "noPayments": "لم يتم العثور على أي دفعات",
+    "noPaymentsDescription": "ستظهر سجلات الدفع هنا بمجرد إجراء الدفعات."
+  },
+  "error": {
+    "failedToLoad": "فشل في تحميل بيانات الدفع",
+    "failedToInitiate": "فشل في بدء الدفع",
+    "failedToVerify": "فشل التحقق من الدفع",
+    "tryAgain": "يرجى المحاولة مرة أخرى",
+    "networkError": "خطأ في الشبكة. يرجى التحقق من الاتصال الخاص بك.",
+    "serverError": "خطأ في الخادم. يرجى المحاولة مرة أخرى في وقت لاحق.",
+    "receiptNotAvailable": "لم تكتمل هذه الدفعة — الإيصالات متاحة فقط للدفعات المكتملة.",
+    "receiptNotFound": "لم نتمكن من العثور على إيصال لهذه الدفعة. ربما تم حذفه أو لم يتم إصداره مطلقًا.",
+    "receiptForbidden": "ليس لديك إذن لعرض هذا الإيصال."
+  },
+  "toast": {
+    "paymentSuccess": "اكتمل الدفع بنجاح",
+    "paymentFailed": "فشل الدفع. يرجى المحاولة مرة أخرى.",
+    "invoiceGenerated": "تم إنشاء الفاتورة بنجاح",
+    "receiptDownloaded": "تم تنزيل الإيصال"
+  },
+  "widgets": {
+    "outstandingFees": "الرسوم المعلقة",
+    "recentPayments": "المدفوعات الأخيرة",
+    "paymentHistory": "تاريخ الدفع"
+  },
+  "headerZone": {
+    "needAttention": "بحاجة الى الاهتمام",
+    "allClear": "كل شيء واضح",
+    "region": "يحتاج إلى اهتمام",
+    "minimize": "تصغير",
+    "acknowledge": "فهمتها",
+    "acknowledged": "معترف به",
+    "acknowledgedHint": "تم الإقرار - انقر للتراجع",
+    "dismiss": "رفض",
+    "emptyTitle": "لقد تم القبض عليك جميعًا.",
+    "domains": {
+      "finance": "تمويل"
+    },
+    "selection": {
+      "aria": "إجراءات الاختيار",
+      "selected": "{{count}} مختارة",
+      "selectAll": "حدد الكل {{count}}",
+      "clear": "مسح التحديد"
+    }
+  },
+  "receiptDetail": {
+    "print": "مطبعة",
+    "stamp": {
+      "paid": "PAID",
+      "partialRefund": "PARTIAL REFUND"
+    },
+    "fields": {
+      "invoice": "فاتورة"
+    },
+    "amountInWords": "المبلغ بالكلمات -",
+    "refund": {
+      "title": "تم إصدار المبلغ المسترد — {{amount}}",
+      "net": "صافي المبلغ المحتفظ به: {{amount}}"
+    },
+    "fine": "إيصال تم إنشاؤه بواسطة الكمبيوتر - صالح بدون توقيع. تم إنشاؤها بواسطة Edforge على {{date}}."
+  }
+}

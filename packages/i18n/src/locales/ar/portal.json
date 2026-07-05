@@ -1,0 +1,102 @@
+{
+  "pages": {
+    "home": "بيت",
+    "myGrades": "درجاتي",
+    "myAttendance": "حضوري",
+    "mySchedule": "الجدول الزمني الخاص بي",
+    "childGrades": "{{name}} التقدم",
+    "childAttendance": "{{name}} الحضور",
+    "childSchedule": "{{name}} الجدول الزمني",
+    "childFees": "{{name}} رسوم",
+    "familyOverview": "نظرة عامة على العائلة"
+  },
+  "stats": {
+    "gpa": "GPA",
+    "attendanceRate": "الحضور",
+    "activeCourses": "الدورات",
+    "balanceDue": "الرصيد المستحق",
+    "openAssignments": "المهام",
+    "invoicesPaid": "الفواتير المدفوعة",
+    "nextDue": "المستحق القادم",
+    "yearProgress": "التقدم العام",
+    "totalDays": "إجمالي الأيام",
+    "presentDays": "الحاضر",
+    "absentDays": "غائب",
+    "lateDays": "متأخر",
+    "excusedDays": "معذرة"
+  },
+  "status": {
+    "present": "الحاضر",
+    "absent": "غائب",
+    "late": "متأخر",
+    "excused": "معذرة",
+    "paid": "مدفوع",
+    "overdue": "تأخرت",
+    "pending": "في انتظار",
+    "upcoming": "القادمة",
+    "outstanding": "متميز",
+    "all": "الجميع",
+    "inProgress": "في تَقَدم",
+    "notGraded": "لم يتم تصنيفها بعد"
+  },
+  "grades": {
+    "cumulativeGpa": "التراكمي GPA",
+    "termGpa": "المصطلح GPA",
+    "credits": "الاعتمادات",
+    "courses": "الدورات",
+    "gradedItems": "العناصر المتدرجة",
+    "allTerms": "جميع الشروط",
+    "courseByourse": "دورة تلو الأخرى",
+    "gradedAssignments": "الواجبات المتدرجة",
+    "nothingToWorry": "لا شيء يدعو للقلق حتى الآن",
+    "noGradesYet": "لم يتم تسجيل الدرجات بعد وسوف تظهر هنا عندما يدخلها معلموك.",
+    "categoryWeights": "أوزان الفئة"
+  },
+  "attendance": {
+    "yearToDate": "منذ بدلية العام ز حتى اليوم",
+    "recentRecords": "السجلات الأخيرة",
+    "patterns": "الأنماط والأعلام",
+    "noConcerns": "لا يتعلق بالأنماط",
+    "monthlyTrend": "الاتجاه الشهري",
+    "noDataToGraph": "لا توجد بيانات كافية لإظهار الاتجاه حتى الآن.",
+    "noRecords": "لا توجد سجلات الحضور حتى الآن.",
+    "holidayUpcoming": "العطلة القادمة في {{date}}",
+    "goal": "{{rate}}% الهدف"
+  },
+  "schedule": {
+    "today": "اليوم",
+    "thisWeek": "هذا الاسبوع",
+    "dayView": "يوم",
+    "weekView": "أسبوع",
+    "coursesAndTeachers": "الدورات والمعلمين",
+    "quickReference": "مرجع سريع",
+    "dropOff": "الانزال",
+    "lunch": "غداء",
+    "pickup": "يلتقط",
+    "noClassesToday": "لا يوجد فصول اليوم.",
+    "noSections": "لم يتم جدولة أي دروس."
+  },
+  "fees": {
+    "yearOnOneLine": "السنة على سطر واحد",
+    "invoices": "الفواتير",
+    "paymentHistory": "تاريخ الدفع",
+    "categoryBreakdown": "حسب الفئة",
+    "noPayments": "لم تسجل أي مدفوعات حتى الآن.",
+    "allFeesCurrent": "جميع الرسوم الحالية",
+    "daysUntilDue": "{{count}} أيام",
+    "receipt": "إيصال"
+  },
+  "home": {
+    "greeting": "مرحبًا، {{name}}.",
+    "todayFor": "اليوم لـ {{name}}",
+    "thisWeekAssignments": "مهمات هذا الأسبوع",
+    "viewAll": "عرض الكل",
+    "noAssignmentsThisWeek": "لا توجد مهام هذا الأسبوع."
+  },
+  "empty": {
+    "noData": "لا شيء لإظهاره هنا حتى الآن.",
+    "selectChild": "حدد طفلاً لعرض معلوماته.",
+    "errorRetry": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+    "retry": "أعد المحاولة"
+  }
+}

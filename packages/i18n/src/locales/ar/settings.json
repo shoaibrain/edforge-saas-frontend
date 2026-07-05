@@ -1,0 +1,1528 @@
+{
+  "title": "إعدادات",
+  "subtitle": "إدارة حسابك، والتفضيلات، وتكوين المدرسة",
+  "overview": {
+    "actions": {
+      "branding": "العلامة التجارية",
+      "feeStructures": "هياكل الرسوم",
+      "paymentGateways": "بوابات الدفع"
+    },
+    "fallbackName": "اسمك",
+    "fallbackEmail": "your@email.com"
+  },
+  "account": {
+    "title": "حساب",
+    "description": "إدارة معلومات ملفك الشخصي",
+    "personalInfo": "المعلومات الشخصية",
+    "firstName": "الاسم الأول",
+    "lastName": "اسم العائلة",
+    "middleName": "الاسم الأوسط",
+    "displayName": "اسم العرض",
+    "email": "بريد إلكتروني",
+    "phone": "هاتف",
+    "address": "عنوان",
+    "street": "شارع",
+    "street2": "شارع الخط 2",
+    "city": "مدينة",
+    "state": "الولاية/المقاطعة",
+    "postalCode": "رمز بريدي",
+    "country": "دولة",
+    "avatar": "صورة الملف الشخصي",
+    "changeAvatar": "تغيير الصورة",
+    "removeAvatar": "إزالة الصورة",
+    "uploadAvatar": "تحميل الصورة",
+    "avatarHint": "JPG أو PNG أو GIF. ماكس 5 ميجابايت.",
+    "saved": "تم تحديث الحساب بنجاح",
+    "saveFailed": "فشل تحديث الحساب",
+    "profileUpdated": "تم تحديث الملف الشخصي بنجاح",
+    "profileUpdateFailed": "فشل في تحديث الملف الشخصي",
+    "fallbackUser": "مستخدم",
+    "accountDetails": "تفاصيل الحساب",
+    "sections": {
+      "personalDescription": "اسمك وهويتك",
+      "contactTitle": "معلومات الاتصال",
+      "contactDescription": "تفاصيل البريد الإلكتروني والهاتف",
+      "addressDescription": "عنوانك البريدي"
+    },
+    "details": {
+      "userId": "المستخدم ID",
+      "created": "مخلوق",
+      "lastLogin": "آخر تسجيل دخول",
+      "mfa": "MFA"
+    },
+    "mfa": {
+      "enabled": "ممكّن",
+      "notEnabled": "غير ممكّن"
+    },
+    "form": {
+      "firstNamePlaceholder": "أدخل الاسم الأول",
+      "lastNamePlaceholder": "أدخل الاسم الأخير",
+      "displayNamePlaceholder": "كيف تريد أن تسمى",
+      "displayNameHelp": "هكذا يظهر اسمك للآخرين",
+      "emailPlaceholder": "email@example.com",
+      "emailHelp": "اتصل بالدعم لتغيير بريدك الإلكتروني",
+      "phonePlaceholder": "+1 555-123-4567",
+      "phoneHelp": "تضمين رمز البلد",
+      "streetPlaceholder": "123 شارع رئيسي",
+      "street2Placeholder": "شقة 4B (اختياري)",
+      "cityPlaceholder": "سان فرانسيسكو",
+      "postalCodePlaceholder": "94102",
+      "selectCountry": "اختر البلد",
+      "selectState": "اختر الدولة"
+    },
+    "error": {
+      "loadTitle": "فشل تحميل الملف الشخصي",
+      "loadDescription": "فشل تحميل الملف الشخصي"
+    }
+  },
+  "security": {
+    "title": "حماية",
+    "description": "إدارة كلمة المرور الخاصة بك، وMFA، والجلسات النشطة",
+    "changePassword": "تغيير كلمة المرور",
+    "currentPassword": "كلمة المرور الحالية",
+    "newPassword": "كلمة المرور الجديدة",
+    "confirmPassword": "تأكيد كلمة المرور الجديدة",
+    "passwordChanged": "تم تغيير كلمة المرور بنجاح",
+    "passwordChangeFailed": "فشل في تغيير كلمة المرور",
+    "mfa": "المصادقة متعددة العوامل",
+    "mfaEnabled": "تم تمكين الMFA",
+    "mfaDisabled": "لم يتم تمكين MFA",
+    "enableMfa": "تمكين وزارة الخارجية",
+    "disableMfa": "تعطيل وزارة الخارجية",
+    "sessions": "الجلسات النشطة",
+    "currentSession": "الجلسة الحالية",
+    "revokeSession": "إبطال",
+    "revokeAllSessions": "إلغاء جميع الجلسات الأخرى",
+    "loginHistory": "سجل تسجيل الدخول",
+    "lastLogin": "تسجيل الدخول الأخير",
+    "securityScore": "نقاط الأمان",
+    "recommendations": "التوصيات",
+    "password": "كلمة المرور",
+    "changePasswordDescription": "أدخل كلمة المرور الحالية واختر كلمة مرور جديدة.",
+    "currentPasswordPlaceholder": "أدخل كلمة المرور الحالية",
+    "newPasswordPlaceholder": "أدخل كلمة المرور الجديدة",
+    "confirmPasswordPlaceholder": "تأكيد كلمة المرور الجديدة",
+    "showPassword": "إظهار كلمة المرور",
+    "hidePassword": "إخفاء كلمة المرور",
+    "activeSessionsCount": "{{count}} جلسة نشطة",
+    "activeSessionsCount_plural": "{{count}} الجلسات النشطة",
+    "passwordRequirements": {
+      "minLength": "ما لا يقل عن 8 أحرف",
+      "uppercase": "حرف كبير",
+      "lowercase": "حرف صغير",
+      "number": "رقم",
+      "special": "طابع خاص"
+    },
+    "passwordStrength": {
+      "weak": "ضعيف",
+      "fair": "عدل",
+      "good": "جيد",
+      "strong": "قوي"
+    },
+    "passwordLastChanged": {
+      "never": "لم تتغير أبدا",
+      "today": "تغيرت اليوم",
+      "yesterday": "تغيرت أمس",
+      "daysAgo": "تم التغيير {{count}} منذ أيام"
+    },
+    "overview": {
+      "title": "نظرة عامة على الأمن",
+      "description": "ملخص سريع لأمان حسابك.",
+      "loadFailed": "غير قادر على تحميل نظرة عامة على الأمان."
+    }
+  },
+  "preferences": {
+    "title": "التفضيلات",
+    "description": "تخصيص تجربتك",
+    "appearance": "مظهر",
+    "themeLight": "ضوء",
+    "themeDark": "مظلم",
+    "themeSystem": "نظام",
+    "language": "لغة",
+    "languageDescription": "اختر لغتك المفضلة",
+    "calendarSystem": "نظام التقويم",
+    "calendarAuto": "تلقائي (يتبع اللغة)",
+    "calendarAD": "الميلادي (AD)",
+    "calendarBS": "بيكرام سامبات (BS)",
+    "dateFormat": "تنسيق التاريخ",
+    "timeFormat": "تنسيق الوقت",
+    "time12h": "12 ساعة",
+    "time24h": "24 ساعة",
+    "timezone": "المنطقة الزمنية",
+    "weekStartsOn": "يبدأ الأسبوع في",
+    "notifications": "إشعارات",
+    "notificationChannels": "قنوات الإخطار",
+    "emailNotifications": "إشعارات البريد الإلكتروني",
+    "pushNotifications": "دفع الإخطارات",
+    "smsNotifications": "SMS الإخطارات",
+    "notificationCategories": "فئات الإخطار",
+    "defaultSchool": "المدرسة الافتراضية",
+    "saved": "تم تحديث التفضيلات بنجاح",
+    "saveFailed": "فشل في تحديث التفضيلات"
+  },
+  "workspace": {
+    "title": "مساحة العمل",
+    "description": "إدارة إعدادات مساحة العمل",
+    "pageDescription": "تكوين على مستوى المنظمة ينطبق على جميع المدارس",
+    "saved": "تم حفظ إعدادات مساحة العمل",
+    "saveFailed": "فشل في حفظ الإعدادات",
+    "tenantInfo": {
+      "title": "معلومات المستأجر",
+      "description": "للقراءة فقط - يتم ضبطها عند التزويد ولا يمكن تغييرها.",
+      "name": "اسم",
+      "archetype": "النموذج الأصلي",
+      "country": "دولة",
+      "tier": "الطبقة",
+      "created": "مخلوق"
+    },
+    "accessDenied": {
+      "title": "تم الرفض",
+      "message": "ليس لديك الإذن لعرض إعدادات مساحة العمل."
+    },
+    "error": {
+      "loadTitle": "فشل في تحميل الإعدادات",
+      "loadDescription": "غير قادر على تحميل إعدادات مساحة العمل. يرجى المحاولة مرة أخرى."
+    },
+    "localization": {
+      "title": "التعريب",
+      "description": "اللغة والمنطقة الزمنية وتنسيق التاريخ/الوقت"
+    },
+    "financeCalendar": {
+      "title": "المالية والتقويم",
+      "description": "العملة ونظام التقويم وتنسيق الأرقام"
+    },
+    "fields": {
+      "defaultTimezone": {
+        "label": "المنطقة الزمنية الافتراضية",
+        "description": "المنطقة الزمنية الأساسية للمؤسسة للجدولة والطوابع الزمنية"
+      },
+      "defaultLanguage": {
+        "label": "اللغة الافتراضية",
+        "description": "اللغة الأساسية للمستخدمين الجدد واتصالات النظام"
+      },
+      "dateFormat": {
+        "label": "تنسيق التاريخ",
+        "description": "كيف يتم عرض التواريخ عبر المنصة"
+      },
+      "timeFormat": {
+        "label": "تنسيق الوقت",
+        "description": "12 أو 24 ساعة"
+      },
+      "weekStartsOn": {
+        "label": "يبدأ الأسبوع في",
+        "description": "اليوم الأول من الأسبوع في التقويمات"
+      },
+      "defaultCurrency": {
+        "label": "العملة الافتراضية",
+        "description": "العملة المستخدمة للفواتير والمدفوعات والتقارير المالية"
+      },
+      "calendarSystem": {
+        "label": "نظام التقويم",
+        "description": "نظام التقويم الأساسي لعرض التاريخ"
+      },
+      "dualDate": {
+        "label": "عرض مواعيد بيكرام سامبات",
+        "description": "عرض BS التواريخ بجانب التواريخ الميلادية في الوحدات المالية والأكاديمية"
+      },
+      "numberFormat": {
+        "label": "تنسيق الرقم",
+        "description": "كيف يتم تجميع الأرقام في العروض المالية"
+      }
+    },
+    "locking": {
+      "locked": "مغلق",
+      "lockedPrefix": "مغلق.",
+      "lockedDefaultReason": "يتم تجميد الإعدادات الإقليمية التي تؤثر على البيانات المخزنة أثناء نشاط العام الدراسي.",
+      "displayFieldsEditable": "تظل حقول العرض فقط (اللغة، تنسيق التاريخ/الوقت، تجميع الأرقام) قابلة للتحرير.",
+      "blockedBy": "تم حظره بواسطة",
+      "headsUpPrefix": "انتباه -",
+      "headsUpDescription": "تصبح الحقول التي تؤثر على البيانات المخزنة (العملة ونظام التقويم والمنطقة الزمنية وبداية الأسبوع) للقراءة فقط عندما يكون العام الدراسي نشطًا، للحفاظ على الاتساق عبر التقارير والفواتير ومسارات التدقيق. تظل حقول العرض فقط قابلة للتحرير طوال الوقت.",
+      "tooltipMultiple": "{{count}} سنوات دراسية نشطة عبر المدارس",
+      "howItWorksTitle": "كيف يعمل القفل",
+      "tenantInfoLabel": "معلومات المستأجر",
+      "tenantInfoDescription": "الحقول المذكورة أعلاه مقفلة بشكل دائم - يتم تعيينها مرة واحدة عند التزويد.",
+      "dataIntegrityLabel": "الإعدادات الإقليمية - حقول تكامل البيانات",
+      "dataIntegrityDescription": "(العملة، نظام التقويم، المنطقة الزمنية، بداية الأسبوع) يتم القفل تلقائيًا عندما يكون أي عام دراسي نشطًا.",
+      "displayOnlyLabel": "الإعدادات الإقليمية - حقول العرض فقط",
+      "displayOnlyDescription": "(اللغة، تنسيق التاريخ/الوقت، تنسيق الأرقام، تبديل بيكرام سامبات) تظل قابلة للتحرير طوال الوقت - تغيير إعادة عرضها دون لمس البيانات المخزنة.",
+      "brandingPoliciesLabel": "العلامات التجارية والسياسات",
+      "brandingPoliciesDescription": "(قريبًا) يظل قابلاً للتحرير في أي وقت، بغض النظر عن حالة العام الدراسي.",
+      "schoolOverrideNote": "يمكن للمدارس تجاوز هذه الإعدادات الافتراضية في تكوين المدرسة الفردي الخاص بها."
+    },
+    "permissions": {
+      "title": "الأذونات",
+      "prefix": "فقط المستخدمين الذين لديهم",
+      "suffix": "يمكن للدور تعديل هذه الإعدادات. يتم تسجيل كل تغيير مع المستخدم الخاص بك ID والطابع الزمني."
+    },
+    "governanceProfile": {
+      "title": "ملف الحوكمة",
+      "subtitle": "الإعدادات الافتراضية الإقليمية التي يقفلها هيكل الإدارة الخاص بك. تم تعيينه عند التزويد، ويتم تطبيقه على مستوى المستأجر.",
+      "governanceBody": "هيئة الحوكمة",
+      "currency": "عملة",
+      "timezone": "المنطقة الزمنية",
+      "calendar": "تقويم",
+      "operatorChoice": "اختيار المشغل",
+      "locked": "مغلق من قبل هيئة الإدارة",
+      "archetype": {
+        "PABSON": "بابسون - المدارس الخاصة والداخلية، نيبال",
+        "GENERIC": "نوعي"
+      },
+      "calendarValue": {
+        "gregorian": "الميلادي",
+        "bikram_sambat": "بيكرام سامبات (BS)"
+      }
+    }
+  },
+  "common": {
+    "cancel": "إلغاء",
+    "change": "يتغير",
+    "create": "يخلق",
+    "delete": "يمسح",
+    "edit": "تحرير",
+    "retry": "أعد المحاولة",
+    "save": "يحفظ",
+    "close": "يغلق",
+    "update": "تحديث",
+    "tryAgain": "حاول ثانية",
+    "saveChanges": "حفظ التغييرات",
+    "optional": "خياري"
+  },
+  "schoolRooms": {
+    "title": "الغرف والمواقع",
+    "summary": "{{count}} غرفة · {{active}} نشط",
+    "summary_plural": "{{count}} الغرف · {{active}} نشط",
+    "actions": {
+      "add": "أضف غرفة"
+    },
+    "types": {
+      "classroom": "الفصل الدراسي",
+      "lab": "مختبر",
+      "gym": "صالة للألعاب الرياضية",
+      "auditorium": "قاعة الاجتماعات",
+      "library": "مكتبة",
+      "office": "مكتب",
+      "other": "آخر"
+    },
+    "searchPlaceholder": "غرف البحث...",
+    "capacitySeats": "{{count}} مقعد",
+    "capacitySeats_plural": "{{count}} المقاعد",
+    "status": {
+      "active": "نشط",
+      "inactive": "غير نشط"
+    },
+    "table": {
+      "room": "غرفة",
+      "building": "مبنى",
+      "type": "يكتب",
+      "floor": "أرضية",
+      "capacity": "سعة",
+      "status": "حالة",
+      "actions": "الإجراءات"
+    },
+    "empty": {
+      "title": "لم يتم تكوين أي غرف",
+      "description": "أضف الغرف والمواقع الفعلية للجدولة.",
+      "noMatches": "لا توجد غرف تطابق \"{{query}}\""
+    },
+    "drawer": {
+      "addTitle": "أضف غرفة",
+      "editTitle": "تحرير الغرفة",
+      "addDescription": "أضف غرفة أو موقعًا جديدًا",
+      "editDescription": "تحديث تفاصيل الغرفة"
+    },
+    "form": {
+      "roomNumber": "رقم الغرفة",
+      "roomNumberPlaceholder": "على سبيل المثال، 101، أ-205",
+      "buildingName": "اسم المبنى",
+      "buildingPlaceholder": "على سبيل المثال، المبنى الرئيسي",
+      "floor": "أرضية",
+      "floorPlaceholder": "على سبيل المثال، 1",
+      "capacity": "سعة",
+      "capacityPlaceholder": "على سبيل المثال، 30",
+      "roomType": "نوع الغرفة",
+      "active": "نشط (متاح للجدولة)",
+      "description": "وصف",
+      "descriptionPlaceholder": "ملاحظات اختيارية"
+    },
+    "validation": {
+      "roomNumberRequired": "رقم الغرفة مطلوب"
+    },
+    "delete": {
+      "title": "حذف الغرفة",
+      "description": "هل أنت متأكد؟ ستفقد الأقسام المخصصة لهذه الغرفة تعيين موقعها."
+    }
+  },
+  "schoolDepartments": {
+    "title": "الأقسام",
+    "description": "إدارة الأقسام الأكاديمية والإدارية",
+    "searchPlaceholder": "أقسام البحث...",
+    "scope": {
+      "organization": "منظمة",
+      "school": "مدرسة"
+    },
+    "actions": {
+      "add": "إضافة قسم",
+      "create": "إنشاء قسم",
+      "edit": "تحرير القسم",
+      "delete": "حذف القسم",
+      "deleteSelected": "حذف المحدد"
+    },
+    "table": {
+      "code": "شفرة",
+      "name": "اسم",
+      "scope": "نِطَاق",
+      "departmentHead": "رئيس القسم"
+    },
+    "form": {
+      "createTitle": "إنشاء قسم",
+      "editTitle": "قسم التحرير",
+      "createDescription": "إضافة قسم جديد لهذه المدرسة",
+      "editDescription": "تحديث تفاصيل القسم",
+      "name": "اسم القسم",
+      "namePlaceholder": "على سبيل المثال، العلوم",
+      "code": "شفرة",
+      "codePlaceholder": "على سبيل المثال، اصابات النخاع الشوكي",
+      "codeHint": "2-10 أحرف. لا يمكن تغييره بعد الإنشاء.",
+      "description": "وصف",
+      "descriptionPlaceholder": "وصف موجز للقسم"
+    },
+    "empty": {
+      "title": "لم يتم العثور على أقسام",
+      "noMatches": "لا توجد أقسام تطابق \"{{query}}\"",
+      "description": "أنشئ قسمك الأول لتنظيم مدرستك",
+      "adjustSearch": "حاول تعديل البحث أو الفلتر"
+    },
+    "delete": {
+      "title": "حذف القسم",
+      "descriptionPrefix": "هل أنت متأكد أنك تريد الحذف",
+      "descriptionSuffix": "لا يمكن التراجع عن هذا الإجراء."
+    },
+    "bulkDelete": {
+      "title": "حذف {{count}} القسم",
+      "title_plural": "حذف {{count}} الأقسام",
+      "description": "أنت على وشك حذف الأقسام التالية نهائيًا. لا يمكن التراجع عن هذا.",
+      "confirm": "حذف {{count}}",
+      "success": "قسم {{count}} المحذوف",
+      "success_plural": "أقسام {{count}} المحذوفة",
+      "partial": "تم حذف {{deleted}}؛ {{failed}} فشل"
+    },
+    "selection": {
+      "lockedDelete": "يتطلب إذنًا لحذف الإدارات"
+    }
+  },
+  "schoolDetail": {
+    "schoolFallback": "مدرسة",
+    "notFound": "لم يتم العثور على المدرسة أو لا يمكن تحميلها.",
+    "status": {
+      "setup": "وضع الإعداد",
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "suspended": "مع وقف التنفيذ",
+      "closed": "مغلق"
+    },
+    "statusActions": {
+      "activate": "تفعيل المدرسة",
+      "suspend": "تعليق المدرسة",
+      "deactivate": "إلغاء تنشيط المدرسة",
+      "reactivate": "إعادة تفعيل المدرسة"
+    },
+    "tabs": {
+      "ariaLabel": "أقسام التفاصيل المدرسية",
+      "configuration": "إعدادات",
+      "academicSetup": "الإعداد الأكاديمي",
+      "attendance": "الحضور",
+      "structure": "بناء",
+      "gradeLevels": "مستويات الصف",
+      "auditLog": "سجل التدقيق",
+      "pending": "{{count}} معلق"
+    },
+    "setupBanner": {
+      "title": "أكمل إعداد المدرسة قبل التنشيط",
+      "description": "قم بتكوين الهيكل الأكاديمي لمدرستك حتى يتمكن EdForge من تتبع الحضور والدرجات والجدولة بشكل صحيح.",
+      "progress": "{{completed}} من {{total}} اكتملت مهام الإعداد",
+      "activate": "✓ تفعيل المدرسة"
+    },
+    "delete": {
+      "title": "حذف المدرسة",
+      "setupPrefix": "هذه سوف",
+      "permanentlyRemove": "إزالة بشكل دائم",
+      "setupSuffix": "المدرسة وجميع البيانات المرتبطة بها. لا يمكن التراجع عن هذا.",
+      "setupBullet": "سيتم حذف كيان المدرسة وتكوينها نهائيًا",
+      "activePrefix": "هذه سوف",
+      "deactivateWord": "إلغاء التنشيط",
+      "activeSuffix": "المدرسة. ويمكن إعادة تنشيطه لاحقًا بواسطة المسؤول.",
+      "inactiveBullet": "سيتم ضبط المدرسة على حالة غير نشطة",
+      "operationsBullet": "سيتم تعليق العمليات الأكاديمية",
+      "reactivateBullet": "يمكن إعادة تنشيطها من صفحة تفاصيل المدرسة",
+      "confirmTypePrefix": "يكتب",
+      "confirmTypeSuffix": "للتأكيد"
+    },
+    "accessDenied": {
+      "title": "تم الرفض",
+      "message": "ليس لديك إذن لعرض إعدادات هذه المدرسة."
+    },
+    "toasts": {
+      "deleted": "تم حذف المدرسة بنجاح",
+      "deleteFailed": "فشل في حذف المدرسة",
+      "activated": "تم تفعيل المدرسة بنجاح",
+      "statusUpdated": "تم تحديث حالة المدرسة إلى {{status}}",
+      "statusFailed": "فشل تحديث حالة المدرسة"
+    }
+  },
+  "schoolConfiguration": {
+    "lockedTooltip": "مغلق خلال العام الدراسي النشط",
+    "lockBanner": {
+      "title": "سنة دراسية نشطة",
+      "description": "يتم قفل بعض الإعدادات أثناء نشاط العام الدراسي. لا يمكن تغيير الجدول الزمني وبنية الفصل الدراسي وحقول الدرجات حتى اكتمال العام الدراسي الحالي أو أرشفته."
+    },
+    "toasts": {
+      "saved": "تم حفظ التكوين بنجاح",
+      "saveFailed": "فشل في حفظ التغييرات"
+    },
+    "sections": {
+      "identity": {
+        "title": "هوية المدرسة",
+        "description": "معلومات المدرسة الأساسية"
+      },
+      "location": {
+        "title": "الموقع والاتصال",
+        "description": "العنوان الفعلي ومعلومات الاتصال"
+      },
+      "schedule": {
+        "title": "الجدول الزمني والعمليات",
+        "description": "أيام الدراسة وساعات العمل"
+      },
+      "academic": {
+        "title": "الإعدادات الأكاديمية",
+        "description": "الدرجات وهيكل المصطلح"
+      },
+      "features": {
+        "title": "الميزات الممكّنة",
+        "description": "التحكم في الوحدات النشطة لهذه المدرسة"
+      },
+      "notifications": {
+        "title": "إشعارات",
+        "description": "تكوين كيفية تسليم الإخطارات"
+      },
+      "attendance": {
+        "title": "إعدادات الحضور",
+        "description": "تكوين تتبع الحضور"
+      }
+    },
+    "fields": {
+      "displayName": {
+        "label": "اسم العرض",
+        "description": "الاسم الكامل للمدرسة"
+      },
+      "schoolType": {
+        "label": "نوع المدرسة",
+        "description": "مستوى التعليم"
+      },
+      "website": {
+        "label": "موقع إلكتروني",
+        "description": "الموقع العام للمدرسة",
+        "placeholder": "https://www.school.edu"
+      },
+      "selectField": "اختر {{field}}",
+      "phoneEmail": {
+        "label": "الهاتف والبريد الإلكتروني",
+        "phonePlaceholder": "رقم التليفون",
+        "emailPlaceholder": "عنوان البريد الإلكتروني"
+      },
+      "schoolDays": {
+        "label": "أيام المدرسة",
+        "description": "الأيام التي تكون فيها المدرسة منعقدة"
+      },
+      "schoolHours": {
+        "label": "ساعات المدرسة",
+        "description": "أوقات البدء والانتهاء اليومية"
+      },
+      "periodDuration": {
+        "label": "مدة الفترة",
+        "description": "طول كل فترة دراسية",
+        "unit": "دقائق"
+      },
+      "termStructure": {
+        "label": "هيكل المصطلح",
+        "description": "كيف يتم تقسيم العام الدراسي"
+      },
+      "gradingScale": {
+        "label": "مقياس الدرجات",
+        "description": "تتم إدارة سياسات التقدير في وحدة الدرجات والتقييمات",
+        "help": "يتم تكوين مقاييس التقدير وأوزان الفئات وقواعد الحساب من خلال سياسات التقدير في وحدة الدرجات والتقييمات.",
+        "action": "إدارة سياسات التقدير"
+      },
+      "notificationsEnabled": {
+        "label": "تمكين الإخطارات",
+        "description": "تبديل رئيسي لجميع الإخطارات"
+      },
+      "emailNotifications": {
+        "label": "إشعارات البريد الإلكتروني",
+        "description": "إرسال الإخطارات عبر البريد الإلكتروني"
+      },
+      "smsNotifications": {
+        "label": "SMS الإخطارات",
+        "description": "إرسال الإخطارات عبر رسالة نصية"
+      },
+      "attendanceRequired": {
+        "label": "الحضور مطلوب",
+        "description": "هل تتبع الحضور إلزامي لهذه المدرسة؟"
+      }
+    },
+    "schoolTypes": {
+      "elementary": "المدرسة الابتدائية",
+      "middle": "المدرسة المتوسطة",
+      "high": "مدرسة ثانوية",
+      "k12": "مدرسة K-12",
+      "charter": "مدرسة الميثاق",
+      "private": "مدرسة خاصة",
+      "vocational": "المدرسة المهنية",
+      "special_education": "التعليم الخاص"
+    },
+    "termStructures": {
+      "semester": "الفصل الدراسي (فصلين دراسيين)",
+      "trimester": "الفصل الدراسي (3 مصطلحات)",
+      "quarter": "الربع (4 مصطلحات)",
+      "year": "سنة كاملة (فصل دراسي واحد)"
+    },
+    "inheritance": {
+      "title": "الوراثة من مساحة العمل:",
+      "description": "يتم توريث بعض الإعدادات من إعدادات مساحة العمل في مؤسستك. ستؤدي التغييرات هنا إلى تجاوز الإعدادات الافتراضية لمساحة العمل لهذه المدرسة فقط."
+    }
+  },
+  "schoolCalendar": {
+    "title": "التقويم المدرسي",
+    "subtitle": "{{year}} إدارة التقويم",
+    "academicYearFallback": "العام الدراسي",
+    "noAcademicYear": "لم يتم العثور على العام الدراسي. يرجى إنشاء عام دراسي أولاً في علامة التبويب \"السنوات الأكاديمية\".",
+    "actions": {
+      "sessions": "الجلسات",
+      "generate": "يولد"
+    },
+    "toasts": {
+      "generated": "تم إنشاء {{totalDays}} أيام ({{instructionalDays}} تعليمية)"
+    },
+    "noSchedule": {
+      "label": "لا يوجد جدول زمني",
+      "description": "لم يتم تعيين جدول الجرس"
+    },
+    "labels": {
+      "calendarDate": "تاريخ التقويم",
+      "weekend": "عطلة نهاية الأسبوع",
+      "holiday": "عطلة",
+      "instructionalDay": "يوم تعليمي",
+      "nonInstructional": "غير تعليمية"
+    },
+    "stats": {
+      "daysElapsed": "{{passed}} من {{total}} الأيام المنقضية",
+      "totalDays": "{{count}} إجمالي الأيام",
+      "instructionalDays": "الأيام التعليمية",
+      "instructionalProgress": "{{completed}} اكتمل، {{remaining}} المتبقي",
+      "holidays": "العطل",
+      "noHolidays": "لا توجد عطلات مجدولة",
+      "scheduledHolidays": "العطل المقررة",
+      "nonInstructional": "غير تعليمية",
+      "teacherOnlyDays": "يتضمن {{count}} أيام المعلم فقط"
+    },
+    "drawer": {
+      "weekendHolidayOverlap": "{{holiday}} يقع في هذا {{day}} - يتم احتسابه كعطلة نهاية الأسبوع، وليس عطلة",
+      "dayNumber": "اليوم {{day}}",
+      "instructionalDayNumber": "اليوم التعليمي #{{day}}",
+      "bellScheduleValue": "جدول الجرس: {{schedule}}",
+      "eventType": "نوع الحدث",
+      "otherAdvanced": "أخرى (متقدمة)…",
+      "rawEventType": "نوع الحدث الخام",
+      "selectPlaceholder": "يختار...",
+      "description": "وصف",
+      "descriptionPlaceholder": "وصف اختياري (على سبيل المثال، Dashain Holiday)",
+      "bellSchedule": "جدول الجرس",
+      "assignBellSchedule": "تعيين جدول الجرس..."
+    },
+    "generate": {
+      "title": "إنشاء التقويم",
+      "subtitle": "إنشاء تواريخ تلقائيًا لـ {{year}}",
+      "dateRangePrefix": "سيؤدي هذا إلى إنشاء تواريخ التقويم من",
+      "dateRangeMiddle": "ل",
+      "instructionalNote": "سيتم وضع علامة على أيام الأسبوع كأيام تعليمية. سيتم وضع علامة على عطلات نهاية الأسبوع تلقائيا.",
+      "replaceWarning": "سيتم استبدال التواريخ الحالية لهذا العام."
+    },
+    "sessions": {
+      "title": "الجلسات الأكاديمية",
+      "description": "الفصول الدراسية وشروط {{year}}",
+      "thisYear": "هذا العام"
+    },
+    "filters": {
+      "all": "الجميع",
+      "none": "لا أحد"
+    }
+  },
+  "academicSetup": {
+    "navigation": {
+      "title": "خطوات الإعداد",
+      "description": "أكمل هذه الخطوات بالترتيب. يعتمد كل منها على السابق — تحتاج إلى عام دراسي قبل إعداد الجلسات، وجلسات قبل إنشاء التقويم."
+    },
+    "steps": {
+      "years": "السنوات الأكاديمية",
+      "sessions": "الجلسات والشروط",
+      "calendar": "تقويم",
+      "bellSchedule": "جدول الجرس"
+    },
+    "fields": {
+      "startDate": "تاريخ البدء",
+      "endDate": "تاريخ الانتهاء",
+      "yearName": "اسم السنة",
+      "sessionName": "اسم الجلسة",
+      "termDescriptor": "واصف المصطلح",
+      "beginDate": "تاريخ البدء"
+    },
+    "actions": {
+      "creating": "جارٍ الإنشاء...",
+      "saving": "جارٍ الحفظ...",
+      "activating": "جارٍ التنشيط...",
+      "applying": "جارٍ التقديم…",
+      "generating": "جارٍ الإنشاء...",
+      "createAcademicYear": "إنشاء سنة دراسية",
+      "newAcademicYear": "العام الدراسي الجديد",
+      "activateYear": "تفعيل السنة",
+      "activate": "فعل",
+      "setAsCurrent": "تعيين كحالي",
+      "addSession": "إضافة جلسة",
+      "applyTemplate": "تطبيق القالب",
+      "createSession": "إنشاء جلسة",
+      "use": "يستخدم"
+    },
+    "toasts": {
+      "currentSet": "تم تعيين العام الدراسي كما هو الحال",
+      "currentSetFailed": "فشل تعيين العام الدراسي كحالي",
+      "missingYearId": "غير قادر على تحديث السنة: معرف السنة مفقود"
+    },
+    "confirmCurrent": {
+      "replacing": "جعل \"{{year}}\" العام الدراسي الحالي؟ لن يتم وضع علامة على \"{{current}}\" كحالية بعد الآن.",
+      "default": "جعل \"{{year}}\" العام الدراسي الحالي؟ سيتم تثبيت لوحات المعلومات والحضور والدرجات هذا العام."
+    },
+    "status": {
+      "planning": "تخطيط",
+      "active": "نشط",
+      "completed": "مؤرشف"
+    },
+    "badges": {
+      "current": "حاضِر",
+      "notCurrent": "ليس الحالي"
+    },
+    "yearModal": {
+      "createTitle": "إنشاء سنة دراسية",
+      "editTitle": "تعديل العام الدراسي",
+      "viewTitle": "عرض العام الدراسي",
+      "bsPlaceholder": "على سبيل المثال، 2082-2083",
+      "adPlaceholder": "على سبيل المثال، 2025-2026",
+      "planningNoticePrefix": "سيتم إنشاء العام الدراسي في حالة \"التخطيط\" بدون أي جلسات حتى الآن. افتح الخطوة التالية",
+      "planningNoticeSuffix": "لتحديد المصطلحات الخاصة بك - اختر قالبًا أو قم بإنشائه بشكل فردي، ثم قم بتنشيط السنة.",
+      "lockedNotice": "هذا العام الدراسي هو {{status}} ولا يمكن تعديله. يتم قفل التواريخ للحفاظ على سلامة البيانات.",
+      "activationLocksNotice": "بمجرد تفعيل هذا العام، سيتم قفل التواريخ ولا يمكن تغييرها."
+    },
+    "activate": {
+      "title": "تفعيل العام الدراسي",
+      "intro": "أنت على وشك التنشيط",
+      "actionLeadIn": "هذا الإجراء:",
+      "lockDates": "سيتم قفل تواريخ البدء والانتهاء بشكل دائم",
+      "deactivateCurrent": "سيتم إلغاء تنشيط أي عام دراسي نشط حاليًا",
+      "cannotReverse": "لا يمكن الرجوع مرة أخرى إلى \"التخطيط\""
+    },
+    "years": {
+      "title": "السنوات الأكاديمية",
+      "description": "تحديد الحدود الزمنية لجميع البيانات الأكاديمية.",
+      "driftTitle": "\"{{year}}\" نشط ولكن لم يتم تحديد أي سنة على أنها حالية.",
+      "driftDescription": "تعتمد لوحات المعلومات والحضور والدرجات على السنة الحالية المحددة.",
+      "emptyTitle": "لا توجد سنوات دراسية بعد",
+      "emptyDescription": "قم بإنشاء عامك الدراسي الأول للبدء في إعداد الهيكل الأكاديمي لمدرستك.",
+      "datesNotSet": "لم يتم تحديد التواريخ",
+      "currentTooltip": "يتم تثبيت لوحات المعلومات والحضور والدرجات هذا العام.",
+      "notCurrentTooltip": "هذا العام نشط ولكن لم يتم تحديد أي عام على أنه عام حالي. استخدم \"تعيين كحالي\" لإصلاح المشكلة.",
+      "setCurrentTooltip": "تحديد العام الدراسي الحالي",
+      "nextStep": "الخطوة التالية: إضافة جلسات (فصول دراسية/فصول دراسية) إلى هذا العام الدراسي لتحديد فترات التقدير.",
+      "integrityNote": "لا يمكن حذف السنوات الأكاديمية بمجرد إنشائها. وهذا يحافظ على سلامة البيانات التاريخية. وضع علامة على السنوات الكاملة كمؤرشفة لإخفائها من المشاهدات النشطة."
+    },
+    "sessions": {
+      "title": "الجلسات والشروط",
+      "descriptionPrefix": "حدد الفصول الدراسية أو الأشهر الثلاثة أو الأرباع داخلها",
+      "edfiPrefix": "تحدد الجلسات فترات وضع العلامات (على سبيل المثال، \"الفصل الدراسي الأول\"، \"Q1\"). تحدد كل جلسة Ed-Fi",
+      "edfiSuffix": "يتلقى الطلاب بطاقات التقرير في كل جلسة.",
+      "templateApplied": "تم تطبيق قالب PABSON ذو 4 فصول دراسية — تم إنشاء 4 جلسات",
+      "templateApplyFailed": "فشل تطبيق القالب",
+      "templateApplyStopped": "توقف تطبيق القالب: {{message}}",
+      "createFailed": "فشل إنشاء الجلسة",
+      "pabsonTemplate": {
+        "title": "قالب بابسون 4 مصطلح",
+        "description": "نقرة واحدة تنشئ هيكل PABSON القياسي ذو الأربعة أرباع المتوافق مع تقويم BS. ويمكنك تعديل الأسماء أو التواريخ بعد ذلك. تخطي هذا إذا كانت مدرستك تستخدم إيقاعًا مختلفًا."
+      },
+      "cardTitle": "{{year}} الجلسات",
+      "configuredCount": "{{count}} تم تكوين الجلسات",
+      "newSession": "جلسة جديدة",
+      "sessionNamePlaceholder": "على سبيل المثال، الفصل الدراسي الأول",
+      "termDescriptorPlaceholder": "حدد واصف المصطلح...",
+      "emptyTitle": "لا توجد جلسات بعد",
+      "emptyDescription": "قم بإنشاء جلستك الأولى أعلاه - على سبيل المثال، \"الفصل الدراسي الأول\" الذي يغطي شهر أبريل حتى شهر سبتمبر. تحدد الجلسات متى يتم إنشاء بطاقات التقارير.",
+      "nepalSuggestionsTitle": "مقترح لمدارس نيبال (نظام الفصل الدراسي):",
+      "firstSemester": "الفصل الدراسي الأول",
+      "firstSemesterDetail": "بيشاخ – أشوين (أبريل – أكتوبر)",
+      "secondSemester": "الفصل الدراسي الثاني",
+      "secondSemesterDetail": "كارتيك – شيترا (أكتوبر – مارس)",
+      "sessionFallback": "حصة"
+    },
+    "termDescriptors": {
+      "fall_semester": "فصل الخريف",
+      "spring_semester": "فصل الربيع",
+      "year_round": "على مدار السنة",
+      "summer": "صيف",
+      "first_quarter": "الربع الأول",
+      "second_quarter": "الربع الثاني",
+      "third_quarter": "الربع الثالث",
+      "fourth_quarter": "الربع الرابع"
+    },
+    "examWindow": {
+      "saved": "تم حفظ نافذة الامتحان",
+      "savedWithWarnings": "تم حفظ نافذة الاختبار مع تحذير (تحذيرات) تداخل العطلة {{count}}",
+      "saveFailed": "فشل حفظ نافذة الامتحان. حاول ثانية.",
+      "notSet": "لم يتم ضبطه",
+      "tooltip": "نافذة الامتحان - تتم المزامنة التلقائية مع التقويم",
+      "summary": "الامتحان: {{range}}",
+      "edit": "تحرير نافذة الامتحان",
+      "set": "ضبط نافذة الامتحان",
+      "rangeHelp": "يجب أن تكون مواعيد الامتحانات ضمن نطاق الجلسة ({{start}} – {{end}}). يؤدي الحفظ التلقائي إلى إنشاء علامات برتقالية لنافذة الاختبار في التقويم.",
+      "startDate": "تاريخ بدء الامتحان",
+      "endDate": "تاريخ انتهاء الامتحان",
+      "saveDates": "حفظ مواعيد الامتحانات",
+      "warningTitle": "تنبيه — تاريخ {{count}} في نافذة الاختبار هذه يتداخل مع عطلة:",
+      "warningTitle_plural": "تنبيه - تتداخل تواريخ {{count}} في نافذة الاختبار هذه مع العطلة:",
+      "warningDescription": "تم الحفظ كما هو. اضبط التواريخ أعلاه أو امسح التحذير من خلال ضبط نافذة الاختبار خارج أيام العطل."
+    },
+    "calendar": {
+      "resetTooltip": "لإعادة ضبط التقويم، استخدم التكوين → منطقة الخطر",
+      "generated": "تم إنشاء التقويم · {{count}} أيام",
+      "scheduledCount": "{{count}} المقرر",
+      "generateDescription": "يمكنك إنشاء أيام تعليمية وغير تعليمية تلقائيًا لهذا العام الدراسي استنادًا إلى إعدادات مدرستك وتكوين الجدول الزمني.",
+      "detectedNepal": "المنطقة التي تم اكتشافها: نيبال (NP) · عطلة نهاية الأسبوع يوم السبت · {{count}} تم تحميل العطلات الرسمية",
+      "detectedInternational": "المنطقة المكتشفة: دولي · التقويم الغريغوري",
+      "countryLocale": "البلد / المنطقة",
+      "weekends": "عطلات نهاية الأسبوع",
+      "schoolDays": "أيام المدرسة",
+      "previewLabel": "معاينة:",
+      "previewRangePrefix": "سيتم إنشاء التواريخ من",
+      "previewInstructional": "✓ الأيام النشطة → الأيام التعليمية",
+      "previewWeekends": "✓ أيام عطلة نهاية الأسبوع → غير تعليمية (عطلة نهاية الأسبوع)",
+      "previewHolidays": "✓ {{count}} سيتم تطبيق العطلات الوطنية من {{locale}} تقويم العطلات الرسمية",
+      "previewNoHolidayCalendar": "⚠ لا يتوفر تقويم محلي للعطلات — يمكن إضافة العطلات يدويًا بعد الإنشاء",
+      "confirmIntro": "سيؤدي هذا إلى إنشاء تواريخ تقويمية للفقرة {{year}} من",
+      "confirmInstructional": "✓ سيتم وضع علامة على الأيام النشطة على أنها تعليمية",
+      "confirmWeekends": "✓ سيتم وضع علامة على أيام عطلة نهاية الأسبوع على أنها غير تعليمية",
+      "confirmHolidays": "✓ {{count}} سيتم تطبيق أيام العطل الرسمية",
+      "confirmSessionCounts": "✓ سيتم تحديث عدد الأيام التعليمية للجلسة تلقائيًا",
+      "confirmGenerate": "تأكيد وإنشاء",
+      "dayTypes": "أنواع اليوم:",
+      "localeNames": {
+        "nepal": "نيبال",
+        "locale": "لغة"
+      },
+      "localeOptions": {
+        "nepal": "نيبال (NP)",
+        "unitedStates": "الولايات المتحدة (الولايات المتحدة)",
+        "india": "الهند (في)",
+        "custom": "مخصص"
+      },
+      "weekendOptions": {
+        "saturday": "السبت فقط (نيبال الافتراضي)",
+        "saturdaySunday": "السبت والأحد",
+        "fridaySaturday": "الجمعة والسبت",
+        "sunday": "الأحد فقط"
+      }
+    },
+    "bellSchedule": {
+      "description": "تحديد فترات الدراسة والفترات الزمنية لكل نوع من اليوم الدراسي.",
+      "useTemplate": "استخدم القالب",
+      "collapse": "▲ انهيار",
+      "expand": "▼ توسيع",
+      "scheduleNamePlaceholder": "على سبيل المثال، \"يوم عادي\"، \"إصدار مبكر\"",
+      "createHint": "قم بإنشاء جدول فارغ، ثم قم بإضافة فترات إليه. أو استخدم القالب أعلاه للبدء بفترات محددة مسبقًا.",
+      "createSchedule": "إنشاء الجدول الزمني",
+      "templateHint": "جداول زمنية معدة مسبقًا — قم بالتعديل بعد التقديم",
+      "applied": "✓ مطبق",
+      "noDefaultTitle": "لا يوجد جدول زمني للجرس الافتراضي قابل للاستخدام.",
+      "noDefaultDescription": "سيتم رفض التنشيط حتى يتم وضع علامة على الجدول الحقيقي (متعدد الفترات) باعتباره الجدول الافتراضي للمدرسة. يستخدم",
+      "placeholderTooltip": "يحتوي هذا الجدول الافتراضي على فترة واحدة فقط. وضع جدول حقيقي قبل تفعيل العام الدراسي.",
+      "placeholderChip": "العنصر النائب — قم بتعيين جدول زمني حقيقي قبل تفعيل AY",
+      "emptyTitle": "لا توجد جداول الجرس حتى الآن",
+      "emptyDescription": "قم بتطبيق قالب أعلاه أو قم بإنشاء جدولك الأول لتحديد كيفية تنظيم كل نوع من أنواع اليوم الدراسي.",
+      "createFirstSchedule": "+ إنشاء الجدول الأول",
+      "templates": {
+        "nepal": {
+          "name": "نيبال القياسية (الأحد – الجمعة)",
+          "description": "9 فترات · 10:00 صباحًا – 3:45 مساءً · تتضمن التجمع والغداء والراحة"
+        },
+        "nepalExam": {
+          "name": "يوم امتحان بابسون",
+          "description": "مجموعتان من الامتحانات · 10:00 صباحًا – 4:00 مساءً · اختبارات صباحية ومسائية"
+        },
+        "elementary": {
+          "name": "الجدول الابتدائي (الولايات المتحدة)",
+          "description": "9 فترات · 8:00 صباحًا – 2:00 ظهرًا · تتضمن حجرة الدراسة، والاستراحة، والغداء"
+        },
+        "highSchool": {
+          "name": "جدول المدرسة الثانوية (الولايات المتحدة)",
+          "description": "9 فترات · 7:30 صباحًا – 3:05 مساءً · تتضمن الاستشارة والغداء"
+        }
+      }
+    }
+  },
+  "schoolBellSchedule": {
+    "title": "جدول الجرس",
+    "description": "تحديد كيفية تنظيم كل نوع من اليوم الدراسي",
+    "actions": {
+      "startFromTemplate": "ابدأ من القالب",
+      "newSchedule": "جدول جديد",
+      "addPeriod": "أضف فترة",
+      "setAsDefault": "تعيين كافتراضي",
+      "createFromExisting": "إنشاء من الموجود",
+      "addFirstPeriod": "إضافة الفترة الأولى",
+      "createFirstSchedule": "إنشاء الجدول الأول"
+    },
+    "validation": {
+      "periodNameRequired": "اسم الفترة مطلوب",
+      "endAfterStart": "يجب أن يكون وقت الانتهاء بعد وقت البدء",
+      "scheduleNameRequired": "اسم الجدول مطلوب",
+      "effectiveDateRequired": "التاريخ الفعلي مطلوب"
+    },
+    "toasts": {
+      "templateFailed": "فشل في تطبيق القالب",
+      "createdFromExisting": "الجدول الزمني الذي تم إنشاؤه من الفترات الحالية"
+    },
+    "badges": {
+      "academic": "أكاديمي",
+      "default": "تقصير",
+      "inactive": "غير نشط"
+    },
+    "examples": {
+      "regularDay": "يوم عادي"
+    },
+    "howItWorks": {
+      "title": "كيف تعمل جداول الجرس",
+      "scheduleEqualsDay": "جدول الجرس = اليوم كله",
+      "periodsInsideSchedule": "= الفترات الزمنية (الفترات) داخل الجدول",
+      "steps": {
+        "create": {
+          "label": "إنشاء جدول زمني",
+          "sub": "\"اليوم العادي\"، \"الإصدار المبكر\""
+        },
+        "periods": {
+          "label": "أضف فترات إليها",
+          "sub": "أوقات الدراسة، الغداء، نظار"
+        },
+        "calendar": {
+          "label": "تعيين إلى التقويم",
+          "sub": "أي أيام تستخدم أي جدول زمني"
+        }
+      }
+    },
+    "summary": {
+      "effective": "فعالة {{date}}",
+      "periodCount": "{{count}} الفترة",
+      "periodCount_plural": "{{count}} فترات",
+      "instructionalTime": "{{duration}} تعليمية",
+      "otherTime": "{{duration}} أخرى"
+    },
+    "migration": {
+      "title": "لديك فترة دراسية {{count}}",
+      "title_plural": "لديك فترات دراسية {{count}}",
+      "description": "قم بإنشاء جدول جرس لتنظيمها في جدول محدد (على سبيل المثال، يوم عادي، إصدار مبكر)."
+    },
+    "empty": {
+      "noPeriodsTitle": "لا توجد فترات بعد",
+      "getStartedTitle": "ابدأ باستخدام جداول الجرس",
+      "noPeriodsDescription": "لا يحتوي الجدول الزمني \"{{schedule}}\" على أي كتل زمنية حتى الآن. أضف فترات لتحديد وقت حدوث كل فصل دراسي ووجبة غداء ونشاط خلال هذا النوع من اليوم الدراسي.",
+      "getStartedDescription": "تحدد جداول الجرس كيفية تنظيم يومك الدراسي. ابدأ بإنشاء جدول (مثل \"يوم عادي\")، ثم أضف إليه فترات (مثل \"الفترة 1: 8:00-8:50\"، \"الغداء: 11:30-12:00\"). يمكنك إنشاء جداول متعددة لأنواع مختلفة من الأيام.",
+      "selectScheduleDescription": "حدد الجدول أعلاه لعرض فتراته وإدارتها، أو إنشاء جدول جديد.",
+      "tip": "نصيحة: معظم المدارس لديها 6-9 فترات دراسية بما في ذلك الفصول الدراسية والفصول الدراسية والغداء وقضاء الوقت."
+    },
+    "list": {
+      "gap": "{{minutes}}م الفجوة",
+      "duration": "{{minutes}} دقيقة"
+    },
+    "periodForm": {
+      "editTitle": "تحرير الفترة",
+      "addTitle": "أضف فترة",
+      "editInSchedule": "قم بتحرير فترة زمنية في \"{{schedule}}\".",
+      "addInSchedule": "أضف فترة زمنية في \"{{schedule}}\".",
+      "editStandalone": "تحرير فتحة زمنية فترة الفصل الدراسي.",
+      "addStandalone": "أضف فترة زمنية للفصل الدراسي.",
+      "periodName": "اسم الفترة",
+      "periodNamePlaceholder": "على سبيل المثال، الفترة 1، غرفة الصف، الغداء",
+      "startTime": "وقت البدء",
+      "endTime": "وقت النهاية",
+      "durationPreview": "المدة: {{minutes}} دقيقة",
+      "periodType": "نوع الفترة",
+      "periodTypePlaceholder": "اختر نوع الفترة",
+      "sortOrder": "ترتيب الفرز",
+      "academic": "الأكاديمية (تحتسب ضمن الساعات التعليمية)",
+      "description": "وصف",
+      "descriptionPlaceholder": "وصف اختياري",
+      "whatIsPeriodTitle": "ما هي الفترة؟",
+      "whatIsPeriodPrefix": "الفترة هي أ",
+      "singleTimeSlot": "فتحة زمنية واحدة",
+      "whatIsPeriodSuffix": "داخل جدول الجرس - كتلة واحدة في اليوم الدراسي. يتم احتساب الفترات \"الأكاديمية\" (الفصول والمختبرات) ضمن الساعات التعليمية المطلوبة. الفترات غير الأكاديمية (الغداء، العطلة، قضاء الوقت) لا تفعل ذلك."
+    },
+    "templates": {
+      "title": "ابدأ من القالب",
+      "existingWarning": "سيؤدي هذا إلى إنشاء جدول جرس جديد إلى جانب جدول الجرس الحالي.",
+      "elementary": {
+        "title": "الجدول الابتدائي",
+        "description": "9 فترات · 8:00 صباحًا - 2:00 ظهرًا · تتضمن حجرة الدراسة، والاستراحة، والغداء"
+      },
+      "highSchool": {
+        "title": "جدول الثانوية العامة",
+        "description": "9 فترات · 7:30 صباحًا - 3:05 مساءً · تتضمن الاستشارة والغداء"
+      }
+    },
+    "deletePeriod": {
+      "title": "حذف الفترة",
+      "scheduleDescription": "هل أنت متأكد أنك تريد إزالة هذه الفترة من الجدول؟",
+      "standaloneDescription": "هل أنت متأكد أنك تريد حذف هذه الفترة الدراسية؟ ستفقد الأقسام التي تشير إليها فترة تعيينها."
+    },
+    "scheduleForm": {
+      "editTitle": "تحرير الجدول الزمني",
+      "newTitle": "جدول الجرس الجديد",
+      "editDescription": "قم بتحديث إعدادات هذا الجدول الزمني.",
+      "newDescription": "قم بتسمية نوع يومك الدراسي، ثم قم بإضافة فترات إليه.",
+      "scheduleName": "اسم الجدول الزمني",
+      "scheduleNamePlaceholder": "على سبيل المثال، يوم عادي",
+      "dayType": "نوع اليوم",
+      "dayTypePlaceholder": "اختر نوع اليوم",
+      "alternateDayName": "اسم اليوم البديل",
+      "alternateDayNamePlaceholder": "على سبيل المثال، يوم، ب يوم",
+      "effectiveDate": "تاريخ النفاذ",
+      "endDate": "تاريخ الانتهاء",
+      "setAsDefault": "تعيين كجدول زمني افتراضي",
+      "description": "وصف",
+      "descriptionPlaceholder": "وصف اختياري",
+      "whatIsScheduleTitle": "ما هو جدول الجرس؟",
+      "whatIsSchedulePrefix": "جدول الجرس هو مدرستك",
+      "dailyTimetable": "الجدول الزمني اليومي",
+      "whatIsScheduleSuffix": "لنوع من اليوم. بعد إنشائه، يمكنك إضافة فترات زمنية فردية (فترات) إليه:",
+      "exampleScheduleHint": "← هذا جدول الجرس"
+    },
+    "deleteSchedule": {
+      "title": "حذف الجدول الزمني",
+      "description": "سيؤدي هذا إلى إزالة جدول الجرس وجميع تكوينات الفترة الخاصة به. يجب إعادة تعيين تواريخ التقويم التي تشير إلى هذا الجدول الزمني."
+    },
+    "periodTypes": {
+      "instructional": {
+        "label": "تعليمي",
+        "description": "فترة الدراسة العادية"
+      },
+      "homeroom": {
+        "label": "غرفة منزلية",
+        "description": "تسجيل الوصول الصباحي"
+      },
+      "lunch": {
+        "label": "غداء",
+        "description": "استراحة الغداء"
+      },
+      "recess": {
+        "label": "العطلة",
+        "description": "استراحة خارجية"
+      },
+      "passing": {
+        "label": "تمرير",
+        "description": "بين الطبقات"
+      },
+      "advisory": {
+        "label": "استشارية",
+        "description": "استشارة طلابية"
+      },
+      "assembly": {
+        "label": "حَشد",
+        "description": "التجمع المدرسي"
+      },
+      "study_hall": {
+        "label": "قاعة الدراسة",
+        "description": "دراسة تحت الإشراف"
+      },
+      "extracurricular": {
+        "label": "خارج المنهج",
+        "description": "نشاط ما بعد المدرسة"
+      },
+      "break": {
+        "label": "استراحة",
+        "description": "استراحة قصيرة"
+      }
+    },
+    "dayTypes": {
+      "regular": {
+        "label": "عادي",
+        "description": "يوم دراسي قياسي"
+      },
+      "early_release": {
+        "label": "الإصدار المبكر",
+        "description": "بعد الظهر مختصرة"
+      },
+      "late_start": {
+        "label": "بداية متأخرة",
+        "description": "تأخر بداية الصباح"
+      },
+      "assembly": {
+        "label": "حَشد",
+        "description": "الجدول الزمني للجمعية"
+      },
+      "testing": {
+        "label": "اختبار",
+        "description": "جدول أيام الاختبار"
+      },
+      "half_day": {
+        "label": "نصف يوم",
+        "description": "جدول نصف يوم"
+      },
+      "special": {
+        "label": "خاص",
+        "description": "جدول خاص"
+      }
+    }
+  },
+  "organization": {
+    "title": "منظمة",
+    "description": "إدارة إعدادات المدرسة والمنطقة",
+    "structure": {
+      "title": "الهيكل التنظيمي",
+      "description": "إدارة التسلسل الهرمي لمؤسستك التعليمية",
+      "summary": "{{orgCount}} المنظمات · {{schoolCount}} المدارس"
+    },
+    "tabs": {
+      "hierarchy": "تَسَلسُل",
+      "networks": "الشبكات",
+      "details": "تفاصيل"
+    },
+    "entities": {
+      "stateEducationAgency": "وكالة التعليم الحكومية",
+      "localEducationAgency": "وكالة التعليم المحلية",
+      "educationServiceCenter": "مركز الخدمات التعليمية",
+      "district": "يصرف",
+      "serviceCenter": "مركز الخدمة",
+      "serviceCenters": "مراكز الخدمات التعليمية"
+    },
+    "typeBadges": {
+      "sea": "SEA",
+      "lea": "LEA",
+      "esc": "ESC",
+      "school": "مدرسة"
+    },
+    "fields": {
+      "name": "اسم",
+      "shortName": "الاسم المختصر",
+      "website": "موقع إلكتروني",
+      "status": "حالة",
+      "operationalStatus": "الحالة التشغيلية",
+      "edFiId": "Ed-Fi ID",
+      "leaCategory": "LEA الفئة",
+      "charterStatus": "حالة الميثاق",
+      "parentLea": "الأصل LEA"
+    },
+    "actions": {
+      "cancel": "إلغاء",
+      "delete": "يمسح",
+      "edit": "تحرير",
+      "setUpSea": "إعداد SEA",
+      "editSea": "تحرير SEA",
+      "setUpStateAgency": "إنشاء وكالة الدولة",
+      "assignments": "المهام",
+      "assignSchools": "تعيين المدارس",
+      "addCategory": "أضف فئة",
+      "addAddress": "إضافة عنوان",
+      "addPhone": "إضافة هاتف",
+      "addCode": "أضف الكود"
+    },
+    "empty": {
+      "title": "قم ببناء التسلسل الهرمي لمؤسستك",
+      "description": "قم بإعداد وكالة التعليم في ولايتك، وأضف المناطق (LEAs) ومراكز الخدمة (ESCs)، ثم قم بتنظيم مدارسك تحتها لإعداد التقارير المتوافقة مع Ed-Fi."
+    },
+    "details": {
+      "rootOrganization": "تنظيم الجذر",
+      "noSeaTitle": "لا توجد وكالة التعليم الحكومية",
+      "noSeaDescription": "قم بإعداد SEA الخاص بك لتحديد جذر التسلسل الهرمي لمؤسستك."
+    },
+    "detail": {
+      "backToOrganizations": "العودة إلى المنظمات",
+      "notFoundTitle": "لم يتم العثور على المنظمة",
+      "invalidTypeDescription": "نوع المؤسسة غير صالح.",
+      "missingDescription": "لا يمكن العثور على المنظمة المطلوبة.",
+      "noSchoolsAssigned": "لا توجد مدارس مخصصة لهذه المنطقة.",
+      "tabs": {
+        "overview": "نظرة عامة",
+        "schools": "المدارس ({{count}})",
+        "children": "منظمات الطفل"
+      }
+    },
+    "confirm": {
+      "unassignSchool": "إلغاء تعيين \"{{name}}\" من منطقتها؟\n\nستنتقل المدرسة إلى قائمة المدارس غير المخصصة."
+    },
+    "toasts": {
+      "schoolUnassigned": "المدرسة غير مخصصة من المنطقة"
+    },
+    "delete": {
+      "title": "حذف {{entity}}",
+      "description": "هل أنت متأكد أنك تريد حذف \"{{name}}\"؟",
+      "irreversible": "لا يمكن التراجع عن هذا الإجراء.",
+      "schoolsBecomeUnassigned": "يوجد في هذه المنطقة مدرسة {{count}} التي ستصبح غير مخصصة.",
+      "schoolsBecomeUnassigned_plural": "يوجد في هذه المنطقة مدارس {{count}} التي ستصبح غير مخصصة.",
+      "typeToConfirm": "اكتب {{name}} للتأكيد:",
+      "confirmAction": "حذف {{entity}}"
+    },
+    "orphanedBanner": {
+      "title": "{{count}} المدرسة غير مخصصة لمنطقة ما",
+      "title_plural": "{{count}} المدارس غير مخصصة لمنطقة ما",
+      "description": "قم بتعيين المدارس إلى وكالة التعليم المحلية (LEA) لإعداد التقارير الصحيحة عن الفقرة Ed-Fi."
+    },
+    "tree": {
+      "emptyTitle": "لا يوجد تسلسل هرمي للمنظمة",
+      "emptyDescription": "قم بإعداد وكالة التعليم الحكومية الخاصة بك للبدء في بناء الهيكل التنظيمي الخاص بك.",
+      "searchPlaceholder": "بحث عن المنظمات...",
+      "searchAria": "منظمات البحث",
+      "expandAll": "قم بتوسيع الكل",
+      "collapseAll": "طي الكل",
+      "organizationCount": "{{count}} التنظيم",
+      "organizationCount_plural": "{{count}} المنظمات",
+      "ariaLabel": "التسلسل الهرمي للمنظمة",
+      "nodeAria": "{{name}} - {{type}}",
+      "unassignedSchools": "المدارس غير المخصصة ({{count}})",
+      "actions": {
+        "viewDetails": "عرض التفاصيل",
+        "changeDistrict": "تغيير المنطقة",
+        "unassignFromDistrict": "إلغاء التعيين من المنطقة",
+        "addSchool": "أضف مدرسة"
+      },
+      "counts": {
+        "schools": "{{count}} المدرسة",
+        "schools_plural": "{{count}} المدارس",
+        "students": "{{count}} طالب",
+        "students_plural": "{{count}} الطلاب",
+        "staff": "{{count}} الموظفين"
+      }
+    },
+    "forms": {
+      "sea": {
+        "createTitle": "إنشاء وكالة التعليم الحكومية",
+        "editTitle": "تحرير وكالة التعليم الحكومية",
+        "description": "قم بتكوين المؤسسة الجذرية في التسلسل الهرمي Ed-Fi الخاص بك.",
+        "createAction": "إنشاء SEA",
+        "updateAction": "تحديث SEA"
+      },
+      "lea": {
+        "createTitle": "إنشاء منطقة (LEA)",
+        "editTitle": "تحرير المنطقة (LEA)",
+        "description": "تدير وكالات التعليم المحلية المدارس وترفع تقاريرها إلى الولاية.",
+        "createAction": "إنشاء منطقة",
+        "updateAction": "تحديث المنطقة"
+      },
+      "esc": {
+        "createTitle": "إنشاء مركز خدمات التعليم",
+        "editTitle": "تحرير مركز الخدمات التعليمية",
+        "description": "توفر مراكز الخدمات التعليمية الدعم الإقليمي للمناطق والمدارس.",
+        "createAction": "إنشاء إيسك",
+        "updateAction": "تحديث إي إس سي"
+      }
+    },
+    "form": {
+      "identity": "هوية",
+      "basicInfo": "معلومات أساسية",
+      "edFiIdHelp": "الرمز الرقمي الفريد المخصص من قبل الدولة. إذا لم يكن لديك واحد، أدخل أي عدد صحيح موجب كعنصر نائب.",
+      "operationalStatusHelp": "حالة التشغيل الحالية لهذه المنظمة وفقًا لمعايير Ed-Fi.",
+      "leaCategoryHelp": "تصنيف هذه المنطقة. المستقلة هي الأكثر شيوعًا في المناطق التعليمية القياسية.",
+      "charterStatusHelp": "ينطبق فقط على المنظمات من نوع الميثاق.",
+      "parentLeaHelp": "خياري. مطلوب فقط إذا كانت هذه المنطقة تقدم تقاريرها من خلال منطقة أخرى، مثل شبكات الميثاق.",
+      "select": "يختار...",
+      "none": "لا أحد",
+      "categories": "فئات",
+      "categoryHelp": "Ed-Fi واصف فئة المنظمة. يحدد نوع المنظمة التعليمية.",
+      "categoryRequired": "مطلوب فئة واحدة على الأقل.",
+      "categoryDescriptor": "واصف الفئة",
+      "selectCategory": "اختر فئة...",
+      "addresses": "العناوين",
+      "noAddresses": "لم تتم إضافة أي عناوين. انقر فوق إضافة عنوان لإضافة عنوان.",
+      "telephones": "الهواتف",
+      "noTelephones": "لم تتم إضافة أي أرقام هواتف.",
+      "identificationCodes": "رموز التعريف",
+      "noIdentificationCodes": "لم تتم إضافة أي رموز تعريف.",
+      "type": "يكتب",
+      "street": "شارع",
+      "aptSuite": "شقة/جناح",
+      "city": "مدينة",
+      "state": "ولاية",
+      "selectState": "اختر الولاية...",
+      "postalCode": "رمز بريدي",
+      "number": "رقم",
+      "system": "نظام",
+      "code": "شفرة"
+    },
+    "status": {
+      "Active": "نشط",
+      "active": "نشط",
+      "Added": "تمت الإضافة",
+      "added": "تمت الإضافة",
+      "ChangedAgency": "الوكالة المتغيرة",
+      "Closed": "مغلق",
+      "closed": "مغلق",
+      "Inactive": "غير نشط",
+      "inactive": "غير نشط",
+      "New": "جديد",
+      "new": "جديد",
+      "Reopened": "أعيد فتحه",
+      "Future": "مستقبل",
+      "setup": "يثبت",
+      "suspended": "مع وقف التنفيذ"
+    },
+    "descriptors": {
+      "educationOrganizationCategory": {
+        "Educator Preparation Provider": "مزود إعداد المعلم",
+        "Education Organization Network": "شبكة تنظيم التعليم",
+        "Education Service Center": "مركز الخدمات التعليمية",
+        "Local Education Agency": "وكالة التعليم المحلية",
+        "Post Secondary Institution": "مؤسسة ما بعد الثانوية",
+        "School": "مدرسة",
+        "State Education Agency": "وكالة التعليم الحكومية",
+        "Other": "آخر"
+      },
+      "leaCategory": {
+        "Independent": "مستقل",
+        "CharterLEA": "الميثاق LEA",
+        "Intermediate": "متوسط",
+        "SupervisoryUnion": "الاتحاد الإشرافي",
+        "Other": "آخر"
+      },
+      "charterStatus": {
+        "NotACharter": "ليست مدرسة ميثاق",
+        "SchoolCharter": "ميثاق المدرسة",
+        "CollegeUniversityCharter": "ميثاق الكلية/الجامعة",
+        "OpenEnrollment": "فتح التسجيل"
+      },
+      "addressType": {
+        "Physical": "بدني",
+        "Mailing": "البريدية",
+        "Shipping": "شحن"
+      },
+      "telephoneType": {
+        "Main": "رئيسي",
+        "Administrative": "إداري",
+        "Fax": "فاكس",
+        "Attendance": "الحضور"
+      },
+      "networkPurpose": {
+        "Collaborative": "تعاونية",
+        "Disciplinary": "تأديبي",
+        "Governance": "الحكم",
+        "Shared Services": "الخدمات المشتركة",
+        "Other": "آخر"
+      }
+    },
+    "networkForm": {
+      "createTitle": "إنشاء شبكة",
+      "editTitle": "تحرير الشبكة",
+      "description": "تجمع شبكات مؤسسات التعليم المؤسسات المعنية بإعداد التقارير أو التعاون أو الإدارة.",
+      "edFiIdHelp": "الرمز الرقمي الفريد لهذه الشبكة. إذا لم يكن لديك واحد، أدخل أي عدد صحيح موجب كعنصر نائب.",
+      "networkPurpose": "الغرض من الشبكة",
+      "networkPurposeHelp": "الغرض الأساسي من تجميع الشبكات هذا وفقًا لمعايير Ed-Fi.",
+      "operationalStatusHelp": "حالة التشغيل الحالية لهذه الشبكة وفقًا لمعايير Ed-Fi.",
+      "createAction": "إنشاء شبكة",
+      "updateAction": "تحديث الشبكة"
+    },
+    "networks": {
+      "title": "شبكات المنظمة",
+      "actions": {
+        "create": "إنشاء شبكة",
+        "editAria": "تحرير {{name}}",
+        "deleteAria": "حذف {{name}}"
+      },
+      "table": {
+        "networkName": "اسم الشبكة",
+        "purpose": "غاية"
+      },
+      "empty": {
+        "title": "لا توجد شبكات حتى الآن",
+        "description": "قم بإنشاء شبكة لتجميع المنظمات لإعداد التقارير أو التعاون."
+      },
+      "members": {
+        "title": "الأعضاء ({{count}})",
+        "addMember": "إضافة عضو",
+        "type": "يكتب",
+        "districtOption": "المنطقة (LEA)",
+        "serviceCenterOption": "مركز الخدمة (ESC)",
+        "organization": "منظمة",
+        "selectOrganization": "اختر منظمة...",
+        "add": "أضف",
+        "cancelAddAria": "إلغاء إضافة عضو",
+        "empty": "لا يوجد أعضاء حتى الآن. إضافة المنظمات إلى هذه الشبكة.",
+        "since": "منذ {{date}}",
+        "removeAria": "قم بإزالة {{name}} من الشبكة",
+        "collapseAria": "طي الأعضاء",
+        "expandAria": "قم بتوسيع الأعضاء",
+        "membersOf": "أعضاء {{name}}"
+      },
+      "delete": {
+        "title": "حذف الشبكة",
+        "description": "هل أنت متأكد أنك تريد حذف \"{{name}}\"؟",
+        "memberAssociationsRemoved": "سيتم أيضًا إزالة جميع الجمعيات الأعضاء.",
+        "confirm": "حذف الشبكة"
+      }
+    },
+    "onboarding": {
+      "title": "ابدأ",
+      "description": "قم بإعداد الهيكل التنظيمي الخاص بك في ثلاث خطوات سهلة",
+      "dismissAria": "رفض الإعداد",
+      "stepLabel": "الخطوة {{number}}",
+      "complete": "مكتمل",
+      "progress": "{{complete}} من {{total}} اكتملت الخطوات",
+      "allDone": "تم كل شيء!",
+      "progressAria": "التقدم على متن الطائرة",
+      "skip": "تخطي عملية الالتحاق - أعرف ما أفعله",
+      "steps": {
+        "sea": {
+          "label": "إنشاء وكالة التعليم الحكومية",
+          "description": "قم بإنشاء SEA الخاص بك - جذر التسلسل الهرمي لمؤسستك. وهذا يمثل قسم التعليم في ولايتك."
+        },
+        "lea": {
+          "label": "أنشئ منطقتك الأولى",
+          "description": "أضف وكالة التعليم المحلية (LEA) - منطقتك التعليمية. تنظم المقاطعات مدارس للإدارة وإعداد التقارير."
+        },
+        "schools": {
+          "label": "أضف المدارس",
+          "description": "تعيين المدارس إلى منطقتك. المدارس هي المكان الذي يلتحق فيه الطلاب ويقوم الموظفون بالتدريس فيه."
+        }
+      }
+    },
+    "quickReassign": {
+      "title": "تغيير منطقة المدرسة",
+      "description": "إعادة تعيين \"{{schoolName}}\" إلى منطقة مختلفة",
+      "currentDistrict": "المنطقة الحالية",
+      "notAssigned": "لم يتم تعيينه حاليا إلى أي منطقة",
+      "newAssignment": "مهمة المنطقة الجديدة",
+      "noDistricts": "لا توجد مناطق متاحة. أنشئ وكالة تعليمية محلية أولاً.",
+      "noneUnassign": "لا شيء (إلغاء التعيين)",
+      "noneHelp": "حدد \"لا شيء\" لإزالة تعيين المنطقة",
+      "previewAssigned": "سيتم تعيينه إلى {{districtName}}",
+      "previewUnassigned": "سيتم إلغاء تعيينه من أي منطقة",
+      "saveChanges": "حفظ التغييرات",
+      "noChanges": "لا تغييرات",
+      "newDistrictFallback": "منطقة جديدة",
+      "toasts": {
+        "assigned": "{{schoolName}} مخصص لـ {{districtName}}",
+        "unassigned": "{{schoolName}} غير معين من المنطقة"
+      }
+    },
+    "edfiExport": {
+      "title": "Ed-Fi تصدير المعاينة",
+      "description": "معاينة والتحقق من صحة مخرجات Ed-Fi Data Standard JSON لمؤسساتك التعليمية",
+      "previewEntityAria": "معاينة {{label}}",
+      "selectEntityAria": "حدد كيانًا لمعاينته",
+      "selectEntityPlaceholder": "حدد كيانًا لمعاينته...",
+      "noEntities": "لم يتم العثور على كيانات لهذا النوع.",
+      "emptyPreview": "حدد كيانًا لمعاينة مخرجاته Ed-Fi JSON",
+      "singletonSea": "سينجلتون - SEA واحد لكل مستأجر",
+      "noSea": "لم يتم تكوين وكالة التعليم الحكومية حتى الآن.",
+      "staffUnavailable": "ستكون معاينة تصدير فريق العمل متاحة من وحدة الأشخاص.",
+      "entities": {
+        "network": "شبكة المنظمة",
+        "staff": "طاقم عمل"
+      },
+      "actions": {
+        "copy": "ينسخ",
+        "copyAria": "انسخ JSON إلى الحافظة",
+        "download": "تحميل",
+        "downloadAria": "قم بتنزيل الملف JSON"
+      },
+      "validation": {
+        "title": "تصديق",
+        "summary": "{{passCount}} تمرير، {{warnCount}} تحذير، {{failCount}} فشل",
+        "isSet": "تم تعيين {{field}}",
+        "isMissing": "{{field}} مفقود",
+        "requiredMissing": "{{field}} مطلوب ولكنه مفقود",
+        "optionalUnset": "{{field}} اختياري ولم يتم ضبطه"
+      },
+      "toasts": {
+        "copied": "JSON تم نسخه إلى الحافظة"
+      }
+    },
+    "edfiPreview": {
+      "title": "Ed-Fi JSON معاينة",
+      "description": "في الوقت الحقيقي Ed-Fi إخراج البيانات القياسية",
+      "generateError": "غير قادر على إنشاء المعاينة",
+      "fieldsComplete": "{{filled}}/{{total}} الحقول",
+      "validation": {
+        "good": "الامتثال الجيد للمادة Ed-Fi",
+        "partial": "الامتثال الجزئي - إضافة المزيد من الحقول",
+        "minimal": "الحد الأدنى من البيانات - املأ الحقول الأساسية أولاً"
+      },
+      "actions": {
+        "copyJson": "نسخ JSON",
+        "copyAria": "انسخ Ed-Fi JSON إلى الحافظة",
+        "copied": "منسوخ!"
+      }
+    },
+    "assignmentManager": {
+      "title": "إدارة الواجبات المدرسية",
+      "description": "قم بتعيين المدارس إلى المناطق (LEAs) لإعداد تقارير Ed-Fi",
+      "searchPlaceholder": "بحث في المدارس...",
+      "filterAria": "تصفية المدارس",
+      "bulkAssignAria": "تعيين المدارس المختارة بشكل جماعي",
+      "bulkAssignPlaceholder": "تعيين مجمع إلى...",
+      "selectedCount": "{{count}} مختارة",
+      "noDistricts": "لا توجد مناطق متاحة. أنشئ وكالة تعليمية محلية أولاً.",
+      "noMatches": "لا توجد مدارس تطابق عوامل التصفية الخاصة بك.",
+      "unassigned": "غير معين",
+      "changesReady": "{{selectedCount}} محدد · {{changedCount}} التغييرات جاهزة",
+      "schoolsShown": "{{shown}} من {{total}} المدارس المعروضة",
+      "applyChanges": "تطبيق التغييرات",
+      "applyChangesWithCount": "تطبيق التغييرات ({{count}})",
+      "filters": {
+        "allSchools": "جميع المدارس",
+        "unassignedOnly": "غير المعينة فقط"
+      },
+      "table": {
+        "schoolName": "اسم المدرسة",
+        "currentDistrict": "المنطقة الحالية",
+        "newAssignment": "مهمة جديدة"
+      },
+      "toasts": {
+        "assigned": "تم تعيين المدارس بنجاح",
+        "noChanges": "لا توجد تغييرات لتطبيقها"
+      }
+    }
+  },
+  "rbac": {
+    "title": "السياسات الأمنية",
+    "description": "إدارة الأدوار والأذونات"
+  },
+  "people": {
+    "title": "إدارة الأفراد",
+    "description": "إدارة وصول الموظفين والأدوار",
+    "selection": {
+      "changeRole": "تغيير الدور",
+      "suspend": "تعليق",
+      "requiresAdmin": "يتطلب مسؤول المستأجر",
+      "noneEligibleRole": "لا يمكنك تغيير دورك.",
+      "noneSuspendable": "لا يمكن تعليق أي مستخدمين محددين — يتم تخطي المستخدمين المعلقين بالفعل وحسابك الخاص."
+    }
+  },
+  "headerZone": {
+    "selection": {
+      "aria": "إجراءات الاختيار",
+      "selected": "{{count}} مختارة",
+      "selectAll": "حدد الكل {{count}}",
+      "clear": "مسح التحديد"
+    }
+  },
+  "quickActions": {
+    "title": "إجراءات سريعة",
+    "editProfile": "تحرير الملف الشخصي",
+    "changePassword": "تغيير كلمة المرور",
+    "manageNotifications": "إدارة الإخطارات",
+    "switchTheme": "تبديل الموضوع"
+  },
+  "searchPlaceholder": "إعدادات البحث...",
+  "privacyNote": "أنت فقط من يستطيع رؤية إعداداتك. EdForge يحافظ على خصوصية بياناتك وأمانها وسلامتها.",
+  "privacyLearnMore": "يتعلم أكثر"
+}

@@ -2,7 +2,7 @@
  * i18next Configuration
  *
  * Initializes the i18n instance for the EdForge platform.
- * Supports English (en), Nepali (ne), and Hindi (hi) with browser language detection.
+ * Supports English (en), Nepali (ne), Hindi (hi), and Arabic (ar) with browser language detection.
  *
  * All micro-frontends share a single i18next instance via Module Federation
  * singleton config, so language changes propagate globally.
@@ -54,13 +54,28 @@ import hiPortal from "./locales/hi/portal.json";
 import hiBranding from "./locales/hi/branding.json";
 import hiIdentifiers from "./locales/hi/identifiers.json";
 
-export const SUPPORTED_LANGUAGES = ["en", "ne", "hi"] as const;
+// Arabic translations
+import arCommon from "./locales/ar/common.json";
+import arAuth from "./locales/ar/auth.json";
+import arNav from "./locales/ar/nav.json";
+import arSettings from "./locales/ar/settings.json";
+import arDashboard from "./locales/ar/dashboard.json";
+import arErrors from "./locales/ar/errors.json";
+import arAcademics from "./locales/ar/academics.json";
+import arPeople from "./locales/ar/people.json";
+import arPayments from "./locales/ar/payments.json";
+import arPortal from "./locales/ar/portal.json";
+import arBranding from "./locales/ar/branding.json";
+import arIdentifiers from "./locales/ar/identifiers.json";
+
+export const SUPPORTED_LANGUAGES = ["en", "ne", "hi", "ar"] as const;
 export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 
 export const LANGUAGE_LABELS: Record<SupportedLanguage, string> = {
   en: "English",
   ne: "नेपाली",
   hi: "हिन्दी",
+  ar: "العربية",
 };
 
 export const NAMESPACES = [
@@ -121,6 +136,20 @@ export const I18N_RESOURCES = {
     portal: hiPortal,
     branding: hiBranding,
     identifiers: hiIdentifiers,
+  },
+  ar: {
+    common: arCommon,
+    auth: arAuth,
+    nav: arNav,
+    settings: arSettings,
+    dashboard: arDashboard,
+    errors: arErrors,
+    academics: arAcademics,
+    people: arPeople,
+    payments: arPayments,
+    portal: arPortal,
+    branding: arBranding,
+    identifiers: arIdentifiers,
   },
 } as const;
 

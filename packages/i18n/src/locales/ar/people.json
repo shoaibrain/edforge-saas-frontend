@@ -1,0 +1,848 @@
+{
+  "title": "الناس",
+  "description": "إدارة الموظفين والأدوار والهيكل التنظيمي",
+  "staffDirectory": {
+    "title": "دليل الموظفين",
+    "description": "إدارة موظفي مؤسستك وإمكانية وصولهم",
+    "searchPlaceholder": "البحث بالاسم أو البريد الإلكتروني...",
+    "addStaff": "إضافة عضو فريق العمل",
+    "bulk": {
+      "exportSelected": "تم تحديد التصدير",
+      "deleteSelected": "حذف المحدد",
+      "requiresDelete": "يتطلب إذن حذف الموظفين"
+    }
+  },
+  "layout": {
+    "noSchool": {
+      "title": "لم يتم تكوين أي مدارس",
+      "description": "قم بإعداد مؤسستك في الإعدادات → المؤسسة قبل استخدام الأشخاص.",
+      "action": "انتقل إلى الإعدادات"
+    }
+  },
+  "overview": {
+    "stats": {
+      "thisMonth": "{{count}} هذا الشهر",
+      "fullTimeContract": "بدوام كامل / العقد",
+      "noneOnboarded": "لا شيء على متن الطائرة"
+    },
+    "roster": {
+      "title": "قائمة الموظفين",
+      "viewDirectory": "عرض الدليل",
+      "loading": "جارٍ تحميل الموظفين...",
+      "empty": "لا توجد سجلات للموظفين حتى الآن"
+    },
+    "breakdown": {
+      "title": "انهيار العمالة",
+      "employmentType": "نوع التوظيف",
+      "contract": "عقد",
+      "partTime": "دوام جزئى",
+      "byDepartment": "حسب القسم",
+      "noDepartments": "لم يتم تعيين أي أقسام"
+    },
+    "activity": {
+      "title": "النشاط الأخير",
+      "accountCreated": "تم إنشاء حساب المستخدم لـ {{name}}",
+      "onboardedNoAccess": "{{name}} على متن الطائرة كـ {{role}} بدون الوصول إلى النظام",
+      "staffFallback": "طاقم عمل",
+      "empty": "لا يوجد نشاط حديث للموظفين"
+    },
+    "directoryShortcutDescription": "بحث وتصفية وإدارة الملفات الشخصية الكاملة للموظفين.",
+    "kpi": {
+      "region": "المقاييس الرئيسية"
+    },
+    "signals": {
+      "unassignedTitle": "{{count}} الموظفون غير المعينين في قسم ما",
+      "unassignedDescription": "تعتمد تغطية القسم وإعداد التقارير على المهام. تعيين هؤلاء الموظفين من الدليل.",
+      "noAccessTitle": "{{count}} ليس لدى الموظفين إمكانية الوصول إلى النظام",
+      "noAccessDescription": "لا يمكن لهؤلاء الموظفين تسجيل الدخول إلى EdForge بعد. قم بإنشاء حسابات المستخدمين الخاصة بهم من الدليل.",
+      "openDirectory": "فتح دليل الموظفين"
+    }
+  },
+  "headerZone": {
+    "needAttention": "بحاجة الى الاهتمام",
+    "allClear": "كل شيء واضح",
+    "region": "يحتاج إلى اهتمام",
+    "minimize": "تصغير",
+    "acknowledge": "فهمتها",
+    "acknowledged": "معترف به",
+    "acknowledgedHint": "تم الإقرار - انقر للتراجع",
+    "dismiss": "رفض",
+    "emptyTitle": "لقد تم القبض عليك جميعًا.",
+    "domains": {
+      "capacity": "سعة",
+      "dataQuality": "جودة البيانات"
+    }
+  },
+  "dataTable": {
+    "errorTitle": "فشل تحميل البيانات",
+    "errorDescription": "حدث خطأ غير متوقع.",
+    "retry": "أعد المحاولة",
+    "clearSearch": "مسح البحث",
+    "clearFilters": "مسح المرشحات",
+    "clearActiveFilters": "واضح ({{count}})",
+    "clearSelection": "مسح التحديد",
+    "selectedRows": "{{count}} مختارة",
+    "selectedRows_plural": "{{count}} مختارة",
+    "paginationShowing": "عرض {{start}}-{{end}} من {{total}} النتائج",
+    "rowsPerPage": "{{size}} / صفحة",
+    "previousPage": "السابق",
+    "nextPage": "التالي",
+    "loadingPage": "جار التحميل...",
+    "rowDensity": "كثافة الصف",
+    "comfortableDensity": "مريح",
+    "comfortableDensityTitle": "صفوف مريحة",
+    "compactDensity": "مدمج",
+    "compactDensityTitle": "صفوف مدمجة",
+    "viewOptions": "عرض",
+    "toggleColumns": "تبديل الأعمدة",
+    "export": "تصدير",
+    "exportFormats": {
+      "csv": "تصدير كـ CSV",
+      "xlsx": "تصدير بتنسيق XLSX"
+    },
+    "xlsxUnavailable": "سفن تصدير XLSX في المتابعة",
+    "filterAriaLabel": "{{title}} مرشح",
+    "clearFilter": "مسح الفلتر",
+    "moreFilters": "المزيد من المرشحات",
+    "selection": {
+      "aria": "إجراءات الاختيار",
+      "selected": "{{count}} مختارة",
+      "selectAll": "حدد الكل {{count}}",
+      "clear": "مسح التحديد"
+    }
+  },
+  "bulkDelete": {
+    "title": "حذف {{count}} موظف؟",
+    "title_plural": "حذف {{count}} الموظفين؟",
+    "description": "يؤدي هذا إلى إزالة سجلات موظفيهم من القائمة.",
+    "fanOutNote": "كل صف هو طلب منفصل. الفشل في أحد الموظفين لا يؤدي إلى التراجع عن الآخرين.",
+    "confirm": "حذف {{count}}",
+    "deleting": "جارٍ الحذف...",
+    "toasts": {
+      "success": "تم حذف {{count}} موظف",
+      "success_plural": "تم حذف {{count}} الموظفين",
+      "allFailed": "لم يتم حذف أي موظف - فشل كل طلب",
+      "partial": "تم حذف {{ok}}؛ {{failed}} فشل"
+    }
+  },
+  "quickAccess": {
+    "addNew": "إضافة شخص جديد",
+    "addNewDescription": "على متن موظف جديد",
+    "departments": "الأقسام",
+    "departmentsDescription": "إدارة الهيكل التنظيمي",
+    "roles": "الأدوار والأذونات",
+    "rolesDescription": "تكوين الوصول والأذونات",
+    "profileSettings": "إعدادات الملف الشخصي",
+    "profileSettingsDescription": "إدارة تكوينات الملف الشخصي",
+    "analytics": "تحليلات الناس",
+    "analyticsDescription": "عرض تحليلات القوى العاملة"
+  },
+  "stats": {
+    "totalStaff": "مجموع الموظفين",
+    "activeTeachers": "المعلمين النشطين",
+    "teachers": "المعلمين",
+    "supportStaff": "طاقم الدعم",
+    "administrators": "المسؤولين",
+    "systemAccess": "الوصول إلى النظام",
+    "tags": {
+      "allActive": "كلها نشطة",
+      "active": "نشيط",
+      "noneYet": "لا شيء حتى الآن",
+      "noAccess": "{{count}} لا يمكن الوصول"
+    }
+  },
+  "tableHeaders": {
+    "staff": "طاقم عمل",
+    "role": "دور",
+    "status": "حالة",
+    "hired": "استأجرت",
+    "department": "قسم",
+    "systemAccess": "الوصول إلى النظام"
+  },
+  "systemAccess": {
+    "active": "نشط",
+    "noAccess": "لا يمكن الوصول",
+    "linkedAccount": "حساب المستخدم المرتبط",
+    "noAccountLinked": "لا يوجد حساب مستخدم مرتبط"
+  },
+  "empty": {
+    "noStaff": "لم يتم العثور على أي موظفين",
+    "getStarted": "ابدأ بإضافة أول موظف لديك إلى الدليل."
+  },
+  "drawer": {
+    "title": "تفاصيل الموظفين",
+    "viewFullProfile": "عرض الملف الشخصي الكامل",
+    "editStaff": "تحرير عضو هيئة التدريس",
+    "deleteStaff": "حذف عضو فريق العمل",
+    "since": "منذ {{date}}",
+    "type": "يكتب",
+    "primary": "أساسي"
+  },
+  "sections": {
+    "employmentInfo": "معلومات التوظيف",
+    "contactInfo": "معلومات الاتصال",
+    "schoolAssignments": "الواجبات المدرسية",
+    "systemAccess": "الوصول إلى النظام"
+  },
+  "fields": {
+    "firstName": "الاسم الأول",
+    "lastName": "اسم العائلة",
+    "middleName": "الاسم الأوسط",
+    "maidenName": "الاسم قبل الزواج",
+    "suffix": "لاحقة",
+    "staffId": "طاقم العمل الفريد ID",
+    "hireDate": "تاريخ الاستئجار",
+    "employmentType": "نوع التوظيف",
+    "title": "عنوان",
+    "primarySchool": "مدرسة إبتدائية",
+    "email": "بريد إلكتروني",
+    "phone": "هاتف",
+    "address": "عنوان",
+    "city": "مدينة",
+    "state": "ولاية",
+    "province": "مقاطعة",
+    "district": "يصرف",
+    "municipality": "البلدية / بلدية الريف / مركز توثيق الانتهاكات",
+    "wardNumber": "رقم الجناح",
+    "street": "شارع",
+    "streetToleHouse": "الشارع / توله / البيت",
+    "zipCode": "ZIP الكود",
+    "country": "دولة",
+    "postalCode": "رمز بريدي",
+    "department": "قسم",
+    "positionTitle": "عنوان المنصب",
+    "fte": "FTE",
+    "isPrimary": "هو الابتدائي",
+    "name": "اسم",
+    "fullName": "الاسم الكامل",
+    "emailAddress": "عنوان البريد الإلكتروني",
+    "phoneNumber": "رقم التليفون",
+    "phoneNumberWithCode": "رقم الهاتف {{code}}",
+    "phoneWithCode": "الهاتف {{code}}",
+    "role": "دور",
+    "addressType": "نوع العنوان",
+    "relationship": "علاقة",
+    "dateOfBirth": "تاريخ الميلاد",
+    "gender": "جنس",
+    "hispanicLatino": "من أصل اسباني / لاتيني",
+    "hispanicLatinoEthnicity": "العرق الإسباني / اللاتيني",
+    "beginDate": "تاريخ البدء",
+    "startDate": "تاريخ البدء",
+    "endDate": "تاريخ الانتهاء"
+  },
+  "employmentStatus": {
+    "active": "نشط",
+    "onLeave": "في إجازة",
+    "suspended": "مع وقف التنفيذ",
+    "terminated": "تم إنهاؤه",
+    "retired": "متقاعد",
+    "resigned": "استقال"
+  },
+  "employmentTypes": {
+    "fullTime": "بدوام كامل"
+  },
+  "roles": {
+    "teacher": "مدرس",
+    "principal": "رئيسي",
+    "vicePrincipal": "نائب المدير",
+    "counselor": "مستشار",
+    "librarian": "أمين مكتبة",
+    "nurse": "ممرضة",
+    "adminStaff": "طاقم الإدارة",
+    "supportStaff": "طاقم الدعم",
+    "itStaff": "موظفو تكنولوجيا المعلومات",
+    "substitute": "بديل",
+    "contractor": "مقاول"
+  },
+  "choices": {
+    "gender": {
+      "male": "ذكر",
+      "female": "أنثى",
+      "nonBinary": "غير ثنائي",
+      "preferNotToSay": "تفضل عدم القول"
+    },
+    "addressType": {
+      "home": "بيت",
+      "mailing": "البريدية",
+      "work": "عمل",
+      "temporary": "مؤقت"
+    },
+    "relationship": {
+      "spouse": "زوج",
+      "parent": "الوالد",
+      "sibling": "أخ أو أخت",
+      "child": "طفل",
+      "friend": "صديق",
+      "other": "آخر"
+    },
+    "employmentType": {
+      "fullTime": "دوام كامل",
+      "partTime": "دوام جزئى",
+      "contract": "عقد",
+      "temporary": "مؤقت",
+      "volunteer": "متطوع"
+    }
+  },
+  "wizard": {
+    "header": {
+      "title": "إضافة عضو فريق العمل",
+      "description": "أكمل المعالج لإنشاء سجل جديد للموظفين"
+    },
+    "stepMeta": {
+      "personal": {
+        "title": "المعلومات الشخصية",
+        "description": "الاسم، ID، والتركيبة السكانية"
+      },
+      "contact": {
+        "title": "اتصال",
+        "description": "البريد الإلكتروني والهاتف والعناوين وجهات الاتصال في حالات الطوارئ"
+      },
+      "employment": {
+        "title": "توظيف",
+        "description": "الدور والنوع والقسم وإعداد الحساب"
+      },
+      "assignment": {
+        "title": "تكليف",
+        "description": "المدرسة الابتدائية والمهام الإضافية"
+      },
+      "review": {
+        "title": "مراجعة وإنشاء",
+        "description": "تأكيد التفاصيل وإنشاء سجل الموظفين"
+      }
+    },
+    "steps": {
+      "personalInfo": "المعلومات الشخصية",
+      "personalInfoDescription": "الاسم، ID، والتركيبة السكانية",
+      "contact": "اتصال",
+      "contactDescription": "البريد الإلكتروني والهاتف والعناوين وجهات الاتصال في حالات الطوارئ",
+      "employment": "توظيف",
+      "employmentDescription": "الدور والنوع والقسم وإعداد الحساب",
+      "assignment": "تكليف",
+      "assignmentDescription": "المدرسة الابتدائية والمهام الإضافية",
+      "review": "مراجعة وإنشاء",
+      "reviewDescription": "تأكيد التفاصيل وإنشاء سجل الموظفين"
+    },
+    "employmentDetails": "تفاصيل التوظيف",
+    "teachingQualifications": "المؤهلات التدريسية",
+    "reviewSubmit": "المراجعة والإرسال",
+    "edit": "تحرير",
+    "submit": "إنشاء عضو فريق العمل",
+    "validation": {
+      "fixFields": "يرجى إصلاح حقل (حقول) {{count}} للمتابعة"
+    },
+    "toasts": {
+      "created": "تم إنشاء الموظف بنجاح",
+      "createdWithUser": "تم إنشاء حساب الموظف والمستخدم بنجاح",
+      "additionalAssignmentFailed": "لا يمكن إنشاء مهمة إضافية. يمكنك إضافته من الملف الشخصي للموظفين.",
+      "createFailed": "فشل في إنشاء عضو فريق العمل"
+    },
+    "placeholders": {
+      "firstName": "على سبيل المثال، جون",
+      "lastName": "على سبيل المثال، سميث",
+      "middleName": "على سبيل المثال، مايكل",
+      "maidenName": "على سبيل المثال، جونسون",
+      "staffUniqueId": "على سبيل المثال، JS4821",
+      "email": "john.smith@school.edu",
+      "streetToleHouse": "على سبيل المثال، تول-12، بيشال بازار",
+      "selectProvince": "اختر المحافظة",
+      "selectDistrict": "اختر المنطقة",
+      "pickProvinceFirst": "اختر المحافظة أولا",
+      "municipality": "على سبيل المثال، مدينة كاتماندو متروبوليتان",
+      "wardNumber": "على سبيل المثال، 12",
+      "postalCodeNp": "على سبيل المثال، 44600",
+      "nepal": "نيبال",
+      "selectRole": "حدد الدور...",
+      "positionTitle": "على سبيل المثال، مدرس رياضيات أول",
+      "selectDepartment": "اختر القسم..."
+    },
+    "help": {
+      "staffUniqueId": "رقم الموظف أو الولاية ID. يتم إنشاؤه تلقائيًا من الاسم، ولكن يمكنك تجاوزه.",
+      "edfiComplianceField": "Ed-Fi مجال الامتثال"
+    },
+    "contact": {
+      "primaryContact": "جهة الاتصال الأساسية",
+      "primaryContactDescription": "يتم استخدام البريد الإلكتروني لتسجيل الدخول والإخطارات",
+      "addresses": "العناوين",
+      "addressesDescription": "أضف عناوين المنزل أو العمل أو البريد",
+      "addAddress": "إضافة عنوان",
+      "removeAddress": "إزالة العنوان",
+      "emergencyContacts": "اتصالات الطوارئ",
+      "emergencyContactsDescription": "الناس للاتصال في حالة الطوارئ",
+      "contactNumber": "اتصل بنا {{count}}",
+      "removeContact": "إزالة جهة الاتصال",
+      "addEmergencyContact": "إضافة جهة اتصال الطوارئ"
+    },
+    "employment": {
+      "details": "تفاصيل التوظيف",
+      "detailsDescription": "تصنيف الدور والوظيفة",
+      "teachingQualifications": "المؤهلات التدريسية",
+      "teachingQualificationsDescription": "Ed-Fi حقول لأعضاء هيئة التدريس",
+      "highlyQualifiedTeacher": "مدرس مؤهل تأهيلا عاليا (HQT)",
+      "highlyQualifiedHelp": "كما هو محدد في متطلبات NCLB/ESSA",
+      "priorTeachingExperience": "سنوات من الخبرة التدريسية السابقة",
+      "priorProfessionalExperience": "سنوات من الخبرة المهنية السابقة",
+      "teachingExperienceYears": "الخبرة في التدريس (سنوات)",
+      "professionalExperienceYears": "الخبرة المهنية (سنوات)",
+      "userAccount": "حساب المستخدم",
+      "userAccountDescription": "اختياريًا، قم بإنشاء حساب تسجيل دخول لهذا الموظف",
+      "createUserAccount": "إنشاء حساب مستخدم لهذا الموظف",
+      "createUserAccountHelp": "تمكين الوصول إلى تسجيل الدخول إلى EdForge. سيتم إرسال دعوة بالبريد الإلكتروني.",
+      "cognitoNotice": "سيتم إنشاء حساب Cognito بالبريد الإلكتروني من الخطوة 2 ({{email}}). سيتم إنشاء كلمة مرور مؤقتة تلقائيًا.",
+      "emailNotSet": "لم يتم تعيينه بعد",
+      "globalRoleHelp": "لدى TenantAdmin حق الوصول الكامل إلى النظام"
+    },
+    "assignment": {
+      "primaryTitle": "مهمة المدرسة الابتدائية",
+      "primaryDescription": "التنسيب المدرسي الرئيسي للموظف",
+      "loadingSchools": "جاري تحميل المدارس...",
+      "selectSchool": "اختر مدرسة...",
+      "sameAsEmploymentRole": "نفس الدور الوظيفي",
+      "roleAtSchool": "الدور في المدرسة",
+      "roleHelp": "الافتراضيات لدور التوظيف",
+      "beginDateHelp": "الإعدادات الافتراضية لتاريخ الاستئجار",
+      "fte": "معادلة الدوام الكامل (FTE)",
+      "primaryFte": "الابتدائية FTE",
+      "additionalTitle": "مهام إضافية",
+      "additionalDescription": "يمكن تعيين الموظفين في مدارس متعددة",
+      "assignmentNumber": "المهمة {{count}}",
+      "school": "مدرسة",
+      "addAnother": "إضافة مهمة مدرسية أخرى",
+      "totalFte": "المجموع FTE",
+      "overcommitted": "مجموع FTE يتجاوز 1.0. قد يكون هذا الموظف ملتزمًا أكثر من اللازم."
+    },
+    "review": {
+      "title": "مراجعة معلومات الموظفين",
+      "description": "يرجى مراجعة كافة التفاصيل قبل إنشاء سجل الموظفين.",
+      "edit": "تحرير",
+      "sections": {
+        "personal": "المعلومات الشخصية"
+      },
+      "addressCount": "{{count}} عنوان",
+      "addressCount_plural": "{{count}} عناوين",
+      "contactCount": "{{count}} الاتصال",
+      "contactCount_plural": "{{count}} جهات الاتصال",
+      "assigned": "مُكَلَّف",
+      "userAccountWillBeCreated": "سيتم إنشاء حساب المستخدم",
+      "noUserAccount": "لا يوجد حساب مستخدم",
+      "loginSummary": "تسجيل الدخول لـ {{email}} كـ {{role}}",
+      "noLoginAccess": "سجل الموظفين فقط - لا يوجد وصول لتسجيل الدخول"
+    }
+  },
+  "tabs": {
+    "overview": "نظرة عامة",
+    "profile": "الملف الشخصي",
+    "assignments": "المهام",
+    "credentials": "أوراق اعتماد",
+    "employmentHistory": "تاريخ التوظيف",
+    "employment-history": "التاريخ",
+    "leave": "يترك",
+    "security": "حماية",
+    "trainings": "التدريبات"
+  },
+  "delete": {
+    "title": "حذف عضو فريق العمل",
+    "warning": "لا يمكن التراجع عن هذا الإجراء",
+    "confirmation": "أنت على وشك حذف سجل الموظفين بشكل دائم لـ {{name}}. سيؤدي هذا إلى إزالة كافة البيانات الخاصة بهم والوصول.",
+    "typeToConfirm": "اكتب {{email}} للتأكيد",
+    "emailPlaceholder": "أدخل البريد الإلكتروني للتأكيد",
+    "emailMismatch": "البريد الإلكتروني غير متطابق",
+    "deleting": "جارٍ الحذف..."
+  },
+  "actions": {
+    "cancel": "إلغاء",
+    "save": "يحفظ",
+    "saving": "جارٍ الحفظ...",
+    "saveChanges": "حفظ التغييرات",
+    "view": "عرض",
+    "edit": "تحرير",
+    "more": "أكثر",
+    "actions": "الإجراءات",
+    "closeDrawer": "إغلاق الدرج",
+    "copyToClipboard": "نسخ إلى الحافظة",
+    "updateStatus": "تحديث الحالة",
+    "assignToSchool": "تكليف بالمدرسة",
+    "addCredential": "إضافة بيانات الاعتماد"
+  },
+  "common": {
+    "unknown": "مجهول",
+    "unassigned": "غير معين",
+    "loading": "جار التحميل...",
+    "select": "يختار…",
+    "none": "لا أحد",
+    "yes": "نعم",
+    "no": "لا",
+    "unsavedChanges": "لديك تغييرات غير محفوظة",
+    "unsavedCloseConfirm": "لديك تغييرات غير محفوظة. هل أنت متأكد أنك تريد الإغلاق؟",
+    "additionalDetails": "تفاصيل اضافية..."
+  },
+  "widgets": {
+    "showHide": "إظهار/إخفاء الحاجيات",
+    "resetDefault": "إعادة التعيين إلى الوضع الافتراضي",
+    "quickStats": "احصائيات سريعة",
+    "quickAccess": "الوصول السريع"
+  },
+  "filters": {
+    "label": "المرشحات",
+    "allRoles": "جميع الأدوار",
+    "allStatuses": "جميع الحالات",
+    "filterByDepartment": "تصفية حسب القسم...",
+    "clearAll": "مسح الكل",
+    "exportCsv": "تصدير CSV",
+    "role": "دور",
+    "employmentStatus": "الحالة الوظيفية",
+    "department": "قسم",
+    "roleAria": "التصفية حسب الدور"
+  },
+  "quickAdd": {
+    "title": "إضافة مستخدم سريع",
+    "description": "إنشاء حساب مستخدم فقط",
+    "menuLabel": "إضافة سريعة لحساب المستخدم",
+    "avatarHint": "سيتم إنشاء الصورة الرمزية لـ DiceBear تلقائيًا من اسم الموظف بعد الإنشاء.",
+    "systemRole": "دور النظام",
+    "createUser": "إنشاء مستخدم",
+    "sections": {
+      "identity": "هوية",
+      "accessRole": "الوصول والدور"
+    },
+    "roles": {
+      "tenantUser": "المستخدم المستأجر",
+      "tenantAdmin": "مشرف المستأجر"
+    },
+    "roleHelp": {
+      "admin": "- الوصول الكامل إلى كافة الميزات.",
+      "user": "— الوصول على مستوى المدرسة بناءً على الأدوار المعينة."
+    },
+    "toasts": {
+      "created": "تم إنشاء المستخدم بنجاح"
+    }
+  },
+  "quickFilters": {
+    "all": "الجميع",
+    "teacher": "المعلمين",
+    "principal": "رئيسي",
+    "support": "يدعم"
+  },
+  "export": {
+    "headers": {
+      "name": "اسم",
+      "email": "بريد إلكتروني",
+      "role": "دور",
+      "status": "حالة",
+      "phone": "هاتف",
+      "hireDate": "تاريخ الاستئجار"
+    }
+  },
+  "editStaff": {
+    "title": "تحرير عضو هيئة التدريس",
+    "description": "تحديث المعلومات لـ {{name}}",
+    "emailReadOnly": "لا يمكن تغيير عنوان البريد الإلكتروني",
+    "errors": {
+      "noStaff": "لا يوجد موظف للتحديث"
+    },
+    "toasts": {
+      "updated": "تم تحديث الموظف بنجاح"
+    },
+    "placeholders": {
+      "selectDepartment": "اختر القسم..."
+    },
+    "iemis": {
+      "title": "IEMIS / هوية CEHRD",
+      "description": "اختياري - قم بالتعبئة لدعم عمليات تصدير تسجيل طاقم عمل CEHRD Flash-II.",
+      "staffId": "IEMIS طاقم العمل ID",
+      "staffIdHelp": "معرف مكون من 16 رقمًا صادر عن CEHRD (تنسيق العنصر النائب V1).",
+      "nationality": "جنسية",
+      "maritalStatus": "الحالة الاجتماعية",
+      "appointmentType": "نوع الموعد",
+      "appointmentDate": "تاريخ التعيين",
+      "appointmentDateHelp": "لكل سجل CEHRD.",
+      "maritalStatusOptions": {
+        "single": "أعزب",
+        "married": "متزوج",
+        "divorced": "مُطلّق",
+        "widowed": "أرمل",
+        "other": "آخر",
+        "prefer_not_to_say": "يفضل عدم القول"
+      },
+      "appointmentTypeOptions": {
+        "permanent": "دائم",
+        "temporary": "مؤقت",
+        "contract": "عقد",
+        "honorary": "فخرية",
+        "volunteer": "متطوع"
+      }
+    }
+  },
+  "credentials": {
+    "description": "تراخيص التدريس والشهادات وأوراق الاعتماد المهنية",
+    "emptyTitle": "لا أوراق اعتماد",
+    "emptyDescription": "لم تتم إضافة أي بيانات اعتماد لهذا الموظف حتى الآن.",
+    "addFirst": "أضف بيانات الاعتماد الأولى",
+    "deleteConfirm": "هل أنت متأكد أنك تريد حذف بيانات الاعتماد هذه؟ لا يمكن التراجع عن هذا الإجراء.",
+    "noExpiration": "لا انتهاء الصلاحية",
+    "expired": "منتهي الصلاحية",
+    "daysRemaining": "{{count}} اليوم المتبقي",
+    "daysRemaining_plural": "{{count}} الأيام المتبقية",
+    "expiresOn": "تنتهي {{date}}",
+    "issued": "صدرت {{date}}",
+    "document": "وثيقة",
+    "grades": "الدرجات:",
+    "edit": "تحرير بيانات الاعتماد",
+    "delete": "حذف بيانات الاعتماد",
+    "toasts": {
+      "added": "تمت إضافة بيانات الاعتماد بنجاح",
+      "updated": "تم تحديث بيانات الاعتماد بنجاح",
+      "deleted": "تم حذف بيانات الاعتماد بنجاح",
+      "deleteFailed": "فشل في حذف بيانات الاعتماد"
+    },
+    "modal": {
+      "addTitle": "إضافة بيانات الاعتماد",
+      "editTitle": "تحرير بيانات الاعتماد",
+      "addDescription": "أضف بيانات اعتماد جديدة لهذا الموظف",
+      "editDescription": "تحديث معلومات الاعتماد"
+    },
+    "fields": {
+      "credentialId": "بيانات الاعتماد ID",
+      "fieldSubjectArea": "المجال / مجال الموضوع",
+      "issuingOrganization": "منظمة الإصدار",
+      "issuingState": "دولة الإصدار",
+      "issuanceDate": "تاريخ الإصدار",
+      "expirationDate": "تاريخ انتهاء الصلاحية",
+      "description": "وصف",
+      "documentUrl": "الوثيقة URL",
+      "renewable": "أوراق اعتماد متجددة",
+      "renewalReminderDays": "تذكير بأيام قبل انتهاء الصلاحية"
+    },
+    "types": {
+      "certification": "شهادة",
+      "license": "رخصة",
+      "endorsement": "تَأيِيد",
+      "degree": "درجة",
+      "registration": "تسجيل",
+      "permit": "يسمح",
+      "clearance": "التخليص",
+      "training": "تمرين",
+      "other": "آخر"
+    },
+    "fieldsBySubject": {
+      "elementary_education": "التعليم الابتدائي",
+      "secondary_education": "التعليم الثانوي",
+      "special_education": "التعليم الخاص",
+      "early_childhood": "الطفولة المبكرة",
+      "mathematics": "الرياضيات",
+      "science": "علوم",
+      "english_language_arts": "فنون اللغة الانجليزية",
+      "social_studies": "العلوم الإجتماعية",
+      "foreign_language": "لغة أجنبية",
+      "physical_education": "التربية البدنية",
+      "music": "موسيقى",
+      "art": "فن",
+      "technology": "تكنولوجيا",
+      "counseling": "الاستشارة",
+      "administration": "إدارة",
+      "library_media": "وسائط المكتبة",
+      "other": "آخر"
+    }
+  },
+  "leave": {
+    "title": "إدارة الإجازات",
+    "description": "عرض وإدارة طلبات الإجازة",
+    "searchPlaceholder": "سبب البحث...",
+    "emptyTitle": "لا طلبات الإجازة",
+    "emptyDescription": "لم يتم تقديم أي طلبات إجازة حتى الآن. انقر فوق \"طلب إجازة\" لإنشاء واحدة.",
+    "actions": {
+      "request": "طلب إجازة",
+      "submitRequest": "إرسال الطلب",
+      "approve": "يعتمد",
+      "reject": "يرفض"
+    },
+    "summary": {
+      "totalRequests": "إجمالي الطلبات",
+      "daysUsed": "الأيام المستخدمة",
+      "pendingRequests": "الطلبات المعلقة",
+      "daysPending": "أيام معلقة"
+    },
+    "table": {
+      "dates": "بلح",
+      "duration": "مدة",
+      "reason": "سبب"
+    },
+    "fields": {
+      "leaveType": "نوع الإجازة",
+      "durationType": "نوع المدة",
+      "hours": "ساعات"
+    },
+    "modal": {
+      "description": "إنشاء طلب إجازة لـ {{name}}",
+      "emergencyContact": "الاتصال في حالات الطوارئ أثناء الإجازة"
+    },
+    "placeholders": {
+      "selectLeaveType": "اختر نوع الإجازة...",
+      "reason": "سبب بسيط للإجازة...",
+      "contactName": "اسم جهة الاتصال",
+      "phoneNumber": "رقم التليفون"
+    },
+    "prompts": {
+      "rejectionReason": "الرجاء إدخال سبب الرفض:",
+      "cancellationReason": "الرجاء إدخال سبب الإلغاء:"
+    },
+    "toasts": {
+      "created": "تم إنشاء طلب الإجازة بنجاح",
+      "approved": "تمت الموافقة على طلب الإجازة",
+      "approveFailed": "فشل في الموافقة على طلب الإجازة",
+      "rejected": "تم رفض طلب الإجازة",
+      "rejectFailed": "فشل في رفض طلب الإجازة",
+      "cancelled": "تم إلغاء طلب الإجازة",
+      "cancelFailed": "فشل في إلغاء طلب الإجازة"
+    },
+    "duration": {
+      "days": "{{count}} يوم",
+      "days_plural": "{{count}} أيام",
+      "hours": "{{count}} ساعة",
+      "hours_plural": "{{count}} ساعات"
+    },
+    "status": {
+      "approved": "موافقة",
+      "completed": "مكتمل",
+      "rejected": "مرفوض",
+      "pending": "في انتظار",
+      "in_progress": "في تَقَدم",
+      "cancelled": "تم الإلغاء"
+    },
+    "types": {
+      "annual": "سنوي",
+      "sick": "مريض",
+      "personal": "شخصي",
+      "bereavement": "الثكل",
+      "maternity": "أمومة",
+      "paternity": "أبوة",
+      "family_medical": "FMLA",
+      "jury_duty": "واجب هيئة المحلفين",
+      "military": "جيش",
+      "professional_development": "البروفيسور ديف.",
+      "sabbatical": "إجازة",
+      "unpaid": "غير مدفوعة الأجر",
+      "other": "آخر"
+    },
+    "typesFull": {
+      "annual": "سنوي / PTO",
+      "sick": "الإجازة المرضية",
+      "personal": "يوم شخصي",
+      "bereavement": "الثكل",
+      "maternity": "أمومة",
+      "paternity": "أبوة",
+      "family_medical": "طب الأسرة (FMLA)",
+      "jury_duty": "واجب هيئة المحلفين",
+      "military": "جيش",
+      "professional_development": "التطوير المهني",
+      "sabbatical": "إجازة",
+      "unpaid": "إجازة غير مدفوعة الأجر",
+      "other": "آخر"
+    },
+    "durationTypes": {
+      "full_day": "يوم كامل",
+      "half_day_am": "نصف يوم (صباحا)",
+      "half_day_pm": "نصف يوم (مساء)",
+      "hours": "ساعات"
+    }
+  },
+  "employmentHistory": {
+    "description": "تتبع تغيرات حالة التوظيف مع مرور الوقت",
+    "updateTitle": "تحديث الحالة الوظيفية",
+    "currentStatus": "الوضع الحالي: {{status}}",
+    "emptyTitle": "لا يوجد تاريخ التوظيف",
+    "emptyDescription": "لم يتم تسجيل أي تغييرات في الوضع الوظيفي حتى الآن. انقر فوق \"تحديث الحالة\" لتسجيل التغيير.",
+    "effective": "فعالة {{date}}",
+    "recorded": "مسجل {{date}}",
+    "fields": {
+      "newStatus": "الوضع الجديد",
+      "effectiveDate": "تاريخ النفاذ",
+      "notes": "ملاحظات",
+      "reasonLabel": "سبب:"
+    },
+    "placeholders": {
+      "selectStatus": "اختر الحالة...",
+      "reason": "على سبيل المثال، نهاية العقد، والترقية، والإجازة الطبية"
+    },
+    "toasts": {
+      "updated": "تم تحديث حالة التوظيف بنجاح"
+    }
+  },
+  "assignments": {
+    "assignTitle": "تكليف بالمدرسة",
+    "assignDescription": "إنشاء مهمة مدرسية جديدة لـ {{name}}",
+    "editTitle": "تحرير الواجب",
+    "editDescription": "تحديث المهمة في {{school}}",
+    "schoolFallback": "مدرسة",
+    "unknownSchool": "مدرسة غير معروفة",
+    "noActiveAssignments": "لا توجد مهام نشطة",
+    "totalFte": "المجموع FTE",
+    "fteValue": "FTE {{value}}",
+    "primary": "أساسي",
+    "ended": "انتهى",
+    "remove": "يزيل",
+    "removeConfirm": "هل أنت متأكد أنك تريد إزالة هذه المهمة؟ لا يمكن التراجع عن هذا الإجراء.",
+    "overcommitted": "مفرط الالتزام - يتجاوز 1.0",
+    "emptyTitle": "لا المهام",
+    "emptyDescription": "استخدم قائمة الإجراءات لتعيين هذا الموظف إلى المدرسة.",
+    "teachingSections": "أقسام التدريس",
+    "sectionsCount": "{{count}} القسم",
+    "sectionsCount_plural": "{{count}} الأقسام",
+    "studentsCount": "{{count}} طالب",
+    "studentsCount_plural": "{{count}} الطلاب",
+    "setPrimary": "تعيين كمهمة أساسية",
+    "createAssignment": "إنشاء مهمة",
+    "ongoingHelp": "اتركه فارغًا للمتابعة",
+    "placeholders": {
+      "selectSchoolFirst": "اختر المدرسة أولا...",
+      "positionTitle": "على سبيل المثال، المعلم الرئيسي"
+    },
+    "toasts": {
+      "created": "تم إنشاء الواجب المدرسي بنجاح",
+      "updated": "تم تحديث المهمة بنجاح",
+      "removed": "تمت إزالة المهمة بنجاح",
+      "removeFailed": "فشل في إزالة المهمة"
+    }
+  },
+  "detail": {
+    "notFound": {
+      "title": "لم يتم العثور على عضو فريق العمل",
+      "description": "لا يمكن العثور على الموظف المطلوب."
+    },
+    "backToDirectory": "العودة إلى دليل الموظفين",
+    "unknownStaff": "طاقم عمل غير معروف",
+    "sectionsAria": "أقسام تفاصيل الموظفين",
+    "overview": {
+      "stats": {
+        "sections": "الأقسام",
+        "students": "طلاب",
+        "capacity": "سعة",
+        "avgGrade": "متوسط ​​الدرجة"
+      },
+      "sectionPerformance": "أداء القسم",
+      "noTeachingSectionsTitle": "لا توجد أقسام التدريس",
+      "noTeachingSectionsDescription": "ولا يتم تعيين هذا الموظف كمدرس لأي قسم.",
+      "staffingRatio": "نسبة التوظيف",
+      "staff": "طاقم عمل",
+      "students": "طلاب",
+      "ratio": "نسبة",
+      "atSchool": "في {{school}}",
+      "noPrimarySchoolAssigned": "لم يتم تعيين مدرسة ابتدائية",
+      "table": {
+        "course": "دورة",
+        "enrolled": "مسجل",
+        "avgGrade": "متوسط ​​الدرجة",
+        "attendancePercent": "أت٪",
+        "section": "قسم",
+        "period": "فترة",
+        "room": "غرفة"
+      }
+    }
+  },
+  "error": {
+    "failedToLoad": "فشل في تحميل الموظفين",
+    "tryAgain": "حاول ثانية"
+  },
+  "toast": {
+    "deleteSuccess": "تم حذف الموظف بنجاح"
+  }
+}

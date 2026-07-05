@@ -1,0 +1,203 @@
+{
+  "greeting": {
+    "morning": "صباح الخير",
+    "afternoon": "مساء الخير",
+    "evening": "مساء الخير"
+  },
+  "recentlyVisited": "تمت زيارته مؤخرًا",
+  "upcomingEvents": "الأحداث القادمة",
+  "noUpcomingEvents": "لا توجد أحداث قادمة",
+  "enjoyFreeTime": "استمتع بوقت فراغك!",
+  "quickActions": "إجراءات سريعة",
+  "today": "اليوم",
+  "tomorrow": "غداً",
+  "yesterday": "أمس",
+  "widgets": {
+    "customize": "تخصيص لوحة القيادة",
+    "showWidget": "يعرض",
+    "hideWidget": "يخفي"
+  },
+  "events": {
+    "calendars": "التقاويم",
+    "includeEvents": "تضمين الأحداث",
+    "days": "{{count}} أيام",
+    "allDayEvents": "أحداث طوال اليوم",
+    "hideFromHome": "إخفاء من المنزل",
+    "back": "خلف",
+    "join": "ينضم"
+  },
+  "quickAction": {
+    "addStudent": "إضافة طالب",
+    "enrollNewStudent": "تسجيل طالب جديد",
+    "attendance": "الحضور",
+    "markDailyAttendance": "علامة الحضور اليومي",
+    "markClassAttendance": "علامة الحضور الصف",
+    "myClasses": "فصولي",
+    "viewYourClasses": "عرض الفصول الدراسية الخاصة بك",
+    "gradebook": "دفتر الدرجات",
+    "enterGrades": "أدخل الدرجات",
+    "grades": "الدرجات",
+    "viewPerformance": "عرض الأداء",
+    "schedule": "جدول",
+    "upcomingClasses": "الفصول القادمة",
+    "assignments": "المهام",
+    "pendingHomework": "الواجبات المنزلية في انتظار",
+    "children": "أطفال",
+    "viewProgress": "عرض التقدم",
+    "academicReports": "التقارير الأكاديمية",
+    "fees": "مصاريف",
+    "payments": "المدفوعات"
+  },
+  "welcomeTip": {
+    "administrator": {
+      "title": "مرحبا بكم في EdForge",
+      "description": "منصة إدارة التعليم الكل في واحد الخاصة بك. قم بتوصيل أدوات مؤتمرات الفيديو الخاصة بك، وإدارة الطلاب، وتتبع الحضور، وتبسيط عمليات مدرستك.",
+      "action": "إدارة طلابك"
+    },
+    "educator": {
+      "title": "جاهز للتدريس",
+      "description": "يمكنك الوصول إلى قوائم الفصل الدراسي وإدخال الدرجات وتتبع الحضور، كل ذلك في مكان واحد. ابق على اتصال مع أولياء الأمور من خلال نظام المراسلة المتكامل الخاص بنا.",
+      "action": "عرض الفصول الدراسية الخاصة بك"
+    },
+    "student": {
+      "title": "مرحبا بكم في البوابة الخاصة بك",
+      "description": "تتبع تقدمك الأكاديمي، واعرض الواجبات، وتحقق من جدولك الزمني، وابق على اطلاع بإعلانات المدرسة.",
+      "action": "تحقق من درجاتك"
+    },
+    "parent": {
+      "title": "ابق على اتصال",
+      "description": "قم بمراقبة التقدم الأكاديمي لأطفالك، وعرض سجلات الحضور، ودفع الرسوم المدرسية، والتواصل مع المعلمين، كل ذلك في مكان واحد.",
+      "action": "شاهد أطفالك"
+    }
+  },
+  "moduleTip": {
+    "academics": {
+      "title": "الإدارة الأكاديمية",
+      "description": "إدارة الطلاب والمعلمين والفصول الدراسية والمناهج الدراسية في مكان واحد. تتبع الدرجات والحضور والأداء الأكاديمي.",
+      "action": "استكشاف الأكاديميين"
+    },
+    "people": {
+      "title": "إدارة الأفراد",
+      "description": "إدارة الموظفين والمعلمين وأولياء الأمور والأوصياء. تتبع المهام والأذونات وتفضيلات الاتصال.",
+      "action": "إدارة الناس"
+    }
+  },
+  "homeV2": {
+    "selectSchool": "اختر مدرسة من الشريط الجانبي لعرض لوحة التحكم.",
+    "selectSchoolTeacher": "حدد مدرسة من الشريط الجانبي لعرض لوحة التحكم الخاصة بك.",
+    "offline": "أنت غير متصل. عرض البيانات المخزنة مؤقتا.",
+    "refresh": "ينعش",
+    "kpi": {
+      "studentsEnrolled": "الطلاب المسجلين",
+      "activeSections": "الأقسام النشطة",
+      "todaysAttendance": "الحضور اليوم",
+      "outstandingFees": "الرسوم المعلقة",
+      "thisAcademicYear": "هذا العام الدراسي",
+      "activeClasses": "الطبقات النشطة",
+      "overdue": "{{amount}} متأخرة",
+      "collected": "{{rate}}% تم جمعها",
+      "aboveTarget": "+{{diff}}% فوق الهدف",
+      "belowThreshold": "تحت العتبة",
+      "critical": "شديد الأهمية",
+      "dayAvg": "متوسط ​​30 يومًا {{avg}}%",
+      "region": "المقاييس الرئيسية"
+    },
+    "alerts": {
+      "unableToLoad": "غير قادر على تحميل التنبيهات",
+      "reviewBilling": "مراجعة الفواتير",
+      "viewStudents": "عرض الطلاب",
+      "region": "التنبيهات"
+    },
+    "attendance": {
+      "classroomAttendance": "الحضور في الفصول الدراسية",
+      "todayRate": "{{rate}}% اليوم",
+      "sectionsTotal": "{{count}} مجموع القسم",
+      "sectionsTotal_plural": "{{count}} مجموع الأقسام",
+      "recorded": "{{taken}}/{{total}} مسجل",
+      "overallRate": "{{rate}}% بشكل عام",
+      "section": "قسم",
+      "students": "طلاب",
+      "recordedCol": "مسجلة",
+      "rate": "معدل",
+      "status": "حالة",
+      "taken": "مأخوذ",
+      "partial": "جزئي",
+      "pending": "في انتظار",
+      "noSectionsToday": "لا توجد أقسام المقرر اليوم",
+      "noAcademicYear": "لا يوجد عام دراسي نشط.",
+      "setupAcademicYear": "قم بإعداد عام دراسي في الإعدادات",
+      "captionPrefix": "حالة الحضور في الفصول الدراسية اليوم حسب القسم."
+    },
+    "trend": {
+      "attendanceTrend": "اتجاه الحضور",
+      "rollingAverage": "المتوسط ​​​​المتداول لمدة 30 يومًا",
+      "actual": "فِعلي",
+      "target": "{{threshold}}% الهدف",
+      "avg": "متوسط ​​{{avg}}%",
+      "noData": "لم يتم تسجيل بيانات الحضور حتى الآن",
+      "viewAttendance": "عرض الحضور"
+    },
+    "finance": {
+      "financialOverview": "نظرة عامة مالية",
+      "collected": "تم جمعها",
+      "outstanding": "متميز",
+      "overdue": "تأخرت",
+      "totalInvoiced": "إجمالي الفواتير هذا العام",
+      "unableToLoad": "غير قادر على تحميل البيانات المالية",
+      "retry": "أعد المحاولة",
+      "viewFinance": "عرض المالية"
+    },
+    "activity": {
+      "recentActivity": "النشاط الأخير",
+      "viewAll": "عرض الكل",
+      "noActivity": "لا يوجد نشاط حديث"
+    },
+    "teacher": {
+      "mySections": "أقسامي",
+      "totalStudents": "إجمالي الطلاب",
+      "assignedClasses": "الفصول المخصصة",
+      "acrossAllSections": "عبر جميع الأقسام",
+      "completionRate": "معدل الإنجاز",
+      "viewAll": "عرض الكل",
+      "noSectionsAssigned": "لم يتم تعيين أي أقسام",
+      "contactAdmin": "اتصل بالمسؤول ليتم تعيينك في أقسام الفصل.",
+      "takeAttendance": "خذ الحضور",
+      "enterGrades": "أدخل الدرجات"
+    },
+    "student": {
+      "welcomeTitle": "مرحبا بكم في البوابة الخاصة بك",
+      "welcomeDescription": "تتبع التقدم الأكاديمي الخاص بك، وعرض المهام، والبقاء على اطلاع دائم.",
+      "grades": "الدرجات",
+      "gradesDesc": "عرض الأداء الأكاديمي الخاص بك",
+      "attendanceLink": "الحضور",
+      "attendanceDesc": "التحقق من سجل الحضور الخاص بك",
+      "schedule": "جدول",
+      "scheduleDesc": "عرض الجدول الدراسي الخاص بك",
+      "assignments": "المهام",
+      "assignmentsDesc": "عرض المهام المعلقة"
+    },
+    "errors": {
+      "unableToLoadKpi": "غير قادر على تحميل بيانات مؤشرات الأداء الرئيسية",
+      "unableToLoadInsights": "غير قادر على تحميل الرؤى",
+      "unableToLoadDetails": "غير قادر على تحميل التفاصيل",
+      "unableToLoadSections": "غير قادر على تحميل الأقسام",
+      "unableToLoadAttendance": "غير قادر على تحميل بيانات الحضور",
+      "unableToLoadDashboard": "غير قادر على تحميل لوحة القيادة",
+      "somethingWentWrong": "حدث خطأ ما"
+    },
+    "headerZone": {
+      "needAttention": "بحاجة الى الاهتمام",
+      "allClear": "كل شيء واضح",
+      "minimize": "تصغير",
+      "acknowledge": "فهمتها",
+      "acknowledged": "معترف به",
+      "acknowledgedHint": "تم الإقرار - انقر للتراجع",
+      "dismiss": "رفض",
+      "emptyTitle": "لقد تم القبض عليك جميعًا.",
+      "domains": {
+        "finance": "تمويل",
+        "attendance": "الحضور"
+      }
+    }
+  }
+}

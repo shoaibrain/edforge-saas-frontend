@@ -64,6 +64,12 @@ describe('initI18n', () => {
     expect(i18n.t('dashboard', { ns: 'nav' })).toBe('डैशबोर्ड')
   })
 
+  it('resolves a known key in Arabic', () => {
+    i18n.changeLanguage('ar')
+    expect(i18n.t('save', { ns: 'common' })).toBe('حفظ')
+    expect(i18n.t('dashboard', { ns: 'nav' })).toBe('لوحة القيادة')
+  })
+
   it('falls back to en for unsupported languages', () => {
     i18n.changeLanguage('fr')
     expect(i18n.t('save', { ns: 'common' })).toBe('Save')

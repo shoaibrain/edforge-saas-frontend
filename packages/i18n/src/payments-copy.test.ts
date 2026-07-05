@@ -6,5 +6,6 @@ describe("payments copy boundaries", () => {
     expect(I18N_RESOURCES.en.payments.feeStructure.amount).toBe("Amount");
     expect(I18N_RESOURCES.ne.payments.feeStructure.amount).toBe("रकम");
     expect(I18N_RESOURCES.hi.payments.feeStructure.amount).toBe("राशि");
+    expect(I18N_RESOURCES.ar.payments.feeStructure.amount).toBe("المبلغ");
   });
 });

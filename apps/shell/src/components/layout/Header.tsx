@@ -30,6 +30,7 @@ const LANG_OPTIONS = [
   { code: "en", label: "EN", labelKey: "languageEnglish" },
   { code: "ne", label: "NP", labelKey: "languageNepali" },
   { code: "hi", label: "HI", labelKey: "languageHindi" },
+  { code: "ar", label: "AR", labelKey: "languageArabic" },
 ] as const;
 
 function LanguageToggle() {

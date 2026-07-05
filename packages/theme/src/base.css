@@ -12,6 +12,7 @@
   --font-sans: 'Inter', system-ui, sans-serif;
   --font-display: 'Fraunces', Georgia, 'Noto Serif Devanagari', serif;
   --font-devanagari: 'Noto Sans Devanagari', 'Inter', system-ui, sans-serif;
+  --font-arabic: 'Noto Sans Arabic', 'Inter', system-ui, sans-serif;
 
   /* Micro-type scale — sub-text-xs sizes for dense operator dashboards.
      Tailwind ships no built-in font-size token below text-xs (12px). These
@@ -346,16 +347,21 @@ html {
 }
 
 /**
- * Devanagari font — applied when locale is Nepali or Hindi.
+ * Script-specific fonts — applied from the <html lang> attribute.
  * The <html lang> attribute is set by useLocaleEffect() hook.
- * The font stylesheet is injected conditionally via JS (not CSS @import)
- * to avoid loading Devanagari glyphs for Latin-only users.
+ * Font stylesheets are injected conditionally via JS (not CSS @import)
+ * to avoid loading localized glyphs for Latin-only users.
  */
 html[lang="ne"],
 html[lang^="ne-"],
 html[lang="hi"],
 html[lang^="hi-"] {
   font-family: var(--font-devanagari);
+}
+
+html[lang="ar"],
+html[lang^="ar-"] {
+  font-family: var(--font-arabic);
 }
 
 body {

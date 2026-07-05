@@ -14,6 +14,7 @@ const LANGUAGES = [
   { code: 'en', label: 'English', flag: 'EN' },
   { code: 'ne', label: 'नेपाली', flag: 'ने' },
   { code: 'hi', label: 'हिन्दी', flag: 'हि' },
+  { code: 'ar', label: 'العربية', flag: 'AR' },
 ] as const
 
 interface LanguageSwitcherProps {
