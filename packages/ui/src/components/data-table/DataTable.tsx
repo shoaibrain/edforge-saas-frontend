@@ -52,6 +52,7 @@ export function DataTable<TData>({
   presets,
   activePreset,
   onPresetChange,
+  presetsLabel,
   searchValue,
   onSearchChange,
   primaryFilter,
@@ -219,6 +220,7 @@ export function DataTable<TData>({
             presets={presets}
             activePreset={activePreset}
             onPresetChange={onPresetChange}
+            presetsLabel={presetsLabel}
             primaryFilter={primaryFilter}
             moreFilters={moreFilters}
             overflowFilters={overflowFilters}

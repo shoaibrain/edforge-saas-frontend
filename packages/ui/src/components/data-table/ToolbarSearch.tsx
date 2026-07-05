@@ -1,4 +1,10 @@
-import { forwardRef, type InputHTMLAttributes } from 'react'
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useRef,
+  type InputHTMLAttributes,
+} from 'react'
 import { Search, X } from 'lucide-react'
 import { cn } from '../../utils'
 
@@ -11,8 +17,14 @@ export interface ToolbarSearchProps
   placeholder?: string
   /** Accessible label for the inline clear (×) button. */
   clearLabel?: string
-  /** Show the `/` keyboard hint while empty (default true). */
+  /**
+   * Enable the page-level `/` shortcut that focuses this field (default true).
+   * The shortcut is documented in the input's `title` tooltip — there is no
+   * longer a visible `/` chip. Kept named `showKbd` for source compatibility.
+   */
   showKbd?: boolean
+  /** Tooltip surfaced on the field; also documents the `/` shortcut. */
+  title?: string
   /**
    * Override the wrapper layout/width. Default is fluid — `flex-1 min-w-44
    * max-w-xs` — so the search absorbs slack and shrinks gracefully instead of
@@ -23,54 +35,166 @@ export interface ToolbarSearchProps
 }
 
 /**
- * ToolbarSearch — the canonical unified-toolbar search field ("esearch").
+ * ToolbarSearch — the canonical unified-toolbar search field.
  *
- * One clean field: leading search icon, subtle `--border-primary/0.35` border,
- * mint focus ring, a `/` keyboard hint while empty, and an inline clear (×)
- * button once typed. Extracted from `DataTableToolbar` so standalone toolbars
- * (e.g. the Classrooms Overview) render a pixel-identical search — and so the
- * native `<input>` lives in `@edforge/ui`, not in an app (design-system rule).
+ * Rebuilt as STRUCTURE, not layers: the icon and the input are flex siblings
+ * inside one bordered wrapper, so overlap is geometrically impossible — there
+ * is no absolutely-positioned icon over the input and no compensating
+ * `padding-left` left to lose in a future port (the class of regression that
+ * shipped "Search" as "🔍arch"). The magnifier sits in a trailing action slot
+ * and cross-morphs into a clear (×) button once a query exists.
+ *
+ * - `/` anywhere on the page (outside a field) focuses the search; surfaced in
+ *   the `title` tooltip, no chip.
+ * - `Esc` clears, then blurs.
+ * - Motion is one-shot and gated behind `prefers-reduced-motion`.
  */
 export const ToolbarSearch = forwardRef<HTMLInputElement, ToolbarSearchProps>(
   (
-    { value, onChange, onClear, placeholder, clearLabel = 'Clear search', showKbd = true, className, ...props },
+    {
+      value,
+      onChange,
+      onClear,
+      placeholder,
+      clearLabel = 'Clear search',
+      showKbd = true,
+      title = 'Press / to search',
+      className,
+      ...props
+    },
     ref,
   ) => {
+    const innerRef = useRef<HTMLInputElement>(null)
+    const setRefs = useCallback(
+      (node: HTMLInputElement | null) => {
+        innerRef.current = node
+        if (typeof ref === 'function') ref(node)
+        else if (ref) (ref as React.MutableRefObject<HTMLInputElement | null>).current = node
+      },
+      [ref],
+    )
+
+    const hasValue = value.length > 0
+
+    const clear = () => {
+      if (onClear) onClear()
+      else onChange('')
+    }
+
+    // `/` → focus the first visible toolbar-search on the page. Every instance
+    // resolves the SAME target, so exactly one focuses (no race), and typing
+    // inside a field never hijacks the key.
+    useEffect(() => {
+      if (!showKbd) return
+      const onKeyDown = (event: KeyboardEvent) => {
+        if (event.key !== '/' || event.metaKey || event.ctrlKey || event.altKey) return
+        const target = event.target as HTMLElement | null
+        if (
+          target &&
+          (target.tagName === 'INPUT' ||
+            target.tagName === 'TEXTAREA' ||
+            target.isContentEditable)
+        ) {
+          return
+        }
+        const fields = Array.from(
+          document.querySelectorAll<HTMLInputElement>('input[data-toolbar-search]'),
+        ).filter((el) => !el.disabled)
+        const chosen =
+          fields.find((el) => {
+            const r = el.getBoundingClientRect()
+            return r.width > 0 && r.top > 0 && r.top < window.innerHeight
+          }) ?? fields[0]
+        if (chosen && chosen === innerRef.current) {
+          event.preventDefault()
+          chosen.focus()
+        }
+      }
+      document.addEventListener('keydown', onKeyDown)
+      return () => document.removeEventListener('keydown', onKeyDown)
+    }, [showKbd])
+
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+      if (event.key === 'Escape' && hasValue) {
+        event.preventDefault()
+        clear()
+        innerRef.current?.blur()
+      }
+      props.onKeyDown?.(event)
+    }
+
     return (
-      <div className={cn('relative flex-1 min-w-44 max-w-xs', className)}>
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[rgb(var(--text-tertiary))]" />
+      <div
+        data-has-value={hasValue ? 'true' : 'false'}
+        className={cn(
+          'group flex h-9 items-center rounded-lg border transition-colors',
+          'border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-primary))]',
+          'hover:border-[rgb(var(--border-primary)/0.6)]',
+          'focus-within:border-[var(--mint-border)] focus-within:ring-2 focus-within:ring-[var(--mint-soft)]',
+          'motion-reduce:transition-none',
+          'flex-1 min-w-44 max-w-xs',
+          className,
+        )}
+      >
+        {/* eslint-disable-next-line edforge-design-system/prefer-ui-form-controls --
+            ToolbarSearch IS the design-system's canonical search primitive; the
+            native <input> lives here by design so apps never hand-roll one. */}
         <input
-          ref={ref}
+          ref={setRefs}
+          data-toolbar-search=""
           type="text"
           placeholder={placeholder}
+          title={title}
           value={value}
           onChange={(e) => onChange(e.target.value)}
+          // Borderless, transparent, flush 12px left inset. NO compensating
+          // padding — nothing overlays the text, so nothing can collide with it.
           className={cn(
-            // physical padding (pl/pr) — logical ps/pe does not render in this build
-            'h-9 w-full rounded-lg pl-9 pr-9 text-sm',
-            'border border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-primary))]',
+            'h-full min-w-0 flex-1 rounded-l-lg border-0 bg-transparent pl-3 pr-1 text-sm',
             'text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))]',
-            'focus:border-[var(--mint-border)] focus:outline-none focus:ring-2 focus:ring-[var(--mint-soft)]',
+            'outline-none focus:outline-none focus:ring-0',
           )}
           {...props}
+          onKeyDown={handleKeyDown}
         />
-        {value ? (
-          <button
-            type="button"
-            onClick={() => (onClear ? onClear() : onChange(''))}
-            aria-label={clearLabel}
-            className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-[rgb(var(--text-tertiary))] hover:bg-[rgb(var(--background-secondary))] hover:text-[rgb(var(--text-primary))]"
-          >
-            <X className="h-3.5 w-3.5" />
-          </button>
-        ) : showKbd ? (
-          <kbd
+        <button
+          type="button"
+          // When empty the slot is a decorative magnifier that also focuses the
+          // field; once a query exists it becomes the real clear (×) button.
+          tabIndex={hasValue ? 0 : -1}
+          aria-hidden={hasValue ? undefined : true}
+          aria-label={clearLabel}
+          title={hasValue ? clearLabel : title}
+          onClick={() => {
+            if (hasValue) clear()
+            innerRef.current?.focus()
+          }}
+          className={cn(
+            'mr-px grid h-8 w-8 flex-none place-items-center rounded-md border-0 bg-transparent',
+            'text-[rgb(var(--text-tertiary))] transition-colors motion-reduce:transition-none',
+            hasValue
+              ? 'cursor-pointer hover:bg-[rgb(var(--background-secondary))] hover:text-[rgb(var(--text-primary))]'
+              : 'cursor-text',
+          )}
+        >
+          <Search
             aria-hidden="true"
-            className="absolute right-2 top-1/2 grid h-5 min-w-5 -translate-y-1/2 place-items-center rounded border border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-tertiary))] px-1.5 font-mono text-2xs font-semibold text-[rgb(var(--text-tertiary))]"
-          >
-            /
-          </kbd>
-        ) : null}
+            className={cn(
+              '[grid-area:1/1] h-4 w-4 transition-[opacity,transform] duration-200 motion-reduce:transition-none',
+              'ease-[cubic-bezier(0.32,0.72,0,1)]',
+              'group-focus-within:text-[rgb(var(--text-secondary))]',
+              hasValue ? 'scale-50 opacity-0' : 'scale-100 opacity-100',
+            )}
+          />
+          <X
+            aria-hidden="true"
+            className={cn(
+              '[grid-area:1/1] h-3.5 w-3.5 transition-[opacity,transform] duration-200 motion-reduce:transition-none',
+              'ease-[cubic-bezier(0.32,0.72,0,1)]',
+              hasValue ? 'rotate-0 scale-100 opacity-100' : '-rotate-45 scale-50 opacity-0',
+            )}
+          />
+        </button>
       </div>
     )
   },

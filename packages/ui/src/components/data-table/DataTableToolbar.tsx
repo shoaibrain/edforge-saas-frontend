@@ -7,7 +7,8 @@ import { DataTableFacetedFilter } from './DataTableFacetedFilter'
 import { DataTableViewOptions } from './DataTableViewOptions'
 import { DataTableExport } from './DataTableExport'
 import { DataTableMoreFilters } from './DataTableMoreFilters'
-import { TablePresetTabs, type TablePreset } from './TablePresetTabs'
+import { FilterSelect, type FilterSelectOption } from './FilterSelect'
+import { type TablePreset } from './TablePresetTabs'
 import { DEFAULT_DATA_TABLE_LABELS } from './labels'
 import type {
   DataTableDensity,
@@ -39,10 +40,17 @@ interface DataTableToolbarProps<TData> {
   enableDensityToggle?: boolean
   exportOptions?: DataTableExportOptions
   labels?: DataTableLabels
-  /** Docked status presets (handoff ③). When set, renders TablePresetTabs. */
+  /**
+   * Status presets (handoff ③). Rendered as a single quiet FilterSelect
+   * trigger — the always-mounted preset row is retired so the toolbar holds
+   * one row at common widths. The preset whose value is '' or 'all' is the
+   * cleared ("All") state.
+   */
   presets?: TablePreset[]
   activePreset?: string
   onPresetChange?: (value: string) => void
+  /** Facet label for the presets trigger (`<label> · All`). Default "Status". */
+  presetsLabel?: string
   /** Bulk-action bar node; swaps in (same footprint) when `bulkActive`. */
   bulkBar?: ReactNode
   bulkActive?: boolean
@@ -81,6 +89,7 @@ export function DataTableToolbar<TData = unknown>({
   presets,
   activePreset,
   onPresetChange,
+  presetsLabel,
   bulkBar,
   bulkActive,
   searchValue,
@@ -165,12 +174,40 @@ export function DataTableToolbar<TData = unknown>({
           />
         )}
 
-        {/* Docked status presets — scroll horizontally rather than wrap */}
-        {presets && activePreset != null && onPresetChange ? (
-          <div className="min-w-0 max-w-full overflow-x-auto">
-            <TablePresetTabs presets={presets} active={activePreset} onChange={onPresetChange} />
-          </div>
-        ) : null}
+        {/* Status presets — folded into a single quiet FilterSelect. The
+            preset whose value is '' / 'all' is the cleared state; picking any
+            other calls onPresetChange with its value (single-select). */}
+        {presets && presets.length > 0 && activePreset != null && onPresetChange
+          ? (() => {
+              const allPreset =
+                presets.find((p) => p.value === '' || p.value === 'all') ?? presets[0]
+              const options: FilterSelectOption[] = presets
+                .filter((p) => p !== allPreset)
+                .map((p) => ({
+                  value: p.value,
+                  label: p.label,
+                  count: p.count,
+                  tone: p.tone,
+                }))
+              const totalCount = allPreset.count
+              const facetTotal = resolvedLabels.facetTotal
+              return (
+                <FilterSelect
+                  label={presetsLabel ?? resolvedLabels.statusLabel ?? 'Status'}
+                  options={options}
+                  value={activePreset === allPreset.value ? [] : [activePreset]}
+                  onChange={(next) =>
+                    onPresetChange(next.length > 0 ? next[0] : allPreset.value)
+                  }
+                  multiple={false}
+                  hint={
+                    totalCount != null && facetTotal ? facetTotal(totalCount) : undefined
+                  }
+                  labels={resolvedLabels}
+                />
+              )
+            })()
+          : null}
 
         {/* Primary facet — inline at @4xl+, folded into the overflow below */}
         {hasPrimary && <div className="hidden @4xl:flex">{primaryFilter}</div>}
