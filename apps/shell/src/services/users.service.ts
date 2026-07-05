@@ -604,11 +604,50 @@ export async function disableMfa(
 }
 
 /**
+ * Register the caller's current session (SR.1).
+ * POST /users/:id/security/sessions
+ *
+ * Called after sign-in so the access token maps to a tracked session row —
+ * Amplify-direct logins don't create one otherwise. Upsert semantics (keyed on
+ * the access-token hash), so calling it again on reload is idempotent.
+ */
+export async function registerSession(userId: string): Promise<UserSession> {
+  return apiPost<UserSession>(`/users/${userId}/security/sessions`, {})
+}
+
+/**
+ * Heartbeat / token-rotation rebind for the caller's own session (SR.3).
+ * PATCH /users/:id/security/sessions/:sessionId
+ *
+ * Keeps the row fresh and rebinds it to the current access token after a
+ * silent Cognito refresh. Strictly self-only on the backend.
+ */
+export async function touchSession(
+  userId: string,
+  sessionId: string
+): Promise<UserSession> {
+  return apiPatch<UserSession>(
+    `/users/${userId}/security/sessions/${sessionId}`,
+    {}
+  )
+}
+
+/**
  * Get active sessions
  * GET /users/:id/security/sessions
+ *
+ * The backend wraps the list in `SecuritySessionsListDto`
+ * (`{ sessions, total, currentSessionId }`), NOT a bare array — unwrap to the
+ * array the UI expects. Returning the wrapper directly crashed the sessions
+ * list with `x.some is not a function`.
  */
 export async function getActiveSessions(userId: string): Promise<UserSession[]> {
-  return apiGet<UserSession[]>(`/users/${userId}/security/sessions`)
+  const res = await apiGet<{
+    sessions?: UserSession[]
+    total?: number
+    currentSessionId?: string
+  }>(`/users/${userId}/security/sessions`)
+  return Array.isArray(res?.sessions) ? res.sessions : []
 }
 
 /**
@@ -623,13 +662,24 @@ export async function revokeSession(
 }
 
 /**
- * Revoke all sessions except current
- * POST /users/:id/security/sessions/revoke-all
+ * Revoke the user's sessions (SR.4).
+ * POST /users/:id/security/sessions/revoke-all[?exceptCurrent=true]
+ *
+ * Default (`exceptCurrent=false`) is a full "sign out everywhere" — revokes all
+ * tracked sessions and triggers a Cognito global sign-out (kills refresh
+ * tokens). `exceptCurrent=true` keeps the caller's current session alive
+ * ("sign out other devices") and does NOT global-sign-out.
+ *
+ * NOTE: `exceptCurrent` is a QUERY parameter on the backend, not a body field.
  */
 export async function revokeAllSessions(
-  userId: string
+  userId: string,
+  exceptCurrent = false
 ): Promise<{ success: boolean; revokedCount: number }> {
-  return apiPost(`/users/${userId}/security/sessions/revoke-all`, {})
+  return apiPost(
+    `/users/${userId}/security/sessions/revoke-all?exceptCurrent=${exceptCurrent}`,
+    {}
+  )
 }
 
 /**
