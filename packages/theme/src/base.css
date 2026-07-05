@@ -346,12 +346,15 @@ html {
 }
 
 /**
- * Devanagari font — applied when locale is Nepali.
- * The <html lang="ne"> attribute is set by useLocaleEffect() hook.
+ * Devanagari font — applied when locale is Nepali or Hindi.
+ * The <html lang> attribute is set by useLocaleEffect() hook.
  * The font stylesheet is injected conditionally via JS (not CSS @import)
- * to avoid loading Devanagari glyphs for English-only users.
+ * to avoid loading Devanagari glyphs for Latin-only users.
  */
-html[lang="ne"] {
+html[lang="ne"],
+html[lang^="ne-"],
+html[lang="hi"],
+html[lang^="hi-"] {
   font-family: var(--font-devanagari);
 }
 
@@ -419,4 +422,3 @@ p {
   font-family: var(--font-display);
   font-variation-settings: "SOFT" 80, "opsz" 72;
 }
-

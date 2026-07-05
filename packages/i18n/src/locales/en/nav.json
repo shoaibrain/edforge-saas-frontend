@@ -23,6 +23,8 @@
   "language": "Language",
   "languageEnglish": "English",
   "languageNepali": "Nepali",
+  "languageHindi": "Hindi",
+  "changeLanguage": "Change language",
   "themeLight": "Light",
   "themeDark": "Dark",
   "expandSidebar": "Expand sidebar",

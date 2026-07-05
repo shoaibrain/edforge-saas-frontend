@@ -21,7 +21,7 @@ describe('initI18n', () => {
     expect(i18n.options.fallbackLng).toContain('en')
   })
 
-  it('supports en and ne languages', () => {
+  it('supports configured platform languages', () => {
     for (const lang of SUPPORTED_LANGUAGES) {
       expect(i18n.options.supportedLngs).toContain(lang)
     }
@@ -35,11 +35,13 @@ describe('initI18n', () => {
     }
   })
 
-  it('has all namespaces loaded for ne', () => {
-    for (const ns of NAMESPACES) {
-      const bundle = i18n.getResourceBundle('ne', ns)
-      expect(bundle, `Missing ne/${ns} resource bundle`).toBeTruthy()
-      expect(Object.keys(bundle).length).toBeGreaterThan(0)
+  it('has all namespaces loaded for localized languages', () => {
+    for (const lang of SUPPORTED_LANGUAGES.filter((lang) => lang !== 'en')) {
+      for (const ns of NAMESPACES) {
+        const bundle = i18n.getResourceBundle(lang, ns)
+        expect(bundle, `Missing ${lang}/${ns} resource bundle`).toBeTruthy()
+        expect(Object.keys(bundle).length).toBeGreaterThan(0)
+      }
     }
   })
 
@@ -54,6 +56,12 @@ describe('initI18n', () => {
     i18n.changeLanguage('ne')
     expect(i18n.t('save', { ns: 'common' })).toBe('सुरक्षित गर्नुहोस्')
     expect(i18n.t('dashboard', { ns: 'nav' })).toBe('ड्यासबोर्ड')
+  })
+
+  it('resolves a known key in Hindi', () => {
+    i18n.changeLanguage('hi')
+    expect(i18n.t('save', { ns: 'common' })).toBe('सहेजें')
+    expect(i18n.t('dashboard', { ns: 'nav' })).toBe('डैशबोर्ड')
   })
 
   it('falls back to en for unsupported languages', () => {

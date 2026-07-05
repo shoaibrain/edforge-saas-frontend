@@ -1,0 +1,2989 @@
+{
+  "tabs": {
+    "overview": "अवलोकन",
+    "profile": "प्रोफ़ाइल",
+    "enrollment": "नामांकन",
+    "family": "परिवार",
+    "demographics": "जनसांख्यिकी"
+  },
+  "error": {
+    "failedToLoad": "प्रोफ़ाइल लोड करने में विफल",
+    "failedToLoadDescription": "हम इस छात्र की प्रोफ़ाइल लोड नहीं कर सके. कृपया पुन: प्रयास करें।",
+    "retry": "पुन: प्रयास करें",
+    "noPermission": "आपको इस छात्र की प्रोफ़ाइल देखने की अनुमति नहीं है. हो सकता है कि यह छात्र आपके निर्दिष्ट अनुभाग में न हो।"
+  },
+  "status": {
+    "active": "सक्रिय",
+    "inactive": "निष्क्रिय",
+    "graduated": "स्नातक की उपाधि",
+    "transferred": "स्थानांतरित",
+    "withdrawn": "वापस लिया गया",
+    "suspended": "निलंबित",
+    "enrolled": "दाखिला लिया",
+    "pending": "लंबित",
+    "completed": "पूर्ण"
+  },
+  "actions": {
+    "editStudent": "विद्यार्थी संपादित करें",
+    "schoolEnrollment": "स्कूल नामांकन",
+    "addToSection": "अनुभाग में जोड़ें",
+    "addGuardian": "अभिभावक जोड़ें",
+    "enrollAtSchool": "स्कूल में दाखिला लें",
+    "newSchoolEnrollment": "नये स्कूल में नामांकन",
+    "grantPortalAccess": "अनुदान पोर्टल पहुँच",
+    "editGuardian": "संरक्षक संपादित करें",
+    "edit": "संपादित करें",
+    "export": "निर्यात करें",
+    "cancel": "रद्द करें",
+    "saveChanges": "बदलाव सहेजें",
+    "saving": "सहेजा जा रहा है...",
+    "adding": "जोड़ा जा रहा है...",
+    "add": "जोड़ें"
+  },
+  "stats": {
+    "attendance": "उपस्थिति",
+    "classes": "कक्षाओं",
+    "termGpa": "अवधि GPA",
+    "cumGpa": "सह. GPA"
+  },
+  "sections": {
+    "attendanceTrend": "उपस्थिति रुझान",
+    "coursePerformance": "पाठ्यक्रम प्रदर्शन",
+    "currentClasses": "वर्तमान कक्षाएँ",
+    "history": "इतिहास",
+    "personalInfo": "व्यक्तिगत जानकारी",
+    "contactInfo": "संपर्क जानकारी",
+    "academicInfo": "शैक्षणिक जानकारी",
+    "programsAccommodations": "कार्यक्रम एवं आवास",
+    "medicalInfo": "चिकित्सा संबंधी जानकारी",
+    "notes": "टिप्पणियाँ",
+    "currentEnrollment": "वर्तमान नामांकन",
+    "enrollmentHistory": "नामांकन इतिहास",
+    "guardians": "रखवालों",
+    "emergencyContacts": "आपातकालीन संपर्क"
+  },
+  "empty": {
+    "noAttendance": "अभी तक कोई उपस्थिति डेटा दर्ज नहीं किया गया है",
+    "noGrades": "अभी तक कोई ग्रेड दर्ज नहीं किया गया",
+    "gradesWillAppear": "शिक्षकों द्वारा रिकॉर्ड किए जाने के बाद ग्रेड यहां दिखाई देंगे।",
+    "noClasses": "कोई कक्षा निर्धारित नहीं",
+    "classesWillAppear": "अनुभागों में नामांकित होने के बाद कक्षाएं यहां दिखाई देंगी।",
+    "noAcademicData": "अभी तक कोई शैक्षणिक डेटा नहीं",
+    "noDataDescription": "इस छात्र के पास अभी तक कोई कक्षा अनुभाग या उपस्थिति डेटा नहीं है।",
+    "enrollFirst": "पहले इस छात्र का नामांकन करें, फिर कक्षा अनुभागों में जोड़ें।",
+    "noEnrollment": "कोई नामांकन रिकॉर्ड नहीं",
+    "enrollmentWillAppear": "एक शैक्षणिक वर्ष में छात्र के नामांकित होने के बाद नामांकन डेटा यहां दिखाई देगा।",
+    "noGuardians": "फ़ाइल पर कोई अभिभावक नहीं",
+    "addGuardianDescription": "इस छात्र की प्रोफ़ाइल में माता-पिता या अभिभावक को जोड़ें।",
+    "noEmergencyContacts": "फ़ाइल पर कोई आपातकालीन संपर्क नहीं",
+    "noSectionsAvailable": "आपके निर्दिष्ट अनुभागों के लिए कोई {{label}} उपलब्ध नहीं है"
+  },
+  "performance": {
+    "excellent": "उत्कृष्ट",
+    "good": "अच्छा",
+    "atRisk": "जोखिम में",
+    "critical": "गंभीर"
+  },
+  "alerts": {
+    "lowAttendance": "90% से कम उपस्थिति शैक्षणिक प्रदर्शन को प्रभावित कर सकती है। अनुवर्ती कार्रवाई पर विचार करें.",
+    "highAttendance": "उत्कृष्ट उपस्थिति रिकॉर्ड!"
+  },
+  "gradeLegend": {
+    "a": "ए (90+)",
+    "b": "बी (80-89)",
+    "c": "सी (70-79)",
+    "d": "डी (60-69)",
+    "f": "एफ (<60)"
+  },
+  "tableHeaders": {
+    "number": "#",
+    "class": "कक्षा",
+    "subject": "विषय",
+    "teacher": "अध्यापक",
+    "grade": "श्रेणी",
+    "school": "विद्यालय",
+    "academicYear": "शैक्षणिक वर्ष",
+    "entryDate": "प्रवेश तिथि",
+    "exitDate": "निकास तिथि",
+    "status": "स्थिति"
+  },
+  "fields": {
+    "dateOfBirth": "जन्मतिथि",
+    "gender": "लिंग",
+    "ethnicity": "जातीयता",
+    "primaryLanguage": "प्राथमिक भाषा",
+    "homeLanguage": "मातृ भाषा",
+    "countryOfBirth": "जन्म का देश",
+    "email": "ईमेल",
+    "phone": "फ़ोन",
+    "altPhone": "Alt. फ़ोन",
+    "address": "पता",
+    "mailingAddress": "डाक पता",
+    "currentGrade": "वर्तमान ग्रेड",
+    "enrollmentDate": "नामांकन की तिथि",
+    "studentNumber": "छात्र संख्या",
+    "stateStudentId": "राज्य छात्र ID",
+    "previousSchool": "पिछला स्कूल",
+    "gradeLevel": "क्रम स्तर",
+    "occupation": "पेशा",
+    "firstName": "पहला नाम",
+    "middleName": "मध्य नाम",
+    "lastName": "उपनाम"
+  },
+  "programs": {
+    "iep": "आईईपी",
+    "plan504": "504 योजना",
+    "specialPrograms": "विशेष कार्यक्रम",
+    "accommodations": "आवास"
+  },
+  "medical": {
+    "allergies": "एलर्जी",
+    "medications": "दवाएं",
+    "conditions": "स्थितियाँ",
+    "dietaryRestrictions": "खानपान संबंधी परहेज़",
+    "bloodType": "रक्त प्रकार",
+    "physician": "चिकित्सक",
+    "physicianPhone": "चिकित्सक फ़ोन",
+    "insurance": "बीमा",
+    "medicalNotes": "मेडिकल नोट्स"
+  },
+  "gender": {
+    "male": "पुरुष",
+    "female": "महिला",
+    "other": "अन्य",
+    "preferNotToSay": "नहीं कहना पसंद करते हैं"
+  },
+  "relationships": {
+    "mother": "माँ",
+    "father": "पिता",
+    "legalGuardian": "कानूनी अभिभावक",
+    "grandparent": "दादा-दादी",
+    "sibling": "भाई बहन",
+    "aunt": "चाची",
+    "uncle": "चाचा",
+    "other": "अन्य"
+  },
+  "guardian": {
+    "primary": "प्राथमिक",
+    "portalAccess": "पोर्टल पहुंच",
+    "pickupAuth": "पिकअप ऑथ",
+    "atEmployer": "{{employer}} पर"
+  },
+  "studentProfile": {
+    "tabsAria": "छात्र प्रोफ़ाइल अनुभाग",
+    "overview": {
+      "attendanceTrendAria": "छात्र उपस्थिति प्रवृत्ति",
+      "categoryBreakdown": "श्रेणी विभाजन"
+    },
+    "guardian": {
+      "addTitle": "अभिभावक जोड़ें",
+      "addDescription": "{{student}} की प्रोफ़ाइल में माता-पिता या अभिभावक को जोड़ें",
+      "unsavedChangesConfirm": "आपके पास सहेजे नहीं गए परिवर्तन हैं. क्या आप वाकई बंद करना चाहते हैं?",
+      "unsavedChanges": "आपके पास असहेजे बदलाव हैं",
+      "firstName": "पहला नाम",
+      "firstNamePlaceholder": "संरक्षक का पहला नाम",
+      "lastName": "उपनाम",
+      "lastNamePlaceholder": "संरक्षक अंतिम नाम",
+      "relationship": "संबंध",
+      "phone": "फ़ोन",
+      "email": "ईमेल",
+      "primaryContact": "प्राथमिक संपर्क",
+      "pickupAuthorized": "पिकअप अधिकृत",
+      "noGuardian": "फ़ाइल पर कोई अभिभावक नहीं",
+      "guardians": "रखवालों",
+      "guardianCount": "{{value}} संरक्षक",
+      "guardianCount_plural": "{{value}} अभिभावक",
+      "cellAria": "{{value}} अभिभावक; प्राथमिक {{firstName}} {{lastName}}, {{relationship}}",
+      "relationships": {
+        "mother": "माँ",
+        "father": "पिता",
+        "guardian": "कानूनी अभिभावक",
+        "grandparent": "दादा-दादी",
+        "sibling": "भाई बहन",
+        "aunt": "चाची",
+        "uncle": "चाचा",
+        "other": "अन्य"
+      },
+      "badges": {
+        "primary": "प्राथमिक",
+        "portal": "पोर्टल",
+        "pickup": "उठाना"
+      }
+    },
+    "section": {
+      "addDescription": "क्लास सेक्शन में {{student}} जोड़ें",
+      "activeEnrollmentRequired": "अनुभागों में जोड़े जाने से पहले छात्र के पास सक्रिय नामांकन होना चाहिए। कृपया पहले छात्र का नामांकन करें।",
+      "selectRequired": "कृपया एक अनुभाग चुनें",
+      "alreadyRostered": "इस अनुभाग में विद्यार्थी पहले से ही सूचीबद्ध है",
+      "addFailed": "छात्र को अनुभाग में जोड़ने में विफल",
+      "grade": "ग्रेड {{grade}}",
+      "currentYear": "चालू वर्ष",
+      "section": "अनुभाग",
+      "selectPlaceholder": "एक अनुभाग चुनें...",
+      "noSectionsFound": "कोई अनुभाग नहीं मिला. पहले शेड्यूलिंग में सेक्शन बनाएं."
+    },
+    "demographics": {
+      "title": "Ed-Fi जनसांख्यिकी",
+      "description": "फ़्लैश I/II रिपोर्टिंग के लिए IEMIS-संरेखित फ़ील्ड का उपयोग किया जाता है। संपादनों का ऑडिट किया जाता है.",
+      "edit": "संपादित करें",
+      "editTitle": "जनसांख्यिकी संपादित करें",
+      "editDescription": "{{student}} के लिए Ed-Fi डिस्क्रिप्टर फ़ील्ड। परिवर्तनों का ऑडिट किया जाता है.",
+      "thisStudent": "यह छात्र",
+      "identity": "पहचान",
+      "sex": "सेक्स",
+      "primaryLanguage": "प्राथमिक भाषा",
+      "motherTongue": "मातृभाषा",
+      "ethnicity": "जातीयता",
+      "disabilities": "विकलांग",
+      "flags": "झंडे",
+      "transferredIn": "में स्थानांतरित कर दिया गया?",
+      "belowPovertyLine": "गरीबी रेखा से नीचे?",
+      "scholarshipCategory": "छात्रवृत्ति श्रेणी",
+      "notSpecified": "निर्दिष्ट नहीं है",
+      "notSpecifiedOption": "- निर्दिष्ट नहीं है -",
+      "derivedConfirm": "व्युत्पन्न - पुष्टि करने के लिए संपादित करें पर क्लिक करें",
+      "noDisabilities": "कोई विकलांगता दर्ज नहीं की गई",
+      "noDisabilitiesPeriod": "कोई विकलांगता दर्ज नहीं की गई.",
+      "ethnicityDescriptorUri": "जातीयता वर्णनकर्ता यूआरआई",
+      "ethnicityHelper": "V1 के लिए फ्री-टेक्स्ट URI (स्प्रिंट 6 में जातीयता कैटलॉग जहाज)।",
+      "format": "प्रारूप",
+      "addDisability": "विकलांगता जोड़ें",
+      "disability": "विकलांगता",
+      "selectDisability": "— विकलांगता का चयन करें —",
+      "disabilityNotesPlaceholder": "नोट्स (वैकल्पिक - निजी रखा गया; ऑडिट जारी होने से पहले हटा दिया गया)",
+      "removeDisability": "विकलांगता दूर करें",
+      "transferredFromAnotherSchool": "दूसरे स्कूल से स्थानांतरित",
+      "scholarshipPlaceholder": "जैसे दलित, जनजाति,..."
+    },
+    "schedule": {
+      "attendanceSummary": "उपस्थिति सारांश",
+      "rate": "दर",
+      "totalDays": "कुल दिन",
+      "class": "कक्षा",
+      "subject": "विषय",
+      "removeConfirm": "{{student}} को {{section}} से हटाएं? यह छात्र को इस अनुभाग से अलग कर देगा।",
+      "removeFromSection": "अनुभाग से हटाएँ",
+      "credits": "क्रेडिट",
+      "noScheduleData": "कोई शेड्यूल डेटा नहीं",
+      "addSectionsHint": "उपस्थिति और ग्रेड पर नज़र रखने के लिए इस छात्र को कक्षा अनुभागों में जोड़ें।",
+      "enrollSectionsHint": "एक बार छात्र के अनुभागों में नामांकित होने के बाद कक्षाएं और उपस्थिति डेटा यहां दिखाई देंगे।",
+      "attendanceHistory": "उपस्थिति इतिहास",
+      "viewGrades": "ग्रेड देखें"
+    }
+  },
+  "studentsModule": {
+    "insight": {
+      "enrolledAcrossGrades": "{{students}} छात्र {{grades}} ग्रेड में नामांकित हैं",
+      "attendanceToday": "आज {{rate}}% उपस्थिति",
+      "noAttendanceData": "कोई उपस्थिति डेटा नहीं",
+      "atRiskStudents": "{{value}} जोखिम में छात्र",
+      "atRiskStudents_plural": "{{value}} जोखिम वाले छात्र",
+      "noAtRiskStudents": "कोई जोखिम वाला छात्र नहीं"
+    },
+    "empty": {
+      "noStudentsFound": "कोई छात्र नहीं मिला",
+      "adjustFilters": "अपने फ़िल्टर या खोज शब्द को समायोजित करने का प्रयास करें"
+    },
+    "noSchool": {
+      "title": "एक स्कूल चुनें",
+      "description": "छात्र निर्देशिका देखने के लिए साइडबार से एक स्कूल चुनें।"
+    },
+    "error": {
+      "title": "विद्यार्थियों को लोड करने में विफल",
+      "description": "छात्र निर्देशिका लोड करते समय कुछ गलत हो गया।"
+    },
+    "bulk": {
+      "message": "संदेश",
+      "moveSection": "अनुभाग ले जाएँ",
+      "archive": "पुरालेख",
+      "requiresAdmin": "एक प्रशासक की भूमिका की आवश्यकता है"
+    },
+    "filters": {
+      "modes": {
+        "all": "सब",
+        "active": "सक्रिय",
+        "atRisk": "ख़तरे में",
+        "pending": "लंबित"
+      },
+      "or": "या",
+      "searchPlaceholder": "नाम या छात्र के आधार पर खोजें ID...",
+      "gradeAria": "श्रेणी",
+      "allGrades": "सभी ग्रेड",
+      "statusAria": "स्थिति",
+      "allStatus": "सभी स्थिति",
+      "clear": "साफ़ करें"
+    },
+    "actions": {
+      "importIemis": "आयात IEMIS",
+      "importIemisAria": "IEMIS से आयात करें",
+      "governmentReports": "सरकार. रिपोर्ट",
+      "governmentReportsAria": "सरकारी रिपोर्ट",
+      "enrollStudent": "छात्र नामांकन करें",
+      "enrollStudentAria": "छात्र नामांकन करें",
+      "exportCsvAria": "छात्रों को CSV के रूप में निर्यात करें"
+    },
+    "widgets": {
+      "enrollmentLoadFailed": "नामांकन डेटा लोड करने में असमर्थ",
+      "atRiskLoadFailed": "जोखिम वाला डेटा लोड करने में असमर्थ",
+      "attendanceLoadFailed": "उपस्थिति डेटा लोड करने में असमर्थ",
+      "gradeLoadFailed": "ग्रेड डेटा लोड करने में असमर्थ"
+    },
+    "stats": {
+      "totalEnrolled": "कुल नामांकित",
+      "recentEnrollments": "+{{value}} हाल का",
+      "acrossGrades": "{{value}} ग्रेड में",
+      "thisAcademicYear": "इस शैक्षणिक वर्ष",
+      "atRiskStudents": "जोखिम में छात्र",
+      "criticalCount": "{{value}} गंभीर",
+      "riskBreakdown": "{{critical}} गंभीर · {{warning}} चेतावनी",
+      "belowThreshold": "90% सीमा से नीचे",
+      "todayAttendance": "आज की उपस्थिति",
+      "partialData": "आंशिक डेटा",
+      "attendanceBreakdown": "{{present}} उपस्थित · {{absent}} अनुपस्थित · {{late}} देर से",
+      "today": "आज",
+      "gradeLevels": "ग्रेड स्तर",
+      "coveredThisYear": "इस वर्ष कवर किया गया"
+    },
+    "withdraw": {
+      "title": "छात्र वापस ले लो",
+      "description": "क्या आप वाकई {{student}} को वापस लेना चाहते हैं? इस कार्रवाई को स्कूल प्रशासक द्वारा उलटा किया जा सकता है।",
+      "confirm": "वापस लेना"
+    },
+    "profiles": {
+      "title": "छात्र प्रोफाइल",
+      "description": "विस्तृत छात्र प्रोफ़ाइल और रिकॉर्ड - मोनोलिथ से माइग्रेट की गई सामग्री से भरे जाने के लिए।"
+    },
+    "quickProfile": {
+      "close": "बंद करें",
+      "atRiskBanner": "जोखिम में · {{rate}}% उपस्थिति (30-दिन)",
+      "grade": "श्रेणी",
+      "gpa": "GPA",
+      "attendance": "उपस्थिति",
+      "enrollment": "नामांकन",
+      "gradeLevel": "क्रम स्तर",
+      "enrolled": "दाखिला लिया",
+      "academicYear": "शैक्षणिक वर्ष",
+      "gradeValue": "ग्रेड {{grade}}",
+      "privacyNote": "जनसांख्यिकी, संपर्क जानकारी और अभिभावक विवरण पूर्ण प्रोफ़ाइल पृष्ठ पर हैं।",
+      "viewFullProfile": "पूर्ण प्रोफ़ाइल देखें",
+      "viewFullProfileAria": "{{student}} के लिए पूर्ण प्रोफ़ाइल देखें",
+      "bsPrefix": "BS {{date}}"
+    },
+    "csvImport": {
+      "title": "छात्रों को आयात करें",
+      "subtitle": {
+        "upload": "छात्रों को थोक में आयात करने के लिए CSV फ़ाइल अपलोड करें",
+        "preview": "{{valid}} मान्य, {{invalid}} त्रुटियों के साथ",
+        "importing": "छात्रों को आयात किया जा रहा है...",
+        "results": "आयात पूर्ण"
+      },
+      "actions": {
+        "close": "आयात संवाद बंद करें",
+        "download": "डाउनलोड करें",
+        "remove": "हटाएँ",
+        "uploadDifferent": "भिन्न फ़ाइल अपलोड करें",
+        "goToPending": "पेंडिंग पर जाएं",
+        "cancel": "रद्द करें",
+        "importAsPending": "लंबित के रूप में आयात ({{count}})"
+      },
+      "dropzone": {
+        "title": "CSV फ़ाइल को खींचें और छोड़ें",
+        "or": "या",
+        "browse": "ब्राउज़ करने के लिए क्लिक करें"
+      },
+      "template": {
+        "title": "CSV टेम्पलेट",
+        "description": "आवश्यक कॉलम के साथ डाउनलोड करें"
+      },
+      "columns": {
+        "required": "आवश्यक",
+        "optional": "वैकल्पिक"
+      },
+      "errors": {
+        "unsupportedFile": "केवल.csv फ़ाइलें समर्थित हैं.",
+        "fileTooLarge": "फ़ाइल का आकार 2MB सीमा ({{size}}MB) से अधिक है। कृपया फ़ाइल को छोटा करें.",
+        "rowLimit": "प्रति आयात अधिकतम {{max}} छात्र। आपकी फ़ाइल में {{rows}} पंक्तियाँ हैं। कृपया छोटी फ़ाइलों में विभाजित करें."
+      },
+      "rowErrors": {
+        "missingFirstName": "पहला नाम गुम है",
+        "missingLastName": "अंतिम नाम गुम है",
+        "missingBirthDate": "जन्मतिथि गुम है",
+        "missingGender": "लिंग गुम",
+        "missingGradeLevel": "ग्रेड स्तर गुम है"
+      },
+      "preview": {
+        "rows": "{{value}} पंक्ति",
+        "rows_plural": "{{value}} पंक्तियाँ",
+        "invalidRows": "त्रुटियों वाली {{value}} पंक्ति (छोड़ दी जाएगी)",
+        "invalidRows_plural": "त्रुटियों वाली {{value}} पंक्तियाँ (छोड़ दी जाएंगी)",
+        "rowError": "पंक्ति {{row}}: {{errors}}",
+        "andMore": "...और {{value}} और भी",
+        "andMore_plural": "...और {{value}} और भी",
+        "status": "स्थिति",
+        "error": "त्रुटि",
+        "valid": "मान्य"
+      },
+      "importing": {
+        "title": "{{value}} छात्र को आयात किया जा रहा है...",
+        "title_plural": "{{value}} छात्रों को आयात किया जा रहा है...",
+        "keepOpen": "कृपया इस विंडो को बंद न करें."
+      },
+      "results": {
+        "imported": "आयातित",
+        "skipped": "छोड़ दिया गया",
+        "errors": "त्रुटियाँ",
+        "pendingNoticeStart": "{{value}} छात्र के रूप में आयात किया गया",
+        "pendingNoticeStart_plural": "{{value}} छात्रों को इस रूप में आयात किया गया",
+        "pendingNoticeEnd": ". उनकी समीक्षा करने और नामांकन करने के लिए लंबित टैब पर जाएँ।",
+        "duplicatesTitle": "डुप्लीकेट मिलान मिले",
+        "duplicateRow": "पंक्ति {{row}}: मिलान {{matches}} ({{confidence}} आत्मविश्वास)",
+        "unknownConfidence": "अज्ञात",
+        "errorsTitle": "आयात त्रुटियाँ",
+        "errorRow": "पंक्ति {{row}}: {{field}} - {{message}}"
+      },
+      "footer": {
+        "constraints": "केवल.csv · अधिकतम {{maxRows}} पंक्तियाँ · अधिकतम 2एमबी",
+        "pendingStart": "आयात बनाता है",
+        "pendingEnd": "नामांकन"
+      }
+    },
+    "signals": {
+      "showAtRisk": "जोखिम में दिखाएँ"
+    },
+    "selection": {
+      "peekAttendance": "{{rate}}% उपस्थिति"
+    }
+  },
+  "privacy": {
+    "showSensitive": "संवेदनशील विवरण दिखाएं",
+    "hideSensitive": "संवेदनशील विवरण छिपाएँ"
+  },
+  "enrollment": {
+    "studentIsEnrolled": "छात्र नामांकित है",
+    "nextStepAddSection": "अगला चरण: उपस्थिति और ग्रेडिंग सक्षम करने के लिए इस छात्र को कक्षा अनुभागों में जोड़ें।",
+    "noActiveEnrollment": "वर्तमान शैक्षणिक वर्ष के लिए फ़ाइल में कोई सक्रिय नामांकन नहीं है।"
+  },
+  "yesNo": {
+    "yes": "हाँ",
+    "no": "नहीं"
+  },
+  "gradeLabel": "ग्रेड {{level}}",
+  "ageLabel": "{{age}} वर्ष",
+  "dataTable": {
+    "errorTitle": "डेटा लोड करने में विफल",
+    "errorDescription": "एक अप्रत्याशित त्रुटि उत्पन्न हुई.",
+    "retry": "पुन: प्रयास करें",
+    "clearSearch": "स्पष्ट खोज",
+    "clearFilters": "फ़िल्टर साफ़ करें",
+    "clearActiveFilters": "साफ़ ({{count}})",
+    "clearSelection": "स्पष्ट चयन",
+    "selectedRows": "{{count}} चयनित",
+    "selectedRows_plural": "{{count}} चयनित",
+    "paginationShowing": "{{total}} में से {{start}}-{{end}} परिणाम दिखाए जा रहे हैं",
+    "rowsPerPage": "{{size}} / पृष्ठ",
+    "previousPage": "पिछला",
+    "nextPage": "अगला",
+    "loadingPage": "लोड हो रहा है...",
+    "rowDensity": "पंक्ति घनत्व",
+    "comfortableDensity": "आरामदायक",
+    "comfortableDensityTitle": "आरामदायक पंक्तियाँ",
+    "compactDensity": "सघन",
+    "compactDensityTitle": "सघन पंक्तियाँ",
+    "viewOptions": "देखें",
+    "toggleColumns": "कॉलम टॉगल करें",
+    "export": "निर्यात करें",
+    "exportFormats": {
+      "csv": "CSV के रूप में निर्यात करें",
+      "xlsx": "XLSX के रूप में निर्यात करें"
+    },
+    "xlsxUnavailable": "XLSX अनुवर्ती जहाजों का निर्यात करता है",
+    "filterAriaLabel": "{{title}} फ़िल्टर",
+    "clearFilter": "फ़िल्टर साफ़ करें",
+    "moreFilters": "अधिक फ़िल्टर",
+    "selection": {
+      "aria": "चयन क्रियाएँ",
+      "selected": "{{count}} चयनित",
+      "selectAll": "सभी का चयन करें {{count}}",
+      "clear": "स्पष्ट चयन"
+    }
+  },
+  "attendance": {
+    "title": "उपस्थिति",
+    "subtitle": "कक्षा अनुभाग द्वारा उपस्थिति रिकॉर्ड करें और समीक्षा करें · {{year}}",
+    "academicYearFallback": "शैक्षणिक वर्ष",
+    "lastUpdated": "अंतिम अद्यतन: {{time}}",
+    "tabs": {
+      "overview": "अवलोकन",
+      "dailyEntry": "दैनिक प्रवेश",
+      "iemisExport": "आईईएमआईएस निर्यात",
+      "aria": "उपस्थिति टैब"
+    },
+    "status": {
+      "present": {
+        "label": "वर्तमान",
+        "short": "पी"
+      },
+      "absent": {
+        "label": "अनुपस्थित",
+        "short": "ए"
+      },
+      "late": {
+        "label": "मंदबुद्धि",
+        "short": "टी"
+      },
+      "excused": {
+        "label": "क्षमा करें",
+        "short": "ई"
+      },
+      "remote": {
+        "label": "रिमोट",
+        "short": "आर"
+      },
+      "half_day": {
+        "label": "आधा दिन",
+        "short": "एच"
+      },
+      "early_departure": {
+        "label": "प्रारंभिक विभाग.",
+        "short": "ईडी"
+      }
+    },
+    "dateSelector": {
+      "previousDay": "पिछला दिन",
+      "nextDay": "अगले दिन",
+      "selectDate": "दिनांक चुनें",
+      "today": "आज",
+      "bsSuffix": "BS"
+    },
+    "sectionSelector": {
+      "empty": "कोई अनुभाग निर्दिष्ट नहीं किया गया. अपने व्यवस्थापक से संपर्क करें.",
+      "placeholder": "एक अनुभाग चुनें...",
+      "fallback": "अनुभाग",
+      "completedPrefix": "रिकार्ड किया गया"
+    },
+    "calendar": {
+      "nonInstructionalTitle": "गैर-शिक्षण दिवस",
+      "nonInstructionalFallback": "यह {{eventType}} दिन है।",
+      "cannotSubmit": "{{description}} इस तिथि के लिए उपस्थिति जमा नहीं की जा सकती।"
+    },
+    "policy": {
+      "modeLabel": "उपस्थिति मोड:",
+      "dailyPresence": "दैनिक उपस्थिति",
+      "perSection": "प्रति अनुभाग",
+      "dailyPresenceDescription": "किसी भी अनुभाग में उपस्थित विद्यार्थी की उस दिन की उपस्थिति मानी जाती है; बाद के अनुभाग उन्हें बंद दिखाते हैं।",
+      "perSectionDescription": "प्रत्येक अनुभाग स्वतंत्र रूप से दर्ज किया गया है.",
+      "dismiss": "समझ गया",
+      "dismissAria": "समझ गया, उपस्थिति मोड नोटिस खारिज करें"
+    },
+    "notRecorded": {
+      "past": "इस दिन उपस्थिति दर्ज नहीं की गई। किसी रिकॉर्ड को बैकफ़िल करने के लिए किसी छात्र पर संपादन का उपयोग करें।",
+      "current": "इस दिन अभी तक उपस्थिति दर्ज नहीं की गई है। ऑल प्रेजेंट का उपयोग करें, फिर अपवादों को चिह्नित करें, या छात्रों को व्यक्तिगत रूप से चिह्नित करें और सहेजें।"
+    },
+    "empty": {
+      "selectSectionTitle": "एक कक्षा अनुभाग चुनें",
+      "selectSectionDescription": "उपस्थिति दर्ज करने के लिए ऊपर दिए गए ड्रॉपडाउन से एक अनुभाग चुनें। सभी उपस्थित लोगों को चिह्नित करने के लिए त्वरित कार्रवाई का उपयोग करें, फिर व्यक्तिगत छात्रों को समायोजित करें।",
+      "noStudentsTitle": "इस अनुभाग में कोई छात्र नहीं है",
+      "noStudentsDescription": "उपस्थिति लेना शुरू करने के लिए इस अनुभाग में छात्रों का नामांकन करें।",
+      "noStudentsEnrolledTitle": "किसी छात्र का नामांकन नहीं हुआ",
+      "noStudentsEnrolledDescription": "इस अनुभाग में अभी तक कोई छात्र नामांकित नहीं है। पीपल टैब से विद्यार्थियों को जोड़ें।",
+      "noSearchMatches": "कोई भी छात्र आपकी खोज से मेल नहीं खाता.",
+      "noDataForDate": "इस तिथि के लिए कोई उपस्थिति डेटा नहीं",
+      "notRecordedForDate": "इस तिथि पर उपस्थिति दर्ज नहीं की गई"
+    },
+    "grid": {
+      "ariaLabel": "उपस्थिति प्रविष्टि ग्रिड",
+      "rowAria": "{{studentName}} के लिए उपस्थिति",
+      "statusAria": "उपस्थिति की स्थिति",
+      "keyboardShortcuts": "कीबोर्ड शॉर्टकट:",
+      "navigate": "नेविगेट करें",
+      "name": "नाम",
+      "status": "स्थिति",
+      "allMarked": "सभी {{total}} चिह्नित - अच्छी तरह से किया गया",
+      "markedCount": "{{marked}} / {{total}} चिह्नित",
+      "coverageTitle": "कवरेज = दर्ज किए गए छात्र ÷ नामांकित (कितना रोल-कॉल किया गया है)। यह उपस्थिति दर से भिन्न है.",
+      "rateTitle": "उपस्थिति दर = उपस्थित छात्र ÷ नामांकित।",
+      "coverage": "कवरेज",
+      "rate": "दर",
+      "ofTotal": "{{recorded}} का {{total}}"
+    },
+    "toolbar": {
+      "search": "छात्रों को खोजें...",
+      "searchAria": "छात्रों को नाम या नंबर से खोजें",
+      "clearSearch": "स्पष्ट खोज",
+      "filterAria": "छात्रों को फ़िल्टर करें",
+      "filters": {
+        "all": "सब",
+        "unmarked": "अचिह्नित",
+        "absent": "अनुपस्थित",
+        "flagged": "ध्वजांकित",
+        "locked": "ताला लगा दिया"
+      },
+      "allPresent": "सभी उपस्थित",
+      "allAbsent": "सभी अनुपस्थित",
+      "markPresent": "मार्क {{value}} उपस्थित",
+      "markAbsent": "मार्क {{value}} अनुपस्थित",
+      "clear": "साफ़ करें"
+    },
+    "actions": {
+      "saveAttendance": "उपस्थिति सहेजें",
+      "save": "सहेजें",
+      "edit": "संपादित करें",
+      "editFor": "{{studentName}} के लिए उपस्थिति संपादित करें",
+      "cancelEdit": "संपादन रद्द करें",
+      "markStatus": "मार्क {{status}}",
+      "mark": "निशान",
+      "addNoteReason": "नोट या कारण जोड़ें",
+      "editNoteReason": "नोट या कारण संपादित करें",
+      "addNoteReasonTitle": "नोट/कारण जोड़ें",
+      "editNoteReasonTitle": "नोट/कारण संपादित करें"
+    },
+    "announcements": {
+      "allPresent": "सभी विद्यार्थी उपस्थित रहे",
+      "allAbsent": "सभी विद्यार्थी अनुपस्थित अंकित किये गये",
+      "allCleared": "सभी प्रविष्टियाँ साफ़ कर दी गईं",
+      "saved": "{{count}} छात्र के लिए उपस्थिति सहेजी गई",
+      "saved_plural": "{{count}} छात्रों के लिए उपस्थिति बचाई गई"
+    },
+    "saveStatus": {
+      "saved": "सहेजा गया",
+      "saving": "सहेजा जा रहा है...",
+      "savingEllipsis": "सहेजा जा रहा है...",
+      "offline": "ऑफ़लाइन",
+      "offlineLocal": "ऑफ़लाइन - परिवर्तन स्थानीय रूप से सहेजे गए",
+      "error": "सहेजना विफल",
+      "errorRetry": "सहेजना विफल - पुनः प्रयास करेंगे"
+    },
+    "row": {
+      "lockedFallback": "दिन की उपस्थिति पहले ही दर्ज की जा चुकी है",
+      "reason": "कारण",
+      "reasonAria": "अनुपस्थिति का कारण",
+      "selectReason": "कारण चुनें…",
+      "note": "नोट",
+      "noteAria": "उपस्थिति नोट",
+      "notePlaceholder": "एक नोट जोड़ें..."
+    },
+    "summary": {
+      "recorded": "{{total}} में से {{recorded}} रिकॉर्ड किया गया",
+      "notTakenYet": "अभी तक नहीं लिया गया",
+      "schoolAverage": "स्कूल का औसत",
+      "sevenDay": "7-दिन: {{value}}%",
+      "thirtyDay": "30-दिन: {{value}}%",
+      "coverage": "कवरेज"
+    },
+    "dashboard": {
+      "ofTotalRecorded": "{{total}} में से {{recorded}} रिकॉर्ड किया गया",
+      "ofTotal": "{{count}} का {{total}}",
+      "schoolAverage": "स्कूल का औसत",
+      "sevenDayAvg": "7 दिन का औसत:",
+      "thirtyDayAvg": "30-दिन का औसत:",
+      "coverage": "कवरेज",
+      "coverageTitle": "कवरेज = दर्ज किए गए छात्र ÷ नामांकित (आज का कितना रोल-कॉल किया गया है)। यह उपस्थिति दर से भिन्न है, जो कि दर्ज किए गए कितने छात्र उपस्थित थे।",
+      "absenceBreakdownTitle": "आज का अनुपस्थिति विवरण",
+      "noAbsencesYet": "अभी तक कोई अनुपस्थिति दर्ज नहीं की गई है",
+      "absences": "{{count}} अनुपस्थिति",
+      "absences_plural": "{{count}} अनुपस्थिति",
+      "absenceCategories": {
+        "unexcused": "माफ़ नहीं किया गया",
+        "excused": "क्षमा करें",
+        "late": "देर/मंदी",
+        "halfDay": "आधा दिन",
+        "remote": "रिमोट"
+      },
+      "dowTitle": "सप्ताह के दिन का पैटर्न",
+      "dowSubtitle": "कार्यदिवस के अनुसार औसत उपस्थिति दर",
+      "dowInsight": "{{minDay}} की औसत उपस्थिति सबसे कम ({{minRate}}%) है। {{maxDay}} उच्चतम है।",
+      "daysShort": {
+        "Sunday": "रवि",
+        "Monday": "सोम",
+        "Tuesday": "मंगल",
+        "Wednesday": "बुध",
+        "Thursday": "गुरु",
+        "Friday": "शुक्र",
+        "Saturday": "शनि"
+      },
+      "trendTitle": "30-दिवसीय उपस्थिति दर",
+      "trendEmptySubtitle": "कोई रुझान डेटा उपलब्ध नहीं है",
+      "trendEmpty": "चयनित अवधि के लिए कोई रुझान डेटा उपलब्ध नहीं है।",
+      "trendSubtitle": "दैनिक दर्ज उपस्थिति दर प्रवृत्ति - {{start}} से {{end}}",
+      "sectionCompletionTitle": "अनुभाग समापन",
+      "sectionCompletionSubtitle": "प्रति अनुभाग आज की रिकॉर्डिंग स्थिति",
+      "section": "अनुभाग",
+      "enrolledAbbr": "एन.आर.",
+      "recordedAbbr": "रिक.",
+      "completionStatus": "स्थिति",
+      "completion": {
+        "complete": "पूर्ण",
+        "partial": "आंशिक",
+        "notStarted": "प्रारंभ नहीं हुआ"
+      },
+      "periodAveragesTitle": "अवधि औसत",
+      "periodAveragesSubtitle": "विभिन्न समय विंडो में उपस्थिति दरें",
+      "periods": {
+        "sevenDay": "7-दिन",
+        "thirtyDay": "30-दिन",
+        "yearly": "वार्षिक"
+      },
+      "trendDirection": "पिछले 7 दिनों बनाम 30-दिवसीय बेसलाइन में उपस्थिति {{direction}} ट्रेंड कर रही है।",
+      "directions": {
+        "upward": "ऊपर की ओर",
+        "downward": "नीचे की ओर"
+      },
+      "alertsTitle": "उपस्थिति अलर्ट",
+      "alertsSubtitle": "{{threshold}}% से कम उपस्थिति दर वाले छात्र · गंभीरता के आधार पर क्रमबद्ध",
+      "below": "नीचे",
+      "thresholdAria": "कम उपस्थिति चेतावनी सीमा",
+      "showingAtRisk": "जोखिम वाले विद्यार्थी में से {{total}} का {{shown}} दिखाया जा रहा है",
+      "showingAtRisk_plural": "जोखिम वाले {{total}} छात्रों में से {{shown}} दिखा रहा है",
+      "noBelowThreshold": "उपस्थिति सीमा से नीचे कोई भी छात्र नहीं",
+      "columns": {
+        "student": "छात्र",
+        "rate": "दर",
+        "absent": "अनुपस्थित",
+        "total": "कुल",
+        "trend": "रुझान"
+      },
+      "trends": {
+        "improving": "↑ सुधार",
+        "declining": "↓ गिरावट",
+        "stable": "- स्थिर"
+      },
+      "scopeSections": "आपके अनुभागों के लिए डेटा दिखाया जा रहा है ({{value}} छात्र)",
+      "loadFailed": "उपस्थिति अवलोकन लोड करने में विफल",
+      "loadFailedDescription": "कृपया पृष्ठ को ताज़ा करने का प्रयास करें. यदि समस्या बनी रहती है, तो सहायता से संपर्क करें।",
+      "commandBar": {
+        "policyTooltip": "{{attending}} को उपस्थित के रूप में गिना जाता है · {{excused}}",
+        "excusedAbsent": "माफ़ किया गया दर के लिए अनुपस्थित गिना जाता है",
+        "excusedPresent": "माफ़ किया गया दर के लिए वर्तमान के रूप में गिना जाता है",
+        "atRiskShort": "जोखिम पर <{{pct}}%",
+        "scopeTooltip": "उपस्थिति डेटा आपकी भूमिका के अनुरूप है",
+        "scopeSchool": "स्कूल-व्यापी",
+        "scopeMine": "मेरे अनुभाग",
+        "export": "निर्यात करें"
+      },
+      "reframe": {
+        "headline": "{{pct}}% \"स्कूल औसत\" एक रिकॉर्डिंग-कवरेज कलाकृति है - वास्तविक अनुपस्थिति नहीं।",
+        "body": "उपस्थिति अनुभाग-दिनों के केवल एक अंश के लिए दर्ज की जाती है, इसलिए मिश्रित औसत ढह जाता है। वास्तव में रिकॉर्ड किए गए सत्रों में, उपस्थिति ~{{rate}}% है। कवरेज और रिकॉर्ड की गई दर को अलग-अलग सिग्नल के रूप में ट्रैक करें।",
+        "record": "एक अनुभाग रिकॉर्ड करें",
+        "ack": "समझ गया",
+        "ackAria": "इस नोटिस को स्वीकार करें और खारिज करें"
+      },
+      "sections": {
+        "title": "रिकॉर्ड करने के लिए अनुभाग",
+        "complete": "{{done}}/{{total}} पूर्ण",
+        "coveredToday": "आज कवर किया गया",
+        "pickToRecord": "{{parts}} - रिकॉर्ड करने के लिए एक चुनें",
+        "allRecorded": "सभी अनुभाग आज रिकॉर्ड किए गए",
+        "notStartedCount": "{{count}} प्रारंभ नहीं हुआ",
+        "inProgressCount": "{{count}} प्रगति पर है",
+        "trackerAria": "कवरेज ट्रैकर: {{full}} पूरी तरह से रिकॉर्ड किया गया, {{partial}} आंशिक, {{none}} प्रारंभ नहीं हुआ",
+        "legendFull": "{{count}} पूर्णतः",
+        "legendPartial": "{{count}} आंशिक",
+        "legendNone": "{{count}} प्रारंभ नहीं हुआ",
+        "studentsCovered": "छात्रों को कवर किया गया",
+        "rateAmongRecorded": "दर्ज के बीच दर",
+        "statusRecorded": "पूरी तरह से रिकॉर्ड किया गया",
+        "statusPartial": "आंशिक {{pct}}%",
+        "statusNotRecorded": "रिकार्ड नहीं किया गया",
+        "enrolledCount": "{{count}} छात्र",
+        "recordedBadge": "रिकार्ड किया गया",
+        "viewEdit": "देखें/संपादित करें",
+        "partialCounts": "{{done}}/{{total}} चिह्नित · {{left}} बाएँ",
+        "partialBadge": "{{pct}}% हो गया",
+        "continue": "जारी रखें",
+        "notStartedBadge": "शुरू नहीं हुआ",
+        "record": "अभिलेख",
+        "emptyScope": "इस दिन के लिए आपके दायरे में कोई अनुभाग नहीं है."
+      },
+      "insight": {
+        "chronicLabel": "चिरकालिक अनुपस्थिति",
+        "chronicSub": "70% से नीचे · अभी कार्य करें",
+        "atRiskLabel": "ख़तरे में",
+        "atRiskSub": "70-90% उपस्थिति",
+        "decliningLabel": "गिरावट",
+        "decliningSub": "फ़्लैग किया गया और नीचे ट्रेंड किया जा रहा है",
+        "lowestLabel": "सबसे निचला समूह",
+        "lowestSub": "ग्रेड {{grade}}"
+      },
+      "atRisk": {
+        "title": "जोखिम और दीर्घकालिक अनुपस्थिति",
+        "subtitle": "90% सीमा से नीचे · सबसे खराब पहला, 30-दिन की प्रवृत्ति के साथ",
+        "export": "निर्यात करें",
+        "filterAll": "सब",
+        "filterChronic": "जीर्ण",
+        "filterAtRisk": "ख़तरे में",
+        "filterAria": "जोखिम वाले छात्रों को बैंड द्वारा फ़िल्टर करें",
+        "empty": "इस बैंड में कोई छात्र नहीं है."
+      },
+      "drawer": {
+        "section": "अनुभाग",
+        "subRecorded": "{{date}} · {{count}} रिकॉर्ड किया गया",
+        "subPartial": "{{date}} · {{done}}/{{total}} अब तक चिह्नित",
+        "subNew": "{{date}} · {{count}} छात्र",
+        "editNote": "सहेजे गए रिकॉर्ड को संपादित करना - परिवर्तन आपके नाम और समय के साथ लॉग किए जाते हैं।"
+      },
+      "gradeLevel": "ग्रेड स्तर",
+      "dowInsightShort": "{{day}} सबसे निचला कार्यदिवस है",
+      "gradeCompareTitle": "ग्रेड-स्तर की तुलना",
+      "gradeCompareSubtitle": "ग्रेड स्तर के अनुसार दर्ज की गई दर · सबसे खराब प्रथम",
+      "gradeCompareEmpty": "अभी तक कोई ग्रेड-स्तरीय डेटा नहीं है.",
+      "gradeLabel": "ग्रेड {{grade}}",
+      "trendRateNote": "जिन अनुभागों में · एक दर दर्ज की गई है, कवरेज नहीं",
+      "trendAvgTarget": "औसत {{avg}}% · लक्ष्य {{target}}%",
+      "trendAria": "30-दिवसीय दर्ज उपस्थिति दर, औसत {{avg}} प्रतिशत",
+      "updating": "अपडेट हो रहा है...",
+      "staleWarning": "{{date}} के लिए रीफ्रेश नहीं किया जा सका - अंतिम लोड किया गया डेटा दिखा रहा है।",
+      "retry": "पुन: प्रयास करें"
+    },
+    "modal": {
+      "trendTitle": "विंडो पर रुझान (हाल ही बनाम पहले)",
+      "trends": {
+        "improving": "सुधार हो रहा है",
+        "declining": "गिरावट",
+        "stable": "स्थिर"
+      },
+      "last30Days": "पिछले 30 दिन",
+      "noRecord": "कोई रिकॉर्ड नहीं",
+      "total": "कुल",
+      "rate": "दर",
+      "recentRecords": "हाल के रिकॉर्ड",
+      "noRecords": "कोई उपस्थिति रिकार्ड नहीं मिला.",
+      "date": "दिनांक",
+      "status": "स्थिति",
+      "notes": "टिप्पणियाँ",
+      "close": "बंद करें"
+    }
+  },
+  "common": {
+    "actions": "कार्रवाइयाँ",
+    "active": "सक्रिय",
+    "inactive": "निष्क्रिय",
+    "current": "वर्तमान",
+    "teacher": "अध्यापक",
+    "primaryInstructor": "प्राथमिक प्रशिक्षक",
+    "student": "छात्र",
+    "students": "{{count}} छात्र",
+    "students_plural": "{{count}} छात्र",
+    "course": "पाठ्यक्रम",
+    "courses": "{{count}} पाठ्यक्रम",
+    "courses_plural": "{{count}} पाठ्यक्रम",
+    "section": "अनुभाग",
+    "sections": "{{count}} अनुभाग",
+    "sections_plural": "{{count}} अनुभाग",
+    "staff": "{{count}} कर्मचारी",
+    "staff_plural": "{{count}} कर्मचारी",
+    "more": "+{{count}} अधिक",
+    "comingSoon": "{{action}} के लिए {{countLabel}} — जल्द ही आ रहा है"
+  },
+  "enums": {
+    "employmentStatus": {
+      "active": "सक्रिय",
+      "on_leave": "छुट्टी पर हूं",
+      "suspended": "निलंबित",
+      "terminated": "ख़त्म कर दिया गया"
+    },
+    "staffRole": {
+      "teacher": "अध्यापक",
+      "principal": "प्राचार्य",
+      "vice_principal": "उप प्राचार्य",
+      "counselor": "परामर्शदाता",
+      "admin_staff": "व्यवस्थापक कर्मचारी"
+    },
+    "examResult": {
+      "generated": "उत्पन्न",
+      "pending": "लंबित",
+      "none": "—"
+    }
+  },
+  "tables": {
+    "students": {
+      "columns": {
+        "student": "छात्र",
+        "grade": "श्रेणी",
+        "attendance": "उपस्थिति",
+        "guardian": "संरक्षक",
+        "location": "स्थान",
+        "status": "स्थिति",
+        "enrolled": "दाखिला लिया"
+      },
+      "actions": {
+        "studentActions": "छात्र क्रियाएँ",
+        "viewProfile": "प्रोफ़ाइल देखें",
+        "withdraw": "वापस लेना",
+        "message": "संदेश",
+        "moveSection": "अनुभाग ले जाएँ",
+        "archive": "पुरालेख"
+      },
+      "bulk": {
+        "message": "संदेश",
+        "move": "हटो",
+        "archive": "पुरालेख"
+      },
+      "empty": {
+        "title": "कोई छात्र नहीं मिला",
+        "description": "अपने पहले छात्र को निर्देशिका में जोड़कर आरंभ करें।",
+        "action": "विद्यार्थी जोड़ें"
+      }
+    },
+    "enrollment": {
+      "columns": {
+        "student": "छात्र",
+        "gradeLevel": "क्रम स्तर",
+        "status": "स्थिति",
+        "entryDate": "प्रवेश तिथि",
+        "exitDate": "निकास तिथि",
+        "type": "प्रकार"
+      },
+      "actions": {
+        "withdraw": "वापस लेना",
+        "transfer": "स्थानांतरण",
+        "markNoShow": "मार्क नो-शो"
+      },
+      "filters": {
+        "loadingGrades": "ग्रेड लोड हो रहे हैं...",
+        "allGrades": "सभी ग्रेड",
+        "allStatus": "सभी स्थिति",
+        "clear": "साफ़ करें"
+      },
+      "types": {
+        "new": "नया",
+        "re_enrollment": "पुनः नामांकन",
+        "transfer": "स्थानांतरण"
+      },
+      "empty": {
+        "title": "कोई नामांकन नहीं मिला",
+        "description": "अपने फ़िल्टर या खोज शब्द को समायोजित करने का प्रयास करें।"
+      },
+      "search": "छात्रों को खोजें..."
+    },
+    "courses": {
+      "columns": {
+        "code": "कोड",
+        "courseName": "पाठ्यक्रम का नाम",
+        "subject": "विषय",
+        "grades": "ग्रेड",
+        "credits": "क्रेडिट",
+        "type": "प्रकार",
+        "duration": "अवधि",
+        "status": "स्थिति"
+      },
+      "actions": {
+        "actions": "कार्रवाइयाँ",
+        "quickView": "त्वरित दृश्य",
+        "viewFullDetails": "पूर्ण विवरण देखें",
+        "editCourse": "पाठ्यक्रम संपादित करें",
+        "activate": "सक्रिय करें",
+        "deactivate": "निष्क्रिय करें"
+      },
+      "warnings": {
+        "missingAcademicSubjectTitle": "कोई विस्तृत शैक्षणिक विषय सेट नहीं. रिपोर्ट कार्ड इस विषय क्षेत्र पर वापस आते हैं - बेहतर लेबल के लिए एक दानेदार विषय जोड़ें।",
+        "missingAcademicSubject": "कोई विस्तृत शैक्षणिक विषय सेट नहीं"
+      },
+      "empty": {
+        "title": "कोई पाठ्यक्रम नहीं मिला",
+        "description": "कैटलॉग में अपना पहला कोर्स जोड़कर आरंभ करें।",
+        "action": "पाठ्यक्रम जोड़ें"
+      }
+    },
+    "gradeLevels": {
+      "stats": {
+        "totalGradeLevels": "कुल ग्रेड स्तर",
+        "courseAssignments": "पाठ्यक्रम असाइनमेंट",
+        "avgCoursesPerGrade": "औसत पाठ्यक्रम/ग्रेड",
+        "gradesWithCourses": "पाठ्यक्रम के साथ ग्रेड"
+      },
+      "columns": {
+        "gradeLevel": "क्रम स्तर",
+        "courseCount": "कोर्स गिनती",
+        "courses": "पाठ्यक्रम",
+        "students": "विद्यार्थी"
+      },
+      "empty": {
+        "title": "कोई ग्रेड स्तर नहीं मिला",
+        "description": "पाठ्यक्रम कॉन्फ़िगर होते ही ग्रेड स्तर दिखाई देंगे।"
+      },
+      "searchPlaceholder": "ग्रेड का नाम या कोड खोजें...",
+      "presets": {
+        "all": "सब",
+        "withCourses": "पाठ्यक्रमों के साथ",
+        "empty": "ख़ाली"
+      },
+      "noCurrentYearTitle": "कोई सक्रिय शैक्षणिक वर्ष नहीं - एक शैक्षणिक वर्ष को वर्तमान के रूप में सेट करने के बाद नामांकन संख्या दिखाई देगी।"
+    },
+    "sections": {
+      "columns": {
+        "section": "अनुभाग",
+        "course": "पाठ्यक्रम",
+        "teacher": "अध्यापक",
+        "period": "अवधि",
+        "room": "कमरा",
+        "enrollment": "नामांकन",
+        "status": "स्थिति"
+      },
+      "actions": {
+        "sectionActions": "अनुभाग क्रियाएँ",
+        "viewDetails": "विवरण देखें",
+        "viewRoster": "रोस्टर देखें",
+        "editSection": "अनुभाग संपादित करें",
+        "activate": "सक्रिय करें",
+        "deactivate": "निष्क्रिय करें",
+        "sendNotification": "अधिसूचना भेजें",
+        "notify": "सूचित करें"
+      },
+      "search": "अनुभाग खोजें...",
+      "empty": {
+        "title": "कोई अनुभाग नहीं मिला",
+        "description": "अपना शेड्यूल बनाना शुरू करने के लिए अपना प्रथम श्रेणी अनुभाग बनाएं।"
+      }
+    },
+    "sectionRoster": {
+      "columns": {
+        "name": "नाम",
+        "studentId": "छात्र ID",
+        "grade": "श्रेणी",
+        "enrolled": "दाखिला लिया"
+      },
+      "actions": {
+        "forStudent": "{{studentName}} के लिए कार्रवाई",
+        "removeFromSection": "अनुभाग से हटाएँ",
+        "addStudents": "छात्र जोड़ें"
+      },
+      "capacity": "{{current}}/{{max}} नामांकित",
+      "search": "नाम या छात्र के आधार पर खोजें ID...",
+      "empty": {
+        "title": "अभी तक किसी छात्र ने नामांकन नहीं कराया है",
+        "description": "अपना कक्षा रोस्टर बनाने के लिए इस अनुभाग में छात्रों को जोड़ें।"
+      },
+      "confirmRemove": {
+        "title": "विद्यार्थी को हटाएँ",
+        "description": "क्या आप वाकई इस अनुभाग से {{studentName}} को हटाना चाहते हैं?",
+        "fallbackStudent": "यह छात्र",
+        "confirm": "हटाएँ"
+      }
+    },
+    "teachers": {
+      "columns": {
+        "name": "नाम",
+        "email": "ईमेल",
+        "role": "भूमिका",
+        "status": "स्थिति"
+      },
+      "actions": {
+        "changeRole": "भूमिका बदलें",
+        "updateStatus": "अद्यतन स्थिति"
+      },
+      "search": "नाम या ईमेल से खोजें...",
+      "empty": {
+        "title": "कोई स्टाफ नहीं मिला",
+        "description": "अपनी खोज या फ़िल्टर समायोजित करने का प्रयास करें."
+      }
+    },
+    "exams": {
+      "columns": {
+        "exam": "परीक्षा",
+        "type": "प्रकार",
+        "term": "अवधि",
+        "grades": "ग्रेड",
+        "schedule": "समय-सारणी",
+        "status": "स्थिति",
+        "results": "परिणाम"
+      },
+      "results": {
+        "generated": "उत्पन्न",
+        "pending": "लंबित"
+      },
+      "search": "खोज परीक्षा...",
+      "schedule": {
+        "daysAgo": "{{count}}d पहले",
+        "today": "आज",
+        "inDays": "{{count}}d में",
+        "duration": "{{count}}d"
+      },
+      "empty": {
+        "title": "कोई परीक्षा मेल नहीं खाती",
+        "description": "शेड्यूलिंग शुरू करने के लिए फ़िल्टर समायोजित करें या इस शैक्षणिक वर्ष के लिए पहली परीक्षा बनाएं।"
+      }
+    },
+    "examScores": {
+      "search": "छात्रों को नाम से खोजें...",
+      "subject": "विषय",
+      "student": "छात्र",
+      "grade": "श्रेणी",
+      "score": "स्कोर",
+      "scoreForStudent": "{{studentName}} के लिए स्कोर",
+      "componentScoreForStudent": "{{studentName}} के लिए {{component}} स्कोर",
+      "subjectFallback": "विषय",
+      "maxMarks": "{{marks}} अधिकतम",
+      "summary": "{{students}} · अधिकतम {{max}}",
+      "pass": "पास {{marks}}",
+      "emptyNoStudents": "स्कोर करने के लिए कोई छात्र नहीं",
+      "emptyNoActiveForGrades": "इस परीक्षा के ग्रेड बैंड ({{grades}}) के लिए कोई सक्रिय छात्र नामांकित नहीं है।",
+      "emptyNoActiveEnrollments": "इस शैक्षणिक वर्ष के लिए कोई सक्रिय नामांकन नहीं।",
+      "noSubjectsTitle": "अभी तक कोई विषय नहीं",
+      "noSubjectsDescription": "अंक दर्ज करने से पहले विषय टैब में विषय जोड़ें।",
+      "lockedStatus": "परीक्षा {{status}} होने पर स्कोर प्रविष्टि लॉक कर दी गई है। स्कोर केवल शेड्यूल्ड या प्रगति में दर्ज या संपादित किए जा सकते हैं।",
+      "lockedPermission": "आपको स्कोर संपादित करने की अनुमति नहीं है.",
+      "invalidRows": "{{count}} पंक्ति अमान्य (0–{{max}})",
+      "invalidRows_plural": "{{count}} पंक्तियाँ अमान्य (0–{{max}})",
+      "noChanges": "कोई परिवर्तन नहीं",
+      "pendingChanges": "{{count}} परिवर्तन लंबित",
+      "pendingChanges_plural": "{{count}} परिवर्तन लंबित हैं",
+      "blankCount": "{{count}} रिक्त",
+      "blankCount_plural": "{{count}} रिक्तियाँ",
+      "saving": "सहेजा जा रहा है...",
+      "saveScores": "स्कोर सहेजें"
+    }
+  },
+  "curriculumModule": {
+    "actions": {
+      "addCourse": "पाठ्यक्रम जोड़ें"
+    },
+    "tabs": {
+      "courses": "पाठ्यक्रम",
+      "gradeLevels": "ग्रेड स्तर",
+      "standards": "मानक"
+    },
+    "summary": {
+      "coursesAcross": "भर में पाठ्यक्रम",
+      "subjectAreasSuffix": "विषय क्षेत्र",
+      "elective": "{{value}} ऐच्छिक",
+      "specializedTypesSuffix": "विशिष्ट पाठ्यक्रम प्रकार (ऑनर्स, एपी, दोहरा नामांकन)",
+      "basedOnLoaded": "लोड किए गए पाठ्यक्रमों पर आधारित"
+    },
+    "stats": {
+      "totalCourses": "कुल पाठ्यक्रम",
+      "activeTag": "{{value}} सक्रिय",
+      "subjectAreas": "विषय क्षेत्र",
+      "subjectHint": "गणित · विज्ञान · ईएलए · एसएस · कला · वोक।",
+      "electives": "ऐच्छिक",
+      "specializedTypes": "विशिष्ट प्रकार",
+      "specializedTag": "सम्मान · एपी · दोहरा नामांकन।"
+    },
+    "filters": {
+      "all": "सब",
+      "search": "पाठ्यक्रम कोड या नाम से खोजें...",
+      "subjectArea": "विषय क्षेत्र",
+      "allSubjects": "सभी विषय",
+      "courseType": "कोर्स का प्रकार",
+      "allTypes": "सभी प्रकार",
+      "creditType": "क्रेडिट प्रकार",
+      "allCreditTypes": "सभी क्रेडिट प्रकार",
+      "gradeLevel": "ग्रेड स्तर",
+      "allGrades": "सभी ग्रेड",
+      "clear": "साफ़ ({{value}})",
+      "exportAria": "CSV के रूप में निर्यात पाठ्यक्रम",
+      "exportCsv": "निर्यात करेंCSV"
+    },
+    "form": {
+      "incompleteTitle": "अपूर्ण पाठ्यक्रम डेटा",
+      "incompleteDescription": "इस पाठ्यक्रम में कोई विस्तृत शैक्षणिक विषय नहीं है। इसे नीचे सेट करें ताकि रिपोर्ट कार्ड और Ed-Fi विषय रोलअप लेबल सही ढंग से हो, फिर सहेजें।",
+      "identityTitle": "पाठ्यक्रम की पहचान",
+      "identityDescription": "पाठ्यक्रम कोड विषय और ग्रेड स्तरों से स्वतः उत्पन्न होता है। यह एक विशिष्ट पहचानकर्ता है और निर्माण के बाद इसे बदला नहीं जा सकता।",
+      "courseCode": "कोर्स कोड",
+      "courseCodePlaceholder": "उदाहरण के लिए, MATH-101",
+      "courseCodeCustom": "कस्टम कोड - स्वतः अपडेट नहीं होगा.",
+      "courseCodeAutoGenerated": "विषय + ग्रेड से स्वतः उत्पन्न - ओवरराइड करने के लिए संपादित करें।",
+      "duplicateCourseCode": "वह पाठ्यक्रम कोड पहले से ही उपयोग में है - उसे पुनः बनाएँ या संपादित करें।",
+      "regenerate": "पुनर्जीवित करें",
+      "courseNamePlaceholder": "उदाहरण के लिए, बीजगणित I",
+      "classificationTitle": "वर्गीकरण",
+      "classificationDescription": "इस पाठ्यक्रम को विषय, प्रकार और क्रेडिट स्तर के आधार पर वर्गीकृत करें। व्यापक Ed-Fi विषय क्षेत्र स्वचालित रूप से शैक्षणिक विषय से प्राप्त होता है।",
+      "academicSubject": "शैक्षणिक विषय",
+      "academicSubjectMissingTooltip": "गुम - रिपोर्ट-कार्ड लेबल और Ed-Fi विषय रोलअप के लिए आवश्यक।",
+      "selectAcademicSubject": "शैक्षणिक विषय का चयन करें",
+      "selectCourseType": "पाठ्यक्रम का प्रकार चुनें",
+      "creditType": "क्रेडिट प्रकार",
+      "selectCreditType": "क्रेडिट प्रकार चुनें",
+      "selectDuration": "अवधि चुनें",
+      "creditsPlaceholder": "जैसे, 1",
+      "periodsPerWeek": "प्रति सप्ताह अवधि",
+      "periodsPerWeekPlaceholder": "जैसे, 5",
+      "gradeLevelsDescription": "चुनें कि यह पाठ्यक्रम किस ग्रेड स्तर पर उपलब्ध है।",
+      "outsideSchoolGradeRange": "स्कूल ग्रेड सीमा के बाहर",
+      "descriptionObjectivesTitle": "विवरण एवं उद्देश्य",
+      "descriptionObjectivesDescription": "पाठ्यक्रम विवरण प्रदान करें और सीखने के उद्देश्यों को परिभाषित करें।",
+      "courseDescription": "पाठ्यक्रम विवरण",
+      "courseDescriptionPlaceholder": "वर्णन करें कि इस पाठ्यक्रम में क्या शामिल है, इसके लक्ष्य और छात्रों की अपेक्षाएँ...",
+      "learningObjectives": "सीखने के उद्देश्य",
+      "objectivePlaceholder": "एक उद्देश्य टाइप करें और Enter दबाएँ",
+      "objectiveCount": "{{count}}/{{max}} उद्देश्य",
+      "materialsTitle": "पाठ्यक्रम सामग्री",
+      "materialsDescription": "इस पाठ्यक्रम के लिए पाठ्यपुस्तकें, कार्यपुस्तिकाएँ या डिजिटल संसाधन जोड़ें।",
+      "addMaterial": "सामग्री जोड़ें",
+      "noMaterials": "अभी तक कोई सामग्री नहीं जोड़ी गई. आरंभ करने के लिए सामग्री जोड़ें पर क्लिक करें।",
+      "materialNumber": "सामग्री {{number}}",
+      "materialType": "प्रकार",
+      "materialTitle": "शीर्षक",
+      "materialTitlePlaceholder": "सामग्री शीर्षक",
+      "materialAuthor": "लेखक",
+      "materialAuthorPlaceholder": "लेखक का नाम",
+      "materialIsbn": "आईएसबीएन",
+      "materialIsbnPlaceholder": "आईएसबीएन-13",
+      "materialTypes": {
+        "textbook": "पाठ्यपुस्तक",
+        "workbook": "कार्यपुस्तिका",
+        "digital": "डिजिटल संसाधन",
+        "other": "अन्य"
+      }
+    },
+    "drawer": {
+      "subjectAreaRollup": "विषय क्षेत्र (Ed-Fi रोलअप)",
+      "createCourse": "पाठ्यक्रम बनाएं",
+      "addNewCourse": "नया पाठ्यक्रम जोड़ें",
+      "courseDetails": "पाठ्यक्रम विवरण",
+      "editing": "संपादन",
+      "closeDrawer": "दराज बंद करो",
+      "noCourseData": "कोई पाठ्यक्रम डेटा उपलब्ध नहीं है",
+      "viewDetails": "विवरण देखें"
+    },
+    "gradeDrawer": {
+      "title": "{{grade}} विवरण",
+      "editComingSoon": "संपादन कार्यक्षमता जल्द ही आ रही है",
+      "exportComingSoon": "निर्यात कार्यक्षमता जल्द ही आ रही है",
+      "assignedToLevel": "{{value}} पाठ्यक्रम इस स्तर को सौंपा गया है",
+      "assignedToLevel_plural": "{{value}} पाठ्यक्रम इस स्तर पर निर्दिष्ट हैं",
+      "courses": "पाठ्यक्रम",
+      "assignedCourses": "निर्दिष्ट पाठ्यक्रम",
+      "noCoursesAssigned": "इस ग्रेड स्तर पर कोई पाठ्यक्रम नहीं सौंपा गया है",
+      "noCoursesDescription": "इस ग्रेड स्तर वाले पाठ्यक्रम यहां दिखाई देंगे।",
+      "activeGroup": "सक्रिय ({{count}})",
+      "inactiveGroup": "निष्क्रिय ({{count}})",
+      "studentEnrollment": "छात्र नामांकन",
+      "studentEnrollmentDescription": "ग्रेड स्तर के अनुसार छात्र नामांकन डेटा",
+      "futureRelease": "भावी रिलीज़ में आ रहा है"
+    },
+    "standards": {
+      "title": "मानक संरेखण",
+      "description": "पाठ्यक्रम कवरेज और Ed-Fi अनुपालन को ट्रैक करने के लिए पाठ्यक्रमों को शैक्षणिक मानकों के अनुसार मैप करें। मानकों को प्रति पाठ्यक्रम कॉन्फ़िगर किया जा सकता है।"
+    },
+    "export": {
+      "headers": {
+        "code": "कोड",
+        "courseName": "पाठ्यक्रम का नाम",
+        "subject": "विषय",
+        "grades": "ग्रेड",
+        "credits": "क्रेडिट",
+        "type": "प्रकार",
+        "duration": "अवधि",
+        "status": "स्थिति"
+      }
+    },
+    "courseDetail": {
+      "actions": {
+        "editCourse": "पाठ्यक्रम संपादित करें",
+        "printDetails": "विवरण प्रिंट करें",
+        "activate": "सक्रिय करें",
+        "deactivate": "निष्क्रिय करें"
+      },
+      "tabs": {
+        "overview": "अवलोकन",
+        "sections": "अनुभाग",
+        "standards": "मानक"
+      },
+      "periodsPerWeekShort": "अवधि/सप्ताह",
+      "description": "विवरण",
+      "learningObjectives": "सीखने के उद्देश्य",
+      "byAuthor": "{{author}} द्वारा",
+      "metadata": "मेटाडेटा",
+      "created": "बनाया गया",
+      "lastUpdated": "अंतिम अद्यतन",
+      "noSectionsTitle": "अभी तक कोई अनुभाग नहीं",
+      "noSectionsDescription": "इस पाठ्यक्रम के लिए कोई कक्षा अनुभाग नहीं बनाया गया है।",
+      "goToScheduling": "शेड्यूलिंग पर जाएँ",
+      "sectionCount": "{{value}} अनुभाग",
+      "sectionCount_plural": "{{value}} अनुभाग",
+      "sectionTitle": "अनुभाग {{section}}",
+      "loadMoreSections": "अधिक अनुभाग लोड करें",
+      "standardsTitle": "सीखने के मानक",
+      "standardsDescription": "इस पाठ्यक्रम के लिए मानक संरेखण भविष्य की विज्ञप्ति में उपलब्ध होगा। योग्यता-आधारित परिणामों को ट्रैक करने के लिए कॉमन कोर, एनजीएसएस, या राज्य-विशिष्ट मानकों को लिंक करें।",
+      "notFoundTitle": "कोर्स नहीं मिला",
+      "notFoundDescription": "हो सकता है कि यह पाठ्यक्रम हटा दिया गया हो या आपके पास पहुंच न हो।",
+      "backToCurriculum": "पाठ्यचर्या पर वापस जाएँ",
+      "credits": "{{value}} क्रेडिट",
+      "credits_plural": "{{value}} क्रेडिट",
+      "courseTabs": "पाठ्यक्रम टैब"
+    }
+  },
+  "rosteringModule": {
+    "description": "सभी सक्रिय अनुभागों में छात्र-दर-अनुभागीय असाइनमेंट प्रबंधित करें",
+    "actions": {
+      "applyChanges": "परिवर्तन लागू करें",
+      "applying": "आवेदन कर रहा हूँ..."
+    },
+    "cell": {
+      "addToSection": "{{section}} में जोड़ें",
+      "removeFromSection": "{{section}} से हटाएँ"
+    },
+    "conflict": {
+      "title": "अनुसूची संघर्ष",
+      "samePeriod": "{{value}} अन्य अनुभागों के समान कक्षा अवधि"
+    },
+    "student": {
+      "gradeShort": "ग्रेड {{grade}}"
+    },
+    "summary": {
+      "additions": "{{value}} जोड़",
+      "additions_plural": "{{value}} अतिरिक्त",
+      "removals": "{{value}} निष्कासन",
+      "removals_plural": "{{value}} निष्कासन",
+      "conflicts": "{{value}} संघर्ष",
+      "conflicts_plural": "{{value}} संघर्ष",
+      "processing": "{{total}} का {{progress}} प्रसंस्करण..."
+    },
+    "toast": {
+      "allApplied": "सभी {{value}} परिवर्तन सफलतापूर्वक लागू हो गए",
+      "allApplied_plural": "सभी {{value}} परिवर्तन सफलतापूर्वक लागू हो गए",
+      "partialApplied": "{{success}} परिवर्तन लागू, {{failed}} विफल। विफल परिवर्तनों की समीक्षा करें और पुनः प्रयास करें।",
+      "allFailed": "सभी {{value}} परिवर्तन विफल रहे। अपने कनेक्शन की जांच करें और पुन: प्रयास करें।",
+      "allFailed_plural": "सभी {{value}} परिवर्तन विफल रहे। अपने कनेक्शन की जांच करें और पुन: प्रयास करें।"
+    },
+    "filters": {
+      "gradeLevel": "क्रम स्तर",
+      "loadingGrades": "ग्रेड लोड हो रहे हैं...",
+      "allGrades": "सभी ग्रेड",
+      "course": "पाठ्यक्रम",
+      "allCourses": "सभी पाठ्यक्रम",
+      "matrixCount": "{{students}} छात्र x {{sections}} अनुभाग"
+    },
+    "loading": {
+      "title": "रोस्टरिंग डेटा लोड हो रहा है...",
+      "description": "छात्र, अनुभाग और वर्तमान नामांकन प्राप्त करना"
+    },
+    "empty": {
+      "noCurrentYear": "विद्यार्थियों का चयन करने से पहले स्कूल में एक शैक्षणिक वर्ष निर्धारित करें।",
+      "noDataTitle": "कोई डेटा उपलब्ध नहीं है",
+      "noStudents": "चयनित ग्रेड स्तर के लिए कोई सक्रिय छात्र नहीं मिला।",
+      "noSections": "वर्तमान शैक्षणिक वर्ष के लिए कोई सक्रिय अनुभाग नहीं मिला।"
+    },
+    "table": {
+      "student": "छात्र",
+      "sectionTitle": "अनुभाग {{section}}",
+      "sectionShort": "अनुभाग {{section}}"
+    }
+  },
+  "teachersModule": {
+    "description": "स्कूल स्टाफ सदस्य और उनके शिक्षण कार्य",
+    "stats": {
+      "totalStaff": "कुल स्टाफ",
+      "teachers": "शिक्षकों",
+      "active": "सक्रिय",
+      "roles": "भूमिकाएँ"
+    },
+    "roles": {
+      "staff": "कर्मचारी",
+      "teacher": "अध्यापक",
+      "principal": "प्राचार्य",
+      "vice_principal": "उप प्राचार्य",
+      "counselor": "परामर्शदाता",
+      "admin": "व्यवस्थापक"
+    },
+    "drawer": {
+      "title": "स्टाफ प्रोफ़ाइल",
+      "close": "स्टाफ प्रोफ़ाइल बंद करें",
+      "contactInformation": "संपर्क जानकारी",
+      "hiredOn": "किराये पर लिया गया {{date}}",
+      "assignedSections": "निर्दिष्ट अनुभाग",
+      "sectionCount": "{{value}} अनुभाग",
+      "sectionCount_plural": "{{value}} अनुभाग",
+      "noSections": "कोई अनुभाग निर्दिष्ट नहीं किया गया",
+      "sectionFallback": "अनुभाग",
+      "sectionTitle": "अनुभाग {{section}}"
+    }
+  },
+  "moduleOverview": {
+    "title": "{{title}} सिंहावलोकन",
+    "retryLoading": "पुनः लोड करने का प्रयास करें",
+    "insight": {
+      "enrolledAcrossGrades": "{{students}} छात्र ने {{grades}} ग्रेड में दाखिला लिया",
+      "enrolledAcrossGrades_plural": "{{students}} छात्र {{grades}} ग्रेड में नामांकित हैं",
+      "attendanceToday": "आज {{value}}% उपस्थिति",
+      "noAttendanceData": "कोई उपस्थिति डेटा नहीं",
+      "atRiskStudents": "{{count}} जोखिम में छात्र",
+      "atRiskStudents_plural": "{{count}} जोखिम वाले छात्र",
+      "noAtRiskStudents": "कोई जोखिम वाला छात्र नहीं"
+    },
+    "guards": {
+      "selectSchoolTitle": "एक स्कूल चुनें",
+      "selectSchoolDescription": "शैक्षणिक अवलोकन देखने के लिए साइडबार से एक स्कूल चुनें।",
+      "noAcademicYearTitle": "कोई सक्रिय शैक्षणिक वर्ष नहीं",
+      "noAcademicYearDescription": "अवलोकन डेटा देखने के लिए अपने स्कूल कैलेंडर में एक शैक्षणिक वर्ष सेट करें और सक्रिय करें।"
+    },
+    "actions": {
+      "enrollStudent": "विद्यार्थी का नामांकन करें",
+      "enrollStudentAria": "एक छात्र का नामांकन करें",
+      "takeAttendance": "उपस्थिति लें",
+      "takeAttendanceAria": "उपस्थिति ले लो"
+    },
+    "filters": {
+      "last7Days": "पिछले 7 दिन",
+      "last30Days": "पिछले 30 दिन",
+      "thisSemester": "इस सेमेस्टर",
+      "thisYear": "इस साल",
+      "or": "या",
+      "fromDate": "दिनांक से",
+      "toDate": "आज तक",
+      "allGrades": "सभी ग्रेड",
+      "kindergarten": "बालवाड़ी",
+      "preK": "प्री-के",
+      "clear": "साफ़ करें",
+      "exportCsv": "निर्यात करेंCSV",
+      "exportCsvAria": "नामांकन को CSV के रूप में निर्यात करें"
+    },
+    "kpis": {
+      "totalEnrolled": "कुल नामांकित",
+      "recent": "+{{count}} हाल का",
+      "grades": "{{count}} ग्रेड",
+      "acrossGrades": "{{count}} ग्रेड में",
+      "thisAcademicYear": "इस शैक्षणिक वर्ष",
+      "activeSections": "सक्रिय अनुभाग",
+      "teachers": "{{count}} शिक्षक",
+      "studentSectionRatio": "{{value}}:1 छात्र-अनुभाग अनुपात",
+      "activeClasses": "सक्रिय कक्षाएं",
+      "todayAttendance": "आज की उपस्थिति",
+      "partialData": "आंशिक डेटा",
+      "attendanceBreakdown": "{{present}} उपस्थित · {{absent}} अनुपस्थित · {{late}} देर से",
+      "today": "आज",
+      "atRiskStudents": "जोखिम में छात्र",
+      "below80": "{{count}} 80% से नीचे",
+      "riskBreakdown": "{{critical}} गंभीर · {{warning}} चेतावनी",
+      "below90Threshold": "90% सीमा से नीचे",
+      "region": "प्रमुख मेट्रिक्स"
+    },
+    "needsAttention": {
+      "title": "ध्यान देने की जरूरत है"
+    },
+    "errors": {
+      "attendanceTrend": "उपस्थिति प्रवृत्ति लोड करने में असमर्थ",
+      "enrollmentChart": "नामांकन चार्ट लोड करने में असमर्थ",
+      "atRiskStudents": "जोखिम वाले छात्रों को लोड करने में असमर्थ",
+      "staffRoster": "स्टाफ रोस्टर लोड करने में असमर्थ"
+    },
+    "attendanceTrend": {
+      "title": "उपस्थिति प्रवृत्ति",
+      "subtitle": "30-दिवसीय रोलिंग औसत",
+      "actual": "वास्तविक",
+      "target": "{{value}}% लक्ष्य",
+      "average": "औसत {{value}}%",
+      "tooltipPresent": "{{present}} में से {{total}} मौजूद",
+      "srNoData": "कोई उपस्थिति प्रवृत्ति डेटा उपलब्ध नहीं है.",
+      "srSummary": "पिछले 30 दिनों में उपस्थिति दर {{min}}% से {{max}}% तक रही, {{target}}% लक्ष्य की तुलना में औसतन {{avg}}% के साथ।",
+      "empty": "अभी तक कोई उपस्थिति डेटा दर्ज नहीं किया गया है",
+      "aria": "30 दिनों में उपस्थिति का रुझान",
+      "viewAttendance": "उपस्थिति देखें"
+    },
+    "enrollmentChart": {
+      "title": "ग्रेड स्तर के अनुसार नामांकन",
+      "total": "{{total}} कुल",
+      "aria": "ग्रेड स्तर के अनुसार नामांकन, {{total}} कुल छात्र",
+      "tooltip": "{{count}} छात्र · {{percentage}}%",
+      "tooltip_plural": "{{count}} छात्र · {{percentage}}%",
+      "empty": "कोई नामांकन डेटा नहीं",
+      "viewEnrollment": "नामांकन देखें"
+    },
+    "atRisk": {
+      "title": "जोखिम में छात्र विवरण",
+      "total": "{{count}} ख़तरे में है",
+      "empty": "कोई जोखिम वाला छात्र नहीं",
+      "absent": "{{count}} अनुपस्थित",
+      "gradeAbsent": "{{grade}} · {{absent}}",
+      "progressLabel": "{{student}}: {{rate}}% उपस्थिति",
+      "viewAll": "सभी {{count}} जोखिम वाले छात्रों को देखें"
+    },
+    "alerts": {
+      "criticalTitle": "{{count}} छात्र 80% से कम उपस्थिति - तत्काल हस्तक्षेप की आवश्यकता है",
+      "criticalTitle_plural": "{{count}} 80% से कम उपस्थिति वाले छात्र - तत्काल हस्तक्षेप की आवश्यकता है",
+      "criticalSubtitle": "30 दिन की अवधि · {{total}} कुल जोखिम में",
+      "viewDetails": "विवरण देखें",
+      "warningTitle": "{{count}} छात्र 90% उपस्थिति सीमा से नीचे",
+      "warningTitle_plural": "{{count}} 90% उपस्थिति सीमा से नीचे के छात्र",
+      "warningSubtitle": "स्कूल में उपस्थिति दर निर्धारित सीमा से कम",
+      "review": "समीक्षा",
+      "unrecordedTitle": "{{count}} छात्र आज उपस्थिति रिकॉर्ड के बिना",
+      "unrecordedTitle_plural": "{{count}} छात्र आज उपस्थिति रिकॉर्ड के बिना",
+      "unrecordedSubtitle": "आज सभी विद्यार्थियों की उपस्थिति दर्ज नहीं की गई है"
+    },
+    "staffRoster": {
+      "title": "स्टाफ रोस्टर",
+      "active": "{{count}} सक्रिय",
+      "loadFailed": "स्टाफ डेटा लोड करने में असमर्थ",
+      "empty": "कोई स्टाफ सदस्य नहीं",
+      "unknown": "अज्ञात",
+      "staff": "कर्मचारी",
+      "general": "सामान्य",
+      "fullTime": "पूर्णकालिक",
+      "contract": "अनुबंध",
+      "teachers": "{{count}} शिक्षक",
+      "teachers_plural": "{{count}} शिक्षक"
+    },
+    "options": {
+      "title": "पेज विकल्प",
+      "showHideWidgets": "विजेट दिखाएँ/छिपाएँ",
+      "resetToDefault": "डिफ़ॉल्ट पर रीसेट करें",
+      "back": "वापस"
+    },
+    "stats": {
+      "scrollLeft": "आँकड़े बाईं ओर स्क्रॉल करें",
+      "scrollRight": "आँकड़े दाईं ओर स्क्रॉल करें",
+      "regionLabel": "प्रमुख प्रदर्शन संकेतक"
+    },
+    "updated": {
+      "justNow": "अभी अपडेट किया गया",
+      "minutesAgo": "{{value}}m पहले अपडेट किया गया",
+      "hoursAgo": "{{value}}h पहले अपडेट किया गया",
+      "refreshTitle": "ताज़ा करने के लिए क्लिक करें"
+    },
+    "widgets": {
+      "quickStats": "त्वरित आँकड़े",
+      "insights": "अंतर्दृष्टि",
+      "insightsCharts": "अंतर्दृष्टि और चार्ट",
+      "activityAlerts": "गतिविधि एवं अलर्ट"
+    },
+    "signals": {
+      "needAttention": "ध्यान देने की जरूरत है",
+      "allClear": "सब साफ़",
+      "minimize": "न्यूनतम करें",
+      "acknowledge": "समझ गया",
+      "acknowledged": "स्वीकृत",
+      "acknowledgedHint": "स्वीकृत - पूर्ववत करने के लिए क्लिक करें",
+      "dismiss": "ख़ारिज करें",
+      "emptyTitle": "आप सब फंस गये हैं।",
+      "domains": {
+        "attendance": "उपस्थिति",
+        "assessment": "आकलन",
+        "finance": "वित्त",
+        "enrollment": "नामांकन",
+        "capacity": "क्षमता",
+        "dataQuality": "डेटा गुणवत्ता"
+      }
+    }
+  },
+  "examModule": {
+    "description": "मध्यावधि, अंतिम और सत्रीय परीक्षाओं की योजना बनाएं, चलाएं और प्रकाशित करें",
+    "descriptionWithYear": "{{yearName}} के लिए परीक्षा की योजना बनाएं, चलाएं और प्रकाशित करें",
+    "createExam": "परीक्षा बनाएं",
+    "createDisabledTitle": "पहले शर्तों के साथ एक शैक्षणिक वर्ष आवश्यक है",
+    "noActiveYear": {
+      "title": "कोई सक्रिय शैक्षणिक वर्ष नहीं",
+      "description": "इस स्कूल में परीक्षाओं का शेड्यूल शुरू करने के लिए एक चालू शैक्षणिक वर्ष निर्धारित करें।"
+    },
+    "bulk": {
+      "changeStatus": "स्थिति बदलें",
+      "generateResults": "परिणाम उत्पन्न करें",
+      "changeStatusComingSoon": "{{count}} परीक्षा(परीक्षाओं) के लिए थोक परिवर्तन की स्थिति - जल्द ही आ रही है",
+      "generateComingSoon": "{{count}} परीक्षा(परीक्षाओं) के लिए कतारबद्ध परिणाम तैयार किया जाएगा - जल्द ही आ रहा है",
+      "onlyClosed": "केवल बंद परीक्षाएं ही परिणाम कार्ड तैयार कर सकती हैं।"
+    },
+    "bulkDrawer": {
+      "title": "परीक्षा की स्थिति बदलें",
+      "selectedCount": "{{value}} परीक्षा चयनित",
+      "selectedCount_plural": "{{value}} परीक्षा चयनित",
+      "moveTo": "की ओर बढ़ें",
+      "noSharedTarget": "प्रत्येक चयनित परीक्षा से कोई स्थिति उपलब्ध नहीं है - चयन को सीमित करें या उन्हें समूहों में स्थानांतरित करें।",
+      "targetStatusAria": "लक्ष्य स्थिति",
+      "notes": "टिप्पणियाँ",
+      "optional": "(वैकल्पिक)",
+      "notesPlaceholder": "एक कारण या संदर्भ जोड़ें जो हर बदलाव के साथ जुड़ा हो...",
+      "selection": "चयन ({{count}})",
+      "statusCount": "{{value}} परीक्षा",
+      "statusCount_plural": "{{value}} परीक्षा",
+      "pickTarget": "एक लक्ष्य चुनें",
+      "targetPreview": "→ {{target}}",
+      "skippedPreview": "- छोड़ दिया गया ({{target}} के लिए कोई रास्ता नहीं)",
+      "applying": "आवेदन कर रहा हूँ...",
+      "applyTo": "{{count}} पर आवेदन करें",
+      "toast": {
+        "movedAll": "{{value}} परीक्षा को {{target}} में ले जाया गया",
+        "movedAll_plural": "{{value}} परीक्षाओं को {{target}} में स्थानांतरित किया गया",
+        "noneMoved": "कोई परीक्षा स्थानांतरित नहीं हुई - {{error}}",
+        "movedPartial": "{{value}} को {{target}} में ले जाया गया",
+        "skipped": "{{value}} छोड़ दिया गया",
+        "failed": "{{value}} विफल",
+        "separator": "·"
+      }
+    },
+    "filter": {
+      "filteredBy": "द्वारा फ़िल्टर किया गया",
+      "clear": "स्पष्ट (1)"
+    },
+    "summary": {
+      "total": "कुल परीक्षा",
+      "live": "अभी जियो",
+      "upcoming": "आगामी",
+      "awaiting": "नतीजों का इंतज़ार है",
+      "readiness": "परिणाम की तैयारी",
+      "typeTermCount": "{{types}} प्रकार · {{terms}} पद",
+      "inSession": "सत्र में",
+      "nothingLive": "कुछ भी नहीं रहता",
+      "allCaughtUp": "सभी को पकड़ लिया गया",
+      "actionNeeded": "कार्रवाई की जरूरत है",
+      "noClosed": "कोई बंद परीक्षा नहीं",
+      "generatedCount": "{{generated}}/{{total}} उत्पन्न हुआ",
+      "readinessAria": "परिणाम की तैयारी: {{percent}}% ({{total}} में से {{generated}} उत्पन्न)",
+      "nextHint": "अगला: {{examName}} · {{days}}d में",
+      "noUpcoming": "कोई आगामी नहीं"
+    },
+    "status": {
+      "draft": "ड्राफ्ट",
+      "scheduled": "अनुसूचित",
+      "in_progress": "प्रगति पर है",
+      "closed": "बंद",
+      "published": "प्रकाशित"
+    },
+    "transitions": {
+      "draft": "ड्राफ्ट पर जाएँ",
+      "scheduled": "समय-सारणी",
+      "in_progress": "परीक्षा प्रारंभ करें",
+      "closed": "परीक्षा बंद करें",
+      "published": "परीक्षा प्रकाशित करें"
+    },
+    "transitionConfirm": {
+      "closed": "यह परीक्षा बंद करें? प्रत्येक नामांकित छात्र के लिए स्कोर लॉक और परिणाम कार्ड तैयार किए जाते हैं। आप बंद करने के बाद ही प्रकाशित कर सकते हैं.",
+      "published": "इस परीक्षा को प्रकाशित करें? यह परीक्षा जीवनचक्र पूर्ण होने का प्रतीक है।"
+    },
+    "types": {
+      "midterm": "मध्यावधि",
+      "final": "अंतिम",
+      "unit_test": "इकाई परीक्षण",
+      "quiz": "प्रश्नोत्तरी"
+    },
+    "resultGeneration": {
+      "label": "परिणाम सृजन",
+      "pending": "परिणाम कार्ड तैयार किया जा रहा है...",
+      "generated": "परिणाम कार्ड तैयार किये गये",
+      "failed": "परिणाम निर्माण विफल रहा",
+      "generatedAt": "उत्पन्न {{dateTime}}"
+    },
+    "detail": {
+      "backToExams": "परीक्षा पर वापस जाएँ",
+      "notFoundTitle": "परीक्षा नहीं मिली",
+      "notFoundDescription": "हो सकता है कि यह परीक्षा हटा दी गई हो या आपके पास पहुंच न हो.",
+      "noTerm": "कोई शब्द नहीं",
+      "grades": "ग्रेड",
+      "edit": "संपादित करें",
+      "resultCards": "परिणाम कार्ड",
+      "closeDrawer": "दराज बंद करो",
+      "lifecycle": "जीवनचक्र",
+      "lifecycleComplete": "यह परीक्षा प्रकाशित हो चुकी है - इसका जीवनचक्र पूरा हो गया है।",
+      "tabsAria": "परीक्षा टैब",
+      "tabs": {
+        "overview": "अवलोकन",
+        "subjects": "विषय",
+        "scores": "स्कोर"
+      },
+      "fields": {
+        "type": "प्रकार",
+        "term": "अवधि",
+        "status": "स्थिति",
+        "gradeLevels": "ग्रेड स्तर",
+        "startDate": "आरंभ तिथि",
+        "endDate": "समाप्ति तिथि",
+        "created": "बनाया गया",
+        "description": "विवरण"
+      }
+    },
+    "drawer": {
+      "createTitle": "परीक्षा बनाएं",
+      "editTitle": "परीक्षा संपादित करें",
+      "saving": "सहेजा जा रहा है...",
+      "creating": "बनाया जा रहा है...",
+      "detailsTitle": "परीक्षा विवरण",
+      "detailsDescription": "इस परीक्षा को नाम दें और इसका प्रकार और अवधि चुनें।",
+      "examName": "परीक्षा का नाम",
+      "examNamePlaceholder": "उदाहरण के लिए, प्रथम सत्र परीक्षा",
+      "selectExamType": "परीक्षा का प्रकार चुनें",
+      "selectTerm": "पद चुनें",
+      "examTypeLocked": "लॉक किया गया: परीक्षा का प्रकार केवल तभी बदल सकता है जब परीक्षा ड्राफ्ट में हो।",
+      "termLocked": "सृजन के बाद पद बदला नहीं जा सकता.",
+      "gradeLevelsDescription": "इस परीक्षा का दायरा इसमें बैठने वाले ग्रेड तक सीमित करें। विषय चयनकर्ता, स्कोर रोस्टर और परिणाम कार्ड निर्माण को संचालित करता है।",
+      "gradeLevelsLocked": "लॉक किया गया: ग्रेड स्तर केवल तभी बदल सकते हैं जब परीक्षा ड्राफ्ट में हो।",
+      "gradeLevelsHelper": "प्रति-ग्रेड परीक्षा के लिए एक चुनें, या ग्रेड-विभाजन के लिए एकाधिक चुनें (उदाहरण के लिए, ग्रेड 9 + 10)।",
+      "scheduleTitle": "समय-सारणी",
+      "scheduleDescription": "यह परीक्षा कब चलती है?",
+      "descriptionDescription": "इस परीक्षा के बारे में वैकल्पिक नोट्स.",
+      "descriptionPlaceholder": "वैकल्पिक विवरण...",
+      "loadingGradeLevels": "उपलब्ध ग्रेड स्तर लोड हो रहा है...",
+      "noGradeLevels": "इस स्कूल में कोई सक्षम ग्रेड स्तर कॉन्फ़िगर नहीं किया गया है। परीक्षा बनाने से पहले उन्हें सेटिंग्स -> ग्रेड स्तर के अंतर्गत सेट करें।"
+    },
+    "subjects": {
+      "count": "{{value}} विषय",
+      "addSubject": "विषय जोड़ें",
+      "locked": "परीक्षा {{status}} होने पर विषय लॉक हो जाते हैं। इन्हें केवल ड्राफ्ट या शेड्यूल में ही बदला जा सकता है।",
+      "noGradeMatch": "कोई भी पाठ्यक्रम इस परीक्षा के ग्रेड स्तर ({{grades}}) से मेल नहीं खाता। पहले पाठ्यक्रम में उन ग्रेडों के लिए टैग किए गए पाठ्यक्रम जोड़ें।",
+      "course": "पाठ्यक्रम",
+      "selectCourse": "एक कोर्स चुनें...",
+      "maxMarks": "मैक्स मार्क्स",
+      "passMarks": "पास मार्क्स",
+      "components": "अवयव",
+      "componentsHint": "(वैकल्पिक - जैसे थ्योरी + प्रैक्टिकल)",
+      "splitComponents": "+ घटकों में विभाजित करें",
+      "componentsSum": "Σ {{sum}} / {{max}} पूर्ण",
+      "componentLabelPlaceholder": "लेबल (जैसे सिद्धांत)",
+      "fullPlaceholder": "पूर्ण",
+      "passPlaceholder": "पास",
+      "componentLabelAria": "घटक {{index}} लेबल",
+      "componentFullAria": "घटक {{index}} पूर्ण अंक",
+      "componentPassAria": "घटक {{index}} उत्तीर्ण अंक",
+      "removeComponent": "घटक हटाएँ",
+      "addComponent": "घटक जोड़ें",
+      "clearComponents": "स्पष्ट (एकल विषय)",
+      "componentsInvalid": "प्रत्येक घटक को एक लेबल की आवश्यकता होती है, पूर्ण >= 1, 0 <= पास <= पूर्ण, और पूर्ण अंकों का योग अधिकतम अंक ({{max}}) होना चाहिए।",
+      "emptyMutable": "अभी तक कोई विषय नहीं. वे पाठ्यक्रम जोड़ें जिनमें यह परीक्षा शामिल होगी.",
+      "emptyReadonly": "अभी तक कोई विषय नहीं.",
+      "courseFallback": "पाठ्यक्रम",
+      "maxShort": "अधिकतम",
+      "passShort": "पास",
+      "editMarks": "चिह्न संपादित करें",
+      "removeSubject": "विषय हटाएँ",
+      "removeConfirm": "परीक्षा से {{subject}} हटाएं?",
+      "thisSubject": "यह विषय",
+      "theory": "सिद्धांत",
+      "practical": "व्यावहारिक"
+    },
+    "resultCards": {
+      "absentTitle": "अनुपस्थित / श्रेणीबद्ध नहीं",
+      "fail": "असफल",
+      "gradeLabel": "ग्रेड {{grade}}",
+      "published": "प्रकाशित",
+      "draft": "ड्राफ्ट",
+      "publishConfirm": "यह परिणाम कार्ड प्रकाशित करें? प्रकाशन अंतिम है और इसे पूर्ववत नहीं किया जा सकता.",
+      "allCards": "सभी परिणाम कार्ड",
+      "percentage": "प्रतिशत",
+      "division": "प्रभाग",
+      "result": "नतीजा",
+      "passUpper": "पास",
+      "failUpper": "असफल",
+      "position": "पद",
+      "termGpa": "अवधि GPA",
+      "overall": "कुल मिलाकर",
+      "subject": "विषय",
+      "marks": "निशान",
+      "passMarksShort": "पास एम.",
+      "score": "स्कोर",
+      "grade": "श्रेणी",
+      "pass": "पास",
+      "total": "कुल",
+      "conduct": "आचरण",
+      "conductPlaceholder": "आचरण टिप्पणी...",
+      "saveConduct": "आचरण बचाओ",
+      "classTeacherRemark": "कक्षा-शिक्षक टिप्पणी",
+      "remarkPlaceholder": "कक्षा-शिक्षक की टिप्पणी...",
+      "saveRemark": "टिप्पणी सहेजें",
+      "publishedReadOnly": "प्रकाशित - केवल पढ़ने योग्य",
+      "draftReview": "ड्राफ्ट - समीक्षा करें फिर प्रकाशित करें",
+      "printPdf": "प्रिंट/PDF",
+      "publish": "प्रकाशित करें",
+      "generatingTitle": "परिणाम कार्ड तैयार किया जा रहा है...",
+      "generatingDescription": "इसमें आमतौर पर कुछ सेकंड लगते हैं. सूची तैयार होने पर स्वचालित रूप से अपडेट हो जाती है।",
+      "generationFailedTitle": "परिणाम निर्माण विफल रहा",
+      "generationFailedDescription": "परिणाम कार्ड बनाने में कुछ गड़बड़ी हुई। परीक्षा दोबारा खोलने और दोबारा बंद करने का प्रयास किया जाएगा।",
+      "emptyTitle": "अभी तक कोई परिणाम कार्ड नहीं",
+      "emptyDescription": "यह परीक्षा समाप्त होते ही परिणाम कार्ड स्वचालित रूप से उत्पन्न हो जाते हैं। सभी अंक दर्ज करने के बाद परीक्षा बंद करें।",
+      "student": "छात्र",
+      "print": {
+        "reportCard": "रिपोर्ट कार्ड",
+        "progressReport": "प्रगति रिपोर्ट",
+        "printSavePdf": "PDF के रूप में प्रिंट/सहेजें",
+        "printed": "मुद्रित",
+        "full": "पूर्ण",
+        "obtained": "प्राप्त करें.",
+        "highestMarks": "एच.एम.",
+        "classTeacher": "कक्षा अध्यापक",
+        "principal": "प्राचार्य",
+        "parentGuardian": "माता-पिता/अभिभावक",
+        "generatedBy": "EdForge द्वारा उत्पन्न",
+        "draftNotPublished": "ड्राफ्ट (अभी तक प्रकाशित नहीं)",
+        "gradePrefix": "श्रेणी",
+        "emisPrefix": "EMIS"
+      }
+    },
+    "signals": {
+      "endingTodayTitle": "{{count}} लाइव परीक्षाएं आज समाप्त हो रही हैं",
+      "endingTodaySub": "बंद होने से पहले चिह्न दर्ज करें",
+      "awaitingTitle": "{{count}} बंद परीक्षाएं परिणाम की प्रतीक्षा कर रही हैं",
+      "awaitingSub": "परिणाम आने तक रिपोर्ट कार्ड ब्लॉक कर दिए जाते हैं",
+      "startingSoonTitle": "{{count}} परीक्षाएं 7 दिनों के भीतर शुरू होंगी",
+      "startingSoonSub": "कार्यक्रम और तैयारी की पुष्टि करें",
+      "viewLive": "लाइव देखें",
+      "viewAwaiting": "देखने का इंतजार है",
+      "viewUpcoming": "आगामी देखें"
+    }
+  },
+  "classrooms": {
+    "pageTitle": "कक्षाएँ",
+    "toolbar": {
+      "searchPlaceholder": "अनुभाग खोजें...",
+      "all": "सब",
+      "statusPresets": "स्थिति प्रीसेट",
+      "course": "पाठ्यक्रम",
+      "teacher": "अध्यापक",
+      "year": "वर्ष",
+      "viewToggle": "देखें",
+      "cards": "कार्ड",
+      "table": "टेबल",
+      "export": "निर्यात करें"
+    },
+    "tabs": {
+      "overview": "अवलोकन",
+      "gradebook": "ग्रेडबुक",
+      "policies": "ग्रेडिंग नीतियाँ",
+      "attendance": "उपस्थिति",
+      "attendanceBoard": "उपस्थिति बोर्ड",
+      "classwork": "क्लासवर्क",
+      "people": "लोग",
+      "progress": "प्रगति"
+    },
+    "actions": {
+      "activate": "सक्रिय करें",
+      "deactivate": "निष्क्रिय करें",
+      "sendNotification": "अधिसूचना भेजें",
+      "newClassroom": "नई कक्षा",
+      "newSection": "नया अनुभाग",
+      "record": "अभिलेख",
+      "finalize": "अंतिम रूप देना",
+      "gradeAnalytics": "ग्रेड एनालिटिक्स",
+      "gridView": "ग्रिड दृश्य",
+      "listView": "सूची दृश्य",
+      "edit": "संपादित करें",
+      "editSection": "अनुभाग संपादित करें",
+      "printRoster": "रोस्टर प्रिंट करें",
+      "backToClassrooms": "कक्षाओं में वापस",
+      "backToSection": "अनुभाग पर वापस जाएँ",
+      "openGradebook": "ग्रेडबुक खोलें",
+      "openAttendance": "उपस्थिति खोलें",
+      "viewAllClasswork": "सभी क्लासवर्क देखें",
+      "takeAttendance": "उपस्थिति लें",
+      "viewRoster": "रोस्टर देखें",
+      "loadMore": "अधिक लोड करें",
+      "loading": "लोड हो रहा है...",
+      "retry": "पुन: प्रयास करें",
+      "cancel": "रद्द करें",
+      "create": "बनाएँ",
+      "saveChanges": "बदलाव सहेजें",
+      "saving": "सहेजा जा रहा है...",
+      "creating": "बनाया जा रहा है...",
+      "createSection": "अनुभाग बनाएँ",
+      "discard": "त्यागें",
+      "keepEditing": "संपादन करते रहें"
+    },
+    "aria": {
+      "tabs": "कक्षाएँ टैब",
+      "classroomTabs": "कक्षा टैब",
+      "progressViews": "प्रगति के विचार",
+      "createMenu": "मेनू बनाएं",
+      "cardActions": "कार्ड क्रियाएँ",
+      "sectionActions": "अनुभाग क्रियाएँ",
+      "createClasswork": "क्लासवर्क बनाएं",
+      "createClassworkOptions": "क्लासवर्क विकल्प बनाएँ",
+      "loadingClasswork": "क्लासवर्क लोड हो रहा है",
+      "loadingClassworkItems": "कक्षाकार्य आइटम लोड हो रहे हैं...",
+      "retryLoadingClasswork": "क्लासवर्क लोड करने का पुनः प्रयास करें",
+      "closeDrawer": "दराज बंद करो",
+      "openItem": "{{title}} खोलें",
+      "newTopicName": "नये विषय का नाम",
+      "addTopic": "विषय जोड़ें",
+      "attachments": "अनुलग्नक:"
+    },
+    "stats": {
+      "region": "प्रमुख मेट्रिक्स",
+      "totalSections": "कुल अनुभाग",
+      "totalStudents": "कुल छात्र",
+      "avgUtilization": "औसत उपयोग",
+      "activeTeachers": "सक्रिय शिक्षक",
+      "activeClassrooms": "सक्रिय कक्षाएँ",
+      "acrossAllSections": "सभी अनुभागों में",
+      "ofSeatCapacity": "सीट क्षमता का",
+      "assignedSections": "निर्दिष्ट अनुभाग",
+      "failedToLoad": "आँकड़े लोड करने में विफल"
+    },
+    "empty": {
+      "noClassesTitle": "अभी तक कोई कक्षा नहीं",
+      "noClassesDescription": "आरंभ करने के लिए अपना प्रथम श्रेणी अनुभाग बनाएं। कक्षाएं यहां कार्ड के रूप में दिखाई देंगी.",
+      "noSectionsAssigned": "कोई अनुभाग निर्दिष्ट नहीं किया गया. अपने व्यवस्थापक से संपर्क करें.",
+      "selectClassSectionTitle": "एक कक्षा अनुभाग चुनें",
+      "selectClassSectionDescription": "छात्र ग्रेड देखने और प्रबंधित करने के लिए ड्रॉपडाउन से एक अनुभाग चुनें।",
+      "sectionNotFound": "अनुभाग नहीं मिला",
+      "sectionNotFoundDescription": "हो सकता है कि यह अनुभाग हटा दिया गया हो या आपके पास पहुंच न हो.",
+      "noGradesRecorded": "अभी तक कोई ग्रेड दर्ज नहीं किया गया",
+      "noAttendanceToday": "आज के लिए अभी तक कोई उपस्थिति दर्ज नहीं की गई है",
+      "noStudentsEnrolled": "अभी तक किसी छात्र ने नामांकन नहीं कराया है",
+      "noClassworkYet": "अभी तक कोई क्लासवर्क नहीं",
+      "noClassworkWithTopics": "आपके पास विषय सेट हैं लेकिन अभी तक कोई क्लासवर्क आइटम नहीं है। आरंभ करने के लिए असाइनमेंट, क्विज़ या सामग्री बनाएं।",
+      "noClassworkDescription": "अपनी कक्षा के लिए असाइनमेंट, क्विज़ और सामग्री बनाएँ।",
+      "noClassworkItems": "अभी तक कोई क्लासवर्क आइटम नहीं"
+    },
+    "gradebook": {
+      "selectSection": "एक अनुभाग चुनें...",
+      "sectionFallback": "अनुभाग",
+      "selectGradingPeriod": "ग्रेडिंग अवधि चुनें...",
+      "selectGradingPeriodPrompt": "ग्रेडिंग अवधि चुनें",
+      "noPolicyTitle": "कोई ग्रेडिंग नीति कॉन्फ़िगर नहीं की गई",
+      "noPolicyDescription": "ग्रेड अक्षर ग्रेड या श्रेणी भार के बिना सरल औसत का उपयोग करेंगे।",
+      "noDefaultPolicyTitle": "कोई डिफ़ॉल्ट ग्रेडिंग नीति सेट नहीं",
+      "noDefaultPolicyDescription": "आपके पास {{count}} ग्रेडिंग नीति है, लेकिन किसी को भी डिफ़ॉल्ट के रूप में चिह्नित नहीं किया गया है।",
+      "noDefaultPolicyDescription_plural": "आपके पास {{count}} ग्रेडिंग नीतियां हैं, लेकिन किसी को भी डिफ़ॉल्ट के रूप में चिह्नित नहीं किया गया है।",
+      "setAcademicYearBeforeGrades": "ग्रेड रिकॉर्ड करने से पहले एक शैक्षणिक वर्ष निर्धारित करें।",
+      "classAverage": "कक्षा औसत",
+      "gradedChip": "{{pct}}% श्रेणीबद्ध · औसत {{avg}}%",
+      "launchpad": {
+        "helper": "ग्रेड रिकॉर्ड करने और समीक्षा करने, या स्कूल-व्यापी विश्लेषण खोलने के लिए एक अनुभाग चुनें।",
+        "noSectionsTitle": "कोई अनुभाग निर्दिष्ट नहीं किया गया",
+        "backToSections": "अनुभाग",
+        "summary": {
+          "sections": "अनुभाग",
+          "withGrades": "ग्रेड के साथ",
+          "needAttention": "ध्यान देने की जरूरत है",
+          "notStarted": "शुरू नहीं हुआ"
+        },
+        "resume": {
+          "title": "वापस अंदर कूदो",
+          "action": "बायोडाटा"
+        },
+        "status": {
+          "attention": "ध्यान देने की जरूरत है",
+          "inProgress": "प्रगति पर है",
+          "notStarted": "शुरू नहीं हुआ",
+          "onTrack": "ट्रैक पर"
+        },
+        "card": {
+          "classAvg": "कक्षा औसत",
+          "avgGpa": "औसत GPA",
+          "atRisk": "ख़तरे में",
+          "noGradesYet": "अभी तक कोई ग्रेड दर्ज नहीं किया गया ·",
+          "startGrading": "ग्रेडिंग प्रारंभ करें",
+          "gradedAvg": "{{pct}}% श्रेणीबद्ध · औसत {{avg}}%",
+          "gradedProgress": "{{graded}}/{{total}} श्रेणीबद्ध · {{pct}}%",
+          "progressAria": "{{pct}}% श्रेणीबद्ध",
+          "students": "{{count}} छात्र"
+        }
+      }
+    },
+    "context": {
+      "activeSections": "सक्रिय अनुभाग",
+      "across": "पार",
+      "courses": "पाठ्यक्रम",
+      "studentsEnrolled": "छात्रों का नामांकन हुआ",
+      "avgUtilization": "औसत उपयोग",
+      "studentsAtRisk": "जोखिम में छात्र (60% से नीचे)",
+      "concentratedIn": "में केंद्रित",
+      "atFullPassRate": "100% उत्तीर्ण दर पर",
+      "grading": "ग्रेडिंग",
+      "complete": "पूर्ण",
+      "recordedToday": "आज रिकॉर्ड किया गया",
+      "sevenDayAverage": "7 दिन का औसत",
+      "vsThirtyDay": "बनाम 30-दिन",
+      "flaggedBelowAttendance": "90% से कम उपस्थिति को चिह्नित किया गया"
+    },
+    "card": {
+      "noCourse": "कोई कोर्स नहीं",
+      "noTeacherAssigned": "कोई शिक्षक नियुक्त नहीं",
+      "students": "छात्र",
+      "enrollmentSummary": "{{current}}/{{max}} छात्र",
+      "articleLabel": "{{sectionName}} - {{courseName}}, {{teacherName}}, {{current}} {{max}} छात्र"
+    },
+    "detail": {
+      "sectionFallback": "अनुभाग {{number}}",
+      "createSectionTitle": "क्लास सेक्शन बनाएं",
+      "createSectionDescription": "पाठ्यक्रम, शिक्षक और शेड्यूल विवरण के साथ एक नया कक्षा अनुभाग स्थापित करें।",
+      "studentsWithCapacity": "{{current}}/{{max}} छात्र ({{percent}}%)",
+      "enrolledWithCapacity": "{{current}}/{{max}} नामांकित ({{percent}}%)",
+      "studentsRecordedToday": "{{total}} छात्रों में से {{recorded}} ने आज रिकॉर्ड किया",
+      "studentsEnrolledCount": "{{count}} छात्रों ने नामांकन किया",
+      "studentsEnrolledCount_plural": "{{count}} छात्रों ने नामांकन किया",
+      "todayRate": "आज का रेट",
+      "course": "पाठ्यक्रम",
+      "teacher": "अध्यापक",
+      "room": "कमरा",
+      "period": "अवधि",
+      "notAvailable": "एन/ए",
+      "notAssigned": "असाइन नहीं किया गया"
+    },
+    "classwork": {
+      "title": "सभी क्लासवर्क",
+      "failedToLoad": "क्लासवर्क लोड करने में विफल",
+      "failedToLoadDescription": "क्लासवर्क डेटा लाने में त्रुटि हुई. कृपया पुन: प्रयास करें।",
+      "other": "अन्य",
+      "create": "बनाएँ",
+      "assignment": "असाइनमेंट",
+      "quiz": "प्रश्नोत्तरी",
+      "quizAssignment": "प्रश्नोत्तरी असाइनमेंट",
+      "material": "सामग्री",
+      "question": "प्रश्न",
+      "topic": "विषय",
+      "topicNamePlaceholder": "विषय का नाम...",
+      "add": "जोड़ें",
+      "editTitle": "क्लासवर्क संपादित करें",
+      "createTitle": "क्लासवर्क बनाएं",
+      "editing": "संपादन",
+      "type": "प्रकार",
+      "titleLabel": "शीर्षक",
+      "titlePlaceholder": "जैसे अध्याय 3 पठन प्रतिक्रिया",
+      "titleRequired": "शीर्षक आवश्यक है",
+      "description": "विवरण",
+      "questionPlaceholder": "अपना प्रश्न यहां लिखें...",
+      "instructionsPlaceholder": "निर्देश या विवरण जोड़ें...",
+      "topicLabel": "विषय",
+      "noTopic": "कोई विषय नहीं",
+      "quizSettings": "प्रश्नोत्तरी सेटिंग्स",
+      "assignmentSettings": "असाइनमेंट सेटिंग्स",
+      "dueDate": "देय तिथि",
+      "pointsPossible": "संभव अंक",
+      "visibility": "दृश्यता",
+      "draft": "ड्राफ्ट",
+      "published": "प्रकाशित",
+      "discardTitle": "परिवर्तन त्यागें?",
+      "discardDescription": "आपके पास सहेजे नहीं गए परिवर्तन हैं. क्या आप वाकई बंद करना चाहते हैं?",
+      "discardLeaveDescription": "आपके पास सहेजे नहीं गए परिवर्तन हैं. क्या आपकी वाकई छोड़ने की इच्छा है? आपके परिवर्तन खो जायेंगे.",
+      "dueDateShort": "देय {{date}}",
+      "pointsShort": "{{points}} अंक",
+      "typeCount": "{{type}}s"
+    },
+    "overviewPanels": {
+      "grades": "ग्रेड",
+      "attendance": "उपस्थिति",
+      "classwork": "क्लासवर्क",
+      "failedLoadGrades": "ग्रेड लोड करने में विफल",
+      "failedLoadAttendance": "उपस्थिति लोड करने में विफल",
+      "failedLoadClasswork": "क्लासवर्क लोड करने में विफल"
+    },
+    "toast": {
+      "notifyComingSoon": "{{count}} अनुभाग को सूचित करें - जल्द ही आ रहा है",
+      "notifyComingSoon_plural": "{{count}} अनुभागों को सूचित करें - जल्द ही आ रहा है"
+    },
+    "signals": {
+      "atCapacityTitle": "{{count}} सेक्शन सीट क्षमता पर हैं",
+      "atCapacitySub": "आने वाले प्लेसमेंट में कोई सीट नहीं है - पुनर्संतुलन पर विचार करें",
+      "lowUtilTitle": "{{count}} अनुभाग 40% सीट उपयोग से कम हैं",
+      "lowUtilSub": "कम भरे गए अनुभागों को विलय करने पर विचार करें",
+      "unrecordedTitle": "{{count}} अनुभागों ने आज उपस्थिति दर्ज नहीं की है",
+      "unrecordedSub": "अब तक {{total}} में से {{done}} रिकॉर्ड किया गया",
+      "reviewSections": "अनुभागों की समीक्षा करें"
+    },
+    "selection": {
+      "noInactive": "चयन में कोई निष्क्रिय अनुभाग नहीं",
+      "noActive": "चयन में कोई सक्रिय अनुभाग नहीं",
+      "peekSeats": "{{enrolled}}/{{cap}} बैठा हुआ"
+    }
+  },
+  "enrollmentModule": {
+    "tabs": {
+      "registration": "पंजीकरण",
+      "records": "नामांकन अभिलेख"
+    },
+    "actions": {
+      "cancelEnrollment": "नामांकन रद्द करें",
+      "export": "निर्यात करें",
+      "exportCsv": "नामांकन को CSV के रूप में निर्यात करें",
+      "closeYear": "बंद वर्ष",
+      "closing": "समापन...",
+      "back": "वापस",
+      "skip": "छोड़ें",
+      "continue": "जारी रखें",
+      "createStudent": "विद्यार्थी बनाएँ"
+    },
+    "header": {
+      "title": "छात्र नामांकन करें",
+      "registering": "नये विद्यार्थी का पंजीकरण",
+      "academicYear": "शैक्षणिक वर्ष {{year}}",
+      "studentsCurrentlyEnrolled": "{{value}} छात्र वर्तमान में नामांकित हैं",
+      "tabsAria": "नामांकन टैब"
+    },
+    "summary": {
+      "enrolled": "नामांकित",
+      "active": "सक्रिय",
+      "gradeLevels": "ग्रेड स्तर",
+      "progressPercent": "{{percent}}%"
+    },
+    "confirm": {
+      "markNoShow": "{{studentName}} को नो-शो के रूप में चिह्नित करें? इससे नामांकन वापस ले लिया जाएगा।",
+      "thisStudent": "यह छात्र",
+      "closeYear": "{{yearName}} के लिए सभी खुले नामांकन बंद करें? यह सभी नामांकित छात्रों को इस वर्ष के लिए स्नातक के रूप में चिह्नित करेगा। इस एक्शन को वापस नहीं किया जा सकता।",
+      "discardTitle": "परिवर्तन त्यागें?",
+      "discardDescription": "आपके पास सहेजी नहीं गई छात्र जानकारी है. क्या आपकी वाकई छोड़ने की इच्छा है? दर्ज किया गया सारा डेटा नष्ट हो जाएगा."
+    },
+    "export": {
+      "failedTitle": "निर्यात विफल",
+      "failedDescription": "फ़ाइल डाउनलोड नहीं हो सकी."
+    },
+    "wizard": {
+      "progressAria": "पंजीकरण की प्रगति",
+      "stepAnnouncement": "{{total}} का चरण {{current}}: {{title}}",
+      "steps": {
+        "personal": {
+          "title": "व्यक्तिगत जानकारी",
+          "description": "छात्र का बुनियादी व्यक्तिगत विवरण दर्ज करें।"
+        },
+        "contact": {
+          "title": "संपर्क करें",
+          "description": "संपर्क विवरण और पते की जानकारी प्रदान करें."
+        },
+        "guardians": {
+          "title": "रखवालों",
+          "description": "छात्र के माता-पिता या कानूनी अभिभावकों को जोड़ें।"
+        },
+        "medical": {
+          "title": "मेडिकल",
+          "description": "स्वास्थ्य संबंधी जानकारी और जनसांख्यिकीय विवरण प्रदान करें।"
+        },
+        "enrollment": {
+          "title": "नामांकन",
+          "description": "नामांकन प्रकार, शैक्षणिक वर्ष और Ed-Fi विवरण सेट करें।"
+        },
+        "review": {
+          "title": "समीक्षा",
+          "description": "छात्र रिकॉर्ड बनाने से पहले सभी जानकारी की समीक्षा करें।"
+        }
+      },
+      "sidebar": {
+        "context": "नामांकन संदर्भ",
+        "academicYear": "शैक्षणिक वर्ष",
+        "enrolled": "दाखिला लिया",
+        "gradeLevels": "ग्रेड स्तर",
+        "requiredForEdFi": "एडफाई के लिए आवश्यक",
+        "progress": "प्रगति",
+        "filled": "भरा हुआ",
+        "required": "आवश्यक",
+        "step": "चरण {{step}}",
+        "done": "हो गया",
+        "current": "वर्तमान",
+        "fields": {
+          "firstName": "पहला नाम",
+          "lastName": "अंतिम नाम",
+          "dateOfBirth": "जन्मतिथि",
+          "gender": "लिंग",
+          "gradeLevel": "ग्रेड स्तर",
+          "entryDate": "प्रवेश तिथि"
+        }
+      },
+      "toast": {
+        "registeredAndEnrolled": "{{studentName}} पंजीकृत और नामांकित किया गया है!",
+        "enrollmentConflict": "छात्र ने बनाया. नामांकन संघर्ष: {{message}}। छात्र पहले से ही नामांकित हो सकता है।",
+        "enrollmentFailed": "छात्र बनाया गया, लेकिन नामांकन विफल रहा: {{message}}। आप छात्र प्रोफ़ाइल से नामांकन जोड़ सकते हैं।",
+        "registered": "{{studentName}} पंजीकृत किया गया है!"
+      }
+    },
+    "duplicate": {
+      "checking": "मौजूदा छात्र रिकॉर्ड की जाँच की जा रही है...",
+      "possibleDuplicate": "संभावित डुप्लिकेट मिला",
+      "similarRecords": "समान अभिलेख मिले",
+      "singleMatch": "समान जानकारी वाला एक छात्र पहले से मौजूद है।",
+      "multipleMatches": "{{value}} समान जानकारी वाले छात्र पाए गए।",
+      "continueNew": "यदि यह नया छात्र है तो आप जारी रख सकते हैं।",
+      "dismiss": "चेतावनी ख़ारिज करें",
+      "dob": "जन्मतिथि: {{date}}",
+      "grade": "ग्रेड {{grade}}",
+      "match": "मिलान: {{reasons}}",
+      "viewStudent": "देखें{{name}}",
+      "confidence": {
+        "high": "ऊँचा",
+        "medium": "मध्यम",
+        "low": "नीचा"
+      }
+    },
+    "step": {
+      "type": {
+        "title": "नामांकन प्रकार",
+        "description": "छात्र कैसे नामांकन कर रहा है",
+        "labels": {
+          "new": "नया विद्यार्थी",
+          "transfer": "स्थानांतरण",
+          "returning": "लौट रहा छात्र",
+          "re_enrollment": "पुनः नामांकन"
+        },
+        "newDescription": "इस विद्यालय में पहली बार नामांकन",
+        "transferDescription": "दूसरे स्कूल से स्थानांतरण",
+        "returningDescription": "पहले नामांकित होकर लौट रहा हूं",
+        "reenrollmentDescription": "नामांकन में विराम के बाद पुनः नामांकन"
+      },
+      "details": {
+        "title": "नामांकन विवरण",
+        "description": "शैक्षणिक वर्ष और नामांकन तिथि",
+        "academicYear": "शैक्षणिक वर्ष",
+        "loadingYears": "शैक्षणिक वर्ष लोड हो रहे हैं...",
+        "failedYears": "शैक्षणिक वर्ष लोड करने में विफल. कृपया ताज़ा करें.",
+        "selectAcademicYear": "शैक्षणिक वर्ष चुनें",
+        "currentSuffix": "वर्तमान",
+        "enrollmentDate": "नामांकन की तिथि",
+        "dateRange": "{{start}} - {{end}} के भीतर होना चाहिए",
+        "activeYear": "सक्रिय शैक्षणिक वर्ष - नामांकन तुरंत सक्रिय हो जाएगा",
+        "noActiveYearTitle": "कोई सक्रिय शैक्षणिक वर्ष उपलब्ध नहीं है",
+        "noActiveYearDescription": "कृपया छात्रों का नामांकन करने से पहले स्कूल सेटिंग्स में एक शैक्षणिक वर्ष को कॉन्फ़िगर और सक्रिय करें।"
+      },
+      "entry": {
+        "title": "प्रवेश विवरण",
+        "description": "राज्य रिपोर्टिंग के लिए Ed-Fi विवरणक फ़ील्ड",
+        "entryType": "प्रवेश प्रकार",
+        "selectEntryType": "प्रवेश प्रकार चुनें",
+        "entryTypeHelp": "इस विद्यालय में विद्यार्थी कैसे प्रवेश कर रहा है",
+        "residencyStatus": "निवास स्थिति",
+        "selectResidencyStatus": "निवास स्थिति का चयन करें",
+        "residencyHelp": "विद्यालय के सापेक्ष छात्र का निवास",
+        "entryTypes": {
+          "nextYearSchool": "अगले वर्ष स्कूल",
+          "transferSameDistrict": "स्थानांतरण (समान जिला)",
+          "transferDifferentDistrict": "स्थानांतरण (विभिन्न जिला)",
+          "transferPrivateSchool": "स्थानांतरण (निजी विद्यालय)",
+          "reentrySameSchool": "पुनः प्रवेश (वही विद्यालय)",
+          "originalEntry": "मूल प्रविष्टि",
+          "transferInternational": "स्थानांतरण (अंतर्राष्ट्रीय)"
+        },
+        "residencyStatuses": {
+          "adminUnitAndSchoolArea": "निवासी - प्रशासन इकाई एवं विद्यालय क्षेत्र",
+          "adminUnitOnly": "निवासी - केवल प्रशासनिक इकाई",
+          "stateOnly": "निवासी - केवल राज्य",
+          "notResident": "निवासी नहीं"
+        }
+      },
+      "settings": {
+        "title": "नामांकन सेटिंग्स",
+        "description": "डिफ़ॉल्ट पूर्व-कॉन्फ़िगर हैं - यदि आवश्यक हो तो ही समायोजित करें",
+        "primarySchool": "प्राथमिक विद्यालय",
+        "primarySchoolHelp": "क्या यह छात्र का नामांकन का प्राथमिक विद्यालय है?",
+        "fte": "पूर्णकालिक समकक्षता (एफटीई)",
+        "fteHelp": "1.0 = पूर्णकालिक, 0.5 = आधा समय",
+        "repeatGrade": "ग्रेड दोहराएँ",
+        "repeatGradeHelp": "जांचें कि क्या छात्र वर्तमान ग्रेड स्तर को दोहरा रहा है"
+      },
+      "transfer": {
+        "title": "स्थानांतरण सूचना",
+        "description": "पिछले स्कूल के बारे में विवरण",
+        "previousSchool": "पिछला स्कूल",
+        "previousSchoolPlaceholder": "पिछले स्कूल का नाम",
+        "previousAddress": "पिछला स्कूल का पता",
+        "previousAddressPlaceholder": "शहर, राज्य",
+        "reason": "स्थानांतरण का कारण",
+        "reasonPlaceholder": "स्थानांतरण के कारण का संक्षेप में वर्णन करें"
+      },
+      "notes": {
+        "title": "अतिरिक्त टिप्पणियाँ",
+        "description": "इस नामांकन के बारे में वैकल्पिक नोट्स",
+        "label": "टिप्पणियाँ",
+        "placeholder": "इस नामांकन के बारे में कोई अतिरिक्त नोट..."
+      },
+      "auto": {
+        "label": "स्वतः-आबादी:",
+        "description": "स्कूल, ग्रेड स्तर और प्रवेश ग्रेड स्तर विवरणक आपके स्कूल के संदर्भ और चरण 1 चयन के आधार पर स्वचालित रूप से सेट किए जाते हैं।"
+      },
+      "personal": {
+        "studentName": "छात्र का नाम",
+        "studentNameDescription": "कानूनी नाम जैसा कि आधिकारिक दस्तावेज़ों पर दिखाई देता है",
+        "firstNamePlaceholder": "प्रथम नाम दर्ज करें",
+        "lastNamePlaceholder": "अंतिम नाम दर्ज करें",
+        "middleNamePlaceholder": "मध्य नाम दर्ज करें",
+        "preferredName": "पसंदीदा नाम",
+        "preferredNamePlaceholder": "उपनाम या पसंदीदा नाम",
+        "suffix": "प्रत्यय",
+        "suffixPlaceholder": "जूनियर, तृतीय, आदि।",
+        "basicDetails": "बुनियादी विवरण",
+        "basicDetailsDescription": "जन्म तिथि, लिंग और ग्रेड स्तर",
+        "ageHelp": "छात्र की आयु 3 से 22 वर्ष के बीच होनी चाहिए",
+        "selectGender": "लिंग चुनें",
+        "selectGradeLevel": "ग्रेड स्तर का चयन करें"
+      },
+      "contact": {
+        "details": "संपर्क विवरण",
+        "detailsDescription": "ईमेल और फ़ोन जानकारी",
+        "emailAddress": "ईमेल पता",
+        "emailHelp": "छात्रों के लिए वैकल्पिक",
+        "phoneNumber": "फ़ोन नंबर",
+        "phoneType": "फ़ोन का प्रकार",
+        "selectType": "प्रकार चुनें",
+        "phoneTypes": {
+          "mobile": "मोबाइल",
+          "home": "गृहपृष्ठ",
+          "work": "काम"
+        },
+        "physicalAddress": "भौतिक पता",
+        "physicalAddressDescription": "छात्र का प्राथमिक आवासीय पता",
+        "mailingAddress": "डाक पता",
+        "mailingAddressDescription": "केवल भौतिक पते से भिन्न होने पर",
+        "differentMailingAddress": "किसी भिन्न डाक पते का उपयोग करें",
+        "differentMailingAddressDescription": "यदि डाक पता उपरोक्त भौतिक पते से भिन्न है तो इसे सक्षम करें"
+      },
+      "guardians": {
+        "guardianNumber": "संरक्षक {{number}}",
+        "remove": "अभिभावक को हटाएं",
+        "relationship": "संबंध",
+        "select": "चयन करें",
+        "employer": "नियोक्ता",
+        "employerPlaceholder": "नियोक्ता का नाम",
+        "occupationPlaceholder": "पेशा",
+        "permissions": "अनुमतियाँ",
+        "primaryGuardian": "प्राथमिक संरक्षक",
+        "primaryGuardianDescription": "संपर्क का मुख्य बिंदु",
+        "portalAccess": "पोर्टल पहुंच",
+        "portalAccessDescription": "छात्र रिकार्ड देख सकते हैं",
+        "pickup": "पिकअप के लिए अधिकृत",
+        "pickupDescription": "छात्र को उठा सकते हैं",
+        "emptyTitle": "अभी तक कोई अभिभावक नहीं जोड़ा गया",
+        "emptyDescription": "अभिभावक की जानकारी वैकल्पिक है लेकिन अनुशंसित है।",
+        "addGuardian": "अभिभावक जोड़ें",
+        "maxReached": "अधिकतम 10 अभिभावक पहुंचे।"
+      },
+      "medical": {
+        "optionalInfo": "इस पृष्ठ पर सभी फ़ील्ड वैकल्पिक हैं. आप इस चरण को छोड़ सकते हैं और बाद में जानकारी जोड़ सकते हैं।",
+        "health": "स्वास्थ्य सूचना",
+        "healthDescription": "एलर्जी, दवाएँ, स्थितियाँ, आहार प्रतिबंध",
+        "allergyPlaceholder": "एलर्जी टाइप करें और एंटर दबाएँ",
+        "allergyHelp": "जैसे मूंगफली, लेटेक्स, पेनिसिलिन",
+        "currentMedications": "वर्तमान औषधियाँ",
+        "medicationPlaceholder": "एक दवा टाइप करें और एंटर दबाएँ",
+        "medicalConditions": "चिकित्सीय स्थितियाँ",
+        "conditionPlaceholder": "एक शर्त टाइप करें और एंटर दबाएँ",
+        "conditionHelp": "जैसे अस्थमा, मधुमेह, मिर्गी",
+        "dietaryPlaceholder": "आहार प्रतिबंध टाइप करें और एंटर दबाएँ",
+        "physicianInsurance": "चिकित्सक एवं बीमा",
+        "physicianInsuranceDescription": "प्राथमिक देखभाल चिकित्सक और बीमा विवरण",
+        "physicianName": "चिकित्सक का नाम",
+        "physicianPlaceholder": "डॉ जेन स्मिथ",
+        "insuranceProvider": "बीमा प्रदाता",
+        "insurancePlaceholder": "बीमा कंपनी का नाम",
+        "policyNumber": "पॉलिसी संख्या",
+        "policyPlaceholder": "पॉलिसी या ID नंबर",
+        "demographics": "जनसांख्यिकी",
+        "demographicsDescription": "जातीयता, भाषा और जन्म का देश",
+        "selectEthnicity": "जातीयता का चयन करें",
+        "selectLanguage": "भाषा चुनें",
+        "countryOfBirthPlaceholder": "जन्म का देश",
+        "ethnicityOptions": {
+          "americanIndian": "अमेरिकी भारतीय/अलास्का मूल निवासी",
+          "asian": "एशियाई",
+          "black": "काला/अफ्रीकी अमेरिकी",
+          "hispanic": "हिस्पैनिक/लातीनी",
+          "nativeHawaiian": "मूल हवाईयन/प्रशांत द्वीपवासी",
+          "white": "सफ़ेद",
+          "twoOrMore": "दो या दो से अधिक जातियाँ",
+          "preferNotToSay": "कहना पसंद नहीं करते"
+        },
+        "languageOptions": {
+          "english": "अंग्रेज़ी",
+          "spanish": "स्पैनिश",
+          "mandarin": "मंदारिन चीनी",
+          "french": "फ़्रेंच",
+          "arabic": "अरबी",
+          "hindi": "हिन्दी",
+          "portuguese": "पुर्तगाली",
+          "vietnamese": "वियतनामी",
+          "korean": "कोरियाई",
+          "tagalog": "तागालोग",
+          "other": "अन्य"
+        }
+      },
+      "review": {
+        "edit": "संपादित करें",
+        "creating": "छात्र रिकॉर्ड और नामांकन बनाना...",
+        "whatWillHappen": "जब आप \"छात्र बनाएँ\" पर क्लिक करेंगे तो क्या होगा",
+        "studentRecordCreated": "{{studentName}} के लिए एक छात्र रिकॉर्ड बनाया जाएगा",
+        "enrolledIn": "{{academicYear}} में {{gradeLevel}} के रूप में नामांकित",
+        "enrollmentTypeDate": "नामांकन प्रकार: {{type}} - दिनांक: {{date}}",
+        "noEnrollment": "कोई नामांकन डेटा नहीं - छात्र नामांकन के बिना बनाया जाएगा",
+        "noGuardiansWarning": "कोई अभिभावक नहीं जोड़ा गया - कम से कम एक अभिभावक जोड़ने पर विचार करें",
+        "personalInfo": "व्यक्तिगत जानकारी",
+        "contactInfo": "संपर्क जानकारी",
+        "medicalDemographics": "चिकित्सा एवं जनसांख्यिकी",
+        "noGuardians": "कोई अभिभावक नहीं जोड़ा गया",
+        "primary": "प्राथमिक",
+        "emailValue": "ईमेल: {{email}}",
+        "phoneValue": "फ़ोन: {{phone}}",
+        "authorizedPickup": "उठाव के लिए अधिकृत किया गया है",
+        "portalAccess": "पोर्टल पहुंच",
+        "allergies": "एलर्जी",
+        "medications": "दवाएं",
+        "conditions": "स्थितियाँ",
+        "physician": "चिकित्सक",
+        "fullTimeEquivalency": "पूर्णकालिक समकक्षता",
+        "transferReason": "स्थानांतरण का कारण"
+      }
+    }
+  },
+  "iemisImport": {
+    "backToStudents": "छात्रों के पास वापस जाएँ",
+    "title": "IEMIS थोक छात्र आयात",
+    "subtitle": "छात्रों को {{schoolName}} में नामांकित करने के लिए नेपाल IEMIS xlsx निर्यात अपलोड करें।",
+    "thisSchool": "यह स्कूल",
+    "states": {
+      "parsingTitle": "xlsx फ़ाइल को पार्स करना",
+      "parsingDescription": "कॉलम पढ़ना और पंक्ति शब्दकोश बनाना। इसमें आमतौर पर 2 सेकंड से कम समय लगता है।",
+      "dryRunTitle": "IEMIS नियमों के विरुद्ध सत्यापन किया जा रहा है",
+      "dryRunDescription": "त्रुटियों, चेतावनियों और डुप्लिकेट के लिए {{value}} पंक्तियों की जाँच करना। अभी तक कोई डेटा सहेजा नहीं गया है.",
+      "dryRunDescriptionPending": "त्रुटियों, चेतावनियों और डुप्लिकेट के लिए पंक्तियों की जाँच करना। अभी तक कोई डेटा सहेजा नहीं गया है.",
+      "parseErrorTitle": "फ़ाइल को पार्स करने में असमर्थ",
+      "unknownParseError": "अज्ञात पार्स त्रुटि.",
+      "submittingTitle": "आयात सबमिट किया जा रहा है",
+      "submittingDescription": "आयात कार्य को कतारबद्ध करना।",
+      "importFailedTitle": "आयात विफल",
+      "unknownError": "अज्ञात त्रुटि.",
+      "rerunDryRun": "ड्राई-रन पुनः चलाएँ",
+      "checkingEligibilityTitle": "विद्यालय पात्रता की जाँच करना",
+      "checkingEligibilityDescription": "यह पुष्टि करना कि सक्रिय स्कूल में IEMIS कोड कॉन्फ़िगर किया गया है।",
+      "noSchoolTitle": "कोई सक्रिय विद्यालय चयनित नहीं",
+      "noSchoolMessage": "हेडर में स्विचर से एक स्कूल चुनें, फिर इस पेज को पुनः लोड करें।"
+    },
+    "gate": {
+      "missingCodeTitle": "{{schoolName}} का कोई IEMIS स्कूल कोड नहीं है",
+      "missingCodeDescription": "IEMIS आयात के लिए स्कूल को नेपाल सरकार द्वारा जारी {{code}} सेट की आवश्यकता होती है। स्कूल निर्माण के बाद वह मूल्य अपरिवर्तनीय है, इसलिए इसे स्कूल में ही दर्ज किया जाना चाहिए। किरायेदार व्यवस्थापक से स्कूल विज़ार्ड के माध्यम से IEMIS कोड के साथ एक नया स्कूल बनाने के लिए कहें, या इस स्कूल के मेटाडेटा को अपडेट करने के लिए समर्थन से संपर्क करें।"
+    },
+    "chooser": {
+      "dropTitle": "IEMIS xlsx को यहां छोड़ें",
+      "dropDescription": "या ब्राउज़ करने के लिए नीचे क्लिक करें. प्रति फ़ाइल {{maxRows}} पंक्तियों तक।",
+      "browse": "फ़ाइलें ब्राउज़ करें",
+      "expectedColumns": "अपेक्षित कॉलम",
+      "expectedDescription": "यह उपकरण मानक IEMIS xlsx निर्यात को सीधे पढ़ता है। आवश्यक कॉलम: छात्र आईडी, पूरा नाम, लिंग, करंटक्लास, जन्मतिथि। पिता का नाम, अभिभावक का नाम और पते जैसे अतिरिक्त कॉलम मौजूद होने पर कैप्चर किए जाते हैं।",
+      "dateDescription": "दिनांकों को बिक्रम संबत के रूप में पढ़ा जाता है और सर्वर पर ग्रेगोरियन में परिवर्तित किया जाता है।"
+    },
+    "summary": {
+      "fileSummary": "{{rows}} पंक्ति · {{mapped}} 20 में से IEMIS कॉलम मैप किए गए",
+      "fileSummary_plural": "{{rows}} पंक्तियाँ · 20 में से {{mapped}} IEMIS कॉलम मैप किए गए",
+      "extraColumns": "{{count}} अतिरिक्त कॉलम पर ध्यान नहीं दिया गया",
+      "extraColumns_plural": "{{count}} अतिरिक्त कॉलमों पर ध्यान नहीं दिया गया",
+      "willImport": "आयात करेंगे",
+      "blocked": "त्रुटियों के कारण अवरोधित",
+      "duplicates": "डुप्लिकेट (छोड़ें)",
+      "warnings": "चेतावनियाँ",
+      "created": "बनाया गया",
+      "enrolled": "दाखिला लिया",
+      "skipped": "छोड़ दिया गया (डुप्लिकेट)",
+      "failed": "असफल"
+    },
+    "enrollOption": {
+      "title": "इस वर्ष सभी आयातित छात्रों का नामांकन करें",
+      "current": "वर्तमान",
+      "noYear": "इस स्कूल में कोई सक्रिय शैक्षणिक वर्ष नहीं है। आयातित छात्रों का नामांकन रिकॉर्ड बिना बनाया जाएगा। इस विकल्प को सक्षम करने के लिए पहले एक शैक्षणिक वर्ष निर्धारित करें।",
+      "description": "सक्षम होने पर, प्रत्येक सफलतापूर्वक बनाए गए छात्र को वर्ष के लिए स्कूल नामांकन भी मिलता है और उसे सक्रिय स्थिति में ले जाया जाता है। अक्षम होने पर, छात्रों को लंबित स्थिति में बनाया जाता है और आपको छात्र विवरण पृष्ठ से प्रत्येक को व्यक्तिगत रूप से नामांकित करना होगा।"
+    },
+    "actions": {
+      "downloadFindings": "निष्कर्ष डाउनलोड करें CSV",
+      "cancel": "रद्द करें",
+      "importStudents": "{{count}} छात्र आयात करें",
+      "importStudents_plural": "{{count}} छात्रों को आयात करें",
+      "noRows": "आयात करने के लिए कोई पंक्तियाँ नहीं",
+      "importAnother": "दूसरी फ़ाइल आयात करें",
+      "viewStudents": "छात्रों को देखें",
+      "backToPreview": "पूर्वावलोकन पर वापस जाएँ",
+      "importNow": "अभी {{value}} आयात करें"
+    },
+    "duplicates": {
+      "title": "{{count}} डुप्लिकेट छोड़ दिया जाएगा",
+      "title_plural": "{{count}} डुप्लिकेट छोड़ दिए जाएंगे",
+      "description": "इन पंक्तियों में एक emisStudentId है जो पहले से ही इस किरायेदार में मौजूद है। उन्हें दोबारा नहीं बनाया जाएगा; मौजूदा रिकॉर्ड अछूते हैं.",
+      "row": "पंक्ति {{row}} - emisStudentId {{emisStudentId}} पहले से ही छात्र आईडी {{studentId}} पर है",
+      "andMore": "...और {{value}} और भी"
+    },
+    "confirm": {
+      "title": "IEMIS आयात की पुष्टि करें",
+      "description": "आप ड्राई-रन करने वाले हैं। इसे असंपादित नहीं किया जा सकता है।",
+      "summary": "{{count}} छात्र रिकॉर्ड {{schoolName}} में बनाया जाएगा।",
+      "summary_plural": "{{count}} छात्र रिकॉर्ड {{schoolName}} में बनाए जाएंगे।",
+      "andEnrolled": "और {{yearName}} में नामांकित",
+      "skipped": "{{count}} डुप्लिकेट छोड़ दिया जाएगा.",
+      "skipped_plural": "{{count}} डुप्लिकेट छोड़ दिए जाएंगे।",
+      "failed": "त्रुटियों के कारण अवरुद्ध {{count}} पंक्ति आयात नहीं होगी।",
+      "failed_plural": "त्रुटियों के कारण अवरुद्ध {{count}} पंक्तियाँ आयात नहीं होंगी।",
+      "ack": "मैंने ड्राई-रन के निष्कर्षों की समीक्षा की है और पुष्टि की है कि गंतव्य स्कूल सही है।"
+    },
+    "progress": {
+      "queuedTitle": "आयात कतारबद्ध",
+      "runningTitle": "छात्रों को आयात किया जा रहा है...",
+      "queuedDescription": "नौकरी कतार में है. {{value}} पंक्तियों का प्रसंस्करण।",
+      "runningDescription": "{{value}} पंक्तियाँ आयात करना।",
+      "runningDescriptionWithYear": "{{value}} पंक्तियों को आयात करना और {{yearName}} में नामांकन करना।",
+      "keepOpen": "आप इस टैब को खुला रख सकते हैं. आयात सर्वर-साइड चलता है; टैब बंद करने से कार्य रद्द नहीं होगा, लेकिन आप लाइव स्थिति दृश्य खो देंगे।"
+    },
+    "results": {
+      "complete": "आयात पूर्ण",
+      "issues": "मुद्दों के साथ आयात समाप्त हो गया",
+      "summary": "{{created}} छात्रों ने बनाया, {{skipped}} ने छोड़ दिया (डुप्लिकेट), {{failed}} कुल पंक्तियों में से {{total}} में विफल रहे।",
+      "summaryWithEnrollment": "{{created}} छात्र बनाए गए, {{enrolled}} नामांकित{{year}}, {{skipped}} छोड़ दिए गए (डुप्लिकेट), {{failed}} कुल पंक्तियों में से {{total}} विफल हो गए।",
+      "inYear": "{{yearName}} में",
+      "duration": "{{seconds}}s लिया।",
+      "truncated": "पहले 500 निष्कर्ष दिखाए गए हैं। संपूर्ण निष्कर्षों को डाउनलोड करने के लिए ड्राई-रन को दोबारा चलाएं CSV।",
+      "findings": "{{count}} आयात से पता लगाना",
+      "findings_plural": "आयात से {{count}} निष्कर्ष"
+    }
+  },
+  "calendarModule": {
+    "description": "शैक्षणिक वर्ष, शर्तें और ग्रेडिंग अवधि प्रबंधित करें",
+    "current": "वर्तमान",
+    "noneSet": "कोई सेट नहीं",
+    "archiveCurrentHint": "संग्रहित करने से पहले एक और वर्ष को वर्तमान के रूप में सेट करें",
+    "status": {
+      "planning": "योजना",
+      "active": "सक्रिय",
+      "completed": "पूर्ण",
+      "archived": "संग्रहीत"
+    },
+    "actions": {
+      "planning": "सक्रिय करें",
+      "active": "पूर्ण",
+      "completed": "पुरालेख",
+      "archived": "संग्रहीत",
+      "setCurrent": "करंट के रूप में सेट करें",
+      "cancel": "रद्द करें",
+      "confirm": "पुष्टि करें"
+    },
+    "stats": {
+      "currentYear": "चालू वर्ष",
+      "totalYears": "कुल वर्ष",
+      "active": "सक्रिय",
+      "planning": "योजना"
+    },
+    "noSchool": {
+      "title": "कोई विद्यालय चयनित नहीं",
+      "description": "शैक्षणिक वर्षों को प्रबंधित करने के लिए कृपया साइडबार से एक स्कूल का चयन करें।"
+    },
+    "error": {
+      "title": "शैक्षणिक वर्ष लोड करने में विफल",
+      "description": "कुछ ग़लत हो गया. कृपया पुन: प्रयास करें।",
+      "retry": "पुन: प्रयास करें"
+    },
+    "empty": {
+      "title": "कोई शैक्षणिक वर्ष नहीं",
+      "description": "अभी तक कोई शैक्षणिक वर्ष नहीं बनाया गया है. टर्म और ग्रेडिंग अवधि प्रबंधन के साथ शुरुआत करने के लिए अपना पहला शैक्षणिक वर्ष बनाएं।"
+    },
+    "confirm": {
+      "setCurrentTitle": "वर्तमान शैक्षणिक वर्ष के रूप में सेट करें",
+      "replaceCurrentDescription": "यह वर्तमान शैक्षणिक वर्ष के रूप में \"{{currentName}}\" को \"{{nextName}}\" से बदल देगा। सभी मॉड्यूल जो वर्तमान वर्ष (उपस्थिति, ग्रेड, शेड्यूलिंग) पर निर्भर करते हैं, नए चयन पर स्विच हो जाएंगे।",
+      "setCurrentDescription": "\"{{yearName}}\" को वर्तमान शैक्षणिक वर्ष के रूप में सेट करें? यह निर्धारित करता है कि कौन सा वर्ष सभी मॉड्यूल में सक्रिय है।",
+      "advanceTitle": "{{action}} शैक्षणिक वर्ष",
+      "updateStatusTitle": "अद्यतन स्थिति",
+      "advanceDescription": "क्या आप वाकई \"{{yearName}}\" को {{fromStatus}} से {{toStatus}} में बदलना चाहते हैं? इस क्रिया को उलटा नहीं किया जा सकता."
+    }
+  },
+  "gradesModule": {
+    "reportCard": {
+      "noStudentTitle": "किसी छात्र का चयन नहीं हुआ",
+      "noStudentDescription": "किसी छात्र प्रोफ़ाइल पर जाएँ और उनके ग्रेड देखने के लिए \"रिपोर्ट कार्ड देखें\" पर क्लिक करें।",
+      "goToStudents": "छात्रों के पास जाएँ",
+      "setAcademicYear": "रिपोर्ट कार्ड तैयार करने से पहले एक शैक्षणिक वर्ष निर्धारित करें।",
+      "title": "रिपोर्ट कार्ड",
+      "printTitle": "छात्र रिपोर्ट कार्ड",
+      "student": "छात्र:",
+      "date": "दिनांक:",
+      "academicYearFallback": "शैक्षणिक वर्ष",
+      "termFallback": "अवधि",
+      "allTerms": "सभी शर्तें",
+      "print": "प्रिंट करें",
+      "noGradesTitle": "कोई ग्रेड दर्ज नहीं किया गया",
+      "noGradesDescription": "शिक्षकों द्वारा रिकॉर्ड किए जाने के बाद ग्रेड यहां दिखाई देंगे।",
+      "termGpa": "अवधि GPA",
+      "cumulativeGpa": "संचयी GPA",
+      "weightedGpa": "भारित GPA",
+      "course": "पाठ्यक्रम",
+      "assignments": "असाइनमेंट",
+      "numeric": "संख्यात्मक",
+      "letter": "पत्र",
+      "gpaPoints": "GPA अंक",
+      "status": "स्थिति",
+      "final": "अंतिम",
+      "inProgress": "प्रगति पर है",
+      "generated": "{{dateTime}} - EdForge छात्र सूचना प्रणाली पर उत्पन्न"
+    },
+    "gradebook": {
+      "noStudentsTitle": "किसी छात्र का नामांकन नहीं हुआ",
+      "noStudentsDescription": "ग्रेड रिकॉर्ड करना शुरू करने के लिए इस अनुभाग में छात्रों का नामांकन करें।",
+      "student": "छात्र",
+      "transferredStudent": "छात्र (स्थानांतरित)",
+      "assignmentTooltip": "{{name}}\nअंक: {{points}}",
+      "assignmentTooltipWithCategory": "{{name}}\nश्रेणी: {{category}}\nअंक: {{points}}",
+      "scoreForStudent": "{{studentName}} के लिए स्कोर",
+      "addAssignment": "असाइनमेंट जोड़ें",
+      "overall": "कुल मिलाकर",
+      "pointsShort": "{{points}} अंक",
+      "gradeFinalized": "ग्रेड फाइनल हो गया",
+      "viewReportCard": "रिपोर्ट कार्ड देखें"
+    },
+    "management": {
+      "recordGrades": "रिकॉर्ड ग्रेड",
+      "newAssignment": "नया कार्यभार",
+      "assignmentName": "असाइनमेंट का नाम",
+      "assignmentPlaceholder": "उदाहरण के लिए, अध्याय 3 प्रश्नोत्तरी",
+      "assignmentPlaceholderAlt": "उदाहरण के लिए, अध्याय 5 प्रश्नोत्तरी",
+      "pointsPossible": "संभव अंक",
+      "category": "श्रेणी",
+      "assessmentPurpose": "मूल्यांकन उद्देश्य",
+      "dueDate": "देय तिथि",
+      "studentScores": "छात्र स्कोर",
+      "enteredCount": "{{entered}} / {{total}} दर्ज किया गया",
+      "searchStudents": "छात्रों को नाम से खोजें...",
+      "noStudents": "इस अनुभाग में कोई भी छात्र नामांकित नहीं है।",
+      "noStudentMatches": "कोई भी छात्र \"{{search}}\" से मेल नहीं खाता।",
+      "saveGrades": "ग्रेड सहेजें ({{value}})",
+      "saveWithScores": "स्कोर के साथ सहेजें ({{value}})",
+      "createAssignment": "असाइनमेंट बनाएं",
+      "scoreStatistics": "स्कोर सांख्यिकी ({{value}} दर्ज किया गया)",
+      "pasteScores": "स्कोर चिपकाएँ (नाम\\tस्कोर प्रति पंक्ति)",
+      "pasteScoresPlaceholder": "जॉन स्मिथ\\t95\nजेन डो\\t88",
+      "pasteFromSpreadsheet": "स्प्रेडशीट से स्कोर चिपकाएँ",
+      "apply": "आवेदन करें",
+      "studentFallback": "छात्र",
+      "studentFallbackNumbered": "छात्र #{{number}}",
+      "categories": {
+        "tests": "परीक्षण",
+        "quizzes": "प्रश्नोत्तरी",
+        "homework": "गृहकार्य",
+        "participation": "भागीदारी",
+        "projects": "परियोजनाएं",
+        "finalExam": "अंतिम परीक्षा",
+        "other": "अन्य"
+      },
+      "purposes": {
+        "autoDetect": "स्वतः पता लगाएं",
+        "formative": "रचनात्मक",
+        "summative": "योगात्मक"
+      },
+      "stats": {
+        "mean": "मतलब",
+        "median": "माध्यिका",
+        "stdDev": "एसटीडी डेव",
+        "min": "न्यूनतम",
+        "max": "अधिकतम"
+      }
+    },
+    "finalization": {
+      "title": "ग्रेड को अंतिम रूप दें",
+      "titleWithTerm": "ग्रेड को अंतिम रूप दें - {{termName}}",
+      "loading": "ग्रेड लोड हो रहे हैं...",
+      "reviewDescription": "अंतिम रूप देने से पहले ग्रेड की समीक्षा करें। अंतिम ग्रेड लॉक हैं और इन्हें बदला नहीं जा सकता।",
+      "toFinalize": "अंतिम रूप देना",
+      "alreadyFinal": "पहले से ही फाइनल",
+      "noScores": "कोई स्कोर नहीं",
+      "emptyStubsWarning": "{{value}} छात्र(छात्रों) के पास कोई अंक प्राप्त असाइनमेंट नहीं है और उन्हें छोड़ दिया जाएगा।",
+      "lowGradesWarning": "{{value}} छात्र उत्तीर्ण ग्रेड से नीचे हैं।",
+      "columns": {
+        "student": "छात्र",
+        "grade": "श्रेणी",
+        "letter": "पत्र",
+        "status": "स्थिति"
+      },
+      "pass": "पास",
+      "fail": "असफल",
+      "allFinalized": "सभी ग्रेड पहले ही तय हो चुके हैं!",
+      "noneToFinalize": "किसी भी छात्र ने असाइनमेंट को अंतिम रूप देने के लिए स्कोर नहीं किया है।",
+      "irreversibleTitle": "इस क्रिया को पूर्ववत नहीं किया जा सकता",
+      "irreversibleBefore": "आप फाइनल होने वाले हैं",
+      "irreversibleAfter": "ग्रेड(ओं). अंतिम ग्रेड लॉक हैं और उन्हें संशोधित नहीं किया जा सकता है।",
+      "finalizing": "ग्रेड को अंतिम रूप दिया जा रहा है...",
+      "completeTitle": "ग्रेड को अंतिम रूप दिया गया",
+      "completeDescription": "{{value}} ग्रेड को सफलतापूर्वक अंतिम रूप दिया गया। ये ग्रेड अब लॉक हो गए हैं.",
+      "errorCount": "{{value}} ग्रेड को अंतिम रूप नहीं दिया जा सका।",
+      "continue": "जारी रखें",
+      "back": "वापस",
+      "finalizeGrades": "{{value}} ग्रेड को अंतिम रूप दें",
+      "done": "हो गया"
+    },
+    "policyForm": {
+      "createTitle": "ग्रेडिंग नीति बनाएं",
+      "editTitle": "ग्रेडिंग नीति संपादित करें",
+      "policyName": "पॉलिसी का नाम",
+      "policyNamePlaceholder": "उदाहरण के लिए, मानक ए-एफ स्केल",
+      "description": "विवरण",
+      "descriptionPlaceholder": "इस नीति का संक्षिप्त विवरण",
+      "roundingRule": "गोलाई नियम",
+      "rounding": {
+        "nearest": "निकटतम तक गोल",
+        "up": "राउंड अप",
+        "down": "गोल नीचे"
+      },
+      "passingGrade": "उत्तीर्ण ग्रेड",
+      "setDefault": "डिफ़ॉल्ट के रूप में सेट करें",
+      "letterGrades": "पत्र ग्रेड",
+      "gpaScale": "GPA स्केल",
+      "to": "को",
+      "gpaPlaceholder": "GPA",
+      "categoryWeights": "श्रेणी भार",
+      "totalWeight": "कुल: {{total}}%",
+      "categoryNamePlaceholder": "श्रेणी का नाम",
+      "dropLowestTitle": "सबसे कम एन स्कोर गिराएं",
+      "drop": "गिराना",
+      "addCategory": "श्रेणी जोड़ें",
+      "createPolicy": "नीति बनाएं",
+      "updatePolicy": "अद्यतन नीति"
+    },
+    "policyList": {
+      "title": "ग्रेडिंग नीतियाँ",
+      "default": "डिफ़ॉल्ट",
+      "editPolicy": "नीति संपादित करें",
+      "gradeScale": "ग्रेड स्केल",
+      "categoryWeights": "श्रेणी भार ({{total}}%)",
+      "newPolicy": "नई नीति",
+      "emptyTitle": "कोई ग्रेडिंग नीति कॉन्फ़िगर नहीं की गई",
+      "emptyDescription": "ग्रेड स्केल, श्रेणी भार और पूर्णांकन नियमों को परिभाषित करने के लिए एक ग्रेडिंग नीति बनाएं।",
+      "gradeChip": "{{letter}} · {{min}}–{{max}}% · {{gpa}} GPA",
+      "weightAria": "{{category}} वजन: {{weight}}%",
+      "scheme": "योजना",
+      "schemeValue": "{{scheme}} · {{scale}}",
+      "schemeType": {
+        "letter_gpa": "पत्र +GPA",
+        "division": "प्रभाग"
+      },
+      "minimumPassing": "न्यूनतम उत्तीर्ण होना",
+      "roundingLabel": "गोलाई"
+    },
+    "overview": {
+      "title": "ग्रेड एनालिटिक्स",
+      "subtitle": "स्कूल-व्यापी शैक्षणिक प्रदर्शन",
+      "error": "ग्रेड डेटा लोड करने में विफल. कृपया ताज़ा करने का प्रयास करें.",
+      "errorStats": "ग्रेड आँकड़े लोड करने में विफल",
+      "empty": "सभी अनुभागों में अभी तक कोई ग्रेड दर्ज नहीं किया गया है।",
+      "sectionsGraded": "{{total}} अनुभागों में से {{graded}} को वर्गीकृत किया गया",
+      "actions": {
+        "more": "अधिक क्रियाएं",
+        "exportGradebookCsv": "निर्यात ग्रेडबुक CSV",
+        "exportAtRiskCsv": "जोखिम पर निर्यात करें CSV",
+        "export": "निर्यात करें"
+      },
+      "kpis": {
+        "studentsGraded": "छात्र GRADED",
+        "averageGpa": "औसत GPA",
+        "passRate": "पास दर",
+        "atRisk": "जोखिम में",
+        "avgGradeHint": "औसत ग्रेड: {{grade}}%",
+        "passRateHint": "60% से अधिक अंक प्राप्त करने वाले छात्र",
+        "atRiskHint": "60% सीमा से नीचे",
+        "belowThreshold": "60% से नीचे",
+        "needSupport": "समर्थन की जरूरत है"
+      },
+      "completion": {
+        "title": "ग्रेडिंग समापन",
+        "subtitle": "सक्रिय अनुभागों में असाइनमेंट प्रविष्टियाँ",
+        "gradedShort": "वर्गीकृत",
+        "graded": "श्रेणीबद्ध",
+        "remaining": "शेष",
+        "totalEntries": "{{total}} कुल असाइनमेंट प्रविष्टियाँ",
+        "gradedCount": "{{count}} श्रेणीबद्ध",
+        "remainingCount": "{{count}} ग्रेड की प्रतीक्षा कर रहा है",
+        "total": "{{count}} कुल असाइनमेंट प्रविष्टियाँ"
+      },
+      "assessment": {
+        "title": "मूल्यांकन प्रदर्शन",
+        "subtitle": "मूल्यांकन प्रकार के अनुसार औसत अंक",
+        "formativeExamples": "प्रश्नोत्तरी, गृहकार्य, भागीदारी",
+        "summativeExamples": "परीक्षण, परीक्षा, परियोजनाएँ",
+        "formativeHigher": "फॉर्मेटिव {{diff}}% अधिक",
+        "higherSuffix": "योगात्मक से - अच्छी तरह से संतुलित।",
+        "summativeHigher": "योगात्मक {{diff}}% अधिक",
+        "summativeHigherSuffix": "गठनात्मक से अधिक.",
+        "equal": "रचनात्मक और योगात्मक स्कोर बराबर हैं - अच्छी तरह से संतुलित।",
+        "unclassified": "+{{value}} अवर्गीकृत (औसत {{avg}}%)",
+        "formative": "रचनात्मक - प्रश्नोत्तरी, गृहकार्य ({{count}} आइटम)",
+        "summative": "योगात्मक - परीक्षण, परीक्षा ({{count}} आइटम)",
+        "noneYet": "— · अभी तक कोई नहीं",
+        "noteBalanced": "चल रहे कार्य के प्रति ग्रेडिंग अच्छी तरह से संतुलित है।",
+        "noteNoSummative": "सभी श्रेणीबद्ध आइटम रचनात्मक हैं - अभी तक कोई योगात्मक मूल्यांकन दर्ज नहीं किया गया है।"
+      },
+      "distribution": {
+        "title": "ग्रेड वितरण",
+        "subtitle": "समग्र पाठ्यक्रम औसत के आधार पर प्रत्येक ग्रेड श्रेणी में छात्रों की संख्या",
+        "a": "ए (90-100)",
+        "b": "बी (80-89)",
+        "c": "सी (70-79)",
+        "d": "डी (60-69)",
+        "f": "एफ (0-59)",
+        "metric": "{{count}} श्रेणीबद्ध",
+        "note": "एफ गिनती में वे छात्र शामिल हैं जो अभी भी ग्रेड का इंतजार कर रहे हैं (वे 0% के रूप में पढ़ते हैं)।"
+      },
+      "category": {
+        "title": "श्रेणी प्रदर्शन",
+        "subtitle": "नीति श्रेणी की ग्रेडिंग के अनुसार औसत स्कोर",
+        "headers": {
+          "category": "श्रेणी",
+          "weight": "Wt.",
+          "score": "स्कोर",
+          "avg": "औसत"
+        }
+      },
+      "course": {
+        "title": "पाठ्यक्रम प्रदर्शन",
+        "subtitle": "सभी अनुभागों में प्रति पाठ्यक्रम एकत्रित ग्रेड मेट्रिक्स"
+      },
+      "courseHeaders": {
+        "course": "पाठ्यक्रम",
+        "sections": "सेक.",
+        "students": "एसटीडी.",
+        "avgGrade": "औसत ग्रेड ↓",
+        "gpa": "GPA",
+        "passRate": "उत्तीर्ण %"
+      },
+      "atRisk": {
+        "title": "जोखिम में छात्र",
+        "subtitle": "किसी भी पाठ्यक्रम में 60% से कम अंक प्राप्त करने वाले छात्र",
+        "studentCount": "{{value}} छात्र",
+        "empty": "ग्रेड सीमा से नीचे कोई भी छात्र नहीं",
+        "headers": {
+          "student": "छात्र",
+          "course": "पाठ्यक्रम",
+          "grade": "श्रेणी",
+          "letter": "पत्र"
+        },
+        "dedupeSubtitle": "60% उत्तीर्ण सीमा से नीचे के अद्वितीय छात्र - {{raw}} चिह्नित प्रविष्टियों से काटे गए",
+        "export": "निर्यात खतरे में है",
+        "filterAria": "जोखिम वाले छात्रों को फ़िल्टर करें",
+        "filterAll": "सब",
+        "filterGraded": "श्रेणीबद्ध",
+        "filterPending": "ग्रेड का इंतजार है",
+        "pendingNote": "{{count}} को केवल इसलिए चिह्नित किया गया क्योंकि ग्रेड अभी तक दर्ज नहीं किए गए हैं",
+        "tagFailing": "असफल होना",
+        "tagBelowPass": "नीचे पास",
+        "tagNotGraded": "अभी तक ग्रेड नहीं दिया गया है"
+      },
+      "backToGradebook": "ग्रेडबुक पर वापस जाएँ",
+      "scope": "स्कूल-व्यापी · {{graded}} में से {{total}} अनुभागों को वर्गीकृत किया गया",
+      "noData": "कोई डेटा उपलब्ध नहीं है",
+      "emptyState": {
+        "title": "अभी तक कोई ग्रेड दर्ज नहीं किया गया",
+        "description": "स्कूल-व्यापी विश्लेषण देखने के लिए कुछ असाइनमेंट को ग्रेड करें।"
+      },
+      "insight": {
+        "body": "{{unique}} में से {{pending}} जोखिम वाले झंडे लंबित ग्रेड हैं, न कि छात्रों को फेल करना। {{totalEntries}} असाइनमेंट प्रविष्टियों में से {{ungraded}} अवर्गीकृत हैं, इसलिए वे छात्र 0% के रूप में पढ़ते हैं - जो {{passRate}}% उत्तीर्ण दर को कम कर देता है और जोखिम की संख्या को बढ़ा देता है। सच्ची तस्वीर के लिए लंबित कार्य को ग्रेड करें।",
+        "reviewPending": "लंबित ग्रेड की समीक्षा करें"
+      },
+      "courses": {
+        "title": "पाठ्यक्रम प्रदर्शन",
+        "subtitle": "प्रति पाठ्यक्रम समेकित ग्रेड मेट्रिक्स",
+        "course": "पाठ्यक्रम",
+        "sections": "सेक.",
+        "students": "विद्यार्थी",
+        "avg": "औसत",
+        "gpa": "GPA",
+        "pass": "उत्तीर्ण %"
+      },
+      "categories": {
+        "title": "श्रेणी प्रदर्शन",
+        "subtitle": "ग्रेडिंग-नीति श्रेणी के अनुसार औसत स्कोर",
+        "empty": "अभी तक कोई श्रेणी डेटा नहीं"
+      }
+    }
+  },
+  "iemisExport": {
+    "title": "IEMiS मासिक निर्यात",
+    "description": "एक कैलेंडर माह के लिए IEMiS फ़्लैश II मासिक उपस्थिति रोल-अप जेनरेट करें। निर्यात प्रति छात्र उपस्थित/अनुपस्थित/क्षमा किए गए दिन की गणना करता है और आपको CSV डाउनलोड करने देता है। ग्रेड स्कूल-स्थानीय ग्रेड स्तर है।",
+    "month": "महीना",
+    "monthAria": "निर्यात माह (YYYY-MM)",
+    "generating": "उत्पन्न हो रहा है...",
+    "generate": "निर्यात उत्पन्न करें",
+    "downloadCsv": "डाउनलोड करें CSV",
+    "invalidMonth": "वैध माह (YYYY-MM) दर्ज करें।",
+    "failed": "निर्यात उत्पन्न करने में विफल. कृपया पुन: प्रयास करें।",
+    "summary": "{{students}} · {{yearMonth}}",
+    "generated": "उत्पन्न {{dateTime}}",
+    "empty": "इस महीने कोई उपस्थिति दर्ज नहीं की गई.",
+    "search": "छात्रों को खोजें...",
+    "bs": "BS {{label}}",
+    "bsRange": "BS {{start}} - {{end}}",
+    "bsMonths": {
+      "1": "बैसाख",
+      "2": "जेठ",
+      "3": "आषाढ़",
+      "4": "श्रावण",
+      "5": "भाद्र",
+      "6": "आश्विन",
+      "7": "कार्तिक",
+      "8": "मंसिर",
+      "9": "पौष",
+      "10": "माघ",
+      "11": "फाल्गुन",
+      "12": "चैत्र"
+    },
+    "columns": {
+      "studentId": "छात्र ID",
+      "studentName": "छात्र का नाम",
+      "grade": "श्रेणी",
+      "presentDays": "वर्तमान दिन",
+      "absentDays": "अनुपस्थित दिन",
+      "excusedDays": "माफ़ किये गए दिन",
+      "totalSchoolDays": "कुल स्कूल दिवस",
+      "student": "छात्र",
+      "present": "वर्तमान",
+      "absent": "अनुपस्थित",
+      "excused": "क्षमा करें",
+      "schoolDays": "स्कूल के दिन"
+    }
+  },
+  "governmentReports": {
+    "title": "सरकारी रिपोर्ट",
+    "descriptionPrefix": "CEHRD IEMIS फ़्लैश I / फ़्लैश II सबमिशन जेनरेट करें, डाउनलोड करें और ट्रैक करें",
+    "iemisCode": "IEMIS {{code}}",
+    "noSchool": "सरकारी रिपोर्ट तैयार करने के लिए एक स्कूल का चयन करें।",
+    "noIemisCode": {
+      "title": "इस स्कूल में अभी तक कोई IEMIS कोड नहीं है",
+      "beforeCode": "CEHRD फ़्लैश I/II निर्यात के लिए स्कूल के सरकार द्वारा जारी IEMIS कोड (द) की आवश्यकता होती है",
+      "afterCode": "स्तंभ). इसे स्कूल सेटिंग्स के अंतर्गत जोड़ें, फिर रिपोर्ट तैयार करने के लिए यहां वापस आएं।"
+    },
+    "fields": {
+      "report": "रिपोर्ट करें",
+      "academicYearBs": "शैक्षणिक वर्ष (BS)",
+      "academicYearAria": "बिक्रम संबत में शैक्षणिक वर्ष"
+    },
+    "year": {
+      "currentOption": "{{yearName}} · वर्तमान",
+      "bs": "BS {{year}}"
+    },
+    "templates": {
+      "IEMIS_NPL_CEHRD_FLASH_I": "फ्लैश I - नामांकन जनगणना",
+      "IEMIS_NPL_CEHRD_FLASH_II": "फ्लैश II - परिणाम और उपस्थिति"
+    },
+    "status": {
+      "generating": "उत्पन्न करना",
+      "generated": "तैयार",
+      "submitted": "प्रस्तुत किया गया",
+      "verified": "सत्यापित",
+      "failed": "असफल"
+    },
+    "actions": {
+      "back": "वापस",
+      "validate": "मान्य करें",
+      "generate": "रिपोर्ट तैयार करें",
+      "downloadCsv": "डाउनलोड करें CSV",
+      "csv": "CSV",
+      "retry": "पुन: प्रयास करें",
+      "retryGeneration": "पुनः प्रयास करें पीढ़ी",
+      "markSubmitted": "मार्क सबमिट किया गया",
+      "markVerified": "सत्यापित चिह्नित करें",
+      "refresh": "रीफ़्रेश करें",
+      "dismiss": "ख़ारिज करें"
+    },
+    "validation": {
+      "invalidBsYear": "4-अंकीय BS वर्ष दर्ज करें, उदा. 2083."
+    },
+    "flashIi": {
+      "beforeExam": "फ़्लैश II",
+      "examMarks": "परीक्षा अंक",
+      "and": "और",
+      "gpa": "GPA",
+      "afterGpa": "इस संस्करण में कॉलम मैन्युअल रूप से दर्ज किए जाते हैं; अन्य सभी कॉलम (नामांकन, उपस्थिति, जनसांख्यिकी) स्वचालित रूप से उत्पन्न होते हैं।"
+    },
+    "existingReport": "BS {{year}} के लिए {{template}} पहले से मौजूद है ({{status}})। जनरेट करने से एक नया संस्करण बनता है.",
+    "history": {
+      "title": "इतिहास रिपोर्ट करें",
+      "filterAria": "रिपोर्ट के अनुसार फ़िल्टर करें",
+      "filters": {
+        "all": "सब",
+        "flashI": "फ़्लैश I",
+        "flashII": "फ़्लैश द्वितीय"
+      },
+      "empty": "इस स्कूल के लिए अभी तक कोई रिपोर्ट तैयार नहीं की गई है.",
+      "emptyFilter": "कोई भी रिपोर्ट इस फ़िल्टर से मेल नहीं खाती.",
+      "rowsPrefix": "{{value}} पंक्तियाँ ·",
+      "generated": "उत्पन्न {{dateTime}}",
+      "created": "बनाया गया {{dateTime}}",
+      "dryRunSuffix": "· ड्राई-रन"
+    },
+    "guidance": {
+      "beforeLink": "डाउनलोड करने के बाद, CSV को IEMIS पोर्टल पर अपलोड करें (",
+      "afterLink": "), फिर रिपोर्ट को चिह्नित करें",
+      "and": "और",
+      "afterVerified": "एक बार CEHRD स्वीकृति की पुष्टि कर दे।"
+    },
+    "preflight": {
+      "passed": "सत्यापन पारित हो गया",
+      "blocked": "सत्यापन अवरुद्ध",
+      "description": "सत्यापन यह पुष्टि करता है कि स्कूल और शैक्षणिक वर्ष मौजूद है। पीढ़ी के दौरान रिपोर्ट पंक्ति पर प्रति-छात्र क्षेत्र के मुद्दों की सूचना दी जाती है।"
+    },
+    "active": {
+      "generating": "रिपोर्ट तैयार की जा रही है...",
+      "stalled": "अपेक्षा से अधिक समय लग रहा है",
+      "ready": "रिपोर्ट तैयार",
+      "failed": "पीढ़ी विफल रही",
+      "stalledDescription": "एकल विद्यालय के लिए यह असामान्य है; यह विफल हो सकता है. नवीनतम स्थिति जांचने के लिए रीफ़्रेश करें.",
+      "emptyReport": "इस रिपोर्ट में 0 छात्र हैं। सबमिट करने से पहले शैक्षणिक वर्ष की दोबारा जांच करें।"
+    }
+  }
+}

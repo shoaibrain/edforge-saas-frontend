@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { I18N_RESOURCES, NAMESPACES, type Namespace } from "./config";
+import {
+  I18N_RESOURCES,
+  NAMESPACES,
+  SUPPORTED_LANGUAGES,
+  type Namespace,
+  type SupportedLanguage,
+} from "./config";
 
 type LocaleObject = Record<string, unknown>;
 
@@ -43,7 +49,7 @@ function interpolationVariables(value: string): string[] {
 }
 
 function resourceFor(
-  language: "en" | "ne",
+  language: SupportedLanguage,
   namespace: Namespace,
 ): LocaleObject {
   return I18N_RESOURCES[language][namespace] as LocaleObject;
@@ -53,16 +59,23 @@ describe("translation interpolation parity", () => {
   for (const namespace of NAMESPACES) {
     it(`keeps interpolation variables aligned for ${namespace}`, () => {
       const enResource = resourceFor("en", namespace);
-      const neResource = resourceFor("ne", namespace);
 
-      for (const key of getLeafKeys(enResource)) {
-        const enVariables = interpolationVariables(valueAt(enResource, key));
-        const neVariables = interpolationVariables(valueAt(neResource, key));
+      for (const language of SUPPORTED_LANGUAGES.filter(
+        (language) => language !== "en",
+      )) {
+        const localizedResource = resourceFor(language, namespace);
 
-        expect(
-          neVariables,
-          `Interpolation variables differ for ${namespace}.${key}`,
-        ).toEqual(enVariables);
+        for (const key of getLeafKeys(enResource)) {
+          const enVariables = interpolationVariables(valueAt(enResource, key));
+          const localizedVariables = interpolationVariables(
+            valueAt(localizedResource, key),
+          );
+
+          expect(
+            localizedVariables,
+            `Interpolation variables differ for ${language}/${namespace}.${key}`,
+          ).toEqual(enVariables);
+        }
       }
     });
   }

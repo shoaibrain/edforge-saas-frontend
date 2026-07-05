@@ -2,7 +2,7 @@
  * i18next Configuration
  *
  * Initializes the i18n instance for the EdForge platform.
- * Supports English (en) and Nepali (ne) with browser language detection.
+ * Supports English (en), Nepali (ne), and Hindi (hi) with browser language detection.
  *
  * All micro-frontends share a single i18next instance via Module Federation
  * singleton config, so language changes propagate globally.
@@ -40,12 +40,27 @@ import nePortal from "./locales/ne/portal.json";
 import neBranding from "./locales/ne/branding.json";
 import neIdentifiers from "./locales/ne/identifiers.json";
 
-export const SUPPORTED_LANGUAGES = ["en", "ne"] as const;
+// Hindi translations
+import hiCommon from "./locales/hi/common.json";
+import hiAuth from "./locales/hi/auth.json";
+import hiNav from "./locales/hi/nav.json";
+import hiSettings from "./locales/hi/settings.json";
+import hiDashboard from "./locales/hi/dashboard.json";
+import hiErrors from "./locales/hi/errors.json";
+import hiAcademics from "./locales/hi/academics.json";
+import hiPeople from "./locales/hi/people.json";
+import hiPayments from "./locales/hi/payments.json";
+import hiPortal from "./locales/hi/portal.json";
+import hiBranding from "./locales/hi/branding.json";
+import hiIdentifiers from "./locales/hi/identifiers.json";
+
+export const SUPPORTED_LANGUAGES = ["en", "ne", "hi"] as const;
 export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 
 export const LANGUAGE_LABELS: Record<SupportedLanguage, string> = {
   en: "English",
   ne: "नेपाली",
+  hi: "हिन्दी",
 };
 
 export const NAMESPACES = [
@@ -92,6 +107,20 @@ export const I18N_RESOURCES = {
     portal: nePortal,
     branding: neBranding,
     identifiers: neIdentifiers,
+  },
+  hi: {
+    common: hiCommon,
+    auth: hiAuth,
+    nav: hiNav,
+    settings: hiSettings,
+    dashboard: hiDashboard,
+    errors: hiErrors,
+    academics: hiAcademics,
+    people: hiPeople,
+    payments: hiPayments,
+    portal: hiPortal,
+    branding: hiBranding,
+    identifiers: hiIdentifiers,
   },
 } as const;
 

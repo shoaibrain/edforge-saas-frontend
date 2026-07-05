@@ -1,0 +1,20 @@
+{
+  "emisStudentId": "EMIS छात्र ID",
+  "studentNumber": "छात्र संख्या",
+  "stateStudentId": "राज्य छात्र ID",
+  "receiptNumber": "रसीद संख्या",
+  "invoiceNumber": "चालान संख्या",
+  "invoiceId": "चालान ID",
+  "accountNumber": "खाता संख्या",
+  "transactionId": "लेन-देन ID",
+  "paymentId": "भुगतान ID",
+  "enrollmentId": "नामांकन ID",
+  "userId": "उपयोगकर्ता ID",
+  "paidBy": "द्वारा भुगतान किया गया",
+  "copy": "प्रतिलिपि",
+  "copied": "कॉपी किया गया",
+  "unverifiedFormat": "असत्यापित प्रारूप",
+  "maskedIdentifier": "छिपाया गया पहचानकर्ता",
+  "hidden": "छिपा हुआ",
+  "none": "कोई नहीं"
+}

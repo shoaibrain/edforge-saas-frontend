@@ -1,0 +1,102 @@
+{
+  "pages": {
+    "home": "गृहपृष्ठ",
+    "myGrades": "मेरे ग्रेड",
+    "myAttendance": "मेरी उपस्थिति",
+    "mySchedule": "मेरा शेड्यूल",
+    "childGrades": "{{name}} की प्रगति",
+    "childAttendance": "{{name}} की उपस्थिति",
+    "childSchedule": "{{name}} का शेड्यूल",
+    "childFees": "{{name}} की फीस",
+    "familyOverview": "परिवार अवलोकन"
+  },
+  "stats": {
+    "gpa": "GPA",
+    "attendanceRate": "उपस्थिति",
+    "activeCourses": "पाठ्यक्रम",
+    "balanceDue": "बकाया शेष",
+    "openAssignments": "असाइनमेंट",
+    "invoicesPaid": "चालान का भुगतान किया गया",
+    "nextDue": "अगला देय",
+    "yearProgress": "वर्ष प्रगति",
+    "totalDays": "कुल दिन",
+    "presentDays": "वर्तमान",
+    "absentDays": "अनुपस्थित",
+    "lateDays": "देर से",
+    "excusedDays": "क्षमा करें"
+  },
+  "status": {
+    "present": "वर्तमान",
+    "absent": "अनुपस्थित",
+    "late": "देर से",
+    "excused": "क्षमा करें",
+    "paid": "भुगतान किया गया",
+    "overdue": "अतिदेय",
+    "pending": "लंबित",
+    "upcoming": "आगामी",
+    "outstanding": "उत्कृष्ट",
+    "all": "सब",
+    "inProgress": "प्रगति पर है",
+    "notGraded": "अभी तक ग्रेड नहीं दिया गया है"
+  },
+  "grades": {
+    "cumulativeGpa": "संचयी GPA",
+    "termGpa": "अवधि GPA",
+    "credits": "क्रेडिट",
+    "courses": "पाठ्यक्रम",
+    "gradedItems": "श्रेणीबद्ध आइटम",
+    "allTerms": "सभी शर्तें",
+    "courseByourse": "कोर्स दर कोर्स",
+    "gradedAssignments": "श्रेणीबद्ध असाइनमेंट",
+    "nothingToWorry": "अभी चिंता की कोई बात नहीं है",
+    "noGradesYet": "अभी तक कोई ग्रेड दर्ज नहीं किया गया. जैसे ही आपके शिक्षक उनमें प्रवेश करेंगे वे यहां दिखाई देंगे।",
+    "categoryWeights": "श्रेणी भार"
+  },
+  "attendance": {
+    "yearToDate": "वर्ष दर दिनांक",
+    "recentRecords": "हाल के रिकॉर्ड",
+    "patterns": "पैटर्न और झंडे",
+    "noConcerns": "पैटर्न के संबंध में नहीं",
+    "monthlyTrend": "मासिक रुझान",
+    "noDataToGraph": "रुझान दिखाने के लिए अभी तक पर्याप्त डेटा नहीं है।",
+    "noRecords": "अभी तक कोई उपस्थिति रिकॉर्ड नहीं है.",
+    "holidayUpcoming": "{{date}} को छुट्टियाँ आ रही हैं",
+    "goal": "{{rate}}% लक्ष्य"
+  },
+  "schedule": {
+    "today": "आज",
+    "thisWeek": "इस सप्ताह",
+    "dayView": "दिन",
+    "weekView": "सप्ताह",
+    "coursesAndTeachers": "पाठ्यक्रम एवं शिक्षक",
+    "quickReference": "त्वरित संदर्भ",
+    "dropOff": "छोड़ना",
+    "lunch": "दोपहर का भोजन",
+    "pickup": "उठाना",
+    "noClassesToday": "आज कोई क्लास नहीं.",
+    "noSections": "कोई कक्षा निर्धारित नहीं."
+  },
+  "fees": {
+    "yearOnOneLine": "एक पंक्ति में वर्ष",
+    "invoices": "चालान",
+    "paymentHistory": "भुगतान इतिहास",
+    "categoryBreakdown": "श्रेणी के अनुसार",
+    "noPayments": "अभी तक कोई भुगतान दर्ज नहीं किया गया.",
+    "allFeesCurrent": "सभी शुल्क चालू हैं",
+    "daysUntilDue": "{{count}} दिन",
+    "receipt": "रसीद"
+  },
+  "home": {
+    "greeting": "नमस्ते, {{name}}।",
+    "todayFor": "आज {{name}} के लिए",
+    "thisWeekAssignments": "इस सप्ताह के कार्य",
+    "viewAll": "सभी देखें",
+    "noAssignmentsThisWeek": "इस सप्ताह कोई असाइनमेंट नहीं."
+  },
+  "empty": {
+    "noData": "अभी यहां दिखाने के लिए कुछ भी नहीं है.",
+    "selectChild": "किसी बच्चे की जानकारी देखने के लिए उसे चुनें.",
+    "errorRetry": "कुछ ग़लत हो गया. कृपया पुन: प्रयास करें।",
+    "retry": "पुन: प्रयास करें"
+  }
+}

@@ -1,0 +1,203 @@
+{
+  "greeting": {
+    "morning": "सुप्रभात",
+    "afternoon": "शुभ दोपहर",
+    "evening": "शुभ संध्या"
+  },
+  "recentlyVisited": "हाल ही में दौरा किया गया",
+  "upcomingEvents": "आगामी कार्यक्रम",
+  "noUpcomingEvents": "कोई आगामी ईवेंट नहीं",
+  "enjoyFreeTime": "अपने खाली समय का आनंद लें!",
+  "quickActions": "त्वरित कार्रवाई",
+  "today": "आज",
+  "tomorrow": "कल",
+  "yesterday": "कल",
+  "widgets": {
+    "customize": "डैशबोर्ड को अनुकूलित करें",
+    "showWidget": "दिखाओ",
+    "hideWidget": "छिपाओ"
+  },
+  "events": {
+    "calendars": "कैलेंडर",
+    "includeEvents": "घटनाओं को शामिल करें",
+    "days": "{{count}} दिन",
+    "allDayEvents": "पूरे दिन के कार्यक्रम",
+    "hideFromHome": "घर से छिप जाओ",
+    "back": "वापस",
+    "join": "सम्मिलित हों"
+  },
+  "quickAction": {
+    "addStudent": "विद्यार्थी जोड़ें",
+    "enrollNewStudent": "नए छात्र का नामांकन करें",
+    "attendance": "उपस्थिति",
+    "markDailyAttendance": "दैनिक उपस्थिति अंकित करें",
+    "markClassAttendance": "कक्षा में उपस्थिति अंकित करें",
+    "myClasses": "मेरी कक्षाएँ",
+    "viewYourClasses": "अपनी कक्षाएं देखें",
+    "gradebook": "ग्रेडबुक",
+    "enterGrades": "ग्रेड दर्ज करें",
+    "grades": "ग्रेड",
+    "viewPerformance": "प्रदर्शन देखें",
+    "schedule": "समय-सारणी",
+    "upcomingClasses": "आगामी कक्षाएँ",
+    "assignments": "असाइनमेंट",
+    "pendingHomework": "लंबित होमवर्क",
+    "children": "बच्चे",
+    "viewProgress": "प्रगति देखें",
+    "academicReports": "शैक्षणिक रिपोर्ट",
+    "fees": "फीस",
+    "payments": "भुगतान"
+  },
+  "welcomeTip": {
+    "administrator": {
+      "title": "EdForge में आपका स्वागत है",
+      "description": "आपका ऑल-इन-वन शिक्षा प्रबंधन मंच। अपने वीडियो कॉन्फ्रेंसिंग टूल कनेक्ट करें, छात्रों को प्रबंधित करें, उपस्थिति पर नज़र रखें और अपने स्कूल संचालन को सुव्यवस्थित करें।",
+      "action": "अपने छात्रों को प्रबंधित करें"
+    },
+    "educator": {
+      "title": "सिखाने के लिए तैयार",
+      "description": "अपनी कक्षा के रोस्टर तक पहुंचें, ग्रेड दर्ज करें और उपस्थिति को एक ही स्थान पर ट्रैक करें। हमारे एकीकृत संदेश प्रणाली के माध्यम से माता-पिता से जुड़े रहें।",
+      "action": "अपनी कक्षाएं देखें"
+    },
+    "student": {
+      "title": "आपके पोर्टल में आपका स्वागत है",
+      "description": "अपनी शैक्षणिक प्रगति को ट्रैक करें, असाइनमेंट देखें, अपना शेड्यूल जांचें और स्कूल की घोषणाओं के साथ अपडेट रहें।",
+      "action": "अपने ग्रेड जांचें"
+    },
+    "parent": {
+      "title": "जुड़े रहें",
+      "description": "अपने बच्चों की शैक्षणिक प्रगति की निगरानी करें, उपस्थिति रिकॉर्ड देखें, स्कूल की फीस का भुगतान करें और शिक्षकों के साथ एक ही स्थान पर संवाद करें।",
+      "action": "अपने बच्चों को देखें"
+    }
+  },
+  "moduleTip": {
+    "academics": {
+      "title": "शैक्षणिक प्रबंधन",
+      "description": "छात्रों, शिक्षकों, कक्षाओं और पाठ्यक्रम सभी को एक ही स्थान पर प्रबंधित करें। ग्रेड, उपस्थिति और शैक्षणिक प्रदर्शन को ट्रैक करें।",
+      "action": "शिक्षाविदों का अन्वेषण करें"
+    },
+    "people": {
+      "title": "लोग प्रबंधन",
+      "description": "कर्मचारियों, शिक्षकों, माता-पिता और अभिभावकों को प्रबंधित करें। असाइनमेंट, अनुमतियाँ और संचार प्राथमिकताएँ ट्रैक करें।",
+      "action": "लोगों को प्रबंधित करें"
+    }
+  },
+  "homeV2": {
+    "selectSchool": "डैशबोर्ड देखने के लिए साइडबार से एक स्कूल चुनें।",
+    "selectSchoolTeacher": "अपना डैशबोर्ड देखने के लिए साइडबार से एक स्कूल चुनें।",
+    "offline": "आप ऑफ़लाइन हैं. कैश्ड डेटा देखना.",
+    "refresh": "रीफ़्रेश करें",
+    "kpi": {
+      "studentsEnrolled": "विद्यार्थियों ने नामांकन कराया",
+      "activeSections": "सक्रिय अनुभाग",
+      "todaysAttendance": "आज की उपस्थिति",
+      "outstandingFees": "बकाया फीस",
+      "thisAcademicYear": "इस शैक्षणिक वर्ष",
+      "activeClasses": "सक्रिय कक्षाएं",
+      "overdue": "{{amount}} अतिदेय",
+      "collected": "{{rate}}% एकत्र किया गया",
+      "aboveTarget": "+{{diff}}% लक्ष्य से ऊपर",
+      "belowThreshold": "सीमा से नीचे",
+      "critical": "गंभीर",
+      "dayAvg": "30-दिन का औसत {{avg}}%",
+      "region": "प्रमुख मेट्रिक्स"
+    },
+    "alerts": {
+      "unableToLoad": "अलर्ट लोड करने में असमर्थ",
+      "reviewBilling": "बिलिंग की समीक्षा करें",
+      "viewStudents": "छात्रों को देखें",
+      "region": "अलर्ट"
+    },
+    "attendance": {
+      "classroomAttendance": "कक्षा में उपस्थिति",
+      "todayRate": "{{rate}}% आज",
+      "sectionsTotal": "{{count}} अनुभाग कुल",
+      "sectionsTotal_plural": "कुल {{count}} अनुभाग",
+      "recorded": "{{taken}}/{{total}} रिकॉर्ड किया गया",
+      "overallRate": "कुल मिलाकर {{rate}}%",
+      "section": "अनुभाग",
+      "students": "विद्यार्थी",
+      "recordedCol": "रिकार्ड किया गया",
+      "rate": "दर",
+      "status": "स्थिति",
+      "taken": "लिया गया",
+      "partial": "आंशिक",
+      "pending": "लंबित",
+      "noSectionsToday": "आज कोई अनुभाग निर्धारित नहीं है",
+      "noAcademicYear": "कोई सक्रिय शैक्षणिक वर्ष नहीं.",
+      "setupAcademicYear": "सेटिंग्स में एक शैक्षणिक वर्ष सेट करें",
+      "captionPrefix": "अनुभाग के अनुसार आज की कक्षा में उपस्थिति की स्थिति।"
+    },
+    "trend": {
+      "attendanceTrend": "उपस्थिति प्रवृत्ति",
+      "rollingAverage": "30-दिवसीय रोलिंग औसत",
+      "actual": "वास्तविक",
+      "target": "{{threshold}}% लक्ष्य",
+      "avg": "औसत {{avg}}%",
+      "noData": "अभी तक कोई उपस्थिति डेटा दर्ज नहीं किया गया है",
+      "viewAttendance": "उपस्थिति देखें"
+    },
+    "finance": {
+      "financialOverview": "वित्तीय सिंहावलोकन",
+      "collected": "एकत्र किया गया",
+      "outstanding": "उत्कृष्ट",
+      "overdue": "अतिदेय",
+      "totalInvoiced": "इस वर्ष कुल चालान किया गया",
+      "unableToLoad": "वित्तीय डेटा लोड करने में असमर्थ",
+      "retry": "पुन: प्रयास करें",
+      "viewFinance": "वित्त देखें"
+    },
+    "activity": {
+      "recentActivity": "हाल की गतिविधि",
+      "viewAll": "सभी देखें",
+      "noActivity": "कोई हालिया गतिविधि नहीं"
+    },
+    "teacher": {
+      "mySections": "मेरे अनुभाग",
+      "totalStudents": "कुल छात्र",
+      "assignedClasses": "निर्दिष्ट कक्षाएं",
+      "acrossAllSections": "सभी अनुभागों में",
+      "completionRate": "पूर्णता दर",
+      "viewAll": "सभी देखें",
+      "noSectionsAssigned": "कोई अनुभाग निर्दिष्ट नहीं किया गया",
+      "contactAdmin": "कक्षा अनुभागों को सौंपे जाने के लिए अपने व्यवस्थापक से संपर्क करें।",
+      "takeAttendance": "उपस्थिति लें",
+      "enterGrades": "ग्रेड दर्ज करें"
+    },
+    "student": {
+      "welcomeTitle": "आपके पोर्टल में आपका स्वागत है",
+      "welcomeDescription": "अपनी शैक्षणिक प्रगति को ट्रैक करें, असाइनमेंट देखें और अपडेट रहें।",
+      "grades": "ग्रेड",
+      "gradesDesc": "अपना शैक्षणिक प्रदर्शन देखें",
+      "attendanceLink": "उपस्थिति",
+      "attendanceDesc": "अपना उपस्थिति रिकॉर्ड जांचें",
+      "schedule": "समय-सारणी",
+      "scheduleDesc": "अपनी कक्षा का शेड्यूल देखें",
+      "assignments": "असाइनमेंट",
+      "assignmentsDesc": "लंबित कार्य देखें"
+    },
+    "errors": {
+      "unableToLoadKpi": "KPI डेटा लोड करने में असमर्थ",
+      "unableToLoadInsights": "अंतर्दृष्टि लोड करने में असमर्थ",
+      "unableToLoadDetails": "विवरण लोड करने में असमर्थ",
+      "unableToLoadSections": "अनुभाग लोड करने में असमर्थ",
+      "unableToLoadAttendance": "उपस्थिति डेटा लोड करने में असमर्थ",
+      "unableToLoadDashboard": "डैशबोर्ड लोड करने में असमर्थ",
+      "somethingWentWrong": "कुछ ग़लत हो गया"
+    },
+    "headerZone": {
+      "needAttention": "ध्यान देने की जरूरत है",
+      "allClear": "सब साफ़",
+      "minimize": "न्यूनतम करें",
+      "acknowledge": "समझ गया",
+      "acknowledged": "स्वीकृत",
+      "acknowledgedHint": "स्वीकृत - पूर्ववत करने के लिए क्लिक करें",
+      "dismiss": "ख़ारिज करें",
+      "emptyTitle": "आप सब फंस गये हैं।",
+      "domains": {
+        "finance": "वित्त",
+        "attendance": "उपस्थिति"
+      }
+    }
+  }
+}

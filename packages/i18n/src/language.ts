@@ -5,6 +5,7 @@ export type LocaleCode = SupportedLanguage | `${SupportedLanguage}-${string}`;
 export const DEFAULT_LANGUAGE_LOCALES: Record<SupportedLanguage, LocaleCode> = {
   en: "en-US",
   ne: "ne-NP",
+  hi: "hi-IN",
 };
 
 const SUPPORTED_LANGUAGE_SET = new Set<string>(SUPPORTED_LANGUAGES);

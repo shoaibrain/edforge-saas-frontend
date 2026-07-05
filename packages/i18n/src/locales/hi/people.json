@@ -1,0 +1,848 @@
+{
+  "title": "लोग",
+  "description": "कर्मचारियों, भूमिकाओं और संगठनात्मक संरचना का प्रबंधन करें",
+  "staffDirectory": {
+    "title": "स्टाफ निर्देशिका",
+    "description": "अपने संगठन के स्टाफ सदस्यों और उनकी पहुंच को प्रबंधित करें",
+    "searchPlaceholder": "नाम या ईमेल से खोजें...",
+    "addStaff": "स्टाफ सदस्य जोड़ें",
+    "bulk": {
+      "exportSelected": "निर्यात चयनित",
+      "deleteSelected": "चयनित हटाएँ",
+      "requiresDelete": "कर्मचारियों को हटाने की अनुमति की आवश्यकता है"
+    }
+  },
+  "layout": {
+    "noSchool": {
+      "title": "कोई स्कूल कॉन्फ़िगर नहीं किया गया",
+      "description": "लोगों का उपयोग करने से पहले सेटिंग्स → संगठन में अपना संगठन सेट करें।",
+      "action": "सेटिंग्स पर जाएं"
+    }
+  },
+  "overview": {
+    "stats": {
+      "thisMonth": "{{count}} इस महीने",
+      "fullTimeContract": "पूर्णकालिक/अनुबंध",
+      "noneOnboarded": "कोई भी शामिल नहीं हुआ"
+    },
+    "roster": {
+      "title": "स्टाफ रोस्टर",
+      "viewDirectory": "निर्देशिका देखें",
+      "loading": "स्टाफ लोड हो रहा है...",
+      "empty": "अभी तक कोई स्टाफ रिकॉर्ड नहीं है"
+    },
+    "breakdown": {
+      "title": "रोज़गार टूटना",
+      "employmentType": "रोजगार का प्रकार",
+      "contract": "अनुबंध",
+      "partTime": "अंशकालिक",
+      "byDepartment": "विभाग द्वारा",
+      "noDepartments": "कोई विभाग नहीं सौंपा गया"
+    },
+    "activity": {
+      "title": "हाल की गतिविधि",
+      "accountCreated": "{{name}} के लिए उपयोगकर्ता खाता बनाया गया",
+      "onboardedNoAccess": "{{name}} को सिस्टम एक्सेस के बिना {{role}} के रूप में शामिल किया गया",
+      "staffFallback": "कर्मचारी",
+      "empty": "कोई हालिया स्टाफ गतिविधि नहीं"
+    },
+    "directoryShortcutDescription": "संपूर्ण स्टाफ प्रोफ़ाइल खोजें, फ़िल्टर करें और प्रबंधित करें।",
+    "kpi": {
+      "region": "प्रमुख मेट्रिक्स"
+    },
+    "signals": {
+      "unassignedTitle": "{{count}} कर्मचारियों को किसी विभाग को नहीं सौंपा गया",
+      "unassignedDescription": "विभाग का कवरेज और रिपोर्टिंग असाइनमेंट पर निर्भर करती है। इन कर्मचारियों को निर्देशिका से नियुक्त करें।",
+      "noAccessTitle": "{{count}} स्टाफ के पास कोई सिस्टम एक्सेस नहीं है",
+      "noAccessDescription": "ये कर्मचारी अभी तक EdForge में साइन इन नहीं कर सकते हैं। निर्देशिका से उनके उपयोगकर्ता खाते बनाएँ।",
+      "openDirectory": "स्टाफ निर्देशिका खोलें"
+    }
+  },
+  "headerZone": {
+    "needAttention": "ध्यान देने की जरूरत है",
+    "allClear": "सब साफ़",
+    "region": "ध्यान देने की जरूरत है",
+    "minimize": "न्यूनतम करें",
+    "acknowledge": "समझ गया",
+    "acknowledged": "स्वीकृत",
+    "acknowledgedHint": "स्वीकृत - पूर्ववत करने के लिए क्लिक करें",
+    "dismiss": "ख़ारिज करें",
+    "emptyTitle": "आप सब फंस गये हैं।",
+    "domains": {
+      "capacity": "क्षमता",
+      "dataQuality": "डेटा गुणवत्ता"
+    }
+  },
+  "dataTable": {
+    "errorTitle": "डेटा लोड करने में विफल",
+    "errorDescription": "एक अप्रत्याशित त्रुटि उत्पन्न हुई.",
+    "retry": "पुन: प्रयास करें",
+    "clearSearch": "स्पष्ट खोज",
+    "clearFilters": "फ़िल्टर साफ़ करें",
+    "clearActiveFilters": "साफ़ ({{count}})",
+    "clearSelection": "स्पष्ट चयन",
+    "selectedRows": "{{count}} चयनित",
+    "selectedRows_plural": "{{count}} चयनित",
+    "paginationShowing": "{{total}} में से {{start}}-{{end}} परिणाम दिखाए जा रहे हैं",
+    "rowsPerPage": "{{size}} / पृष्ठ",
+    "previousPage": "पिछला",
+    "nextPage": "अगला",
+    "loadingPage": "लोड हो रहा है...",
+    "rowDensity": "पंक्ति घनत्व",
+    "comfortableDensity": "आरामदायक",
+    "comfortableDensityTitle": "आरामदायक पंक्तियाँ",
+    "compactDensity": "सघन",
+    "compactDensityTitle": "सघन पंक्तियाँ",
+    "viewOptions": "देखें",
+    "toggleColumns": "कॉलम टॉगल करें",
+    "export": "निर्यात करें",
+    "exportFormats": {
+      "csv": "CSV के रूप में निर्यात करें",
+      "xlsx": "XLSX के रूप में निर्यात करें"
+    },
+    "xlsxUnavailable": "XLSX अनुवर्ती जहाजों का निर्यात करता है",
+    "filterAriaLabel": "{{title}} फ़िल्टर",
+    "clearFilter": "फ़िल्टर साफ़ करें",
+    "moreFilters": "अधिक फ़िल्टर",
+    "selection": {
+      "aria": "चयन क्रियाएँ",
+      "selected": "{{count}} चयनित",
+      "selectAll": "सभी का चयन करें {{count}}",
+      "clear": "स्पष्ट चयन"
+    }
+  },
+  "bulkDelete": {
+    "title": "{{count}} स्टाफ सदस्य हटाएं?",
+    "title_plural": "{{count}} स्टाफ सदस्यों को हटाएं?",
+    "description": "इससे उनके स्टाफ रिकॉर्ड को रोस्टर से हटा दिया जाता है।",
+    "fanOutNote": "प्रत्येक पंक्ति एक अलग अनुरोध है. एक स्टाफ सदस्य की विफलता से अन्य को पीछे नहीं हटना पड़ता।",
+    "confirm": "हटाएं {{count}}",
+    "deleting": "हटाया जा रहा है...",
+    "toasts": {
+      "success": "{{count}} स्टाफ सदस्य को हटा दिया गया",
+      "success_plural": "{{count}} स्टाफ सदस्यों को हटा दिया गया",
+      "allFailed": "कोई स्टाफ नहीं हटाया गया - हर अनुरोध विफल रहा",
+      "partial": "हटाया गया {{ok}}; {{failed}} विफल"
+    }
+  },
+  "quickAccess": {
+    "addNew": "नया व्यक्ति जोड़ें",
+    "addNewDescription": "एक नए स्टाफ सदस्य को शामिल करें",
+    "departments": "विभाग",
+    "departmentsDescription": "संगठनात्मक संरचना का प्रबंधन करें",
+    "roles": "भूमिकाएँ एवं अनुमतियाँ",
+    "rolesDescription": "पहुंच और अनुमतियाँ कॉन्फ़िगर करें",
+    "profileSettings": "प्रोफ़ाइल सेटिंग्स",
+    "profileSettingsDescription": "प्रोफ़ाइल कॉन्फ़िगरेशन प्रबंधित करें",
+    "analytics": "लोग विश्लेषिकी",
+    "analyticsDescription": "कार्यबल विश्लेषण देखें"
+  },
+  "stats": {
+    "totalStaff": "कुल स्टाफ",
+    "activeTeachers": "सक्रिय शिक्षक",
+    "teachers": "शिक्षकों",
+    "supportStaff": "सहायक कर्मचारी",
+    "administrators": "प्रशासक",
+    "systemAccess": "सिस्टम एक्सेस",
+    "tags": {
+      "allActive": "सभी सक्रिय",
+      "active": "सक्रिय",
+      "noneYet": "अभी तक कोई नहीं",
+      "noAccess": "{{count}} कोई पहुंच नहीं"
+    }
+  },
+  "tableHeaders": {
+    "staff": "कर्मचारी",
+    "role": "भूमिका",
+    "status": "स्थिति",
+    "hired": "किराये पर लिया",
+    "department": "विभाग",
+    "systemAccess": "सिस्टम एक्सेस"
+  },
+  "systemAccess": {
+    "active": "सक्रिय",
+    "noAccess": "कोई प्रवेश नहीं",
+    "linkedAccount": "लिंक किया गया उपयोगकर्ता खाता",
+    "noAccountLinked": "कोई उपयोगकर्ता खाता लिंक नहीं किया गया"
+  },
+  "empty": {
+    "noStaff": "कोई स्टाफ सदस्य नहीं मिला",
+    "getStarted": "निर्देशिका में अपना पहला स्टाफ सदस्य जोड़कर आरंभ करें।"
+  },
+  "drawer": {
+    "title": "कर्मचारी विवरण",
+    "viewFullProfile": "पूर्ण प्रोफ़ाइल देखें",
+    "editStaff": "स्टाफ सदस्य संपादित करें",
+    "deleteStaff": "स्टाफ सदस्य हटाएँ",
+    "since": "चूँकि {{date}}",
+    "type": "प्रकार",
+    "primary": "प्राथमिक"
+  },
+  "sections": {
+    "employmentInfo": "रोजगार सूचना",
+    "contactInfo": "संपर्क जानकारी",
+    "schoolAssignments": "स्कूल असाइनमेंट",
+    "systemAccess": "सिस्टम एक्सेस"
+  },
+  "fields": {
+    "firstName": "पहला नाम",
+    "lastName": "उपनाम",
+    "middleName": "मध्य नाम",
+    "maidenName": "युवती का नाम",
+    "suffix": "प्रत्यय",
+    "staffId": "स्टाफ अद्वितीय ID",
+    "hireDate": "नियुक्ति तिथि",
+    "employmentType": "रोजगार का प्रकार",
+    "title": "शीर्षक",
+    "primarySchool": "प्राथमिक विद्यालय",
+    "email": "ईमेल",
+    "phone": "फ़ोन",
+    "address": "पता",
+    "city": "शहर",
+    "state": "राज्य",
+    "province": "प्रांत",
+    "district": "जिला",
+    "municipality": "नगर पालिका/ग्रामीण नगर पालिका/वीडीसी",
+    "wardNumber": "वार्ड क्रमांक",
+    "street": "सड़क",
+    "streetToleHouse": "गली/टोले/घर",
+    "zipCode": "ज़िप कोड",
+    "country": "देश",
+    "postalCode": "डाक कोड",
+    "department": "विभाग",
+    "positionTitle": "पद का शीर्षक",
+    "fte": "FTE",
+    "isPrimary": "प्राथमिक है",
+    "name": "नाम",
+    "fullName": "पूरा नाम",
+    "emailAddress": "ईमेल पता",
+    "phoneNumber": "फ़ोन नंबर",
+    "phoneNumberWithCode": "फ़ोन नंबर {{code}}",
+    "phoneWithCode": "फ़ोन {{code}}",
+    "role": "भूमिका",
+    "addressType": "पता प्रकार",
+    "relationship": "संबंध",
+    "dateOfBirth": "जन्मतिथि",
+    "gender": "लिंग",
+    "hispanicLatino": "हिस्पैनिक/लातीनी",
+    "hispanicLatinoEthnicity": "हिस्पैनिक/लातीनी जातीयता",
+    "beginDate": "आरंभ तिथि",
+    "startDate": "आरंभ तिथि",
+    "endDate": "समाप्ति तिथि"
+  },
+  "employmentStatus": {
+    "active": "सक्रिय",
+    "onLeave": "छुट्टी पर",
+    "suspended": "निलंबित",
+    "terminated": "ख़त्म कर दिया गया",
+    "retired": "सेवानिवृत्त",
+    "resigned": "इस्तीफा दे दिया"
+  },
+  "employmentTypes": {
+    "fullTime": "पूर्णकालिक"
+  },
+  "roles": {
+    "teacher": "अध्यापक",
+    "principal": "प्राचार्य",
+    "vicePrincipal": "उप प्राचार्य",
+    "counselor": "परामर्शदाता",
+    "librarian": "लाइब्रेरियन",
+    "nurse": "नर्स",
+    "adminStaff": "व्यवस्थापक कर्मचारी",
+    "supportStaff": "सहायक कर्मचारी",
+    "itStaff": "आईटी स्टाफ",
+    "substitute": "स्थानापन्न",
+    "contractor": "ठेकेदार"
+  },
+  "choices": {
+    "gender": {
+      "male": "पुरुष",
+      "female": "महिला",
+      "nonBinary": "गैर-बाइनरी",
+      "preferNotToSay": "कहना पसंद नहीं करते"
+    },
+    "addressType": {
+      "home": "गृहपृष्ठ",
+      "mailing": "मेल करना",
+      "work": "काम",
+      "temporary": "अस्थायी"
+    },
+    "relationship": {
+      "spouse": "जीवनसाथी",
+      "parent": "अभिभावक",
+      "sibling": "भाई बहन",
+      "child": "बच्चा",
+      "friend": "मित्र",
+      "other": "अन्य"
+    },
+    "employmentType": {
+      "fullTime": "पूर्णकालिक",
+      "partTime": "अंशकालिक",
+      "contract": "अनुबंध",
+      "temporary": "अस्थायी",
+      "volunteer": "स्वयंसेवक"
+    }
+  },
+  "wizard": {
+    "header": {
+      "title": "स्टाफ सदस्य जोड़ें",
+      "description": "नया स्टाफ रिकॉर्ड बनाने के लिए विज़ार्ड को पूरा करें"
+    },
+    "stepMeta": {
+      "personal": {
+        "title": "व्यक्तिगत जानकारी",
+        "description": "नाम, ID, और जनसांख्यिकी"
+      },
+      "contact": {
+        "title": "संपर्क करें",
+        "description": "ईमेल, फ़ोन, पते और आपातकालीन संपर्क"
+      },
+      "employment": {
+        "title": "रोज़गार",
+        "description": "भूमिका, प्रकार, विभाग और खाता सेटअप"
+      },
+      "assignment": {
+        "title": "असाइनमेंट",
+        "description": "प्राथमिक विद्यालय और अतिरिक्त कार्यभार"
+      },
+      "review": {
+        "title": "समीक्षा करें और बनाएं",
+        "description": "विवरण की पुष्टि करें और स्टाफ रिकॉर्ड बनाएं"
+      }
+    },
+    "steps": {
+      "personalInfo": "व्यक्तिगत जानकारी",
+      "personalInfoDescription": "नाम, ID, और जनसांख्यिकी",
+      "contact": "संपर्क करें",
+      "contactDescription": "ईमेल, फ़ोन, पते और आपातकालीन संपर्क",
+      "employment": "रोज़गार",
+      "employmentDescription": "भूमिका, प्रकार, विभाग और खाता सेटअप",
+      "assignment": "असाइनमेंट",
+      "assignmentDescription": "प्राथमिक विद्यालय और अतिरिक्त कार्यभार",
+      "review": "समीक्षा करें और बनाएं",
+      "reviewDescription": "विवरण की पुष्टि करें और स्टाफ रिकॉर्ड बनाएं"
+    },
+    "employmentDetails": "रोजगार विवरण",
+    "teachingQualifications": "शिक्षण योग्यताएँ",
+    "reviewSubmit": "समीक्षा करें और सबमिट करें",
+    "edit": "संपादित करें",
+    "submit": "स्टाफ सदस्य बनाएँ",
+    "validation": {
+      "fixFields": "कृपया जारी रखने के लिए {{count}} फ़ील्ड को ठीक करें"
+    },
+    "toasts": {
+      "created": "स्टाफ सदस्य सफलतापूर्वक बनाया गया",
+      "createdWithUser": "स्टाफ सदस्य और उपयोगकर्ता खाता सफलतापूर्वक बनाया गया",
+      "additionalAssignmentFailed": "अतिरिक्त असाइनमेंट नहीं बनाया जा सका. आप इसे स्टाफ प्रोफ़ाइल से जोड़ सकते हैं.",
+      "createFailed": "स्टाफ़ सदस्य बनाने में विफल"
+    },
+    "placeholders": {
+      "firstName": "उदाहरण के लिए, जॉन",
+      "lastName": "उदाहरण के लिए, स्मिथ",
+      "middleName": "उदाहरण के लिए, माइकल",
+      "maidenName": "उदाहरण के लिए, जॉनसन",
+      "staffUniqueId": "उदाहरण के लिए, JS4821",
+      "email": "john.smith@school.edu",
+      "streetToleHouse": "जैसे, टोले-12, बिशाल बाज़ार",
+      "selectProvince": "प्रांत चुनें",
+      "selectDistrict": "जिला चुनें",
+      "pickProvinceFirst": "पहले प्रांत चुनें",
+      "municipality": "उदाहरण के लिए, काठमांडू मेट्रोपॉलिटन सिटी",
+      "wardNumber": "जैसे, 12",
+      "postalCodeNp": "जैसे, 44600",
+      "nepal": "नेपाल",
+      "selectRole": "एक भूमिका चुनें...",
+      "positionTitle": "उदाहरण के लिए, वरिष्ठ गणित शिक्षक",
+      "selectDepartment": "विभाग चुनें..."
+    },
+    "help": {
+      "staffUniqueId": "कर्मचारी संख्या या राज्य ID। नाम से स्वतः उत्पन्न, लेकिन आप ओवरराइड कर सकते हैं।",
+      "edfiComplianceField": "Ed-Fi अनुपालन क्षेत्र"
+    },
+    "contact": {
+      "primaryContact": "प्राथमिक संपर्क",
+      "primaryContactDescription": "ईमेल का उपयोग लॉगिन और नोटिफिकेशन के लिए किया जाता है",
+      "addresses": "पते",
+      "addressesDescription": "घर, कार्यस्थल, या डाक पता जोड़ें",
+      "addAddress": "पता जोड़ें",
+      "removeAddress": "पता हटाएँ",
+      "emergencyContacts": "आपातकालीन संपर्क",
+      "emergencyContactsDescription": "आपातकालीन स्थिति में संपर्क करने के लिए लोग",
+      "contactNumber": "संपर्क करें {{count}}",
+      "removeContact": "संपर्क हटाएँ",
+      "addEmergencyContact": "आपातकालीन संपर्क जोड़ें"
+    },
+    "employment": {
+      "details": "रोजगार विवरण",
+      "detailsDescription": "भूमिका और रोजगार वर्गीकरण",
+      "teachingQualifications": "शिक्षण योग्यताएँ",
+      "teachingQualificationsDescription": "अनुदेशात्मक स्टाफ के लिए Ed-Fi फ़ील्ड",
+      "highlyQualifiedTeacher": "उच्च योग्य शिक्षक (मुख्यालय)",
+      "highlyQualifiedHelp": "जैसा कि एनसीएलबी/ईएसएसए आवश्यकताओं द्वारा परिभाषित है",
+      "priorTeachingExperience": "वर्षों का पूर्व शिक्षण अनुभव",
+      "priorProfessionalExperience": "वर्षों का पूर्व व्यावसायिक अनुभव",
+      "teachingExperienceYears": "शिक्षण अनुभव (वर्ष)",
+      "professionalExperienceYears": "व्यावसायिक अनुभव (वर्ष)",
+      "userAccount": "उपयोगकर्ता खाता",
+      "userAccountDescription": "वैकल्पिक रूप से इस स्टाफ सदस्य के लिए एक लॉगिन खाता बनाएं",
+      "createUserAccount": "इस स्टाफ सदस्य के लिए उपयोगकर्ता खाता बनाएँ",
+      "createUserAccountHelp": "EdForge तक लॉगिन पहुंच सक्षम करता है। एक ईमेल आमंत्रण भेजा जाएगा.",
+      "cognitoNotice": "चरण 2 ({{email}}) के ईमेल से एक Cognito खाता बनाया जाएगा। एक अस्थायी पासवर्ड स्वतः जेनरेट हो जाएगा.",
+      "emailNotSet": "अभी तक सेट नहीं है",
+      "globalRoleHelp": "TenantAdmin के पास पूर्ण सिस्टम एक्सेस है"
+    },
+    "assignment": {
+      "primaryTitle": "प्राथमिक विद्यालय असाइनमेंट",
+      "primaryDescription": "स्टाफ सदस्य का मुख्य स्कूल प्लेसमेंट",
+      "loadingSchools": "स्कूल लोड हो रहे हैं...",
+      "selectSchool": "एक स्कूल चुनें...",
+      "sameAsEmploymentRole": "रोजगार भूमिका के समान",
+      "roleAtSchool": "स्कूल में भूमिका",
+      "roleHelp": "रोज़गार भूमिका में चूक",
+      "beginDateHelp": "किराये की तारीख तय करने में चूक",
+      "fte": "पूर्णकालिक समकक्षता (एफटीई)",
+      "primaryFte": "प्राथमिक एफटीई",
+      "additionalTitle": "अतिरिक्त कार्य",
+      "additionalDescription": "स्टाफ को कई स्कूलों में नियुक्त किया जा सकता है",
+      "assignmentNumber": "असाइनमेंट {{count}}",
+      "school": "विद्यालय",
+      "addAnother": "एक और स्कूल असाइनमेंट जोड़ें",
+      "totalFte": "कुल एफटीई",
+      "overcommitted": "कुल FTE 1.0 से अधिक है। यह स्टाफ सदस्य अत्यधिक प्रतिबद्ध हो सकता है।"
+    },
+    "review": {
+      "title": "स्टाफ जानकारी की समीक्षा करें",
+      "description": "कृपया स्टाफ रिकॉर्ड बनाने से पहले सभी विवरणों की समीक्षा करें।",
+      "edit": "संपादित करें",
+      "sections": {
+        "personal": "व्यक्तिगत जानकारी"
+      },
+      "addressCount": "{{count}} पता",
+      "addressCount_plural": "{{count}} पते",
+      "contactCount": "{{count}} संपर्क करें",
+      "contactCount_plural": "{{count}} संपर्क",
+      "assigned": "सौंपा गया",
+      "userAccountWillBeCreated": "उपयोगकर्ता खाता बनाया जाएगा",
+      "noUserAccount": "कोई उपयोगकर्ता खाता नहीं",
+      "loginSummary": "{{email}} के लिए {{role}} के रूप में लॉगिन करें",
+      "noLoginAccess": "केवल स्टाफ रिकॉर्ड - कोई लॉगिन एक्सेस नहीं"
+    }
+  },
+  "tabs": {
+    "overview": "अवलोकन",
+    "profile": "प्रोफ़ाइल",
+    "assignments": "असाइनमेंट",
+    "credentials": "साख",
+    "employmentHistory": "रोजगार इतिहास",
+    "employment-history": "इतिहास",
+    "leave": "छोड़ो",
+    "security": "सुरक्षा",
+    "trainings": "प्रशिक्षण"
+  },
+  "delete": {
+    "title": "स्टाफ सदस्य हटाएँ",
+    "warning": "इस क्रिया को पूर्ववत नहीं किया जा सकता",
+    "confirmation": "आप {{name}} के स्टाफ रिकॉर्ड को स्थायी रूप से हटाने वाले हैं। इससे उनका सारा डेटा और एक्सेस हटा दिया जाएगा.",
+    "typeToConfirm": "पुष्टि करने के लिए {{email}} टाइप करें",
+    "emailPlaceholder": "पुष्टि करने के लिए ईमेल दर्ज करें",
+    "emailMismatch": "ईमेल मेल नहीं खाता",
+    "deleting": "हटाया जा रहा है..."
+  },
+  "actions": {
+    "cancel": "रद्द करें",
+    "save": "सहेजें",
+    "saving": "सहेजा जा रहा है...",
+    "saveChanges": "बदलाव सहेजें",
+    "view": "देखें",
+    "edit": "संपादित करें",
+    "more": "अधिक",
+    "actions": "कार्रवाइयाँ",
+    "closeDrawer": "दराज बंद करो",
+    "copyToClipboard": "क्लिपबोर्ड पर कॉपी करें",
+    "updateStatus": "अद्यतन स्थिति",
+    "assignToSchool": "स्कूल को सौंपें",
+    "addCredential": "क्रेडेंशियल जोड़ें"
+  },
+  "common": {
+    "unknown": "अज्ञात",
+    "unassigned": "असाइन नहीं किया गया",
+    "loading": "लोड हो रहा है...",
+    "select": "चुनें...",
+    "none": "कोई नहीं",
+    "yes": "हाँ",
+    "no": "नहीं",
+    "unsavedChanges": "आपके पास असहेजे बदलाव हैं",
+    "unsavedCloseConfirm": "आपके पास सहेजे नहीं गए परिवर्तन हैं. क्या आप वाकई बंद करना चाहते हैं?",
+    "additionalDetails": "अतिरिक्त विवरण..."
+  },
+  "widgets": {
+    "showHide": "विजेट दिखाएँ/छिपाएँ",
+    "resetDefault": "डिफ़ॉल्ट पर रीसेट करें",
+    "quickStats": "त्वरित आँकड़े",
+    "quickAccess": "त्वरित पहुंच"
+  },
+  "filters": {
+    "label": "फिल्टर",
+    "allRoles": "सभी भूमिकाएँ",
+    "allStatuses": "सभी क़ानून",
+    "filterByDepartment": "विभाग द्वारा फ़िल्टर करें...",
+    "clearAll": "सब साफ़ करें",
+    "exportCsv": "निर्यात करेंCSV",
+    "role": "भूमिका",
+    "employmentStatus": "रोजगार की स्थिति",
+    "department": "विभाग",
+    "roleAria": "भूमिका के अनुसार फ़िल्टर करें"
+  },
+  "quickAdd": {
+    "title": "त्वरित उपयोगकर्ता जोड़ें",
+    "description": "केवल उपयोगकर्ता खाता बनाएं",
+    "menuLabel": "शीघ्र उपयोगकर्ता खाता जोड़ें",
+    "avatarHint": "निर्माण के बाद स्टाफ सदस्य के नाम से एक डाइसबियर अवतार स्वतः उत्पन्न हो जाएगा।",
+    "systemRole": "सिस्टम भूमिका",
+    "createUser": "उपयोगकर्ता बनाएं",
+    "sections": {
+      "identity": "पहचान",
+      "accessRole": "पहुंच एवं भूमिका"
+    },
+    "roles": {
+      "tenantUser": "किरायेदार उपयोगकर्ता",
+      "tenantAdmin": "किरायेदार व्यवस्थापक"
+    },
+    "roleHelp": {
+      "admin": "- सभी सुविधाओं तक पूर्ण पहुंच।",
+      "user": "- निर्दिष्ट भूमिकाओं के आधार पर स्कूल-स्कोप पहुंच।"
+    },
+    "toasts": {
+      "created": "उपयोगकर्ता सफलतापूर्वक बनाया गया"
+    }
+  },
+  "quickFilters": {
+    "all": "सब",
+    "teacher": "शिक्षकों",
+    "principal": "प्राचार्य",
+    "support": "समर्थन"
+  },
+  "export": {
+    "headers": {
+      "name": "नाम",
+      "email": "ईमेल",
+      "role": "भूमिका",
+      "status": "स्थिति",
+      "phone": "फ़ोन",
+      "hireDate": "नियुक्ति तिथि"
+    }
+  },
+  "editStaff": {
+    "title": "स्टाफ सदस्य संपादित करें",
+    "description": "{{name}} के लिए अद्यतन जानकारी",
+    "emailReadOnly": "ईमेल पता बदला नहीं जा सकता",
+    "errors": {
+      "noStaff": "अद्यतन करने के लिए कोई स्टाफ सदस्य नहीं"
+    },
+    "toasts": {
+      "updated": "स्टाफ सदस्य सफलतापूर्वक अद्यतन किया गया"
+    },
+    "placeholders": {
+      "selectDepartment": "विभाग चुनें..."
+    },
+    "iemis": {
+      "title": "IEMIS / CEHRD पहचान",
+      "description": "वैकल्पिक - CEHRD फ्लैश-II स्टाफ रजिस्टर निर्यात का समर्थन करने के लिए पॉप्युलेट करें।",
+      "staffId": "IEMIS स्टाफ ID",
+      "staffIdHelp": "CEHRD द्वारा जारी 16-अंकीय पहचानकर्ता (V1 प्लेसहोल्डर प्रारूप)।",
+      "nationality": "राष्ट्रीयता",
+      "maritalStatus": "वैवाहिक स्थिति",
+      "appointmentType": "नियुक्ति प्रकार",
+      "appointmentDate": "नियुक्ति तिथि",
+      "appointmentDateHelp": "प्रति सीईएचआरडी रजिस्टर।",
+      "maritalStatusOptions": {
+        "single": "एकल",
+        "married": "शादीशुदा",
+        "divorced": "तलाकशुदा",
+        "widowed": "विधवा",
+        "other": "अन्य",
+        "prefer_not_to_say": "नहीं कहना पसंद करते हैं"
+      },
+      "appointmentTypeOptions": {
+        "permanent": "स्थाई",
+        "temporary": "अस्थायी",
+        "contract": "अनुबंध",
+        "honorary": "मानद",
+        "volunteer": "स्वयंसेवक"
+      }
+    }
+  },
+  "credentials": {
+    "description": "शिक्षण लाइसेंस, प्रमाणपत्र और पेशेवर प्रमाण-पत्र",
+    "emptyTitle": "कोई क्रेडेंशियल नहीं",
+    "emptyDescription": "इस स्टाफ सदस्य के लिए अभी तक कोई क्रेडेंशियल नहीं जोड़ा गया है।",
+    "addFirst": "पहला क्रेडेंशियल जोड़ें",
+    "deleteConfirm": "क्या आप वाकई इस क्रेडेंशियल को हटाना चाहते हैं? इस एक्शन को वापस नहीं किया जा सकता।",
+    "noExpiration": "कोई समाप्ति नहीं",
+    "expired": "समाप्त हो गया",
+    "daysRemaining": "{{count}} दिन शेष",
+    "daysRemaining_plural": "{{count}} दिन शेष",
+    "expiresOn": "समाप्त हो रहा है {{date}}",
+    "issued": "जारी {{date}}",
+    "document": "दस्तावेज़",
+    "grades": "ग्रेड:",
+    "edit": "क्रेडेंशियल संपादित करें",
+    "delete": "क्रेडेंशियल हटाएँ",
+    "toasts": {
+      "added": "क्रेडेंशियल सफलतापूर्वक जोड़ा गया",
+      "updated": "क्रेडेंशियल सफलतापूर्वक अपडेट किया गया",
+      "deleted": "क्रेडेंशियल सफलतापूर्वक हटा दिया गया",
+      "deleteFailed": "क्रेडेंशियल हटाने में विफल"
+    },
+    "modal": {
+      "addTitle": "क्रेडेंशियल जोड़ें",
+      "editTitle": "क्रेडेंशियल संपादित करें",
+      "addDescription": "इस स्टाफ सदस्य के लिए एक नया क्रेडेंशियल जोड़ें",
+      "editDescription": "क्रेडेंशियल जानकारी अद्यतन करें"
+    },
+    "fields": {
+      "credentialId": "क्रेडेंशियल ID",
+      "fieldSubjectArea": "फ़ील्ड/विषय क्षेत्र",
+      "issuingOrganization": "जारीकर्ता संगठन",
+      "issuingState": "जारीकर्ता राज्य",
+      "issuanceDate": "जारी करने की तारीख",
+      "expirationDate": "समाप्ति तिथि",
+      "description": "विवरण",
+      "documentUrl": "दस्तावेज़ URL",
+      "renewable": "नवीकरणीय क्रेडेंशियल",
+      "renewalReminderDays": "समाप्ति से कुछ दिन पहले अनुस्मारक"
+    },
+    "types": {
+      "certification": "प्रमाणन",
+      "license": "लाइसेंस",
+      "endorsement": "समर्थन",
+      "degree": "डिग्री",
+      "registration": "पंजीकरण",
+      "permit": "अनुमति",
+      "clearance": "निकासी",
+      "training": "प्रशिक्षण",
+      "other": "अन्य"
+    },
+    "fieldsBySubject": {
+      "elementary_education": "प्रारंभिक शिक्षा",
+      "secondary_education": "माध्यमिक शिक्षा",
+      "special_education": "विशेष शिक्षा",
+      "early_childhood": "प्रारंभिक बचपन",
+      "mathematics": "गणित",
+      "science": "विज्ञान",
+      "english_language_arts": "अंग्रेजी भाषा कला",
+      "social_studies": "सामाजिक अध्ययन",
+      "foreign_language": "विदेशी भाषा",
+      "physical_education": "शारीरिक शिक्षा",
+      "music": "संगीत",
+      "art": "कला",
+      "technology": "प्रौद्योगिकी",
+      "counseling": "परामर्श",
+      "administration": "प्रशासन",
+      "library_media": "लाइब्रेरी मीडिया",
+      "other": "अन्य"
+    }
+  },
+  "leave": {
+    "title": "प्रबंधन छोड़ें",
+    "description": "छुट्टी अनुरोध देखें और प्रबंधित करें",
+    "searchPlaceholder": "कारण खोजें...",
+    "emptyTitle": "कोई छुट्टी का अनुरोध नहीं",
+    "emptyDescription": "अभी तक कोई छुट्टी अनुरोध प्रस्तुत नहीं किया गया है। एक बनाने के लिए \"अनुरोध छुट्टी\" पर क्लिक करें।",
+    "actions": {
+      "request": "छुट्टी का अनुरोध करें",
+      "submitRequest": "अनुरोध सबमिट करें",
+      "approve": "स्वीकृत करें",
+      "reject": "अस्वीकार करें"
+    },
+    "summary": {
+      "totalRequests": "कुल अनुरोध",
+      "daysUsed": "प्रयुक्त दिन",
+      "pendingRequests": "लंबित अनुरोध",
+      "daysPending": "लंबित दिन"
+    },
+    "table": {
+      "dates": "खजूर",
+      "duration": "अवधि",
+      "reason": "कारण"
+    },
+    "fields": {
+      "leaveType": "प्रकार छोड़ें",
+      "durationType": "अवधि प्रकार",
+      "hours": "घंटे"
+    },
+    "modal": {
+      "description": "{{name}} के लिए छुट्टी का अनुरोध बनाएं",
+      "emergencyContact": "छुट्टी के दौरान आपातकालीन संपर्क"
+    },
+    "placeholders": {
+      "selectLeaveType": "छुट्टी का प्रकार चुनें...",
+      "reason": "छुट्टी का संक्षिप्त कारण...",
+      "contactName": "संपर्क नाम",
+      "phoneNumber": "फ़ोन नंबर"
+    },
+    "prompts": {
+      "rejectionReason": "कृपया अस्वीकृति का कारण दर्ज करें:",
+      "cancellationReason": "कृपया रद्दीकरण का कारण दर्ज करें:"
+    },
+    "toasts": {
+      "created": "छुट्टी का अनुरोध सफलतापूर्वक बनाया गया",
+      "approved": "छुट्टी का अनुरोध स्वीकृत",
+      "approveFailed": "छुट्टी अनुरोध स्वीकृत करने में विफल",
+      "rejected": "छुट्टी का अनुरोध अस्वीकृत",
+      "rejectFailed": "छुट्टी अनुरोध अस्वीकार करने में विफल",
+      "cancelled": "छुट्टी का अनुरोध रद्द कर दिया गया",
+      "cancelFailed": "छुट्टी का अनुरोध रद्द करने में विफल"
+    },
+    "duration": {
+      "days": "{{count}} दिन",
+      "days_plural": "{{count}} दिन",
+      "hours": "{{count}} घंटा",
+      "hours_plural": "{{count}} घंटे"
+    },
+    "status": {
+      "approved": "स्वीकृत",
+      "completed": "पूर्ण",
+      "rejected": "अस्वीकृत",
+      "pending": "लंबित",
+      "in_progress": "प्रगति पर है",
+      "cancelled": "रद्द कर दिया गया"
+    },
+    "types": {
+      "annual": "वार्षिक",
+      "sick": "बीमार",
+      "personal": "निजी",
+      "bereavement": "शोक",
+      "maternity": "मातृत्व",
+      "paternity": "पितृत्व",
+      "family_medical": "एफएमएलए",
+      "jury_duty": "जूरी ड्यूटी",
+      "military": "सैन्य",
+      "professional_development": "प्रोफेसर देव.",
+      "sabbatical": "विश्रामकालीन",
+      "unpaid": "अवैतनिक",
+      "other": "अन्य"
+    },
+    "typesFull": {
+      "annual": "वार्षिक/पीटीओ",
+      "sick": "बीमार छुट्टी",
+      "personal": "व्यक्तिगत दिन",
+      "bereavement": "शोक",
+      "maternity": "मातृत्व",
+      "paternity": "पितृत्व",
+      "family_medical": "पारिवारिक चिकित्सा (एफएमएलए)",
+      "jury_duty": "जूरी ड्यूटी",
+      "military": "सैन्य",
+      "professional_development": "व्यावसायिक विकास",
+      "sabbatical": "विश्रामकालीन",
+      "unpaid": "अवैतनिक अवकाश",
+      "other": "अन्य"
+    },
+    "durationTypes": {
+      "full_day": "पूरा दिन",
+      "half_day_am": "आधा दिन (एएम)",
+      "half_day_pm": "आधा दिन (पीएम)",
+      "hours": "घंटे"
+    }
+  },
+  "employmentHistory": {
+    "description": "समय के साथ रोजगार की स्थिति में बदलाव को ट्रैक करें",
+    "updateTitle": "रोज़गार की स्थिति अपडेट करें",
+    "currentStatus": "वर्तमान स्थिति: {{status}}",
+    "emptyTitle": "कोई रोजगार इतिहास नहीं",
+    "emptyDescription": "रोजगार की स्थिति में अभी तक कोई बदलाव दर्ज नहीं किया गया है। परिवर्तन रिकॉर्ड करने के लिए \"अद्यतन स्थिति\" पर क्लिक करें।",
+    "effective": "प्रभावी {{date}}",
+    "recorded": "रिकॉर्ड किया गया {{date}}",
+    "fields": {
+      "newStatus": "नई स्थिति",
+      "effectiveDate": "प्रभावी तिथि",
+      "notes": "टिप्पणियाँ",
+      "reasonLabel": "कारण:"
+    },
+    "placeholders": {
+      "selectStatus": "स्थिति चुनें...",
+      "reason": "जैसे, अनुबंध की समाप्ति, पदोन्नति, चिकित्सा अवकाश"
+    },
+    "toasts": {
+      "updated": "रोज़गार की स्थिति सफलतापूर्वक अपडेट की गई"
+    }
+  },
+  "assignments": {
+    "assignTitle": "स्कूल को सौंपें",
+    "assignDescription": "{{name}} के लिए एक नया स्कूल असाइनमेंट बनाएं",
+    "editTitle": "असाइनमेंट संपादित करें",
+    "editDescription": "{{school}} पर असाइनमेंट अपडेट करें",
+    "schoolFallback": "स्कूल",
+    "unknownSchool": "अज्ञात विद्यालय",
+    "noActiveAssignments": "कोई सक्रिय असाइनमेंट नहीं",
+    "totalFte": "कुल एफटीई",
+    "fteValue": "एफटीई {{value}}",
+    "primary": "प्राथमिक",
+    "ended": "समाप्त",
+    "remove": "हटाएँ",
+    "removeConfirm": "क्या आप वाकई इस असाइनमेंट को हटाना चाहते हैं? इस एक्शन को वापस नहीं किया जा सकता।",
+    "overcommitted": "ओवरकमिटेड - 1.0 से अधिक है",
+    "emptyTitle": "कोई असाइनमेंट नहीं",
+    "emptyDescription": "इस स्टाफ सदस्य को स्कूल में नियुक्त करने के लिए क्रिया मेनू का उपयोग करें।",
+    "teachingSections": "शिक्षण अनुभाग",
+    "sectionsCount": "{{count}} अनुभाग",
+    "sectionsCount_plural": "{{count}} अनुभाग",
+    "studentsCount": "{{count}} छात्र",
+    "studentsCount_plural": "{{count}} छात्र",
+    "setPrimary": "प्राथमिक असाइनमेंट के रूप में सेट करें",
+    "createAssignment": "असाइनमेंट बनाएं",
+    "ongoingHelp": "जारी रखने के लिए खाली छोड़ें",
+    "placeholders": {
+      "selectSchoolFirst": "सबसे पहले एक स्कूल चुनें...",
+      "positionTitle": "जैसे, लीड टीचर"
+    },
+    "toasts": {
+      "created": "स्कूल असाइनमेंट सफलतापूर्वक बनाया गया",
+      "updated": "असाइनमेंट सफलतापूर्वक अपडेट किया गया",
+      "removed": "असाइनमेंट सफलतापूर्वक निकाला गया",
+      "removeFailed": "असाइनमेंट हटाने में विफल"
+    }
+  },
+  "detail": {
+    "notFound": {
+      "title": "स्टाफ सदस्य नहीं मिला",
+      "description": "अनुरोधित स्टाफ सदस्य नहीं मिल सका."
+    },
+    "backToDirectory": "स्टाफ़ निर्देशिका पर वापस जाएँ",
+    "unknownStaff": "अज्ञात कर्मचारी",
+    "sectionsAria": "स्टाफ विवरण अनुभाग",
+    "overview": {
+      "stats": {
+        "sections": "अनुभाग",
+        "students": "विद्यार्थी",
+        "capacity": "क्षमता",
+        "avgGrade": "औसत ग्रेड"
+      },
+      "sectionPerformance": "अनुभाग प्रदर्शन",
+      "noTeachingSectionsTitle": "कोई शिक्षण अनुभाग नहीं",
+      "noTeachingSectionsDescription": "इस स्टाफ सदस्य को किसी अनुभाग में शिक्षक के रूप में नियुक्त नहीं किया गया है।",
+      "staffingRatio": "स्टाफिंग अनुपात",
+      "staff": "कर्मचारी",
+      "students": "विद्यार्थी",
+      "ratio": "अनुपात",
+      "atSchool": "{{school}} पर",
+      "noPrimarySchoolAssigned": "कोई प्राथमिक विद्यालय आवंटित नहीं",
+      "table": {
+        "course": "पाठ्यक्रम",
+        "enrolled": "दाखिला लिया",
+        "avgGrade": "औसत ग्रेड",
+        "attendancePercent": "अट %",
+        "section": "अनुभाग",
+        "period": "अवधि",
+        "room": "कमरा"
+      }
+    }
+  },
+  "error": {
+    "failedToLoad": "स्टाफ़ लोड करने में विफल",
+    "tryAgain": "फिर से प्रयास करें"
+  },
+  "toast": {
+    "deleteSuccess": "स्टाफ सदस्य सफलतापूर्वक हटा दिया गया"
+  }
+}
