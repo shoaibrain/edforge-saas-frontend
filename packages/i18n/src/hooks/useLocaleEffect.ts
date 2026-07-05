@@ -9,6 +9,7 @@
 
 import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
+import { getLanguageDirection } from '../language'
 
 const DEVANAGARI_FONT_ID = 'edforge-devanagari-font'
 const DEVANAGARI_FONT_URL =
@@ -17,7 +18,6 @@ const DEVANAGARI_LANGUAGES = new Set(['ne', 'hi'])
 const ARABIC_FONT_ID = 'edforge-arabic-font'
 const ARABIC_FONT_URL =
   'https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap'
-const RTL_LANGUAGES = new Set(['ar'])
 
 function injectFont(id: string, href: string) {
   if (document.getElementById(id)) return
@@ -43,7 +43,7 @@ export function useLocaleEffect() {
       document.documentElement.lang = lang
 
       const baseLanguage = lang.split('-')[0]
-      document.documentElement.dir = RTL_LANGUAGES.has(baseLanguage) ? 'rtl' : 'ltr'
+      document.documentElement.dir = getLanguageDirection(lang)
 
       // Conditionally load script-specific fonts.
       if (DEVANAGARI_LANGUAGES.has(baseLanguage)) {

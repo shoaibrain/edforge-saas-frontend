@@ -1,6 +1,7 @@
 import { SUPPORTED_LANGUAGES, type SupportedLanguage } from "./config";
 
 export type LocaleCode = SupportedLanguage | `${SupportedLanguage}-${string}`;
+export type LanguageDirection = "ltr" | "rtl";
 
 export const DEFAULT_LANGUAGE_LOCALES: Record<SupportedLanguage, LocaleCode> = {
   en: "en-US",
@@ -10,6 +11,7 @@ export const DEFAULT_LANGUAGE_LOCALES: Record<SupportedLanguage, LocaleCode> = {
 };
 
 const SUPPORTED_LANGUAGE_SET = new Set<string>(SUPPORTED_LANGUAGES);
+const RTL_LANGUAGES = new Set<SupportedLanguage>(["ar"]);
 
 function firstLanguageCandidate(value: unknown): string | null {
   if (Array.isArray(value)) {
@@ -77,4 +79,13 @@ export function normalizeLocaleCode(
   return region
     ? (`${normalizedLanguage}-${region.toUpperCase()}` as LocaleCode)
     : DEFAULT_LANGUAGE_LOCALES[normalizedLanguage as SupportedLanguage];
+}
+
+export function getLanguageDirection(
+  value: unknown,
+  fallback: LanguageDirection = "ltr",
+): LanguageDirection {
+  const platformLanguage = toPlatformLanguage(value);
+  if (!platformLanguage) return fallback;
+  return RTL_LANGUAGES.has(platformLanguage) ? "rtl" : "ltr";
 }

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  getLanguageDirection,
   normalizeLocaleCode,
   normalizePlatformLanguage,
   toPlatformLanguage,
@@ -51,5 +52,13 @@ describe("platform language normalization", () => {
     expect(normalizeLocaleCode("hi-IN")).toBe("hi-IN");
     expect(normalizeLocaleCode("ar")).toBe("ar-AE");
     expect(normalizeLocaleCode("ar-EG")).toBe("ar-AE");
+  });
+
+  it("resolves layout direction for supported platform languages", () => {
+    expect(getLanguageDirection("en")).toBe("ltr");
+    expect(getLanguageDirection("ne-NP")).toBe("ltr");
+    expect(getLanguageDirection("hi-IN")).toBe("ltr");
+    expect(getLanguageDirection("ar-AE")).toBe("rtl");
+    expect(getLanguageDirection("fr-FR")).toBe("ltr");
   });
 });
