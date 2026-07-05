@@ -28,7 +28,8 @@ test.describe('Dashboard data', () => {
 
     await page.goto('/home')
     await expect(page.locator('html')).toHaveAttribute('dir', 'rtl')
-    await expect(page.locator('[dir="ltr"]').first()).toBeVisible()
+    await expect(page.getByTestId('app-scroll-frame')).toHaveAttribute('dir', 'ltr')
+    await expect(page.getByTestId('app-content')).toHaveAttribute('dir', 'rtl')
 
     await page.getByRole('button', { name: /My Profile|ملفي الشخصي/ }).click()
     const panel = page.getByTestId('user-menu-panel')

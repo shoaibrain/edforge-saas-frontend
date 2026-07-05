@@ -66,7 +66,7 @@ export function LanguageSwitcher({
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <MenuItems className="absolute right-0 z-50 mt-1.5 w-40 origin-top-right rounded-xl bg-[rgb(var(--background-elevated))] shadow-popover ring-1 ring-[rgb(var(--border-secondary))] border border-[rgb(var(--border-secondary))] focus:outline-none overflow-hidden">
+        <MenuItems className="absolute ef-inset-inline-end-0 z-50 mt-1.5 w-40 origin-top-right rounded-xl bg-[rgb(var(--background-elevated))] shadow-popover ring-1 ring-[rgb(var(--border-secondary))] border border-[rgb(var(--border-secondary))] focus:outline-none overflow-hidden">
           <div className="py-1">
             {LANGUAGES.map((lang) => (
               <MenuItem key={lang.code}>

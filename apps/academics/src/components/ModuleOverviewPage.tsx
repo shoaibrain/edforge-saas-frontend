@@ -121,7 +121,7 @@ function WidgetVisibilityMenu({ widgets, onToggle, onReset }: WidgetVisibilityMe
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="absolute right-0 top-full mt-1 z-50 w-52 py-1 bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-xl"
+                    className="absolute ef-inset-inline-end-0 top-full mt-1 z-50 w-52 py-1 bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-xl"
                     role="menu"
                 >
                     <button
@@ -149,7 +149,7 @@ function WidgetVisibilityMenu({ widgets, onToggle, onReset }: WidgetVisibilityMe
                 <motion.div
                     initial={{ opacity: 0, x: 4 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className="absolute right-0 top-full mt-1 z-50 w-52 py-1 bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-xl"
+                    className="absolute ef-inset-inline-end-0 top-full mt-1 z-50 w-52 py-1 bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-xl"
                     role="menu"
                 >
                     <button

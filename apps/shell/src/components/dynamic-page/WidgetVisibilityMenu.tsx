@@ -92,7 +92,7 @@ export function WidgetVisibilityMenu() {
             exit={{ opacity: 0, scale: 0.95, y: -4 }}
             transition={{ duration: 0.1 }}
             className={`
-              absolute right-0 top-full mt-1 z-50
+              absolute ef-inset-inline-end-0 top-full mt-1 z-50
               w-52 py-1
               bg-[rgb(var(--background-primary))]
               border border-[rgb(var(--border-primary))]
@@ -149,7 +149,7 @@ export function WidgetVisibilityMenu() {
             exit={{ opacity: 0, x: 4 }}
             transition={{ duration: 0.1 }}
             className={`
-              absolute right-0 top-full mt-1 z-50
+              absolute ef-inset-inline-end-0 top-full mt-1 z-50
               w-52 py-1
               bg-[rgb(var(--background-primary))]
               border border-[rgb(var(--border-primary))]

@@ -138,7 +138,7 @@ function ActionsDropdown({
       {isOpen && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} aria-hidden="true" />
-          <div className="absolute right-0 z-20 mt-1 w-48 rounded-lg bg-surface-primary border border-border-primary shadow-lg py-1" role="menu" aria-label={t('classrooms.aria.sectionActions')}>
+          <div className="absolute ef-inset-inline-end-0 z-20 mt-1 w-48 rounded-lg bg-surface-primary border border-border-primary shadow-lg py-1" role="menu" aria-label={t('classrooms.aria.sectionActions')}>
             <button
               type="button"
               role="menuitem"

@@ -61,7 +61,8 @@ export function AppShell({ children }: AppShellProps) {
           <main
             id="main-content"
             tabIndex={-1}
-            dir={contentDirection}
+            dir="ltr"
+            data-testid="app-scroll-frame"
             aria-busy={isSchoolTransitioning || undefined}
             className="h-full overflow-y-auto overflow-x-hidden outline-none bg-[var(--shell-cp-bg)] rounded-[var(--shell-cp-radius)] shadow-[var(--shell-cp-shadow)]"
             style={{
@@ -72,7 +73,9 @@ export function AppShell({ children }: AppShellProps) {
             }}
             aria-label="Main content"
           >
-            {children}
+            <div dir={contentDirection} data-testid="app-content" className="min-h-full">
+              {children}
+            </div>
             <SchoolTransitionOverlay />
           </main>
         </div>

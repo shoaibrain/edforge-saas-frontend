@@ -97,7 +97,7 @@ function ActionsDropdown({
       {isOpen && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
-          <div className="absolute right-0 z-20 mt-1 w-48 rounded-lg bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] shadow-lg py-1">
+          <div className="absolute ef-inset-inline-end-0 z-20 mt-1 w-48 rounded-lg bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] shadow-lg py-1">
             {canEdit && (
               <button
                 type="button"

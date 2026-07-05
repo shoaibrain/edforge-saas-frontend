@@ -55,7 +55,7 @@ export function DataTableExport<TData>({
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <PopoverPanel className="absolute right-0 z-50 mt-1 w-44 origin-top-right rounded-xl bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary)/0.35)] shadow-popover focus:outline-none overflow-hidden">
+        <PopoverPanel className="absolute ef-inset-inline-end-0 z-50 mt-1 w-44 origin-top-right rounded-xl bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary)/0.35)] shadow-popover focus:outline-none overflow-hidden">
           {({ close }) => (
             <div className="py-1">
               {formats.map((format) => {

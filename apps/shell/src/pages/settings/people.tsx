@@ -318,7 +318,7 @@ function UserActionsDropdown({
               initial={{ opacity: 0, y: -4 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -4 }}
-              className="absolute right-0 top-full mt-1 z-50 w-48 bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-lg py-1"
+              className="absolute ef-inset-inline-end-0 top-full mt-1 z-50 w-48 bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-lg py-1"
             >
               <button
                 type="button"

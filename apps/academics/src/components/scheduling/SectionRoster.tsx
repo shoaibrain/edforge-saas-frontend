@@ -76,7 +76,7 @@ function RowActions({
             onClick={() => setOpen(false)}
             aria-hidden="true"
           />
-          <div className="absolute right-0 top-full mt-1 z-20 w-48 rounded-lg border border-border-secondary bg-surface-primary shadow-lg py-1">
+          <div className="absolute ef-inset-inline-end-0 top-full mt-1 z-20 w-48 rounded-lg border border-border-secondary bg-surface-primary shadow-lg py-1">
             <button
               type="button"
               onClick={() => {
