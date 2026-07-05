@@ -2731,10 +2731,10 @@
         "export": "تصدير"
       },
       "kpis": {
-        "studentsGraded": "STUDENTS GRADED",
-        "averageGpa": "AVERAGE GPA",
-        "passRate": "PASS RATE",
-        "atRisk": "AT RISK",
+        "studentsGraded": "الطلاب المُقيَّمون",
+        "averageGpa": "متوسط المعدل",
+        "passRate": "نسبة النجاح",
+        "atRisk": "المعرَّضون للخطر",
         "avgGradeHint": "متوسط ​​الدرجة: {{grade}}%",
         "passRateHint": "حصل الطلاب على نسبة 60% فما فوق",
         "atRiskHint": "أقل من عتبة 60%",
