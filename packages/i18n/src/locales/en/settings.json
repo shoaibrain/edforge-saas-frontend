@@ -114,6 +114,9 @@
     "sessionRevokeError": "Couldn't sign out that session. Please try again.",
     "otherDevicesSignedOut": "Signed out {{count}} other session.",
     "otherDevicesSignedOut_plural": "Signed out {{count}} other sessions.",
+    "noLoginHistory": "No login history yet.",
+    "loginHistoryError": "Couldn't load your login history.",
+    "loadMore": "Load more",
     "passwordRequirements": {
       "minLength": "At least 8 characters",
       "uppercase": "Uppercase letter",

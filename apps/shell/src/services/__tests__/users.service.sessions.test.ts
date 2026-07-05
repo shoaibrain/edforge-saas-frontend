@@ -23,6 +23,7 @@ import {
   touchSession,
   revokeAllSessions,
   getActiveSessions,
+  getLoginHistory,
 } from '../users.service'
 
 const asMock = (fn: unknown) => fn as ReturnType<typeof vi.fn>
@@ -42,6 +43,30 @@ describe('users.service — session write route shapes', () => {
     expect(apiGet).toHaveBeenCalledWith('/users/u1/security/sessions')
     expect(Array.isArray(res)).toBe(true)
     expect(res).toHaveLength(1)
+  })
+
+  it('getLoginHistory unwraps { entries, nextCursor }, maps deviceInfo, sends limit', async () => {
+    // Backend returns LoginHistoryResponseDto with browser/os (no deviceInfo/id).
+    asMock(apiGet).mockResolvedValue({
+      entries: [
+        { timestamp: '2026-07-05T10:00:00Z', status: 'success', ipAddress: '1.2.3.4', browser: 'Chrome', os: 'macOS' },
+      ],
+      total: 1,
+      hasMore: true,
+      nextCursor: 'CURSOR1',
+    })
+    const page = await getLoginHistory('u1', { limit: 10 })
+    expect(apiGet).toHaveBeenCalledWith('/users/u1/security/login-history?limit=10')
+    expect(page.entries).toHaveLength(1)
+    expect(page.entries[0].deviceInfo).toBe('Chrome on macOS')
+    expect(page.entries[0].id).toBeTruthy()
+    expect(page.nextCursor).toBe('CURSOR1')
+  })
+
+  it('getLoginHistory forwards the cursor for pagination', async () => {
+    asMock(apiGet).mockResolvedValue({ entries: [], nextCursor: undefined })
+    await getLoginHistory('u1', { limit: 10, cursor: 'CURSOR1' })
+    expect(apiGet).toHaveBeenCalledWith('/users/u1/security/login-history?limit=10&cursor=CURSOR1')
   })
 
   it('getActiveSessions returns [] when the response has no sessions field', async () => {

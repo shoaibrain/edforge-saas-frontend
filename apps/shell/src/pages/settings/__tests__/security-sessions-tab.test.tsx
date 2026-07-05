@@ -42,12 +42,14 @@ const getSecurityOverview = vi.fn()
 const getActiveSessions = vi.fn()
 const revokeSession = vi.fn()
 const revokeAllSessions = vi.fn()
+const getLoginHistory = vi.fn()
 vi.mock('@/services/users.service', () => ({
   usersService: {
     getSecurityOverview: (...a: unknown[]) => getSecurityOverview(...a),
     getActiveSessions: (...a: unknown[]) => getActiveSessions(...a),
     revokeSession: (...a: unknown[]) => revokeSession(...a),
     revokeAllSessions: (...a: unknown[]) => revokeAllSessions(...a),
+    getLoginHistory: (...a: unknown[]) => getLoginHistory(...a),
   },
 }))
 
@@ -112,5 +114,31 @@ describe('SecurityPage — Sessions tab', () => {
     renderPage()
     fireEvent.click(await screen.findByRole('button', { name: 'security.sessions' }))
     expect(await screen.findByText('security.noSessions')).toBeInTheDocument()
+  })
+
+  it('lists login history and loads the next page via the cursor', async () => {
+    getLoginHistory
+      .mockResolvedValueOnce({
+        entries: [{ id: 'e1', timestamp: '2026-07-05T10:00:00Z', ipAddress: '1.2.3.4', deviceInfo: 'Chrome on macOS', status: 'success' }],
+        nextCursor: 'C1',
+      })
+      .mockResolvedValueOnce({
+        entries: [{ id: 'e2', timestamp: '2026-07-04T10:00:00Z', ipAddress: '5.6.7.8', deviceInfo: 'Firefox on Windows', status: 'failed', failureReason: 'bad password' }],
+        nextCursor: undefined,
+      })
+    renderPage()
+    fireEvent.click(await screen.findByRole('button', { name: 'security.loginHistory' }))
+    expect(await screen.findByText('Chrome on macOS')).toBeInTheDocument()
+    await waitFor(() => expect(getLoginHistory).toHaveBeenCalledWith('u1', { limit: 10, cursor: undefined }))
+    fireEvent.click(screen.getByText('security.loadMore'))
+    expect(await screen.findByText('Firefox on Windows')).toBeInTheDocument()
+    await waitFor(() => expect(getLoginHistory).toHaveBeenCalledWith('u1', { limit: 10, cursor: 'C1' }))
+  })
+
+  it('renders the login-history empty state', async () => {
+    getLoginHistory.mockResolvedValue({ entries: [], nextCursor: undefined })
+    renderPage()
+    fireEvent.click(await screen.findByRole('button', { name: 'security.loginHistory' }))
+    expect(await screen.findByText('security.noLoginHistory')).toBeInTheDocument()
   })
 })

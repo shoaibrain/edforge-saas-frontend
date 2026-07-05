@@ -19,7 +19,12 @@ import {
   RotateCcw,
   X,
 } from 'lucide-react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import {
+  useQuery,
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query'
 import { useTranslation } from '@edforge/i18n'
 import { toast } from 'sonner'
 import axios from 'axios'
@@ -42,7 +47,7 @@ import {
   type SecurityOverview,
   type UserSession,
 } from '@/services/users.service'
-import { SessionCard } from './security-post-mvp'
+import { SessionCard, LoginHistoryItem } from './security-post-mvp'
 
 // ============================================================================
 // PASSWORD REQUIREMENTS CHECKLIST
@@ -456,11 +461,12 @@ function SecurityOverviewCard({
 // SECURITY TABS
 // ============================================================================
 
-type SecurityTab = 'password' | 'sessions'
+type SecurityTab = 'password' | 'sessions' | 'loginHistory'
 
 const SECURITY_TABS: Array<{ id: SecurityTab; labelKey: string }> = [
   { id: 'password', labelKey: 'security.password' },
   { id: 'sessions', labelKey: 'security.sessions' },
+  { id: 'loginHistory', labelKey: 'security.loginHistory' },
 ]
 
 function SecurityTabs({
@@ -566,6 +572,28 @@ export default function SecurityPage() {
     },
     onError: () => toast.error(t('security.sessionRevokeError')),
   })
+
+  const {
+    data: historyData,
+    isLoading: isLoadingHistory,
+    isError: isHistoryError,
+    refetch: refetchHistory,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ['login-history', user?.id],
+    queryFn: ({ pageParam }) =>
+      usersService.getLoginHistory(user!.id, {
+        limit: 10,
+        cursor: pageParam as string | undefined,
+      }),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
+    enabled: !!user?.id && activeTab === 'loginHistory',
+    staleTime: 30 * 1000,
+  })
+  const historyEntries = historyData?.pages.flatMap((p) => p.entries) ?? []
 
   const handlePasswordSuccess = () => {
     toast.success(t('security.passwordChanged'))
@@ -678,6 +706,56 @@ export default function SecurityPage() {
                         isRevoking={revokeMutation.isPending}
                       />
                     ))}
+                  </>
+                )}
+              </motion.div>
+            )}
+
+            {activeTab === 'loginHistory' && (
+              <motion.div
+                key="loginHistory"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                className="space-y-2"
+              >
+                {isLoadingHistory ? (
+                  <SettingsSkeleton rows={4} />
+                ) : isHistoryError ? (
+                  <div className="p-5 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-center space-y-3">
+                    <p className="text-sm text-[rgb(var(--text-tertiary))]">
+                      {t('security.loginHistoryError')}
+                    </p>
+                    <Button variant="outline" size="sm" onClick={() => refetchHistory()}>
+                      {t('security.retry')}
+                    </Button>
+                  </div>
+                ) : historyEntries.length === 0 ? (
+                  <div className="p-5 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-center">
+                    <p className="text-sm text-[rgb(var(--text-tertiary))]">
+                      {t('security.noLoginHistory')}
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-4">
+                      {historyEntries.map((entry) => (
+                        <LoginHistoryItem key={entry.id} entry={entry} />
+                      ))}
+                    </div>
+                    {hasNextPage && (
+                      <div className="flex justify-center">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => fetchNextPage()}
+                          disabled={isFetchingNextPage}
+                        >
+                          {t('security.loadMore')}
+                        </Button>
+                      </div>
+                    )}
                   </>
                 )}
               </motion.div>
