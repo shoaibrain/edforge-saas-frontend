@@ -5,7 +5,7 @@
  * Integrated with backend Security API and Cognito.
  */
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useForm, FormProvider } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -593,7 +593,12 @@ export default function SecurityPage() {
     enabled: !!user?.id && activeTab === 'loginHistory',
     staleTime: 30 * 1000,
   })
-  const historyEntries = historyData?.pages.flatMap((p) => p.entries) ?? []
+  // Login history is unbounded (load-more keeps appending pages) — flatten once
+  // per page change rather than on every render, and keep a stable reference.
+  const historyEntries = useMemo(
+    () => historyData?.pages.flatMap((p) => p.entries) ?? [],
+    [historyData?.pages]
+  )
 
   const handlePasswordSuccess = () => {
     toast.success(t('security.passwordChanged'))
