@@ -7,6 +7,11 @@ export { DataTablePagination } from './DataTablePagination'
 export { DataTableToolbar } from './DataTableToolbar'
 export { ToolbarSearch, type ToolbarSearchProps } from './ToolbarSearch'
 export { DataTableFacetedFilter } from './DataTableFacetedFilter'
+export {
+  FilterSelect,
+  type FilterSelectProps,
+  type FilterSelectOption,
+} from './FilterSelect'
 export { DataTableViewOptions } from './DataTableViewOptions'
 export { DataTableRowActions } from './DataTableRowActions'
 export { DataTableSkeleton } from './DataTableSkeleton'

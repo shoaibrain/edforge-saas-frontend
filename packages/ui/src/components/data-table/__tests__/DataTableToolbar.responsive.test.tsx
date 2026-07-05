@@ -114,7 +114,7 @@ describe('DataTableToolbar — responsive layout', () => {
 describe('DataTableToolbar — standalone mode (no table instance)', () => {
   it('renders controlled search, presets, primary + overflow filters, and extras', () => {
     const onSearchChange = vi.fn()
-    const { container, getByPlaceholderText, getByText } = render(
+    const { container, getByPlaceholderText, getByText, getByRole, queryByRole } = render(
       <DataTableToolbar
         searchPlaceholder="Search sections"
         searchValue="alg"
@@ -137,7 +137,10 @@ describe('DataTableToolbar — standalone mode (no table instance)', () => {
     expect(search.value).toBe('alg')
     fireEvent.change(search, { target: { value: 'geom' } })
     expect(onSearchChange).toHaveBeenCalledWith('geom')
-    expect(getByText('Active')).toBeTruthy()
+    // Status presets fold into a single FilterSelect trigger — no always-mounted
+    // preset row. "Active" lives in the closed listbox, not the toolbar row.
+    expect(getByRole('button', { name: 'Status filter' })).toBeTruthy()
+    expect(queryByRole('tab')).toBeNull()
     expect(getByText('Course control')).toBeTruthy()
     expect(getByText('Export')).toBeTruthy()
     // Overflow content stays behind the single trigger.

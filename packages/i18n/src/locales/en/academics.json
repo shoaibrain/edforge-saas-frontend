@@ -1004,6 +1004,7 @@
       },
       "searchPlaceholder": "Search grade name or code…",
       "presets": {
+        "label": "Show",
         "all": "All",
         "withCourses": "With courses",
         "empty": "Empty"

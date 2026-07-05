@@ -8,6 +8,7 @@
  */
 import { forwardRef, useRef, type HTMLAttributes, type KeyboardEvent } from 'react'
 import { cn, focusRing } from '../../utils'
+import type { StatusTone } from '../StatusBadge'
 
 export interface TablePreset {
   /** Stable value identifying the preset (e.g. "active"). */
@@ -15,6 +16,11 @@ export interface TablePreset {
   label: string
   /** Optional count badge. */
   count?: number
+  /**
+   * Optional semantic tone — surfaced as the leading dot when presets render
+   * through the toolbar's FilterSelect. Reuses the row status-pill taxonomy.
+   */
+  tone?: StatusTone
 }
 
 export interface TablePresetTabsProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {

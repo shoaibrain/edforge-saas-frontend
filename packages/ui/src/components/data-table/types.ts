@@ -8,6 +8,7 @@ import type {
   VisibilityState,
 } from '@tanstack/react-table'
 import type { TablePreset } from './TablePresetTabs'
+import type { StatusTone } from '../StatusBadge'
 
 // ============================================================================
 // COLUMN META
@@ -58,6 +59,11 @@ export interface FacetedFilterOption {
   label: string
   value: string
   icon?: ReactNode
+  /**
+   * Semantic tone for the leading dot in the FilterSelect menu — reuses the
+   * row status-pill taxonomy so trigger, menu and table agree. Optional.
+   */
+  tone?: StatusTone
 }
 
 export interface FacetedFilterConfig {
@@ -180,6 +186,14 @@ export interface DataTableLabels {
   xlsxUnavailable: string
   filterAriaLabel: (title: string) => string
   clearFilter: string
+  /**
+   * Default facet label for the status presets FilterSelect trigger. Optional
+   * so existing full-object label builders keep type-checking; the resolver
+   * backfills the English default.
+   */
+  statusLabel?: string
+  /** Footer hint in a FilterSelect menu, e.g. "16 results". Optional (as above). */
+  facetTotal?: (total: number) => string
 }
 
 export type DataTableLabelsInput = Partial<DataTableLabels>
@@ -266,10 +280,15 @@ export interface DataTableProps<TData> {
   facets?: FacetedFilterConfig[]
   /** Keep the first faceted filter inline and fold the rest into "More filters". */
   foldFacets?: boolean
-  /** Docked status presets (with counts) for the unified toolbar. */
+  /**
+   * Status presets (with counts) for the unified toolbar — rendered as a
+   * single FilterSelect trigger, not an always-mounted row.
+   */
   presets?: TablePreset[]
   activePreset?: string
   onPresetChange?: (value: string) => void
+  /** Facet label for the presets trigger (`<label> · All`). Default "Status". */
+  presetsLabel?: string
   /** Primary facet control shown inline (e.g. a Grade/Subject/Type dropdown). Folds into the toolbar's built-in "More filters" overflow on narrow container widths. */
   primaryFilter?: ReactNode
   /**

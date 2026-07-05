@@ -33,6 +33,8 @@ export const DEFAULT_DATA_TABLE_LABELS: DataTableLabels = {
   xlsxUnavailable: 'XLSX export ships in a follow-up',
   filterAriaLabel: (title) => `${title} filter`,
   clearFilter: 'Clear filter',
+  statusLabel: 'Status',
+  facetTotal: (total) => `${total} results`,
 }
 
 export function resolveDataTableLabels(

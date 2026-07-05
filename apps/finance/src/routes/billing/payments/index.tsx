@@ -19,6 +19,7 @@ import {
   StatBand,
   type StatMetric,
   Select,
+  FilterSelect,
   SelectionContextBar,
   type SelectionAction,
 } from '@edforge/ui'
@@ -869,13 +870,16 @@ export default function PaymentsPage() {
   }
 
 
+  // Tones reuse the FinanceStatusChip taxonomy so the FilterSelect dots agree
+  // with the row status pills (completed=success, refunded/pending=warning,
+  // failed=danger, cancelled=neutral).
   const STATUS_PRESETS = [
     { label: t('filters.allStatuses'), value: '' },
-    { label: t('status.completed'), value: 'completed' },
-    { label: t('status.failed'), value: 'failed' },
-    { label: t('status.cancelled'), value: 'cancelled' },
-    { label: t('status.refunded'), value: 'refunded' },
-    { label: t('status.pending'), value: 'pending' },
+    { label: t('status.completed'), value: 'completed', tone: 'success' as const },
+    { label: t('status.failed'), value: 'failed', tone: 'danger' as const },
+    { label: t('status.cancelled'), value: 'cancelled', tone: 'neutral' as const },
+    { label: t('status.refunded'), value: 'refunded', tone: 'warning' as const },
+    { label: t('status.pending'), value: 'pending', tone: 'warning' as const },
   ]
 
   // ── StatBand metrics (calm; attention only via state) ────────────────────
@@ -988,22 +992,22 @@ export default function PaymentsPage() {
         presets={STATUS_PRESETS}
         activePreset={statusFilter}
         onPresetChange={(v) => setStatusFilter(v)}
+        presetsLabel={t('invoices.status')}
         primaryFilter={
-          <Select
-            size="sm"
-            className="w-48"
-            value={gatewayFilter}
-            onChange={(v) => setGatewayFilter(v ?? '')}
+          <FilterSelect
+            label={t('paymentsList.gateway')}
+            icon={<CreditCard className="h-3.5 w-3.5" />}
+            multiple={false}
+            value={gatewayFilter ? [gatewayFilter] : []}
+            onChange={(next) => setGatewayFilter(next[0] ?? '')}
             options={[
-              { label: t('paymentsList.allGateways'), value: '' },
-              { label: t('gateway.cash'), value: 'cash' },
-              { label: t('gateway.bankTransfer'), value: 'bank_transfer' },
-              { label: t('gateway.cheque'), value: 'cheque' },
-              { label: t('gateway.esewa'), value: 'esewa' },
-              { label: t('gateway.khalti'), value: 'khalti' },
-              { label: t('gateway.fonepay'), value: 'fonepay' },
+              { value: 'cash', label: t('gateway.cash') },
+              { value: 'bank_transfer', label: t('gateway.bankTransfer') },
+              { value: 'cheque', label: t('gateway.cheque') },
+              { value: 'esewa', label: t('gateway.esewa') },
+              { value: 'khalti', label: t('gateway.khalti') },
+              { value: 'fonepay', label: t('gateway.fonepay') },
             ]}
-            buttonClassName="border-[rgb(var(--border-primary)/0.35)]"
           />
         }
         overflowFilters={
