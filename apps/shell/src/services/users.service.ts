@@ -604,11 +604,50 @@ export async function disableMfa(
 }
 
 /**
+ * Register the caller's current session (SR.1).
+ * POST /users/:id/security/sessions
+ *
+ * Called after sign-in so the access token maps to a tracked session row —
+ * Amplify-direct logins don't create one otherwise. Upsert semantics (keyed on
+ * the access-token hash), so calling it again on reload is idempotent.
+ */
+export async function registerSession(userId: string): Promise<UserSession> {
+  return apiPost<UserSession>(`/users/${userId}/security/sessions`, {})
+}
+
+/**
+ * Heartbeat / token-rotation rebind for the caller's own session (SR.3).
+ * PATCH /users/:id/security/sessions/:sessionId
+ *
+ * Keeps the row fresh and rebinds it to the current access token after a
+ * silent Cognito refresh. Strictly self-only on the backend.
+ */
+export async function touchSession(
+  userId: string,
+  sessionId: string
+): Promise<UserSession> {
+  return apiPatch<UserSession>(
+    `/users/${userId}/security/sessions/${sessionId}`,
+    {}
+  )
+}
+
+/**
  * Get active sessions
  * GET /users/:id/security/sessions
+ *
+ * The backend wraps the list in `SecuritySessionsListDto`
+ * (`{ sessions, total, currentSessionId }`), NOT a bare array — unwrap to the
+ * array the UI expects. Returning the wrapper directly crashed the sessions
+ * list with `x.some is not a function`.
  */
 export async function getActiveSessions(userId: string): Promise<UserSession[]> {
-  return apiGet<UserSession[]>(`/users/${userId}/security/sessions`)
+  const res = await apiGet<{
+    sessions?: UserSession[]
+    total?: number
+    currentSessionId?: string
+  }>(`/users/${userId}/security/sessions`)
+  return Array.isArray(res?.sessions) ? res.sessions : []
 }
 
 /**
@@ -623,26 +662,80 @@ export async function revokeSession(
 }
 
 /**
- * Revoke all sessions except current
- * POST /users/:id/security/sessions/revoke-all
+ * Revoke the user's sessions (SR.4).
+ * POST /users/:id/security/sessions/revoke-all[?exceptCurrent=true]
+ *
+ * Default (`exceptCurrent=false`) is a full "sign out everywhere" — revokes all
+ * tracked sessions and triggers a Cognito global sign-out (kills refresh
+ * tokens). `exceptCurrent=true` keeps the caller's current session alive
+ * ("sign out other devices") and does NOT global-sign-out.
+ *
+ * NOTE: `exceptCurrent` is a QUERY parameter on the backend, not a body field.
  */
 export async function revokeAllSessions(
-  userId: string
+  userId: string,
+  exceptCurrent = false
 ): Promise<{ success: boolean; revokedCount: number }> {
-  return apiPost(`/users/${userId}/security/sessions/revoke-all`, {})
+  return apiPost(
+    `/users/${userId}/security/sessions/revoke-all?exceptCurrent=${exceptCurrent}`,
+    {}
+  )
+}
+
+/** One page of login history + the opaque cursor for the next (older) page. */
+export interface LoginHistoryPage {
+  entries: LoginHistoryEntry[]
+  nextCursor?: string
 }
 
 /**
- * Get login history
- * GET /users/:id/security/login-history
+ * Get a page of login history.
+ * GET /users/:id/security/login-history?limit=&cursor=
+ *
+ * The backend returns a WRAPPED, differently-shaped DTO:
+ *   { entries: [{ timestamp, status, ipAddress, userAgent, browser, os,
+ *     deviceType, location, failureReason }], total, hasMore, nextCursor }
+ * — not a bare `LoginHistoryEntry[]`. Unwrap + map each entry to the UI shape
+ * (compose `deviceInfo` from browser/os; synthesize a stable `id`). Returning
+ * the wrapper directly would crash the list with `x.some is not a function`.
  */
 export async function getLoginHistory(
   userId: string,
-  limit: number = 10
-): Promise<LoginHistoryEntry[]> {
-  return apiGet<LoginHistoryEntry[]>(
-    `/users/${userId}/security/login-history?limit=${limit}`
-  )
+  opts: { limit?: number; cursor?: string } = {}
+): Promise<LoginHistoryPage> {
+  const params = new URLSearchParams({ limit: String(opts.limit ?? 10) })
+  if (opts.cursor) params.set('cursor', opts.cursor)
+
+  const res = await apiGet<{
+    entries?: Array<{
+      timestamp: string
+      status: LoginHistoryEntry['status']
+      ipAddress: string
+      userAgent?: string
+      browser?: string
+      os?: string
+      location?: string
+      failureReason?: string
+    }>
+    nextCursor?: string
+  }>(`/users/${userId}/security/login-history?${params.toString()}`)
+
+  const entries: LoginHistoryEntry[] = (
+    Array.isArray(res?.entries) ? res.entries : []
+  ).map((e, i) => ({
+    id: `${e.timestamp}-${i}`,
+    timestamp: e.timestamp,
+    ipAddress: e.ipAddress,
+    location: e.location,
+    deviceInfo:
+      [e.browser, e.os].filter(Boolean).join(' on ') ||
+      e.userAgent ||
+      'Unknown device',
+    status: e.status,
+    failureReason: e.failureReason,
+  }))
+
+  return { entries, nextCursor: res?.nextCursor }
 }
 
 // ============================================================================

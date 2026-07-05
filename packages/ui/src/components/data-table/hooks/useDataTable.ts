@@ -99,6 +99,11 @@ export function useDataTable<TData>(
     persisted?.columnVisibility ?? initialColumnVisibility
   )
   const [expanded, setExpanded] = useState<ExpandedState>({})
+  // Search text is controlled here so it can persist per tableId (survives
+  // reload / route re-entry) alongside the column filters.
+  const [globalFilter, setGlobalFilter] = useState<string>(
+    persisted?.globalFilter ?? ''
+  )
   const [density, setDensity] = useState<DataTableDensity>(
     persisted?.density ?? initialDensity
   )
@@ -129,7 +134,17 @@ export function useDataTable<TData>(
       columnVisibility,
       rowSelection,
       expanded,
+      globalFilter,
       ...(pagination && { pagination: pageState }),
+    },
+    onGlobalFilterChange: (updater) => {
+      setGlobalFilter((prev) =>
+        typeof updater === 'function' ? (updater(prev) as string) : (updater as string)
+      )
+      // Searching snaps back to the first page, matching column-filter changes.
+      if (pagination) {
+        setPageState((p) => ({ ...p, pageIndex: 0 }))
+      }
     },
     onSortingChange: controlledOnSortingChange ?? setSorting,
     onColumnFiltersChange: (updater) => {
@@ -194,6 +209,7 @@ export function useDataTable<TData>(
     pageSize: pageState.pageSize,
     columnFilters,
     sorting,
+    globalFilter,
   })
 
   return { table, density, setDensity }

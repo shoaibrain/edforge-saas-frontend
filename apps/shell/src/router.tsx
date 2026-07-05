@@ -28,6 +28,7 @@ import { useAuthStore } from './stores/auth.store'
 import { isAuthenticated } from '@edforge/auth'
 import { useLocaleEffect, useTranslation } from '@edforge/i18n'
 import { useOnboardingRequired } from './hooks/useOnboardingRequired'
+import { useSessionLifecycle } from './hooks/useSessionLifecycle'
 
 // Landing Pages (public)
 import { PublicLayout } from './components/landing/PublicLayout'
@@ -170,6 +171,9 @@ function ProtectedLayout() {
   const isAuthLoading = useAuthStore((s) => s.isLoading)
   const { onboardingRequired, isLoading: onboardingLoading } = useOnboardingRequired()
   const navigate = useNavigate()
+
+  // Register + heartbeat the caller's session (SR.1/SR.3) while authenticated.
+  useSessionLifecycle()
 
   // The cookie-rehydrated isAuthenticated:true passes beforeLoad at t0;
   // if the async Cognito check then fails, this is the recovery path.

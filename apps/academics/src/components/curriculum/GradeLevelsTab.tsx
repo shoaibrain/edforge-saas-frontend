@@ -288,6 +288,7 @@ export function GradeLevelsTab({
         ]}
         activePreset={gradePreset}
         onPresetChange={(v) => setGradePreset(v as 'all' | 'with' | 'empty')}
+        presetsLabel={t('tables.gradeLevels.presets.label', { defaultValue: 'Show' })}
         emptyState={{
           icon: <Layers className="w-10 h-10" />,
           title: t('tables.gradeLevels.empty.title'),

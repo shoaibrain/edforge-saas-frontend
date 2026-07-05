@@ -5,7 +5,7 @@
  * Integrated with backend Security API and Cognito.
  */
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useForm, FormProvider } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -19,7 +19,12 @@ import {
   RotateCcw,
   X,
 } from 'lucide-react'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import {
+  useQuery,
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from '@tanstack/react-query'
 import { useTranslation } from '@edforge/i18n'
 import { toast } from 'sonner'
 import axios from 'axios'
@@ -37,7 +42,12 @@ import {
   staggerChildren,
   fadeInUp,
 } from '@/components/settings/SettingsShared'
-import { usersService, type SecurityOverview } from '@/services/users.service'
+import {
+  usersService,
+  type SecurityOverview,
+  type UserSession,
+} from '@/services/users.service'
+import { SessionCard, LoginHistoryItem } from './security-post-mvp'
 
 // ============================================================================
 // PASSWORD REQUIREMENTS CHECKLIST
@@ -451,10 +461,12 @@ function SecurityOverviewCard({
 // SECURITY TABS
 // ============================================================================
 
-type SecurityTab = 'password'
+type SecurityTab = 'password' | 'sessions' | 'loginHistory'
 
 const SECURITY_TABS: Array<{ id: SecurityTab; labelKey: string }> = [
   { id: 'password', labelKey: 'security.password' },
+  { id: 'sessions', labelKey: 'security.sessions' },
+  { id: 'loginHistory', labelKey: 'security.loginHistory' },
 ]
 
 function SecurityTabs({
@@ -519,6 +531,75 @@ export default function SecurityPage() {
     staleTime: 60 * 1000,
   })
 
+  const {
+    data: sessions,
+    isLoading: isLoadingSessions,
+    isError: isSessionsError,
+    refetch: refetchSessions,
+  } = useQuery<UserSession[]>({
+    queryKey: ['security-sessions', user?.id],
+    queryFn: () => usersService.getActiveSessions(user!.id),
+    enabled: !!user?.id && activeTab === 'sessions',
+    staleTime: 30 * 1000,
+  })
+
+  // Defense-in-depth: never let an unexpected non-array shape crash the page.
+  const sessionList = Array.isArray(sessions) ? sessions : []
+
+  const invalidateSessions = () => {
+    queryClient.invalidateQueries({ queryKey: ['security-sessions', user?.id] })
+    queryClient.invalidateQueries({ queryKey: ['security', user?.id] })
+  }
+
+  const revokeMutation = useMutation({
+    mutationFn: (sessionId: string) =>
+      usersService.revokeSession(user!.id, sessionId),
+    onSuccess: () => {
+      toast.success(t('security.sessionRevoked'))
+      invalidateSessions()
+    },
+    onError: () => toast.error(t('security.sessionRevokeError')),
+  })
+
+  const signOutOthersMutation = useMutation({
+    // exceptCurrent=true → "sign out other devices"; keeps this session alive.
+    mutationFn: () => usersService.revokeAllSessions(user!.id, true),
+    onSuccess: (res) => {
+      toast.success(
+        t('security.otherDevicesSignedOut', { count: res.revokedCount })
+      )
+      invalidateSessions()
+    },
+    onError: () => toast.error(t('security.sessionRevokeError')),
+  })
+
+  const {
+    data: historyData,
+    isLoading: isLoadingHistory,
+    isError: isHistoryError,
+    refetch: refetchHistory,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ['login-history', user?.id],
+    queryFn: ({ pageParam }) =>
+      usersService.getLoginHistory(user!.id, {
+        limit: 10,
+        cursor: pageParam as string | undefined,
+      }),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
+    enabled: !!user?.id && activeTab === 'loginHistory',
+    staleTime: 30 * 1000,
+  })
+  // Login history is unbounded (load-more keeps appending pages) — flatten once
+  // per page change rather than on every render, and keep a stable reference.
+  const historyEntries = useMemo(
+    () => historyData?.pages.flatMap((p) => p.entries) ?? [],
+    [historyData?.pages]
+  )
+
   const handlePasswordSuccess = () => {
     toast.success(t('security.passwordChanged'))
 
@@ -579,6 +660,109 @@ export default function SecurityPage() {
                     </Button>
                   }
                 />
+              </motion.div>
+            )}
+
+            {activeTab === 'sessions' && (
+              <motion.div
+                key="sessions"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                className="space-y-3"
+              >
+                {isLoadingSessions ? (
+                  <SettingsSkeleton rows={3} />
+                ) : isSessionsError ? (
+                  <div className="p-5 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-center space-y-3">
+                    <p className="text-sm text-[rgb(var(--text-tertiary))]">
+                      {t('security.sessionsError')}
+                    </p>
+                    <Button variant="outline" size="sm" onClick={() => refetchSessions()}>
+                      {t('security.retry')}
+                    </Button>
+                  </div>
+                ) : sessionList.length === 0 ? (
+                  <div className="p-5 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-center">
+                    <p className="text-sm text-[rgb(var(--text-tertiary))]">
+                      {t('security.noSessions')}
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    {sessionList.some((s) => !s.isCurrent) && (
+                      <div className="flex justify-end">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => signOutOthersMutation.mutate()}
+                          disabled={signOutOthersMutation.isPending}
+                        >
+                          {t('security.signOutOtherDevices')}
+                        </Button>
+                      </div>
+                    )}
+                    {sessionList.map((s) => (
+                      <SessionCard
+                        key={s.sessionId}
+                        session={s}
+                        onRevoke={(sid) => revokeMutation.mutate(sid)}
+                        isRevoking={revokeMutation.isPending}
+                      />
+                    ))}
+                  </>
+                )}
+              </motion.div>
+            )}
+
+            {activeTab === 'loginHistory' && (
+              <motion.div
+                key="loginHistory"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                className="space-y-2"
+              >
+                {isLoadingHistory ? (
+                  <SettingsSkeleton rows={4} />
+                ) : isHistoryError ? (
+                  <div className="p-5 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-center space-y-3">
+                    <p className="text-sm text-[rgb(var(--text-tertiary))]">
+                      {t('security.loginHistoryError')}
+                    </p>
+                    <Button variant="outline" size="sm" onClick={() => refetchHistory()}>
+                      {t('security.retry')}
+                    </Button>
+                  </div>
+                ) : historyEntries.length === 0 ? (
+                  <div className="p-5 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-center">
+                    <p className="text-sm text-[rgb(var(--text-tertiary))]">
+                      {t('security.noLoginHistory')}
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-4">
+                      {historyEntries.map((entry) => (
+                        <LoginHistoryItem key={entry.id} entry={entry} />
+                      ))}
+                    </div>
+                    {hasNextPage && (
+                      <div className="flex justify-center">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => fetchNextPage()}
+                          disabled={isFetchingNextPage}
+                        >
+                          {t('security.loadMore')}
+                        </Button>
+                      </div>
+                    )}
+                  </>
+                )}
               </motion.div>
             )}
 

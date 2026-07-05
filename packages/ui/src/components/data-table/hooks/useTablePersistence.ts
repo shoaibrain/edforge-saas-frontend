@@ -16,6 +16,8 @@ export interface PersistedTableState {
   pageSize?: number
   columnFilters?: ColumnFiltersState
   sorting?: SortingState
+  /** Persisted search text (the table's global filter). Optional; back-compat. */
+  globalFilter?: string
 }
 
 function readKey(tableId: string): PersistedTableState | null {
