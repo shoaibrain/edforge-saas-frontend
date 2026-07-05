@@ -58,12 +58,15 @@ export const ToolbarSearch = forwardRef<HTMLInputElement, ToolbarSearchProps>(
       placeholder,
       clearLabel = 'Clear search',
       showKbd = true,
-      title = 'Press / to search',
+      title,
       className,
       ...props
     },
     ref,
   ) => {
+    // Only advertise the `/` shortcut when it is actually wired (showKbd). A
+    // caller-supplied title always wins.
+    const resolvedTitle = title ?? (showKbd ? 'Press / to search' : undefined)
     const innerRef = useRef<HTMLInputElement>(null)
     const setRefs = useCallback(
       (node: HTMLInputElement | null) => {
@@ -141,10 +144,12 @@ export const ToolbarSearch = forwardRef<HTMLInputElement, ToolbarSearchProps>(
             native <input> lives here by design so apps never hand-roll one. */}
         <input
           ref={setRefs}
-          data-toolbar-search=""
+          // Only opted-in fields join the `/` target pool, so a showKbd={false}
+          // field can never swallow the shortcut from an enabled sibling.
+          data-toolbar-search={showKbd ? '' : undefined}
           type="text"
           placeholder={placeholder}
-          title={title}
+          title={resolvedTitle}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           // Borderless, transparent, flush 12px left inset. NO compensating
@@ -164,7 +169,7 @@ export const ToolbarSearch = forwardRef<HTMLInputElement, ToolbarSearchProps>(
           tabIndex={hasValue ? 0 : -1}
           aria-hidden={hasValue ? undefined : true}
           aria-label={clearLabel}
-          title={hasValue ? clearLabel : title}
+          title={hasValue ? clearLabel : resolvedTitle}
           onClick={() => {
             if (hasValue) clear()
             innerRef.current?.focus()

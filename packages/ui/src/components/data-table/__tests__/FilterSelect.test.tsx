@@ -59,7 +59,12 @@ describe('FilterSelect — trigger grammar', () => {
     render(<Harness initial={['completed']} />)
     const t = trigger()
     expect(t.textContent).toContain('Completed')
-    expect(within(t).getByLabelText('Clear filter')).toBeTruthy()
+    // The clear ✕ is a real, keyboard-operable button…
+    const clear = screen.getByRole('button', { name: 'Clear filter' })
+    expect(clear.tagName).toBe('BUTTON')
+    // …and it is NOT nested inside the trigger button (no interactive-in-
+    // interactive / axe nested-interactive violation).
+    expect(t.contains(clear)).toBe(false)
   })
 
   it('collapses multi-selection to "<first> +N"', () => {
@@ -124,9 +129,22 @@ describe('FilterSelect — clear + keyboard', () => {
   it('inline ✕ clears without reopening', () => {
     const onChangeSpy = vi.fn()
     render(<Harness initial={['completed']} onChangeSpy={onChangeSpy} />)
-    fireEvent.click(within(trigger()).getByLabelText('Clear filter'))
+    fireEvent.click(screen.getByRole('button', { name: 'Clear filter' }))
     expect(onChangeSpy).toHaveBeenLastCalledWith([])
     expect(screen.queryByRole('listbox')).toBeNull()
+  })
+
+  it('clearing while the menu is open does not strand focus on <body>', () => {
+    const onChangeSpy = vi.fn()
+    render(<Harness initial={['completed']} onChangeSpy={onChangeSpy} />)
+    const t = trigger()
+    fireEvent.click(t)
+    expect(screen.getByRole('listbox')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Clear filter' }))
+    expect(onChangeSpy).toHaveBeenLastCalledWith([])
+    // Focus must not fall to <body> — the ✕ is a real focus target, not a
+    // tabindex=-1 span swallowed by the trigger.
+    expect(document.activeElement).not.toBe(document.body)
   })
 
   it('focuses an option on open and moves focus with ArrowDown', () => {
@@ -136,6 +154,20 @@ describe('FilterSelect — clear + keyboard', () => {
     expect(document.activeElement).toBe(options[0])
     fireEvent.keyDown(screen.getByRole('listbox'), { key: 'ArrowDown' })
     expect(document.activeElement).toBe(options[1])
+  })
+
+  it('roving tabindex — the listbox is a single tab stop, not one per option', () => {
+    render(<Harness />)
+    fireEvent.click(trigger())
+    const options = screen.getAllByRole('option')
+    const tabbable = options.filter((o) => o.getAttribute('tabindex') === '0')
+    // Exactly one option is tabbable at a time (the active one); the rest are -1.
+    expect(tabbable).toHaveLength(1)
+    expect(options.filter((o) => o.getAttribute('tabindex') === '-1')).toHaveLength(options.length - 1)
+    // The footer Clear lives OUTSIDE the listbox so its keydowns can't hijack
+    // arrow navigation.
+    const listbox = screen.getByRole('listbox')
+    expect(listbox.contains(screen.getByRole('button', { name: 'Clear' }))).toBe(false)
   })
 
   it('Escape closes the menu and returns focus to the trigger', () => {

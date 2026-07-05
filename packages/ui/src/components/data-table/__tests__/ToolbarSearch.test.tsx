@@ -87,6 +87,20 @@ describe('ToolbarSearch — no `/` chip, shortcut lives in the tooltip', () => {
     fireEvent.keyDown(other, { key: '/' })
     expect(document.activeElement).toBe(other)
   })
+
+  it('showKbd={false} opts out of the `/` target pool and the tooltip', () => {
+    render(
+      <ToolbarSearch value="" onChange={() => {}} placeholder="No shortcut" showKbd={false} />,
+    )
+    const input = screen.getByPlaceholderText('No shortcut')
+    // Not a candidate for the shortcut → no data attribute, so it can never
+    // swallow `/` from an enabled sibling.
+    expect(input.hasAttribute('data-toolbar-search')).toBe(false)
+    // And it must not advertise a shortcut it doesn't wire.
+    expect(input.getAttribute('title')).toBeNull()
+    fireEvent.keyDown(document.body, { key: '/' })
+    expect(document.activeElement).not.toBe(input)
+  })
 })
 
 describe('ToolbarSearch — trailing action morphs to clear', () => {

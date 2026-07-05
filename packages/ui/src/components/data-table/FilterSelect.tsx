@@ -1,6 +1,7 @@
 import {
   useEffect,
   useRef,
+  useState,
   type KeyboardEvent as ReactKeyboardEvent,
   type ReactNode,
 } from 'react'
@@ -155,89 +156,105 @@ function FilterSelectMenu({
   clearLabel: string
   close: () => void
 }) {
-  const listRef = useRef<HTMLDivElement>(null)
+  const optionRefs = useRef<Array<HTMLButtonElement | null>>([])
 
-  // On open, land focus on the first selected option (or the first option) so
-  // arrow-key navigation and Enter work immediately.
+  // Indices of the options that can hold focus (disabled ones are skipped).
+  const focusableIndexes = options
+    .map((o, i) => (o.disabled ? -1 : i))
+    .filter((i) => i >= 0)
+
+  // Roving tabindex: exactly ONE option is a tab stop at a time, so the whole
+  // listbox is a single stop (Tab moves out of it, not option-by-option). Start
+  // on the first selected option, else the first focusable one.
+  const [activeIndex, setActiveIndex] = useState(() => {
+    const sel = options.findIndex((o) => !o.disabled && value.includes(o.value))
+    return sel >= 0 ? sel : (focusableIndexes[0] ?? -1)
+  })
+
+  // On open, land focus on the active option so arrow-keys + Enter work at once.
   useEffect(() => {
-    const list = listRef.current
-    if (!list) return
-    const opts = Array.from(
-      list.querySelectorAll<HTMLElement>('[role="option"]:not([aria-disabled="true"])'),
-    )
-    const target = opts.find((el) => el.getAttribute('aria-selected') === 'true') ?? opts[0]
-    target?.focus()
+    if (activeIndex >= 0) optionRefs.current[activeIndex]?.focus()
+    // Run once, when the menu mounts.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  const moveTo = (index: number) => {
+    if (index < 0) return
+    setActiveIndex(index)
+    optionRefs.current[index]?.focus()
+  }
+
   const handleKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
-    const list = listRef.current
-    if (!list) return
     if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return
     event.preventDefault()
-    const opts = Array.from(
-      list.querySelectorAll<HTMLElement>('[role="option"]:not([aria-disabled="true"])'),
-    )
-    if (opts.length === 0) return
-    const current = opts.indexOf(document.activeElement as HTMLElement)
-    let next = current
-    if (event.key === 'ArrowDown') next = Math.min(current + 1, opts.length - 1)
-    else if (event.key === 'ArrowUp') next = Math.max(current - 1, 0)
-    else if (event.key === 'Home') next = 0
-    else if (event.key === 'End') next = opts.length - 1
-    if (next < 0) next = 0
-    opts[next]?.focus()
+    if (focusableIndexes.length === 0) return
+    const pos = focusableIndexes.indexOf(activeIndex)
+    let nextPos = pos
+    if (event.key === 'ArrowDown') nextPos = Math.min(pos + 1, focusableIndexes.length - 1)
+    else if (event.key === 'ArrowUp') nextPos = Math.max(pos - 1, 0)
+    else if (event.key === 'Home') nextPos = 0
+    else if (event.key === 'End') nextPos = focusableIndexes.length - 1
+    moveTo(focusableIndexes[nextPos < 0 ? 0 : nextPos])
   }
 
   return (
-    <div
-      ref={listRef}
-      role="listbox"
-      aria-label={menuLabel}
-      aria-multiselectable={multiple || undefined}
-      onKeyDown={handleKeyDown}
-    >
+    <>
       <div className="px-2.5 pb-1 pt-1.5 font-mono text-2xs font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))]">
         {menuLabel}
       </div>
-      {options.map((option) => {
-        const isSelected = value.includes(option.value)
-        const isZero = option.count === 0
-        return (
-          <button
-            key={option.value}
-            type="button"
-            role="option"
-            aria-selected={isSelected}
-            aria-disabled={option.disabled || undefined}
-            disabled={option.disabled}
-            onClick={() => !option.disabled && onToggle(option.value, close)}
-            className={cn(
-              'flex h-8 w-full items-center gap-2.5 rounded-md px-2.5 text-sm transition-colors',
-              'text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-secondary))] hover:text-[rgb(var(--text-primary))]',
-              'motion-reduce:transition-none',
-              focusRingInset,
-              isSelected && 'text-[rgb(var(--text-primary))]',
-              isZero && 'opacity-40',
-              option.disabled && 'cursor-not-allowed opacity-40',
-            )}
-          >
-            <Dot tone={option.tone} />
-            <span className="min-w-0 flex-1 truncate text-left">{option.label}</span>
-            {option.count != null && (
-              <span className="font-mono text-2xs tabular-nums text-[rgb(var(--text-tertiary))]">
-                {option.count}
-              </span>
-            )}
-            <Check
-              aria-hidden="true"
+      {/* Only the options live inside role=listbox. The Clear button sits in the
+          footer OUTSIDE it, so its keydowns never leak into arrow navigation. */}
+      <div
+        role="listbox"
+        aria-label={menuLabel}
+        aria-multiselectable={multiple || undefined}
+        onKeyDown={handleKeyDown}
+      >
+        {options.map((option, i) => {
+          const isSelected = value.includes(option.value)
+          const isZero = option.count === 0
+          return (
+            <button
+              key={option.value}
+              ref={(el) => {
+                optionRefs.current[i] = el
+              }}
+              type="button"
+              role="option"
+              aria-selected={isSelected}
+              aria-disabled={option.disabled || undefined}
+              disabled={option.disabled}
+              tabIndex={i === activeIndex ? 0 : -1}
+              onFocus={() => setActiveIndex(i)}
+              onClick={() => !option.disabled && onToggle(option.value, close)}
               className={cn(
-                'h-3.5 w-3.5 flex-none text-[rgb(var(--state-success-fg))] transition-opacity motion-reduce:transition-none',
-                isSelected ? 'opacity-100' : 'opacity-0',
+                'flex h-8 w-full items-center gap-2.5 rounded-md px-2.5 text-sm transition-colors',
+                'text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-secondary))] hover:text-[rgb(var(--text-primary))]',
+                'motion-reduce:transition-none',
+                focusRingInset,
+                isSelected && 'text-[rgb(var(--text-primary))]',
+                isZero && 'opacity-40',
+                option.disabled && 'cursor-not-allowed opacity-40',
               )}
-            />
-          </button>
-        )
-      })}
+            >
+              <Dot tone={option.tone} />
+              <span className="min-w-0 flex-1 truncate text-left">{option.label}</span>
+              {option.count != null && (
+                <span className="font-mono text-2xs tabular-nums text-[rgb(var(--text-tertiary))]">
+                  {option.count}
+                </span>
+              )}
+              <Check
+                aria-hidden="true"
+                className={cn(
+                  'h-3.5 w-3.5 flex-none text-[rgb(var(--state-success-fg))] transition-opacity motion-reduce:transition-none',
+                  isSelected ? 'opacity-100' : 'opacity-0',
+                )}
+              />
+            </button>
+          )
+        })}
+      </div>
       <div className="mt-1 flex items-center justify-between border-t border-[rgb(var(--border-primary)/0.35)] px-2.5 pb-1 pt-2">
         {hint ? (
           <span className="text-2xs text-[rgb(var(--text-tertiary))]">{hint}</span>
@@ -259,7 +276,7 @@ function FilterSelectMenu({
           {clearLabel}
         </button>
       </div>
-    </div>
+    </>
   )
 }
 
@@ -311,23 +328,19 @@ export function FilterSelect({
     onChange(value.includes(val) ? value.filter((v) => v !== val) : [...value, val])
   }
 
-  const clearFromTrigger = (event: React.MouseEvent | React.KeyboardEvent) => {
-    event.preventDefault()
-    event.stopPropagation()
-    onChange([])
-  }
-
   return (
     <Popover className={cn('relative inline-block flex-none', className)}>
       {({ open }) => (
         <>
-          <PopoverButton
-            aria-haspopup="listbox"
-            aria-label={resolvedLabels.filterAriaLabel(label)}
+          {/* Bordered wrapper owns the border/tint/radius. The clear (✕) is a
+              real sibling <button>, NOT nested inside the trigger button, so
+              there is no interactive-in-interactive nesting and the ✕ is
+              keyboard-operable. The chevron stays inside the single trigger
+              button (unambiguous focus-return on Esc/outside-click). */}
+          <div
             className={cn(
-              'inline-flex h-9 max-w-60 items-center gap-1.5 rounded-lg border px-2.5 text-sm font-medium transition-colors',
+              'inline-flex h-9 max-w-60 items-center overflow-hidden rounded-lg border text-sm font-medium transition-colors',
               'whitespace-nowrap motion-reduce:transition-none',
-              focusRingInset,
               active
                 ? 'border-[var(--mint-border)] bg-[var(--mint-soft)] text-[rgb(var(--text-primary))]'
                 : open
@@ -335,42 +348,54 @@ export function FilterSelect({
                   : 'border-[rgb(var(--border-primary)/0.35)] text-[rgb(var(--text-secondary))] hover:border-[rgb(var(--border-primary)/0.6)] hover:bg-[rgb(var(--background-secondary))]',
             )}
           >
-            <span
+            <PopoverButton
+              aria-haspopup="listbox"
+              aria-label={resolvedLabels.filterAriaLabel(label)}
               className={cn(
-                'flex-none',
-                active ? 'text-[rgb(var(--mint))]' : 'text-[rgb(var(--text-tertiary))]',
+                'inline-flex h-full min-w-0 items-center gap-1.5 border-0 bg-transparent pl-2.5',
+                active ? 'pr-1' : 'pr-2.5',
+                focusRingInset,
               )}
             >
-              {icon ?? <ListFilter className="h-3.5 w-3.5" />}
-            </span>
-            <span className="flex-none text-[rgb(var(--text-secondary))]">{label}</span>
-            <span aria-hidden="true" className="flex-none text-[rgb(var(--text-tertiary))]">
-              ·
-            </span>
-            <span className="inline-flex min-w-0 items-center">
-              <TriggerValue selected={selected} allLabel={allLabel} />
-            </span>
-            {active && (
               <span
-                role="button"
-                tabIndex={-1}
+                className={cn(
+                  'flex-none',
+                  active ? 'text-[rgb(var(--mint))]' : 'text-[rgb(var(--text-tertiary))]',
+                )}
+              >
+                {icon ?? <ListFilter className="h-3.5 w-3.5" />}
+              </span>
+              <span className="flex-none text-[rgb(var(--text-secondary))]">{label}</span>
+              <span aria-hidden="true" className="flex-none text-[rgb(var(--text-tertiary))]">
+                ·
+              </span>
+              <span className="inline-flex min-w-0 items-center">
+                <TriggerValue selected={selected} allLabel={allLabel} />
+              </span>
+              <ChevronDown
+                aria-hidden="true"
+                className={cn(
+                  'ml-0.5 h-3.5 w-3.5 flex-none text-[rgb(var(--text-tertiary))] transition-transform duration-200 motion-reduce:transition-none',
+                  EASE,
+                  open && 'rotate-180',
+                )}
+              />
+            </PopoverButton>
+            {active && (
+              <button
+                type="button"
                 aria-label={resolvedLabels.clearFilter}
-                onMouseDown={(e) => e.stopPropagation()}
-                onClick={clearFromTrigger}
-                className="ml-0.5 grid h-5 w-5 flex-none place-items-center rounded text-[rgb(var(--text-tertiary))] hover:bg-[rgb(var(--mint-border)/0.4)] hover:text-[rgb(var(--text-primary))]"
+                onClick={() => onChange([])}
+                className={cn(
+                  'mr-1.5 grid h-5 w-5 flex-none place-items-center rounded text-[rgb(var(--text-tertiary))]',
+                  'hover:bg-[rgb(var(--mint-border)/0.4)] hover:text-[rgb(var(--text-primary))]',
+                  focusRingInset,
+                )}
               >
                 <X className="h-3 w-3" />
-              </span>
+              </button>
             )}
-            <ChevronDown
-              aria-hidden="true"
-              className={cn(
-                'h-3.5 w-3.5 flex-none text-[rgb(var(--text-tertiary))] transition-transform duration-200 motion-reduce:transition-none',
-                EASE,
-                open && 'rotate-180',
-              )}
-            />
-          </PopoverButton>
+          </div>
 
           {/* Entry-only CSS animation (not a Headless transition) so the panel
               unmounts synchronously on close — focus returns to the trigger,
