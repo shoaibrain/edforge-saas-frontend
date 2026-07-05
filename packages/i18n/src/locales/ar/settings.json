@@ -129,7 +129,18 @@
       "title": "نظرة عامة على الأمن",
       "description": "ملخص سريع لأمان حسابك.",
       "loadFailed": "غير قادر على تحميل نظرة عامة على الأمان."
-    }
+    },
+    "loadMore": "تحميل المزيد",
+    "loginHistoryError": "تعذّر تحميل سجل تسجيل الدخول الخاص بك.",
+    "noLoginHistory": "لا يوجد سجل تسجيل دخول بعد.",
+    "noSessions": "لا توجد جلسات نشطة.",
+    "otherDevicesSignedOut": "تم تسجيل الخروج من {{count}} جلسة أخرى.",
+    "otherDevicesSignedOut_plural": "تم تسجيل الخروج من {{count}} جلسات أخرى.",
+    "retry": "إعادة المحاولة",
+    "sessionRevokeError": "تعذّر تسجيل الخروج من تلك الجلسة. يرجى المحاولة مرة أخرى.",
+    "sessionRevoked": "تم تسجيل الخروج من الجلسة.",
+    "sessionsError": "تعذّر تحميل جلساتك.",
+    "signOutOtherDevices": "تسجيل الخروج من الأجهزة الأخرى"
   },
   "preferences": {
     "title": "التفضيلات",

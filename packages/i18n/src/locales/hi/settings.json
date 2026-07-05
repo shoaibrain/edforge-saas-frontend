@@ -129,7 +129,18 @@
       "title": "सुरक्षा अवलोकन",
       "description": "आपके खाते की सुरक्षा का त्वरित सारांश.",
       "loadFailed": "सुरक्षा अवलोकन लोड करने में असमर्थ."
-    }
+    },
+    "loadMore": "और लोड करें",
+    "loginHistoryError": "आपका लॉगिन इतिहास लोड नहीं हो सका।",
+    "noLoginHistory": "अभी तक कोई लॉगिन इतिहास नहीं।",
+    "noSessions": "कोई सक्रिय सत्र नहीं।",
+    "otherDevicesSignedOut": "{{count}} अन्य सत्र से साइन आउट किया गया।",
+    "otherDevicesSignedOut_plural": "{{count}} अन्य सत्रों से साइन आउट किया गया।",
+    "retry": "पुनः प्रयास करें",
+    "sessionRevokeError": "उस सत्र से साइन आउट नहीं हो सका। कृपया पुनः प्रयास करें।",
+    "sessionRevoked": "सत्र से साइन आउट किया गया।",
+    "sessionsError": "आपके सत्र लोड नहीं हो सके।",
+    "signOutOtherDevices": "अन्य डिवाइस से साइन आउट करें"
   },
   "preferences": {
     "title": "प्राथमिकताएँ",
