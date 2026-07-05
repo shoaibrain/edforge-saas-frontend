@@ -114,6 +114,9 @@
     "sessionRevokeError": "त्यो सत्र साइन आउट गर्न सकिएन। कृपया पुनः प्रयास गर्नुहोस्।",
     "otherDevicesSignedOut": "{{count}} अन्य सत्र साइन आउट गरियो।",
     "otherDevicesSignedOut_plural": "{{count}} अन्य सत्रहरू साइन आउट गरियो।",
+    "noLoginHistory": "अहिलेसम्म कुनै लगइन इतिहास छैन।",
+    "loginHistoryError": "तपाईंको लगइन इतिहास लोड गर्न सकिएन।",
+    "loadMore": "थप लोड गर्नुहोस्",
     "passwordRequirements": {
       "minLength": "कम्तीमा ८ अक्षर",
       "uppercase": "ठूलो अक्षर",

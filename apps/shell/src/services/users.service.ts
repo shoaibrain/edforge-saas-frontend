@@ -682,17 +682,60 @@ export async function revokeAllSessions(
   )
 }
 
+/** One page of login history + the opaque cursor for the next (older) page. */
+export interface LoginHistoryPage {
+  entries: LoginHistoryEntry[]
+  nextCursor?: string
+}
+
 /**
- * Get login history
- * GET /users/:id/security/login-history
+ * Get a page of login history.
+ * GET /users/:id/security/login-history?limit=&cursor=
+ *
+ * The backend returns a WRAPPED, differently-shaped DTO:
+ *   { entries: [{ timestamp, status, ipAddress, userAgent, browser, os,
+ *     deviceType, location, failureReason }], total, hasMore, nextCursor }
+ * — not a bare `LoginHistoryEntry[]`. Unwrap + map each entry to the UI shape
+ * (compose `deviceInfo` from browser/os; synthesize a stable `id`). Returning
+ * the wrapper directly would crash the list with `x.some is not a function`.
  */
 export async function getLoginHistory(
   userId: string,
-  limit: number = 10
-): Promise<LoginHistoryEntry[]> {
-  return apiGet<LoginHistoryEntry[]>(
-    `/users/${userId}/security/login-history?limit=${limit}`
-  )
+  opts: { limit?: number; cursor?: string } = {}
+): Promise<LoginHistoryPage> {
+  const params = new URLSearchParams({ limit: String(opts.limit ?? 10) })
+  if (opts.cursor) params.set('cursor', opts.cursor)
+
+  const res = await apiGet<{
+    entries?: Array<{
+      timestamp: string
+      status: LoginHistoryEntry['status']
+      ipAddress: string
+      userAgent?: string
+      browser?: string
+      os?: string
+      location?: string
+      failureReason?: string
+    }>
+    nextCursor?: string
+  }>(`/users/${userId}/security/login-history?${params.toString()}`)
+
+  const entries: LoginHistoryEntry[] = (
+    Array.isArray(res?.entries) ? res.entries : []
+  ).map((e, i) => ({
+    id: `${e.timestamp}-${i}`,
+    timestamp: e.timestamp,
+    ipAddress: e.ipAddress,
+    location: e.location,
+    deviceInfo:
+      [e.browser, e.os].filter(Boolean).join(' on ') ||
+      e.userAgent ||
+      'Unknown device',
+    status: e.status,
+    failureReason: e.failureReason,
+  }))
+
+  return { entries, nextCursor: res?.nextCursor }
 }
 
 // ============================================================================
