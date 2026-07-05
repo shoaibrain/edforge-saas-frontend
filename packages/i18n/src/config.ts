@@ -156,6 +156,32 @@ export const I18N_RESOURCES = {
 const resources = I18N_RESOURCES;
 
 /**
+ * `isolate` interpolation format — bidi-isolates an interpolated value so LTR
+ * "islands" (numbers, codes, dates, currency, ranges) don't reorder inside RTL
+ * (Arabic) content. Opt in per placeholder: `"{{amount, isolate}}"`.
+ *
+ * Wraps the value in Unicode First-Strong-Isolate (U+2068) … Pop-Directional-
+ * Isolate (U+2069) for RTL languages only, so it is a no-op for en/ne/hi and
+ * always safe to annotate a placeholder with it. RTL is derived from the base
+ * language code to keep this file free of a circular import on ./language.
+ */
+const FIRST_STRONG_ISOLATE = "⁨";
+const POP_DIRECTIONAL_ISOLATE = "⁩";
+const RTL_LANGUAGE_CODES = new Set(["ar"]);
+
+export function isolateInterpolation(
+  value: unknown,
+  format?: string,
+  lng?: string,
+): string {
+  const text = value == null ? "" : String(value);
+  if (format !== "isolate") return text;
+  const baseLanguage = (lng ?? "").split("-")[0];
+  if (!RTL_LANGUAGE_CODES.has(baseLanguage)) return text;
+  return `${FIRST_STRONG_ISOLATE}${text}${POP_DIRECTIONAL_ISOLATE}`;
+}
+
+/**
  * Initialize the i18next instance.
  * Safe to call multiple times — subsequent calls are no-ops if already initialized.
  */
@@ -173,6 +199,7 @@ export function initI18n() {
       ns: NAMESPACES as unknown as string[],
       interpolation: {
         escapeValue: false, // React already handles XSS
+        format: isolateInterpolation,
       },
       detection: {
         order: ["localStorage", "navigator"],

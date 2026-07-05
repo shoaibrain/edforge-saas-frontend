@@ -83,7 +83,7 @@
       "invoiceCount_plural": "{{count}} الفواتير",
       "agingOverview": "نظرة عامة على الشيخوخة",
       "overdueCount": "{{count}} متأخرة",
-      "agingBucketTitle": "{{bucket}}: {{count}} الفواتير ({{amount}})",
+      "agingBucketTitle": "{{bucket, isolate}}: {{count, isolate}} الفواتير ({{amount, isolate}})",
       "agingBuckets": {
         "current": "حاضِر",
         "days1To30": "1-30 يوما",
@@ -92,7 +92,7 @@
         "days90Plus": "أكثر من 90 يومًا"
       },
       "agingInsight": {
-        "singleBucket": "{{count}} متأخرة · {{amount}}، كل ذلك داخل نافذة {{bucket}}.",
+        "singleBucket": "{{count, isolate}} متأخرة · {{amount, isolate}}، كل ذلك داخل نافذة {{bucket, isolate}}.",
         "multipleBuckets": "{{count}} متأخرة بإجمالي {{amount}}. {{worstCount}} في {{bucket}} بحاجة إلى اهتمام فوري."
       },
       "noOverdue": "لا توجد فواتير متأخرة - جميع الحسابات جارية.",
@@ -248,7 +248,7 @@
       "daysLate": "{{days}}د متأخرا"
     },
     "lineItems": {
-      "qtyAt": "{{quantity}} × {{amount}}"
+      "qtyAt": "{{quantity, isolate}} × {{amount, isolate}}"
     },
     "aside": {
       "details": "تفاصيل",

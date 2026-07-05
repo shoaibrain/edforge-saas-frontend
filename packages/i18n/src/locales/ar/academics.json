@@ -367,7 +367,7 @@
       "privacyNote": "تتوفر المعلومات السكانية ومعلومات الاتصال وتفاصيل الوصي على صفحة الملف الشخصي الكاملة.",
       "viewFullProfile": "عرض الملف الشخصي الكامل",
       "viewFullProfileAria": "مشاهدة الملف الشخصي الكامل لـ{{student}}",
-      "bsPrefix": "BS {{date}}"
+      "bsPrefix": "BS {{date, isolate}}"
     },
     "csvImport": {
       "title": "استيراد الطلاب",
@@ -1484,7 +1484,7 @@
       "total": "{{count}} في خطر",
       "empty": "لا يوجد طلاب معرضون للخطر",
       "absent": "{{count}} غائب",
-      "gradeAbsent": "{{grade}} · {{absent}}",
+      "gradeAbsent": "{{grade, isolate}} · {{absent, isolate}}",
       "progressLabel": "{{student}}: {{rate}}% حضور",
       "viewAll": "عرض جميع الطلاب المعرضين للخطر {{count}}"
     },
@@ -2706,7 +2706,7 @@
       "newPolicy": "سياسة جديدة",
       "emptyTitle": "لم يتم تكوين سياسات التقدير",
       "emptyDescription": "قم بإنشاء سياسة تقدير لتحديد مقاييس التقدير وأوزان الفئات وقواعد التقريب.",
-      "gradeChip": "{{letter}} · {{min}}–{{max}}% · {{gpa}} GPA",
+      "gradeChip": "{{letter, isolate}} · {{min, isolate}}–{{max, isolate}}% · {{gpa, isolate}} GPA",
       "weightAria": "{{category}} الوزن: {{weight}}%",
       "scheme": "مخطط",
       "schemeValue": "{{scheme}} · {{scale}}",
@@ -2862,12 +2862,12 @@
     "downloadCsv": "تحميل CSV",
     "invalidMonth": "أدخل شهرًا صالحًا (YYYY-MM).",
     "failed": "فشل في إنشاء التصدير. يرجى المحاولة مرة أخرى.",
-    "summary": "{{students}} · {{yearMonth}}",
+    "summary": "{{students, isolate}} · {{yearMonth, isolate}}",
     "generated": "تم إنشاؤها {{dateTime}}",
     "empty": "لم يتم تسجيل أي حضور لهذا الشهر.",
     "search": "بحث عن الطلاب...",
-    "bs": "BS {{label}}",
-    "bsRange": "BS {{start}} – {{end}}",
+    "bs": "BS {{label, isolate}}",
+    "bsRange": "BS {{start, isolate}} – {{end, isolate}}",
     "bsMonths": {
       "1": "بايساك",
       "2": "جيستا",
@@ -2914,7 +2914,7 @@
     },
     "year": {
       "currentOption": "{{yearName}} · الحالي",
-      "bs": "BS {{year}}"
+      "bs": "BS {{year, isolate}}"
     },
     "templates": {
       "IEMIS_NPL_CEHRD_FLASH_I": "فلاش الأول - تعداد الالتحاق",

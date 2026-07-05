@@ -83,7 +83,7 @@
     "clearSelection": "مسح التحديد",
     "selectedRows": "{{count}} مختارة",
     "selectedRows_plural": "{{count}} مختارة",
-    "paginationShowing": "عرض {{start}}-{{end}} من {{total}} النتائج",
+    "paginationShowing": "عرض {{start, isolate}}-{{end, isolate}} من {{total, isolate}} النتائج",
     "rowsPerPage": "{{size}} / صفحة",
     "previousPage": "السابق",
     "nextPage": "التالي",
