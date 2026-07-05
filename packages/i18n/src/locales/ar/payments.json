@@ -2,7 +2,7 @@
   "title": "دفع الرسوم",
   "description": "عرض الفواتير، وإجراء الدفعات، وتنزيل الإيصالات",
   "overview": {
-    "finance": "تمويل",
+    "finance": "المالية",
     "selectSchoolTitle": "اختر مدرسة",
     "selectSchoolDescription": "اختر مدرسة من شريط التنقل العلوي لعرض البيانات المالية.",
     "actions": {
@@ -47,7 +47,7 @@
       "totalInvoiced": "إجمالي الفاتورة",
       "collected": "تم جمعها",
       "outstanding": "متميز",
-      "overdue": "تأخرت",
+      "overdue": "متأخر",
       "invoiceCount": "{{count}} الفواتير",
       "paymentCount": "{{count}} المدفوعات",
       "awaiting": "{{count}} في انتظار",
@@ -65,7 +65,7 @@
       "percentCollected": "{{rate}}% تم جمعها",
       "collected": "تم جمعها",
       "outstanding": "متميز",
-      "overdue": "تأخرت",
+      "overdue": "متأخر",
       "byFeeType": "حسب نوع الرسوم",
       "typeCount": "{{count}} النوع",
       "typeCount_plural": "{{count}} أنواع",
@@ -120,7 +120,7 @@
     "manageDescription": "إنشاء وإصدار وإدارة فواتير الطلاب.",
     "outstanding": "متميز",
     "paid": "مدفوع",
-    "overdue": "تأخرت",
+    "overdue": "متأخر",
     "all": "جميع الفواتير",
     "invoiceNumber": "فاتورة #",
     "status": "حالة",
@@ -313,7 +313,7 @@
     "cashDescription": "الدفع في مكتب المدرسة",
     "bankTransfer": "التحويل البنكي",
     "bankTransferDescription": "التحويل إلى الحساب البنكي للمدرسة",
-    "cheque": "يفحص",
+    "cheque": "شيك",
     "chequeDescription": "الدفع عن طريق الشيكات في مكتب المدرسة",
     "testMode": "وضع الاختبار",
     "productionMode": "إنتاج",
@@ -366,11 +366,11 @@
     "issued": "صادر",
     "partially_paid": "مدفوعة جزئيا",
     "paid": "مدفوع",
-    "overdue": "تأخرت",
+    "overdue": "متأخر",
     "cancelled": "تم الإلغاء",
     "written_off": "شطب",
     "pending": "في انتظار",
-    "processing": "يعالج",
+    "processing": "قيد المعالجة",
     "completed": "مكتمل",
     "failed": "فشل",
     "refunded": "ردها",
@@ -434,7 +434,7 @@
     "fields": {
       "name": "اسم",
       "description": "وصف",
-      "type": "يكتب",
+      "type": "نوع",
       "academicYear": "العام الدراسي",
       "amount": "كمية",
       "frequency": "تكرار",
@@ -495,7 +495,7 @@
       "tuition": "تدريس",
       "admission": "قبول",
       "exam": "فحص",
-      "transport": "ينقل",
+      "transport": "النقل",
       "library": "مكتبة",
       "lab": "معمل",
       "hostel": "نزل",
@@ -723,7 +723,7 @@
   "gatewayConfig": {
     "title": "بوابات الدفع",
     "description": "تكوين بوابات الدفع لمدرستك",
-    "enable": "يُمكَِن",
+    "enable": "تفعيل",
     "disable": "إبطال",
     "merchantCode": "رمز التاجر",
     "apiKey": "API مفتاح",
@@ -862,7 +862,7 @@
         "both": "كلاهما"
       },
       "cancel": "إلغاء",
-      "close": "يغلق"
+      "close": "إغلاق"
     },
     "progress": {
       "queued": "في قائمة الانتظار - انتظار العامل لاستلام الوظيفة.",
@@ -938,7 +938,7 @@
       "title": "ضبط التوازن",
       "progress": "ترحيل إدخالات دفتر الأستاذ",
       "warning": "تتم كتابة نفس التعديل في دفتر الأستاذ لكل حساب محدد. استخدم مفتاح التجاوز لتخطي حارس عتبة التوقيع، على سبيل المثال إضافة رصيد إلى حساب فائض بالفعل.",
-      "type": "يكتب",
+      "type": "نوع",
       "types": {
         "debit": "الخصم (الزيادة المستحقة)",
         "credit": "الائتمان (تخفيض المستحق)"
@@ -1096,7 +1096,7 @@
     "saved": "تم حفظ تكوين البوابة",
     "saveFailed": "فشل حفظ تكوين البوابة",
     "loadFailed": "فشل تحميل تكوينات البوابة",
-    "enable": "يُمكَِن",
+    "enable": "تفعيل",
     "saveConfiguration": "حفظ التكوين",
     "securityNote": "يتم تشفير بيانات الاعتماد وتخزينها بشكل آمن. بعد الحفظ، سيتم إخفاء القيم.",
     "showSecret": "إظهار القيمة السرية",
@@ -1109,7 +1109,7 @@
       "stripe": "شريط",
       "cash": "نقدي",
       "bank_transfer": "التحويل البنكي",
-      "cheque": "يفحص"
+      "cheque": "شيك"
     },
     "descriptions": {
       "esewa": "المحفظة الرقمية الرائدة في نيبال للمدفوعات عبر الإنترنت",
@@ -1172,11 +1172,11 @@
       "student": "طالب",
       "studentName": "اسم الطالب",
       "date": "تاريخ",
-      "type": "يكتب",
+      "type": "نوع",
       "description": "وصف",
       "debit": "دَين",
       "credit": "ائتمان",
-      "balance": "توازن",
+      "balance": "الرصيد",
       "balanceBucket": "دلو التوازن",
       "invoiceNumber": "فاتورة #",
       "status": "حالة",
@@ -1222,10 +1222,10 @@
     "downloadPdf": "تحميل PDF",
     "exportCsv": "تصدير CSV",
     "cancel": "إلغاء",
-    "confirm": "يتأكد",
-    "save": "يحفظ",
+    "confirm": "تأكيد",
+    "save": "حفظ",
     "saving": "جارٍ الحفظ...",
-    "close": "يغلق",
+    "close": "إغلاق",
     "back": "خلف",
     "next": "التالي",
     "retry": "أعد المحاولة"
@@ -1274,7 +1274,7 @@
     "dismiss": "رفض",
     "emptyTitle": "لقد تم القبض عليك جميعًا.",
     "domains": {
-      "finance": "تمويل"
+      "finance": "المالية"
     },
     "selection": {
       "aria": "إجراءات الاختيار",

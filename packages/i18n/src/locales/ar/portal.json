@@ -31,7 +31,7 @@
     "late": "متأخر",
     "excused": "معذرة",
     "paid": "مدفوع",
-    "overdue": "تأخرت",
+    "overdue": "متأخر",
     "pending": "في انتظار",
     "upcoming": "القادمة",
     "outstanding": "متميز",
@@ -72,7 +72,7 @@
     "quickReference": "مرجع سريع",
     "dropOff": "الانزال",
     "lunch": "غداء",
-    "pickup": "يلتقط",
+    "pickup": "استلام",
     "noClassesToday": "لا يوجد فصول اليوم.",
     "noSections": "لم يتم جدولة أي دروس."
   },

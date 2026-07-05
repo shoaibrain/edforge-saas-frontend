@@ -175,7 +175,7 @@
     "editStaff": "تحرير عضو هيئة التدريس",
     "deleteStaff": "حذف عضو فريق العمل",
     "since": "منذ {{date}}",
-    "type": "يكتب",
+    "type": "نوع",
     "primary": "أساسي"
   },
   "sections": {
@@ -201,7 +201,7 @@
     "city": "مدينة",
     "state": "ولاية",
     "province": "مقاطعة",
-    "district": "يصرف",
+    "district": "منطقة",
     "municipality": "البلدية / بلدية الريف / مركز توثيق الانتهاكات",
     "wardNumber": "رقم الجناح",
     "street": "شارع",
@@ -435,7 +435,7 @@
     "credentials": "أوراق اعتماد",
     "employmentHistory": "تاريخ التوظيف",
     "employment-history": "التاريخ",
-    "leave": "يترك",
+    "leave": "إجازة",
     "security": "حماية",
     "trainings": "التدريبات"
   },
@@ -450,7 +450,7 @@
   },
   "actions": {
     "cancel": "إلغاء",
-    "save": "يحفظ",
+    "save": "حفظ",
     "saving": "جارٍ الحفظ...",
     "saveChanges": "حفظ التغييرات",
     "view": "عرض",
@@ -467,7 +467,7 @@
     "unknown": "مجهول",
     "unassigned": "غير معين",
     "loading": "جار التحميل...",
-    "select": "يختار…",
+    "select": "اختيار…",
     "none": "لا أحد",
     "yes": "نعم",
     "no": "لا",
@@ -520,7 +520,7 @@
     "all": "الجميع",
     "teacher": "المعلمين",
     "principal": "رئيسي",
-    "support": "يدعم"
+    "support": "دعم"
   },
   "export": {
     "headers": {
@@ -618,7 +618,7 @@
       "endorsement": "تَأيِيد",
       "degree": "درجة",
       "registration": "تسجيل",
-      "permit": "يسمح",
+      "permit": "تصريح",
       "clearance": "التخليص",
       "training": "تمرين",
       "other": "آخر"
@@ -652,8 +652,8 @@
     "actions": {
       "request": "طلب إجازة",
       "submitRequest": "إرسال الطلب",
-      "approve": "يعتمد",
-      "reject": "يرفض"
+      "approve": "موافقة",
+      "reject": "رفض"
     },
     "summary": {
       "totalRequests": "إجمالي الطلبات",
@@ -779,7 +779,7 @@
     "fteValue": "FTE {{value}}",
     "primary": "أساسي",
     "ended": "انتهى",
-    "remove": "يزيل",
+    "remove": "إزالة",
     "removeConfirm": "هل أنت متأكد أنك تريد إزالة هذه المهمة؟ لا يمكن التراجع عن هذا الإجراء.",
     "overcommitted": "مفرط الالتزام - يتجاوز 1.0",
     "emptyTitle": "لا المهام",

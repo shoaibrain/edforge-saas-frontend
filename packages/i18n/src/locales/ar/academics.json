@@ -207,7 +207,7 @@
       "badges": {
         "primary": "أساسي",
         "portal": "منفذ",
-        "pickup": "يلتقط"
+        "pickup": "استلام"
       }
     },
     "section": {
@@ -347,14 +347,14 @@
     "withdraw": {
       "title": "انسحاب الطالب",
       "description": "هل أنت متأكد أنك تريد سحب {{student}}؟ يمكن إلغاء هذا الإجراء من قبل مسؤول المدرسة.",
-      "confirm": "ينسحب"
+      "confirm": "سحب"
     },
     "profiles": {
       "title": "الملفات الشخصية للطلاب",
       "description": "الملفات الشخصية والسجلات التفصيلية للطلاب - ليتم ملؤها بالمحتوى المُرحّل من الوحدة المتراصة."
     },
     "quickProfile": {
-      "close": "يغلق",
+      "close": "إغلاق",
       "atRiskBanner": "المعرضون للخطر · {{rate}}% الحضور (30 يومًا)",
       "grade": "درجة",
       "gpa": "GPA",
@@ -380,7 +380,7 @@
       "actions": {
         "close": "إغلاق مربع حوار الاستيراد",
         "download": "تحميل",
-        "remove": "يزيل",
+        "remove": "إزالة",
         "uploadDifferent": "تحميل ملف مختلف",
         "goToPending": "اذهب إلى معلق",
         "cancel": "إلغاء",
@@ -626,7 +626,7 @@
     },
     "actions": {
       "saveAttendance": "حفظ الحضور",
-      "save": "يحفظ",
+      "save": "حفظ",
       "edit": "تحرير",
       "editFor": "تحرير الحضور لـ {{studentName}}",
       "cancelEdit": "إلغاء التعديل",
@@ -645,9 +645,9 @@
       "saved_plural": "تم حفظ الحضور لطلاب {{count}}"
     },
     "saveStatus": {
-      "saved": "أنقذ",
+      "saved": "تم الحفظ",
       "saving": "جارٍ الحفظ...",
-      "savingEllipsis": "توفير…",
+      "savingEllipsis": "جارٍ الحفظ…",
       "offline": "غير متصل",
       "offlineLocal": "غير متصل - يتم حفظ التغييرات محليًا",
       "error": "فشل الحفظ",
@@ -696,7 +696,7 @@
         "Sunday": "شمس",
         "Monday": "الاثنين",
         "Tuesday": "الثلاثاء",
-        "Wednesday": "تزوج",
+        "Wednesday": "الأربعاء",
         "Thursday": "الخميس",
         "Friday": "الجمعة",
         "Saturday": "قعد"
@@ -789,7 +789,7 @@
         "viewEdit": "عرض / تحرير",
         "partialCounts": "تم وضع علامة على {{done}}/{{total}} · {{left}} على اليسار",
         "partialBadge": "{{pct}}% تم",
-        "continue": "يكمل",
+        "continue": "متابعة",
         "notStartedBadge": "لم يبدأ",
         "record": "سِجِلّ",
         "emptyScope": "لا توجد أقسام في نطاقك لهذا اليوم."
@@ -850,7 +850,7 @@
       "date": "تاريخ",
       "status": "حالة",
       "notes": "ملاحظات",
-      "close": "يغلق"
+      "close": "إغلاق"
     }
   },
   "common": {
@@ -908,14 +908,14 @@
       "actions": {
         "studentActions": "تصرفات الطلاب",
         "viewProfile": "عرض الملف الشخصي",
-        "withdraw": "ينسحب",
+        "withdraw": "سحب",
         "message": "رسالة",
         "moveSection": "نقل القسم",
         "archive": "أرشيف"
       },
       "bulk": {
         "message": "رسالة",
-        "move": "يتحرك",
+        "move": "نقل",
         "archive": "أرشيف"
       },
       "empty": {
@@ -931,10 +931,10 @@
         "status": "حالة",
         "entryDate": "تاريخ الدخول",
         "exitDate": "تاريخ الخروج",
-        "type": "يكتب"
+        "type": "نوع"
       },
       "actions": {
-        "withdraw": "ينسحب",
+        "withdraw": "سحب",
         "transfer": "تحويل",
         "markNoShow": "مارك نو شو"
       },
@@ -962,7 +962,7 @@
         "subject": "موضوع",
         "grades": "الدرجات",
         "credits": "الاعتمادات",
-        "type": "يكتب",
+        "type": "نوع",
         "duration": "مدة",
         "status": "حالة"
       },
@@ -1027,7 +1027,7 @@
         "activate": "فعل",
         "deactivate": "إلغاء التنشيط",
         "sendNotification": "إرسال الإخطار",
-        "notify": "يخطر"
+        "notify": "إخطار"
       },
       "search": "أقسام البحث...",
       "empty": {
@@ -1057,7 +1057,7 @@
         "title": "إزالة الطالب",
         "description": "هل أنت متأكد أنك تريد إزالة {{studentName}} من هذا القسم؟",
         "fallbackStudent": "هذا الطالب",
-        "confirm": "يزيل"
+        "confirm": "إزالة"
       }
     },
     "teachers": {
@@ -1080,7 +1080,7 @@
     "exams": {
       "columns": {
         "exam": "امتحان",
-        "type": "يكتب",
+        "type": "نوع",
         "term": "شرط",
         "grades": "الدرجات",
         "schedule": "جدول",
@@ -1211,7 +1211,7 @@
       "addMaterial": "أضف مادة",
       "noMaterials": "لم تتم إضافة أي مواد حتى الآن. انقر فوق إضافة مادة للبدء.",
       "materialNumber": "المادة {{number}}",
-      "materialType": "يكتب",
+      "materialType": "نوع",
       "materialTitle": "عنوان",
       "materialTitlePlaceholder": "عنوان المادة",
       "materialAuthor": "مؤلف",
@@ -1262,7 +1262,7 @@
         "subject": "موضوع",
         "grades": "الدرجات",
         "credits": "الاعتمادات",
-        "type": "يكتب",
+        "type": "نوع",
         "duration": "مدة",
         "status": "حالة"
       }
@@ -1549,7 +1549,7 @@
       "domains": {
         "attendance": "الحضور",
         "assessment": "تقدير",
-        "finance": "تمويل",
+        "finance": "المالية",
         "enrollment": "التسجيل",
         "capacity": "سعة",
         "dataQuality": "جودة البيانات"
@@ -1670,7 +1670,7 @@
         "scores": "عشرات"
       },
       "fields": {
-        "type": "يكتب",
+        "type": "نوع",
         "term": "شرط",
         "status": "حالة",
         "gradeLevels": "مستويات الصف",
@@ -1718,7 +1718,7 @@
       "componentsSum": "Σ {{sum}} / {{max}} كامل",
       "componentLabelPlaceholder": "التسمية (مثل النظرية)",
       "fullPlaceholder": "ممتلىء",
-      "passPlaceholder": "يمر",
+      "passPlaceholder": "ناجح",
       "componentLabelAria": "تسمية المكون {{index}}",
       "componentFullAria": "المكون {{index}} العلامات الكاملة",
       "componentPassAria": "مكون {{index}} علامات المرور",
@@ -1730,7 +1730,7 @@
       "emptyReadonly": "لا توجد مواضيع حتى الآن.",
       "courseFallback": "دورة",
       "maxShort": "الأعلى",
-      "passShort": "يمر",
+      "passShort": "ناجح",
       "editMarks": "تحرير العلامات",
       "removeSubject": "إزالة الموضوع",
       "removeConfirm": "إزالة {{subject}} من الامتحان؟",
@@ -1740,7 +1740,7 @@
     },
     "resultCards": {
       "absentTitle": "غائب / غير متدرج",
-      "fail": "يفشل",
+      "fail": "راسب",
       "gradeLabel": "الصف {{grade}}",
       "published": "تم النشر",
       "draft": "مسودة",
@@ -1759,7 +1759,7 @@
       "passMarksShort": "تمر م.",
       "score": "نتيجة",
       "grade": "درجة",
-      "pass": "يمر",
+      "pass": "ناجح",
       "total": "المجموع",
       "conduct": "سلوك",
       "conductPlaceholder": "مذكرة التصرف...",
@@ -1856,12 +1856,12 @@
       "loading": "جار التحميل...",
       "retry": "أعد المحاولة",
       "cancel": "إلغاء",
-      "create": "يخلق",
+      "create": "إنشاء",
       "saveChanges": "حفظ التغييرات",
       "saving": "جارٍ الحفظ...",
       "creating": "جارٍ الإنشاء...",
       "createSection": "إنشاء قسم",
-      "discard": "ينبذ",
+      "discard": "تجاهل",
       "keepEditing": "استمر في التحرير"
     },
     "aria": {
@@ -2001,7 +2001,7 @@
       "failedToLoad": "فشل تحميل الواجب الدراسي",
       "failedToLoadDescription": "حدث خطأ أثناء جلب بيانات الواجب الدراسي. يرجى المحاولة مرة أخرى.",
       "other": "آخر",
-      "create": "يخلق",
+      "create": "إنشاء",
       "assignment": "تكليف",
       "quiz": "لغز",
       "quizAssignment": "مهمة الاختبار",
@@ -2013,7 +2013,7 @@
       "editTitle": "تحرير الواجب الدراسي",
       "createTitle": "إنشاء واجب دراسي",
       "editing": "التحرير",
-      "type": "يكتب",
+      "type": "نوع",
       "titleLabel": "عنوان",
       "titlePlaceholder": "على سبيل المثال الفصل 3 قراءة الاستجابة",
       "titleRequired": "العنوان مطلوب",
@@ -2075,8 +2075,8 @@
       "closeYear": "إغلاق السنة",
       "closing": "إغلاق...",
       "back": "خلف",
-      "skip": "يتخطى",
-      "continue": "يكمل",
+      "skip": "تخطي",
+      "continue": "متابعة",
       "createStudent": "إنشاء الطالب"
     },
     "header": {
@@ -2302,7 +2302,7 @@
         "guardianNumber": "الوصي {{number}}",
         "remove": "إزالة الوصي",
         "relationship": "علاقة",
-        "select": "يختار",
+        "select": "اختيار",
         "employer": "صاحب العمل",
         "employerPlaceholder": "اسم صاحب العمل",
         "occupationPlaceholder": "إشغال",
@@ -2517,7 +2517,7 @@
       "archived": "مؤرشف",
       "setCurrent": "تعيين كحالي",
       "cancel": "إلغاء",
-      "confirm": "يتأكد"
+      "confirm": "تأكيد"
     },
     "stats": {
       "currentYear": "العام الحالي",
@@ -2612,7 +2612,7 @@
       "pasteScores": "لصق النتائج (الاسم\\tالنتيجة لكل سطر)",
       "pasteScoresPlaceholder": "جون سميث\\t95\nجين دو\\t88",
       "pasteFromSpreadsheet": "لصق العشرات من جدول البيانات",
-      "apply": "يتقدم",
+      "apply": "تطبيق",
       "studentFallback": "طالب",
       "studentFallbackNumbered": "الطالب #{{number}}",
       "categories": {
@@ -2630,7 +2630,7 @@
         "summative": "تلخيصي"
       },
       "stats": {
-        "mean": "يقصد",
+        "mean": "المتوسط",
         "median": "متوسط",
         "stdDev": "التطوير القياسي",
         "min": "دقيقة",
@@ -2653,8 +2653,8 @@
         "letter": "خطاب",
         "status": "حالة"
       },
-      "pass": "يمر",
-      "fail": "يفشل",
+      "pass": "ناجح",
+      "fail": "راسب",
       "allFinalized": "تم الانتهاء من جميع الدرجات بالفعل!",
       "noneToFinalize": "لم يسجل أي طالب واجبات للانتهاء منها.",
       "irreversibleTitle": "لا يمكن التراجع عن هذا الإجراء",
@@ -2664,7 +2664,7 @@
       "completeTitle": "الانتهاء من الدرجات",
       "completeDescription": "تم الانتهاء بنجاح من درجة (درجات) {{value}}. هذه الدرجات مقفلة الآن.",
       "errorCount": "{{value}} لا يمكن الانتهاء من الدرجة (الدرجات).",
-      "continue": "يكمل",
+      "continue": "متابعة",
       "back": "خلف",
       "finalizeGrades": "وضع اللمسات الأخيرة على {{value}} الدرجات",
       "done": "منتهي"
@@ -2692,14 +2692,14 @@
       "totalWeight": "المجموع: {{total}}%",
       "categoryNamePlaceholder": "اسم الفئة",
       "dropLowestTitle": "إسقاط أدنى درجات N",
-      "drop": "يسقط",
+      "drop": "إسقاط",
       "addCategory": "أضف فئة",
       "createPolicy": "إنشاء سياسة",
       "updatePolicy": "تحديث السياسة"
     },
     "policyList": {
       "title": "سياسات الدرجات",
-      "default": "تقصير",
+      "default": "افتراضي",
       "editPolicy": "تحرير السياسة",
       "gradeScale": "مقياس الصف",
       "categoryWeights": "أوزان الفئة ({{total}}%)",
@@ -2937,7 +2937,7 @@
       "retryGeneration": "إعادة محاولة الجيل",
       "markSubmitted": "تم تقديم مارك",
       "markVerified": "تم التحقق من العلامة",
-      "refresh": "ينعش",
+      "refresh": "تحديث",
       "dismiss": "رفض"
     },
     "validation": {
