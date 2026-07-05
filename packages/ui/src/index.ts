@@ -212,6 +212,7 @@ export { LanguageSwitcher } from './components/LanguageSwitcher'
 export { DateDisplay } from './components/DateDisplay'
 export { BsDatePicker, DateInput } from './components/BsDatePicker'
 export { SchoolDate } from './components/SchoolDate'
+export { Bdi, type BdiProps } from './components/Bdi'
 
 // Portal Primitives
 export { ContentSection, type ContentSectionProps } from './components/ContentSection'

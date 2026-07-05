@@ -17,11 +17,12 @@ export {
 export type { SupportedLanguage, Namespace } from "./config";
 export {
   DEFAULT_LANGUAGE_LOCALES,
+  getLanguageDirection,
   normalizeLocaleCode,
   normalizePlatformLanguage,
   toPlatformLanguage,
 } from "./language";
-export type { LocaleCode } from "./language";
+export type { LanguageDirection, LocaleCode } from "./language";
 
 export { useLocaleEffect } from "./hooks/useLocaleEffect";
 

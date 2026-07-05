@@ -126,7 +126,7 @@ function RowActionMenu({
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 z-20 mt-1 w-40 rounded-lg border overflow-hidden shadow-lg bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary))]">
+          <div className="absolute ef-inset-inline-end-0 z-20 mt-1 w-40 rounded-lg border overflow-hidden shadow-lg bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-primary))]">
             {onView && (
               <button
                 onClick={() => { onView(student); setOpen(false) }}

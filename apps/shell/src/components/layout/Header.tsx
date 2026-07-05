@@ -30,6 +30,7 @@ const LANG_OPTIONS = [
   { code: "en", label: "EN", labelKey: "languageEnglish" },
   { code: "ne", label: "NP", labelKey: "languageNepali" },
   { code: "hi", label: "HI", labelKey: "languageHindi" },
+  { code: "ar", label: "AR", labelKey: "languageArabic" },
 ] as const;
 
 function LanguageToggle() {
@@ -238,7 +239,10 @@ function UserMenu() {
 
   return (
     <Menu as="div" className="relative">
-      <MenuButton className="flex items-center rounded-full hover:ring-[rgb(var(--border-focus)/0.50)] transition-all duration-200 ml-1 flex-shrink-0">
+      <MenuButton
+        aria-label={tNav("myProfile")}
+        className="flex items-center rounded-full hover:ring-[rgb(var(--border-focus)/0.50)] transition-all duration-200 ml-1 flex-shrink-0"
+      >
         <div className="w-8 h-8 rounded-full overflow-hidden">
           <Avatar name={user.name} size="sm" shape="circle" />
         </div>
@@ -253,7 +257,10 @@ function UserMenu() {
         leaveFrom="opacity-100 scale-100 translate-y-0"
         leaveTo="opacity-0 scale-95 translate-y-1"
       >
-        <MenuItems className="absolute right-0 mt-2 w-72 origin-top-right rounded-2xl bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] shadow-xl shadow-ink-500/10 dark:shadow-black/20 z-50 overflow-hidden">
+        <MenuItems
+          data-testid="user-menu-panel"
+          className="absolute right-0 mt-2 w-72 origin-top-right rounded-2xl bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] shadow-xl shadow-ink-500/10 dark:shadow-black/20 z-50 overflow-hidden"
+        >
           {/* User Info */}
           <div className="px-4 py-4 border-b border-[rgb(var(--border-secondary))] bg-[rgb(var(--background-tertiary))]">
             <div className="flex items-center gap-3">

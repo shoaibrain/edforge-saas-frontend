@@ -1,0 +1,2989 @@
+{
+  "tabs": {
+    "overview": "نظرة عامة",
+    "profile": "الملف الشخصي",
+    "enrollment": "التسجيل",
+    "family": "العائلة",
+    "demographics": "التركيبة السكانية"
+  },
+  "error": {
+    "failedToLoad": "فشل تحميل الملف الشخصي",
+    "failedToLoadDescription": "لم نتمكن من تحميل الملف الشخصي لهذا الطالب. يرجى المحاولة مرة أخرى.",
+    "retry": "أعد المحاولة",
+    "noPermission": "ليس لديك إذن لعرض الملف الشخصي لهذا الطالب. قد لا يكون هذا الطالب في الأقسام المخصصة لك."
+  },
+  "status": {
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "graduated": "تخرج",
+    "transferred": "منقول",
+    "withdrawn": "انسحبت",
+    "suspended": "مع وقف التنفيذ",
+    "enrolled": "مسجل",
+    "pending": "في انتظار",
+    "completed": "مكتمل"
+  },
+  "actions": {
+    "editStudent": "تحرير الطالب",
+    "schoolEnrollment": "الالتحاق بالمدرسة",
+    "addToSection": "إضافة إلى القسم",
+    "addGuardian": "إضافة ولي الأمر",
+    "enrollAtSchool": "التسجيل في المدرسة",
+    "newSchoolEnrollment": "الالتحاق بالمدرسة الجديدة",
+    "grantPortalAccess": "منح الوصول إلى البوابة",
+    "editGuardian": "تحرير الجارديان",
+    "edit": "تحرير",
+    "export": "تصدير",
+    "cancel": "إلغاء",
+    "saveChanges": "حفظ التغييرات",
+    "saving": "جارٍ الحفظ...",
+    "adding": "جارٍ الإضافة...",
+    "add": "أضف"
+  },
+  "stats": {
+    "attendance": "الحضور",
+    "classes": "فصول",
+    "termGpa": "المصطلح GPA",
+    "cumGpa": "النُطَف المَنَويّة. GPA"
+  },
+  "sections": {
+    "attendanceTrend": "اتجاه الحضور",
+    "coursePerformance": "أداء الدورة",
+    "currentClasses": "الفصول الحالية",
+    "history": "التاريخ",
+    "personalInfo": "المعلومات الشخصية",
+    "contactInfo": "معلومات الاتصال",
+    "academicInfo": "المعلومات الأكاديمية",
+    "programsAccommodations": "البرامج والإقامة",
+    "medicalInfo": "المعلومات الطبية",
+    "notes": "ملاحظات",
+    "currentEnrollment": "التسجيل الحالي",
+    "enrollmentHistory": "تاريخ الالتحاق",
+    "guardians": "الأوصياء",
+    "emergencyContacts": "اتصالات الطوارئ"
+  },
+  "empty": {
+    "noAttendance": "لم يتم تسجيل بيانات الحضور حتى الآن",
+    "noGrades": "لم يتم تسجيل الدرجات بعد",
+    "gradesWillAppear": "ستظهر الدرجات هنا بمجرد تسجيلها من قبل المعلمين.",
+    "noClasses": "لم يتم جدولة أي دروس",
+    "classesWillAppear": "سوف تظهر الفصول الدراسية هنا بمجرد التسجيل في الأقسام.",
+    "noAcademicData": "لا توجد بيانات أكاديمية حتى الآن",
+    "noDataDescription": "هذا الطالب ليس لديه أقسام الصف أو بيانات الحضور حتى الآن.",
+    "enrollFirst": "قم بتسجيل هذا الطالب أولاً، ثم قم بإضافته إلى أقسام الفصل.",
+    "noEnrollment": "لا توجد سجلات التسجيل",
+    "enrollmentWillAppear": "ستظهر بيانات التسجيل هنا بمجرد تسجيل الطالب في العام الدراسي.",
+    "noGuardians": "لا يوجد أوصياء في الملف",
+    "addGuardianDescription": "أضف أحد الوالدين أو الوصي إلى الملف الشخصي لهذا الطالب.",
+    "noEmergencyContacts": "لا توجد جهات اتصال للطوارئ في الملف",
+    "noSectionsAvailable": "لا يوجد {{label}} متاح للأقسام المخصصة لك"
+  },
+  "performance": {
+    "excellent": "ممتاز",
+    "good": "جيد",
+    "atRisk": "في خطر",
+    "critical": "شديد الأهمية"
+  },
+  "alerts": {
+    "lowAttendance": "الحضور أقل من 90% قد يؤثر على الأداء الأكاديمي. النظر في المتابعة.",
+    "highAttendance": "سجل الحضور المتميز!"
+  },
+  "gradeLegend": {
+    "a": "أ (90+)",
+    "b": "ب (80-89)",
+    "c": "ج (70-79)",
+    "d": "د (60-69)",
+    "f": "واو (<60)"
+  },
+  "tableHeaders": {
+    "number": "#",
+    "class": "فصل",
+    "subject": "موضوع",
+    "teacher": "مدرس",
+    "grade": "درجة",
+    "school": "مدرسة",
+    "academicYear": "العام الدراسي",
+    "entryDate": "تاريخ الدخول",
+    "exitDate": "تاريخ الخروج",
+    "status": "حالة"
+  },
+  "fields": {
+    "dateOfBirth": "تاريخ الميلاد",
+    "gender": "جنس",
+    "ethnicity": "عِرق",
+    "primaryLanguage": "اللغة الأساسية",
+    "homeLanguage": "اللغة الرئيسية",
+    "countryOfBirth": "بلد الميلاد",
+    "email": "بريد إلكتروني",
+    "phone": "هاتف",
+    "altPhone": "بديل. هاتف",
+    "address": "عنوان",
+    "mailingAddress": "العنوان البريدي",
+    "currentGrade": "الصف الحالي",
+    "enrollmentDate": "تاريخ التسجيل",
+    "studentNumber": "رقم الطالب",
+    "stateStudentId": "طالب الدولة ID",
+    "previousSchool": "المدرسة السابقة",
+    "gradeLevel": "مستوى الصف",
+    "occupation": "إشغال",
+    "firstName": "الاسم الأول",
+    "middleName": "الاسم الأوسط",
+    "lastName": "اسم العائلة"
+  },
+  "programs": {
+    "iep": "IEP",
+    "plan504": "خطة 504",
+    "specialPrograms": "برامج خاصة",
+    "accommodations": "أماكن الإقامة"
+  },
+  "medical": {
+    "allergies": "الحساسية",
+    "medications": "الأدوية",
+    "conditions": "شروط",
+    "dietaryRestrictions": "القيود الغذائية",
+    "bloodType": "فصيلة الدم",
+    "physician": "طبيب",
+    "physicianPhone": "هاتف الطبيب",
+    "insurance": "تأمين",
+    "medicalNotes": "ملاحظات طبية"
+  },
+  "gender": {
+    "male": "ذكر",
+    "female": "أنثى",
+    "other": "آخر",
+    "preferNotToSay": "يفضل عدم القول"
+  },
+  "relationships": {
+    "mother": "الأم",
+    "father": "أب",
+    "legalGuardian": "الوصي القانوني",
+    "grandparent": "الجد",
+    "sibling": "أخ أو أخت",
+    "aunt": "عمة",
+    "uncle": "عم",
+    "other": "آخر"
+  },
+  "guardian": {
+    "primary": "أساسي",
+    "portalAccess": "الوصول إلى البوابة",
+    "pickupAuth": "مصادقة الالتقاط",
+    "atEmployer": "في {{employer}}"
+  },
+  "studentProfile": {
+    "tabsAria": "أقسام الملف الشخصي للطالب",
+    "overview": {
+      "attendanceTrendAria": "اتجاه حضور الطلاب",
+      "categoryBreakdown": "انهيار الفئة"
+    },
+    "guardian": {
+      "addTitle": "إضافة ولي الأمر",
+      "addDescription": "قم بإضافة أحد الوالدين أو الوصي إلى الملف الشخصي لـ {{student}}",
+      "unsavedChangesConfirm": "لديك تغييرات غير محفوظة. هل أنت متأكد أنك تريد الإغلاق؟",
+      "unsavedChanges": "لديك تغييرات غير محفوظة",
+      "firstName": "الاسم الأول",
+      "firstNamePlaceholder": "الاسم الأول للوصي",
+      "lastName": "اسم العائلة",
+      "lastNamePlaceholder": "اسم الوصي الأخير",
+      "relationship": "علاقة",
+      "phone": "هاتف",
+      "email": "بريد إلكتروني",
+      "primaryContact": "جهة الاتصال الأساسية",
+      "pickupAuthorized": "بيك اب معتمد",
+      "noGuardian": "لا يوجد ولي أمر في الملف",
+      "guardians": "الأوصياء",
+      "guardianCount": "{{value}} الوصي",
+      "guardianCount_plural": "{{value}} الأوصياء",
+      "cellAria": "{{value}} الوصي (الأوصياء)؛ ابتدائي {{firstName}} {{lastName}}, {{relationship}}",
+      "relationships": {
+        "mother": "الأم",
+        "father": "أب",
+        "guardian": "الوصي القانوني",
+        "grandparent": "الجد",
+        "sibling": "أخ أو أخت",
+        "aunt": "عمة",
+        "uncle": "عم",
+        "other": "آخر"
+      },
+      "badges": {
+        "primary": "أساسي",
+        "portal": "منفذ",
+        "pickup": "يلتقط"
+      }
+    },
+    "section": {
+      "addDescription": "أضف {{student}} إلى قسم الفصل الدراسي",
+      "activeEnrollmentRequired": "يجب أن يكون لدى الطالب تسجيل نشط قبل إضافته إلى الأقسام. الرجاء تسجيل الطالب أولا",
+      "selectRequired": "الرجاء تحديد القسم",
+      "alreadyRostered": "تم إدراج الطالب بالفعل في هذا القسم",
+      "addFailed": "فشلت إضافة الطالب إلى القسم",
+      "grade": "الصف {{grade}}",
+      "currentYear": "العام الحالي",
+      "section": "قسم",
+      "selectPlaceholder": "حدد قسم...",
+      "noSectionsFound": "لم يتم العثور على أقسام. قم بإنشاء أقسام في الجدولة أولاً."
+    },
+    "demographics": {
+      "title": "Ed-Fi التركيبة السكانية",
+      "description": "IEMIS الحقول المحاذاة المستخدمة لتقارير Flash I / II. يتم تدقيق التعديلات.",
+      "edit": "تحرير",
+      "editTitle": "تحرير التركيبة السكانية",
+      "editDescription": "Ed-Fi الحقول الواصفة لـ {{student}}. يتم تدقيق التغييرات.",
+      "thisStudent": "هذا الطالب",
+      "identity": "هوية",
+      "sex": "الجنس",
+      "primaryLanguage": "اللغة الأساسية",
+      "motherTongue": "اللغة الأم",
+      "ethnicity": "عِرق",
+      "disabilities": "الإعاقات",
+      "flags": "أعلام",
+      "transferredIn": "منقول في؟",
+      "belowPovertyLine": "تحت خط الفقر؟",
+      "scholarshipCategory": "فئة المنح الدراسية",
+      "notSpecified": "غير محدد",
+      "notSpecifiedOption": "— غير محدد —",
+      "derivedConfirm": "مشتق - انقر فوق \"تحرير\" للتأكيد",
+      "noDisabilities": "لم يتم تسجيل أي إعاقات",
+      "noDisabilitiesPeriod": "لم يتم تسجيل أي إعاقات.",
+      "ethnicityDescriptorUri": "URI واصف العرق",
+      "ethnicityHelper": "URI نص حر لـ V1 (يأتي كتالوج العرق في Sprint 6).",
+      "format": "شكل",
+      "addDisability": "إضافة الإعاقة",
+      "disability": "الإعاقة",
+      "selectDisability": "— اختر الإعاقة —",
+      "disabilityNotesPlaceholder": "الملاحظات (اختياري - تظل خاصة، ويتم تجريدها قبل إرسال التدقيق)",
+      "removeDisability": "إزالة الإعاقة",
+      "transferredFromAnotherSchool": "منقول من مدرسة اخرى",
+      "scholarshipPlaceholder": "على سبيل المثال داليت، جاناجاتي، ..."
+    },
+    "schedule": {
+      "attendanceSummary": "ملخص الحضور",
+      "rate": "معدل",
+      "totalDays": "إجمالي الأيام",
+      "class": "فصل",
+      "subject": "موضوع",
+      "removeConfirm": "إزالة {{student}} من {{section}}؟ سيؤدي هذا إلى إلغاء ربط الطالب بهذا القسم.",
+      "removeFromSection": "إزالة من القسم",
+      "credits": "الاعتمادات",
+      "noScheduleData": "لا توجد بيانات الجدول الزمني",
+      "addSectionsHint": "أضف هذا الطالب إلى أقسام الفصل الدراسي لبدء تتبع الحضور والدرجات.",
+      "enrollSectionsHint": "ستظهر هنا بيانات الفصول والحضور بمجرد تسجيل الطالب في الأقسام.",
+      "attendanceHistory": "تاريخ الحضور",
+      "viewGrades": "عرض الدرجات"
+    }
+  },
+  "studentsModule": {
+    "insight": {
+      "enrolledAcrossGrades": "{{students}} الطلاب المسجلون عبر الصفوف {{grades}}",
+      "attendanceToday": "{{rate}}% الحضور اليوم",
+      "noAttendanceData": "لا توجد بيانات الحضور",
+      "atRiskStudents": "{{value}} الطالب المعرض للخطر",
+      "atRiskStudents_plural": "{{value}} الطلاب المعرضون للخطر",
+      "noAtRiskStudents": "لا يوجد طلاب معرضون للخطر"
+    },
+    "empty": {
+      "noStudentsFound": "لم يتم العثور على أي طلاب",
+      "adjustFilters": "حاول تعديل عوامل التصفية أو مصطلح البحث"
+    },
+    "noSchool": {
+      "title": "اختر مدرسة",
+      "description": "اختر مدرسة من الشريط الجانبي لعرض دليل الطلاب."
+    },
+    "error": {
+      "title": "فشل في تحميل الطلاب",
+      "description": "حدث خطأ ما أثناء تحميل دليل الطالب."
+    },
+    "bulk": {
+      "message": "رسالة",
+      "moveSection": "نقل القسم",
+      "archive": "أرشيف",
+      "requiresAdmin": "يتطلب دور المسؤول"
+    },
+    "filters": {
+      "modes": {
+        "all": "الجميع",
+        "active": "نشط",
+        "atRisk": "في خطر",
+        "pending": "في انتظار"
+      },
+      "or": "أو",
+      "searchPlaceholder": "البحث بالاسم أو الطالب ID...",
+      "gradeAria": "درجة",
+      "allGrades": "جميع الدرجات",
+      "statusAria": "حالة",
+      "allStatus": "كل الحالة",
+      "clear": "واضح"
+    },
+    "actions": {
+      "importIemis": "استيراد IEMIS",
+      "importIemisAria": "استيراد من IEMIS",
+      "governmentReports": "الحكومة. التقارير",
+      "governmentReportsAria": "التقارير الحكومية",
+      "enrollStudent": "تسجيل الطالب",
+      "enrollStudentAria": "تسجيل الطالب",
+      "exportCsvAria": "تصدير الطلاب كـ CSV"
+    },
+    "widgets": {
+      "enrollmentLoadFailed": "غير قادر على تحميل بيانات التسجيل",
+      "atRiskLoadFailed": "غير قادر على تحميل البيانات المعرضة للخطر",
+      "attendanceLoadFailed": "غير قادر على تحميل بيانات الحضور",
+      "gradeLoadFailed": "غير قادر على تحميل بيانات التقدير"
+    },
+    "stats": {
+      "totalEnrolled": "إجمالي المسجلين",
+      "recentEnrollments": "+{{value}} الأخيرة",
+      "acrossGrades": "عبر {{value}} الدرجات",
+      "thisAcademicYear": "هذا العام الدراسي",
+      "atRiskStudents": "الطلاب المعرضون للخطر",
+      "criticalCount": "{{value}} حرجة",
+      "riskBreakdown": "{{critical}} حاسم · {{warning}} تحذير",
+      "belowThreshold": "تحت عتبة 90٪",
+      "todayAttendance": "الحضور اليوم",
+      "partialData": "بيانات جزئية",
+      "attendanceBreakdown": "{{present}} حاضر · {{absent}} غائب · {{late}} متأخر",
+      "today": "اليوم",
+      "gradeLevels": "مستويات الصف",
+      "coveredThisYear": "غطت هذا العام"
+    },
+    "withdraw": {
+      "title": "انسحاب الطالب",
+      "description": "هل أنت متأكد أنك تريد سحب {{student}}؟ يمكن إلغاء هذا الإجراء من قبل مسؤول المدرسة.",
+      "confirm": "ينسحب"
+    },
+    "profiles": {
+      "title": "الملفات الشخصية للطلاب",
+      "description": "الملفات الشخصية والسجلات التفصيلية للطلاب - ليتم ملؤها بالمحتوى المُرحّل من الوحدة المتراصة."
+    },
+    "quickProfile": {
+      "close": "يغلق",
+      "atRiskBanner": "المعرضون للخطر · {{rate}}% الحضور (30 يومًا)",
+      "grade": "درجة",
+      "gpa": "GPA",
+      "attendance": "الحضور",
+      "enrollment": "التسجيل",
+      "gradeLevel": "مستوى الصف",
+      "enrolled": "مسجل",
+      "academicYear": "العام الدراسي",
+      "gradeValue": "الصف {{grade}}",
+      "privacyNote": "تتوفر المعلومات السكانية ومعلومات الاتصال وتفاصيل الوصي على صفحة الملف الشخصي الكاملة.",
+      "viewFullProfile": "عرض الملف الشخصي الكامل",
+      "viewFullProfileAria": "مشاهدة الملف الشخصي الكامل لـ{{student}}",
+      "bsPrefix": "BS {{date}}"
+    },
+    "csvImport": {
+      "title": "استيراد الطلاب",
+      "subtitle": {
+        "upload": "قم بتحميل ملف CSV لاستيراد الطلاب بشكل مجمّع",
+        "preview": "{{valid}} صالح، {{invalid}} به أخطاء",
+        "importing": "استيراد الطلاب...",
+        "results": "اكتمل الاستيراد"
+      },
+      "actions": {
+        "close": "إغلاق مربع حوار الاستيراد",
+        "download": "تحميل",
+        "remove": "يزيل",
+        "uploadDifferent": "تحميل ملف مختلف",
+        "goToPending": "اذهب إلى معلق",
+        "cancel": "إلغاء",
+        "importAsPending": "الاستيراد في انتظار المراجعة ({{count}})"
+      },
+      "dropzone": {
+        "title": "قم بسحب وإسقاط ملف CSV",
+        "or": "أو",
+        "browse": "انقر للتصفح"
+      },
+      "template": {
+        "title": "CSV القالب",
+        "description": "تحميل مع الأعمدة المطلوبة"
+      },
+      "columns": {
+        "required": "مطلوب",
+        "optional": "خياري"
+      },
+      "errors": {
+        "unsupportedFile": "يتم دعم ملفات ‎.csv فقط.",
+        "fileTooLarge": "يتجاوز حجم الملف حد 2 ميجابايت ({{size}}MB). يرجى تقليل الملف.",
+        "rowLimit": "الحد الأقصى {{max}} من الطلاب لكل عملية استيراد. يحتوي ملفك على صفوف {{rows}}. يرجى تقسيمها إلى ملفات أصغر."
+      },
+      "rowErrors": {
+        "missingFirstName": "الاسم الأول مفقود",
+        "missingLastName": "الاسم الأخير مفقود",
+        "missingBirthDate": "تاريخ الميلاد مفقود",
+        "missingGender": "جنس مفقود",
+        "missingGradeLevel": "مستوى الصف المفقود"
+      },
+      "preview": {
+        "rows": "{{value}} صف",
+        "rows_plural": "{{value}} الصفوف",
+        "invalidRows": "{{value}} الصف الذي يحتوي على أخطاء (سيتم تخطيه)",
+        "invalidRows_plural": "{{value}} الصفوف التي بها أخطاء (سيتم تخطيها)",
+        "rowError": "الصف {{row}}: {{errors}}",
+        "andMore": "...و {{value}} أكثر",
+        "andMore_plural": "...و {{value}} أكثر",
+        "status": "حالة",
+        "error": "خطأ",
+        "valid": "صالح"
+      },
+      "importing": {
+        "title": "جارٍ استيراد {{value}} طالب...",
+        "title_plural": "جارٍ استيراد طلاب {{value}}...",
+        "keepOpen": "من فضلك لا تغلق هذه النافذة."
+      },
+      "results": {
+        "imported": "مستورد",
+        "skipped": "تم تخطيه",
+        "errors": "أخطاء",
+        "pendingNoticeStart": "{{value}} الطالب مستورد كـ",
+        "pendingNoticeStart_plural": "{{value}} الطلاب المستوردة ك",
+        "pendingNoticeEnd": ". تفضل بزيارة علامة التبويب \"في انتظار المراجعة\" لمراجعتها وتسجيلها.",
+        "duplicatesTitle": "تم العثور على تطابقات مكررة",
+        "duplicateRow": "الصف {{row}}: مطابق {{matches}} ({{confidence}} الثقة)",
+        "unknownConfidence": "غير معروف",
+        "errorsTitle": "أخطاء الاستيراد",
+        "errorRow": "الصف {{row}}: {{field}} - {{message}}"
+      },
+      "footer": {
+        "constraints": ".csv فقط · الحد الأقصى {{maxRows}} الصفوف · الحد الأقصى 2 ميجابايت",
+        "pendingStart": "الواردات خلق",
+        "pendingEnd": "التسجيلات"
+      }
+    },
+    "signals": {
+      "showAtRisk": "عرض للخطر"
+    },
+    "selection": {
+      "peekAttendance": "{{rate}}% الحضور"
+    }
+  },
+  "privacy": {
+    "showSensitive": "إظهار التفاصيل الحساسة",
+    "hideSensitive": "إخفاء التفاصيل الحساسة"
+  },
+  "enrollment": {
+    "studentIsEnrolled": "تم تسجيل الطالب",
+    "nextStepAddSection": "الخطوة التالية: أضف هذا الطالب إلى أقسام الفصل الدراسي لتمكين الحضور ووضع الدرجات.",
+    "noActiveEnrollment": "لا يوجد تسجيل نشط في الملف للعام الدراسي الحالي."
+  },
+  "yesNo": {
+    "yes": "نعم",
+    "no": "لا"
+  },
+  "gradeLabel": "الصف {{level}}",
+  "ageLabel": "{{age}} سنة",
+  "dataTable": {
+    "errorTitle": "فشل تحميل البيانات",
+    "errorDescription": "حدث خطأ غير متوقع.",
+    "retry": "أعد المحاولة",
+    "clearSearch": "مسح البحث",
+    "clearFilters": "مسح المرشحات",
+    "clearActiveFilters": "واضح ({{count}})",
+    "clearSelection": "مسح التحديد",
+    "selectedRows": "{{count}} مختارة",
+    "selectedRows_plural": "{{count}} مختارة",
+    "paginationShowing": "عرض {{start}}-{{end}} من {{total}} النتائج",
+    "rowsPerPage": "{{size}} / صفحة",
+    "previousPage": "السابق",
+    "nextPage": "التالي",
+    "loadingPage": "جار التحميل...",
+    "rowDensity": "كثافة الصف",
+    "comfortableDensity": "مريح",
+    "comfortableDensityTitle": "صفوف مريحة",
+    "compactDensity": "مدمج",
+    "compactDensityTitle": "صفوف مدمجة",
+    "viewOptions": "عرض",
+    "toggleColumns": "تبديل الأعمدة",
+    "export": "تصدير",
+    "exportFormats": {
+      "csv": "تصدير كـ CSV",
+      "xlsx": "تصدير بتنسيق XLSX"
+    },
+    "xlsxUnavailable": "سفن تصدير XLSX في المتابعة",
+    "filterAriaLabel": "{{title}} مرشح",
+    "clearFilter": "مسح الفلتر",
+    "moreFilters": "المزيد من المرشحات",
+    "selection": {
+      "aria": "إجراءات الاختيار",
+      "selected": "{{count}} مختارة",
+      "selectAll": "حدد الكل {{count}}",
+      "clear": "مسح التحديد"
+    }
+  },
+  "attendance": {
+    "title": "الحضور",
+    "subtitle": "تسجيل ومراجعة الحضور حسب قسم الفصل · {{year}}",
+    "academicYearFallback": "العام الدراسي",
+    "lastUpdated": "آخر تحديث: {{time}}",
+    "tabs": {
+      "overview": "نظرة عامة",
+      "dailyEntry": "الدخول اليومي",
+      "iemisExport": "تصدير IEMiS",
+      "aria": "علامات الحضور"
+    },
+    "status": {
+      "present": {
+        "label": "الحاضر",
+        "short": "P"
+      },
+      "absent": {
+        "label": "غائب",
+        "short": "A"
+      },
+      "late": {
+        "label": "متأخر",
+        "short": "T"
+      },
+      "excused": {
+        "label": "معذرة",
+        "short": "E"
+      },
+      "remote": {
+        "label": "بعيد",
+        "short": "R"
+      },
+      "half_day": {
+        "label": "نصف يوم",
+        "short": "H"
+      },
+      "early_departure": {
+        "label": "قسم مبكر.",
+        "short": "ED"
+      }
+    },
+    "dateSelector": {
+      "previousDay": "اليوم السابق",
+      "nextDay": "في اليوم التالي",
+      "selectDate": "اختر التاريخ",
+      "today": "اليوم",
+      "bsSuffix": "BS"
+    },
+    "sectionSelector": {
+      "empty": "لم يتم تعيين أي أقسام. اتصل بالمسؤول.",
+      "placeholder": "حدد قسم...",
+      "fallback": "قسم",
+      "completedPrefix": "مسجلة"
+    },
+    "calendar": {
+      "nonInstructionalTitle": "يوم غير تعليمي",
+      "nonInstructionalFallback": "هذا هو يوم {{eventType}}.",
+      "cannotSubmit": "{{description}} لا يمكن تقديم الحضور لهذا التاريخ."
+    },
+    "policy": {
+      "modeLabel": "وضع الحضور:",
+      "dailyPresence": "التواجد اليومي",
+      "perSection": "لكل قسم",
+      "dailyPresenceDescription": "يعتبر الطالب الحاضر في أي قسم حاضرًا لهذا اليوم؛ الأقسام اللاحقة تظهرهم مقفلين.",
+      "perSectionDescription": "يتم تسجيل كل قسم بشكل مستقل.",
+      "dismiss": "فهمتها",
+      "dismissAria": "حسنًا، قم برفض إشعار وضع الحضور"
+    },
+    "notRecorded": {
+      "past": "ولم يتم تسجيل الحضور لهذا اليوم. استخدم التحرير على الطالب لإعادة تعبئة السجل.",
+      "current": "ولم يتم تسجيل الحضور لهذا اليوم بعد. استخدم الكل حاضر، ثم قم بوضع علامة على الاستثناءات، أو قم بوضع علامة على الطلاب بشكل فردي ثم قم بالحفظ."
+    },
+    "empty": {
+      "selectSectionTitle": "حدد قسم الفصل",
+      "selectSectionDescription": "اختر قسمًا من القائمة المنسدلة أعلاه لتسجيل الحضور. استخدم الإجراءات السريعة لوضع علامة على جميع الحاضرين، ثم قم بضبط الطلاب الفرديين.",
+      "noStudentsTitle": "لا يوجد طلاب في هذا القسم",
+      "noStudentsDescription": "قم بتسجيل الطلاب في هذا القسم للبدء في تسجيل الحضور.",
+      "noStudentsEnrolledTitle": "لم يتم تسجيل أي طلاب",
+      "noStudentsEnrolledDescription": "هذا القسم لا يوجد به أي طلاب مسجلين حتى الآن. أضف طلابًا من علامة التبويب \"الأشخاص\".",
+      "noSearchMatches": "لا يوجد طلاب يطابقون بحثك.",
+      "noDataForDate": "لا توجد بيانات الحضور لهذا التاريخ",
+      "notRecordedForDate": "لم يتم تسجيل الحضور لهذا التاريخ"
+    },
+    "grid": {
+      "ariaLabel": "شبكة دخول الحضور",
+      "rowAria": "الحضور لـ {{studentName}}",
+      "statusAria": "حالة الحضور",
+      "keyboardShortcuts": "اختصارات لوحة المفاتيح:",
+      "navigate": "انتقل",
+      "name": "اسم",
+      "status": "حالة",
+      "allMarked": "تم وضع علامة على كل {{total}} - تم القيام به بشكل جيد",
+      "markedCount": "{{marked}} / {{total}} تم وضع علامة عليها",
+      "coverageTitle": "التغطية = الطلاب المسجلين ÷ المسجلين (كم من استدعاء الأسماء تم إجراؤه). وهذا يختلف عن معدل الحضور.",
+      "rateTitle": "معدل الحضور = الطلاب الحاضرين ÷ المسجلين.",
+      "coverage": "التغطية",
+      "rate": "معدل",
+      "ofTotal": "{{recorded}} من {{total}}"
+    },
+    "toolbar": {
+      "search": "بحث عن الطلاب...",
+      "searchAria": "البحث عن الطلاب بالاسم أو الرقم",
+      "clearSearch": "مسح البحث",
+      "filterAria": "تصفية الطلاب",
+      "filters": {
+        "all": "الجميع",
+        "unmarked": "غير مميزة",
+        "absent": "غائب",
+        "flagged": "تم وضع علامة عليها",
+        "locked": "مغلق"
+      },
+      "allPresent": "كل الحاضر",
+      "allAbsent": "الكل غائب",
+      "markPresent": "ضع علامة {{value}} الحاضر",
+      "markAbsent": "علامة {{value}} غائبة",
+      "clear": "واضح"
+    },
+    "actions": {
+      "saveAttendance": "حفظ الحضور",
+      "save": "يحفظ",
+      "edit": "تحرير",
+      "editFor": "تحرير الحضور لـ {{studentName}}",
+      "cancelEdit": "إلغاء التعديل",
+      "markStatus": "علامة {{status}}",
+      "mark": "علامة",
+      "addNoteReason": "أضف ملاحظة أو سببًا",
+      "editNoteReason": "تعديل الملاحظة أو السبب",
+      "addNoteReasonTitle": "أضف ملاحظة/سبب",
+      "editNoteReasonTitle": "تعديل الملاحظة/السبب"
+    },
+    "announcements": {
+      "allPresent": "تم وضع علامة على جميع الطلاب بالحاضر",
+      "allAbsent": "تم وضع علامة على جميع الطلاب غائبين",
+      "allCleared": "تم مسح كافة الإدخالات",
+      "saved": "تم حفظ الحضور للطالب {{count}}",
+      "saved_plural": "تم حفظ الحضور لطلاب {{count}}"
+    },
+    "saveStatus": {
+      "saved": "أنقذ",
+      "saving": "جارٍ الحفظ...",
+      "savingEllipsis": "توفير…",
+      "offline": "غير متصل",
+      "offlineLocal": "غير متصل - يتم حفظ التغييرات محليًا",
+      "error": "فشل الحفظ",
+      "errorRetry": "فشل الحفظ — ستتم إعادة المحاولة"
+    },
+    "row": {
+      "lockedFallback": "تم تسجيل التواجد اليومي بالفعل",
+      "reason": "سبب",
+      "reasonAria": "سبب الغياب",
+      "selectReason": "اختر السبب…",
+      "note": "ملحوظة",
+      "noteAria": "ملاحظة الحضور",
+      "notePlaceholder": "إضافة ملاحظة..."
+    },
+    "summary": {
+      "recorded": "{{recorded}} من {{total}} مسجلة",
+      "notTakenYet": "لم يؤخذ بعد",
+      "schoolAverage": "المتوسط ​​المدرسي",
+      "sevenDay": "7 أيام: {{value}}%",
+      "thirtyDay": "30 يومًا: {{value}}%",
+      "coverage": "التغطية"
+    },
+    "dashboard": {
+      "ofTotalRecorded": "{{recorded}} من {{total}} مسجلة",
+      "ofTotal": "{{count}} من {{total}}",
+      "schoolAverage": "المتوسط ​​المدرسي",
+      "sevenDayAvg": "متوسط ​​7 أيام:",
+      "thirtyDayAvg": "متوسط ​​30 يومًا:",
+      "coverage": "التغطية",
+      "coverageTitle": "التغطية = الطلاب المسجلين ÷ المسجلين (كم من استدعاء الأسماء اليوم). وهذا يختلف عن معدل الحضور، وهو عدد الطلاب المسجلين الذين كانوا حاضرين.",
+      "absenceBreakdownTitle": "تفاصيل الغياب اليوم",
+      "noAbsencesYet": "لم يتم تسجيل أي غيابات حتى الآن",
+      "absences": "{{count}} الغياب",
+      "absences_plural": "{{count}} الغياب",
+      "absenceCategories": {
+        "unexcused": "بدون عذر",
+        "excused": "معذرة",
+        "late": "متأخر / متأخر",
+        "halfDay": "نصف يوم",
+        "remote": "بعيد"
+      },
+      "dowTitle": "نمط يوم من الأسبوع",
+      "dowSubtitle": "متوسط ​​معدل الحضور حسب أيام الأسبوع",
+      "dowInsight": "{{minDay}} لديه أدنى متوسط ​​حضور ({{minRate}}%). {{maxDay}} هو الأعلى.",
+      "daysShort": {
+        "Sunday": "شمس",
+        "Monday": "الاثنين",
+        "Tuesday": "الثلاثاء",
+        "Wednesday": "تزوج",
+        "Thursday": "الخميس",
+        "Friday": "الجمعة",
+        "Saturday": "قعد"
+      },
+      "trendTitle": "معدل الحضور لمدة 30 يومًا",
+      "trendEmptySubtitle": "لا توجد بيانات الاتجاه المتاحة",
+      "trendEmpty": "لا توجد بيانات الاتجاه المتاحة للفترة المحددة.",
+      "trendSubtitle": "اتجاه معدل الحضور المسجل اليومي — {{start}} إلى {{end}}",
+      "sectionCompletionTitle": "استكمال القسم",
+      "sectionCompletionSubtitle": "حالة التسجيل اليوم لكل قسم",
+      "section": "قسم",
+      "enrolledAbbr": "إنر.",
+      "recordedAbbr": "تفصيل.",
+      "completionStatus": "حالة",
+      "completion": {
+        "complete": "مكتمل",
+        "partial": "جزئي",
+        "notStarted": "لم يبدأ"
+      },
+      "periodAveragesTitle": "متوسطات الفترة",
+      "periodAveragesSubtitle": "معدلات الحضور عبر فترات زمنية مختلفة",
+      "periods": {
+        "sevenDay": "7-يوم",
+        "thirtyDay": "30 يومًا",
+        "yearly": "سنوي"
+      },
+      "trendDirection": "يتجه الحضور {{direction}} خلال آخر 7 أيام مقابل خط الأساس لمدة 30 يومًا.",
+      "directions": {
+        "upward": "إلى أعلى",
+        "downward": "إلى الأسفل"
+      },
+      "alertsTitle": "تنبيهات الحضور",
+      "alertsSubtitle": "الطلاب أقل من {{threshold}}% معدل الحضور · مرتبة حسب الخطورة",
+      "below": "أقل",
+      "thresholdAria": "عتبة تنبيه الحضور المنخفض",
+      "showingAtRisk": "عرض {{shown}} من {{total}} الطالب المعرض للخطر",
+      "showingAtRisk_plural": "عرض {{shown}} من {{total}} الطلاب المعرضين للخطر",
+      "noBelowThreshold": "لا يوجد طلاب أقل من حد الحضور",
+      "columns": {
+        "student": "طالب",
+        "rate": "معدل",
+        "absent": "غائب",
+        "total": "المجموع",
+        "trend": "اتجاه"
+      },
+      "trends": {
+        "improving": "↑ تحسين",
+        "declining": "↓ انخفاض",
+        "stable": "- مستقر"
+      },
+      "scopeSections": "عرض بيانات أقسامك (طلاب {{value}})",
+      "loadFailed": "فشل تحميل نظرة عامة على الحضور",
+      "loadFailedDescription": "يرجى محاولة تحديث الصفحة. إذا استمرت المشكلة، فاتصل بالدعم.",
+      "commandBar": {
+        "policyTooltip": "{{attending}} يتم احتساب الحضور · {{excused}}",
+        "excusedAbsent": "يعتبر العذر غائبًا عن السعر",
+        "excusedPresent": "التهم المعذرة كحاضر للسعر",
+        "atRiskShort": "المعرضون للخطر <{{pct}}%",
+        "scopeTooltip": "يتم تحديد نطاق بيانات الحضور لدورك",
+        "scopeSchool": "على مستوى المدرسة",
+        "scopeMine": "أقسامي",
+        "export": "تصدير"
+      },
+      "reframe": {
+        "headline": "إن \"المعدل المدرسي\" {{pct}}% هو نتيجة لتغطية التسجيل - وليس غيابًا حقيقيًا.",
+        "body": "يتم إدخال الحضور لجزء صغير فقط من أيام القسم، وبالتالي ينهار المتوسط ​​المختلط. من بين الجلسات المسجلة فعليًا، يبلغ معدل الحضور ~{{rate}}%. تغطية المسار والمعدل المسجل كإشارات منفصلة.",
+        "record": "تسجيل مقطع",
+        "ack": "فهمتها",
+        "ackAria": "قبول ورفض هذا الإشعار"
+      },
+      "sections": {
+        "title": "أقسام للتسجيل",
+        "complete": "{{done}}/{{total}} كامل",
+        "coveredToday": "غطت اليوم",
+        "pickToRecord": "{{parts}} - اختر واحدًا للتسجيل",
+        "allRecorded": "جميع الأقسام المسجلة اليوم",
+        "notStartedCount": "{{count}} لم يبدأ",
+        "inProgressCount": "{{count}} قيد التقدم",
+        "trackerAria": "تعقب التغطية: {{full}} مسجل بالكامل، {{partial}} جزئي، {{none}} لم يبدأ",
+        "legendFull": "{{count}} بالكامل",
+        "legendPartial": "{{count}} جزئي",
+        "legendNone": "{{count}} لم يبدأ",
+        "studentsCovered": "الطلاب المغطاة",
+        "rateAmongRecorded": "معدل بين المسجلة",
+        "statusRecorded": "مسجلة بالكامل",
+        "statusPartial": "جزئي {{pct}}%",
+        "statusNotRecorded": "لم يتم تسجيلها",
+        "enrolledCount": "{{count}} الطلاب",
+        "recordedBadge": "مسجلة",
+        "viewEdit": "عرض / تحرير",
+        "partialCounts": "تم وضع علامة على {{done}}/{{total}} · {{left}} على اليسار",
+        "partialBadge": "{{pct}}% تم",
+        "continue": "يكمل",
+        "notStartedBadge": "لم يبدأ",
+        "record": "سِجِلّ",
+        "emptyScope": "لا توجد أقسام في نطاقك لهذا اليوم."
+      },
+      "insight": {
+        "chronicLabel": "الغياب المزمن",
+        "chronicSub": "أقل من 70% · تحرك الآن",
+        "atRiskLabel": "في خطر",
+        "atRiskSub": "نسبة الحضور 70-90%",
+        "decliningLabel": "انخفاض",
+        "decliningSub": "تم وضع علامة عليها وتتجه للأسفل",
+        "lowestLabel": "أدنى فوج",
+        "lowestSub": "الصف {{grade}}"
+      },
+      "atRisk": {
+        "title": "المعرضين للخطر والغياب المزمن",
+        "subtitle": "تحت عتبة 90% · الأسوأ أولاً، مع اتجاه لمدة 30 يوماً",
+        "export": "تصدير",
+        "filterAll": "الجميع",
+        "filterChronic": "مزمن",
+        "filterAtRisk": "في خطر",
+        "filterAria": "تصفية الطلاب المعرضين للخطر حسب الفرقة",
+        "empty": "لا يوجد طلاب في هذه الفرقة."
+      },
+      "drawer": {
+        "section": "قسم",
+        "subRecorded": "{{date}} · {{count}} مسجل",
+        "subPartial": "{{date}} · {{done}}/{{total}} تم وضع علامة عليها حتى الآن",
+        "subNew": "{{date}} · {{count}} الطلاب",
+        "editNote": "تحرير سجل محفوظ - يتم تسجيل التغييرات باسمك ووقتك."
+      },
+      "gradeLevel": "مستوى الصف",
+      "dowInsightShort": "{{day}} هو أدنى أيام الأسبوع",
+      "gradeCompareTitle": "مقارنة على مستوى الصف",
+      "gradeCompareSubtitle": "المعدل المسجل حسب مستوى الصف الدراسي · الأسوأ أولاً",
+      "gradeCompareEmpty": "لا توجد بيانات على مستوى الصف حتى الآن.",
+      "gradeLabel": "الصف {{grade}}",
+      "trendRateNote": "ومن بين الأقسام التي سجلت · معدل وليس تغطية",
+      "trendAvgTarget": "المتوسط ​​{{avg}}% · الهدف {{target}}%",
+      "trendAria": "معدل الحضور المسجل لمدة 30 يومًا، بمتوسط ​​{{avg}} في المائة",
+      "updating": "جارٍ التحديث…",
+      "staleWarning": "لا يمكن التحديث للفقرة {{date}} — إظهار آخر البيانات المحملة.",
+      "retry": "أعد المحاولة"
+    },
+    "modal": {
+      "trendTitle": "الاتجاه خلال النافذة (الأخير مقابل السابق)",
+      "trends": {
+        "improving": "تحسين",
+        "declining": "انخفاض",
+        "stable": "مستقر"
+      },
+      "last30Days": "آخر 30 يومًا",
+      "noRecord": "لا يوجد سجل",
+      "total": "المجموع",
+      "rate": "معدل",
+      "recentRecords": "السجلات الأخيرة",
+      "noRecords": "لم يتم العثور على سجلات الحضور.",
+      "date": "تاريخ",
+      "status": "حالة",
+      "notes": "ملاحظات",
+      "close": "يغلق"
+    }
+  },
+  "common": {
+    "actions": "الإجراءات",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "current": "حاضِر",
+    "teacher": "مدرس",
+    "primaryInstructor": "مدرس ابتدائي",
+    "student": "طالب",
+    "students": "{{count}} طالب",
+    "students_plural": "{{count}} الطلاب",
+    "course": "دورة",
+    "courses": "{{count}} بالطبع",
+    "courses_plural": "{{count}} الدورات",
+    "section": "قسم",
+    "sections": "{{count}} القسم",
+    "sections_plural": "{{count}} الأقسام",
+    "staff": "{{count}} الموظفين",
+    "staff_plural": "{{count}} الموظفين",
+    "more": "+{{count}} المزيد",
+    "comingSoon": "{{action}} لـ {{countLabel}} – قريبًا"
+  },
+  "enums": {
+    "employmentStatus": {
+      "active": "نشط",
+      "on_leave": "في إجازة",
+      "suspended": "مع وقف التنفيذ",
+      "terminated": "تم إنهاؤه"
+    },
+    "staffRole": {
+      "teacher": "مدرس",
+      "principal": "رئيسي",
+      "vice_principal": "نائب المدير",
+      "counselor": "مستشار",
+      "admin_staff": "طاقم الإدارة"
+    },
+    "examResult": {
+      "generated": "تم إنشاؤها",
+      "pending": "في انتظار",
+      "none": "—"
+    }
+  },
+  "tables": {
+    "students": {
+      "columns": {
+        "student": "طالب",
+        "grade": "درجة",
+        "attendance": "الحضور",
+        "guardian": "الوصي",
+        "location": "موقع",
+        "status": "حالة",
+        "enrolled": "مسجل"
+      },
+      "actions": {
+        "studentActions": "تصرفات الطلاب",
+        "viewProfile": "عرض الملف الشخصي",
+        "withdraw": "ينسحب",
+        "message": "رسالة",
+        "moveSection": "نقل القسم",
+        "archive": "أرشيف"
+      },
+      "bulk": {
+        "message": "رسالة",
+        "move": "يتحرك",
+        "archive": "أرشيف"
+      },
+      "empty": {
+        "title": "لم يتم العثور على أي طلاب",
+        "description": "ابدأ بإضافة الطالب الأول إلى الدليل.",
+        "action": "إضافة طالب"
+      }
+    },
+    "enrollment": {
+      "columns": {
+        "student": "طالب",
+        "gradeLevel": "مستوى الصف",
+        "status": "حالة",
+        "entryDate": "تاريخ الدخول",
+        "exitDate": "تاريخ الخروج",
+        "type": "يكتب"
+      },
+      "actions": {
+        "withdraw": "ينسحب",
+        "transfer": "تحويل",
+        "markNoShow": "مارك نو شو"
+      },
+      "filters": {
+        "loadingGrades": "جارٍ تحميل الدرجات...",
+        "allGrades": "جميع الدرجات",
+        "allStatus": "كل الحالة",
+        "clear": "واضح"
+      },
+      "types": {
+        "new": "جديد",
+        "re_enrollment": "إعادة التسجيل",
+        "transfer": "تحويل"
+      },
+      "empty": {
+        "title": "لم يتم العثور على التسجيلات",
+        "description": "حاول تعديل عوامل التصفية أو مصطلح البحث."
+      },
+      "search": "بحث عن الطلاب..."
+    },
+    "courses": {
+      "columns": {
+        "code": "شفرة",
+        "courseName": "اسم الدورة",
+        "subject": "موضوع",
+        "grades": "الدرجات",
+        "credits": "الاعتمادات",
+        "type": "يكتب",
+        "duration": "مدة",
+        "status": "حالة"
+      },
+      "actions": {
+        "actions": "الإجراءات",
+        "quickView": "عرض سريع",
+        "viewFullDetails": "عرض التفاصيل الكاملة",
+        "editCourse": "تحرير الدورة",
+        "activate": "فعل",
+        "deactivate": "إلغاء التنشيط"
+      },
+      "warnings": {
+        "missingAcademicSubjectTitle": "لا توجد مجموعة موضوعات أكاديمية دقيقة. تعود بطاقات التقارير إلى منطقة الموضوع هذه - أضف موضوعًا دقيقًا للتسميات الدقيقة.",
+        "missingAcademicSubject": "لا توجد مجموعة موضوعات أكاديمية دقيقة"
+      },
+      "empty": {
+        "title": "لم يتم العثور على دورات",
+        "description": "ابدأ بإضافة الدورة التدريبية الأولى إلى الكتالوج.",
+        "action": "إضافة دورة"
+      }
+    },
+    "gradeLevels": {
+      "stats": {
+        "totalGradeLevels": "إجمالي مستويات الصف",
+        "courseAssignments": "مهام الدورة",
+        "avgCoursesPerGrade": "متوسط الدورات / الصف",
+        "gradesWithCourses": "الدرجات مع الدورات"
+      },
+      "columns": {
+        "gradeLevel": "مستوى الصف",
+        "courseCount": "عدد الدورات",
+        "courses": "الدورات",
+        "students": "طلاب"
+      },
+      "empty": {
+        "title": "لم يتم العثور على مستويات الصف",
+        "description": "ستظهر مستويات التقدير بمجرد تكوين المقررات الدراسية."
+      },
+      "searchPlaceholder": "البحث عن اسم الصف أو رمزه...",
+      "presets": {
+        "all": "الجميع",
+        "withCourses": "مع الدورات",
+        "empty": "فارغ"
+      },
+      "noCurrentYearTitle": "لا يوجد عام دراسي نشط - ستظهر أعداد المسجلين بمجرد تعيين العام الدراسي على أنه حالي."
+    },
+    "sections": {
+      "columns": {
+        "section": "قسم",
+        "course": "دورة",
+        "teacher": "مدرس",
+        "period": "فترة",
+        "room": "غرفة",
+        "enrollment": "التسجيل",
+        "status": "حالة"
+      },
+      "actions": {
+        "sectionActions": "إجراءات القسم",
+        "viewDetails": "عرض التفاصيل",
+        "viewRoster": "عرض القائمة",
+        "editSection": "تحرير القسم",
+        "activate": "فعل",
+        "deactivate": "إلغاء التنشيط",
+        "sendNotification": "إرسال الإخطار",
+        "notify": "يخطر"
+      },
+      "search": "أقسام البحث...",
+      "empty": {
+        "title": "لم يتم العثور على أقسام",
+        "description": "قم بإنشاء قسم الصف الأول الخاص بك للبدء في بناء الجدول الزمني الخاص بك."
+      }
+    },
+    "sectionRoster": {
+      "columns": {
+        "name": "اسم",
+        "studentId": "الطالب ID",
+        "grade": "درجة",
+        "enrolled": "مسجل"
+      },
+      "actions": {
+        "forStudent": "إجراءات لـ {{studentName}}",
+        "removeFromSection": "إزالة من القسم",
+        "addStudents": "إضافة الطلاب"
+      },
+      "capacity": "{{current}}/{{max}} مسجل",
+      "search": "البحث بالاسم أو الطالب ID...",
+      "empty": {
+        "title": "لم يسجل أي طالب حتى الآن",
+        "description": "قم بإضافة الطلاب إلى هذا القسم لإنشاء قائمة الفصل الدراسي الخاصة بك."
+      },
+      "confirmRemove": {
+        "title": "إزالة الطالب",
+        "description": "هل أنت متأكد أنك تريد إزالة {{studentName}} من هذا القسم؟",
+        "fallbackStudent": "هذا الطالب",
+        "confirm": "يزيل"
+      }
+    },
+    "teachers": {
+      "columns": {
+        "name": "اسم",
+        "email": "بريد إلكتروني",
+        "role": "دور",
+        "status": "حالة"
+      },
+      "actions": {
+        "changeRole": "تغيير الدور",
+        "updateStatus": "تحديث الحالة"
+      },
+      "search": "البحث بالاسم أو البريد الإلكتروني...",
+      "empty": {
+        "title": "لم يتم العثور على الموظفين",
+        "description": "حاول تعديل بحثك أو عوامل التصفية."
+      }
+    },
+    "exams": {
+      "columns": {
+        "exam": "امتحان",
+        "type": "يكتب",
+        "term": "شرط",
+        "grades": "الدرجات",
+        "schedule": "جدول",
+        "status": "حالة",
+        "results": "نتائج"
+      },
+      "results": {
+        "generated": "تم إنشاؤها",
+        "pending": "في انتظار"
+      },
+      "search": "بحث عن الامتحانات...",
+      "schedule": {
+        "daysAgo": "{{count}}د منذ",
+        "today": "اليوم",
+        "inDays": "في {{count}}د",
+        "duration": "{{count}}د"
+      },
+      "empty": {
+        "title": "لا توجد اختبارات متطابقة",
+        "description": "اضبط عوامل التصفية أو أنشئ الاختبار الأول لهذا العام الدراسي لبدء جدولته."
+      }
+    },
+    "examScores": {
+      "search": "البحث عن الطلاب بالاسم...",
+      "subject": "موضوع",
+      "student": "طالب",
+      "grade": "درجة",
+      "score": "نتيجة",
+      "scoreForStudent": "النتيجة ل {{studentName}}",
+      "componentScoreForStudent": "{{component}} النتيجة لـ {{studentName}}",
+      "subjectFallback": "موضوع",
+      "maxMarks": "{{marks}} كحد أقصى",
+      "summary": "{{students}} · الحد الأقصى {{max}}",
+      "pass": "تمرير {{marks}}",
+      "emptyNoStudents": "لا يوجد طلاب ليسجلوا",
+      "emptyNoActiveForGrades": "لم يتم تسجيل أي طلاب نشطين في نطاق درجات هذا الاختبار ({{grades}}).",
+      "emptyNoActiveEnrollments": "لا يوجد تسجيلات نشطة لهذا العام الدراسي.",
+      "noSubjectsTitle": "لا توجد مواضيع حتى الآن",
+      "noSubjectsDescription": "أضف موضوعات في علامة تبويب الموضوعات قبل إدخال الدرجات.",
+      "lockedStatus": "يتم قفل إدخال النتيجة أثناء الامتحان {{status}}. لا يمكن إدخال النتائج أو تحريرها إلا في جدول أو قيد التقدم.",
+      "lockedPermission": "ليس لديك إذن لتعديل النتائج.",
+      "invalidRows": "{{count}} الصف غير صالح (0–{{max}})",
+      "invalidRows_plural": "{{count}} الصفوف غير صالحة (0–{{max}})",
+      "noChanges": "لا تغييرات",
+      "pendingChanges": "{{count}} التغيير معلق",
+      "pendingChanges_plural": "{{count}} التغييرات معلقة",
+      "blankCount": "{{count}} فارغة",
+      "blankCount_plural": "{{count}} الفراغات",
+      "saving": "جارٍ الحفظ...",
+      "saveScores": "حفظ النتائج"
+    }
+  },
+  "curriculumModule": {
+    "actions": {
+      "addCourse": "إضافة دورة"
+    },
+    "tabs": {
+      "courses": "الدورات",
+      "gradeLevels": "مستويات الصف",
+      "standards": "المعايير"
+    },
+    "summary": {
+      "coursesAcross": "الدورات عبر",
+      "subjectAreasSuffix": "مجالات الموضوع",
+      "elective": "{{value}} اختياري",
+      "specializedTypesSuffix": "أنواع الدورات المتخصصة (مرتبة الشرف، AP، التسجيل المزدوج)",
+      "basedOnLoaded": "على أساس الدورات المحملة"
+    },
+    "stats": {
+      "totalCourses": "إجمالي الدورات",
+      "activeTag": "{{value}} نشط",
+      "subjectAreas": "مجالات الموضوع",
+      "subjectHint": "الرياضيات · العلوم · ELA · SS · الفنون · Voc.",
+      "electives": "الاختيارية",
+      "specializedTypes": "الأنواع المتخصصة",
+      "specializedTag": "مرتبة الشرف · AP · التسجيل المزدوج."
+    },
+    "filters": {
+      "all": "الجميع",
+      "search": "البحث عن طريق رمز الدورة أو الاسم...",
+      "subjectArea": "منطقة الموضوع",
+      "allSubjects": "جميع المواضيع",
+      "courseType": "نوع الدورة",
+      "allTypes": "جميع الأنواع",
+      "creditType": "نوع الائتمان",
+      "allCreditTypes": "جميع أنواع الائتمان",
+      "gradeLevel": "مستوى الصف",
+      "allGrades": "جميع الدرجات",
+      "clear": "واضح ({{value}})",
+      "exportAria": "تصدير الدورات بتنسيق CSV",
+      "exportCsv": "تصدير CSV"
+    },
+    "form": {
+      "incompleteTitle": "بيانات الدورة غير مكتملة",
+      "incompleteDescription": "لا تحتوي هذه الدورة على موضوع أكاديمي محدد. قم بتعيينه أدناه بحيث تكون بطاقات التقرير وتسمية الموضوع Ed-Fi بشكل صحيح، ثم حفظ.",
+      "identityTitle": "هوية الدورة",
+      "identityDescription": "يتم إنشاء رمز الدورة تلقائيًا من مستويات الموضوع والصف الدراسي. إنه معرف فريد ولا يمكن تغييره بعد الإنشاء.",
+      "courseCode": "رمز الدورة",
+      "courseCodePlaceholder": "على سبيل المثال، الرياضيات-101",
+      "courseCodeCustom": "رمز مخصص - لن يتم التحديث تلقائيًا.",
+      "courseCodeAutoGenerated": "يتم إنشاؤها تلقائيًا من الموضوع + الدرجات - قم بالتعديل للتجاوز.",
+      "duplicateCourseCode": "رمز الدورة التدريبية هذا قيد الاستخدام بالفعل - قم بإعادة إنشائه أو تحريره.",
+      "regenerate": "تجديد",
+      "courseNamePlaceholder": "على سبيل المثال، الجبر الأول",
+      "classificationTitle": "تصنيف",
+      "classificationDescription": "تصنيف هذه الدورة حسب الموضوع والنوع ومستوى الائتمان. يتم اشتقاق مجال موضوع Ed-Fi الواسع تلقائيًا من الموضوع الأكاديمي.",
+      "academicSubject": "الموضوع الأكاديمي",
+      "academicSubjectMissingTooltip": "مفقود - مطلوب لتسميات بطاقة التقرير ومجموعة المواضيع Ed-Fi.",
+      "selectAcademicSubject": "اختر المادة الأكاديمية",
+      "selectCourseType": "اختر نوع الدورة",
+      "creditType": "نوع الائتمان",
+      "selectCreditType": "اختر نوع الائتمان",
+      "selectDuration": "اختر المدة",
+      "creditsPlaceholder": "على سبيل المثال، 1",
+      "periodsPerWeek": "فترات في الأسبوع",
+      "periodsPerWeekPlaceholder": "على سبيل المثال، 5",
+      "gradeLevelsDescription": "حدد المستويات الدراسية التي سيتم تقديم هذه الدورة إليها.",
+      "outsideSchoolGradeRange": "خارج نطاق الصف المدرسي",
+      "descriptionObjectivesTitle": "الوصف والأهداف",
+      "descriptionObjectivesDescription": "تقديم وصف للدورة وتحديد أهداف التعلم.",
+      "courseDescription": "وصف الدورة",
+      "courseDescriptionPlaceholder": "قم بوصف ما يغطيه هذا المقرر وأهدافه وتوقعات الطلاب...",
+      "learningObjectives": "أهداف التعلم",
+      "objectivePlaceholder": "اكتب هدفًا واضغط على Enter",
+      "objectiveCount": "{{count}}/{{max}} الأهداف",
+      "materialsTitle": "مواد الدورة",
+      "materialsDescription": "أضف الكتب المدرسية أو المصنفات أو الموارد الرقمية لهذه الدورة.",
+      "addMaterial": "أضف مادة",
+      "noMaterials": "لم تتم إضافة أي مواد حتى الآن. انقر فوق إضافة مادة للبدء.",
+      "materialNumber": "المادة {{number}}",
+      "materialType": "يكتب",
+      "materialTitle": "عنوان",
+      "materialTitlePlaceholder": "عنوان المادة",
+      "materialAuthor": "مؤلف",
+      "materialAuthorPlaceholder": "اسم المؤلف",
+      "materialIsbn": "ISBN",
+      "materialIsbnPlaceholder": "ISBN-13",
+      "materialTypes": {
+        "textbook": "كتاب مدرسي",
+        "workbook": "المصنف",
+        "digital": "الموارد الرقمية",
+        "other": "آخر"
+      }
+    },
+    "drawer": {
+      "subjectAreaRollup": "مجال الموضوع (Ed-Fi التراكمي)",
+      "createCourse": "إنشاء دورة",
+      "addNewCourse": "إضافة دورة جديدة",
+      "courseDetails": "تفاصيل الدورة",
+      "editing": "التحرير",
+      "closeDrawer": "إغلاق الدرج",
+      "noCourseData": "لا توجد بيانات الدورة المتاحة",
+      "viewDetails": "عرض التفاصيل"
+    },
+    "gradeDrawer": {
+      "title": "{{grade}} التفاصيل",
+      "editComingSoon": "تحرير الوظائف قريبا",
+      "exportComingSoon": "وظيفة التصدير قريبا",
+      "assignedToLevel": "{{value}} المقرر المخصص لهذا المستوى",
+      "assignedToLevel_plural": "{{value}} المقررات المخصصة لهذا المستوى",
+      "courses": "الدورات",
+      "assignedCourses": "الدورات المخصصة",
+      "noCoursesAssigned": "لا توجد دورات مخصصة لهذا المستوى الدراسي",
+      "noCoursesDescription": "ستظهر هنا الدورات التدريبية بهذا المستوى الدراسي.",
+      "activeGroup": "نشط ({{count}})",
+      "inactiveGroup": "غير نشط ({{count}})",
+      "studentEnrollment": "تسجيل الطالب",
+      "studentEnrollmentDescription": "بيانات تسجيل الطلاب حسب المرحلة الدراسية",
+      "futureRelease": "القادمة في الاصدار المستقبلي"
+    },
+    "standards": {
+      "title": "مواءمة المعايير",
+      "description": "قم بتعيين الدورات وفقًا للمعايير الأكاديمية لتتبع تغطية المناهج الدراسية والامتثال للفقرة Ed-Fi. يمكن تكوين المعايير لكل دورة."
+    },
+    "export": {
+      "headers": {
+        "code": "شفرة",
+        "courseName": "اسم الدورة",
+        "subject": "موضوع",
+        "grades": "الدرجات",
+        "credits": "الاعتمادات",
+        "type": "يكتب",
+        "duration": "مدة",
+        "status": "حالة"
+      }
+    },
+    "courseDetail": {
+      "actions": {
+        "editCourse": "تحرير الدورة",
+        "printDetails": "تفاصيل الطباعة",
+        "activate": "فعل",
+        "deactivate": "إلغاء التنشيط"
+      },
+      "tabs": {
+        "overview": "نظرة عامة",
+        "sections": "الأقسام",
+        "standards": "المعايير"
+      },
+      "periodsPerWeekShort": "فترات / أسبوع",
+      "description": "وصف",
+      "learningObjectives": "أهداف التعلم",
+      "byAuthor": "بواسطة {{author}}",
+      "metadata": "البيانات الوصفية",
+      "created": "مخلوق",
+      "lastUpdated": "آخر تحديث",
+      "noSectionsTitle": "لا توجد أقسام حتى الآن",
+      "noSectionsDescription": "لم يتم إنشاء أي أقسام صفية لهذه الدورة.",
+      "goToScheduling": "انتقل إلى الجدولة",
+      "sectionCount": "{{value}} القسم",
+      "sectionCount_plural": "{{value}} الأقسام",
+      "sectionTitle": "القسم {{section}}",
+      "loadMoreSections": "تحميل المزيد من الأقسام",
+      "standardsTitle": "معايير التعلم",
+      "standardsDescription": "ستكون مواءمة المعايير لهذه الدورة متاحة في إصدار مستقبلي. ربط المعايير الأساسية المشتركة أو NGSS أو المعايير الخاصة بالولاية لتتبع النتائج القائمة على الكفاءة.",
+      "notFoundTitle": "لم يتم العثور على الدورة التدريبية",
+      "notFoundDescription": "ربما تمت إزالة هذه الدورة التدريبية أو لا يمكنك الوصول إليها.",
+      "backToCurriculum": "العودة إلى المنهج",
+      "credits": "{{value}} الائتمان",
+      "credits_plural": "{{value}} الاعتمادات",
+      "courseTabs": "علامات تبويب الدورة التدريبية"
+    }
+  },
+  "rosteringModule": {
+    "description": "إدارة الواجبات من طالب إلى قسم عبر جميع الأقسام النشطة",
+    "actions": {
+      "applyChanges": "تطبيق التغييرات",
+      "applying": "جارٍ التقديم..."
+    },
+    "cell": {
+      "addToSection": "أضف إلى {{section}}",
+      "removeFromSection": "إزالة من {{section}}"
+    },
+    "conflict": {
+      "title": "تعارض الجدول الزمني",
+      "samePeriod": "نفس فترة الفصل الدراسي مثل {{value}} القسم (الأقسام) الأخرى"
+    },
+    "student": {
+      "gradeShort": "غرام {{grade}}"
+    },
+    "summary": {
+      "additions": "{{value}} إضافة",
+      "additions_plural": "{{value}} الإضافات",
+      "removals": "{{value}} إزالة",
+      "removals_plural": "{{value}} عمليات الإزالة",
+      "conflicts": "{{value}} الصراع",
+      "conflicts_plural": "{{value}} الصراعات",
+      "processing": "معالجة {{progress}} من {{total}}..."
+    },
+    "toast": {
+      "allApplied": "تم تطبيق كافة التغييرات {{value}} بنجاح",
+      "allApplied_plural": "تم تطبيق جميع تغييرات {{value}} بنجاح",
+      "partialApplied": "{{success}} تم تطبيق التغييرات، {{failed}} فشل. قم بمراجعة التغييرات الفاشلة وإعادة محاولتها.",
+      "allFailed": "فشل كل تغيير {{value}}. يرجى التحقق من اتصالك والمحاولة مرة أخرى.",
+      "allFailed_plural": "فشلت جميع تغييرات {{value}}. يرجى التحقق من اتصالك والمحاولة مرة أخرى."
+    },
+    "filters": {
+      "gradeLevel": "مستوى الصف",
+      "loadingGrades": "جارٍ تحميل الدرجات...",
+      "allGrades": "جميع الدرجات",
+      "course": "دورة",
+      "allCourses": "جميع الدورات",
+      "matrixCount": "{{students}} الطلاب × {{sections}} الأقسام"
+    },
+    "loading": {
+      "title": "جارٍ تحميل بيانات القائمة...",
+      "description": "جلب الطلاب والأقسام والتسجيلات الحالية"
+    },
+    "empty": {
+      "noCurrentYear": "قم بإعداد عام دراسي في البيئات المدرسية قبل تسجيل الطلاب.",
+      "noDataTitle": "لا توجد بيانات متاحة",
+      "noStudents": "لم يتم العثور على طلاب نشطين لمستوى الصف المحدد.",
+      "noSections": "لم يتم العثور على أقسام نشطة للعام الدراسي الحالي."
+    },
+    "table": {
+      "student": "طالب",
+      "sectionTitle": "القسم {{section}}",
+      "sectionShort": "ثانية {{section}}"
+    }
+  },
+  "teachersModule": {
+    "description": "أعضاء هيئة التدريس ومهامهم التدريسية",
+    "stats": {
+      "totalStaff": "مجموع الموظفين",
+      "teachers": "المعلمين",
+      "active": "نشط",
+      "roles": "الأدوار"
+    },
+    "roles": {
+      "staff": "طاقم عمل",
+      "teacher": "مدرس",
+      "principal": "رئيسي",
+      "vice_principal": "نائب المدير",
+      "counselor": "مستشار",
+      "admin": "مسؤل"
+    },
+    "drawer": {
+      "title": "الملف الشخصي للموظفين",
+      "close": "إغلاق ملف تعريف الموظفين",
+      "contactInformation": "معلومات الاتصال",
+      "hiredOn": "تم تعيينه {{date}}",
+      "assignedSections": "الأقسام المخصصة",
+      "sectionCount": "{{value}} القسم",
+      "sectionCount_plural": "{{value}} الأقسام",
+      "noSections": "لم يتم تعيين أي أقسام",
+      "sectionFallback": "قسم",
+      "sectionTitle": "القسم {{section}}"
+    }
+  },
+  "moduleOverview": {
+    "title": "{{title}} نظرة عامة",
+    "retryLoading": "أعد محاولة التحميل",
+    "insight": {
+      "enrolledAcrossGrades": "{{students}} طالب مسجل عبر الصفوف {{grades}}",
+      "enrolledAcrossGrades_plural": "{{students}} الطلاب المسجلون عبر الصفوف {{grades}}",
+      "attendanceToday": "{{value}}% الحضور اليوم",
+      "noAttendanceData": "لا توجد بيانات الحضور",
+      "atRiskStudents": "{{count}} الطالب المعرض للخطر",
+      "atRiskStudents_plural": "{{count}} الطلاب المعرضون للخطر",
+      "noAtRiskStudents": "لا يوجد طلاب معرضون للخطر"
+    },
+    "guards": {
+      "selectSchoolTitle": "اختر مدرسة",
+      "selectSchoolDescription": "اختر مدرسة من الشريط الجانبي لعرض نظرة عامة على الأكاديميين.",
+      "noAcademicYearTitle": "لا يوجد عام دراسي نشط",
+      "noAcademicYearDescription": "قم بإعداد وتفعيل عام دراسي في التقويم المدرسي الخاص بك للاطلاع على البيانات العامة."
+    },
+    "actions": {
+      "enrollStudent": "تسجيل الطالب",
+      "enrollStudentAria": "تسجيل طالب",
+      "takeAttendance": "خذ الحضور",
+      "takeAttendanceAria": "خذ الحضور"
+    },
+    "filters": {
+      "last7Days": "آخر 7 أيام",
+      "last30Days": "آخر 30 يومًا",
+      "thisSemester": "هذا الفصل الدراسي",
+      "thisYear": "هذا العام",
+      "or": "أو",
+      "fromDate": "من تاريخ",
+      "toDate": "حتى الآن",
+      "allGrades": "جميع الدرجات",
+      "kindergarten": "روضة أطفال",
+      "preK": "ما قبل الروضة",
+      "clear": "واضح",
+      "exportCsv": "تصدير CSV",
+      "exportCsvAria": "تصدير التسجيلات كـ CSV"
+    },
+    "kpis": {
+      "totalEnrolled": "إجمالي المسجلين",
+      "recent": "+{{count}} الأخيرة",
+      "grades": "{{count}} الدرجات",
+      "acrossGrades": "عبر {{count}} الدرجات",
+      "thisAcademicYear": "هذا العام الدراسي",
+      "activeSections": "الأقسام النشطة",
+      "teachers": "{{count}} المعلمين",
+      "studentSectionRatio": "{{value}}:1 نسبة قسم الطلاب",
+      "activeClasses": "الطبقات النشطة",
+      "todayAttendance": "الحضور اليوم",
+      "partialData": "بيانات جزئية",
+      "attendanceBreakdown": "{{present}} حاضر · {{absent}} غائب · {{late}} متأخر",
+      "today": "اليوم",
+      "atRiskStudents": "الطلاب المعرضون للخطر",
+      "below80": "{{count}} أقل من 80%",
+      "riskBreakdown": "{{critical}} حاسم · {{warning}} تحذير",
+      "below90Threshold": "تحت عتبة 90٪",
+      "region": "المقاييس الرئيسية"
+    },
+    "needsAttention": {
+      "title": "يحتاج إلى اهتمام"
+    },
+    "errors": {
+      "attendanceTrend": "غير قادر على تحميل اتجاه الحضور",
+      "enrollmentChart": "غير قادر على تحميل مخطط التسجيل",
+      "atRiskStudents": "غير قادر على تحميل الطلاب المعرضين للخطر",
+      "staffRoster": "غير قادر على تحميل قائمة الموظفين"
+    },
+    "attendanceTrend": {
+      "title": "اتجاه الحضور",
+      "subtitle": "المتوسط ​​​​المتداول لمدة 30 يومًا",
+      "actual": "فِعلي",
+      "target": "{{value}}% الهدف",
+      "average": "متوسط ​​{{value}}%",
+      "tooltipPresent": "{{present}} من {{total}} موجود",
+      "srNoData": "لا تتوفر بيانات اتجاه الحضور.",
+      "srSummary": "تراوح معدل الحضور من {{min}}% إلى {{max}}% خلال الثلاثين يومًا الماضية، بمتوسط ​​{{avg}}%، مقارنة بالهدف {{target}}%.",
+      "empty": "لم يتم تسجيل بيانات الحضور حتى الآن",
+      "aria": "اتجاه الحضور على مدى 30 يوما",
+      "viewAttendance": "عرض الحضور"
+    },
+    "enrollmentChart": {
+      "title": "التسجيل حسب المستوى الدراسي",
+      "total": "{{total}} المجموع",
+      "aria": "التسجيل حسب مستوى الصف، {{total}} إجمالي الطلاب",
+      "tooltip": "{{count}} طالب · {{percentage}}%",
+      "tooltip_plural": "{{count}} الطلاب · {{percentage}}%",
+      "empty": "لا توجد بيانات التسجيل",
+      "viewEnrollment": "عرض التسجيل"
+    },
+    "atRisk": {
+      "title": "تفاصيل الطالب المعرض للخطر",
+      "total": "{{count}} في خطر",
+      "empty": "لا يوجد طلاب معرضون للخطر",
+      "absent": "{{count}} غائب",
+      "gradeAbsent": "{{grade}} · {{absent}}",
+      "progressLabel": "{{student}}: {{rate}}% حضور",
+      "viewAll": "عرض جميع الطلاب المعرضين للخطر {{count}}"
+    },
+    "alerts": {
+      "criticalTitle": "{{count}} حضور الطلاب أقل من 80% – التدخل الفوري مطلوب",
+      "criticalTitle_plural": "{{count}} الطلاب الذين تقل نسبة حضورهم عن 80% - يلزم التدخل الفوري",
+      "criticalSubtitle": "فترة 30 يومًا · {{total}} إجمالي المخاطر",
+      "viewDetails": "عرض التفاصيل",
+      "warningTitle": "{{count}} طالب أقل من 90% من عتبة الحضور",
+      "warningTitle_plural": "{{count}} الطلاب الذين تقل نسبة حضورهم عن 90%",
+      "warningSubtitle": "معدل الحضور أقل من عتبة المدرسة",
+      "review": "مراجعة",
+      "unrecordedTitle": "{{count}} طالب بدون سجل حضور اليوم",
+      "unrecordedTitle_plural": "{{count}} الطلاب بدون سجل حضور اليوم",
+      "unrecordedSubtitle": "ولم يتم تسجيل الحضور لجميع الطلاب اليوم"
+    },
+    "staffRoster": {
+      "title": "قائمة الموظفين",
+      "active": "{{count}} نشط",
+      "loadFailed": "غير قادر على تحميل بيانات الموظفين",
+      "empty": "لا يوجد موظفين",
+      "unknown": "مجهول",
+      "staff": "طاقم عمل",
+      "general": "عام",
+      "fullTime": "بدوام كامل",
+      "contract": "عقد",
+      "teachers": "{{count}} المعلم",
+      "teachers_plural": "{{count}} المعلمين"
+    },
+    "options": {
+      "title": "خيارات الصفحة",
+      "showHideWidgets": "إظهار/إخفاء الحاجيات",
+      "resetToDefault": "إعادة التعيين إلى الوضع الافتراضي",
+      "back": "خلف"
+    },
+    "stats": {
+      "scrollLeft": "انتقل احصائيات اليسار",
+      "scrollRight": "انتقل احصائيات الحق",
+      "regionLabel": "مؤشرات الأداء الرئيسية"
+    },
+    "updated": {
+      "justNow": "تم التحديث للتو",
+      "minutesAgo": "تم التحديث منذ {{value}}m",
+      "hoursAgo": "تم التحديث منذ {{value}}h",
+      "refreshTitle": "انقر للتحديث"
+    },
+    "widgets": {
+      "quickStats": "احصائيات سريعة",
+      "insights": "رؤى",
+      "insightsCharts": "الرؤى والرسوم البيانية",
+      "activityAlerts": "النشاط والتنبيهات"
+    },
+    "signals": {
+      "needAttention": "بحاجة الى الاهتمام",
+      "allClear": "كل شيء واضح",
+      "minimize": "تصغير",
+      "acknowledge": "فهمتها",
+      "acknowledged": "معترف به",
+      "acknowledgedHint": "تم الإقرار - انقر للتراجع",
+      "dismiss": "رفض",
+      "emptyTitle": "لقد تم القبض عليك جميعًا.",
+      "domains": {
+        "attendance": "الحضور",
+        "assessment": "تقدير",
+        "finance": "تمويل",
+        "enrollment": "التسجيل",
+        "capacity": "سعة",
+        "dataQuality": "جودة البيانات"
+      }
+    }
+  },
+  "examModule": {
+    "description": "تخطيط وإدارة ونشر اختبارات منتصف الفصل الدراسي والنهائيات وامتحانات الفصل الدراسي",
+    "descriptionWithYear": "تخطيط الامتحانات وتشغيلها ونشرها لـ {{yearName}}",
+    "createExam": "إنشاء الامتحان",
+    "createDisabledTitle": "مطلوب سنة دراسية مع الشروط أولا",
+    "noActiveYear": {
+      "title": "لا يوجد عام دراسي نشط",
+      "description": "تحديد العام الدراسي الحالي لهذه المدرسة لبدء جدولة الامتحانات."
+    },
+    "bulk": {
+      "changeStatus": "تغيير الحالة",
+      "generateResults": "توليد النتائج",
+      "changeStatusComingSoon": "حالة التغيير المجمع لامتحان (اختبارات) {{count}} — قريبًا",
+      "generateComingSoon": "سيتم وضع قائمة انتظار توليد النتائج لامتحان (امتحانات) {{count}} - قريبًا",
+      "onlyClosed": "يمكن للامتحانات المغلقة فقط إنشاء بطاقات النتائج."
+    },
+    "bulkDrawer": {
+      "title": "تغيير حالة الامتحان",
+      "selectedCount": "{{value}} تم اختيار الامتحان",
+      "selectedCount_plural": "{{value}} الامتحانات مختارة",
+      "moveTo": "انتقل الى",
+      "noSharedTarget": "لا يمكن الوصول إلى أي حالة من كل اختبار محدد — قم بتضييق التحديد أو نقلهم في مجموعات.",
+      "targetStatusAria": "حالة الهدف",
+      "notes": "ملاحظات",
+      "optional": "(خياري)",
+      "notesPlaceholder": "أضف سببًا أو سياقًا يتناسب مع كل عملية انتقال...",
+      "selection": "الاختيار ({{count}})",
+      "statusCount": "{{value}} الامتحان",
+      "statusCount_plural": "{{value}} الامتحانات",
+      "pickTarget": "اختر هدفا",
+      "targetPreview": "→ {{target}}",
+      "skippedPreview": "- تم تخطيه (لا يوجد مسار إلى {{target}})",
+      "applying": "جارٍ التقديم...",
+      "applyTo": "تنطبق على {{count}}",
+      "toast": {
+        "movedAll": "تم نقل امتحان {{value}} إلى {{target}}",
+        "movedAll_plural": "تم نقل {{value}} الامتحانات إلى {{target}}",
+        "noneMoved": "لم يتم نقل أي اختبارات — {{error}}",
+        "movedPartial": "تم نقل {{value}} إلى {{target}}",
+        "skipped": "{{value}} تم تخطيه",
+        "failed": "{{value}} فشل",
+        "separator": "·"
+      }
+    },
+    "filter": {
+      "filteredBy": "تمت التصفية بواسطة",
+      "clear": "شفاف (1)"
+    },
+    "summary": {
+      "total": "مجموع الامتحانات",
+      "live": "عش الآن",
+      "upcoming": "القادمة",
+      "awaiting": "في انتظار النتائج",
+      "readiness": "جاهزية النتيجة",
+      "typeTermCount": "{{types}} الأنواع · {{terms}} المصطلحات",
+      "inSession": "في الجلسة",
+      "nothingLive": "لا شيء يعيش",
+      "allCaughtUp": "جميع المحاصرين",
+      "actionNeeded": "الإجراء المطلوب",
+      "noClosed": "لا توجد اختبارات مغلقة",
+      "generatedCount": "{{generated}}/{{total}} تم إنشاؤها",
+      "readinessAria": "جاهزية النتيجة: {{percent}}% (تم إنشاء {{generated}} من {{total}})",
+      "nextHint": "التالي: {{examName}} · في {{days}}د",
+      "noUpcoming": "لا القادمة"
+    },
+    "status": {
+      "draft": "مسودة",
+      "scheduled": "المقرر",
+      "in_progress": "في تَقَدم",
+      "closed": "مغلق",
+      "published": "تم النشر"
+    },
+    "transitions": {
+      "draft": "الانتقال إلى المسودة",
+      "scheduled": "جدول",
+      "in_progress": "بدء الامتحان",
+      "closed": "إغلاق الامتحان",
+      "published": "نشر الامتحان"
+    },
+    "transitionConfirm": {
+      "closed": "هل تريد إغلاق هذا الاختبار؟ يتم إنشاء قفل النتائج وبطاقات النتائج لكل طالب مسجل. لا يمكنك النشر إلا بعد الإغلاق.",
+      "published": "نشر هذا الامتحان؟ يشير هذا إلى اكتمال دورة حياة الاختبار."
+    },
+    "types": {
+      "midterm": "منتصف المدة",
+      "final": "أخير",
+      "unit_test": "اختبار الوحدة",
+      "quiz": "لغز"
+    },
+    "resultGeneration": {
+      "label": "توليد النتيجة",
+      "pending": "جارٍ إنشاء بطاقات النتائج...",
+      "generated": "تم إنشاء بطاقات النتائج",
+      "failed": "فشل توليد النتيجة",
+      "generatedAt": "تم إنشاؤها {{dateTime}}"
+    },
+    "detail": {
+      "backToExams": "العودة إلى الامتحانات",
+      "notFoundTitle": "لم يتم العثور على الامتحان",
+      "notFoundDescription": "ربما تمت إزالة هذا الاختبار أو لا يمكنك الوصول إليه.",
+      "noTerm": "لا يوجد مصطلح",
+      "grades": "الدرجات",
+      "edit": "تحرير",
+      "resultCards": "بطاقات النتائج",
+      "closeDrawer": "إغلاق الدرج",
+      "lifecycle": "دورة الحياة",
+      "lifecycleComplete": "تم نشر هذا الاختبار — اكتملت دورة حياته.",
+      "tabsAria": "علامات الامتحان",
+      "tabs": {
+        "overview": "نظرة عامة",
+        "subjects": "المواضيع",
+        "scores": "عشرات"
+      },
+      "fields": {
+        "type": "يكتب",
+        "term": "شرط",
+        "status": "حالة",
+        "gradeLevels": "مستويات الصف",
+        "startDate": "تاريخ البدء",
+        "endDate": "تاريخ الانتهاء",
+        "created": "مخلوق",
+        "description": "وصف"
+      }
+    },
+    "drawer": {
+      "createTitle": "إنشاء الامتحان",
+      "editTitle": "تحرير الامتحان",
+      "saving": "جارٍ الحفظ...",
+      "creating": "جارٍ الإنشاء...",
+      "detailsTitle": "تفاصيل الامتحان",
+      "detailsDescription": "قم بتسمية هذا الامتحان واختيار نوعه ومدته.",
+      "examName": "اسم الامتحان",
+      "examNamePlaceholder": "على سبيل المثال، امتحان الفصل الدراسي الأول",
+      "selectExamType": "اختر نوع الامتحان",
+      "selectTerm": "حدد المصطلح",
+      "examTypeLocked": "مغلق: لا يمكن تغيير نوع الاختبار إلا عندما يكون الاختبار في مسودة.",
+      "termLocked": "لا يمكن تغيير المصطلح بعد الإنشاء.",
+      "gradeLevelsDescription": "نطاق هذا الاختبار إلى الصف (الدرجات) الذي يجلس فيه. يقود منتقي المواضيع وقائمة النتائج وإنشاء بطاقة النتيجة.",
+      "gradeLevelsLocked": "مغلق: لا يمكن تغيير مستويات التقدير إلا أثناء وجود الاختبار في المسودة.",
+      "gradeLevelsHelper": "اختر واحدة لامتحان لكل درجة، أو متعددة لتقسيم الدرجات (على سبيل المثال، الصف 9 + 10).",
+      "scheduleTitle": "جدول",
+      "scheduleDescription": "متى يجرى هذا الامتحان؟",
+      "descriptionDescription": "ملاحظات اختيارية حول هذا الامتحان.",
+      "descriptionPlaceholder": "وصف اختياري...",
+      "loadingGradeLevels": "جارٍ تحميل مستويات الصف المتاحة...",
+      "noGradeLevels": "لم يتم تكوين مستويات صفية ممكّنة في هذه المدرسة. قم بتعيينها ضمن الإعدادات -> مستويات التقدير قبل إنشاء الاختبارات."
+    },
+    "subjects": {
+      "count": "{{value}} الموضوع (المواضيع)",
+      "addSubject": "أضف الموضوع",
+      "locked": "يتم قفل المواضيع أثناء الامتحان {{status}}. ولا يمكن تغييرها إلا في المسودة أو المجدولة.",
+      "noGradeMatch": "لا توجد دورات تطابق مستويات درجات هذا الاختبار ({{grades}}). قم بإضافة المقررات الدراسية التي تم وضع علامة عليها لتلك الدرجات في المنهج الدراسي أولاً.",
+      "course": "دورة",
+      "selectCourse": "اختر الدورة...",
+      "maxMarks": "ماكس ماركس",
+      "passMarks": "علامات المرور",
+      "components": "عناصر",
+      "componentsHint": "(اختياري - على سبيل المثال نظري + عملي)",
+      "splitComponents": "+ تقسيم إلى مكونات",
+      "componentsSum": "Σ {{sum}} / {{max}} كامل",
+      "componentLabelPlaceholder": "التسمية (مثل النظرية)",
+      "fullPlaceholder": "ممتلىء",
+      "passPlaceholder": "يمر",
+      "componentLabelAria": "تسمية المكون {{index}}",
+      "componentFullAria": "المكون {{index}} العلامات الكاملة",
+      "componentPassAria": "مكون {{index}} علامات المرور",
+      "removeComponent": "إزالة المكون",
+      "addComponent": "إضافة مكون",
+      "clearComponents": "واضح (موضوع واحد)",
+      "componentsInvalid": "يحتاج كل مكون إلى علامة كاملة >= 1، 0 <= تمرير <= كامل، ويجب أن يكون مجموع العلامات الكاملة هو الحد الأقصى للعلامات ({{max}}).",
+      "emptyMutable": "لا توجد مواضيع حتى الآن. أضف الدورات التي سيغطيها هذا الاختبار.",
+      "emptyReadonly": "لا توجد مواضيع حتى الآن.",
+      "courseFallback": "دورة",
+      "maxShort": "الأعلى",
+      "passShort": "يمر",
+      "editMarks": "تحرير العلامات",
+      "removeSubject": "إزالة الموضوع",
+      "removeConfirm": "إزالة {{subject}} من الامتحان؟",
+      "thisSubject": "هذا الموضوع",
+      "theory": "نظرية",
+      "practical": "عملي"
+    },
+    "resultCards": {
+      "absentTitle": "غائب / غير متدرج",
+      "fail": "يفشل",
+      "gradeLabel": "الصف {{grade}}",
+      "published": "تم النشر",
+      "draft": "مسودة",
+      "publishConfirm": "هل ترغب في نشر بطاقة النتائج هذه؟ النشر نهائي ولا يمكن التراجع عنه.",
+      "allCards": "جميع بطاقات النتائج",
+      "percentage": "نسبة مئوية",
+      "division": "قسم",
+      "result": "نتيجة",
+      "passUpper": "PASS",
+      "failUpper": "FAIL",
+      "position": "موضع",
+      "termGpa": "المصطلح GPA",
+      "overall": "إجمالي",
+      "subject": "موضوع",
+      "marks": "ماركس",
+      "passMarksShort": "تمر م.",
+      "score": "نتيجة",
+      "grade": "درجة",
+      "pass": "يمر",
+      "total": "المجموع",
+      "conduct": "سلوك",
+      "conductPlaceholder": "مذكرة التصرف...",
+      "saveConduct": "حفظ السلوك",
+      "classTeacherRemark": "ملاحظة معلم الفصل",
+      "remarkPlaceholder": "ملاحظة معلم الصف...",
+      "saveRemark": "حفظ الملاحظة",
+      "publishedReadOnly": "منشور - للقراءة فقط",
+      "draftReview": "المسودة - المراجعة ثم النشر",
+      "printPdf": "طباعة / PDF",
+      "publish": "نشر",
+      "generatingTitle": "جارٍ إنشاء بطاقات النتائج...",
+      "generatingDescription": "يستغرق هذا عادةً بضع ثوانٍ. يتم تحديث القائمة تلقائيًا عندما تصبح جاهزة.",
+      "generationFailedTitle": "فشل توليد النتيجة",
+      "generationFailedDescription": "حدث خطأ ما أثناء إنشاء بطاقات النتائج. ستتم إعادة المحاولة من خلال إعادة فتح الاختبار وإغلاقه مرة أخرى.",
+      "emptyTitle": "لا توجد بطاقات النتائج حتى الآن",
+      "emptyDescription": "يتم إنشاء بطاقات النتائج تلقائيًا بمجرد إغلاق هذا الاختبار. إغلاق الامتحان بعد إدخال جميع الدرجات.",
+      "student": "طالب",
+      "print": {
+        "reportCard": "بطاقة التقرير",
+        "progressReport": "تقرير التقدم",
+        "printSavePdf": "طباعة / حفظ باسم PDF",
+        "printed": "مطبوعة",
+        "full": "ممتلىء",
+        "obtained": "Obt.",
+        "highestMarks": "H.M.",
+        "classTeacher": "معلم صف",
+        "principal": "رئيسي",
+        "parentGuardian": "الوالد / الوصي",
+        "generatedBy": "تم إنشاؤها بواسطة EdForge",
+        "draftNotPublished": "مسودة (لم تنشر بعد)",
+        "gradePrefix": "درجة",
+        "emisPrefix": "EMIS"
+      }
+    },
+    "signals": {
+      "endingTodayTitle": "{{count}} تنتهي الامتحانات المباشرة اليوم",
+      "endingTodaySub": "أدخل العلامات قبل أن تغلق",
+      "awaitingTitle": "{{count}} الامتحانات المغلقة في انتظار النتائج",
+      "awaitingSub": "يتم حظر بطاقات التقرير حتى يتم إنشاء النتائج",
+      "startingSoonTitle": "{{count}} تبدأ الامتحانات خلال 7 أيام",
+      "startingSoonSub": "تأكيد الجداول الزمنية والاستعداد",
+      "viewLive": "عرض مباشر",
+      "viewAwaiting": "عرض في انتظار",
+      "viewUpcoming": "عرض القادمة"
+    }
+  },
+  "classrooms": {
+    "pageTitle": "الفصول الدراسية",
+    "toolbar": {
+      "searchPlaceholder": "أقسام البحث...",
+      "all": "الجميع",
+      "statusPresets": "الإعدادات المسبقة للحالة",
+      "course": "دورة",
+      "teacher": "مدرس",
+      "year": "سنة",
+      "viewToggle": "عرض",
+      "cards": "بطاقات",
+      "table": "طاولة",
+      "export": "تصدير"
+    },
+    "tabs": {
+      "overview": "نظرة عامة",
+      "gradebook": "دفتر الدرجات",
+      "policies": "سياسات الدرجات",
+      "attendance": "الحضور",
+      "attendanceBoard": "مجلس الحضور",
+      "classwork": "الواجبات الدراسية",
+      "people": "الناس",
+      "progress": "تقدم"
+    },
+    "actions": {
+      "activate": "فعل",
+      "deactivate": "إلغاء التنشيط",
+      "sendNotification": "إرسال الإخطار",
+      "newClassroom": "فصل دراسي جديد",
+      "newSection": "قسم جديد",
+      "record": "سِجِلّ",
+      "finalize": "وضع اللمسات الأخيرة",
+      "gradeAnalytics": "تحليلات الصف",
+      "gridView": "عرض الشبكة",
+      "listView": "عرض القائمة",
+      "edit": "تحرير",
+      "editSection": "تحرير القسم",
+      "printRoster": "قائمة الطباعة",
+      "backToClassrooms": "العودة إلى الفصول الدراسية",
+      "backToSection": "العودة إلى القسم",
+      "openGradebook": "افتح دفتر التقديرات",
+      "openAttendance": "الحضور مفتوح",
+      "viewAllClasswork": "عرض جميع الواجبات الدراسية",
+      "takeAttendance": "خذ الحضور",
+      "viewRoster": "عرض القائمة",
+      "loadMore": "تحميل المزيد",
+      "loading": "جار التحميل...",
+      "retry": "أعد المحاولة",
+      "cancel": "إلغاء",
+      "create": "يخلق",
+      "saveChanges": "حفظ التغييرات",
+      "saving": "جارٍ الحفظ...",
+      "creating": "جارٍ الإنشاء...",
+      "createSection": "إنشاء قسم",
+      "discard": "ينبذ",
+      "keepEditing": "استمر في التحرير"
+    },
+    "aria": {
+      "tabs": "علامات التبويب الفصول الدراسية",
+      "classroomTabs": "علامات التبويب الفصول الدراسية",
+      "progressViews": "وجهات نظر التقدم",
+      "createMenu": "إنشاء القائمة",
+      "cardActions": "إجراءات البطاقة",
+      "sectionActions": "إجراءات القسم",
+      "createClasswork": "أنشئ واجبًا دراسيًا",
+      "createClassworkOptions": "إنشاء خيارات الواجب الدراسي",
+      "loadingClasswork": "جارٍ تحميل الواجب الدراسي",
+      "loadingClassworkItems": "جارٍ تحميل عناصر الواجب الدراسي...",
+      "retryLoadingClasswork": "أعد محاولة تحميل الواجب الدراسي",
+      "closeDrawer": "إغلاق الدرج",
+      "openItem": "فتح {{title}}",
+      "newTopicName": "اسم الموضوع الجديد",
+      "addTopic": "إضافة موضوع",
+      "attachments": "المرفقات:"
+    },
+    "stats": {
+      "region": "المقاييس الرئيسية",
+      "totalSections": "مجموع الأقسام",
+      "totalStudents": "إجمالي الطلاب",
+      "avgUtilization": "متوسط ​​الاستخدام",
+      "activeTeachers": "المعلمين النشطين",
+      "activeClassrooms": "الفصول الدراسية النشطة",
+      "acrossAllSections": "عبر جميع الأقسام",
+      "ofSeatCapacity": "من سعة المقعد",
+      "assignedSections": "الأقسام المخصصة",
+      "failedToLoad": "فشل تحميل الإحصائيات"
+    },
+    "empty": {
+      "noClassesTitle": "لا توجد فصول بعد",
+      "noClassesDescription": "قم بإنشاء قسم الصف الأول الخاص بك للبدء. سوف تظهر الطبقات هنا كبطاقات.",
+      "noSectionsAssigned": "لم يتم تعيين أي أقسام. اتصل بالمسؤول.",
+      "selectClassSectionTitle": "حدد قسم الفصل",
+      "selectClassSectionDescription": "اختر قسمًا من القائمة المنسدلة لعرض درجات الطلاب وإدارتها.",
+      "sectionNotFound": "لم يتم العثور على القسم",
+      "sectionNotFoundDescription": "ربما تمت إزالة هذا القسم أو لا يمكنك الوصول إليه.",
+      "noGradesRecorded": "لم يتم تسجيل الدرجات بعد",
+      "noAttendanceToday": "ولم يتم تسجيل أي حضور لهذا اليوم حتى الآن",
+      "noStudentsEnrolled": "لم يسجل أي طالب حتى الآن",
+      "noClassworkYet": "لا يوجد واجب دراسي بعد",
+      "noClassworkWithTopics": "لقد تم إعداد المواضيع ولكن لا توجد عناصر للواجب الدراسي حتى الآن. قم بإنشاء مهام أو اختبارات أو مواد للبدء.",
+      "noClassworkDescription": "قم بإنشاء مهام واختبارات ومواد لفصلك الدراسي.",
+      "noClassworkItems": "لا توجد عناصر للواجب الدراسي حتى الآن"
+    },
+    "gradebook": {
+      "selectSection": "حدد قسم...",
+      "sectionFallback": "قسم",
+      "selectGradingPeriod": "تحديد فترة التقدير...",
+      "selectGradingPeriodPrompt": "حدد فترة التقدير",
+      "noPolicyTitle": "لم يتم تكوين سياسة التقدير",
+      "noPolicyDescription": "ستستخدم الدرجات المتوسط ​​البسيط بدون درجات الحروف أو أوزان الفئات.",
+      "noDefaultPolicyTitle": "لم يتم تعيين سياسة التقدير الافتراضية",
+      "noDefaultPolicyDescription": "لديك سياسة تصنيف {{count}}، ولكن لم يتم وضع علامة على أي منها كسياسة افتراضية.",
+      "noDefaultPolicyDescription_plural": "لديك سياسات تصنيف {{count}}، ولكن لم يتم وضع علامة على أي منها على أنها افتراضية.",
+      "setAcademicYearBeforeGrades": "قم بإعداد عام دراسي قبل تسجيل الدرجات.",
+      "classAverage": "متوسط ​​الفصل",
+      "gradedChip": "{{pct}}% متدرج · المتوسط ​​{{avg}}%",
+      "launchpad": {
+        "helper": "اختر قسمًا لتسجيل الدرجات ومراجعتها، أو افتح التحليلات على مستوى المدرسة.",
+        "noSectionsTitle": "لم يتم تعيين أي أقسام",
+        "backToSections": "الأقسام",
+        "summary": {
+          "sections": "أقسام",
+          "withGrades": "مع الدرجات",
+          "needAttention": "بحاجة الى الاهتمام",
+          "notStarted": "لم يبدأ"
+        },
+        "resume": {
+          "title": "القفز مرة أخرى",
+          "action": "سيرة ذاتية"
+        },
+        "status": {
+          "attention": "يحتاج إلى اهتمام",
+          "inProgress": "في تَقَدم",
+          "notStarted": "لم يبدأ",
+          "onTrack": "على المسار الصحيح"
+        },
+        "card": {
+          "classAvg": "متوسط ​​الفصل",
+          "avgGpa": "متوسط ​​GPA",
+          "atRisk": "في خطر",
+          "noGradesYet": "لم يتم تسجيل الدرجات بعد ·",
+          "startGrading": "ابدأ بالتقييم",
+          "gradedAvg": "{{pct}}% متدرج · المتوسط ​​{{avg}}%",
+          "gradedProgress": "{{graded}}/{{total}} متدرج · {{pct}}%",
+          "progressAria": "{{pct}}% متدرج",
+          "students": "{{count}} الطلاب"
+        }
+      }
+    },
+    "context": {
+      "activeSections": "الأقسام النشطة",
+      "across": "عير",
+      "courses": "الدورات",
+      "studentsEnrolled": "الطلاب المسجلين",
+      "avgUtilization": "متوسط ​​الاستخدام",
+      "studentsAtRisk": "الطلاب المعرضون للخطر (أقل من 60%)",
+      "concentratedIn": "تتركز في",
+      "atFullPassRate": "بنسبة نجاح 100%",
+      "grading": "الدرجات",
+      "complete": "مكتمل",
+      "recordedToday": "سجلت اليوم",
+      "sevenDayAverage": "متوسط ​​7 أيام",
+      "vsThirtyDay": "مقابل 30 يومًا",
+      "flaggedBelowAttendance": "تم وضع علامة على الحضور أقل من 90٪"
+    },
+    "card": {
+      "noCourse": "لا دورة",
+      "noTeacherAssigned": "لم يتم تعيين أي معلم",
+      "students": "طلاب",
+      "enrollmentSummary": "{{current}}/{{max}} الطلاب",
+      "articleLabel": "{{sectionName}} - {{courseName}}، {{teacherName}}، {{current}} من {{max}} الطلاب"
+    },
+    "detail": {
+      "sectionFallback": "القسم {{number}}",
+      "createSectionTitle": "إنشاء قسم الفصل",
+      "createSectionDescription": "قم بإعداد قسم فصل جديد يحتوي على تفاصيل الدورة التدريبية والمعلم والجدول الزمني.",
+      "studentsWithCapacity": "{{current}}/{{max}} الطلاب ({{percent}}%)",
+      "enrolledWithCapacity": "{{current}}/{{max}} مسجل ({{percent}}%)",
+      "studentsRecordedToday": "{{recorded}} من {{total}} الطلاب المسجلين اليوم",
+      "studentsEnrolledCount": "{{count}} الطلاب المسجلين",
+      "studentsEnrolledCount_plural": "{{count}} الطلاب المسجلين",
+      "todayRate": "معدل اليوم",
+      "course": "دورة",
+      "teacher": "مدرس",
+      "room": "غرفة",
+      "period": "فترة",
+      "notAvailable": "N/A",
+      "notAssigned": "لم يتم تعيينه"
+    },
+    "classwork": {
+      "title": "جميع الواجبات الدراسية",
+      "failedToLoad": "فشل تحميل الواجب الدراسي",
+      "failedToLoadDescription": "حدث خطأ أثناء جلب بيانات الواجب الدراسي. يرجى المحاولة مرة أخرى.",
+      "other": "آخر",
+      "create": "يخلق",
+      "assignment": "تكليف",
+      "quiz": "لغز",
+      "quizAssignment": "مهمة الاختبار",
+      "material": "مادة",
+      "question": "سؤال",
+      "topic": "عنوان",
+      "topicNamePlaceholder": "اسم الموضوع...",
+      "add": "أضف",
+      "editTitle": "تحرير الواجب الدراسي",
+      "createTitle": "إنشاء واجب دراسي",
+      "editing": "التحرير",
+      "type": "يكتب",
+      "titleLabel": "عنوان",
+      "titlePlaceholder": "على سبيل المثال الفصل 3 قراءة الاستجابة",
+      "titleRequired": "العنوان مطلوب",
+      "description": "وصف",
+      "questionPlaceholder": "أكتب سؤالك هنا...",
+      "instructionsPlaceholder": "إضافة تعليمات أو تفاصيل...",
+      "topicLabel": "عنوان",
+      "noTopic": "لا يوجد موضوع",
+      "quizSettings": "إعدادات الاختبار",
+      "assignmentSettings": "إعدادات المهمة",
+      "dueDate": "تاريخ الاستحقاق",
+      "pointsPossible": "النقاط الممكنة",
+      "visibility": "الرؤية",
+      "draft": "مسودة",
+      "published": "تم النشر",
+      "discardTitle": "هل تريد تجاهل التغييرات؟",
+      "discardDescription": "لديك تغييرات غير محفوظة. هل أنت متأكد أنك تريد الإغلاق؟",
+      "discardLeaveDescription": "لديك تغييرات غير محفوظة. هل أنت متأكد أنك تريد المغادرة؟ سيتم فقدان التغييرات الخاصة بك.",
+      "dueDateShort": "بسبب {{date}}",
+      "pointsShort": "{{points}} نقاط",
+      "typeCount": "{{type}}ث"
+    },
+    "overviewPanels": {
+      "grades": "الدرجات",
+      "attendance": "الحضور",
+      "classwork": "الواجبات الدراسية",
+      "failedLoadGrades": "فشل تحميل الدرجات",
+      "failedLoadAttendance": "فشل تحميل الحضور",
+      "failedLoadClasswork": "فشل تحميل الواجب الدراسي"
+    },
+    "toast": {
+      "notifyComingSoon": "إخطار القسم {{count}} - قريبًا",
+      "notifyComingSoon_plural": "إخطار أقسام {{count}} - قريبًا"
+    },
+    "signals": {
+      "atCapacityTitle": "{{count}} الأقسام في سعة المقعد",
+      "atCapacitySub": "المواضع الواردة ليس لها مقعد - فكر في إعادة التوازن",
+      "lowUtilTitle": "{{count}} نسبة استخدام المقاعد أقل من 40%",
+      "lowUtilSub": "فكر في دمج الأقسام غير المملوءة بالقدر الكافي",
+      "unrecordedTitle": "{{count}} أقسام لم تسجل الحضور اليوم",
+      "unrecordedSub": "{{done}} من {{total}} تم تسجيله حتى الآن",
+      "reviewSections": "أقسام المراجعة"
+    },
+    "selection": {
+      "noInactive": "لا توجد أقسام غير نشطة في التحديد",
+      "noActive": "لا توجد أقسام نشطة في التحديد",
+      "peekSeats": "{{enrolled}}/{{cap}} جالسا"
+    }
+  },
+  "enrollmentModule": {
+    "tabs": {
+      "registration": "تسجيل",
+      "records": "سجلات الالتحاق"
+    },
+    "actions": {
+      "cancelEnrollment": "إلغاء التسجيل",
+      "export": "تصدير",
+      "exportCsv": "تصدير التسجيلات كـ CSV",
+      "closeYear": "إغلاق السنة",
+      "closing": "إغلاق...",
+      "back": "خلف",
+      "skip": "يتخطى",
+      "continue": "يكمل",
+      "createStudent": "إنشاء الطالب"
+    },
+    "header": {
+      "title": "تسجيل الطالب",
+      "registering": "تسجيل طالب جديد",
+      "academicYear": "العام الدراسي {{year}}",
+      "studentsCurrentlyEnrolled": "{{value}} الطلاب المسجلين حاليا",
+      "tabsAria": "علامات التبويب التسجيل"
+    },
+    "summary": {
+      "enrolled": "المسجلين",
+      "active": "نشيط",
+      "gradeLevels": "مستويات الصف",
+      "progressPercent": "{{percent}}%"
+    },
+    "confirm": {
+      "markNoShow": "هل تم وضع علامة على {{studentName}} كحالة عدم الحضور؟ سيؤدي هذا إلى سحب التسجيل.",
+      "thisStudent": "هذا الطالب",
+      "closeYear": "إغلاق جميع التسجيلات المفتوحة لـ {{yearName}}؟ سيؤدي هذا إلى وضع علامة على جميع الطلاب المسجلين على أنهم متخرجون لهذا العام. لا يمكن التراجع عن هذا الإجراء.",
+      "discardTitle": "هل تريد تجاهل التغييرات؟",
+      "discardDescription": "لديك معلومات الطالب غير المحفوظة. هل أنت متأكد أنك تريد المغادرة؟ سيتم فقدان كافة البيانات المدخلة."
+    },
+    "export": {
+      "failedTitle": "فشل التصدير",
+      "failedDescription": "تعذر تنزيل الملف."
+    },
+    "wizard": {
+      "progressAria": "تقدم التسجيل",
+      "stepAnnouncement": "الخطوة {{current}} من {{total}}: {{title}}",
+      "steps": {
+        "personal": {
+          "title": "المعلومات الشخصية",
+          "description": "إدخال البيانات الشخصية الأساسية للطالب."
+        },
+        "contact": {
+          "title": "اتصال",
+          "description": "تقديم تفاصيل الاتصال ومعلومات العنوان."
+        },
+        "guardians": {
+          "title": "الأوصياء",
+          "description": "أضف والدي الطالب أو الأوصياء القانونيين عليه."
+        },
+        "medical": {
+          "title": "طبي",
+          "description": "توفير المعلومات الصحية والتفاصيل الديموغرافية."
+        },
+        "enrollment": {
+          "title": "التسجيل",
+          "description": "قم بتعيين نوع التسجيل والعام الدراسي وتفاصيل Ed-Fi."
+        },
+        "review": {
+          "title": "مراجعة",
+          "description": "قم بمراجعة جميع المعلومات قبل إنشاء سجل الطالب."
+        }
+      },
+      "sidebar": {
+        "context": "سياق التسجيل",
+        "academicYear": "العام الدراسي",
+        "enrolled": "مسجل",
+        "gradeLevels": "مستويات الصف",
+        "requiredForEdFi": "مطلوب لـ EdFi",
+        "progress": "تقدم",
+        "filled": "مملوء",
+        "required": "مطلوب",
+        "step": "الخطوة {{step}}",
+        "done": "منتهي",
+        "current": "حاضِر",
+        "fields": {
+          "firstName": "الاسم الأول",
+          "lastName": "اسم العائلة",
+          "dateOfBirth": "تاريخ الميلاد",
+          "gender": "جنس",
+          "gradeLevel": "مستوى الصف",
+          "entryDate": "تاريخ الدخول"
+        }
+      },
+      "toast": {
+        "registeredAndEnrolled": "{{studentName}} تم تسجيله وتسجيله!",
+        "enrollmentConflict": "أنشأ الطالب. تعارض التسجيل: {{message}}. من الممكن أن يكون الطالب مسجلاً بالفعل.",
+        "enrollmentFailed": "تم إنشاء الطالب، ولكن فشل التسجيل: {{message}}. يمكنك إضافة التسجيل من الملف الشخصي للطالب.",
+        "registered": "{{studentName}} تم تسجيله!"
+      }
+    },
+    "duplicate": {
+      "checking": "التحقق من سجلات الطلاب الموجودة...",
+      "possibleDuplicate": "تم العثور على نسخة مكررة محتملة",
+      "similarRecords": "تم العثور على سجلات مماثلة",
+      "singleMatch": "يوجد بالفعل طالب لديه معلومات مماثلة.",
+      "multipleMatches": "{{value}} تم العثور على طلاب لديهم معلومات مماثلة.",
+      "continueNew": "يمكنك الاستمرار إذا كان هذا طالبًا جديدًا.",
+      "dismiss": "تجاهل التحذير",
+      "dob": "تاريخ الميلاد: {{date}}",
+      "grade": "الصف {{grade}}",
+      "match": "المباراة: {{reasons}}",
+      "viewStudent": "عرض {{name}}",
+      "confidence": {
+        "high": "عالي",
+        "medium": "واسطة",
+        "low": "قليل"
+      }
+    },
+    "step": {
+      "type": {
+        "title": "نوع التسجيل",
+        "description": "كيف يتم تسجيل الطالب",
+        "labels": {
+          "new": "طالب جديد",
+          "transfer": "تحويل",
+          "returning": "الطالب العائد",
+          "re_enrollment": "إعادة التسجيل"
+        },
+        "newDescription": "التسجيل لأول مرة في هذه المدرسة",
+        "transferDescription": "الإنتقال من مدرسة أخرى",
+        "returningDescription": "المسجلين سابقا والعودة",
+        "reenrollmentDescription": "إعادة القيد بعد انقطاع القيد"
+      },
+      "details": {
+        "title": "تفاصيل التسجيل",
+        "description": "العام الدراسي وتاريخ التسجيل",
+        "academicYear": "العام الدراسي",
+        "loadingYears": "جارٍ تحميل السنوات الدراسية...",
+        "failedYears": "فشل تحميل السنوات الدراسية. يرجى التحديث.",
+        "selectAcademicYear": "اختر العام الدراسي",
+        "currentSuffix": "حاضِر",
+        "enrollmentDate": "تاريخ التسجيل",
+        "dateRange": "يجب أن يكون ضمن {{start}} - {{end}}",
+        "activeYear": "عام دراسي نشط - سيتم تفعيل التسجيل على الفور",
+        "noActiveYearTitle": "لا يوجد عام دراسي نشط متاح",
+        "noActiveYearDescription": "يرجى تكوين وتفعيل عام دراسي في إعدادات المدرسة قبل تسجيل الطلاب."
+      },
+      "entry": {
+        "title": "تفاصيل الدخول",
+        "description": "Ed-Fi الحقول الوصفية لتقارير الدولة",
+        "entryType": "نوع الإدخال",
+        "selectEntryType": "حدد نوع الإدخال",
+        "entryTypeHelp": "كيف يدخل الطالب هذه المدرسة",
+        "residencyStatus": "حالة الإقامة",
+        "selectResidencyStatus": "اختر حالة الإقامة",
+        "residencyHelp": "إقامة الطالب بالنسبة للمدرسة",
+        "entryTypes": {
+          "nextYearSchool": "مدرسة العام القادم",
+          "transferSameDistrict": "النقل (نفس المنطقة)",
+          "transferDifferentDistrict": "النقل (منطقة مختلفة)",
+          "transferPrivateSchool": "النقل (مدرسة خاصة)",
+          "reentrySameSchool": "إعادة الالتحاق (نفس المدرسة)",
+          "originalEntry": "الإدخال الأصلي",
+          "transferInternational": "تحويل (دولي)"
+        },
+        "residencyStatuses": {
+          "adminUnitAndSchoolArea": "مقيم - الوحدة الإدارية ومنطقة المدرسة",
+          "adminUnitOnly": "مقيم - الوحدة الإدارية فقط",
+          "stateOnly": "مقيم - الدولة فقط",
+          "notResident": "ليس مقيمًا"
+        }
+      },
+      "settings": {
+        "title": "إعدادات التسجيل",
+        "description": "تم تكوين الإعدادات الافتراضية مسبقًا - قم بضبطها فقط إذا لزم الأمر",
+        "primarySchool": "مدرسة إبتدائية",
+        "primarySchoolHelp": "هل هذه هي المدرسة الابتدائية التي يسجل فيها الطالب؟",
+        "fte": "معادلة الدوام الكامل (FTE)",
+        "fteHelp": "1.0 = دوام كامل، 0.5 = نصف الوقت",
+        "repeatGrade": "كرر الصف",
+        "repeatGradeHelp": "التحقق مما إذا كان الطالب يعيد مستوى الصف الحالي"
+      },
+      "transfer": {
+        "title": "نقل المعلومات",
+        "description": "تفاصيل عن المدرسة السابقة",
+        "previousSchool": "المدرسة السابقة",
+        "previousSchoolPlaceholder": "اسم المدرسة السابقة",
+        "previousAddress": "عنوان المدرسة السابقة",
+        "previousAddressPlaceholder": "المدينة، الولاية",
+        "reason": "سبب النقل",
+        "reasonPlaceholder": "صف بإيجاز سبب النقل"
+      },
+      "notes": {
+        "title": "ملاحظات إضافية",
+        "description": "ملاحظات اختيارية حول هذا التسجيل",
+        "label": "ملاحظات",
+        "placeholder": "أي ملاحظات إضافية حول هذا التسجيل..."
+      },
+      "auto": {
+        "label": "ملؤها تلقائيًا:",
+        "description": "يتم تعيين واصف المدرسة ومستوى الصف الدراسي ومستوى الصف الدراسي تلقائيًا بناءً على سياق مدرستك واختيارات الخطوة 1."
+      },
+      "personal": {
+        "studentName": "اسم الطالب",
+        "studentNameDescription": "الاسم القانوني كما يظهر في الوثائق الرسمية",
+        "firstNamePlaceholder": "أدخل الاسم الأول",
+        "lastNamePlaceholder": "أدخل الاسم الأخير",
+        "middleNamePlaceholder": "أدخل الاسم الأوسط",
+        "preferredName": "الاسم المفضل",
+        "preferredNamePlaceholder": "اللقب أو الاسم المفضل",
+        "suffix": "لاحقة",
+        "suffixPlaceholder": "الابن، الثالث، الخ.",
+        "basicDetails": "التفاصيل الأساسية",
+        "basicDetailsDescription": "تاريخ الميلاد والجنس والمستوى الدراسي",
+        "ageHelp": "أن يتراوح عمر الطالب بين 3 و 22 سنة",
+        "selectGender": "اختر الجنس",
+        "selectGradeLevel": "حدد مستوى الصف"
+      },
+      "contact": {
+        "details": "تفاصيل الاتصال",
+        "detailsDescription": "معلومات البريد الإلكتروني والهاتف",
+        "emailAddress": "عنوان البريد الإلكتروني",
+        "emailHelp": "اختياري للطلاب",
+        "phoneNumber": "رقم التليفون",
+        "phoneType": "نوع الهاتف",
+        "selectType": "اختر النوع",
+        "phoneTypes": {
+          "mobile": "متحرك",
+          "home": "بيت",
+          "work": "عمل"
+        },
+        "physicalAddress": "العنوان الفعلي",
+        "physicalAddressDescription": "عنوان السكن الرئيسي للطالب",
+        "mailingAddress": "العنوان البريدي",
+        "mailingAddressDescription": "فقط إذا كان مختلفًا عن العنوان الفعلي",
+        "differentMailingAddress": "استخدم عنوانًا بريديًا مختلفًا",
+        "differentMailingAddressDescription": "قم بتمكين هذا إذا كان العنوان البريدي مختلفًا عن العنوان الفعلي أعلاه"
+      },
+      "guardians": {
+        "guardianNumber": "الوصي {{number}}",
+        "remove": "إزالة الوصي",
+        "relationship": "علاقة",
+        "select": "يختار",
+        "employer": "صاحب العمل",
+        "employerPlaceholder": "اسم صاحب العمل",
+        "occupationPlaceholder": "إشغال",
+        "permissions": "الأذونات",
+        "primaryGuardian": "الوصي الأساسي",
+        "primaryGuardianDescription": "نقطة الاتصال الرئيسية",
+        "portalAccess": "الوصول إلى البوابة",
+        "portalAccessDescription": "يمكن عرض سجلات الطلاب",
+        "pickup": "معتمد للاستلام",
+        "pickupDescription": "يمكن التقاط الطالب",
+        "emptyTitle": "لم تتم إضافة أي أوصياء حتى الآن",
+        "emptyDescription": "معلومات الوصي اختيارية ولكن يوصى بها.",
+        "addGuardian": "إضافة ولي الأمر",
+        "maxReached": "تم الوصول إلى الحد الأقصى 10 أوصياء."
+      },
+      "medical": {
+        "optionalInfo": "جميع الحقول في هذه الصفحة اختيارية. يمكنك تخطي هذه الخطوة وإضافة المعلومات لاحقًا.",
+        "health": "معلومات صحية",
+        "healthDescription": "الحساسية والأدوية والظروف والقيود الغذائية",
+        "allergyPlaceholder": "اكتب الحساسية واضغط على Enter",
+        "allergyHelp": "على سبيل المثال الفول السوداني، اللاتكس، البنسلين",
+        "currentMedications": "الأدوية الحالية",
+        "medicationPlaceholder": "اكتب الدواء واضغط على Enter",
+        "medicalConditions": "الحالات الطبية",
+        "conditionPlaceholder": "اكتب شرطًا واضغط على Enter",
+        "conditionHelp": "على سبيل المثال الربو، السكري، الصرع",
+        "dietaryPlaceholder": "اكتب قيودًا غذائية واضغط على Enter",
+        "physicianInsurance": "الطبيب والتأمين",
+        "physicianInsuranceDescription": "طبيب الرعاية الأولية وتفاصيل التأمين",
+        "physicianName": "اسم الطبيب",
+        "physicianPlaceholder": "دكتور جين سميث",
+        "insuranceProvider": "مزود التأمين",
+        "insurancePlaceholder": "اسم شركة التأمين",
+        "policyNumber": "رقم السياسة",
+        "policyPlaceholder": "السياسة أو رقم ID",
+        "demographics": "التركيبة السكانية",
+        "demographicsDescription": "العرق واللغة وبلد الميلاد",
+        "selectEthnicity": "حدد العرق",
+        "selectLanguage": "اختر اللغة",
+        "countryOfBirthPlaceholder": "بلد الميلاد",
+        "ethnicityOptions": {
+          "americanIndian": "هندي أمريكي / مواطن ألاسكا",
+          "asian": "الآسيوية",
+          "black": "أسود / أمريكي من أصل أفريقي",
+          "hispanic": "اسباني / لاتيني",
+          "nativeHawaiian": "سكان هاواي الأصليين / جزر المحيط الهادئ",
+          "white": "أبيض",
+          "twoOrMore": "سباقان أو أكثر",
+          "preferNotToSay": "تفضل عدم القول"
+        },
+        "languageOptions": {
+          "english": "إنجليزي",
+          "spanish": "الأسبانية",
+          "mandarin": "لغة الماندرين الصينية",
+          "french": "فرنسي",
+          "arabic": "عربي",
+          "hindi": "الهندية",
+          "portuguese": "البرتغالية",
+          "vietnamese": "الفيتنامية",
+          "korean": "كوري",
+          "tagalog": "التاغالوغية",
+          "other": "آخر"
+        }
+      },
+      "review": {
+        "edit": "تحرير",
+        "creating": "إنشاء سجل الطلاب والتسجيل ...",
+        "whatWillHappen": "ماذا سيحدث عند الضغط على \"إنشاء طالب\"",
+        "studentRecordCreated": "سيتم إنشاء سجل الطالب لـ {{studentName}}",
+        "enrolledIn": "تم التسجيل في {{academicYear}} كـ {{gradeLevel}}",
+        "enrollmentTypeDate": "نوع التسجيل: {{type}} - التاريخ: {{date}}",
+        "noEnrollment": "لا توجد بيانات تسجيل - سيتم إنشاء طالب بدون تسجيل",
+        "noGuardiansWarning": "لم تتم إضافة أي أوصياء - فكر في إضافة ولي أمر واحد على الأقل",
+        "personalInfo": "المعلومات الشخصية",
+        "contactInfo": "معلومات الاتصال",
+        "medicalDemographics": "الطبية والديموغرافية",
+        "noGuardians": "لم تتم إضافة أي أوصياء",
+        "primary": "أساسي",
+        "emailValue": "البريد الإلكتروني: {{email}}",
+        "phoneValue": "الهاتف: {{phone}}",
+        "authorizedPickup": "مصرح له بالاستلام",
+        "portalAccess": "الوصول إلى البوابة",
+        "allergies": "الحساسية",
+        "medications": "الأدوية",
+        "conditions": "شروط",
+        "physician": "طبيب",
+        "fullTimeEquivalency": "معادلة الدوام الكامل",
+        "transferReason": "سبب النقل"
+      }
+    }
+  },
+  "iemisImport": {
+    "backToStudents": "العودة إلى الطلاب",
+    "title": "IEMIS استيراد الطلاب بالجملة",
+    "subtitle": "قم بتحميل ملف تصدير نيبال IEMIS xlsx لتسجيل الطلاب في {{schoolName}}.",
+    "thisSchool": "هذه المدرسة",
+    "states": {
+      "parsingTitle": "تحليل ملف xlsx",
+      "parsingDescription": "قراءة الأعمدة وبناء قواميس الصف. يستغرق هذا عادةً أقل من ثانيتين.",
+      "dryRunTitle": "التحقق من صحة ضد قواعد IEMIS",
+      "dryRunDescription": "التحقق من صفوف {{value}} بحثًا عن الأخطاء والتحذيرات والتكرارات. لم يتم حفظ أية بيانات حتى الآن.",
+      "dryRunDescriptionPending": "فحص الصفوف بحثًا عن الأخطاء والتحذيرات والتكرارات. لم يتم حفظ أية بيانات حتى الآن.",
+      "parseErrorTitle": "غير قادر على تحليل الملف",
+      "unknownParseError": "خطأ تحليلي غير معروف.",
+      "submittingTitle": "تقديم الاستيراد",
+      "submittingDescription": "انتظار مهمة الاستيراد.",
+      "importFailedTitle": "فشل الاستيراد",
+      "unknownError": "خطأ غير معروف.",
+      "rerunDryRun": "أعد تشغيل التشغيل الجاف",
+      "checkingEligibilityTitle": "التحقق من أهلية المدرسة",
+      "checkingEligibilityDescription": "التأكد من أن المدرسة النشطة تحتوي على رمز IEMIS الذي تم تكوينه.",
+      "noSchoolTitle": "لم يتم تحديد مدرسة نشطة",
+      "noSchoolMessage": "حدد مدرسة من أداة التبديل الموجودة في رأس الصفحة، ثم أعد تحميل هذه الصفحة."
+    },
+    "gate": {
+      "missingCodeTitle": "{{schoolName}} ليس لديه IEMIS رمز المدرسة",
+      "missingCodeDescription": "IEMIS تتطلب الواردات أن تكون المدرسة لديها مجموعة {{code}} الصادرة عن حكومة نيبال. وهذه القيمة غير قابلة للتغيير بعد إنشاء المدرسة، لذا يجب إدخالها في المدرسة نفسها. اطلب من مسؤول المستأجر إنشاء مدرسة جديدة من خلال School Wizard باستخدام الرمز IEMIS، أو اتصل بالدعم لتحديث بيانات التعريف الخاصة بهذه المدرسة."
+    },
+    "chooser": {
+      "dropTitle": "قم بإسقاط IEMIS XLSX هنا",
+      "dropDescription": "أو انقر أدناه للتصفح. ما يصل إلى {{maxRows}} صفوف لكل ملف.",
+      "browse": "تصفح الملفات",
+      "expectedColumns": "الأعمدة المتوقعة",
+      "expectedDescription": "تقرأ هذه الأداة تصدير IEMIS xlsx القياسي مباشرةً. الأعمدة المطلوبة: معرف الطالب، الاسم الكامل، الجنس، الفئة الحالية، تاريخ الميلاد. يتم التقاط أعمدة إضافية مثل اسم الأب واسم الوصي والعناوين عند وجودها.",
+      "dateDescription": "تتم قراءة التواريخ باسم بيكرام سامبات ويتم تحويلها إلى الميلادي على الخادم."
+    },
+    "summary": {
+      "fileSummary": "{{rows}} صف · {{mapped}} من 20 IEMIS تم تعيين الأعمدة",
+      "fileSummary_plural": "{{rows}} الصفوف · {{mapped}} من 20 IEMIS الأعمدة المعينة",
+      "extraColumns": "{{count}} تم تجاهل العمود الإضافي",
+      "extraColumns_plural": "{{count}} تم تجاهل الأعمدة الإضافية",
+      "willImport": "سوف استيراد",
+      "blocked": "تم حظره بسبب الأخطاء",
+      "duplicates": "التكرارات (تخطي)",
+      "warnings": "تحذيرات",
+      "created": "مخلوق",
+      "enrolled": "مسجل",
+      "skipped": "تم تخطي (مكررة)",
+      "failed": "فشل"
+    },
+    "enrollOption": {
+      "title": "تسجيل كافة الطلاب الوافدين لهذا العام",
+      "current": "حاضِر",
+      "noYear": "لا يوجد عام دراسي نشط في هذه المدرسة. سيتم إنشاء الطلاب المستوردين بدون سجل تسجيل. قم بإعداد عام دراسي أولاً لتمكين هذا الخيار.",
+      "description": "عند التمكين، يحصل كل طالب تم إنشاؤه بنجاح أيضًا على SchoolEnrollment لهذا العام ويتم نقله إلى الحالة النشطة. عند التعطيل، يتم إنشاء الطلاب في حالة معلقة وستحتاج إلى تسجيل كل طالب على حدة من صفحة تفاصيل الطالب."
+    },
+    "actions": {
+      "downloadFindings": "تنزيل النتائج CSV",
+      "cancel": "إلغاء",
+      "importStudents": "استيراد {{count}} طالب",
+      "importStudents_plural": "استيراد {{count}} الطلاب",
+      "noRows": "لا توجد صفوف لاستيرادها",
+      "importAnother": "استيراد ملف آخر",
+      "viewStudents": "عرض الطلاب",
+      "backToPreview": "العودة إلى المعاينة",
+      "importNow": "استيراد {{value}} الآن"
+    },
+    "duplicates": {
+      "title": "{{count}} سيتم تخطي التكرارات",
+      "title_plural": "{{count}} سيتم تخطي التكرارات",
+      "description": "تحتوي هذه الصفوف على emisStudentId الموجود بالفعل في هذا المستأجر. لن يتم إعادة خلقهم. السجلات الموجودة لم تمس.",
+      "row": "الصف {{row}} - emisStudentId {{emisStudentId}} موجود بالفعل في معرف الطالب {{studentId}}",
+      "andMore": "...و {{value}} أكثر"
+    },
+    "confirm": {
+      "title": "قم بتأكيد استيراد IEMIS",
+      "description": "أنت على وشك تنفيذ عملية التشغيل الجاف. لا يمكن التراجع عن هذا.",
+      "summary": "{{count}} سيتم إنشاء سجل الطالب في {{schoolName}}.",
+      "summary_plural": "{{count}} سيتم إنشاء سجلات الطلاب في {{schoolName}}.",
+      "andEnrolled": "والمسجل في {{yearName}}",
+      "skipped": "{{count}} سيتم تخطي التكرارات.",
+      "skipped_plural": "{{count}} سيتم تخطي التكرارات.",
+      "failed": "{{count}} لن يتم استيراد الصف المحظور بسبب الأخطاء.",
+      "failed_plural": "{{count}} لن يتم استيراد الصفوف المحظورة بسبب الأخطاء.",
+      "ack": "لقد قمت بمراجعة نتائج التشغيل التجريبي وتأكدت من صحة المدرسة الوجهة."
+    },
+    "progress": {
+      "queuedTitle": "استيراد في قائمة الانتظار",
+      "runningTitle": "استيراد الطلاب...",
+      "queuedDescription": "المهمة في قائمة الانتظار. معالجة {{value}} الصفوف.",
+      "runningDescription": "استيراد صفوف {{value}}.",
+      "runningDescriptionWithYear": "استيراد صفوف {{value}} والتسجيل في {{yearName}}.",
+      "keepOpen": "يمكنك إبقاء علامة التبويب هذه مفتوحة. يتم تشغيل الاستيراد من جانب الخادم؛ لن يؤدي إغلاق علامة التبويب إلى إلغاء المهمة، ولكنك ستفقد عرض الحالة المباشرة."
+    },
+    "results": {
+      "complete": "اكتمل الاستيراد",
+      "issues": "انتهى الاستيراد مع وجود مشاكل",
+      "summary": "{{created}} تم إنشاء الطلاب، {{skipped}} تم تخطيهم (التكرارات)، {{failed}} فشلوا في {{total}} إجمالي الصفوف.",
+      "summaryWithEnrollment": "{{created}} تم إنشاء الطلاب، {{enrolled}} تم تسجيلهم {{year}}، {{skipped}} تم تخطيهم (التكرارات)، {{failed}} فشلوا في الخروج من {{total}} إجمالي الصفوف.",
+      "inYear": "في {{yearName}}",
+      "duration": "استغرق {{seconds}}s.",
+      "truncated": "يتم عرض أول 500 نتيجة. أعد تشغيل التجربة التجريبية لتنزيل النتائج الكاملة CSV.",
+      "findings": "{{count}} العثور على الاستيراد",
+      "findings_plural": "{{count}} نتائج الاستيراد"
+    }
+  },
+  "calendarModule": {
+    "description": "إدارة السنوات الدراسية والمصطلحات وفترات التقدير",
+    "current": "حاضِر",
+    "noneSet": "لم يتم ضبط أي شيء",
+    "archiveCurrentHint": "قم بتعيين سنة أخرى كسنة حالية قبل الأرشفة",
+    "status": {
+      "planning": "تخطيط",
+      "active": "نشط",
+      "completed": "مكتمل",
+      "archived": "مؤرشف"
+    },
+    "actions": {
+      "planning": "فعل",
+      "active": "مكتمل",
+      "completed": "أرشيف",
+      "archived": "مؤرشف",
+      "setCurrent": "تعيين كحالي",
+      "cancel": "إلغاء",
+      "confirm": "يتأكد"
+    },
+    "stats": {
+      "currentYear": "العام الحالي",
+      "totalYears": "إجمالي السنوات",
+      "active": "نشط",
+      "planning": "تخطيط"
+    },
+    "noSchool": {
+      "title": "لم يتم تحديد مدرسة",
+      "description": "يرجى اختيار مدرسة من الشريط الجانبي لإدارة السنوات الأكاديمية."
+    },
+    "error": {
+      "title": "فشل في تحميل السنوات الأكاديمية",
+      "description": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+      "retry": "أعد المحاولة"
+    },
+    "empty": {
+      "title": "لا توجد سنوات دراسية",
+      "description": "لم يتم إنشاء سنوات دراسية بعد. قم بإنشاء عامك الدراسي الأول للبدء في إدارة الفصل الدراسي وفترة التقدير."
+    },
+    "confirm": {
+      "setCurrentTitle": "تعيين كالعام الدراسي الحالي",
+      "replaceCurrentDescription": "سيتم استبدال \"{{currentName}}\" باعتباره العام الدراسي الحالي بـ \"{{nextName}}\". سيتم تبديل جميع الوحدات التي تعتمد على العام الحالي (الحضور، الدرجات، الجدولة) إلى التحديد الجديد.",
+      "setCurrentDescription": "هل تريد تعيين \"{{yearName}}\" ليكون العام الدراسي الحالي؟ يحدد هذا العام النشط عبر جميع الوحدات.",
+      "advanceTitle": "{{action}} العام الدراسي",
+      "updateStatusTitle": "تحديث الحالة",
+      "advanceDescription": "هل أنت متأكد أنك تريد تغيير \"{{yearName}}\" من {{fromStatus}} إلى {{toStatus}}؟ لا يمكن التراجع عن هذا الإجراء."
+    }
+  },
+  "gradesModule": {
+    "reportCard": {
+      "noStudentTitle": "لم يتم تحديد أي طالب",
+      "noStudentDescription": "انتقل إلى ملف تعريف الطالب وانقر على \"عرض بطاقة التقرير\" لمعرفة درجاتهم.",
+      "goToStudents": "اذهب إلى الطلاب",
+      "setAcademicYear": "قم بإعداد عام دراسي قبل إنشاء بطاقات التقارير.",
+      "title": "بطاقة التقرير",
+      "printTitle": "بطاقة تقرير الطالب",
+      "student": "طالب:",
+      "date": "تاريخ:",
+      "academicYearFallback": "العام الدراسي",
+      "termFallback": "شرط",
+      "allTerms": "جميع الشروط",
+      "print": "مطبعة",
+      "noGradesTitle": "لم يتم تسجيل الدرجات",
+      "noGradesDescription": "ستظهر الدرجات هنا بمجرد تسجيلها من قبل المعلمين.",
+      "termGpa": "المصطلح GPA",
+      "cumulativeGpa": "التراكمي GPA",
+      "weightedGpa": "مرجح GPA",
+      "course": "دورة",
+      "assignments": "المهام",
+      "numeric": "رقمي",
+      "letter": "خطاب",
+      "gpaPoints": "GPA النقاط",
+      "status": "حالة",
+      "final": "أخير",
+      "inProgress": "في تَقَدم",
+      "generated": "تم الإنشاء في {{dateTime}} - EdForge نظام معلومات الطالب"
+    },
+    "gradebook": {
+      "noStudentsTitle": "لم يتم تسجيل أي طلاب",
+      "noStudentsDescription": "قم بتسجيل الطلاب في هذا القسم لبدء تسجيل الدرجات.",
+      "student": "طالب",
+      "transferredStudent": "طالب (منقول)",
+      "assignmentTooltip": "{{name}}\nالنقاط: {{points}}",
+      "assignmentTooltipWithCategory": "{{name}}\nالفئة: {{category}}\nالنقاط: {{points}}",
+      "scoreForStudent": "النتيجة ل {{studentName}}",
+      "addAssignment": "إضافة مهمة",
+      "overall": "إجمالي",
+      "pointsShort": "{{points}} نقاط",
+      "gradeFinalized": "تم الانتهاء من الدرجة",
+      "viewReportCard": "عرض بطاقة التقرير"
+    },
+    "management": {
+      "recordGrades": "سجل الدرجات",
+      "newAssignment": "مهمة جديدة",
+      "assignmentName": "اسم المهمة",
+      "assignmentPlaceholder": "على سبيل المثال، الفصل 3 مسابقة",
+      "assignmentPlaceholderAlt": "على سبيل المثال، الفصل 5 مسابقة",
+      "pointsPossible": "النقاط الممكنة",
+      "category": "فئة",
+      "assessmentPurpose": "الغرض من التقييم",
+      "dueDate": "تاريخ الاستحقاق",
+      "studentScores": "نتائج الطلاب",
+      "enteredCount": "{{entered}} / {{total}} دخلت",
+      "searchStudents": "البحث عن الطلاب بالاسم...",
+      "noStudents": "لا يوجد طلاب مسجلون في هذا القسم.",
+      "noStudentMatches": "لا يوجد طلاب يطابقون \"{{search}}\".",
+      "saveGrades": "حفظ الدرجات ({{value}})",
+      "saveWithScores": "حفظ مع النتائج ({{value}})",
+      "createAssignment": "إنشاء مهمة",
+      "scoreStatistics": "إحصائيات النتيجة (تم إدخال {{value}})",
+      "pasteScores": "لصق النتائج (الاسم\\tالنتيجة لكل سطر)",
+      "pasteScoresPlaceholder": "جون سميث\\t95\nجين دو\\t88",
+      "pasteFromSpreadsheet": "لصق العشرات من جدول البيانات",
+      "apply": "يتقدم",
+      "studentFallback": "طالب",
+      "studentFallbackNumbered": "الطالب #{{number}}",
+      "categories": {
+        "tests": "الاختبارات",
+        "quizzes": "مسابقات",
+        "homework": "العمل في المنزل",
+        "participation": "مشاركة",
+        "projects": "المشاريع",
+        "finalExam": "الامتحان النهائي",
+        "other": "آخر"
+      },
+      "purposes": {
+        "autoDetect": "الكشف التلقائي",
+        "formative": "التكوينية",
+        "summative": "تلخيصي"
+      },
+      "stats": {
+        "mean": "يقصد",
+        "median": "متوسط",
+        "stdDev": "التطوير القياسي",
+        "min": "دقيقة",
+        "max": "الأعلى"
+      }
+    },
+    "finalization": {
+      "title": "إنهاء الدرجات",
+      "titleWithTerm": "وضع اللمسات النهائية على الدرجات — {{termName}}",
+      "loading": "جارٍ تحميل الدرجات...",
+      "reviewDescription": "مراجعة الدرجات قبل الانتهاء. الدرجات النهائية مقفلة ولا يمكن تغييرها.",
+      "toFinalize": "لوضع اللمسات النهائية",
+      "alreadyFinal": "نهائي بالفعل",
+      "noScores": "لا عشرات",
+      "emptyStubsWarning": "{{value}} ليس لدى الطالب (الطلاب) أي واجبات مسجلة وسيتم تخطيها.",
+      "lowGradesWarning": "{{value}} الطالب (الطلاب) أقل من درجة النجاح.",
+      "columns": {
+        "student": "طالب",
+        "grade": "درجة",
+        "letter": "خطاب",
+        "status": "حالة"
+      },
+      "pass": "يمر",
+      "fail": "يفشل",
+      "allFinalized": "تم الانتهاء من جميع الدرجات بالفعل!",
+      "noneToFinalize": "لم يسجل أي طالب واجبات للانتهاء منها.",
+      "irreversibleTitle": "لا يمكن التراجع عن هذا الإجراء",
+      "irreversibleBefore": "أنت على وشك الانتهاء",
+      "irreversibleAfter": "الصف (الدرجات). الدرجات النهائية مقفلة ولا يمكن تعديلها.",
+      "finalizing": "الانتهاء من الدرجات...",
+      "completeTitle": "الانتهاء من الدرجات",
+      "completeDescription": "تم الانتهاء بنجاح من درجة (درجات) {{value}}. هذه الدرجات مقفلة الآن.",
+      "errorCount": "{{value}} لا يمكن الانتهاء من الدرجة (الدرجات).",
+      "continue": "يكمل",
+      "back": "خلف",
+      "finalizeGrades": "وضع اللمسات الأخيرة على {{value}} الدرجات",
+      "done": "منتهي"
+    },
+    "policyForm": {
+      "createTitle": "إنشاء سياسة الدرجات",
+      "editTitle": "تحرير سياسة الدرجات",
+      "policyName": "اسم السياسة",
+      "policyNamePlaceholder": "على سبيل المثال، مقياس A-F القياسي",
+      "description": "وصف",
+      "descriptionPlaceholder": "وصف موجز لهذه السياسة",
+      "roundingRule": "قاعدة التقريب",
+      "rounding": {
+        "nearest": "جولة إلى الأقرب",
+        "up": "جمع الشمل",
+        "down": "جولة للأسفل"
+      },
+      "passingGrade": "درجة النجاح",
+      "setDefault": "تعيين كافتراضي",
+      "letterGrades": "درجات الحروف",
+      "gpaScale": "GPA مقياس",
+      "to": "ل",
+      "gpaPlaceholder": "GPA",
+      "categoryWeights": "أوزان الفئة",
+      "totalWeight": "المجموع: {{total}}%",
+      "categoryNamePlaceholder": "اسم الفئة",
+      "dropLowestTitle": "إسقاط أدنى درجات N",
+      "drop": "يسقط",
+      "addCategory": "أضف فئة",
+      "createPolicy": "إنشاء سياسة",
+      "updatePolicy": "تحديث السياسة"
+    },
+    "policyList": {
+      "title": "سياسات الدرجات",
+      "default": "تقصير",
+      "editPolicy": "تحرير السياسة",
+      "gradeScale": "مقياس الصف",
+      "categoryWeights": "أوزان الفئة ({{total}}%)",
+      "newPolicy": "سياسة جديدة",
+      "emptyTitle": "لم يتم تكوين سياسات التقدير",
+      "emptyDescription": "قم بإنشاء سياسة تقدير لتحديد مقاييس التقدير وأوزان الفئات وقواعد التقريب.",
+      "gradeChip": "{{letter}} · {{min}}–{{max}}% · {{gpa}} GPA",
+      "weightAria": "{{category}} الوزن: {{weight}}%",
+      "scheme": "مخطط",
+      "schemeValue": "{{scheme}} · {{scale}}",
+      "schemeType": {
+        "letter_gpa": "رسالة + GPA",
+        "division": "قسم"
+      },
+      "minimumPassing": "الحد الأدنى من المرور",
+      "roundingLabel": "التقريب"
+    },
+    "overview": {
+      "title": "تحليلات الصف",
+      "subtitle": "الأداء الأكاديمي على مستوى المدرسة",
+      "error": "فشل تحميل بيانات التقدير. يرجى محاولة التحديث.",
+      "errorStats": "فشل تحميل إحصائيات التقدير",
+      "empty": "لم يتم تسجيل الدرجات بعد عبر الأقسام.",
+      "sectionsGraded": "{{graded}} من {{total}} أقسام متدرجة",
+      "actions": {
+        "more": "المزيد من الإجراءات",
+        "exportGradebookCsv": "تصدير دفتر التقديرات CSV",
+        "exportAtRiskCsv": "التصدير المعرض للخطر CSV",
+        "export": "تصدير"
+      },
+      "kpis": {
+        "studentsGraded": "الطلاب المُقيَّمون",
+        "averageGpa": "متوسط المعدل",
+        "passRate": "نسبة النجاح",
+        "atRisk": "المعرَّضون للخطر",
+        "avgGradeHint": "متوسط ​​الدرجة: {{grade}}%",
+        "passRateHint": "حصل الطلاب على نسبة 60% فما فوق",
+        "atRiskHint": "أقل من عتبة 60%",
+        "belowThreshold": "أقل من 60%",
+        "needSupport": "بحاجة إلى الدعم"
+      },
+      "completion": {
+        "title": "استكمال الدرجات",
+        "subtitle": "إدخالات الواجب عبر الأقسام النشطة",
+        "gradedShort": "متدرج",
+        "graded": "متدرج",
+        "remaining": "متبقي",
+        "totalEntries": "{{total}} إجمالي إدخالات المهمة",
+        "gradedCount": "{{count}} متدرج",
+        "remainingCount": "{{count}} في انتظار الدرجات",
+        "total": "{{count}} إجمالي إدخالات المهمة"
+      },
+      "assessment": {
+        "title": "أداء التقييم",
+        "subtitle": "متوسط ​​الدرجات حسب نوع التقييم",
+        "formativeExamples": "الاختبارات والواجبات المنزلية والمشاركة",
+        "summativeExamples": "الاختبارات والامتحانات والمشاريع",
+        "formativeHigher": "التكوينية {{diff}}% أعلى",
+        "higherSuffix": "من التلخيصية - متوازنة بشكل جيد.",
+        "summativeHigher": "التلخيصية {{diff}}% أعلى",
+        "summativeHigherSuffix": "من التكوينية.",
+        "equal": "الدرجات التكوينية والختامية متساوية ومتوازنة بشكل جيد.",
+        "unclassified": "+{{value}} غير مصنف (متوسط ​​{{avg}}%)",
+        "formative": "التكوينية - الاختبارات والواجبات المنزلية (عناصر {{count}})",
+        "summative": "التلخيصية - الاختبارات والامتحانات (عناصر {{count}})",
+        "noneYet": "— · لا شيء بعد",
+        "noteBalanced": "الدرجات متوازنة بشكل جيد تجاه العمل المستمر.",
+        "noteNoSummative": "جميع العناصر المقدرة هي عناصر تكوينية - ولم يتم تسجيل أي تقييمات ختامية حتى الآن."
+      },
+      "distribution": {
+        "title": "توزيع الدرجات",
+        "subtitle": "عدد الطلاب في كل نطاق دراسي بناءً على المعدلات الإجمالية للدورة",
+        "a": "أ (90-100)",
+        "b": "ب (80-89)",
+        "c": "ج (70-79)",
+        "d": "د (60-69)",
+        "f": "ف (0-59)",
+        "metric": "{{count}} متدرج",
+        "note": "يشمل عدد F الطلاب الذين ما زالوا ينتظرون الدرجات (يقرأون على أنها 0%)."
+      },
+      "category": {
+        "title": "أداء الفئة",
+        "subtitle": "متوسط ​​الدرجات حسب تصنيف فئة السياسة",
+        "headers": {
+          "category": "فئة",
+          "weight": "بالوزن.",
+          "score": "نتيجة",
+          "avg": "متوسط"
+        }
+      },
+      "course": {
+        "title": "أداء الدورة",
+        "subtitle": "مقاييس الدرجات المجمعة لكل دورة عبر الأقسام"
+      },
+      "courseHeaders": {
+        "course": "دورة",
+        "sections": "ثانية.",
+        "students": "الأمراض المنقولة جنسيا.",
+        "avgGrade": "متوسط ​​الصف ↓",
+        "gpa": "GPA",
+        "passRate": "يمر ٪"
+      },
+      "atRisk": {
+        "title": "الطلاب المعرضون للخطر",
+        "subtitle": "الطلاب الحاصلون على درجات أقل من 60% في أي دورة",
+        "studentCount": "{{value}} الطلاب",
+        "empty": "لا يوجد طلاب تحت عتبة الصف",
+        "headers": {
+          "student": "طالب",
+          "course": "دورة",
+          "grade": "درجة",
+          "letter": "خطاب"
+        },
+        "dedupeSubtitle": "الطلاب الفريدون الذين تقل أعمارهم عن 60% من عتبة النجاح - يتم استخلاصهم من الإدخالات التي تم وضع علامة عليها في {{raw}}",
+        "export": "التصدير في خطر",
+        "filterAria": "تصفية الطلاب المعرضين للخطر",
+        "filterAll": "الجميع",
+        "filterGraded": "متدرج",
+        "filterPending": "في انتظار الدرجات",
+        "pendingNote": "{{count}} تم وضع علامة عليه فقط لأنه لم يتم إدخال الدرجات بعد",
+        "tagFailing": "فاشل",
+        "tagBelowPass": "أدناه تمر",
+        "tagNotGraded": "لم يتم تصنيفها بعد"
+      },
+      "backToGradebook": "العودة إلى دفتر الدرجات",
+      "scope": "على مستوى المدرسة · {{graded}} من {{total}} تم تقدير الأقسام",
+      "noData": "لا توجد بيانات متاحة",
+      "emptyState": {
+        "title": "لم يتم تسجيل الدرجات بعد",
+        "description": "قم بتقييم بعض الواجبات لرؤية التحليلات على مستوى المدرسة."
+      },
+      "insight": {
+        "body": "{{pending}} من {{unique}} العلامات المعرضة للخطر هي الدرجات المعلقة، وليس الطلاب الراسبين. {{ungraded}} من {{totalEntries}} إدخالات الواجب غير مصنفة، لذلك يقرأ هؤلاء الطلاب على أنها 0% - مما يقلل من معدل النجاح {{passRate}}% ويضخم عدد المعرضين للخطر. قم بتقييم العمل المعلق للحصول على صورة حقيقية.",
+        "reviewPending": "مراجعة الدرجات المعلقة"
+      },
+      "courses": {
+        "title": "أداء الدورة",
+        "subtitle": "مقاييس الدرجات المجمعة لكل دورة",
+        "course": "دورة",
+        "sections": "ثانية.",
+        "students": "طلاب",
+        "avg": "متوسط",
+        "gpa": "GPA",
+        "pass": "يمر ٪"
+      },
+      "categories": {
+        "title": "أداء الفئة",
+        "subtitle": "متوسط ​​الدرجات حسب فئة سياسة الدرجات",
+        "empty": "لا توجد بيانات الفئة حتى الآن"
+      }
+    }
+  },
+  "iemisExport": {
+    "title": "IEMiS التصدير الشهري",
+    "description": "قم بإنشاء سجل الحضور الشهري لـ IEMiS Flash II لمدة شهر تقويمي. تقوم عملية التصدير بإعادة حساب عدد أيام الحضور/الغياب/العذر لكل طالب وتتيح لك تنزيل CSV. الصف هو مستوى الصف المدرسي المحلي.",
+    "month": "شهر",
+    "monthAria": "شهر التصدير (YYYY-MM)",
+    "generating": "جارٍ الإنشاء...",
+    "generate": "توليد التصدير",
+    "downloadCsv": "تحميل CSV",
+    "invalidMonth": "أدخل شهرًا صالحًا (YYYY-MM).",
+    "failed": "فشل في إنشاء التصدير. يرجى المحاولة مرة أخرى.",
+    "summary": "{{students}} · {{yearMonth}}",
+    "generated": "تم إنشاؤها {{dateTime}}",
+    "empty": "لم يتم تسجيل أي حضور لهذا الشهر.",
+    "search": "بحث عن الطلاب...",
+    "bs": "BS {{label}}",
+    "bsRange": "BS {{start}} – {{end}}",
+    "bsMonths": {
+      "1": "بايساك",
+      "2": "جيستا",
+      "3": "اشاد",
+      "4": "شروان",
+      "5": "بهادرا",
+      "6": "اشوين",
+      "7": "كارتيك",
+      "8": "مانجسير",
+      "9": "ادفع",
+      "10": "ماغ",
+      "11": "فالجون",
+      "12": "شيترا"
+    },
+    "columns": {
+      "studentId": "الطالب ID",
+      "studentName": "اسم الطالب",
+      "grade": "درجة",
+      "presentDays": "الأيام الحالية",
+      "absentDays": "أيام الغياب",
+      "excusedDays": "الأيام المعذرة",
+      "totalSchoolDays": "إجمالي أيام الدراسة",
+      "student": "طالب",
+      "present": "الحاضر",
+      "absent": "غائب",
+      "excused": "معذرة",
+      "schoolDays": "أيام المدرسة"
+    }
+  },
+  "governmentReports": {
+    "title": "التقارير الحكومية",
+    "descriptionPrefix": "قم بإنشاء وتنزيل وتتبع عمليات تقديم CEHRD IEMIS Flash I / Flash II لـ",
+    "iemisCode": "IEMIS {{code}}",
+    "noSchool": "اختر مدرسة لتوليد التقارير الحكومية.",
+    "noIemisCode": {
+      "title": "هذه المدرسة ليس لديها رمز IEMIS حتى الآن",
+      "beforeCode": "تتطلب صادرات CEHRD Flash I/II رمز IEMIS الصادر عن الحكومة (",
+      "afterCode": "عمود). قم بإضافته ضمن إعدادات المدرسة، ثم قم بالعودة إلى هنا لإنشاء التقارير."
+    },
+    "fields": {
+      "report": "تقرير",
+      "academicYearBs": "العام الدراسي (BS)",
+      "academicYearAria": "العام الدراسي في بيكرام سامبات"
+    },
+    "year": {
+      "currentOption": "{{yearName}} · الحالي",
+      "bs": "BS {{year}}"
+    },
+    "templates": {
+      "IEMIS_NPL_CEHRD_FLASH_I": "فلاش الأول - تعداد الالتحاق",
+      "IEMIS_NPL_CEHRD_FLASH_II": "Flash II — النتائج والحضور"
+    },
+    "status": {
+      "generating": "توليد",
+      "generated": "مستعد",
+      "submitted": "مُقَدَّم",
+      "verified": "تم التحقق منه",
+      "failed": "فشل"
+    },
+    "actions": {
+      "back": "خلف",
+      "validate": "التحقق من صحة",
+      "generate": "إنشاء تقرير",
+      "downloadCsv": "تحميل CSV",
+      "csv": "CSV",
+      "retry": "أعد المحاولة",
+      "retryGeneration": "إعادة محاولة الجيل",
+      "markSubmitted": "تم تقديم مارك",
+      "markVerified": "تم التحقق من العلامة",
+      "refresh": "ينعش",
+      "dismiss": "رفض"
+    },
+    "validation": {
+      "invalidBsYear": "أدخل سنة BS مكونة من 4 أرقام، على سبيل المثال. 2083."
+    },
+    "flashIi": {
+      "beforeExam": "فلاش الثاني",
+      "examMarks": "علامات الامتحان",
+      "and": "و",
+      "gpa": "GPA",
+      "afterGpa": "يتم إدخال الأعمدة يدويا في هذا الإصدار؛ يتم إنشاء جميع الأعمدة الأخرى (التسجيل والحضور والمعلومات السكانية) تلقائيًا."
+    },
+    "existingReport": "{{template}} لـ BS {{year}} موجود بالفعل ({{status}}). يؤدي الإنشاء إلى إنشاء إصدار جديد.",
+    "history": {
+      "title": "تقرير التاريخ",
+      "filterAria": "تصفية حسب التقرير",
+      "filters": {
+        "all": "الجميع",
+        "flashI": "فلاش أنا",
+        "flashII": "فلاش الثاني"
+      },
+      "empty": "لم يتم إنشاء تقارير حتى الآن لهذه المدرسة.",
+      "emptyFilter": "لا توجد تقارير تتطابق مع هذا الفلتر.",
+      "rowsPrefix": "{{value}} الصفوف ·",
+      "generated": "ولدت {{dateTime}}",
+      "created": "تم إنشاؤه {{dateTime}}",
+      "dryRunSuffix": "· التشغيل الجاف"
+    },
+    "guidance": {
+      "beforeLink": "بعد التنزيل، قم بتحميل CSV إلى بوابة IEMIS (",
+      "afterLink": ")، ثم ضع علامة على التقرير",
+      "and": "و",
+      "afterVerified": "بمجرد تأكيد CEHRD القبول."
+    },
+    "preflight": {
+      "passed": "تم التحقق من الصحة",
+      "blocked": "تم حظر التحقق",
+      "description": "يؤكد التحقق من وجود المدرسة والعام الدراسي. يتم الإبلاغ عن المشكلات الميدانية لكل طالب في صف التقرير أثناء الإنشاء."
+    },
+    "active": {
+      "generating": "جارٍ إنشاء التقرير...",
+      "stalled": "يستغرق وقتًا أطول من المتوقع",
+      "ready": "التقرير جاهز",
+      "failed": "فشل الجيل",
+      "stalledDescription": "وهذا أمر غير معتاد بالنسبة لمدرسة واحدة؛ ربما تكون قد فشلت. قم بالتحديث للتحقق من أحدث حالة.",
+      "emptyReport": "يحتوي هذا التقرير على 0 طلاب. تحقق مرة أخرى من العام الدراسي قبل التقديم."
+    }
+  }
+}

@@ -99,7 +99,7 @@ function RowActions({ section, onView, onEdit, onToggleActive, onViewRoster }: R
               setIsOpen(false)
             }}
           />
-          <div className="absolute right-0 z-20 mt-1 w-48 rounded-lg bg-surface-primary border border-border-primary shadow-lg py-1">
+          <div className="absolute ef-inset-inline-end-0 z-20 mt-1 w-48 rounded-lg bg-surface-primary border border-border-primary shadow-lg py-1">
             <button
               type="button"
               onClick={(e) => {

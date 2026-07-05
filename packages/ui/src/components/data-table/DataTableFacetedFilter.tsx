@@ -92,7 +92,7 @@ export function DataTableFacetedFilter<TData>({
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <PopoverPanel className="absolute z-50 mt-1 w-60 origin-top-left rounded-xl bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary)/0.35)] shadow-popover focus:outline-none overflow-hidden">
+        <PopoverPanel className="absolute ef-inset-inline-start-0 z-50 mt-1 w-60 origin-top-left rounded-xl bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary)/0.35)] shadow-popover focus:outline-none overflow-hidden">
           <div className="py-1 max-h-64 overflow-y-auto">
             {options.map((option) => {
               const isSelected = selectedValues.has(option.value)

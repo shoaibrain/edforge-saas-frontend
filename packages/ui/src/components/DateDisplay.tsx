@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next'
 import { adToBS, formatBSDate, formatBSLong, formatBSShort } from '@edforge/date-utils'
 import type { CalendarSystem } from '@edforge/date-utils'
 import { BS_MONTH_NAMES_NE, BS_MONTH_NAMES_EN } from '@edforge/date-utils'
+import { Bdi } from './Bdi'
 
 interface DateDisplayProps {
   /** The date to display. Accepts Date object, ISO string, or null/undefined */
@@ -76,5 +77,11 @@ export function DateDisplay({
     }
   }, [date, format, showDual, calendar, i18n.language])
 
-  return <span className={className}>{display}</span>
+  // Dates are numeric LTR islands (digits, slashes, `bs (ad)` parens). Isolate
+  // them so they don't reorder inside RTL (Arabic) content. No-op in LTR.
+  return (
+    <span className={className}>
+      <Bdi>{display}</Bdi>
+    </span>
+  )
 }

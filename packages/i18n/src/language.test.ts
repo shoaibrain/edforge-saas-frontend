@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  getLanguageDirection,
   normalizeLocaleCode,
   normalizePlatformLanguage,
   toPlatformLanguage,
@@ -10,6 +11,7 @@ describe("platform language normalization", () => {
     expect(toPlatformLanguage("en")).toBe("en");
     expect(toPlatformLanguage("ne")).toBe("ne");
     expect(toPlatformLanguage("hi")).toBe("hi");
+    expect(toPlatformLanguage("ar")).toBe("ar");
   });
 
   it("normalizes regional and underscored locale codes to platform languages", () => {
@@ -19,11 +21,14 @@ describe("platform language normalization", () => {
     expect(toPlatformLanguage("NE_np")).toBe("ne");
     expect(toPlatformLanguage("hi-IN")).toBe("hi");
     expect(toPlatformLanguage("HI_in")).toBe("hi");
+    expect(toPlatformLanguage("ar-AE")).toBe("ar");
+    expect(toPlatformLanguage("AR_eg")).toBe("ar");
   });
 
   it("uses the first supported language candidate from arrays", () => {
     expect(toPlatformLanguage(["fr-FR", "ne-NP", "en-US"])).toBe("ne");
     expect(toPlatformLanguage(["fr-FR", "hi-IN", "en-US"])).toBe("hi");
+    expect(toPlatformLanguage(["fr-FR", "ar-AE", "en-US"])).toBe("ar");
     expect(toPlatformLanguage([null, "", "en-US"])).toBe("en");
   });
 
@@ -45,5 +50,15 @@ describe("platform language normalization", () => {
     expect(normalizeLocaleCode("ne-NP")).toBe("ne-NP");
     expect(normalizeLocaleCode("hi")).toBe("hi-IN");
     expect(normalizeLocaleCode("hi-IN")).toBe("hi-IN");
+    expect(normalizeLocaleCode("ar")).toBe("ar-AE");
+    expect(normalizeLocaleCode("ar-EG")).toBe("ar-AE");
+  });
+
+  it("resolves layout direction for supported platform languages", () => {
+    expect(getLanguageDirection("en")).toBe("ltr");
+    expect(getLanguageDirection("ne-NP")).toBe("ltr");
+    expect(getLanguageDirection("hi-IN")).toBe("ltr");
+    expect(getLanguageDirection("ar-AE")).toBe("rtl");
+    expect(getLanguageDirection("fr-FR")).toBe("ltr");
   });
 });

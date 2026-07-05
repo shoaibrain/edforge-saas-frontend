@@ -2,7 +2,7 @@
  * Locale parity tests.
  *
  * These derive from the same namespace registry used by runtime i18n config so
- * adding a namespace without Nepali coverage fails immediately.
+ * adding a namespace without localized coverage fails immediately.
  */
 
 import { describe, expect, it } from "vitest";

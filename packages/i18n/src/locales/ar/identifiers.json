@@ -1,0 +1,20 @@
+{
+  "emisStudentId": "EMIS الطالب ID",
+  "studentNumber": "رقم الطالب",
+  "stateStudentId": "طالب الدولة ID",
+  "receiptNumber": "رقم الإيصال",
+  "invoiceNumber": "رقم الفاتورة",
+  "invoiceId": "الفاتورة ID",
+  "accountNumber": "رقم الحساب",
+  "transactionId": "المعاملة ID",
+  "paymentId": "الدفع ID",
+  "enrollmentId": "التسجيل ID",
+  "userId": "المستخدم ID",
+  "paidBy": "المدفوعة بواسطة",
+  "copy": "ينسخ",
+  "copied": "منقول",
+  "unverifiedFormat": "تنسيق لم يتم التحقق منه",
+  "maskedIdentifier": "معرف مقنع",
+  "hidden": "مختفي",
+  "none": "لا أحد"
+}

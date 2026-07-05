@@ -51,7 +51,7 @@ export function DataTableViewOptions<TData>({
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <PopoverPanel className="absolute right-0 z-50 mt-1 w-52 origin-top-right rounded-xl bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary)/0.35)] shadow-lg focus:outline-none overflow-hidden">
+        <PopoverPanel className="absolute ef-inset-inline-end-0 z-50 mt-1 w-52 origin-top-right rounded-xl bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary)/0.35)] shadow-lg focus:outline-none overflow-hidden">
           {showDensity && (
             <div className="px-3 py-2.5 border-b border-[rgb(var(--border-secondary))]">
               <span className="text-xs font-semibold text-[rgb(var(--text-secondary))] uppercase tracking-wider">

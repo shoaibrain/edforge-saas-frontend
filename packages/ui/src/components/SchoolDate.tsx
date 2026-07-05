@@ -14,6 +14,7 @@
 
 import { useMemo } from 'react'
 import { formatSchoolDate } from '@aibrains/shared-types'
+import { Bdi } from './Bdi'
 
 interface SchoolDateProps {
   date: string | null | undefined
@@ -39,5 +40,10 @@ export function SchoolDate({
     }
   }, [date, calendarSystem, format, fallback])
 
-  return <span className={className}>{formatted}</span>
+  // Date strings are LTR islands — isolate so they don't reorder in RTL. No-op in LTR.
+  return (
+    <span className={className}>
+      <Bdi>{formatted}</Bdi>
+    </span>
+  )
 }

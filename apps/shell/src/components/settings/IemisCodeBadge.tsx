@@ -13,6 +13,7 @@
 import { useState } from 'react'
 import { Check, Copy, AlertCircle } from 'lucide-react'
 import { toast } from 'sonner'
+import { Bdi } from '@edforge/ui'
 
 /**
  * Local IEMIS School Code format check (Sprint 1 S1.1 intent).
@@ -74,7 +75,7 @@ export function IemisCodeBadge({ code, className }: IemisCodeBadgeProps) {
       ) : (
         <AlertCircle className="w-3 h-3" aria-hidden />
       )}
-      <span className="tabular-nums">IEMIS&nbsp;{code}</span>
+      <span className="tabular-nums">IEMIS&nbsp;<Bdi>{code}</Bdi></span>
       <button
         type="button"
         onClick={handleCopy}
@@ -87,7 +88,7 @@ export function IemisCodeBadge({ code, className }: IemisCodeBadgeProps) {
       {hovering && (
         <span
           role="tooltip"
-          className="absolute left-0 top-full z-20 mt-1.5 w-64 rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))] px-3 py-2 text-xs font-normal leading-relaxed text-[rgb(var(--text-secondary))] shadow-lg"
+          className="absolute ef-inset-inline-start-0 top-full z-20 mt-1.5 w-64 rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))] px-3 py-2 text-xs font-normal leading-relaxed text-[rgb(var(--text-secondary))] shadow-lg"
         >
           {tooltipText}
         </span>

@@ -64,7 +64,7 @@ export function ActionsMenu({ items, label }: ActionsMenuProps) {
       {open && (
         <div
           role="menu"
-          className="absolute right-0 z-20 mt-1.5 w-56 overflow-hidden rounded-xl border border-[rgb(var(--border-secondary))] bg-[rgb(var(--background-elevated))] py-1 shadow-popover"
+          className="absolute ef-inset-inline-end-0 z-20 mt-1.5 w-56 overflow-hidden rounded-xl border border-[rgb(var(--border-secondary))] bg-[rgb(var(--background-elevated))] py-1 shadow-popover"
         >
           {items.map((item) => (
             <button

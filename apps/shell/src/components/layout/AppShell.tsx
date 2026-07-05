@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { useEffect } from 'react'
+import { getLanguageDirection, useTranslation } from '@edforge/i18n'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
 import { SkipLink } from './SkipLink'
@@ -15,6 +16,8 @@ export function AppShell({ children }: AppShellProps) {
   const collapsed = useAppStore((s) => s.sidebarCollapsed)
   const toggleSidebar = useAppStore((s) => s.toggleSidebar)
   const isSchoolTransitioning = useAppStore((s) => s.isSchoolTransitioning)
+  const { i18n } = useTranslation()
+  const contentDirection = getLanguageDirection(i18n.language)
 
   // Accessibility: Focus management on route changes
   useRouteFocus()
@@ -35,6 +38,7 @@ export function AppShell({ children }: AppShellProps) {
   return (
     <div
       className="h-screen overflow-hidden bg-[var(--shell-page-bg)]"
+      dir="ltr"
       style={{ transition: 'background 0.3s' }}
     >
       {/* Skip link for keyboard/screen reader users */}
@@ -57,6 +61,8 @@ export function AppShell({ children }: AppShellProps) {
           <main
             id="main-content"
             tabIndex={-1}
+            dir="ltr"
+            data-testid="app-scroll-frame"
             aria-busy={isSchoolTransitioning || undefined}
             className="h-full overflow-y-auto overflow-x-hidden outline-none bg-[var(--shell-cp-bg)] rounded-[var(--shell-cp-radius)] shadow-[var(--shell-cp-shadow)]"
             style={{
@@ -67,7 +73,9 @@ export function AppShell({ children }: AppShellProps) {
             }}
             aria-label="Main content"
           >
-            {children}
+            <div dir={contentDirection} data-testid="app-content" className="min-h-full">
+              {children}
+            </div>
             <SchoolTransitionOverlay />
           </main>
         </div>

@@ -138,7 +138,7 @@ export function GuardianCell({ guardians }: { guardians?: GuardianDto[] }) {
           <div
             role="dialog"
             aria-label={t('studentProfile.guardian.guardians')}
-            className="absolute left-0 z-20 mt-1 w-64 rounded-lg border overflow-hidden shadow-lg bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.5)]"
+            className="absolute ef-inset-inline-start-0 z-20 mt-1 w-64 rounded-lg border overflow-hidden shadow-lg bg-[rgb(var(--background-secondary))] border-[rgb(var(--border-primary)/0.5)]"
             onKeyDown={(e) => { if (e.key === 'Escape') setOpen(false) }}
           >
             <div className="px-3 py-2 text-xs font-bold uppercase tracking-wider border-b text-[rgb(var(--text-tertiary))] border-[rgb(var(--border-primary)/0.3)]">

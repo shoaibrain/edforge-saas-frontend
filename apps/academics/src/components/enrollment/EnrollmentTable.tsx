@@ -120,7 +120,7 @@ function ActionMenu({
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 z-20 mt-1 w-44 rounded-lg py-1 overflow-hidden shadow-lg bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary)/0.35)]">
+          <div className="absolute ef-inset-inline-end-0 z-20 mt-1 w-44 rounded-lg py-1 overflow-hidden shadow-lg bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-primary)/0.35)]">
             <button
               type="button"
               onClick={() => { onWithdraw(); setOpen(false) }}
