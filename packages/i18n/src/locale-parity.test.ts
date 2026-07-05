@@ -11,6 +11,7 @@ import {
   NAMESPACES,
   SUPPORTED_LANGUAGES,
   type Namespace,
+  type SupportedLanguage,
 } from "./config";
 
 type LocaleObject = Record<string, unknown>;
@@ -41,7 +42,7 @@ function valueAt(obj: LocaleObject, path: string): unknown {
 }
 
 function resourceFor(
-  language: "en" | "ne",
+  language: SupportedLanguage,
   namespace: Namespace,
 ): LocaleObject {
   return I18N_RESOURCES[language][namespace] as LocaleObject;
@@ -60,45 +61,59 @@ describe("locale registry", () => {
   });
 });
 
-describe("locale parity (en ↔ ne)", () => {
+describe("locale parity", () => {
   for (const namespace of NAMESPACES) {
     describe(`namespace: ${namespace}`, () => {
-      it("English keys have corresponding Nepali keys", () => {
+      it("English keys have corresponding localized keys", () => {
         const enKeys = getKeys(resourceFor("en", namespace));
-        const neKeys = new Set(getKeys(resourceFor("ne", namespace)));
-        const missing = enKeys.filter((key) => !neKeys.has(key));
 
-        expect(
-          missing,
-          `Missing in ne/${namespace}.json: ${missing.join(", ")}`,
-        ).toEqual([]);
+        for (const language of SUPPORTED_LANGUAGES.filter(
+          (language) => language !== "en",
+        )) {
+          const localizedKeys = new Set(getKeys(resourceFor(language, namespace)));
+          const missing = enKeys.filter((key) => !localizedKeys.has(key));
+
+          expect(
+            missing,
+            `Missing in ${language}/${namespace}.json: ${missing.join(", ")}`,
+          ).toEqual([]);
+        }
       });
 
-      it("Nepali keys have corresponding English keys", () => {
-        const neKeys = getKeys(resourceFor("ne", namespace));
+      it("localized keys have corresponding English keys", () => {
         const enKeys = new Set(getKeys(resourceFor("en", namespace)));
-        const extra = neKeys.filter((key) => !enKeys.has(key));
 
-        expect(
-          extra,
-          `Extra in ne/${namespace}.json: ${extra.join(", ")}`,
-        ).toEqual([]);
+        for (const language of SUPPORTED_LANGUAGES.filter(
+          (language) => language !== "en",
+        )) {
+          const localizedKeys = getKeys(resourceFor(language, namespace));
+          const extra = localizedKeys.filter((key) => !enKeys.has(key));
+
+          expect(
+            extra,
+            `Extra in ${language}/${namespace}.json: ${extra.join(", ")}`,
+          ).toEqual([]);
+        }
       });
 
-      it("Nepali leaves are non-empty strings", () => {
-        const neResource = resourceFor("ne", namespace);
+      it("localized leaves are non-empty strings", () => {
+        for (const language of SUPPORTED_LANGUAGES.filter(
+          (language) => language !== "en",
+        )) {
+          const resource = resourceFor(language, namespace);
 
-        for (const key of getKeys(neResource)) {
-          const value = valueAt(neResource, key);
+          for (const key of getKeys(resource)) {
+            const value = valueAt(resource, key);
 
-          expect(
-            value,
-            `ne/${namespace}.json "${key}" should be a non-empty string`,
-          ).toBeTruthy();
-          expect(
-            typeof value,
-            `ne/${namespace}.json "${key}" should be string, got ${typeof value}`,
-          ).toBe("string");
+            expect(
+              value,
+              `${language}/${namespace}.json "${key}" should be a non-empty string`,
+            ).toBeTruthy();
+            expect(
+              typeof value,
+              `${language}/${namespace}.json "${key}" should be string, got ${typeof value}`,
+            ).toBe("string");
+          }
         }
       });
     });

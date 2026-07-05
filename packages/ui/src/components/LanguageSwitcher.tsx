@@ -1,7 +1,7 @@
 /**
  * LanguageSwitcher
  *
- * Dropdown toggle for switching between English and नेपाली.
+ * Dropdown toggle for switching between supported platform languages.
  * Uses Headless UI Menu for accessible keyboard-navigable dropdown.
  */
 
@@ -13,6 +13,7 @@ import { cn, focusRing, focusRingInset } from '../utils'
 const LANGUAGES = [
   { code: 'en', label: 'English', flag: 'EN' },
   { code: 'ne', label: 'नेपाली', flag: 'ने' },
+  { code: 'hi', label: 'हिन्दी', flag: 'हि' },
 ] as const
 
 interface LanguageSwitcherProps {
@@ -28,7 +29,7 @@ export function LanguageSwitcher({
   className,
   variant = 'default',
 }: LanguageSwitcherProps) {
-  const { i18n } = useTranslation()
+  const { i18n, t } = useTranslation('nav')
   const currentLang = LANGUAGES.find((l) => l.code === i18n.language) || LANGUAGES[0]
 
   const handleSelect = (code: string) => {
@@ -46,7 +47,7 @@ export function LanguageSwitcher({
             ? 'bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-tertiary))] border border-[rgb(var(--border-secondary))]'
             : 'text-[rgb(var(--text-inverted)/0.80)] hover:text-[rgb(var(--text-inverted))] hover:bg-[rgb(var(--background-primary)/0.10)]'
         )}
-        aria-label="Change language"
+        aria-label={t('changeLanguage')}
       >
         <span className="text-xs font-bold w-5 text-center">{currentLang.flag}</span>
         <span className="hidden sm:inline">{currentLang.label}</span>

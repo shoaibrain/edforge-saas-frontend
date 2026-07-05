@@ -29,6 +29,7 @@ import { SchoolSwitcher } from "./SchoolSwitcher";
 const LANG_OPTIONS = [
   { code: "en", label: "EN", labelKey: "languageEnglish" },
   { code: "ne", label: "NP", labelKey: "languageNepali" },
+  { code: "hi", label: "HI", labelKey: "languageHindi" },
 ] as const;
 
 function LanguageToggle() {

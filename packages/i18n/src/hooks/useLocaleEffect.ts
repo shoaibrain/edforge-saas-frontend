@@ -2,9 +2,9 @@
  * useLocaleEffect
  *
  * Synchronizes the document's <html lang> attribute and conditionally loads
- * Noto Sans Devanagari font when Nepali locale is active.
+ * Noto Sans Devanagari font when Nepali or Hindi locale is active.
  *
- * Nepali (Devanagari script) is LTR — no dir attribute change needed.
+ * Nepali and Hindi (Devanagari script) are LTR — no dir attribute change needed.
  */
 
 import { useEffect } from 'react'
@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next'
 const DEVANAGARI_FONT_ID = 'edforge-devanagari-font'
 const DEVANAGARI_FONT_URL =
   'https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap'
+const DEVANAGARI_LANGUAGES = new Set(['ne', 'hi'])
 
 function injectDevanagariFont() {
   if (document.getElementById(DEVANAGARI_FONT_ID)) return
@@ -38,7 +39,8 @@ export function useLocaleEffect() {
       document.documentElement.lang = lang
 
       // Conditionally load Devanagari font
-      if (lang === 'ne') {
+      const baseLanguage = lang.split('-')[0]
+      if (DEVANAGARI_LANGUAGES.has(baseLanguage)) {
         injectDevanagariFont()
       } else {
         removeDevanagariFont()

@@ -9,6 +9,7 @@ describe("platform language normalization", () => {
   it("normalizes supported language codes", () => {
     expect(toPlatformLanguage("en")).toBe("en");
     expect(toPlatformLanguage("ne")).toBe("ne");
+    expect(toPlatformLanguage("hi")).toBe("hi");
   });
 
   it("normalizes regional and underscored locale codes to platform languages", () => {
@@ -16,10 +17,13 @@ describe("platform language normalization", () => {
     expect(toPlatformLanguage("en_GB")).toBe("en");
     expect(toPlatformLanguage("ne-NP")).toBe("ne");
     expect(toPlatformLanguage("NE_np")).toBe("ne");
+    expect(toPlatformLanguage("hi-IN")).toBe("hi");
+    expect(toPlatformLanguage("HI_in")).toBe("hi");
   });
 
   it("uses the first supported language candidate from arrays", () => {
     expect(toPlatformLanguage(["fr-FR", "ne-NP", "en-US"])).toBe("ne");
+    expect(toPlatformLanguage(["fr-FR", "hi-IN", "en-US"])).toBe("hi");
     expect(toPlatformLanguage([null, "", "en-US"])).toBe("en");
   });
 
@@ -39,5 +43,7 @@ describe("platform language normalization", () => {
     expect(normalizeLocaleCode("en-GB")).toBe("en-US");
     expect(normalizeLocaleCode("ne")).toBe("ne-NP");
     expect(normalizeLocaleCode("ne-NP")).toBe("ne-NP");
+    expect(normalizeLocaleCode("hi")).toBe("hi-IN");
+    expect(normalizeLocaleCode("hi-IN")).toBe("hi-IN");
   });
 });

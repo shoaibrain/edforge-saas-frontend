@@ -1,0 +1,1302 @@
+{
+  "title": "शुल्क भुगतान",
+  "description": "चालान देखें, भुगतान करें और रसीदें डाउनलोड करें",
+  "overview": {
+    "finance": "वित्त",
+    "selectSchoolTitle": "एक स्कूल चुनें",
+    "selectSchoolDescription": "वित्तीय डेटा देखने के लिए शीर्ष नेविगेशन से एक स्कूल चुनें।",
+    "actions": {
+      "bulkInvoice": "थोक चालान",
+      "bulkInvoiceAria": "थोक चालान सृजन",
+      "recordPayment": "भुगतान रिकॉर्ड करें",
+      "recordPaymentAria": "भुगतान रिकॉर्ड करें"
+    },
+    "insight": {
+      "invoiced": "{{amount}} चालान किया गया",
+      "collected": "{{rate}}% एकत्र किया गया",
+      "invoiceOverdue": "{{count}} चालान अतिदेय",
+      "invoiceOverdue_plural": "{{count}} चालान अतिदेय",
+      "noOverdue": "कोई अतिदेय नहीं"
+    },
+    "filters": {
+      "today": "आज",
+      "week": "इस सप्ताह",
+      "month": "इस महीने",
+      "year": "इस साल",
+      "or": "या",
+      "fromDate": "दिनांक से",
+      "toDate": "आज तक",
+      "allYears": "सभी वर्ष",
+      "clear": "साफ़ करें",
+      "exportCsv": "निर्यात करेंCSV",
+      "exportCsvAria": "इनवॉइस को CSV के रूप में निर्यात करें"
+    },
+    "export": {
+      "success": "CSV निर्यात डाउनलोड किया गया",
+      "failed": "CSV निर्यात करने में विफल"
+    },
+    "alert": {
+      "title": "{{count}} चालान अतिदेय - {{amount}} एकत्रित नहीं हुए",
+      "collectionRate": "संग्रहण दर {{rate}}% है",
+      "agingBucket": "{{count}} इनवॉइस {{bucket}} बकेट में",
+      "drafts": "{{count}} अतिरिक्त ड्राफ्ट जारी करने की आवश्यकता है",
+      "reviewBilling": "बिलिंग की समीक्षा करें",
+      "region": "अलर्ट"
+    },
+    "kpi": {
+      "totalInvoiced": "कुल चालान किया गया",
+      "collected": "एकत्र किया गया",
+      "outstanding": "उत्कृष्ट",
+      "overdue": "अतिदेय",
+      "invoiceCount": "{{count}} चालान",
+      "paymentCount": "{{count}} भुगतान",
+      "awaiting": "{{count}} प्रतीक्षारत",
+      "thisMonth": "इस महीने",
+      "region": "प्रमुख मेट्रिक्स"
+    },
+    "empty": {
+      "noPaymentsTitle": "अभी तक कोई भुगतान नहीं",
+      "noPaymentsMessage": "जैसे ही छात्र भुगतान करना शुरू करेंगे, भुगतान यहां दिखाई देगा।",
+      "noInvoicesTitle": "अभी तक कोई चालान नहीं",
+      "noInvoicesMessage": "बिलिंग गतिविधि पर नज़र रखना शुरू करने के लिए चालान बनाएं।"
+    },
+    "collection": {
+      "title": "संग्रह प्रदर्शन",
+      "percentCollected": "{{rate}}% एकत्र किया गया",
+      "collected": "एकत्र किया गया",
+      "outstanding": "उत्कृष्ट",
+      "overdue": "अतिदेय",
+      "byFeeType": "शुल्क प्रकार के अनुसार",
+      "typeCount": "{{count}} प्रकार",
+      "typeCount_plural": "{{count}} प्रकार",
+      "showLess": "कम दिखाओ",
+      "showAll": "सभी दिखाएँ ({{count}})",
+      "totalInvoicedThisYear": "इस वर्ष कुल चालान किया गया"
+    },
+    "billingHealth": {
+      "title": "बिलिंग स्वास्थ्य",
+      "allAccountsCurrent": "सभी खाते चालू",
+      "noInvoicesTitle": "अभी तक कोई चालान नहीं",
+      "noInvoicesDescription": "बिलिंग स्वास्थ्य डेटा देखने के लिए अपना पहला चालान बनाएं।",
+      "invoices": "चालान",
+      "invoiceCount": "{{count}} चालान",
+      "invoiceCount_plural": "{{count}} चालान",
+      "agingOverview": "उम्र बढ़ने का अवलोकन",
+      "overdueCount": "{{count}} अतिदेय",
+      "agingBucketTitle": "{{bucket}}: {{count}} चालान ({{amount}})",
+      "agingBuckets": {
+        "current": "वर्तमान",
+        "days1To30": "1-30 दिन",
+        "days31To60": "31-60 दिन",
+        "days61To90": "61-90 दिन",
+        "days90Plus": "90+ दिन"
+      },
+      "agingInsight": {
+        "singleBucket": "{{count}} अतिदेय · {{amount}}, सभी {{bucket}} विंडो के भीतर।",
+        "multipleBuckets": "{{count}} अतिदेय योग {{amount}}। {{worstCount}} में {{bucket}} पर तत्काल ध्यान देने की आवश्यकता है।"
+      },
+      "noOverdue": "कोई अतिदेय चालान नहीं - सभी खाते चालू हैं।",
+      "paymentMethods": "भुगतान के तरीके",
+      "noPaymentsRecorded": "अभी तक कोई भुगतान दर्ज नहीं किया गया."
+    },
+    "recent": {
+      "payments": "हाल के भुगतान",
+      "invoices": "हाल के चालान",
+      "noPayments": "अभी तक कोई भुगतान नहीं.",
+      "noInvoices": "अभी तक कोई चालान नहीं.",
+      "unknown": "अज्ञात",
+      "due": "बकाया",
+      "today": "आज",
+      "yesterday": "कल",
+      "daysAgo": "{{count}} दिन पहले"
+    }
+  },
+  "invoices": {
+    "kpi": {
+      "region": "प्रमुख मेट्रिक्स"
+    },
+    "title": "चालान",
+    "description": "शुल्क चालान देखें और प्रबंधित करें",
+    "manageDescription": "छात्र चालान बनाएं, जारी करें और प्रबंधित करें।",
+    "outstanding": "उत्कृष्ट",
+    "paid": "भुगतान किया गया",
+    "overdue": "अतिदेय",
+    "all": "सभी चालान",
+    "invoiceNumber": "चालान #",
+    "status": "स्थिति",
+    "dueDate": "देय तिथि",
+    "dueDateRequired": "देय तिथि *",
+    "issuedDate": "जारी दिनांक",
+    "billingPeriod": "बिलिंग अवधि",
+    "billingPeriodPlaceholder": "जैसे, प्रथम सत्र, प्रवेश",
+    "notes": "टिप्पणियाँ",
+    "amountDue": "देय राशि",
+    "grandTotal": "कुल",
+    "noInvoices": "कोई चालान नहीं मिला",
+    "noInvoicesDescription": "चयनित अवधि के लिए कोई चालान नहीं हैं.",
+    "generateFirstInvoice": "आरंभ करने के लिए अपना पहला चालान बनाएं।",
+    "noOutstanding": "सब पकड़ लिया गया!",
+    "noOutstandingDescription": "इस समय कोई बकाया चालान नहीं है.",
+    "generateInvoice": "चालान जनरेट करें",
+    "selectFees": "शामिल करने के लिए शुल्क का चयन करें",
+    "selectStudent": "छात्र का चयन करें",
+    "selectSchool": "चालान प्रबंधित करने के लिए एक स्कूल का चयन करें।",
+    "selectAcademicYear": "शैक्षणिक वर्ष चुनें",
+    "studentRequired": "विद्यार्थी*",
+    "feeStructuresRequired": "शुल्क संरचना *",
+    "generated": "चालान सफलतापूर्वक जनरेट हुआ",
+    "generateFailed": "चालान जनरेट करने में विफल",
+    "requiredFields": "कृपया सभी आवश्यक फ़ील्ड भरें",
+    "issue": "मुद्दा",
+    "issueSuccess": "चालान सफलतापूर्वक जारी किया गया",
+    "issueFailed": "चालान जारी करने में विफल",
+    "cancelSuccess": "चालान रद्द कर दिया गया",
+    "cancelFailed": "चालान रद्द करने में विफल",
+    "bulkIssueSuccess": "{{count}} चालान जारी किया गया।",
+    "bulkIssueSuccess_plural": "{{count}} चालान जारी किए गए।",
+    "bulkIssueSuccessWithSkipped": "{{count}} चालान जारी किया गया। {{skipped}} छोड़ दिया गया।",
+    "bulkIssueSuccessWithSkipped_plural": "{{count}} चालान जारी किए गए। {{skipped}} छोड़ दिया गया।",
+    "bulkIssueFailed": "चालान जारी करने में विफल",
+    "overdueByDays": "{{count}}d द्वारा अतिदेय",
+    "overdueBanner": "{{count}} चालान अतिदेय - {{amount}} संग्रहित नहीं हुआ",
+    "overdueBanner_plural": "{{count}} चालान अतिदेय - {{amount}} एकत्रित नहीं हुए",
+    "overdueBannerRate": "संग्रहण दर {{rate}}% है।",
+    "overdueBannerWithDrafts": "संग्रहण दर {{rate}}% है। {{drafts}} ड्राफ्ट जारी करने की आवश्यकता है।",
+    "loadedInvoices": "{{count}} चालान",
+    "loadedCount": "{{count}} लोड किया गया",
+    "paidCount": "{{count}} भुगतान किया गया",
+    "loadedSelectionOnly": "चयन केवल लोड किए गए रिकॉर्ड पर लागू होता है ({{count}} दिखाया गया है)। अतिरिक्त चालान शामिल करने के लिए अधिक पृष्ठ लोड करें।",
+    "searchPlaceholder": "चालान # या छात्र द्वारा खोजें...",
+    "issueSelected": "अंक चयनित ({{count}})",
+    "sendReminder": "अनुस्मारक भेजें",
+    "bulkPdfExport": {
+      "menuLabel": "PDFs डाउनलोड करें"
+    },
+    "cancelTitle": "चालान रद्द करें {{invoiceNumber}}?",
+    "cancelDescriptionPrefix": "यह क्रिया है",
+    "irreversible": "अपरिवर्तनीय",
+    "cancelDescriptionSuffix": "चालान स्थायी रूप से रद्द कर दिया जाएगा और दोबारा जारी नहीं किया जा सकेगा.",
+    "cancelReason": "रद्दीकरण का कारण*",
+    "cancelReasonPlaceholder": "इस चालान को रद्द करने का कारण दर्ज करें...",
+    "keepInvoice": "चालान रखें",
+    "cancelInvoice": "चालान रद्द करें",
+    "bulkIssueTitle": "{{count}} चालान जारी करें?",
+    "bulkIssueTitle_plural": "{{count}} चालान जारी करें?",
+    "bulkIssueDescription": "जारी होने के बाद छात्र इन चालानों को देख और भुगतान कर सकेंगे। इस एक्शन को वापस नहीं किया जा सकता।",
+    "issueCountInvoices": "जारी करें {{count}} चालान",
+    "issueCountInvoices_plural": "जारी करें {{count}} चालान",
+    "signals": {
+      "overdueTitle": "{{amount}} सभी {{count}} चालानों में अतिदेय",
+      "overdueSub": "आगे देय आयु से पहले अनुवर्ती कार्रवाई करें",
+      "viewOverdue": "अतिदेय देखें",
+      "draftsTitle": "{{count}} ड्राफ्ट चालान जारी करने के लिए तैयार हैं",
+      "draftsSub": "ड्राफ्ट जारी होने तक परिवार भुगतान नहीं कर सकते",
+      "viewDrafts": "ड्राफ्ट देखें"
+    },
+    "selection": {
+      "noDrafts": "चयन में कोई ड्राफ्ट नहीं",
+      "noneRemindable": "भुगतान किए गए चालानों को अनुस्मारक की आवश्यकता नहीं है"
+    }
+  },
+  "invoiceDetail": {
+    "backToInvoices": "चालान पर वापस जाएँ",
+    "invoice": "चालान",
+    "student": "विद्यार्थी: {{name}}",
+    "due": "देय: {{date}}",
+    "actions": {
+      "issueInvoice": "चालान जारी करें",
+      "sendReminder": "अनुस्मारक भेजें",
+      "cancelDraft": "ड्राफ्ट रद्द करें",
+      "moreActions": "अधिक क्रियाएं"
+    },
+    "sections": {
+      "lineItems": "पंक्ति वस्तुएँ",
+      "paymentHistory": "भुगतान इतिहास"
+    },
+    "empty": {
+      "noLineItems": "कोई पंक्ति वस्तु नहीं"
+    },
+    "paymentHistory": {
+      "payment": "भुगतान",
+      "via": "{{gateway}} के माध्यम से",
+      "empty": "इस चालान पर अभी तक कोई भुगतान दर्ज नहीं किया गया है.",
+      "recordFirst": "पहला भुगतान रिकॉर्ड करें"
+    },
+    "metadata": {
+      "created": "बनाया गया: {{date}}",
+      "issued": "जारी: {{date}}",
+      "notes": "टिप्पणियाँ: {{notes}}"
+    },
+    "banner": {
+      "draftTitle": "यह चालान एक ड्राफ्ट है.",
+      "draftBody": "यह छात्र खाते पर दिखाई नहीं देता है और इसके जारी होने तक कोई भुगतान रिकॉर्ड नहीं किया जा सकता है।",
+      "cancelledTitle": "यह चालान रद्द कर दिया गया",
+      "cancelledOn": "{{date}} पर",
+      "cancelledBy": "{{name}} द्वारा",
+      "cancelledBody": "अब इसका विद्यार्थी के संतुलन पर कोई प्रभाव नहीं पड़ता।"
+    },
+    "band": {
+      "region": "चालान सारांश",
+      "lineItemCount": "{{count}} पंक्ति वस्तुएँ",
+      "lineItemCount_one": "{{count}} लाइन आइटम",
+      "lineItemCount_other": "{{count}} पंक्ति वस्तुएँ",
+      "noPaymentsYet": "अभी तक कोई भुगतान नहीं",
+      "invoiceCancelled": "चालान रद्द",
+      "settledInFull": "पूर्ण रूप से निपटारा किया गया",
+      "outstandingBalance": "बकाया शेष",
+      "dueDate": "देय तिथि",
+      "daysLate": "{{days}}d देर से"
+    },
+    "lineItems": {
+      "qtyAt": "{{quantity}} × {{amount}}"
+    },
+    "aside": {
+      "details": "विवरण",
+      "status": "स्थिति",
+      "issued": "जारी किया गया",
+      "notIssuedYet": "अभी तक जारी नहीं किया गया",
+      "due": "देय",
+      "billingPeriod": "बिलिंग अवधि",
+      "academicYear": "शैक्षणिक वर्ष",
+      "viewStudentAccount": "छात्र खाता देखें",
+      "activity": "गतिविधि"
+    },
+    "timeline": {
+      "created": "चालान बनाया गया",
+      "issued": "छात्र के खाते में जारी किया गया",
+      "overdue": "अतिदेय चिह्नित",
+      "overdueSub": "स्वचालित · नियत तारीख बीत गई",
+      "payment": "भुगतान प्राप्त - {{amount}}",
+      "paymentSub": "{{gateway}} · रसीद {{receipt}}",
+      "paid": "पूरा भुगतान किया",
+      "paidSub": "संतुलन ठीक हो गया",
+      "cancelled": "चालान रद्द कर दिया गया",
+      "writtenOff": "बट्टे खाते में डाल दिया गया",
+      "by": "{{name}} द्वारा"
+    },
+    "error": {
+      "forbidden": "आपके पास इस चालान को देखने की अनुमति नहीं है.",
+      "notFound": "हमें यह चालान नहीं मिला. हो सकता है कि इसे हटा दिया गया हो."
+    }
+  },
+  "lineItems": {
+    "description": "विवरण",
+    "amount": "रकम",
+    "quantity": "मात्रा",
+    "discount": "छूट",
+    "tax": "कर",
+    "total": "कुल"
+  },
+  "summary": {
+    "subtotal": "उप योग",
+    "taxTotal": "कर",
+    "discountTotal": "छूट",
+    "grandTotal": "कुल योग",
+    "amountPaid": "भुगतान की गई राशि",
+    "amountDue": "देय राशि",
+    "balanceDue": "बकाया शेष"
+  },
+  "gateway": {
+    "selectMethod": "भुगतान विधि चुनें",
+    "selectMethodDescription": "चुनें कि आप कैसे भुगतान करना चाहेंगे",
+    "esewa": "eSewa",
+    "esewaDescription": "अपने eSewa डिजिटल वॉलेट का उपयोग करके भुगतान करें",
+    "khalti": "Khalti",
+    "khaltiDescription": "अपने Khalti डिजिटल वॉलेट का उपयोग करके भुगतान करें",
+    "fonepay": "फ़ोनपे",
+    "fonepayDescription": "फ़ोनेपे क्यूआर या मोबाइल बैंकिंग के माध्यम से भुगतान करें",
+    "connectips": "ConnectIPS",
+    "connectipsDescription": "सीधे अपने बैंक खाते से भुगतान करें",
+    "stripe": "कार्ड से भुगतान",
+    "stripeDescription": "वीज़ा, मास्टरकार्ड या अन्य कार्ड से भुगतान करें",
+    "cash": "नकद",
+    "cashDescription": "स्कूल कार्यालय में भुगतान करें",
+    "bankTransfer": "बैंक स्थानांतरण",
+    "bankTransferDescription": "स्कूल के बैंक खाते में स्थानांतरण",
+    "cheque": "जांचें",
+    "chequeDescription": "स्कूल कार्यालय में चेक द्वारा भुगतान करें",
+    "testMode": "परीक्षण मोड",
+    "productionMode": "उत्पादन",
+    "configured": "विन्यस्त",
+    "notConfigured": "कॉन्फ़िगर नहीं किया गया"
+  },
+  "flow": {
+    "confirmPayment": "भुगतान की पुष्टि करें",
+    "confirmDescription": "आप {{gateway}} के माध्यम से {{amount}} का भुगतान करने वाले हैं",
+    "redirecting": "{{gateway}} पर पुनर्निर्देशित किया जा रहा है...",
+    "redirectDescription": "अपना भुगतान पूरा करने के लिए आपको {{gateway}} पर पुनः निर्देशित किया जाएगा",
+    "verifying": "भुगतान सत्यापित किया जा रहा है...",
+    "verifyDescription": "कृपया प्रतीक्षा करें जब तक हम आपके भुगतान को {{gateway}} से सत्यापित करते हैं",
+    "processingPayment": "भुगतान संसाधित हो रहा है...",
+    "paymentSuccessful": "भुगतान सफल!",
+    "paymentFailed": "भुगतान विफल",
+    "paymentCancelled": "भुगतान रद्द कर दिया गया",
+    "failedDescription": "आपका भुगतान संसाधित नहीं किया जा सका. कोई राशि नहीं ली गई.",
+    "cancelledDescription": "आपने भुगतान रद्द कर दिया. कोई राशि नहीं ली गई.",
+    "tryAgain": "फिर से प्रयास करें",
+    "returnToInvoices": "चालान को लौटें",
+    "returnToPayments": "भुगतान पर लौटें",
+    "sessionExpired": "भुगतान सत्र समाप्त हो गया है. कृपया पुन: प्रयास करें।",
+    "paymentInProgress": "भुगतान प्रगति पर है",
+    "paymentInProgressDescription": "अभी खुले {{gateway}} टैब में अपना भुगतान पूरा करें। काम पूरा हो जाने पर 'स्थिति जांचें' पर क्लिक करें।",
+    "checkStatus": "स्थिति जांचें"
+  },
+  "receipt": {
+    "title": "भुगतान रसीद",
+    "receiptNumber": "रसीद #",
+    "transactionId": "लेन-देन ID",
+    "paymentDate": "भुगतान तिथि",
+    "paymentMethod": "भुगतान विधि",
+    "paidBy": "द्वारा रिकॉर्ड किया गया",
+    "studentName": "छात्र",
+    "studentNumber": "छात्र संख्या",
+    "emisStudentId": "EMIS ID",
+    "schoolName": "विद्यालय",
+    "downloadPdf": "डाउनलोड करें PDF",
+    "emailReceipt": "ईमेल रसीद",
+    "taxInvoice": "कर चालान",
+    "panNumber": "PAN",
+    "vatNumber": "वैट रजि.",
+    "taxableAmount": "करयोग्य राशि",
+    "taxAmount": "कर राशि",
+    "thankYou": "आपके भुगतान के लिए धन्यवाद!"
+  },
+  "status": {
+    "draft": "ड्राफ्ट",
+    "issued": "जारी किया गया",
+    "partially_paid": "आंशिक रूप से भुगतान किया गया",
+    "paid": "भुगतान किया गया",
+    "overdue": "अतिदेय",
+    "cancelled": "रद्द कर दिया गया",
+    "written_off": "बट्टे खाते में डाल दिया गया",
+    "pending": "लंबित",
+    "processing": "प्रसंस्करण",
+    "completed": "पूर्ण",
+    "failed": "असफल",
+    "refunded": "वापस कर दिया गया",
+    "partially_refunded": "आंशिक रूप से वापसी",
+    "debit": "डेबिट",
+    "credit": "श्रेय"
+  },
+  "feeStructure": {
+    "kpi": {
+      "region": "प्रमुख मेट्रिक्स"
+    },
+    "title": "शुल्क संरचनाएँ",
+    "description": "अपने विद्यालय के लिए शुल्क प्रकार और राशि कॉन्फ़िगर करें",
+    "addFee": "शुल्क संरचना जोड़ें",
+    "editFee": "शुल्क संरचना संपादित करें",
+    "deleteFee": "शुल्क संरचना हटाएँ",
+    "deleteConfirmation": "क्या आप वाकई इस शुल्क संरचना को हटाना चाहते हैं? इसे असंपादित नहीं किया जा सकता है।",
+    "name": "शुल्क का नाम",
+    "type": "शुल्क प्रकार",
+    "amount": "राशि",
+    "frequency": "आवृत्ति",
+    "taxRate": "कर दर (%)",
+    "taxType": "कर प्रकार",
+    "gradeLevels": "ग्रेड स्तर",
+    "allGrades": "सभी ग्रेड",
+    "effectiveFrom": "से प्रभावी",
+    "effectiveTo": "तक प्रभावी",
+    "academicYear": "शैक्षणिक वर्ष",
+    "noFeeStructures": "कोई शुल्क संरचना कॉन्फ़िगर नहीं की गई",
+    "noFeeStructuresDescription": "चालान बनाना शुरू करने के लिए अपने स्कूल की फीस संरचनाएं जोड़ें।",
+    "created": "शुल्क संरचना सफलतापूर्वक बनाई गई",
+    "updated": "शुल्क संरचना सफलतापूर्वक अपडेट की गई",
+    "deleted": "शुल्क संरचना सफलतापूर्वक हटा दी गई",
+    "createFailed": "शुल्क संरचना बनाने में विफल",
+    "updateFailed": "शुल्क संरचना अद्यतन करने में विफल",
+    "deleteFailed": "शुल्क संरचना हटाने में विफल",
+    "selectSchool": "शुल्क संरचनाओं के प्रबंधन के लिए एक स्कूल का चयन करें।",
+    "loadFailed": "शुल्क संरचनाएं लोड करने में विफल",
+    "connectionRetry": "कृपया अपना कनेक्शन जांचें और पुनः प्रयास करें।",
+    "autoApplyBanner": "नामांकन पर स्वत: लागू होने वाली शुल्क संरचनाएं किसी छात्र के नामांकित होने पर स्वचालित रूप से दायित्व उत्पन्न करेंगी।",
+    "stats": {
+      "totalStructures": "कुल संरचनाएँ",
+      "autoApply": "स्वत: लागू करें",
+      "feeTypes": "शुल्क के प्रकार",
+      "maxFee": "अधिकतम शुल्क"
+    },
+    "filters": {
+      "all": "सब",
+      "active": "सक्रिय",
+      "inactive": "निष्क्रिय"
+    },
+    "autoApplyOnEnrollment": "नामांकन पर स्वत: आवेदन करें",
+    "closeForm": "शुल्क संरचना प्रपत्र बंद करें",
+    "sections": {
+      "basicInfo": "बुनियादी जानकारी",
+      "pricing": "मूल्य निर्धारण",
+      "scope": "दायरा",
+      "enrollmentRules": "नामांकन नियम",
+      "effectivePeriod": "प्रभावी अवधि"
+    },
+    "fields": {
+      "name": "नाम",
+      "description": "विवरण",
+      "type": "प्रकार",
+      "academicYear": "शैक्षणिक वर्ष",
+      "amount": "रकम",
+      "frequency": "आवृत्ति",
+      "taxType": "कर प्रकार",
+      "taxRate": "कर दर (%)",
+      "gradeLevels": "ग्रेड स्तर",
+      "effectiveFrom": "से प्रभावी",
+      "effectiveTo": "के लिए प्रभावी"
+    },
+    "placeholders": {
+      "name": "जैसे वार्षिक ट्यूशन शुल्क",
+      "description": "वैकल्पिक विवरण",
+      "selectYear": "वर्ष चुनें..."
+    },
+    "academicYearStatus": {
+      "current": "वर्तमान",
+      "planning": "योजना",
+      "noneConfigured": "कोई शैक्षणिक वर्ष कॉन्फ़िगर नहीं किया गया."
+    },
+    "taxTypes": {
+      "none": "कोई नहीं"
+    },
+    "enrollment": {
+      "proRateOnMidTermEntry": "मध्यावधि प्रवेश पर आनुपातिक दर",
+      "proRateHelp": "सक्षम होने पर, मध्यावधि में नामांकन करने वाले छात्रों के लिए फीस की गणना स्वचालित रूप से आनुपातिक रूप से की जाती है।"
+    },
+    "dateHelp": {
+      "gregorianStorage": "तिथियाँ ग्रेगोरियन (AD) में प्रदर्शित की जाती हैं। सिस्टम सभी तिथियों को AD प्रारूप में संग्रहीत करता है।",
+      "dualBs": "जहां लागू हो वहां बिक्रम संबत समकक्ष दिखाए गए हैं।"
+    },
+    "gradeSelect": {
+      "placeholder": "ग्रेड स्तर चुनें...",
+      "selectedCount": "{{count}} ग्रेड चयनित",
+      "selectedCount_plural": "{{count}} ग्रेड चयनित",
+      "gradeLabel": "ग्रेड {{grade}}",
+      "removeGradeAria": "ग्रेड {{grade}} हटाएं"
+    },
+    "validation": {
+      "nameRequired": "नाम आवश्यक है",
+      "nameMax": "नाम 100 अक्षर या उससे कम होना चाहिए",
+      "descriptionMax": "विवरण 255 अक्षर या उससे कम होना चाहिए",
+      "amountRequired": "राशि आवश्यक है",
+      "amountMin": "राशि ऋणात्मक नहीं हो सकती",
+      "amountMax": "राशि 10,000,000 से अधिक नहीं हो सकती",
+      "taxRateMin": "कर की दर ऋणात्मक नहीं हो सकती",
+      "taxRateMax": "कर की दर 100% से अधिक नहीं हो सकती",
+      "effectiveFromRequired": "प्रभावी प्रारंभ दिनांक आवश्यक है",
+      "academicYearRequired": "शैक्षणिक वर्ष आवश्यक है",
+      "effectiveToAfterFrom": "प्रभावी समाप्ति तिथि आरंभ तिथि के बाद की होनी चाहिए"
+    },
+    "editAria": "शुल्क संरचना संपादित करें",
+    "deleteAria": "शुल्क संरचना हटाएँ",
+    "deleteTitle": "शुल्क संरचना हटाएँ",
+    "deleteMessage": "क्या आप वाकई {{feeName}} को हटाना चाहते हैं? यह क्रिया अपरिवर्तनीय है और इसे पूर्ववत नहीं किया जा सकता.",
+    "deleting": "हटाया जा रहा है...",
+    "confirmDelete": "हटाने की पुष्टि करें",
+    "types": {
+      "tuition": "ट्यूशन",
+      "admission": "प्रवेश",
+      "exam": "परीक्षा",
+      "transport": "परिवहन",
+      "library": "पुस्तकालय",
+      "lab": "प्रयोगशाला",
+      "hostel": "छात्रावास",
+      "uniform": "वर्दी",
+      "miscellaneous": "विविध",
+      "custom": "कस्टम"
+    },
+    "frequencies": {
+      "one_time": "एक बार",
+      "monthly": "मासिक",
+      "quarterly": "त्रैमासिक",
+      "annual": "वार्षिक"
+    }
+  },
+  "bulkGenerate": {
+    "title": "थोक में चालान बनाएं",
+    "description": "एक साथ कई छात्रों के लिए चालान बनाएं - ग्रेड के अनुसार, छात्र के अनुसार, या स्मार्ट सेगमेंट के अनुसार।",
+    "selectSchool": "थोक चालान बनाने के लिए एक स्कूल का चयन करें।",
+    "loadingRoster": "स्कूल रोस्टर लोड हो रहा है...",
+    "steps": {
+      "selectRecipients": "प्राप्तकर्ताओं का चयन करें",
+      "feeStructures": "शुल्क संरचनाएँ",
+      "invoiceDetails": "चालान विवरण",
+      "reviewConfirm": "समीक्षा करें और पुष्टि करें"
+    },
+    "actions": {
+      "generating": "उत्पन्न हो रहा है...",
+      "generateInvoices": "चालान बनाएं"
+    },
+    "toast": {
+      "generated": "{{count}} चालान उत्पन्न हुआ",
+      "generated_plural": "{{count}} चालान उत्पन्न हुए",
+      "generatedWithSkipped": "{{count}} चालान उत्पन्न हुआ · {{skipped}} छोड़ दिया गया",
+      "generatedWithSkipped_plural": "{{count}} चालान उत्पन्न हुए · {{skipped}} छोड़े गए",
+      "syncLimitExceeded": "समकालिक पीढ़ी के लिए बहुत अधिक छात्र (>25)। अभी के लिए, चयन को सीमित करें या एक ग्रेड चुनें और पुनः प्रयास करें।",
+      "failed": "थोक पीढ़ी विफल रही."
+    },
+    "confirm": {
+      "title": "चालान जनरेट करें?",
+      "description": "{{count}} चालान जनरेट करें? इसे असंपादित नहीं किया जा सकता है।",
+      "description_plural": "{{count}} चालान जनरेट करें? इसे असंपादित नहीं किया जा सकता है।",
+      "body": "{{count}} छात्र के लिए चालान ड्राफ्ट के रूप में बनाए जाएंगे। आप चालान सूची से उनकी समीक्षा कर सकते हैं और उन्हें जारी कर सकते हैं।",
+      "body_plural": "{{count}} छात्रों के लिए चालान ड्राफ्ट के रूप में बनाए जाएंगे। आप चालान सूची से उनकी समीक्षा कर सकते हैं और उन्हें जारी कर सकते हैं।",
+      "generateCount": "{{count}} उत्पन्न करें",
+      "generateCount_plural": "{{count}} उत्पन्न करें"
+    },
+    "async": {
+      "inProgressTitle": "चालान जनरेट किया जा रहा है...",
+      "failedTitle": "थोक पीढ़ी विफल रही",
+      "failedDescription": "किसी भी या सभी चालान बनाए जाने से पहले कार्यकर्ता ने कार्य-स्तर की विफलता की सूचना दी।",
+      "runningDescription": "{{count}} छात्र के लिए ड्राफ्ट चालान बनाना। यह आमतौर पर 90 सेकंड से कम समय में पूरा हो जाता है।",
+      "runningDescription_plural": "{{count}} छात्रों के लिए ड्राफ्ट चालान बनाना। यह आमतौर पर 90 सेकंड से कम समय में पूरा हो जाता है।",
+      "progressVerb": "चालान बनाना",
+      "startOver": "फिर से शुरू करें",
+      "runInBackground": "पृष्ठभूमि में चलाएँ",
+      "toastSucceeded": "{{count}} ड्राफ्ट इनवॉइस बनाया गया",
+      "toastSucceeded_plural": "{{count}} ड्राफ्ट चालान बनाए गए",
+      "toastSkipped": "{{count}} छोड़ दिया गया",
+      "toastFailed": "{{count}} विफल"
+    },
+    "asyncSuccess": {
+      "title": "{{count}} चालान ड्राफ्ट के रूप में बनाया गया",
+      "title_plural": "{{count}} चालान ड्राफ्ट के रूप में बनाए गए",
+      "notice": "प्रत्येक चालान पर इश्यू पर क्लिक करें, या उन्हें परिवारों को भेजने के लिए बल्क-इश्यू का उपयोग करें।",
+      "periodNotice": "{{billingPeriod}} के लिए। प्रत्येक चालान पर इश्यू पर क्लिक करें, या उन्हें परिवारों को भेजने के लिए बल्क-इश्यू का उपयोग करें।",
+      "created": "बनाया गया",
+      "skipped": "छोड़ दिया गया",
+      "failed": "असफल",
+      "retryFailed": "पुनः प्रयास विफल ({{count}})",
+      "failureCount": "{{count}} विफलता",
+      "failureCount_plural": "{{count}} विफलताएँ",
+      "showingFirst": "(पहला {{count}} दिखा रहा है)",
+      "noReasons": "कार्यकर्ता द्वारा कोई प्रति-रिकॉर्ड कारण नहीं लौटाया गया।"
+    },
+    "footer": {
+      "selectStudent": "जारी रखने के लिए कम से कम एक छात्र का चयन करें",
+      "studentsSelected": "{{count}} छात्र चयनित",
+      "studentsSelected_plural": "{{count}} छात्रों का चयन किया गया",
+      "addFeeOrLine": "कम से कम एक शुल्क या कस्टम लाइन जोड़ें",
+      "lineItemsAndStudents": "{{lineCount}} {{lineLabel}} · {{studentCount}} {{studentLabel}}",
+      "invoicesConfigured": "{{count}} चालान कॉन्फ़िगर किया जाएगा",
+      "invoicesConfigured_plural": "{{count}} चालान कॉन्फ़िगर किए जाएंगे",
+      "resolvingPreview": "पूर्वावलोकन का समाधान किया जा रहा है...",
+      "readyToGenerate": "{{count}} चालान जनरेट करने के लिए तैयार",
+      "readyToGenerate_plural": "{{count}} चालान जनरेट करने के लिए तैयार"
+    },
+    "common": {
+      "unknown": "अज्ञात",
+      "grade": "ग्रेड",
+      "grade_plural": "ग्रेड",
+      "gradeLabel": "ग्रेड {{grade}}",
+      "gradesList": "ग्रेड {{grades}}",
+      "student": "छात्र",
+      "student_plural": "छात्र",
+      "studentCount": "{{count}} छात्र",
+      "studentCount_plural": "{{count}} छात्र",
+      "selectedCount": "{{count}} चयनित",
+      "notSelectedCount": "{{count}} चयनित नहीं",
+      "noneSelected": "कोई भी चयनित नहीं",
+      "lineItem": "पंक्ति वस्तु",
+      "lineItem_plural": "पंक्ति वस्तुएँ",
+      "optional": "(वैकल्पिक)"
+    },
+    "step1": {
+      "byGrade": "ग्रेड के अनुसार",
+      "byStudent": "विद्यार्थी द्वारा",
+      "searchPlaceholder": "नाम, छात्र ID, या छात्र संख्या खोजें...",
+      "quickSegments": "त्वरित खंड",
+      "studentTotalCount": "{{count}} कुल छात्र",
+      "studentTotalCount_plural": "कुल {{count}} छात्र",
+      "studentMatchCount": "{{count}} छात्र मैच",
+      "studentMatchCount_plural": "{{count}} छात्र मेल खाते हैं",
+      "selectAll": "सभी का चयन करें",
+      "selectAllMatching": "सभी मिलान का चयन करें",
+      "clear": "साफ़ करें",
+      "phase1Tooltip": "बल्क-पूर्वावलोकन एकीकरण के साथ काउंटर वायरिंग भूमि; चिप फ़िल्टरिंग अनुवर्ती पीआर में होती है",
+      "phase2Tooltip": "चरण 2 में आ रहा है - छात्र जनसांख्यिकीय डेटा की आवश्यकता है",
+      "segments": {
+        "outstanding": "बकाया शेष",
+        "new": "नये प्रवेश",
+        "not-billed-this-period": "इस अवधि का बिल अभी तक नहीं दिया गया है",
+        "transport": "परिवहन उपयोगकर्ता",
+        "boarders": "बोर्डर्स",
+        "scholarship": "छात्रवृत्ति/बी.पी.एल"
+      },
+      "noStudentsMatch": "कोई भी छात्र वर्तमान खोज से मेल नहीं खाता।",
+      "recipientsSelected": "प्राप्तकर्ता चयनित",
+      "gradesCovered": "ग्रेड कवर किए गए",
+      "emptyRailPrefix": "अभी तक किसी का चयन नहीं हुआ. किसी ग्रेड में सभी को जोड़ने के लिए उस पर टिक करें, फिर उन व्यक्तिगत विद्यार्थियों को अनचेक करें जिन्हें आप छोड़ना चाहते हैं - या स्विच करना चाहते हैं",
+      "emptyRailSuffix": "चेरी-चुनने के लिए."
+    },
+    "step2": {
+      "coverageIntro": "प्रत्येक शुल्क की जाँच आपके {{count}} चयनित छात्र से की जाती है। जो फीस किसी छात्र पर लागू नहीं होती वह उस चालान पर स्वचालित रूप से छोड़ दी जाती है।",
+      "coverageIntro_plural": "प्रत्येक शुल्क की जाँच आपके {{count}} चयनित छात्रों से की जाती है। जो फीस किसी छात्र पर लागू नहीं होती वह उस चालान पर स्वचालित रूप से छोड़ दी जाती है।",
+      "estimatedGrandTotal": "अनुमानित कुल योग",
+      "avgPerStudent": "{{amount}} औसत/छात्र",
+      "students": "विद्यार्थी",
+      "feeStructures": "शुल्क संरचनाएँ",
+      "customLines": "कस्टम पंक्तियाँ",
+      "grossSubtotal": "सकल उप योग",
+      "feeDiscounts": "शुल्क में छूट",
+      "zeroTotalWarning": "{{count}} छात्र का अनुमानित कुल 0 है। उन्हें बाहर करने के लिए चरण 3 में शून्य-कुल छोड़ें चालू करें।",
+      "zeroTotalWarning_plural": "{{count}} छात्रों का अनुमानित कुल 0 है। उन्हें बाहर करने के लिए चरण 3 में शून्य-कुल छोड़ें चालू करें।",
+      "perFeeDiscount": "प्रति शुल्क छूट %",
+      "appliesToAll": "सभी {{count}} पर लागू होता है",
+      "appliesToZero": "0 पर लागू होता है - चयन योग्य नहीं",
+      "partialCoverage": "{{total}} में से {{covered}} · {{skipped}} को छोड़ दिया गया",
+      "customLineItems": "कस्टम लाइन आइटम",
+      "addLine": "पंक्ति जोड़ें",
+      "customLineHelp": "प्रत्येक चयनित छात्र के चालान में वैकल्पिक एकमुश्त शुल्क जोड़ा गया (उदाहरण के लिए, वार्षिक पिकनिक - स्वैच्छिक)।",
+      "customLinePlaceholder": "जैसे वार्षिक पिकनिक - स्वैच्छिक",
+      "customLineFallback": "कस्टम लाइन आइटम",
+      "removeLine": "लाइन हटाएँ"
+    },
+    "step3": {
+      "academicYear": "शैक्षणिक वर्ष",
+      "academicYearHelp": "सक्रिय वर्ष - ड्राइव इनवॉइस + लेज़र एंकरिंग।",
+      "noAcademicYears": "कोई शैक्षणिक वर्ष कॉन्फ़िगर नहीं किया गया",
+      "billingPeriod": "बिलिंग अवधि/अवधि",
+      "billingPeriodHelp": "ग्रेडिंग-अवधि संरेखित बिलिंग विंडो।",
+      "selectPeriod": "- चुनें -",
+      "terms": {
+        "first": "पहला कार्यकाल",
+        "second": "दूसरा कार्यकाल",
+        "third": "तीसरा कार्यकाल",
+        "fourth": "चौथा कार्यकाल"
+      },
+      "issueDate": "जारी करने की तारीख",
+      "dueDate": "नियत तिथि",
+      "numberPreview": "चालान संख्या पूर्वावलोकन",
+      "sequentialNumbers": "{{count}} अनुक्रमिक संख्या",
+      "sequentialNumbers_plural": "{{count}} अनुक्रमिक संख्याएँ",
+      "numberPreviewHelp": "केवल प्रारूप - वास्तविक संख्याएँ उत्पन्न समय पर आरक्षित की जाती हैं। प्रारूप:",
+      "note": "प्रत्येक चालान पर नोट",
+      "notePlaceholder": "जैसे कृपया नियत तिथि से पहले अकाउंट काउंटर पर या eSewa के माध्यम से भुगतान करें।",
+      "reviewEveryInvoice": "जनरेट करने से पहले प्रत्येक चालान की समीक्षा करें",
+      "reviewEveryInvoiceHelp": "अगले चरण पर प्रति-छात्र लाइन-आइटम पूर्वावलोकन दिखाएँ।",
+      "skipZeroTotal": "जिन छात्रों का कुल योग शून्य आता है उन्हें छोड़ दें",
+      "skipZeroTotalHelp": "शून्य-राशि वाले चालान जारी न करें (जैसे कि पूर्ण छूट वाले छात्र)।"
+    },
+    "step4": {
+      "verifyIntro": "नीचे सब कुछ सत्यापित करें. {{count}} चालान जनरेट किया जाएगा",
+      "verifyIntro_plural": "नीचे सब कुछ सत्यापित करें. {{count}} चालान जनरेट किए जाएंगे",
+      "skippedZeroParenthetical": "({{count}} छोड़ दिया गया - शून्य कुल)",
+      "recipients": "प्राप्तकर्ता",
+      "recipientSummary": "{{studentCount}} {{studentLabel}} · {{gradeCount}} {{gradeLabel}}",
+      "feeStructures": "शुल्क संरचनाएँ",
+      "noFeesSelected": "कोई शुल्क चयनित नहीं.",
+      "period": "अवधि",
+      "issueDue": "अंक {{issueDate}} · देय {{dueDate}}",
+      "perStudentPreview": "प्रति छात्र पूर्वावलोकन",
+      "tapToExpand": "विस्तार करने के लिए किसी पंक्ति पर टैप करें",
+      "noBillableStudents": "कोई बिल योग्य छात्र नहीं.",
+      "allProjectedZero": "सभी अनुमानित योग 0 हैं।",
+      "invoices": "चालान",
+      "avgPerStudent": "औसत/छात्र",
+      "grandTotal": "कुल योग",
+      "postingNotice": "मुद्दे पर जनरल लेजर को पोस्ट। अधिसूचनाएं अभिभावक चैनल प्राथमिकताओं के अनुसार भेजी जाती हैं।",
+      "resolvingServerPreview": "सर्वर पूर्वावलोकन का समाधान किया जा रहा है...",
+      "serverPreviewUnavailable": "सर्वर पूर्वावलोकन अनुपलब्ध - जनरेट अभी भी काम करेगा, लेकिन डुप्लिकेट/सेगमेंट गणना नहीं दिखाई जाएगी।",
+      "serverPreview": "सर्वर पूर्वावलोकन",
+      "duplicateSkip": "डुप्लिकेट छोड़ें",
+      "hasBalanceDue": "बकाया है",
+      "newAdmissions": "नये प्रवेश",
+      "notBilledThisPeriod": "इस अवधि का बिल नहीं दिया गया",
+      "estimatedDuration": "अनुमानित अवधि ≈ {{seconds}}s",
+      "lineItemCount": "{{count}} लाइन आइटम",
+      "lineItemCount_plural": "{{count}} पंक्ति वस्तुएँ",
+      "customBadge": "कस्टम",
+      "invoiceTotal": "कुल चालान"
+    },
+    "success": {
+      "generatedTitle": "{{count}} चालान उत्पन्न हुआ",
+      "generatedTitle_plural": "{{count}} चालान उत्पन्न हुए",
+      "notice": "अभिभावकों को उनकी चैनल प्राथमिकताओं के अनुसार सूचित किया जाएगा।",
+      "periodNotice": "{{billingPeriod}} के लिए। अभिभावकों को उनकी चैनल प्राथमिकताओं के अनुसार सूचित किया जाएगा।",
+      "invoices": "चालान",
+      "totalBilled": "कुल बिल किया गया",
+      "skipped": "छोड़ दिया गया",
+      "downloadAll": "सभी डाउनलोड करें (PDF)",
+      "downloadAllTooltip": "बाद के स्प्रिंट में थोक PDF डाउनलोड भूमि",
+      "newBatch": "नया बैच"
+    }
+  },
+  "gatewayConfig": {
+    "title": "भुगतान गेटवे",
+    "description": "अपने विद्यालय के लिए भुगतान गेटवे कॉन्फ़िगर करें",
+    "enable": "सक्षम करें",
+    "disable": "अक्षम करें",
+    "merchantCode": "व्यापारी कोड",
+    "apiKey": "API कुंजी",
+    "secretKey": "गुप्त कुंजी",
+    "publicKey": "सार्वजनिक कुंजी",
+    "saveConfig": "कॉन्फ़िगरेशन सहेजें",
+    "testPayment": "परीक्षण भुगतान",
+    "testPaymentDescription": "कॉन्फ़िगरेशन को सत्यापित करने के लिए NPR 1 परीक्षण लेनदेन करें",
+    "saved": "गेटवे कॉन्फ़िगरेशन सफलतापूर्वक सहेजा गया",
+    "credentialsMasked": "सुरक्षा के लिए क्रेडेंशियल को छुपाया जाता है"
+  },
+  "paymentsList": {
+    "kpi": {
+      "region": "प्रमुख मेट्रिक्स"
+    },
+    "title": "भुगतान",
+    "description": "सभी भुगतान लेनदेन देखें और प्रबंधित करें।",
+    "selectSchool": "भुगतान देखने के लिए एक स्कूल चुनें।",
+    "gateway": "प्रवेश द्वार",
+    "date": "दिनांक",
+    "allGateways": "सभी गेटवे",
+    "viewReceipt": "रसीद देखें",
+    "voidPayment": "शून्य भुगतान",
+    "voidDescription": "यह बही प्रविष्टि को उलट देगा और चालान पर देय राशि को बहाल कर देगा। इस एक्शन को वापस नहीं किया जा सकता।",
+    "voidReason": "रद्द करने का कारण*",
+    "voidReasonPlaceholder": "जैसे डुप्लिकेट भुगतान, डेटा प्रविष्टि त्रुटि",
+    "refundPayment": "भुगतान वापसी",
+    "refundPartial": "रिफंड (आंशिक)",
+    "originalAmount": "मूल राशि",
+    "alreadyRefunded": "पहले ही रिफंड कर दिया गया है",
+    "maxRefundable": "अधिकतम वापसी योग्य",
+    "refundAmount": "रिफंड राशि ({{currency}}) *",
+    "reasonRequired": "कारण*",
+    "refundReasonPlaceholder": "रिफंड का कारण...",
+    "amountGreaterThanZero": "राशि 0 से अधिक होनी चाहिए",
+    "exceedsRefundable": "वापसीयोग्य राशि से अधिक ({{amount}})",
+    "voidSuccess": "भुगतान सफलतापूर्वक रद्द कर दिया गया",
+    "voidFailed": "भुगतान रद्द करने में विफल",
+    "refundSuccess": "धनवापसी सफलतापूर्वक प्रारंभ हुई",
+    "refundFailed": "रिफ़ंड बनाने में विफल",
+    "voidSelected": "शून्य चयनित",
+    "sendReceipt": "रसीद भेजें",
+    "paymentCount": "{{count}} भुगतान",
+    "paymentCount_plural": "{{count}} भुगतान",
+    "processed": "संसाधित",
+    "partialRefunds": "आंशिक धनवापसी",
+    "searchPlaceholder": "रसीद #, चालान #, या छात्र द्वारा खोजें...",
+    "exportSuccess": "भुगतान CSV निर्यात किया गया",
+    "exportFailed": "भुगतान निर्यात करने में विफल CSV",
+    "recordManualPayment": "मैन्युअल भुगतान रिकॉर्ड करें",
+    "bulkReceiptPdfExport": {
+      "menuLabel": "PDFs डाउनलोड करें"
+    },
+    "selection": {
+      "noneVoidable": "कोई भी चयनित भुगतान रद्द नहीं किया जा सकता - केवल रसीद के साथ पूर्ण किए गए भुगतान ही योग्य होंगे।",
+      "noneCompleted": "चयन में कोई पूर्ण भुगतान नहीं."
+    }
+  },
+  "recordPayment": {
+    "title": "भुगतान दर्ज करें",
+    "description": "नकद, बैंक हस्तांतरण, या चेक भुगतान को मैन्युअल रूप से रिकॉर्ड करें।",
+    "selectSchool": "भुगतान रिकॉर्ड करने के लिए एक स्कूल का चयन करें।",
+    "loadingInvoices": "चालान लोड हो रहे हैं...",
+    "noUnpaidInvoices": "इस छात्र का कोई बकाया बिल नहीं है.",
+    "dueDate": "देय {{date}}",
+    "selectInvoiceError": "कृपया एक चालान चुनें",
+    "validAmountError": "कृपया एक वैध राशि दर्ज करें",
+    "referenceRequired": "बैंक हस्तांतरण/चेक के लिए संदर्भ संख्या आवश्यक है",
+    "recordSuccess": "भुगतान सफलतापूर्वक दर्ज किया गया",
+    "recordFailed": "भुगतान रिकॉर्ड करने में विफल",
+    "successTitle": "भुगतान रिकार्ड किया गया",
+    "successDescription": "मैन्युअल भुगतान दर्ज कर लिया गया है और छात्र खाता अपडेट कर दिया गया है।",
+    "recordAnother": "एक और भुगतान रिकॉर्ड करें",
+    "studentRequired": "विद्यार्थी*",
+    "studentSearchPlaceholder": "छात्र को नाम से खोजें...",
+    "invoiceRequired": "चालान*",
+    "paymentMethodRequired": "भुगतान विधि*",
+    "amountRequired": "राशि ({{currency}}) *",
+    "referenceRequiredLabel": "संदर्भ # *",
+    "bankReferencePlaceholder": "बैंक संदर्भ संख्या",
+    "chequeReferencePlaceholder": "नंबर जांचें",
+    "datePaid": "भुगतान की तिथि",
+    "notesPlaceholder": "इस भुगतान के बारे में वैकल्पिक नोट्स...",
+    "preview": "पूर्वावलोकन",
+    "method": "विधि",
+    "reference": "संदर्भ #",
+    "drawer": {
+      "amountLabel": "राशि प्राप्त हुई",
+      "dueHint": "देय {{amount}}",
+      "overpayError": "देय राशि से अधिक - अधिक भुगतान की अनुमति नहीं है। अधिकतम {{max}}.",
+      "overCapError": "राशि {{max}} प्रति-भुगतान सीमा से अधिक है।",
+      "partialHint": "आंशिक भुगतान - {{amount}} देय रहेगा।",
+      "chipFull": "पूरी रकम बकाया",
+      "chipHalf": "आधा",
+      "methodLabel": "भुगतान विधि",
+      "referenceLabel": "लेन-देन का संदर्भ",
+      "referenceHint": "{{method}} के लिए आवश्यक",
+      "dateLabel": "भुगतान तिथि",
+      "receivedBy": "द्वारा प्राप्त किया गया",
+      "noteLabel": "नोट",
+      "noteHint": "वैकल्पिक - रसीद पर दिखाई देता है",
+      "notePlaceholder": "जैसे अभिभावक द्वारा काउंटर पर नकद भुगतान किया गया",
+      "infoNote": "एक रसीद स्वचालित रूप से उत्पन्न होती है और छात्र खाते का शेष तुरंत अपडेट हो जाता है।",
+      "recording": "रिकॉर्डिंग...",
+      "recordAmount": "रिकॉर्ड {{amount}}",
+      "toastRecorded": "भुगतान दर्ज किया गया - रसीद {{receipt}}",
+      "view": "देखें",
+      "done": "हो गया",
+      "viewReceipt": "रसीद देखें",
+      "doneVia": "भुगतान {{method}} · {{date}} के माध्यम से दर्ज किया गया",
+      "donePaidInFull": "इस चालान का अब पूरा भुगतान कर दिया गया है.",
+      "doneRemains": "इस चालान पर {{amount}} बकाया है।"
+    }
+  },
+  "asyncJobs": {
+    "common": {
+      "closeDrawer": "दराज बंद करो",
+      "starting": "प्रारंभ...",
+      "channel": "चैनल",
+      "optional": "(वैकल्पिक)",
+      "unknownStudent": "अज्ञात छात्र",
+      "recipients": "प्राप्तकर्ता ({{count}})",
+      "willSkip": "छोड़ देंगे ({{count}})",
+      "balance": "संतुलन {{amount}}",
+      "selected": {
+        "accounts": "{{count}} खाता चयनित",
+        "accounts_plural": "{{count}} खाते चयनित",
+        "payments": "{{count}} भुगतान चयनित",
+        "payments_plural": "{{count}} भुगतान चयनित",
+        "invoices": "{{count}} चालान चयनित",
+        "invoices_plural": "{{count}} चालान चयनित"
+      },
+      "channels": {
+        "email": "ईमेल",
+        "sms": "एसएमएस",
+        "both": "दोनों"
+      },
+      "cancel": "रद्द करें",
+      "close": "बंद करें"
+    },
+    "progress": {
+      "queued": "कतारबद्ध - काम लेने के लिए किसी कार्यकर्ता की प्रतीक्षा करना।",
+      "processed": "{{done}} / {{total}} संसाधित",
+      "done": "हो गया",
+      "summary": "{{succeeded}} सफल हुआ · {{skipped}} छोड़ दिया गया · {{failed}} विफल रहा",
+      "failed": "कार्य विफल रहा",
+      "failureFallback": "कार्य एक अप्राप्य त्रुटि के साथ समाप्त हुआ।"
+    },
+    "toast": {
+      "skipped": "{{count}} छोड़ दिया गया",
+      "failed": "{{count}} विफल",
+      "statements": {
+        "success": "{{count}} कथन भेजा गया",
+        "success_plural": "{{count}} कथन भेजे गए",
+        "none": "कोई विवरण नहीं भेजा गया - {{failed}} विफल; {{skipped}} छोड़ दिया गया"
+      },
+      "receipts": {
+        "success": "{{count}} रसीद भेजी गई",
+        "success_plural": "{{count}} रसीदें भेजी गईं",
+        "none": "कोई रसीद नहीं भेजी गई - {{failed}} विफल; {{skipped}} छोड़ दिया गया"
+      },
+      "reminders": {
+        "success": "{{count}} अनुस्मारक भेजा गया",
+        "success_plural": "{{count}} अनुस्मारक भेजे गए",
+        "none": "कोई अनुस्मारक नहीं भेजा गया - {{failed}} विफल; {{skipped}} छोड़ दिया गया"
+      },
+      "adjustments": {
+        "success": "समायोजित {{count}} खाता",
+        "success_plural": "समायोजित {{count}} खाते",
+        "none": "कोई समायोजन लागू नहीं - {{failed}} विफल; {{skipped}} छोड़ दिया गया"
+      },
+      "voidPayments": {
+        "success": "{{count}} भुगतान रद्द कर दिया गया",
+        "success_plural": "{{count}} भुगतान रद्द कर दिया गया",
+        "none": "कोई भुगतान रद्द नहीं हुआ - {{failed}} विफल; {{skipped}} छोड़ दिया गया"
+      }
+    },
+    "skip": {
+      "noReceiptNumber": "कोई रसीद संख्या नहीं",
+      "notCompleted": "पूरा नहीं हुआ ({{status}})",
+      "notOutstanding": "बकाया नहीं ({{status}})"
+    },
+    "statements": {
+      "title": "बयान भेजें",
+      "progress": "बयान भेजा जा रहा है",
+      "description": "फ़ाइल पर प्रत्येक अभिभावक को वर्तमान शेष और हाल की खाता गतिविधि PDF अनुलग्नक के रूप में प्राप्त होती है। केवल ईमेल द्वारा वितरित.",
+      "send": "{{count}} भेजें",
+      "jobFailed": "विवरण भेजने का कार्य विफल रहा.",
+      "failedToStart": "विवरण भेजने का कार्य प्रारंभ करने में विफल."
+    },
+    "receipts": {
+      "title": "रसीदें भेजें",
+      "progress": "रसीदें भेज रहा हूँ",
+      "willSend": "भेज देंगे ({{count}})",
+      "noneEligible": "चयनित भुगतानों में से कोई भी पात्र नहीं है - रसीदों के लिए रसीद संख्या के साथ पूर्ण भुगतान की आवश्यकता होती है।",
+      "send": "{{count}} भेजें",
+      "jobFailed": "भेजने-प्राप्ति का कार्य विफल रहा.",
+      "failedToStart": "प्रेषण-प्राप्ति कार्य प्रारंभ करने में विफल."
+    },
+    "reminders": {
+      "title": "अनुस्मारक भेजें",
+      "progress": "अनुस्मारक भेज रहा हूँ",
+      "customNote": "कस्टम नोट",
+      "customNotePlaceholder": "जैसे मैत्रीपूर्ण अनुस्मारक - कृपया कार्यकाल समाप्त होने से पहले निपटान करें।",
+      "willRemind": "याद दिलाऊंगा ({{count}})",
+      "noneEligible": "चयनित चालानों में से किसी में भी बकाया नहीं है।",
+      "send": "{{count}} भेजें",
+      "jobFailed": "अनुस्मारक भेजने का कार्य विफल रहा.",
+      "failedToStart": "अनुस्मारक भेजने का कार्य प्रारंभ करने में विफल."
+    },
+    "adjustments": {
+      "title": "संतुलन समायोजित करें",
+      "progress": "खाता बही प्रविष्टियाँ पोस्ट करना",
+      "warning": "प्रत्येक चयनित खाते के बहीखाते में समान समायोजन लिखा होता है। साइन-थ्रेसहोल्ड गार्ड को छोड़ने के लिए ओवरराइड टॉगल का उपयोग करें, उदाहरण के लिए पहले से ही अधिशेष खाते को जमा करना।",
+      "type": "प्रकार",
+      "types": {
+        "debit": "डेबिट (बकाया वृद्धि)",
+        "credit": "क्रेडिट (बकाया कम करें)"
+      },
+      "amount": "रकम",
+      "effectiveDate": "प्रभावी तिथि",
+      "reason": "कारण",
+      "reasonPlaceholder": "जैसे छात्रवृत्ति क्रेडिट सत्र की शुरुआत में लागू किया गया",
+      "override": "ओवरराइड साइन-थ्रेसहोल्ड गार्ड - उन खातों के लिए भी लागू करें जहां समायोजन बैलेंस साइन सीमा को पार करता है।",
+      "apply": "{{count}} पर आवेदन करें",
+      "jobFailed": "समायोजन-संतुलन कार्य विफल.",
+      "failedToStart": "समायोजन-संतुलन कार्य प्रारंभ करने में विफल."
+    },
+    "voidPayments": {
+      "title": "शून्य भुगतान",
+      "warning": "शून्यकरण प्रत्येक भुगतान पर खाता बही प्रविष्टि को उलट देता है और लिंक किए गए चालान पर देय राशि को पुनर्स्थापित करता है। प्रत्येक पंक्ति एक अलग अनुरोध है और आंशिक विफलताएँ वापस नहीं आतीं।",
+      "reason": "शून्य करने का कारण",
+      "reasonPlaceholder": "जैसे डुप्लिकेट भुगतान, डेटा प्रविष्टि त्रुटि",
+      "reasonHelp": "प्रत्येक निरस्त भुगतान के विरुद्ध एक ही कारण दर्ज किया जाता है।",
+      "willVoid": "रद्द हो जाएगा ({{count}})",
+      "noneEligible": "चयनित भुगतानों में से कोई भी रद्दीकरण के योग्य नहीं है।",
+      "voiding": "शून्यीकरण...",
+      "apply": "शून्य {{count}}"
+    },
+    "pdfExport": {
+      "title": "थोक PDF निर्यात",
+      "progress": "PDFs उत्पन्न करना",
+      "readyTitle": "{{count}} इनवॉइस को ज़िप के रूप में निर्यात करने के लिए तैयार",
+      "readyBody": "जेनरेट किए गए ज़िप में प्रति इनवॉइस एक PDF होता है। बड़े बैचों के लिए इसमें कुछ मिनट लग सकते हैं; आप दराज को बंद कर सकते हैं और कार्य पृष्ठभूमि में चलता रहेगा।",
+      "startExport": "निर्यात प्रारंभ करें",
+      "starting": "निर्यात शुरू हो रहा है...",
+      "downloadZip": "इनवॉइस.ज़िप डाउनलोड करें",
+      "alreadyRunning": "इस स्कूल के लिए एक और थोक निर्यात पहले से ही चल रहा है। इसकी प्रगति दिखा रहा है.",
+      "payloadTooLarge": "एक बैच में {{requested}} चालान निर्यात नहीं किया जा सकता (सीमा {{limit}} है)। कृपया चयन को सीमित करें.",
+      "toastSucceeded": "थोक निर्यात पूर्ण: {{succeeded}} सफल, {{failed}} विफल।",
+      "toastFailed": "थोक निर्यात विफल रहा. विवरण के लिए दराज की जाँच करें।",
+      "readyTitle_plural": "{{count}} चालान को ज़िप के रूप में निर्यात करने के लिए तैयार",
+      "totalValueLabel": "कुल मूल्य",
+      "skippedNote": "{{count}} आपके चयन में रद्द किए गए चालान छोड़ दिए जाएंगे - रद्द किए गए दस्तावेज़ निर्यात नहीं किए जाते हैं।",
+      "skippedNote_one": "आपके चयन में {{count}} रद्द किए गए चालान को छोड़ दिया जाएगा - रद्द किए गए दस्तावेज़ निर्यात नहीं किए जाते हैं।",
+      "skippedNote_other": "{{count}} आपके चयन में रद्द किए गए चालान छोड़ दिए जाएंगे - रद्द किए गए दस्तावेज़ निर्यात नहीं किए जाते हैं।",
+      "format": {
+        "zip": "PDFs का ज़िप",
+        "zipSub": "ज़िप · प्रति चालान एक PDF",
+        "merged": "मर्ज किया गया PDF",
+        "mergedSub": "क्रम में एक संयुक्त PDF"
+      }
+    },
+    "receiptPdfExport": {
+      "title": "थोक रसीद निर्यात",
+      "progress": "रसीदें उत्पन्न करना",
+      "readyTitle": "{{count}} रसीद को ज़िप के रूप में निर्यात करने के लिए तैयार",
+      "readyTitle_plural": "{{count}} रसीदों को ज़िप के रूप में निर्यात करने के लिए तैयार",
+      "readyBody": "जेनरेट किए गए ज़िप में प्रति रसीद एक PDF होता है। अपूर्ण भुगतान (अस्थिर/वापसी/असफल) स्वचालित रूप से छोड़ दिए जाते हैं। बड़े बैचों के लिए इसमें कुछ मिनट लग सकते हैं; आप दराज को बंद कर सकते हैं और कार्य पृष्ठभूमि में चलता रहेगा।",
+      "startExport": "निर्यात प्रारंभ करें",
+      "starting": "निर्यात शुरू हो रहा है...",
+      "downloadZip": "रसीदें.ज़िप डाउनलोड करें",
+      "alreadyRunning": "इस स्कूल के लिए एक और थोक निर्यात पहले से ही चल रहा है। इसकी प्रगति दिखा रहा है.",
+      "payloadTooLarge": "{{requested}} रसीदों को एक बैच में निर्यात नहीं किया जा सकता (सीमा {{limit}} है)। कृपया चयन को सीमित करें.",
+      "toastSucceeded": "थोक निर्यात पूर्ण: {{succeeded}} सफल, {{failed}} विफल।",
+      "toastFailed": "थोक निर्यात विफल रहा. विवरण के लिए दराज की जाँच करें।",
+      "totalValueLabel": "राशि प्राप्त हुई",
+      "skippedNote": "{{count}} आपके चयन में अपूर्ण भुगतान छोड़ दिए जाएंगे - रसीदें केवल पूर्ण भुगतानों के लिए मौजूद हैं।",
+      "skippedNote_one": "{{count}} आपके चयन में अपूर्ण भुगतान छोड़ दिया जाएगा - रसीदें केवल पूर्ण भुगतान के लिए मौजूद हैं।",
+      "skippedNote_other": "{{count}} आपके चयन में अपूर्ण भुगतान छोड़ दिए जाएंगे - रसीदें केवल पूर्ण भुगतानों के लिए मौजूद हैं।",
+      "format": {
+        "zip": "PDFs का ज़िप",
+        "zipSub": "ज़िप · प्रति रसीद एक PDF",
+        "merged": "मर्ज किया गया PDF",
+        "mergedSub": "क्रम में एक संयुक्त PDF"
+      }
+    },
+    "pdfExportShared": {
+      "documents": "दस्तावेज़",
+      "students": "विद्यार्थी",
+      "studentCount": "{{count}} छात्र",
+      "studentCount_one": "{{count}} छात्र",
+      "studentCount_other": "{{count}} छात्र",
+      "grades": "ग्रेड {{grades}}",
+      "bundle": "बंडल",
+      "estimateSeconds": "लगभग {{seconds}} सेकंड",
+      "morePdfs": "+ {{count}} अधिक PDFs",
+      "backgroundNote": "पृष्ठभूमि में चलता है - आप इस पैनल को बंद कर सकते हैं और काम करना जारी रख सकते हैं। जैसे ही यह तैयार हो जाएगा हम आपको बता देंगे।",
+      "synced": "लाइव · {{seconds}}s पहले सिंक किया गया",
+      "preparingExport": "निर्यात की तैयारी है...",
+      "generatingPdfs": "PDFs उत्पन्न हो रहा है...",
+      "prepared": "{{total}} PDF में से {{current}} तैयार",
+      "docTotal": "{{count}} दस्तावेज़",
+      "docTotal_one": "{{count}} दस्तावेज़",
+      "docTotal_other": "{{count}} दस्तावेज़",
+      "toastDownload": "डाउनलोड करें",
+      "generated": "उत्पन्न",
+      "skipped": "छोड़ दिया गया",
+      "failed": "असफल",
+      "safeToClose": "बंद करना सुरक्षित - निर्यात सर्वर पर चलता रहता है।",
+      "inProgress": "निर्यात प्रगति पर है...",
+      "complete": "पूर्ण",
+      "completeWithFailures": "पूर्ण, असफलताओं के साथ",
+      "wentWrong": "कुछ ग़लत हो गया",
+      "runInBackground": "पृष्ठभूमि में चलाएँ",
+      "exportAgain": "पुनः निर्यात करें",
+      "freshLink": "एक ताज़ा लिंक प्राप्त करें",
+      "gettingFreshLink": "एक ताज़ा लिंक मिल रहा है...",
+      "tryAgain": "पुनः प्रयास करें",
+      "download": "डाउनलोड करें {{bundle}}",
+      "readyTitle": "निर्यात तैयार",
+      "partialTitle": "{{requested}} में से {{succeeded}} निर्यात किया गया",
+      "succeededChip": "{{count}} सफल हुआ",
+      "skippedChip": "{{count}} छोड़ दिया गया",
+      "failedChip": "{{count}} विफल",
+      "bundleMeta": "{{count}} PDFs",
+      "expiresIn": "लिंक समाप्त हो रहा है",
+      "linkExpired": "डाउनलोड लिंक की समय सीमा समाप्त हो गई है - आपकी फ़ाइलें सर्वर पर सुरक्षित हैं।",
+      "whatsInside": "· {{count}} फ़ाइलों के अंदर क्या है",
+      "failedBoxTitle": "{{count}} उत्पन्न नहीं किया जा सका",
+      "retryFailed": "पुनः प्रयास करें {{count}} विफल रहा",
+      "failedBoxFoot": "आप अभी भी {{count}} को डाउनलोड कर सकते हैं जो सफल हुआ।",
+      "completedAt": "पूर्ण {{time}}",
+      "took": "{{seconds}}s लिया",
+      "jobIdCopied": "कार्य ID कॉपी किया गया",
+      "copyJobId": "सहायता के लिए कार्य ID की प्रतिलिपि बनाएँ",
+      "jobShort": "नौकरी {{id}}",
+      "failedTitle": "निर्यात विफल",
+      "failedBody": "{{count}} PDFs में से कोई भी उत्पन्न नहीं किया जा सका। किसी भी कारण से कुछ भी नहीं बदला गया।",
+      "supportNote": "यदि ऐसा होता रहता है, तो इस जॉब आईडी को समर्थन के साथ साझा करें:",
+      "format": {
+        "label": "आउटपुट स्वरूप",
+        "overCap": "{{limit}} दस्तावेज़ तक"
+      },
+      "whatsInside_one": "· {{count}} फ़ाइल के अंदर क्या है",
+      "whatsInside_other": "· {{count}} फ़ाइलों के अंदर क्या है",
+      "bundleMeta_one": "{{count}} PDF",
+      "bundleMeta_other": "{{count}} PDFs",
+      "morePdfs_one": "+ {{count}} अधिक PDF",
+      "morePdfs_other": "+ {{count}} अधिक PDFs"
+    }
+  },
+  "financeLayout": {
+    "error": {
+      "title": "कुछ ग़लत हो गया",
+      "description": "वित्त मॉड्यूल में एक अप्रत्याशित त्रुटि उत्पन्न हुई. आप पृष्ठ को पुनः लोड करने या अवलोकन पर वापस जाने का प्रयास कर सकते हैं।",
+      "reload": "पुनः लोड करें",
+      "overview": "अवलोकन पर जाएँ"
+    },
+    "noSchools": {
+      "title": "कोई स्कूल कॉन्फ़िगर नहीं किया गया",
+      "description": "वित्त का उपयोग करने से पहले सेटिंग्स > संगठन में अपना संगठन स्थापित करें।",
+      "goToSettings": "सेटिंग्स पर जाएं"
+    }
+  },
+  "paymentGateways": {
+    "title": "भुगतान गेटवे",
+    "description": "कॉन्फ़िगर करें कि आपके विद्यालय के लिए कौन से भुगतान गेटवे उपलब्ध हैं।",
+    "selectSchool": "भुगतान गेटवे प्रबंधित करने के लिए एक स्कूल का चयन करें।",
+    "saved": "गेटवे कॉन्फ़िगरेशन सहेजा गया",
+    "saveFailed": "गेटवे कॉन्फ़िगरेशन सहेजने में विफल",
+    "loadFailed": "गेटवे कॉन्फ़िगरेशन लोड करने में विफल",
+    "enable": "सक्षम करें",
+    "saveConfiguration": "कॉन्फ़िगरेशन सहेजें",
+    "securityNote": "क्रेडेंशियल एन्क्रिप्टेड और सुरक्षित रूप से संग्रहीत हैं। सहेजने के बाद, मान छिपा दिए जाएंगे.",
+    "showSecret": "गुप्त मूल्य दिखाएँ",
+    "hideSecret": "गुप्त मूल्य छिपाएँ",
+    "gatewayLabels": {
+      "esewa": "eSewa",
+      "khalti": "Khalti",
+      "fonepay": "फ़ोनपे",
+      "connectips": "ConnectIPS",
+      "stripe": "धारी",
+      "cash": "नकद",
+      "bank_transfer": "बैंक स्थानांतरण",
+      "cheque": "जांचें"
+    },
+    "descriptions": {
+      "esewa": "ऑनलाइन भुगतान के लिए नेपाल का अग्रणी डिजिटल वॉलेट",
+      "khalti": "नेपाल के लिए डिजिटल वॉलेट और भुगतान गेटवे",
+      "fonepay": "क्यूआर-आधारित इंटरबैंक भुगतान नेटवर्क",
+      "connectips": "एनसीएचएल द्वारा इंटरनेट बैंकिंग भुगतान प्रणाली",
+      "stripe": "कार्ड और वॉलेट के लिए वैश्विक भुगतान प्रसंस्करण",
+      "cash": "मैन्युअल नकद भुगतान",
+      "bank_transfer": "प्रत्यक्ष बैंक हस्तांतरण भुगतान",
+      "cheque": "चेक से भुगतान"
+    },
+    "credentials": {
+      "merchantCode": "व्यापारी कोड",
+      "secretKey": "गुप्त कुंजी",
+      "publicKey": "सार्वजनिक कुंजी",
+      "apiKey": "API कुंजी"
+    }
+  },
+  "studentSearch": {
+    "placeholder": "नाम या छात्र संख्या से खोजें...",
+    "searching": "खोज रहे हैं...",
+    "noStudents": "कोई छात्र नहीं मिला.",
+    "grade": "ग्रेड {{grade}}"
+  },
+  "studentAccount": {
+    "kpi": {
+      "region": "प्रमुख मेट्रिक्स"
+    },
+    "title": "छात्र खाता",
+    "pageTitle": "विद्यार्थी खाते",
+    "description": "छात्र बिलिंग खाते, चालान, भुगतान और खाता बही इतिहास देखें।",
+    "selectSchool": "छात्र खाते देखने के लिए एक स्कूल चुनें।",
+    "balance": "बकाया शेष",
+    "totalPaid": "कुल भुगतान",
+    "lastPayment": "अंतिम भुगतान",
+    "ledger": "खाता बही",
+    "noTransactions": "अभी तक कोई लेन-देन नहीं",
+    "never": "कभी नहीं",
+    "searchPlaceholder": "छात्र के नाम से खोजें...",
+    "tabs": {
+      "ledger": "बही",
+      "invoices": "चालान",
+      "payments": "भुगतान"
+    },
+    "summary": {
+      "totalStudents": "कुल छात्र",
+      "outstanding": "उत्कृष्ट",
+      "fullyPaid": "पूरी तरह से भुगतान किया गया",
+      "withBalance": "संतुलन के साथ",
+      "accounts": "{{count}} खाता",
+      "accounts_plural": "{{count}} खाते",
+      "withBalanceCount": "{{count}} संतुलन के साथ",
+      "noBalance": "कोई संतुलन नहीं"
+    },
+    "actions": {
+      "sendStatement": "विवरण भेजें",
+      "adjustBalance": "संतुलन समायोजित करें"
+    },
+    "columns": {
+      "student": "छात्र",
+      "studentName": "छात्र का नाम",
+      "date": "दिनांक",
+      "type": "प्रकार",
+      "description": "विवरण",
+      "debit": "डेबिट",
+      "credit": "श्रेय",
+      "balance": "संतुलन",
+      "balanceBucket": "संतुलन बाल्टी",
+      "invoiceNumber": "चालान #",
+      "status": "स्थिति",
+      "total": "कुल",
+      "due": "देय",
+      "dueDate": "देय तिथि",
+      "amountPaid": "भुगतान की गई राशि",
+      "grandTotal": "कुल योग"
+    },
+    "balanceBuckets": {
+      "noBalance": "कोई संतुलन नहीं"
+    },
+    "openingBalance": {
+      "title": "प्रारंभिक शेष (पिछला बकाया)",
+      "amount": "रकम",
+      "asOf": "के रूप में",
+      "remaining": "शेष",
+      "settled": "{{amount}} बस गया",
+      "note": "नोट",
+      "showMore": "और दिखाएँ",
+      "showLess": "कम दिखाओ"
+    },
+    "empty": {
+      "noAccounts": "किसी छात्र का खाता नहीं मिला",
+      "noAccountsDescription": "चालान जनरेट होने पर छात्र खाते स्वचालित रूप से बनाए जाते हैं।",
+      "noLedger": "अभी तक कोई खाता बही प्रविष्टियाँ नहीं.",
+      "noInvoices": "इस छात्र का कोई चालान नहीं.",
+      "noPayments": "इस छात्र के लिए कोई भुगतान दर्ज नहीं किया गया।"
+    },
+    "error": {
+      "ledgerLoadFailed": "खाता बही प्रविष्टियाँ लोड करने में विफल.",
+      "unknown": "अज्ञात त्रुटि"
+    }
+  },
+  "currency": {
+    "npr": "NPR",
+    "symbol": "रु"
+  },
+  "actions": {
+    "payNow": "अभी भुगतान करें",
+    "viewReceipt": "रसीद देखें",
+    "viewInvoice": "चालान देखें",
+    "downloadPdf": "डाउनलोड करें PDF",
+    "exportCsv": "निर्यात करेंCSV",
+    "cancel": "रद्द करें",
+    "confirm": "पुष्टि करें",
+    "save": "सहेजें",
+    "saving": "सहेजा जा रहा है...",
+    "close": "बंद करें",
+    "back": "वापस",
+    "next": "अगला",
+    "retry": "पुन: प्रयास करें"
+  },
+  "filters": {
+    "label": "फिल्टर",
+    "allStatuses": "सभी क़ानून",
+    "dateRange": "दिनांक सीमा",
+    "academicYear": "शैक्षणिक वर्ष",
+    "clearAll": "सभी साफ़ करें"
+  },
+  "empty": {
+    "noPayments": "कोई भुगतान नहीं मिला",
+    "noPaymentsDescription": "भुगतान हो जाने के बाद भुगतान रिकॉर्ड यहां दिखाई देंगे।"
+  },
+  "error": {
+    "failedToLoad": "भुगतान डेटा लोड करने में विफल",
+    "failedToInitiate": "भुगतान आरंभ करने में विफल",
+    "failedToVerify": "भुगतान सत्यापित करने में विफल",
+    "tryAgain": "कृपया पुनः प्रयास करें",
+    "networkError": "नेटवर्क त्रुटि. कृपया अपना कनेक्शन जांचें.",
+    "serverError": "सर्वर त्रुटि. कृपया बाद में पुन: प्रयास करें।",
+    "receiptNotAvailable": "यह भुगतान पूरा नहीं हुआ है - रसीदें केवल पूर्ण भुगतान के लिए उपलब्ध हैं।",
+    "receiptNotFound": "हमें इस भुगतान की रसीद नहीं मिल सकी. हो सकता है कि इसे हटा दिया गया हो या कभी जारी ही नहीं किया गया हो.",
+    "receiptForbidden": "आपके पास इस रसीद को देखने की अनुमति नहीं है."
+  },
+  "toast": {
+    "paymentSuccess": "भुगतान सफलतापूर्वक पूरा हुआ",
+    "paymentFailed": "भुगतान विफल. कृपया पुन: प्रयास करें।",
+    "invoiceGenerated": "चालान सफलतापूर्वक जनरेट हुआ",
+    "receiptDownloaded": "रसीद डाउनलोड की गई"
+  },
+  "widgets": {
+    "outstandingFees": "बकाया फीस",
+    "recentPayments": "हाल के भुगतान",
+    "paymentHistory": "भुगतान इतिहास"
+  },
+  "headerZone": {
+    "needAttention": "ध्यान देने की जरूरत है",
+    "allClear": "सब साफ़",
+    "region": "ध्यान देने की जरूरत है",
+    "minimize": "न्यूनतम करें",
+    "acknowledge": "समझ गया",
+    "acknowledged": "स्वीकृत",
+    "acknowledgedHint": "स्वीकृत - पूर्ववत करने के लिए क्लिक करें",
+    "dismiss": "ख़ारिज करें",
+    "emptyTitle": "आप सब फंस गये हैं।",
+    "domains": {
+      "finance": "वित्त"
+    },
+    "selection": {
+      "aria": "चयन क्रियाएँ",
+      "selected": "{{count}} चयनित",
+      "selectAll": "सभी का चयन करें {{count}}",
+      "clear": "स्पष्ट चयन"
+    }
+  },
+  "receiptDetail": {
+    "print": "प्रिंट करें",
+    "stamp": {
+      "paid": "PAID",
+      "partialRefund": "आंशिक वापसी"
+    },
+    "fields": {
+      "invoice": "चालान"
+    },
+    "amountInWords": "राशि शब्दों में -",
+    "refund": {
+      "title": "रिफंड जारी - {{amount}}",
+      "net": "बरकरार रखी गई शुद्ध राशि: {{amount}}"
+    },
+    "fine": "कंप्यूटर जनित रसीद - हस्ताक्षर के बिना वैध। एडफोर्ज द्वारा {{date}} पर जेनरेट किया गया।"
+  }
+}
