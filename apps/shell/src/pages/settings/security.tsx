@@ -537,6 +537,9 @@ export default function SecurityPage() {
     staleTime: 30 * 1000,
   })
 
+  // Defense-in-depth: never let an unexpected non-array shape crash the page.
+  const sessionList = Array.isArray(sessions) ? sessions : []
+
   const invalidateSessions = () => {
     queryClient.invalidateQueries({ queryKey: ['security-sessions', user?.id] })
     queryClient.invalidateQueries({ queryKey: ['security', user?.id] })
@@ -647,7 +650,7 @@ export default function SecurityPage() {
                       {t('security.retry')}
                     </Button>
                   </div>
-                ) : !sessions || sessions.length === 0 ? (
+                ) : sessionList.length === 0 ? (
                   <div className="p-5 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-center">
                     <p className="text-sm text-[rgb(var(--text-tertiary))]">
                       {t('security.noSessions')}
@@ -655,7 +658,7 @@ export default function SecurityPage() {
                   </div>
                 ) : (
                   <>
-                    {sessions.some((s) => !s.isCurrent) && (
+                    {sessionList.some((s) => !s.isCurrent) && (
                       <div className="flex justify-end">
                         <Button
                           variant="outline"
@@ -667,7 +670,7 @@ export default function SecurityPage() {
                         </Button>
                       </div>
                     )}
-                    {sessions.map((s) => (
+                    {sessionList.map((s) => (
                       <SessionCard
                         key={s.sessionId}
                         session={s}

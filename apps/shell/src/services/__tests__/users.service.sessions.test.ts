@@ -17,13 +17,37 @@ vi.mock('../../lib/api', () => ({
   apiDelete: vi.fn(),
 }))
 
-import { apiPost, apiPatch } from '../../lib/api'
-import { registerSession, touchSession, revokeAllSessions } from '../users.service'
+import { apiGet, apiPost, apiPatch } from '../../lib/api'
+import {
+  registerSession,
+  touchSession,
+  revokeAllSessions,
+  getActiveSessions,
+} from '../users.service'
 
 const asMock = (fn: unknown) => fn as ReturnType<typeof vi.fn>
 
 describe('users.service — session write route shapes', () => {
   beforeEach(() => vi.clearAllMocks())
+
+  it('getActiveSessions unwraps the { sessions, total } response into an array', async () => {
+    // Backend returns SecuritySessionsListDto, NOT a bare array. Returning the
+    // wrapper crashed the sessions list with "x.some is not a function".
+    asMock(apiGet).mockResolvedValue({
+      sessions: [{ sessionId: 's1', isCurrent: true }],
+      total: 1,
+      currentSessionId: 's1',
+    })
+    const res = await getActiveSessions('u1')
+    expect(apiGet).toHaveBeenCalledWith('/users/u1/security/sessions')
+    expect(Array.isArray(res)).toBe(true)
+    expect(res).toHaveLength(1)
+  })
+
+  it('getActiveSessions returns [] when the response has no sessions field', async () => {
+    asMock(apiGet).mockResolvedValue({})
+    expect(await getActiveSessions('u1')).toEqual([])
+  })
 
   it('registerSession POSTs /users/:id/security/sessions (SR.1)', async () => {
     asMock(apiPost).mockResolvedValue({ sessionId: 's1', isCurrent: true })

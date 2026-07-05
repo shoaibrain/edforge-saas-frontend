@@ -635,9 +635,19 @@ export async function touchSession(
 /**
  * Get active sessions
  * GET /users/:id/security/sessions
+ *
+ * The backend wraps the list in `SecuritySessionsListDto`
+ * (`{ sessions, total, currentSessionId }`), NOT a bare array — unwrap to the
+ * array the UI expects. Returning the wrapper directly crashed the sessions
+ * list with `x.some is not a function`.
  */
 export async function getActiveSessions(userId: string): Promise<UserSession[]> {
-  return apiGet<UserSession[]>(`/users/${userId}/security/sessions`)
+  const res = await apiGet<{
+    sessions?: UserSession[]
+    total?: number
+    currentSessionId?: string
+  }>(`/users/${userId}/security/sessions`)
+  return Array.isArray(res?.sessions) ? res.sessions : []
 }
 
 /**
