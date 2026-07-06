@@ -111,8 +111,11 @@ function QuickDrawerRoot({
   }, [isOpen, handleEscape])
 
   // ── Transform values ────────────────────────────────────────────
+  // Side drawer anchors to the inline-end edge (right in LTR, left in RTL), so
+  // it slides off toward that edge — negative X when the document is RTL.
+  const isRtl = typeof document !== 'undefined' && document.dir === 'rtl'
   const closedTransform = mode === 'side'
-    ? `translateX(${width + 20}px)`
+    ? `translateX(${(isRtl ? -1 : 1) * (width + 20)}px)`
     : 'translateY(100%)'
 
   const panelTransition = noMotion
@@ -161,7 +164,7 @@ function QuickDrawerRoot({
         // allow-presentation-style: panel surface/borders/shadow are mode-driven and accept a caller style override
         className={cn(
           'absolute flex flex-col',
-          mode === 'side' && 'top-0 right-0 bottom-0',
+          mode === 'side' && 'top-0 end-0 bottom-0',
           mode === 'sheet' && 'bottom-0 left-0 right-0',
           className,
         )}
@@ -175,11 +178,13 @@ function QuickDrawerRoot({
           visibility: isOpen ? 'visible' : 'hidden',
           transition: panelTransition,
           background: 'rgb(var(--background-secondary))',
-          borderLeft: mode === 'side' ? '1px solid rgb(var(--border-primary) / 0.35)' : 'none',
+          borderInlineStart: mode === 'side' ? '1px solid rgb(var(--border-primary) / 0.35)' : 'none',
           borderTop: mode === 'sheet' ? '1px solid rgb(var(--border-primary) / 0.35)' : 'none',
           borderRadius: mode === 'sheet' ? '14px 14px 0 0' : undefined,
           boxShadow: isOpen
-            ? (mode === 'side' ? '-14px 0 44px rgba(0,0,0,0.5)' : '0 -12px 40px rgba(0,0,0,0.4)')
+            ? (mode === 'side'
+                ? `${isRtl ? '14px' : '-14px'} 0 44px rgba(0,0,0,0.5)`
+                : '0 -12px 40px rgba(0,0,0,0.4)')
             : 'none',
           ...style,
         }}
