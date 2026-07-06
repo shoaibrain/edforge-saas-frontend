@@ -308,6 +308,7 @@ function AttendanceTrendChart({ studentId }: { studentId: string }) {
 // ============================================================================
 
 function AttendanceDailyStrip({ studentId }: { studentId: string }) {
+  const { t: tAcad } = useTranslation('academics')
   const thirtyDaysAgo = useMemo(() => {
     const d = new Date()
     d.setDate(d.getDate() - 30)
@@ -366,10 +367,10 @@ function AttendanceDailyStrip({ studentId }: { studentId: string }) {
       </div>
       <div className="flex items-center gap-3 mt-2">
         {[
-          { status: 'present', label: 'Present' },
-          { status: 'absent', label: 'Absent' },
-          { status: 'late', label: 'Late' },
-          { status: 'excused', label: 'Excused' },
+          { status: 'present', label: tAcad('attendance.status.present.label') },
+          { status: 'absent', label: tAcad('attendance.status.absent.label') },
+          { status: 'late', label: tAcad('attendance.status.late.label') },
+          { status: 'excused', label: tAcad('attendance.status.excused.label') },
         ].map((item) => (
           <span key={item.status} className="flex items-center gap-1 text-xs text-text-tertiary">
             <span className={`w-2 h-2 rounded-sm ${getAttendanceDotColor(item.status)}`} />
