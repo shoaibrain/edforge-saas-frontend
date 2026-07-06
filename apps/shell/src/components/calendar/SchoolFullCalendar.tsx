@@ -220,7 +220,7 @@ export function SchoolFullCalendar({
     return (
       <div className="flex items-center justify-center py-20">
         <Loader2 className="w-6 h-6 text-[rgb(var(--action-secondary-fg))] animate-spin" />
-        <span className="ml-2 text-sm text-[rgb(var(--text-tertiary))]">Loading calendar...</span>
+        <span className="ms-2 text-sm text-[rgb(var(--text-tertiary))]">Loading calendar...</span>
       </div>
     )
   }

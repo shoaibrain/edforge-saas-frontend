@@ -90,7 +90,7 @@ function Section({ title, description, icon: Icon, children }: SectionProps) {
           <p className="text-sm text-[rgb(var(--text-tertiary))]">{description}</p>
         </div>
       </div>
-      <div className="pl-12">
+      <div className="ps-12">
         {children}
       </div>
     </section>
@@ -396,7 +396,7 @@ export default function SchoolConfigurationPage({ schoolId, school }: SchoolConf
                 <div className="h-3 w-48 bg-[rgb(var(--background-tertiary))] rounded" />
               </div>
             </div>
-            <div className="pl-12 space-y-4">
+            <div className="ps-12 space-y-4">
               <div className="h-10 bg-[rgb(var(--background-tertiary))] rounded-xl" />
               <div className="h-10 bg-[rgb(var(--background-tertiary))] rounded-xl" />
             </div>

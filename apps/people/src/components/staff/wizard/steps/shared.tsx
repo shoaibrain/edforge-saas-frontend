@@ -30,7 +30,7 @@ export const AnimatedInput = React.forwardRef<HTMLInputElement, AnimatedInputPro
         {label && (
           <label htmlFor={fieldId} className="block text-sm font-medium text-[rgb(var(--text-secondary))]">
             {label}
-            {required && <span className="text-rust-500 ml-0.5">*</span>}
+            {required && <span className="text-rust-500 ms-0.5">*</span>}
           </label>
         )}
         <Input
@@ -74,7 +74,7 @@ export function AnimatedSelect({ label, error, required, options, helpText, id, 
       {label && (
         <label htmlFor={fieldId} className="block text-sm font-medium text-[rgb(var(--text-secondary))]">
           {label}
-          {required && <span className="text-rust-500 ml-0.5">*</span>}
+          {required && <span className="text-rust-500 ms-0.5">*</span>}
         </label>
       )}
       <Select
@@ -133,13 +133,13 @@ export function AnimatedCheckbox({ label, checked, onChange, helpText, disabled 
         <button
           type="button"
           onClick={() => !disabled && onChange(!checked)}
-          className="text-sm text-[rgb(var(--text-primary))] text-left"
+          className="text-sm text-[rgb(var(--text-primary))] text-start"
           disabled={disabled}
         >
           {label}
         </button>
       </label>
-      {helpText && <p className="text-xs text-[rgb(var(--text-tertiary))] ml-8">{helpText}</p>}
+      {helpText && <p className="text-xs text-[rgb(var(--text-tertiary))] ms-8">{helpText}</p>}
     </div>
   )
 }

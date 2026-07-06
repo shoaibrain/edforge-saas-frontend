@@ -148,7 +148,7 @@ export function DuplicateWarning({
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 flex-shrink-0 ml-3">
+                  <div className="flex items-center gap-2 flex-shrink-0 ms-3">
                     <span
                       className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium border ${style.badge}`}
                     >

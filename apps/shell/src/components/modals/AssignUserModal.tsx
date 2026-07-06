@@ -111,7 +111,7 @@ export default function AssignUserModal({ isOpen, onClose, preselectedUserId }: 
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <Dialog.Panel className="w-full max-w-lg transform rounded-2xl bg-[rgb(var(--background-secondary))]  p-6 text-left align-middle shadow-xl transition-all border border-[rgb(var(--border-secondary))] ">
+                            <Dialog.Panel className="w-full max-w-lg transform rounded-2xl bg-[rgb(var(--background-secondary))]  p-6 text-start align-middle shadow-xl transition-all border border-[rgb(var(--border-secondary))] ">
                                 <div className="flex items-center justify-between mb-6">
                                     <Dialog.Title
                                         as="h3"
@@ -136,9 +136,9 @@ export default function AssignUserModal({ isOpen, onClose, preselectedUserId }: 
                                             </label>
                                             <Combobox value={selectedUser} onChange={setSelectedUser}>
                                                 <div className="relative mt-1">
-                                                    <div className="relative w-full cursor-default overflow-hidden rounded-lg bg-[rgb(var(--background-secondary))]  text-left border border-[rgb(var(--border-primary))]  focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))] sm:text-sm">
+                                                    <div className="relative w-full cursor-default overflow-hidden rounded-lg bg-[rgb(var(--background-secondary))]  text-start border border-[rgb(var(--border-primary))]  focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))] sm:text-sm">
                                                         <Combobox.Input
-                                                            className="w-full border-none py-2.5 pl-3 pr-10 text-sm leading-5 text-[rgb(var(--text-primary))]  bg-transparent focus:ring-0"
+                                                            className="w-full border-none py-2.5 ps-3 pe-10 text-sm leading-5 text-[rgb(var(--text-primary))]  bg-transparent focus:ring-0"
                                                             displayValue={(userId: string) => {
                                                                 const u = usersData?.items.find(u => u.userId === userId)
                                                                 return u ? `${u.firstName} ${u.lastName} (${u.email})` : ''
@@ -146,7 +146,7 @@ export default function AssignUserModal({ isOpen, onClose, preselectedUserId }: 
                                                             onChange={(event) => setSearchUserQuery(event.target.value)}
                                                             placeholder="Search by name or email..."
                                                         />
-                                                        <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
+                                                        <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pe-2">
                                                             <ChevronDown
                                                                 className="h-5 w-5 text-[rgb(var(--text-tertiary))]"
                                                                 aria-hidden="true"
@@ -170,7 +170,7 @@ export default function AssignUserModal({ isOpen, onClose, preselectedUserId }: 
                                                                     <Combobox.Option
                                                                         key={user.userId}
                                                                         className={({ active }) =>
-                                                                            `relative cursor-default select-none py-2 pl-10 pr-4 ${active ? 'bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]' : 'text-[rgb(var(--text-primary))] '
+                                                                            `relative cursor-default select-none py-2 ps-10 pe-4 ${active ? 'bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))]' : 'text-[rgb(var(--text-primary))] '
                                                                             }`
                                                                         }
                                                                         value={user.userId}
@@ -187,7 +187,7 @@ export default function AssignUserModal({ isOpen, onClose, preselectedUserId }: 
                                                                                 </div>
                                                                                 {selected ? (
                                                                                     <span
-                                                                                        className={`absolute inset-y-0 left-0 flex items-center pl-3 ${active ? 'text-[rgb(var(--action-primary-fg))]' : 'text-[rgb(var(--action-secondary-fg))]'
+                                                                                        className={`absolute inset-y-0 left-0 flex items-center ps-3 ${active ? 'text-[rgb(var(--action-primary-fg))]' : 'text-[rgb(var(--action-secondary-fg))]'
                                                                                             }`}
                                                                                     >
                                                                                         <Check className="h-5 w-5" aria-hidden="true" />
@@ -216,7 +216,7 @@ export default function AssignUserModal({ isOpen, onClose, preselectedUserId }: 
                                                     key={school.id}
                                                     onClick={() => setSelectedSchool(school.id)}
                                                     className={`
-                                    flex items-center gap-3 p-3 rounded-lg border text-left transition-all
+                                    flex items-center gap-3 p-3 rounded-lg border text-start transition-all
                                     ${selectedSchool === school.id
                                                             ? 'border-[rgb(var(--border-focus))] bg-[rgb(var(--state-info-bg)/0.18)]  ring-1 ring-[rgb(var(--border-focus))]'
                                                             : 'border-[rgb(var(--border-secondary))]  hover:border-[rgb(var(--border-primary))] dark:hover:border-[rgb(var(--border-primary))]'
@@ -230,7 +230,7 @@ export default function AssignUserModal({ isOpen, onClose, preselectedUserId }: 
                                                         <div className="font-medium text-[rgb(var(--text-primary))] ">{school.name}</div>
                                                         <div className="text-xs text-[rgb(var(--text-tertiary))]">{school.code}</div>
                                                     </div>
-                                                    {selectedSchool === school.id && <Check className="w-5 h-5 text-[rgb(var(--action-secondary-fg))] ml-auto" />}
+                                                    {selectedSchool === school.id && <Check className="w-5 h-5 text-[rgb(var(--action-secondary-fg))] ms-auto" />}
                                                 </button>
                                             ))}
                                         </div>
@@ -247,7 +247,7 @@ export default function AssignUserModal({ isOpen, onClose, preselectedUserId }: 
                                                     key={role.id}
                                                     onClick={() => setSelectedRole(role.id)}
                                                     className={`
-                                    flex flex-col items-start p-3 rounded-lg border text-left transition-all h-full
+                                    flex flex-col items-start p-3 rounded-lg border text-start transition-all h-full
                                     ${selectedRole === role.id
                                                             ? 'border-[rgb(var(--border-focus))] bg-[rgb(var(--state-info-bg)/0.18)]  ring-1 ring-[rgb(var(--border-focus))]'
                                                             : 'border-[rgb(var(--border-secondary))]  hover:border-[rgb(var(--border-primary))] dark:hover:border-[rgb(var(--border-primary))]'
@@ -256,7 +256,7 @@ export default function AssignUserModal({ isOpen, onClose, preselectedUserId }: 
                                                 >
                                                     <div className="font-medium text-[rgb(var(--text-primary))]  flex items-center gap-2 w-full">
                                                         {role.name}
-                                                        {selectedRole === role.id && <Check className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] ml-auto" />}
+                                                        {selectedRole === role.id && <Check className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] ms-auto" />}
                                                     </div>
                                                     <div className="text-xs text-[rgb(var(--text-tertiary))] mt-1">{role.description}</div>
                                                 </button>

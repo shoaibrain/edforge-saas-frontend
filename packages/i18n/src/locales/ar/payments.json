@@ -2,7 +2,7 @@
   "title": "دفع الرسوم",
   "description": "عرض الفواتير، وإجراء الدفعات، وتنزيل الإيصالات",
   "overview": {
-    "finance": "تمويل",
+    "finance": "المالية",
     "selectSchoolTitle": "اختر مدرسة",
     "selectSchoolDescription": "اختر مدرسة من شريط التنقل العلوي لعرض البيانات المالية.",
     "actions": {
@@ -46,8 +46,8 @@
     "kpi": {
       "totalInvoiced": "إجمالي الفاتورة",
       "collected": "تم جمعها",
-      "outstanding": "متميز",
-      "overdue": "تأخرت",
+      "outstanding": "المستحق",
+      "overdue": "متأخر",
       "invoiceCount": "{{count}} الفواتير",
       "paymentCount": "{{count}} المدفوعات",
       "awaiting": "{{count}} في انتظار",
@@ -64,8 +64,8 @@
       "title": "أداء التجميع",
       "percentCollected": "{{rate}}% تم جمعها",
       "collected": "تم جمعها",
-      "outstanding": "متميز",
-      "overdue": "تأخرت",
+      "outstanding": "المستحق",
+      "overdue": "متأخر",
       "byFeeType": "حسب نوع الرسوم",
       "typeCount": "{{count}} النوع",
       "typeCount_plural": "{{count}} أنواع",
@@ -83,7 +83,7 @@
       "invoiceCount_plural": "{{count}} الفواتير",
       "agingOverview": "نظرة عامة على الشيخوخة",
       "overdueCount": "{{count}} متأخرة",
-      "agingBucketTitle": "{{bucket}}: {{count}} الفواتير ({{amount}})",
+      "agingBucketTitle": "{{bucket, isolate}}: {{count, isolate}} الفواتير ({{amount, isolate}})",
       "agingBuckets": {
         "current": "حاضِر",
         "days1To30": "1-30 يوما",
@@ -92,7 +92,7 @@
         "days90Plus": "أكثر من 90 يومًا"
       },
       "agingInsight": {
-        "singleBucket": "{{count}} متأخرة · {{amount}}، كل ذلك داخل نافذة {{bucket}}.",
+        "singleBucket": "{{count, isolate}} متأخرة · {{amount, isolate}}، كل ذلك داخل نافذة {{bucket, isolate}}.",
         "multipleBuckets": "{{count}} متأخرة بإجمالي {{amount}}. {{worstCount}} في {{bucket}} بحاجة إلى اهتمام فوري."
       },
       "noOverdue": "لا توجد فواتير متأخرة - جميع الحسابات جارية.",
@@ -118,9 +118,9 @@
     "title": "الفواتير",
     "description": "عرض وإدارة فواتير الرسوم",
     "manageDescription": "إنشاء وإصدار وإدارة فواتير الطلاب.",
-    "outstanding": "متميز",
+    "outstanding": "المستحق",
     "paid": "مدفوع",
-    "overdue": "تأخرت",
+    "overdue": "متأخر",
     "all": "جميع الفواتير",
     "invoiceNumber": "فاتورة #",
     "status": "حالة",
@@ -157,7 +157,7 @@
     "bulkIssueSuccessWithSkipped": "تم إصدار فاتورة {{count}}. {{skipped}} تم تخطيه.",
     "bulkIssueSuccessWithSkipped_plural": "تم إصدار الفواتير {{count}}. {{skipped}} تم تخطيه.",
     "bulkIssueFailed": "فشل في إصدار الفواتير",
-    "overdueByDays": "متأخرة بحلول {{count}}د",
+    "overdueByDays": "متأخرة بـ {{count, isolate}} يومًا",
     "overdueBanner": "{{count}} الفاتورة متأخرة - {{amount}} غير محصلة",
     "overdueBanner_plural": "{{count}} الفواتير المتأخرة - {{amount}} غير محصلة",
     "overdueBannerRate": "معدل التحصيل هو {{rate}}%.",
@@ -240,15 +240,19 @@
       "lineItemCount": "{{count}} البنود",
       "lineItemCount_one": "{{count}} البند",
       "lineItemCount_other": "{{count}} البنود",
+      "lineItemCount_zero": "لا بنود",
+      "lineItemCount_two": "بندان",
+      "lineItemCount_few": "{{count}} بنود",
+      "lineItemCount_many": "{{count}} بندًا",
       "noPaymentsYet": "لا توجد مدفوعات حتى الآن",
       "invoiceCancelled": "تم إلغاء الفاتورة",
       "settledInFull": "استقر بالكامل",
-      "outstandingBalance": "الرصيد المتميز",
+      "outstandingBalance": "الرصيد المستحق",
       "dueDate": "تاريخ الاستحقاق",
-      "daysLate": "{{days}}د متأخرا"
+      "daysLate": "متأخر بـ {{days, isolate}} يومًا"
     },
     "lineItems": {
-      "qtyAt": "{{quantity}} × {{amount}}"
+      "qtyAt": "{{quantity, isolate}} × {{amount, isolate}}"
     },
     "aside": {
       "details": "تفاصيل",
@@ -313,7 +317,7 @@
     "cashDescription": "الدفع في مكتب المدرسة",
     "bankTransfer": "التحويل البنكي",
     "bankTransferDescription": "التحويل إلى الحساب البنكي للمدرسة",
-    "cheque": "يفحص",
+    "cheque": "شيك",
     "chequeDescription": "الدفع عن طريق الشيكات في مكتب المدرسة",
     "testMode": "وضع الاختبار",
     "productionMode": "إنتاج",
@@ -366,11 +370,11 @@
     "issued": "صادر",
     "partially_paid": "مدفوعة جزئيا",
     "paid": "مدفوع",
-    "overdue": "تأخرت",
+    "overdue": "متأخر",
     "cancelled": "تم الإلغاء",
     "written_off": "شطب",
     "pending": "في انتظار",
-    "processing": "يعالج",
+    "processing": "قيد المعالجة",
     "completed": "مكتمل",
     "failed": "فشل",
     "refunded": "ردها",
@@ -434,7 +438,7 @@
     "fields": {
       "name": "اسم",
       "description": "وصف",
-      "type": "يكتب",
+      "type": "نوع",
       "academicYear": "العام الدراسي",
       "amount": "كمية",
       "frequency": "تكرار",
@@ -495,7 +499,7 @@
       "tuition": "تدريس",
       "admission": "قبول",
       "exam": "فحص",
-      "transport": "ينقل",
+      "transport": "النقل",
       "library": "مكتبة",
       "lab": "معمل",
       "hostel": "نزل",
@@ -614,7 +618,7 @@
       "phase1Tooltip": "أراضي الأسلاك المضادة مع تكامل المعاينة المجمعة ؛ يتبع تصفية الرقائق متابعة العلاقات العامة",
       "phase2Tooltip": "القادمة في المرحلة الثانية - تتطلب البيانات الديموغرافية للطلاب",
       "segments": {
-        "outstanding": "رصيد متميز",
+        "outstanding": "رصيد مستحق",
         "new": "قبولات جديدة",
         "not-billed-this-period": "لم يتم إصدار فاتورة لهذه الفترة بعد",
         "transport": "مستخدمي النقل",
@@ -723,7 +727,7 @@
   "gatewayConfig": {
     "title": "بوابات الدفع",
     "description": "تكوين بوابات الدفع لمدرستك",
-    "enable": "يُمكَِن",
+    "enable": "تفعيل",
     "disable": "إبطال",
     "merchantCode": "رمز التاجر",
     "apiKey": "API مفتاح",
@@ -862,7 +866,7 @@
         "both": "كلاهما"
       },
       "cancel": "إلغاء",
-      "close": "يغلق"
+      "close": "إغلاق"
     },
     "progress": {
       "queued": "في قائمة الانتظار - انتظار العامل لاستلام الوظيفة.",
@@ -938,7 +942,7 @@
       "title": "ضبط التوازن",
       "progress": "ترحيل إدخالات دفتر الأستاذ",
       "warning": "تتم كتابة نفس التعديل في دفتر الأستاذ لكل حساب محدد. استخدم مفتاح التجاوز لتخطي حارس عتبة التوقيع، على سبيل المثال إضافة رصيد إلى حساب فائض بالفعل.",
-      "type": "يكتب",
+      "type": "نوع",
       "types": {
         "debit": "الخصم (الزيادة المستحقة)",
         "credit": "الائتمان (تخفيض المستحق)"
@@ -1017,6 +1021,10 @@
       "studentCount": "{{count}} الطلاب",
       "studentCount_one": "{{count}} طالب",
       "studentCount_other": "{{count}} الطلاب",
+      "studentCount_zero": "لا طلاب",
+      "studentCount_two": "طالبان",
+      "studentCount_few": "{{count}} طلاب",
+      "studentCount_many": "{{count}} طالبًا",
       "grades": "الدرجات {{grades}}",
       "bundle": "باقة",
       "estimateSeconds": "حول {{seconds}} ثانية",
@@ -1029,6 +1037,10 @@
       "docTotal": "{{count}} الوثائق",
       "docTotal_one": "{{count}} وثيقة",
       "docTotal_other": "{{count}} الوثائق",
+      "docTotal_zero": "لا وثائق",
+      "docTotal_two": "وثيقتان",
+      "docTotal_few": "{{count}} وثائق",
+      "docTotal_many": "{{count}} وثيقةً",
       "toastDownload": "تحميل",
       "generated": "تم إنشاؤها",
       "skipped": "تم تخطيه",
@@ -1070,6 +1082,10 @@
       },
       "whatsInside_one": "ماذا يوجد بالداخل · ملف {{count}}",
       "whatsInside_other": "ماذا يوجد بالداخل · {{count}} الملفات",
+      "whatsInside_zero": "ماذا يوجد بالداخل · لا ملفات",
+      "whatsInside_two": "ماذا يوجد بالداخل · ملفان",
+      "whatsInside_few": "ماذا يوجد بالداخل · {{count}} ملفات",
+      "whatsInside_many": "ماذا يوجد بالداخل · {{count}} ملفًا",
       "bundleMeta_one": "{{count}} PDF",
       "bundleMeta_other": "{{count}} PDFs",
       "morePdfs_one": "+ {{count}} المزيد PDF",
@@ -1096,7 +1112,7 @@
     "saved": "تم حفظ تكوين البوابة",
     "saveFailed": "فشل حفظ تكوين البوابة",
     "loadFailed": "فشل تحميل تكوينات البوابة",
-    "enable": "يُمكَِن",
+    "enable": "تفعيل",
     "saveConfiguration": "حفظ التكوين",
     "securityNote": "يتم تشفير بيانات الاعتماد وتخزينها بشكل آمن. بعد الحفظ، سيتم إخفاء القيم.",
     "showSecret": "إظهار القيمة السرية",
@@ -1109,7 +1125,7 @@
       "stripe": "شريط",
       "cash": "نقدي",
       "bank_transfer": "التحويل البنكي",
-      "cheque": "يفحص"
+      "cheque": "شيك"
     },
     "descriptions": {
       "esewa": "المحفظة الرقمية الرائدة في نيبال للمدفوعات عبر الإنترنت",
@@ -1142,7 +1158,7 @@
     "pageTitle": "حسابات الطلاب",
     "description": "عرض حسابات فواتير الطلاب والفواتير والمدفوعات وسجل دفتر الأستاذ.",
     "selectSchool": "اختر مدرسة لعرض حسابات الطلاب.",
-    "balance": "الرصيد المتميز",
+    "balance": "الرصيد المستحق",
     "totalPaid": "إجمالي المبلغ المدفوع",
     "lastPayment": "الدفعة الأخيرة",
     "ledger": "دفتر الحسابات",
@@ -1156,7 +1172,7 @@
     },
     "summary": {
       "totalStudents": "إجمالي الطلاب",
-      "outstanding": "متميز",
+      "outstanding": "المستحق",
       "fullyPaid": "مدفوعة بالكامل",
       "withBalance": "مع الرصيد",
       "accounts": "{{count}} الحساب",
@@ -1172,11 +1188,11 @@
       "student": "طالب",
       "studentName": "اسم الطالب",
       "date": "تاريخ",
-      "type": "يكتب",
+      "type": "نوع",
       "description": "وصف",
       "debit": "دَين",
       "credit": "ائتمان",
-      "balance": "توازن",
+      "balance": "الرصيد",
       "balanceBucket": "دلو التوازن",
       "invoiceNumber": "فاتورة #",
       "status": "حالة",
@@ -1222,10 +1238,10 @@
     "downloadPdf": "تحميل PDF",
     "exportCsv": "تصدير CSV",
     "cancel": "إلغاء",
-    "confirm": "يتأكد",
-    "save": "يحفظ",
+    "confirm": "تأكيد",
+    "save": "حفظ",
     "saving": "جارٍ الحفظ...",
-    "close": "يغلق",
+    "close": "إغلاق",
     "back": "خلف",
     "next": "التالي",
     "retry": "أعد المحاولة"
@@ -1274,7 +1290,7 @@
     "dismiss": "رفض",
     "emptyTitle": "لقد تم القبض عليك جميعًا.",
     "domains": {
-      "finance": "تمويل"
+      "finance": "المالية"
     },
     "selection": {
       "aria": "إجراءات الاختيار",

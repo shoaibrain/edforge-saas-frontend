@@ -28,7 +28,7 @@ function KvRow({ label, value, sub }: { label: string; value: ReactNode; sub?: s
   return (
     <div className="flex items-start justify-between gap-3 border-b border-[rgb(var(--border-primary))] px-4 py-2.5 text-sm last:border-b-0">
       <span className="flex-none text-[rgb(var(--text-tertiary))]">{label}</span>
-      <span className="min-w-0 text-right font-medium text-[rgb(var(--text-primary))]">
+      <span className="min-w-0 text-end font-medium text-[rgb(var(--text-primary))]">
         {value}
         {sub && (
           <span className="block font-mono text-2xs font-normal text-[rgb(var(--text-tertiary))]">
@@ -97,7 +97,7 @@ export function InvoiceDetailAside({
         >
           <Users className="h-3.5 w-3.5" />
           {t('invoiceDetail.aside.viewStudentAccount')}
-          <ArrowRight className="ml-auto h-3.5 w-3.5" />
+          <ArrowRight className="ms-auto h-3.5 w-3.5" />
         </Link>
       </section>
 

@@ -86,16 +86,16 @@ export function AsyncGenerateSuccess({
             onClick={() => onRetryFailed!(failedIds)}
             disabled={retryPending}
           >
-            <RotateCcw className="w-4 h-4 mr-1.5" />
+            <RotateCcw className="w-4 h-4 me-1.5" />
             {t('bulkGenerate.asyncSuccess.retryFailed', { count: failedIds.length })}
           </Button>
         )}
         <Button variant="outline" onClick={onReset} disabled={retryPending}>
-          <RotateCcw className="w-4 h-4 mr-1.5" /> {t('bulkGenerate.success.newBatch')}
+          <RotateCcw className="w-4 h-4 me-1.5" /> {t('bulkGenerate.success.newBatch')}
         </Button>
         {onClose && (
           <Button onClick={onClose} disabled={retryPending}>
-            <X className="w-4 h-4 mr-1.5" /> {t('actions.close')}
+            <X className="w-4 h-4 me-1.5" /> {t('actions.close')}
           </Button>
         )}
       </div>

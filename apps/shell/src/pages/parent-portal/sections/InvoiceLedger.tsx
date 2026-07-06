@@ -131,7 +131,7 @@ export function InvoiceLedger({
               {i > 0 && <DashedDivider className="mx-4 my-0" />}
               <button
                 onClick={() => onSelectInvoice(inv)}
-                className="w-full text-left flex items-center gap-3 px-4 py-3 transition-colors"
+                className="w-full text-start flex items-center gap-3 px-4 py-3 transition-colors"
                 style={{ background: 'transparent' }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.background = 'rgb(var(--background-tertiary) / 0.7)'

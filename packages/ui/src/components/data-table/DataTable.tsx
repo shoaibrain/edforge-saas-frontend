@@ -9,6 +9,7 @@ import { DataTableEmpty } from './DataTableEmpty'
 import { DataTablePagination } from './DataTablePagination'
 import { DataTableToolbar } from './DataTableToolbar'
 import { resolveDataTableLabels } from './labels'
+import { useDataTableLabels } from './useDataTableLabels'
 import type {
   DataTableColumnMeta,
   DataTableProps,
@@ -70,7 +71,9 @@ export function DataTable<TData>({
   className,
   maxHeight,
 }: DataTableProps<TData>) {
-  const resolvedLabels = resolveDataTableLabels(labels)
+  // i18n-translated labels are the default; an explicit `labels` prop overrides.
+  const i18nLabels = useDataTableLabels()
+  const resolvedLabels = resolveDataTableLabels({ ...i18nLabels, ...labels })
   // Resolve prototype-shaped aliases onto the canonical props.
   const resolvedFacets: FacetedFilterConfig[] | undefined =
     facets ?? facetedFilters
@@ -286,10 +289,10 @@ export function DataTable<TData>({
                           'px-4 text-2xs font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))]',
                           'h-[var(--dt-header-h-comfortable)] [[data-density=compact]_&]:h-[var(--dt-header-h-compact)]',
                           meta?.align === 'right'
-                            ? 'text-right'
+                            ? 'text-end'
                             : meta?.align === 'center'
                               ? 'text-center'
-                              : 'text-left',
+                              : 'text-start',
                           meta?.className
                         )}
                         style={{ width: header.getSize() }}
@@ -394,7 +397,7 @@ function TableRowWithExpansion<TData>({
           'transition-colors duration-[var(--motion-duration-fast)]',
           'motion-reduce:transition-none',
           isSelected
-            ? 'bg-[var(--mint-soft)] border-l-2 border-l-[var(--mint-border)]'
+            ? 'bg-[var(--mint-soft)] border-s-2 border-s-[var(--mint-border)]'
             : isEvenRow
               ? 'bg-[rgb(var(--background-tertiary)/0.35)]'
               : '',
@@ -418,7 +421,7 @@ function TableRowWithExpansion<TData>({
               className={cn(
                 'px-4 text-sm text-[rgb(var(--text-primary))]',
                 'h-[var(--dt-row-h-comfortable)] [[data-density=compact]_&]:h-[var(--dt-row-h-compact)]',
-                meta?.align === 'right' && 'text-right',
+                meta?.align === 'right' && 'text-end',
                 meta?.align === 'center' && 'text-center',
                 meta?.className
               )}
@@ -434,7 +437,7 @@ function TableRowWithExpansion<TData>({
         <tr className="border-b border-[rgb(var(--border-secondary)/0.7)]">
           <td
             colSpan={visibleCellCount}
-            className="bg-[rgb(var(--background-tertiary)/0.2)] border-l-2 border-l-[var(--mint-border)] px-4 py-3"
+            className="bg-[rgb(var(--background-tertiary)/0.2)] border-s-2 border-s-[var(--mint-border)] px-4 py-3"
           >
             {renderSubComponent({ row })}
           </td>

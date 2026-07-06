@@ -14,8 +14,8 @@
   "yesterday": "أمس",
   "widgets": {
     "customize": "تخصيص لوحة القيادة",
-    "showWidget": "يعرض",
-    "hideWidget": "يخفي"
+    "showWidget": "عرض",
+    "hideWidget": "إخفاء"
   },
   "events": {
     "calendars": "التقاويم",
@@ -24,7 +24,7 @@
     "allDayEvents": "أحداث طوال اليوم",
     "hideFromHome": "إخفاء من المنزل",
     "back": "خلف",
-    "join": "ينضم"
+    "join": "انضمام"
   },
   "quickAction": {
     "addStudent": "إضافة طالب",
@@ -86,7 +86,7 @@
     "selectSchool": "اختر مدرسة من الشريط الجانبي لعرض لوحة التحكم.",
     "selectSchoolTeacher": "حدد مدرسة من الشريط الجانبي لعرض لوحة التحكم الخاصة بك.",
     "offline": "أنت غير متصل. عرض البيانات المخزنة مؤقتا.",
-    "refresh": "ينعش",
+    "refresh": "تحديث",
     "kpi": {
       "studentsEnrolled": "الطلاب المسجلين",
       "activeSections": "الأقسام النشطة",
@@ -141,7 +141,7 @@
       "financialOverview": "نظرة عامة مالية",
       "collected": "تم جمعها",
       "outstanding": "متميز",
-      "overdue": "تأخرت",
+      "overdue": "متأخر",
       "totalInvoiced": "إجمالي الفواتير هذا العام",
       "unableToLoad": "غير قادر على تحميل البيانات المالية",
       "retry": "أعد المحاولة",
@@ -195,7 +195,7 @@
       "dismiss": "رفض",
       "emptyTitle": "لقد تم القبض عليك جميعًا.",
       "domains": {
-        "finance": "تمويل",
+        "finance": "المالية",
         "attendance": "الحضور"
       }
     }

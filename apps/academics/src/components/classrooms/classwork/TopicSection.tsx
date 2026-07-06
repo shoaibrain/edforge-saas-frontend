@@ -23,7 +23,7 @@ export function TopicSection({ name, items, defaultOpen = true, onItemClick }: T
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 w-full text-left group"
+        className="flex items-center gap-2 w-full text-start group"
         aria-expanded={isOpen}
       >
         {isOpen ? (
@@ -46,7 +46,7 @@ export function TopicSection({ name, items, defaultOpen = true, onItemClick }: T
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <div className="space-y-2 pl-6">
+            <div className="space-y-2 ps-6">
               {items.map((item) => (
                 <ClassworkItemCard
                   key={item.itemId}

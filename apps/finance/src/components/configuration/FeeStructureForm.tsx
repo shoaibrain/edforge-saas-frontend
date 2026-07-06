@@ -308,7 +308,7 @@ export function FeeStructureForm({
                   min="0"
                   max="10000000"
                   step={currency === 'NPR' ? '1' : '0.01'}
-                  className="input pl-12"
+                  className="input ps-12"
                   placeholder={currency === 'NPR' ? '0' : '0.00'}
                 />
               </div>
@@ -518,7 +518,7 @@ function GradeLevelSelect({
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="input w-full text-left flex items-center justify-between"
+          className="input w-full text-start flex items-center justify-between"
         >
           <span className={value.length === 0 ? 'text-[rgb(var(--text-tertiary))]' : ''}>
             {displayText}

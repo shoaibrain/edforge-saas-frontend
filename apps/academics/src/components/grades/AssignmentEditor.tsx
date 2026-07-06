@@ -227,7 +227,7 @@ export function AssignmentEditor({
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-[rgb(var(--background-overlay)/0.50)]">
-      <div className="bg-surface-primary w-full max-w-lg h-full shadow-xl flex flex-col overflow-hidden border-l border-border-secondary">
+      <div className="bg-surface-primary w-full max-w-lg h-full shadow-xl flex flex-col overflow-hidden border-s border-border-secondary">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-border-secondary">
           <h3 className="text-lg font-semibold text-text-primary">
@@ -431,7 +431,7 @@ export function AssignmentEditor({
             onClick={() => handleSubmit(true)}
             disabled={isSaving || !assignmentName.trim() || possiblePts <= 0 || students.length === 0}
           >
-            {isSaving ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Plus className="w-4 h-4 mr-2" />}
+            {isSaving ? <Loader2 className="w-4 h-4 me-2 animate-spin" /> : <Plus className="w-4 h-4 me-2" />}
             {t('gradesModule.management.createAssignment')}
           </Button>
           <div className="flex items-center gap-3">
@@ -444,9 +444,9 @@ export function AssignmentEditor({
               disabled={isSaving || !assignmentName.trim() || possiblePts <= 0 || filledCount === 0}
             >
               {isSaving ? (
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                <Loader2 className="w-4 h-4 me-2 animate-spin" />
               ) : (
-                <Save className="w-4 h-4 mr-2" />
+                <Save className="w-4 h-4 me-2" />
               )}
               {formatCount('gradesModule.management.saveWithScores', filledCount)}
             </Button>

@@ -79,7 +79,7 @@ function FieldRow({
   return (
     <div className="flex items-start justify-between gap-4 py-2.5 border-b border-[rgb(var(--border-primary))] last:border-0">
       <span className="text-sm text-[rgb(var(--text-tertiary))] min-w-40">{label}</span>
-      <div className="flex-1 text-right">
+      <div className="flex-1 text-end">
         {display.kind === 'unset' && (
           <span className="text-sm italic text-[rgb(var(--text-tertiary))]">{t('studentProfile.demographics.notSpecified')}</span>
         )}
@@ -129,7 +129,7 @@ function TextRow({ label, value }: { label: string; value?: string }) {
     <div className="flex items-start justify-between gap-4 py-2.5 border-b border-[rgb(var(--border-primary))] last:border-0">
       <span className="text-sm text-[rgb(var(--text-tertiary))] min-w-40">{label}</span>
       {value ? (
-        <span className="text-sm text-[rgb(var(--text-primary))] text-right">{value}</span>
+        <span className="text-sm text-[rgb(var(--text-primary))] text-end">{value}</span>
       ) : (
         <span className="text-sm italic text-[rgb(var(--text-tertiary))]">{t('studentProfile.demographics.notSpecified')}</span>
       )}

@@ -148,7 +148,7 @@ const ComboboxControl = forwardRef<HTMLInputElement, ComboboxControlProps>(
             data-invalid={resolvedInvalid || undefined}
             data-disabled={resolvedDisabled || undefined}
           >
-            <Search className="ml-3 h-4 w-4 shrink-0 text-[rgb(var(--text-tertiary))]" aria-hidden="true" />
+            <Search className="ms-3 h-4 w-4 shrink-0 text-[rgb(var(--text-tertiary))]" aria-hidden="true" />
             <ComboboxInput
               ref={ref}
               id={field?.controlId}
@@ -168,7 +168,7 @@ const ComboboxControl = forwardRef<HTMLInputElement, ComboboxControlProps>(
                   setQuery('')
                 }}
                 className={cn(
-                  'mr-1 rounded p-1 text-[rgb(var(--text-tertiary))]',
+                  'me-1 rounded p-1 text-[rgb(var(--text-tertiary))]',
                   'hover:bg-[rgb(var(--background-tertiary))] hover:text-[rgb(var(--text-primary))]',
                   focusRingInset
                 )}
@@ -179,7 +179,7 @@ const ComboboxControl = forwardRef<HTMLInputElement, ComboboxControlProps>(
             ) : null}
             <ComboboxButton
               className={cn(
-                'mr-2 rounded p-1 text-[rgb(var(--text-tertiary))]',
+                'me-2 rounded p-1 text-[rgb(var(--text-tertiary))]',
                 'hover:bg-[rgb(var(--background-tertiary))] hover:text-[rgb(var(--text-primary))]',
                 focusRingInset
               )}

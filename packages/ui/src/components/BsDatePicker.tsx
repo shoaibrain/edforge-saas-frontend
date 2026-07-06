@@ -276,7 +276,7 @@ export function DateInput({ value, onChange, calendarSystem = 'gregorian', label
           disabled={disabled}
           onClick={() => !disabled && setShowPicker(!showPicker)}
           className={`
-            w-full flex items-center gap-2 px-3 py-2 rounded-xl border text-sm text-left transition-all
+            w-full flex items-center gap-2 px-3 py-2 rounded-xl border text-sm text-start transition-all
             ${showPicker
               ? 'border-[rgb(var(--border-focus))] ring-2 ring-[rgb(var(--border-focus)/0.24)]'
               : 'border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-secondary))]'
@@ -294,7 +294,7 @@ export function DateInput({ value, onChange, calendarSystem = 'gregorian', label
               role="button"
               tabIndex={-1}
               onClick={(e) => { e.stopPropagation(); onChange(''); setShowPicker(false) }}
-              className="ml-auto text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
+              className="ms-auto text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
               aria-label="Clear date"
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" x2="6" y1="6" y2="18"/><line x1="6" x2="18" y1="6" y2="18"/></svg>

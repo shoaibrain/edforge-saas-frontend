@@ -223,7 +223,7 @@ export function ScrollSpyNav({
               key={section.id}
               onClick={() => onSectionClick(section.id)}
               className={cn(
-                'block w-full text-left px-3 py-2 text-sm rounded-lg transition-colors',
+                'block w-full text-start px-3 py-2 text-sm rounded-lg transition-colors',
                 isActive
                   ? 'text-[rgb(var(--action-secondary-fg))]  font-medium'
                   : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-secondary))]'

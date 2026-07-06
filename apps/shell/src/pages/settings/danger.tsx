@@ -42,7 +42,7 @@ export default function DangerZonePage() {
               Permanently delete your account and all associated data. This cannot be undone.
             </p>
             <Button variant="outline" className="border-rust-500/30 text-rust-600 hover:bg-rust-500/10">
-              <Trash2 className="w-4 h-4 mr-2" />
+              <Trash2 className="w-4 h-4 me-2" />
               Delete Account
             </Button>
           </div>

@@ -62,7 +62,7 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
           <label
             key={option.value}
             className={cn(
-              'group flex cursor-pointer items-start gap-3 text-left transition-colors duration-fast ease-standard',
+              'group flex cursor-pointer items-start gap-3 text-start transition-colors duration-fast ease-standard',
               optionDisabled && 'cursor-not-allowed opacity-60',
               variant === 'card' &&
                 cn(

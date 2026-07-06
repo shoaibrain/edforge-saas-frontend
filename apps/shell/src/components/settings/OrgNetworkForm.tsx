@@ -154,7 +154,7 @@ export function OrgNetworkForm({ open, onClose, mode, editId }: OrgNetworkFormPr
                   <>
                     {t('organization.fields.edFiId')}
                     <Tooltip content={t('organization.networkForm.edFiIdHelp')} side="top">
-                      <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
+                      <Info className="inline w-3.5 h-3.5 ms-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
                     </Tooltip>
                   </>
                 }
@@ -190,7 +190,7 @@ export function OrgNetworkForm({ open, onClose, mode, editId }: OrgNetworkFormPr
                   <>
                     {t('organization.networkForm.networkPurpose')}
                     <Tooltip content={t('organization.networkForm.networkPurposeHelp')} side="top">
-                      <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
+                      <Info className="inline w-3.5 h-3.5 ms-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
                     </Tooltip>
                   </>
                 }
@@ -202,7 +202,7 @@ export function OrgNetworkForm({ open, onClose, mode, editId }: OrgNetworkFormPr
                   <>
                     {t('organization.fields.operationalStatus')}
                     <Tooltip content={t('organization.networkForm.operationalStatusHelp')} side="top">
-                      <Info className="inline w-3.5 h-3.5 ml-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
+                      <Info className="inline w-3.5 h-3.5 ms-1 text-[rgb(var(--text-tertiary))] cursor-help align-text-bottom" />
                     </Tooltip>
                   </>
                 }

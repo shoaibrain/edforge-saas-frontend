@@ -830,7 +830,7 @@ function YearsStep({
                         {isBikramSambat && year.nameBS ? (
                           <>
                             {year.nameBS}
-                            <span className="text-xs text-[rgb(var(--text-tertiary))] font-normal ml-1.5">{year.name}</span>
+                            <span className="text-xs text-[rgb(var(--text-tertiary))] font-normal ms-1.5">{year.name}</span>
                           </>
                         ) : year.name}
                       </div>
@@ -1241,7 +1241,7 @@ function SessionsStep({ schoolId, activeYear, sessions, isNepal, calendarSystem 
               <div key={s.type} className="flex items-center justify-between px-3 py-2 bg-[rgba(55,138,221,0.04)] border border-[rgba(55,138,221,0.1)] rounded-lg">
                 <div>
                   <span className="text-xs font-medium text-[rgb(var(--text-primary))]">{s.label}</span>
-                  <span className="text-xs text-[rgb(var(--text-tertiary))] ml-2">{s.detail}</span>
+                  <span className="text-xs text-[rgb(var(--text-tertiary))] ms-2">{s.detail}</span>
                 </div>
                 <button onClick={() => prefillNepalSemester(s.type)} className="px-2.5 py-1 text-xs font-medium rounded-lg border border-[rgba(255,255,255,0.08)] text-[rgb(var(--text-tertiary))] hover:bg-[rgba(255,255,255,0.04)]">
                   + {t('academicSetup.actions.use')}
@@ -1490,7 +1490,7 @@ function SessionRowWithExamForm({
             <span aria-hidden>⚠</span>
             {t('academicSetup.examWindow.warningTitle', { count: warnings.length })}
           </p>
-          <ul className="text-[10.5px] text-[rgb(var(--text-secondary))] space-y-0.5 ml-4 list-disc">
+          <ul className="text-[10.5px] text-[rgb(var(--text-secondary))] space-y-0.5 ms-4 list-disc">
             {warnings.map(w => (
               <li key={w.date}>
                 <strong>{new Date(w.date + 'T12:00:00').toLocaleDateString(i18n.language === 'ne' ? 'ne-NP' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</strong>{' '}
@@ -2449,7 +2449,7 @@ function CalendarStep({ schoolId, activeYear, calendarStats, localeDefaults }: {
           DAY_TYPE_LEGEND_CHIPS automatically excludes server-managed types
           (exam_window) per S2.5 so operators only see types they can pick. */}
       <div className="flex flex-wrap gap-1.5 items-center">
-        <span className="text-xs text-[rgb(var(--text-tertiary))] mr-1">
+        <span className="text-xs text-[rgb(var(--text-tertiary))] me-1">
           {t('academicSetup.calendar.dayTypes')}
         </span>
         {DAY_TYPE_LEGEND_CHIPS.map(dt => (
@@ -2847,7 +2847,7 @@ function BellScheduleStep({ schoolId, bellSchedules, isNepal, activeYear }: {
                         <span className="text-xs text-[rgb(var(--text-tertiary))] tabular-nums">{period.startTime} – {period.endTime}</span>
                         <span
                           // allow-presentation-style: period-type chip colors are data-driven (colors)
-                          className="text-xs font-medium px-1.5 py-px rounded ml-auto"
+                          className="text-xs font-medium px-1.5 py-px rounded ms-auto"
                           style={{ background: colors.bg, color: colors.text }}
                         >
                           {t(`schoolBellSchedule.periodTypes.${period.periodType}.label`, { defaultValue: period.periodType })}

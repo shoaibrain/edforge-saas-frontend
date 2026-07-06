@@ -233,9 +233,9 @@ export function ExportResult({
             <List className="h-4 w-4" />
             {t('asyncJobs.pdfExportShared.whatsInside', { count: okRows.length })}
             {listOpen ? (
-              <ChevronUp className="ml-auto h-4 w-4" />
+              <ChevronUp className="ms-auto h-4 w-4" />
             ) : (
-              <ChevronDown className="ml-auto h-4 w-4" />
+              <ChevronDown className="ms-auto h-4 w-4" />
             )}
           </button>
           {listOpen && (
@@ -250,7 +250,7 @@ export function ExportResult({
                     {fileNameFor(row)}
                   </span>
                   {row.studentName && (
-                    <span className="ml-auto truncate text-[rgb(var(--text-tertiary))]">
+                    <span className="ms-auto truncate text-[rgb(var(--text-tertiary))]">
                       {row.studentName}
                     </span>
                   )}

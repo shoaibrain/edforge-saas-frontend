@@ -215,7 +215,7 @@ function HomeTopbarCenter() {
         {greeting}
       </span>
       <span
-        className="text-xs ml-[10px] pl-[10px] border-l text-[color:var(--shell-text-4)] border-[var(--shell-border-color)]"
+        className="text-xs ms-[10px] ps-[10px] border-s text-[color:var(--shell-text-4)] border-[var(--shell-border-color)]"
         style={{ transition: "color 0.3s, border-color 0.3s" }}
       >
         {dateDisplay}
@@ -241,7 +241,7 @@ function UserMenu() {
     <Menu as="div" className="relative">
       <MenuButton
         aria-label={tNav("myProfile")}
-        className="flex items-center rounded-full hover:ring-[rgb(var(--border-focus)/0.50)] transition-all duration-200 ml-1 flex-shrink-0"
+        className="flex items-center rounded-full hover:ring-[rgb(var(--border-focus)/0.50)] transition-all duration-200 ms-1 flex-shrink-0"
       >
         <div className="w-8 h-8 rounded-full overflow-hidden">
           <Avatar name={user.name} size="sm" shape="circle" />
@@ -259,7 +259,7 @@ function UserMenu() {
       >
         <MenuItems
           data-testid="user-menu-panel"
-          className="absolute right-0 mt-2 w-72 origin-top-right rounded-2xl bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] shadow-xl shadow-ink-500/10 dark:shadow-black/20 z-50 overflow-hidden"
+          className="absolute end-0 mt-2 w-72 origin-top-right rounded-2xl bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] shadow-xl shadow-ink-500/10 dark:shadow-black/20 z-50 overflow-hidden"
         >
           {/* User Info */}
           <div className="px-4 py-4 border-b border-[rgb(var(--border-secondary))] bg-[rgb(var(--background-tertiary))]">
@@ -322,7 +322,7 @@ function UserMenu() {
                   <div className="w-8 h-8 rounded-lg bg-[rgb(var(--background-tertiary))] flex items-center justify-center">
                     <AnimatedIcon name="account" icon={User} size={16} applyAccent={false} className="text-[rgb(var(--text-secondary))]" />
                   </div>
-                  <div className="text-left">
+                  <div className="text-start">
                     <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
                       {tNav("myProfile")}
                     </p>
@@ -344,7 +344,7 @@ function UserMenu() {
                   <div className="w-8 h-8 rounded-lg bg-[rgb(var(--background-tertiary))] flex items-center justify-center">
                     <AnimatedIcon name="settings" icon={Settings} size={16} applyAccent={false} className="text-[rgb(var(--text-secondary))]" />
                   </div>
-                  <div className="text-left">
+                  <div className="text-start">
                     <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
                       {tNav("settings")}
                     </p>
@@ -397,7 +397,7 @@ export function Header() {
     >
       {/* LEFT ZONE: width tracks sidebar for visual alignment */}
       <div
-        className={`flex items-center gap-1 flex-shrink-0 overflow-hidden pl-4 ${collapsed ? "w-[var(--shell-sidebar-w-collapsed)]" : "w-[var(--shell-sidebar-w)]"}`}
+        className={`flex items-center gap-1 flex-shrink-0 overflow-hidden ps-4 ${collapsed ? "w-[var(--shell-sidebar-w-collapsed)]" : "w-[var(--shell-sidebar-w)]"}`}
         style={{ transition: "width var(--shell-transition)" }}
       >
         <HamburgerButton />
@@ -410,7 +410,7 @@ export function Header() {
       </div>
 
       {/* RIGHT ZONE: User avatar (theme moved into the avatar menu) */}
-      <div className="flex items-center flex-shrink-0 pr-4">
+      <div className="flex items-center flex-shrink-0 pe-4">
         <UserMenu />
       </div>
     </header>

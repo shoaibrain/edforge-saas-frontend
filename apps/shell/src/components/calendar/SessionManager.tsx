@@ -227,7 +227,7 @@ function SessionForm({
       <div className="flex justify-end gap-2">
         <Button variant="ghost" size="sm" type="button" onClick={onCancel}>Cancel</Button>
         <Button variant="primary" size="sm" type="submit" disabled={isLoading} isLoading={isLoading}>
-          <Save className="w-4 h-4 mr-1.5" />
+          <Save className="w-4 h-4 me-1.5" />
           {submitLabel}
         </Button>
       </div>
@@ -327,7 +327,7 @@ export function SessionManager({
           size="sm"
           onClick={() => { setShowCreate(true); setEditingId(null) }}
         >
-          <Plus className="w-3.5 h-3.5 mr-1" />
+          <Plus className="w-3.5 h-3.5 me-1" />
           Add Session
         </Button>
       </div>
@@ -393,7 +393,7 @@ export function SessionManager({
         {isLoading && (
           <div className="flex items-center justify-center py-8">
             <Loader2 className="w-5 h-5 text-[rgb(var(--action-secondary-fg))] animate-spin" />
-            <span className="ml-2 text-sm text-[rgb(var(--text-tertiary))]">Loading sessions...</span>
+            <span className="ms-2 text-sm text-[rgb(var(--text-tertiary))]">Loading sessions...</span>
           </div>
         )}
 
@@ -482,7 +482,7 @@ export function SessionManager({
                           disabled={deleteSession.isPending}
                           isLoading={deleteSession.isPending}
                         >
-                          <Trash2 className="w-3.5 h-3.5 mr-1" />
+                          <Trash2 className="w-3.5 h-3.5 me-1" />
                           Delete
                         </Button>
                         <Button variant="ghost" size="sm" onClick={() => setDeletingId(null)}>
@@ -520,7 +520,7 @@ export function SessionManager({
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1 flex-shrink-0 ml-2">
+                  <div className="flex items-center gap-1 flex-shrink-0 ms-2">
                     <button
                       onClick={() => { setEditingId(session.academicSessionId); setShowCreate(false) }}
                       className="p-1.5 rounded-lg hover:bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
@@ -677,7 +677,7 @@ function SessionTemplatePicker({
             key={tpl.id}
             onClick={() => applyTemplate(tpl)}
             disabled={applying !== null}
-            className="text-left p-3 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]/40 hover:border-[rgb(var(--border-focus))] hover:bg-[rgb(var(--action-primary-bg))]/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="text-start p-3 rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]/40 hover:border-[rgb(var(--border-focus))] hover:bg-[rgb(var(--action-primary-bg))]/5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <div className="flex items-center justify-between gap-2">
               <span className="text-sm font-medium text-[rgb(var(--text-primary))]">

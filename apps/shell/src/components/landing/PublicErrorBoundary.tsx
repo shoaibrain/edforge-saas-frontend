@@ -30,7 +30,7 @@ export function PublicErrorBoundary({ error, reset }: ErrorComponentProps) {
           </a>
         </div>
         {import.meta.env.DEV && error && (
-          <details className="mt-6 text-left p-4 rounded-xl bg-muted border border-border">
+          <details className="mt-6 text-start p-4 rounded-xl bg-muted border border-border">
             <summary className="text-xs text-muted-foreground cursor-pointer">Developer Info</summary>
             <pre className="mt-2 p-3 rounded-lg bg-background text-xs text-[rgb(var(--state-danger-fg))] font-mono overflow-x-auto max-h-40">
               {error.message}

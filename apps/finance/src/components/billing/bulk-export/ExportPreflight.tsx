@@ -43,7 +43,7 @@ function ManifestRow({
         {icon}
       </span>
       <span className="w-24 flex-none text-sm text-[rgb(var(--text-tertiary))]">{label}</span>
-      <span className="min-w-0 flex-1 text-right text-sm font-medium text-[rgb(var(--text-primary))]">
+      <span className="min-w-0 flex-1 text-end text-sm font-medium text-[rgb(var(--text-primary))]">
         {children}
       </span>
     </div>
@@ -76,7 +76,7 @@ export function ExportPreflight({
         disabled={overCap}
         onClick={() => onFormatChange(value)}
         className={cn(
-          'flex flex-col gap-0.5 rounded-lg border px-3 py-2.5 text-left transition-colors',
+          'flex flex-col gap-0.5 rounded-lg border px-3 py-2.5 text-start transition-colors',
           on
             ? 'border-[rgb(var(--state-success-border))] bg-[rgb(var(--state-success-bg))]'
             : 'border-[rgb(var(--border-secondary)/0.5)] bg-[rgb(var(--background-primary))] hover:border-[rgb(var(--border-strong)/0.7)]',
@@ -180,12 +180,12 @@ export function ExportPreflight({
         {format === 'zip' && (
           <>
             {previewRows.map((row) => (
-              <p key={row.id} className="py-0.5 pl-5">
+              <p key={row.id} className="py-0.5 ps-5">
                 └ {fileNameFor(row)}
               </p>
             ))}
             {count > previewRows.length && (
-              <p className="pl-5 pt-0.5 text-[rgb(var(--text-disabled))]">
+              <p className="ps-5 pt-0.5 text-[rgb(var(--text-disabled))]">
                 {t('asyncJobs.pdfExportShared.morePdfs', { count: count - previewRows.length })}
               </p>
             )}

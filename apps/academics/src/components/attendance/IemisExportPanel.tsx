@@ -116,7 +116,7 @@ export function IemisExportPanel({ schoolId, academicYearId, embedded = false }:
   const columns: ColumnDef<IemisExportRow, unknown>[] = useMemo(
     () => {
       const numericCell = (value: number) => (
-        <div className="text-right tabular-nums text-text-secondary">{formatNumber(value)}</div>
+        <div className="text-end tabular-nums text-text-secondary">{formatNumber(value)}</div>
       )
 
       return [

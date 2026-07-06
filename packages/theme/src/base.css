@@ -428,3 +428,36 @@ p {
   font-family: var(--font-display);
   font-variation-settings: "SOFT" 80, "opsz" 72;
 }
+
+/**
+ * RTL icon mirroring — horizontal directional glyphs (back/forward arrows,
+ * chevrons, corner arrows) point the other way when the document is RTL, so a
+ * "back" or "next" affordance reads correctly in Arabic. Vertical icons
+ * (chevron-up/down) and non-directional icons are intentionally left alone.
+ * Opt an individual icon out with the `.rtl-no-flip` class.
+ */
+[dir="rtl"] .lucide-arrow-left:not(.rtl-no-flip),
+[dir="rtl"] .lucide-arrow-right:not(.rtl-no-flip),
+[dir="rtl"] .lucide-arrow-left-right:not(.rtl-no-flip),
+[dir="rtl"] .lucide-arrow-up-right:not(.rtl-no-flip),
+[dir="rtl"] .lucide-arrow-up-left:not(.rtl-no-flip),
+[dir="rtl"] .lucide-arrow-down-right:not(.rtl-no-flip),
+[dir="rtl"] .lucide-arrow-down-left:not(.rtl-no-flip),
+[dir="rtl"] .lucide-arrow-big-left:not(.rtl-no-flip),
+[dir="rtl"] .lucide-arrow-big-right:not(.rtl-no-flip),
+[dir="rtl"] .lucide-chevron-left:not(.rtl-no-flip),
+[dir="rtl"] .lucide-chevron-right:not(.rtl-no-flip),
+[dir="rtl"] .lucide-chevrons-left:not(.rtl-no-flip),
+[dir="rtl"] .lucide-chevrons-right:not(.rtl-no-flip),
+[dir="rtl"] .lucide-move-left:not(.rtl-no-flip),
+[dir="rtl"] .lucide-move-right:not(.rtl-no-flip),
+[dir="rtl"] .lucide-corner-down-left:not(.rtl-no-flip),
+[dir="rtl"] .lucide-corner-down-right:not(.rtl-no-flip),
+[dir="rtl"] .lucide-corner-up-left:not(.rtl-no-flip),
+[dir="rtl"] .lucide-corner-up-right:not(.rtl-no-flip),
+[dir="rtl"] .lucide-log-out:not(.rtl-no-flip),
+[dir="rtl"] .lucide-reply:not(.rtl-no-flip),
+[dir="rtl"] .lucide-undo-2:not(.rtl-no-flip),
+[dir="rtl"] .lucide-redo-2:not(.rtl-no-flip) {
+  transform: scaleX(-1);
+}

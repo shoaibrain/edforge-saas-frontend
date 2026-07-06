@@ -160,7 +160,7 @@ function TimelineVisualization({ academicYears }: TimelineVisualizationProps) {
             <motion.div
               key={year.id}
               variants={fadeInUp}
-              className="relative flex items-start gap-4 pl-3"
+              className="relative flex items-start gap-4 ps-3"
             >
               {/* Timeline dot */}
               <div className={`
@@ -833,7 +833,7 @@ export default function SchoolAcademicYearsPage({ schoolId }: SchoolAcademicYear
           </p>
         </div>
         <Button variant={'outline'} onClick={() => setIsCreateModalOpen(true)}>
-          <Plus className="w-4 h-4 mr-2" />
+          <Plus className="w-4 h-4 me-2" />
           New Academic Year
         </Button>
       </motion.div>
@@ -863,7 +863,7 @@ export default function SchoolAcademicYearsPage({ schoolId }: SchoolAcademicYear
                     {currentYear.terms.map((term: Term) => (
                       <div key={term.id} className="text-xs">
                         <span className="font-medium text-[rgb(var(--text-secondary))]">{term.name}</span>
-                        <span className="text-[rgb(var(--text-tertiary))] ml-1">
+                        <span className="text-[rgb(var(--text-tertiary))] ms-1">
                           ({new Date(term.startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {new Date(term.endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })})
                         </span>
                       </div>
@@ -883,7 +883,7 @@ export default function SchoolAcademicYearsPage({ schoolId }: SchoolAcademicYear
                     }}
                     disabled={completeMutation.isPending}
                   >
-                    <CheckCircle className="w-4 h-4 mr-1" />
+                    <CheckCircle className="w-4 h-4 me-1" />
                     Complete Year
                   </Button>
                 )}
@@ -924,7 +924,7 @@ export default function SchoolAcademicYearsPage({ schoolId }: SchoolAcademicYear
                   }}
                   disabled={setCurrentMutation.isPending}
                 >
-                  <Star className="w-4 h-4 mr-1" />
+                  <Star className="w-4 h-4 me-1" />
                   Set as Current
                 </Button>
               </div>
@@ -993,7 +993,7 @@ export default function SchoolAcademicYearsPage({ schoolId }: SchoolAcademicYear
                         disabled={setCurrentMutation.isPending}
                         title="Designate as the current academic year"
                       >
-                        <Star className="w-4 h-4 mr-1" />
+                        <Star className="w-4 h-4 me-1" />
                         Set as Current
                       </Button>
                     )}
@@ -1002,7 +1002,7 @@ export default function SchoolAcademicYearsPage({ schoolId }: SchoolAcademicYear
                       size="sm"
                       onClick={() => setYearToActivate(year)}
                     >
-                      <Play className="w-4 h-4 mr-1" />
+                      <Play className="w-4 h-4 me-1" />
                       Activate
                     </Button>
                   </div>
@@ -1047,7 +1047,7 @@ export default function SchoolAcademicYearsPage({ schoolId }: SchoolAcademicYear
             Create your first academic year to get started
           </p>
           <Button onClick={() => setIsCreateModalOpen(true)}>
-            <Plus className="w-4 h-4 mr-2" />
+            <Plus className="w-4 h-4 me-2" />
             Create Academic Year
           </Button>
         </div>

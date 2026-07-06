@@ -121,7 +121,7 @@ describe('StatBand', () => {
   })
 
   it('draws a divider between segments (first segment has none)', () => {
-    // App is LTR-only (en + ne); physical `border-l` renders reliably in this
+    // App is LTR-only (en + ne); physical `border-s` renders reliably in this
     // Tailwind build where logical `border-s` did not.
     render(
       <StatBand
@@ -132,7 +132,7 @@ describe('StatBand', () => {
       />,
     )
     const segs = screen.getAllByRole('status')
-    expect(segs[1].className).toContain('border-l')
+    expect(segs[1].className).toContain('border-s')
     expect(segs[0].className).toContain('first:border-l-0')
   })
 

@@ -115,7 +115,7 @@ export function PaymentReceipt({ receipt, onBack, invoiceId }: PaymentReceiptPro
             {t('actions.back')}
           </button>
         )}
-        <div className="ml-auto flex gap-2">
+        <div className="ms-auto flex gap-2">
           <Button variant="outline" size="sm" onClick={() => window.print()}>
             <Printer className="h-3.5 w-3.5" />
             {t('receiptDetail.print')}
@@ -338,7 +338,7 @@ function PaperKv({
     <div className="flex items-start justify-between gap-4 py-1.5 text-sm">
       <span className="flex-none text-[#6B7280]">{label}</span>
       <span
-        className={`min-w-0 break-words text-right font-medium ${mono ? 'font-mono text-xs font-normal' : ''}`}
+        className={`min-w-0 break-words text-end font-medium ${mono ? 'font-mono text-xs font-normal' : ''}`}
       >
         {value}
       </span>

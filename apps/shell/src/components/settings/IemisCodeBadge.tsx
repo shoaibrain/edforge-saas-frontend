@@ -79,7 +79,7 @@ export function IemisCodeBadge({ code, className }: IemisCodeBadgeProps) {
       <button
         type="button"
         onClick={handleCopy}
-        className="ml-0.5 inline-flex items-center justify-center w-4 h-4 rounded hover:bg-[rgba(255,255,255,0.15)] transition-colors"
+        className="ms-0.5 inline-flex items-center justify-center w-4 h-4 rounded hover:bg-[rgba(255,255,255,0.15)] transition-colors"
         aria-label="Copy IEMIS School Code"
       >
         <Copy className="w-2.5 h-2.5" aria-hidden />

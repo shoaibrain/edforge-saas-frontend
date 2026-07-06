@@ -270,9 +270,9 @@ export const ICON_PARTS: Record<IconName, ReactNode> = {
   ),
   more: (
     <>
-      <circle className="mr-1" cx="5" cy="12" r="1.7" fill="currentColor" stroke="none" />
-      <circle className="mr-2" cx="12" cy="12" r="1.7" fill="currentColor" stroke="none" />
-      <circle className="mr-3" cx="19" cy="12" r="1.7" fill="currentColor" stroke="none" />
+      <circle className="me-1" cx="5" cy="12" r="1.7" fill="currentColor" stroke="none" />
+      <circle className="me-2" cx="12" cy="12" r="1.7" fill="currentColor" stroke="none" />
+      <circle className="me-3" cx="19" cy="12" r="1.7" fill="currentColor" stroke="none" />
     </>
   ),
   refresh: (

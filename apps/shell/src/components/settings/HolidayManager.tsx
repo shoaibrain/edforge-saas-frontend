@@ -235,7 +235,7 @@ function DeleteConfirmModal({ isOpen, holiday, onClose, onConfirm, isDeleting }:
             Cancel
           </Button>
           <Button variant="danger" onClick={onConfirm} isLoading={isDeleting}>
-            <Trash2 className="w-4 h-4 mr-1.5" />
+            <Trash2 className="w-4 h-4 me-1.5" />
             Delete
           </Button>
         </div>

@@ -235,7 +235,7 @@ export function PersonForm({
               onClick={onCancel}
               disabled={isSubmitting}
             >
-              <X className="w-4 h-4 mr-2" />
+              <X className="w-4 h-4 me-2" />
               Cancel
             </Button>
           )}
@@ -253,7 +253,7 @@ export function PersonForm({
               />
             ) : (
               <>
-                <Save className="w-4 h-4 mr-2" />
+                <Save className="w-4 h-4 me-2" />
                 {mode === 'create' ? 'Create Person' : 'Save Changes'}
               </>
             )}

@@ -97,7 +97,7 @@ export function RosterSummaryStrip({
         </div>
       )}
 
-      <div className="ml-auto flex items-center gap-3">
+      <div className="ms-auto flex items-center gap-3">
         <div className="h-2 w-24 overflow-hidden rounded-full bg-surface-secondary">
           <div
             className={`h-full rounded-full transition-all duration-300 ${

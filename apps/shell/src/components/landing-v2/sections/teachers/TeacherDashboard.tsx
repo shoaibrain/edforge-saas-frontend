@@ -7,7 +7,7 @@ import { Tag } from '@edforge/ui'
  */
 export function TeacherDashboard() {
   return (
-    <div className="pt-[22px] pb-[22px] pl-[22px] pr-[22px] bg-[var(--lp-bg-elevated)]">
+    <div className="pt-[22px] pb-[22px] ps-[22px] pe-[22px] bg-[var(--lp-bg-elevated)]">
       <div
         className="mb-4"
         style={{

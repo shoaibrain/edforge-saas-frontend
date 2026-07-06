@@ -60,7 +60,7 @@ export const GradeRangeField = forwardRef<HTMLDivElement, GradeRangeFieldProps>(
           <span id={labelId} className="block text-sm font-medium text-[rgb(var(--text-secondary))]">
             {label}
             {required ? (
-              <span className="ml-1 text-[rgb(var(--state-danger-fg))]" aria-hidden="true">
+              <span className="ms-1 text-[rgb(var(--state-danger-fg))]" aria-hidden="true">
                 *
               </span>
             ) : null}

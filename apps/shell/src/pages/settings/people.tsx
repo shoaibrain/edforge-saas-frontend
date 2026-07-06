@@ -175,7 +175,7 @@ function ChangeRoleModal({
             disabled={mutation.isPending || newRole === user.globalRole}
             isLoading={mutation.isPending}
           >
-            <ShieldCheck className="w-4 h-4 mr-1.5" />
+            <ShieldCheck className="w-4 h-4 me-1.5" />
             Update Role
           </Button>
         </div>
@@ -659,7 +659,7 @@ export default function PeopleSettingsPage() {
               placeholder="Search by name or email..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-[rgb(var(--border-secondary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
+              className="w-full ps-10 pe-4 py-2.5 rounded-lg border border-[rgb(var(--border-secondary))] bg-[rgb(var(--background-secondary))] text-sm text-[rgb(var(--text-primary))] placeholder:text-[rgb(var(--text-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
             />
           </div>
 

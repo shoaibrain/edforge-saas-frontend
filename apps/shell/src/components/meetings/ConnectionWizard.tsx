@@ -72,7 +72,7 @@ function PlatformSelectStep() {
                 onClick={() => !connected && handleSelect(platform.id)}
                 disabled={connected}
                 className={`
-                  group flex items-center gap-4 p-4 rounded-xl border text-left w-full
+                  group flex items-center gap-4 p-4 rounded-xl border text-start w-full
                   transition-all duration-200
                   ${connected
                     ? 'bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-secondary))] cursor-not-allowed opacity-60'
@@ -121,7 +121,7 @@ function PlatformSelectStep() {
                 onClick={() => !connected && handleSelect(platform.id)}
                 disabled={connected}
                 className={`
-                  group flex items-center gap-4 p-4 rounded-xl border text-left w-full
+                  group flex items-center gap-4 p-4 rounded-xl border text-start w-full
                   transition-all duration-200
                   ${connected
                     ? 'bg-[rgb(var(--background-tertiary))] border-[rgb(var(--border-secondary))] cursor-not-allowed opacity-60'
@@ -338,7 +338,7 @@ function SuccessStep() {
           <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${platform.bgColor}`}>
             <PlatformLogo platformId={platform.id} size={24} />
           </div>
-          <div className="text-left">
+          <div className="text-start">
             <p className="font-medium text-sm text-[rgb(var(--text-primary))]">
               {platform.name}
             </p>
@@ -350,7 +350,7 @@ function SuccessStep() {
       )}
       
       {/* What's Next */}
-      <div className="text-left p-4 rounded-xl bg-[rgb(var(--state-info-bg)/0.12)]  border border-[rgb(var(--border-focus)/0.35)]  mb-6">
+      <div className="text-start p-4 rounded-xl bg-[rgb(var(--state-info-bg)/0.12)]  border border-[rgb(var(--border-focus)/0.35)]  mb-6">
         <h3 className="font-medium text-sm text-[rgb(var(--text-primary))] mb-2">
           What's next?
         </h3>

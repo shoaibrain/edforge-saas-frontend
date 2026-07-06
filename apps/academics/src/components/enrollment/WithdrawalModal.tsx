@@ -123,7 +123,7 @@ export function WithdrawalModal({
           onClick={handleSubmit}
           disabled={withdrawMutation.isPending || !reason || !exitWithdrawType}
         >
-          {withdrawMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+          {withdrawMutation.isPending && <Loader2 className="w-4 h-4 me-2 animate-spin" />}
           Withdraw Student
         </Button>
       </ModalFooter>

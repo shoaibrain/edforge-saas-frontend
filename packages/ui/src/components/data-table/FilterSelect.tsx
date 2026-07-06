@@ -117,7 +117,7 @@ function TriggerValue({
             tone={opt.tone}
             className={cn(
               'h-1.5 w-1.5',
-              i > 0 && '-ml-1 ring-2 ring-[rgb(var(--background-secondary))]',
+              i > 0 && '-ms-1 ring-2 ring-[rgb(var(--background-secondary))]',
             )}
           />
         ))}
@@ -222,7 +222,7 @@ function FilterSelectMenu({
             )}
           >
             <Dot tone={option.tone} />
-            <span className="min-w-0 flex-1 truncate text-left">{option.label}</span>
+            <span className="min-w-0 flex-1 truncate text-start">{option.label}</span>
             {option.count != null && (
               <span className="font-mono text-2xs tabular-nums text-[rgb(var(--text-tertiary))]">
                 {option.count}
@@ -357,7 +357,7 @@ export function FilterSelect({
                 aria-label={resolvedLabels.clearFilter}
                 onMouseDown={(e) => e.stopPropagation()}
                 onClick={clearFromTrigger}
-                className="ml-0.5 grid h-5 w-5 flex-none place-items-center rounded text-[rgb(var(--text-tertiary))] hover:bg-[rgb(var(--mint-border)/0.4)] hover:text-[rgb(var(--text-primary))]"
+                className="ms-0.5 grid h-5 w-5 flex-none place-items-center rounded text-[rgb(var(--text-tertiary))] hover:bg-[rgb(var(--mint-border)/0.4)] hover:text-[rgb(var(--text-primary))]"
               >
                 <X className="h-3 w-3" />
               </span>

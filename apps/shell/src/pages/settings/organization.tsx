@@ -626,7 +626,7 @@ export default function OrganizationSettingsPage() {
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="ml-auto gap-1.5"
+                        className="ms-auto gap-1.5"
                         onClick={() => seaModal.openEdit(null)}
                       >
                         {t('organization.actions.edit')}

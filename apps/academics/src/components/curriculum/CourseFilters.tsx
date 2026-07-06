@@ -139,7 +139,7 @@ export function useCourseToolbar(
       isLoading={isExporting}
       disabled={!opts?.onExport || isExporting}
     >
-      <Download className="w-3 h-3 mr-1.5" />
+      <Download className="w-3 h-3 me-1.5" />
       {t('curriculumModule.filters.exportCsv')}
     </Button>
   )

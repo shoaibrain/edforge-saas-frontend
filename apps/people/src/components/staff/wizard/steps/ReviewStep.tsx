@@ -66,7 +66,7 @@ function DetailRow({ label, value }: { label: string; value?: string | number | 
   return (
     <div className="flex items-baseline justify-between gap-4">
       <span className="text-xs text-[rgb(var(--text-tertiary))] flex-shrink-0">{label}</span>
-      <span className="text-sm text-[rgb(var(--text-primary))] text-right truncate">
+      <span className="text-sm text-[rgb(var(--text-primary))] text-end truncate">
         {String(display)}
       </span>
     </div>
@@ -138,7 +138,7 @@ export function ReviewStep({ data }: WizardStepProps) {
           value={filledAddresses.length > 0 ? t('wizard.review.addressCount', { count: filledAddresses.length }) : undefined}
         />
         {filledAddresses.map((addr, i) => (
-          <div key={i} className="pl-4 text-xs text-[rgb(var(--text-secondary))]">
+          <div key={i} className="ps-4 text-xs text-[rgb(var(--text-secondary))]">
             {[addr.streetNumberName, addr.city, addr.stateAbbreviationDescriptor, addr.postalCode].filter(Boolean).join(', ')}
           </div>
         ))}
@@ -147,7 +147,7 @@ export function ReviewStep({ data }: WizardStepProps) {
           value={filledContacts.length > 0 ? t('wizard.review.contactCount', { count: filledContacts.length }) : undefined}
         />
         {filledContacts.map((c, i) => (
-          <div key={i} className="pl-4 text-xs text-[rgb(var(--text-secondary))]">
+          <div key={i} className="ps-4 text-xs text-[rgb(var(--text-secondary))]">
             {c.name} ({relationshipLabel(c.relationship)}) — {c.phone}
           </div>
         ))}

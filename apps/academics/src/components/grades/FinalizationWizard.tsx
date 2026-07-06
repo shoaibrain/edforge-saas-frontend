@@ -214,7 +214,7 @@ export function FinalizationWizard({
                         <table className="w-full text-sm">
                           <thead className="bg-surface-secondary sticky top-0">
                             <tr>
-                              <th className="text-left px-3 py-2 text-xs font-medium text-text-secondary">
+                              <th className="text-start px-3 py-2 text-xs font-medium text-text-secondary">
                                 {t('gradesModule.finalization.columns.student')}
                               </th>
                               <th className="text-center px-3 py-2 text-xs font-medium text-text-secondary">
@@ -384,7 +384,7 @@ export function FinalizationWizard({
             </>
           )}
           {step === 'complete' && (
-            <div className="ml-auto">
+            <div className="ms-auto">
               <button
                 type="button"
                 onClick={onClose}

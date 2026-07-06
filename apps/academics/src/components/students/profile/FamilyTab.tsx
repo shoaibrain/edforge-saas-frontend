@@ -133,14 +133,14 @@ function GuardianRow({
 
       {/* Expanded details */}
       {expanded && (
-        <div className="mt-3 ml-0 pl-0 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
+        <div className="mt-3 ms-0 ps-0 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
           {guardian.phone && (
             <div>
               <span className="text-xs text-text-tertiary uppercase tracking-wide">{t('fields.phone')}</span>
               <p className="text-text-primary mt-0.5">
                 {guardian.phone}
                 {guardian.phoneType && (
-                  <span className="text-text-tertiary capitalize ml-1">({guardian.phoneType})</span>
+                  <span className="text-text-tertiary capitalize ms-1">({guardian.phoneType})</span>
                 )}
               </p>
             </div>
@@ -186,9 +186,9 @@ function GuardianRow({
                   disabled={isGrantingAccess}
                 >
                   {isGrantingAccess ? (
-                    <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" />
+                    <Loader2 className="w-3.5 h-3.5 me-1 animate-spin" />
                   ) : (
-                    <KeyRound className="w-3.5 h-3.5 mr-1" />
+                    <KeyRound className="w-3.5 h-3.5 me-1" />
                   )}
                   {t('actions.grantPortalAccess')}
                 </Button>
@@ -261,14 +261,14 @@ export function FamilyTab({
             <Users className="w-4 h-4 text-[rgb(var(--state-info-fg))]" />
             {t('sections.guardians')}
             {guardians.length > 0 && (
-              <span className="text-xs text-text-tertiary font-normal ml-1">
+              <span className="text-xs text-text-tertiary font-normal ms-1">
                 ({guardians.length})
               </span>
             )}
           </h3>
           {canEdit && onAddGuardian && (
             <Button variant="ghost" size="sm" onClick={onAddGuardian}>
-              <Plus className="w-3.5 h-3.5 mr-1" />
+              <Plus className="w-3.5 h-3.5 me-1" />
               {t('actions.add')}
             </Button>
           )}
@@ -283,7 +283,7 @@ export function FamilyTab({
             </p>
             {canEdit && onAddGuardian && (
               <Button variant="outline" size="sm" onClick={onAddGuardian} className="mt-4">
-                <Plus className="w-4 h-4 mr-1.5" />
+                <Plus className="w-4 h-4 me-1.5" />
                 {t('actions.addGuardian')}
               </Button>
             )}
@@ -318,7 +318,7 @@ export function FamilyTab({
           <AlertTriangle className="w-4 h-4 text-[rgb(var(--state-danger-fg))]" />
           {t('sections.emergencyContacts')}
           {emergencyContacts.length > 0 && (
-            <span className="text-xs text-text-tertiary font-normal ml-1">
+            <span className="text-xs text-text-tertiary font-normal ms-1">
               ({emergencyContacts.length})
             </span>
           )}

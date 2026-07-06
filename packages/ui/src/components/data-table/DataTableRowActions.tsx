@@ -55,7 +55,7 @@ export function DataTableRowActions<TData>({
                       )}
                     >
                       {action.icon && (
-                        <span className="flex-shrink-0 mr-2.5 w-4 h-4">
+                        <span className="flex-shrink-0 me-2.5 w-4 h-4">
                           {action.icon}
                         </span>
                       )}

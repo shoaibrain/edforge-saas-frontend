@@ -76,7 +76,7 @@ export function ActionsMenu({ items, label }: ActionsMenuProps) {
                 item.onClick()
               }}
               className={cn(
-                'flex w-full items-center gap-2.5 px-3 py-2 text-left text-sm transition-colors',
+                'flex w-full items-center gap-2.5 px-3 py-2 text-start text-sm transition-colors',
                 'hover:bg-[rgb(var(--background-tertiary))]',
                 item.danger
                   ? 'text-[rgb(var(--state-danger-fg))]'

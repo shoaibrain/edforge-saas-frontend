@@ -195,12 +195,12 @@ export function SectionAssociations({
                   <table className="w-full">
                     <thead>
                       <tr className="bg-[rgb(var(--background-tertiary))]">
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Course</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Section</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Period</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Room</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Term</th>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Students</th>
+                        <th className="px-4 py-3 text-start text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Course</th>
+                        <th className="px-4 py-3 text-start text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Section</th>
+                        <th className="px-4 py-3 text-start text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Period</th>
+                        <th className="px-4 py-3 text-start text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Room</th>
+                        <th className="px-4 py-3 text-start text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Term</th>
+                        <th className="px-4 py-3 text-start text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">Students</th>
                         <th className="px-4 py-3 w-10" />
                       </tr>
                     </thead>

@@ -237,7 +237,7 @@ export function TrainingsSection({ staffId }: { staffId: string }) {
                   </div>
 
                   {/* Actions */}
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 ml-2">
+                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 ms-2">
                     <button
                       onClick={() => handleEdit(training)}
                       className="p-2 rounded-lg hover:bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"

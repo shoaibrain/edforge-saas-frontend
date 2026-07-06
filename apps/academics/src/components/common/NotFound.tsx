@@ -120,7 +120,7 @@ export function NotFound({
               onClick={handleGoBack}
               className="w-full sm:w-auto"
             >
-              <ArrowLeft className="w-4 h-4 mr-2" />
+              <ArrowLeft className="w-4 h-4 me-2" />
               Go Back
             </Button>
           )}
@@ -128,14 +128,14 @@ export function NotFound({
           {type === 'student' ? (
             <Link to="/students">
               <Button className="w-full sm:w-auto">
-                <Users className="w-4 h-4 mr-2" />
+                <Users className="w-4 h-4 me-2" />
                 Student Directory
               </Button>
             </Link>
           ) : (
             <Link to="/">
               <Button className="w-full sm:w-auto">
-                <Home className="w-4 h-4 mr-2" />
+                <Home className="w-4 h-4 me-2" />
                 Academics Home
               </Button>
             </Link>

@@ -147,7 +147,7 @@ export function BulkChangeUserRoleModal({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] p-6 text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] p-6 text-start align-middle shadow-xl transition-all">
                 <div className="flex items-start gap-4">
                   <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-[rgb(var(--state-info-bg)/0.18)] dark:bg-[rgb(var(--state-info-fg)/0.2)]">
                     <Shield className="w-5 h-5 text-[rgb(var(--state-info-fg))]" />
@@ -230,12 +230,12 @@ export function BulkChangeUserRoleModal({
                   >
                     {isApplying ? (
                       <>
-                        <Loader2 className="w-4 h-4 animate-spin mr-1.5" />
+                        <Loader2 className="w-4 h-4 animate-spin me-1.5" />
                         Updating…
                       </>
                     ) : (
                       <>
-                        <ShieldCheck className="w-4 h-4 mr-1.5" />
+                        <ShieldCheck className="w-4 h-4 me-1.5" />
                         Apply to {eligible.length}
                       </>
                     )}

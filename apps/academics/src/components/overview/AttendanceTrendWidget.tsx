@@ -110,7 +110,7 @@ export function AttendanceTrendWidget({
           Attendance Trend (30 Days)
         </h3>
         {summary && (
-          <span className="ml-auto text-xs text-text-tertiary">
+          <span className="ms-auto text-xs text-text-tertiary">
             Avg {summary.avg.toFixed(1)}%
           </span>
         )}

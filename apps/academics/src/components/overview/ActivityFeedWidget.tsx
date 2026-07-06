@@ -31,21 +31,21 @@ const SEVERITY_STYLES = {
     bg: 'bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)]',
     text: 'text-[rgb(var(--state-danger-fg))]',
     badge: 'bg-[rgb(var(--state-danger-bg)/0.18)] text-[rgb(var(--state-danger-fg))] dark:bg-[rgb(var(--state-danger-fg)/0.2)] ',
-    border: 'border-l-4 border-[rgb(var(--state-danger-border))]',
+    border: 'border-s-4 border-[rgb(var(--state-danger-border))]',
     label: 'Critical',
   },
   warning: {
     bg: 'bg-amber-50 dark:bg-[rgb(var(--state-warning-fg))]/10',
     text: 'text-[rgb(var(--state-warning-fg))]',
     badge: 'bg-[rgb(var(--state-warning-bg)/0.18)] text-amber-700 dark:bg-[rgb(var(--state-warning-fg))]/20 dark:text-amber-400',
-    border: 'border-l-4 border-amber-400',
+    border: 'border-s-4 border-amber-400',
     label: 'Warning',
   },
   info: {
     bg: 'bg-[rgb(var(--state-info-bg)/0.18)] dark:bg-[rgb(var(--state-info-bg)/0.18)]',
     text: 'text-[rgb(var(--action-secondary-fg))]',
     badge: 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--text-secondary))] dark:bg-[rgb(var(--state-info-fg)/0.2)] ',
-    border: 'border-l-4 border-[rgb(var(--border-focus))]',
+    border: 'border-s-4 border-[rgb(var(--border-focus))]',
     label: 'Info',
   },
 }
@@ -153,7 +153,7 @@ export function ActivityFeedWidget({
           Activity & Alerts
         </h3>
         {totalCount > 0 && (
-          <span className="ml-auto text-xs text-text-tertiary">
+          <span className="ms-auto text-xs text-text-tertiary">
             {totalCount} alert{totalCount !== 1 ? 's' : ''}
           </span>
         )}

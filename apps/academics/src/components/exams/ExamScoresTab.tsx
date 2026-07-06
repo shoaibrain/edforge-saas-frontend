@@ -131,7 +131,7 @@ function ScoreCell({ enrollmentId, studentName }: { enrollmentId: string; studen
                 value={componentText}
                 disabled={!writable}
                 onChange={(e) => setComponent(enrollmentId, d.code, e.target.value)}
-                className={`w-16 rounded-lg border bg-surface-primary px-2 py-1 text-sm tabular-nums text-right ${
+                className={`w-16 rounded-lg border bg-surface-primary px-2 py-1 text-sm tabular-nums text-end ${
                   err ? 'border-[rgb(var(--state-danger-border))] text-[rgb(var(--state-danger-fg))]' : 'border-border-secondary text-text-primary'
                 } disabled:opacity-50`}
                 aria-label={t('examScores.componentScoreForStudent', {
@@ -145,7 +145,7 @@ function ScoreCell({ enrollmentId, studentName }: { enrollmentId: string; studen
           )
         })}
         <span
-          className={`text-xs tabular-nums w-16 text-right ${partial ? 'text-[rgb(var(--state-danger-fg))]' : 'text-text-secondary'}`}
+          className={`text-xs tabular-nums w-16 text-end ${partial ? 'text-[rgb(var(--state-danger-fg))]' : 'text-text-secondary'}`}
         >
           = {ev.anyFilled ? formatNumber(ev.sum) : '—'}/{formatNumber(maxMarks)}
         </span>
@@ -168,7 +168,7 @@ function ScoreCell({ enrollmentId, studentName }: { enrollmentId: string; studen
         value={row.text}
         disabled={!writable}
         onChange={(ev) => setRow(enrollmentId, ev.target.value)}
-        className={`w-24 rounded-lg border bg-surface-primary px-2 py-1 text-sm tabular-nums text-right ${
+        className={`w-24 rounded-lg border bg-surface-primary px-2 py-1 text-sm tabular-nums text-end ${
           showError ? 'border-[rgb(var(--state-danger-border))] text-[rgb(var(--state-danger-fg))]' : 'border-border-secondary text-text-primary'
         } disabled:opacity-50`}
         aria-label={t('examScores.scoreForStudent', { studentName })}
@@ -418,7 +418,7 @@ export function ExamScoresTab({
       },
       {
         id: 'score',
-        header: () => <span className="block text-right">{t('tables.examScores.score')}</span>,
+        header: () => <span className="block text-end">{t('tables.examScores.score')}</span>,
         size: 340,
         enableSorting: false,
         cell: ({ row }) => (
@@ -514,7 +514,7 @@ export function ExamScoresTab({
           <select
             value={selectedExamCourseId}
             onChange={(e) => setSelectedExamCourseId(e.target.value)}
-            className="ml-2 rounded-lg border border-border-secondary bg-surface-primary px-3 py-2 text-sm text-text-primary"
+            className="ms-2 rounded-lg border border-border-secondary bg-surface-primary px-3 py-2 text-sm text-text-primary"
           >
             {examCourses.map((c) => (
               <option key={c.examCourseId} value={c.examCourseId}>

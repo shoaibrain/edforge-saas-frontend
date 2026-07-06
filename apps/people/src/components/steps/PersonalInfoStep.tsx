@@ -36,7 +36,7 @@ const AnimatedInput = React.forwardRef<HTMLInputElement, AnimatedInputProps>(
       <div className="space-y-1.5">
         <label className="block text-sm font-medium text-[rgb(var(--text-secondary))]">
           {label}
-          {required && <span className="text-rust-500 ml-0.5">*</span>}
+          {required && <span className="text-rust-500 ms-0.5">*</span>}
         </label>
         <Input
           ref={ref}
@@ -80,7 +80,7 @@ function AnimatedSelect({ label, error, icon, required, options, value, onChange
     <div className="space-y-1.5">
       <label className="block text-sm font-medium text-[rgb(var(--text-secondary))]">
         {label}
-        {required && <span className="text-rust-500 ml-0.5">*</span>}
+        {required && <span className="text-rust-500 ms-0.5">*</span>}
       </label>
       <Select
         options={selectableOptions}
@@ -140,7 +140,7 @@ function PhotoUpload({ value, onChange, error }: PhotoUploadProps) {
     <div className="space-y-2">
       <label className="block text-sm font-medium text-[rgb(var(--text-secondary))]">
         Profile Photo
-        <span className="ml-1 text-xs text-[rgb(var(--text-tertiary))]">(optional)</span>
+        <span className="ms-1 text-xs text-[rgb(var(--text-tertiary))]">(optional)</span>
       </label>
 
       <motion.div

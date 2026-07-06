@@ -152,7 +152,7 @@ export const WeekTimetable = forwardRef<HTMLDivElement, WeekTimetableProps>(
               className="grid grid-cols-[72px_repeat(5,1fr)] gap-1 mb-1"
             >
               {/* Time label */}
-              <div className="flex flex-col justify-center pr-2 text-right">
+              <div className="flex flex-col justify-center pe-2 text-end">
                 <span className="text-xs font-mono tabular-nums leading-tight text-[rgb(var(--text-tertiary))]">
                   {period.startTime}
                 </span>

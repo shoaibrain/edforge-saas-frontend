@@ -67,7 +67,7 @@ export function BrandingDisplay({ data }: BrandingDisplayProps) {
             <span className="text-xs text-[rgb(var(--text-tertiary))] shrink-0">
               {t('fields.addressLines')}
             </span>
-            <div className="text-sm text-[rgb(var(--text-primary))] text-right">
+            <div className="text-sm text-[rgb(var(--text-primary))] text-end">
               {branding.addressLines.map((line, idx) => (
                 <div key={idx}>{line}</div>
               ))}
@@ -176,7 +176,7 @@ function Field({ label, value, mono }: FieldProps) {
         {label}
       </span>
       <span
-        className={`text-sm text-[rgb(var(--text-primary))] text-right break-all ${
+        className={`text-sm text-[rgb(var(--text-primary))] text-end break-all ${
           mono ? 'font-mono text-xs' : ''
         }`}
       >

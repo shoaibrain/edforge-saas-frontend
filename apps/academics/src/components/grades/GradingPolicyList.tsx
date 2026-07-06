@@ -120,7 +120,7 @@ function PolicyCard({
                   height={5}
                 />
               </div>
-              <span className="text-xs text-text-secondary w-24 text-right">
+              <span className="text-xs text-text-secondary w-24 text-end">
                 {cat.categoryName} ({formatNumber(cat.weight)}%)
               </span>
             </div>

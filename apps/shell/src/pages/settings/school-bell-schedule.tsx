@@ -778,12 +778,12 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
             </Button>
           )}
           <Button variant="outline" size="sm" onClick={openScheduleCreate}>
-            <Plus className="w-4 h-4 mr-1.5" />
+            <Plus className="w-4 h-4 me-1.5" />
             {t('schoolBellSchedule.actions.newSchedule')}
           </Button>
           {(selectedSchedule || standalonePeriods.length > 0) && (
             <Button variant="outline" size="sm" onClick={openCreate}>
-              <Plus className="w-4 h-4 mr-1.5" />
+              <Plus className="w-4 h-4 me-1.5" />
               {t('schoolBellSchedule.actions.addPeriod')}
             </Button>
           )}
@@ -794,7 +794,7 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
       <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]/50 overflow-hidden">
         <button
           onClick={() => setShowHowItWorks(v => !v)}
-          className="w-full flex items-center gap-2 px-4 py-2.5 text-left hover:bg-[rgb(var(--background-secondary))] transition-colors"
+          className="w-full flex items-center gap-2 px-4 py-2.5 text-start hover:bg-[rgb(var(--background-secondary))] transition-colors"
         >
           <Info className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] flex-shrink-0" />
           <span className="text-sm font-medium text-[rgb(var(--text-secondary))] flex-1">{t('schoolBellSchedule.howItWorks.title')}</span>
@@ -820,7 +820,7 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
                     <span className="text-xs font-sans font-medium text-[rgb(var(--text-primary))]">{t('schoolBellSchedule.examples.regularDay')}</span>
                     <span className="text-xs font-sans px-1.5 py-0.5 rounded bg-[rgb(var(--action-primary-bg))]/10 text-[rgb(var(--action-secondary-fg))]">{t('schoolBellSchedule.howItWorks.scheduleEqualsDay')}</span>
                   </div>
-                  <div className="pl-4 border-l-2 border-[rgb(var(--border-focus)/0.35)] ml-1.5 space-y-0.5">
+                  <div className="ps-4 border-s-2 border-[rgb(var(--border-focus)/0.35)] ms-1.5 space-y-0.5">
                     <div className="flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-[rgb(var(--state-info-fg))] flex-shrink-0" />
                       <span>Homeroom &nbsp;&nbsp;8:00 – 8:15</span>
@@ -846,7 +846,7 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
                     </div>
                   </div>
                   <div className="mt-2 pt-2 border-t border-[rgb(var(--border-primary))] text-[rgb(var(--text-tertiary))] font-sans text-xs">
-                    <span className="w-2 h-2 rounded-full bg-[rgb(var(--action-primary-bg))] inline-block mr-1" /> {t('schoolBellSchedule.howItWorks.periodsInsideSchedule')}
+                    <span className="w-2 h-2 rounded-full bg-[rgb(var(--action-primary-bg))] inline-block me-1" /> {t('schoolBellSchedule.howItWorks.periodsInsideSchedule')}
                   </div>
                 </div>
 
@@ -1046,12 +1046,12 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
                 )}
                 {selectedSchedule ? (
                   <Button variant="outline" size="sm" onClick={openCreate}>
-                    <Plus className="w-4 h-4 mr-1.5" />
+                    <Plus className="w-4 h-4 me-1.5" />
                     {t('schoolBellSchedule.actions.addFirstPeriod')}
                   </Button>
                 ) : bellSchedules.length === 0 ? (
                   <Button variant="outline" size="sm" onClick={openScheduleCreate}>
-                    <Plus className="w-4 h-4 mr-1.5" />
+                    <Plus className="w-4 h-4 me-1.5" />
                     {t('schoolBellSchedule.actions.createFirstSchedule')}
                   </Button>
                 ) : null}
@@ -1318,7 +1318,7 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
                 <button
                   onClick={() => applyPreset('elementary')}
                   disabled={isApplyingPreset || createScheduleMutation.isPending}
-                  className="w-full text-left p-4 rounded-xl border border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-focus)/0.35)] hover:bg-[rgb(var(--action-primary-bg))]/5 transition-colors disabled:opacity-50"
+                  className="w-full text-start p-4 rounded-xl border border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-focus)/0.35)] hover:bg-[rgb(var(--action-primary-bg))]/5 transition-colors disabled:opacity-50"
                 >
                   <div className="font-medium text-sm text-[rgb(var(--text-primary))]">{t('schoolBellSchedule.templates.elementary.title')}</div>
                   <div className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
@@ -1328,7 +1328,7 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
                 <button
                   onClick={() => applyPreset('highSchool')}
                   disabled={isApplyingPreset || createScheduleMutation.isPending}
-                  className="w-full text-left p-4 rounded-xl border border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-focus)/0.35)] hover:bg-[rgb(var(--action-primary-bg))]/5 transition-colors disabled:opacity-50"
+                  className="w-full text-start p-4 rounded-xl border border-[rgb(var(--border-primary))] hover:border-[rgb(var(--border-focus)/0.35)] hover:bg-[rgb(var(--action-primary-bg))]/5 transition-colors disabled:opacity-50"
                 >
                   <div className="font-medium text-sm text-[rgb(var(--text-primary))]">{t('schoolBellSchedule.templates.highSchool.title')}</div>
                   <div className="text-xs text-[rgb(var(--text-tertiary))] mt-1">
@@ -1495,13 +1495,13 @@ export default function SchoolBellSchedulePage({ schoolId }: SchoolBellScheduleP
               <strong className="text-[rgb(var(--text-secondary))]">{t('schoolBellSchedule.scheduleForm.dailyTimetable')}</strong>{' '}
               {t('schoolBellSchedule.scheduleForm.whatIsScheduleSuffix')}
             </p>
-            <div className="text-xs text-[rgb(var(--text-tertiary))] font-mono leading-relaxed pl-1">
+            <div className="text-xs text-[rgb(var(--text-tertiary))] font-mono leading-relaxed ps-1">
               <div className="flex items-center gap-1.5">
                 <CalendarDays className="w-3 h-3 text-[rgb(var(--action-secondary-fg))] flex-shrink-0" />
                 <span className="text-[rgb(var(--text-secondary))]">{t('schoolBellSchedule.examples.regularDay')}</span>
                 <span className="text-[rgb(var(--text-tertiary))]">{t('schoolBellSchedule.scheduleForm.exampleScheduleHint')}</span>
               </div>
-              <div className="pl-4 border-l border-[rgb(var(--border-primary))] ml-1.5 mt-1 space-y-0.5">
+              <div className="ps-4 border-s border-[rgb(var(--border-primary))] ms-1.5 mt-1 space-y-0.5">
                 <div>├ Period 1 &nbsp;8:00 – 8:50</div>
                 <div>├ Period 2 &nbsp;8:55 – 9:45</div>
                 <div>├ Lunch &nbsp;&nbsp;&nbsp;&nbsp;11:30 – 12:00</div>

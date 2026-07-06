@@ -234,7 +234,7 @@ export default function SchoolRoomsPage({ schoolId }: SchoolRoomsPageProps) {
         </div>
 
         <Button variant="outline" size="sm" onClick={openCreate}>
-          <Plus className="w-4 h-4 mr-1.5" />
+          <Plus className="w-4 h-4 me-1.5" />
           {t('schoolRooms.actions.add')}
         </Button>
       </div>
@@ -262,7 +262,7 @@ export default function SchoolRoomsPage({ schoolId }: SchoolRoomsPageProps) {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={t('schoolRooms.searchPlaceholder')}
-            className="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
+            className="w-full ps-9 pe-3 py-2 text-sm rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))]"
           />
         </div>
       )}
@@ -275,7 +275,7 @@ export default function SchoolRoomsPage({ schoolId }: SchoolRoomsPageProps) {
           description={t('schoolRooms.empty.description')}
           action={
             <Button variant="primary" size="sm" onClick={openCreate}>
-              <Plus className="w-4 h-4 mr-1.5" />
+              <Plus className="w-4 h-4 me-1.5" />
               {t('schoolRooms.actions.add')}
             </Button>
           }
@@ -290,7 +290,7 @@ export default function SchoolRoomsPage({ schoolId }: SchoolRoomsPageProps) {
             <div className="col-span-1">{t('schoolRooms.table.floor')}</div>
             <div className="col-span-2">{t('schoolRooms.table.capacity')}</div>
             <div className="col-span-1">{t('schoolRooms.table.status')}</div>
-            <div className="col-span-2 text-right">{t('schoolRooms.table.actions')}</div>
+            <div className="col-span-2 text-end">{t('schoolRooms.table.actions')}</div>
           </div>
 
           {/* Table body */}

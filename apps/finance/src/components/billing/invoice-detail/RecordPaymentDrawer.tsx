@@ -185,7 +185,7 @@ export function RecordPaymentDrawer({
           })
         }
       >
-        <ReceiptText className="mr-1.5 h-4 w-4" />
+        <ReceiptText className="me-1.5 h-4 w-4" />
         {t('recordPayment.drawer.viewReceipt')}
       </Button>
     </>
@@ -196,9 +196,9 @@ export function RecordPaymentDrawer({
       </Button>
       <Button onClick={() => void submit()} disabled={!valid || recordPayment.isPending}>
         {recordPayment.isPending ? (
-          <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+          <Loader2 className="me-1.5 h-4 w-4 animate-spin" />
         ) : (
-          <Wallet className="mr-1.5 h-4 w-4" />
+          <Wallet className="me-1.5 h-4 w-4" />
         )}
         {recordPayment.isPending
           ? t('recordPayment.drawer.recording')
@@ -295,7 +295,7 @@ export function RecordPaymentDrawer({
                     aria-checked={on}
                     onClick={() => setGateway(key)}
                     className={cn(
-                      'flex items-center gap-2.5 rounded-lg border px-3 py-2.5 text-left text-sm font-medium transition-colors',
+                      'flex items-center gap-2.5 rounded-lg border px-3 py-2.5 text-start text-sm font-medium transition-colors',
                       on
                         ? 'border-[rgb(var(--state-success-border))] bg-[rgb(var(--state-success-bg))] text-[rgb(var(--state-success-fg))]'
                         : 'border-[rgb(var(--border-secondary))] bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] hover:border-[rgb(var(--border-strong))]'

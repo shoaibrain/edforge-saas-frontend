@@ -66,7 +66,7 @@ export function DateField({
           )}
         >
           {label}
-          {required && <span className="text-rust-500 ml-0.5">*</span>}
+          {required && <span className="text-rust-500 ms-0.5">*</span>}
         </label>
       )}
 
@@ -83,7 +83,7 @@ export function DateField({
         )}
       >
         {/* Icon */}
-        <div className="pl-3 flex items-center text-[rgb(var(--text-tertiary))]">
+        <div className="ps-3 flex items-center text-[rgb(var(--text-tertiary))]">
           <Icon className="w-4 h-4" />
         </div>
 
@@ -104,7 +104,7 @@ export function DateField({
           aria-invalid={hasError}
           aria-describedby={hasError ? `${name}-error` : helperText ? `${name}-helper` : undefined}
           className={cn(
-            'flex-1 w-full pl-2 pr-3 py-2.5 text-sm bg-transparent',
+            'flex-1 w-full ps-2 pe-3 py-2.5 text-sm bg-transparent',
             'text-[rgb(var(--text-primary))]',
             'focus:outline-none',
             'disabled:cursor-not-allowed',
@@ -116,7 +116,7 @@ export function DateField({
 
         {/* Error Icon */}
         {hasError && (
-          <div className="pr-3">
+          <div className="pe-3">
             <AlertCircle className="w-4 h-4 text-rust-500" />
           </div>
         )}

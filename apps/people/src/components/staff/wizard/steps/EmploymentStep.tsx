@@ -166,7 +166,7 @@ export function EmploymentStep({ data, updateData, errors, clearError }: WizardS
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="space-y-4 pl-8 border-l-2 border-[rgb(var(--border-focus)/0.35)]"
+              className="space-y-4 ps-8 border-s-2 border-[rgb(var(--border-focus)/0.35)]"
             >
               <div className="p-3 rounded-lg bg-[rgb(var(--state-info-bg)/0.18)] text-sm text-[rgb(var(--state-info-fg))] ">
                 {t('wizard.employment.cognitoNotice', { email: (data.email as string) || t('wizard.employment.emailNotSet') })}

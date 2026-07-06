@@ -355,7 +355,7 @@ export function ForgotPasswordPage() {
                           onChange={(e) => setNewPassword(e.target.value)}
                           autoComplete="new-password"
                           required
-                          className={`${AUTH_INPUT} pr-10`}
+                          className={`${AUTH_INPUT} pe-10`}
                         />
                         <button
                           type="button"

@@ -187,7 +187,7 @@ export function CredentialModal({
       size="lg"
     >
       <FormProvider {...methods}>
-        <form onSubmit={onSubmit} className="space-y-4 max-h-[65vh] overflow-y-auto pr-1">
+        <form onSubmit={onSubmit} className="space-y-4 max-h-[65vh] overflow-y-auto pe-1">
           {/* Name & Identifier */}
           <div className="grid grid-cols-2 gap-4">
             <TextField

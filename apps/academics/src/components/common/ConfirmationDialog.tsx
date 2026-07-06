@@ -79,7 +79,7 @@ export function ConfirmationDialog({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-surface-primary border border-border-primary p-6 text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-surface-primary border border-border-primary p-6 text-start align-middle shadow-xl transition-all">
                 <div className="flex items-start gap-4">
                   {/* Icon */}
                   <div

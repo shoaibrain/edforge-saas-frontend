@@ -186,7 +186,7 @@ function MatrixCell({
   const hasConflict = conflict !== null && checked
 
   return (
-    <td className="px-1 py-1 text-center border-r border-border-secondary relative group">
+    <td className="px-1 py-1 text-center border-e border-border-secondary relative group">
       <button
         type="button"
         onClick={onToggle}
@@ -228,7 +228,7 @@ function MatrixCell({
           <div>
             {formatCount('rosteringModule.conflict.samePeriod', conflict?.conflictingSectionIds.length ?? 0)}
           </div>
-          <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-red-600" />
+          <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-s-4 border-e-4 border-t-4 border-s-transparent border-e-transparent border-t-red-600" />
         </div>
       )}
       {/* Pending change indicator dot */}
@@ -271,7 +271,7 @@ function MatrixStudentRow({
       }}
     >
       {/* Sticky student name column */}
-      <td className="sticky left-0 z-10 bg-surface-primary px-3 py-2 border-r-2 border-border-secondary whitespace-nowrap min-w-56">
+      <td className="sticky left-0 z-10 bg-surface-primary px-3 py-2 border-e-2 border-border-secondary whitespace-nowrap min-w-56">
         <div className="text-sm font-medium text-text-primary truncate max-w-52">
           {student.lastName}, {student.firstName}
         </div>
@@ -758,7 +758,7 @@ export function BulkRosteringPage() {
             ))}
           </select>
         </div>
-        <div className="ml-auto text-xs text-text-tertiary">
+        <div className="ms-auto text-xs text-text-tertiary">
           {t('rosteringModule.filters.matrixCount', {
             students: formatNumber(allStudents.length),
             sections: formatNumber(allSections.length),
@@ -792,7 +792,7 @@ export function BulkRosteringPage() {
             <thead className="sticky top-0 z-20">
               <tr className="bg-surface-secondary">
                 {/* Top-left corner cell */}
-                <th className="sticky left-0 z-30 bg-surface-secondary px-3 py-3 border-r-2 border-b border-border-secondary min-w-56 text-left">
+                <th className="sticky left-0 z-30 bg-surface-secondary px-3 py-3 border-e-2 border-b border-border-secondary min-w-56 text-start">
                   <span className="text-xs font-semibold text-text-secondary uppercase tracking-wider">
                     {t('rosteringModule.table.student')}
                   </span>
@@ -800,7 +800,7 @@ export function BulkRosteringPage() {
                 {allSections.map((section) => (
                   <th
                     key={section.sectionId}
-                    className="px-1 py-2 border-r border-b border-border-secondary min-w-20 max-w-32"
+                    className="px-1 py-2 border-e border-b border-border-secondary min-w-20 max-w-32"
                   >
                     <div className="text-xs font-semibold text-text-primary truncate" title={`${section.courseName ?? ''} - ${t('rosteringModule.table.sectionTitle', { section: section.sectionNumber })}`}>
                       {section.courseCode ?? section.courseName ?? ''}

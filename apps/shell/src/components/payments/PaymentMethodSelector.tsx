@@ -88,7 +88,7 @@ export function PaymentMethodSelector({
                 onClick={() => onSelect(gw.gateway)}
                 className={`
                   relative flex items-start gap-3 p-4 rounded-xl border-2
-                  text-left transition-all duration-150
+                  text-start transition-all duration-150
                   focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--border-focus))] focus-visible:ring-offset-2
                   ${
                     isSelected

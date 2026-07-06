@@ -172,7 +172,7 @@ export default function GradeLevelsTab({ schoolId, school }: GradeLevelsTabProps
       <div className="flex items-center justify-between border-t border-[rgba(255,255,255,0.06)] pt-4">
         <p className="text-xs text-[rgb(var(--text-tertiary))]">
           {selected.size} of {GRADE_LEVEL_OPTIONS.length} selected
-          {isDirty && <span className="ml-2 text-[#EF9F27]">• unsaved changes</span>}
+          {isDirty && <span className="ms-2 text-[#EF9F27]">• unsaved changes</span>}
         </p>
         <div className="flex items-center gap-2">
           <button

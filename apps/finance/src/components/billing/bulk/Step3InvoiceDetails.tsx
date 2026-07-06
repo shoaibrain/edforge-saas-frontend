@@ -140,7 +140,7 @@ function Field({
       <label className="block text-xs font-medium text-[rgb(var(--text-secondary))] mb-1">
         {label}
         {optional && (
-          <span className="ml-1 text-[rgb(var(--text-tertiary))]">
+          <span className="ms-1 text-[rgb(var(--text-tertiary))]">
             {t('bulkGenerate.common.optional')}
           </span>
         )}
@@ -163,7 +163,7 @@ function DateInput({ value, onChange }: { value: string; onChange: (v: string) =
         type="date"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full pl-9 pr-3 py-2 text-sm font-mono rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-strong))] focus:border-transparent"
+        className="w-full ps-9 pe-3 py-2 text-sm font-mono rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-strong))] focus:border-transparent"
       />
     </div>
   )

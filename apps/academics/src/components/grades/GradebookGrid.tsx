@@ -297,14 +297,14 @@ export function GradebookGrid({
         <thead>
           <tr className="bg-surface-secondary">
             {/* Frozen student column (sticky on both axes — top-left corner) */}
-            <th className="sticky left-0 top-0 z-20 bg-surface-secondary px-4 py-3 text-left font-semibold text-text-primary border-r border-border-secondary min-w-52">
+            <th className="sticky left-0 top-0 z-20 bg-surface-secondary px-4 py-3 text-start font-semibold text-text-primary border-e border-border-secondary min-w-52">
               {t('gradesModule.gradebook.student')}
             </th>
             {/* Assignment columns with tooltips (Ticket 3.1) */}
             {assignmentColumns.map((col) => (
               <th
                 key={col.name}
-                className="sticky top-0 z-10 bg-surface-secondary px-3 py-3 text-center font-medium text-text-secondary min-w-24 border-r border-border-secondary group relative"
+                className="sticky top-0 z-10 bg-surface-secondary px-3 py-3 text-center font-medium text-text-secondary min-w-24 border-e border-border-secondary group relative"
                 title={
                   col.categoryId
                     ? t('gradesModule.gradebook.assignmentTooltipWithCategory', {
@@ -326,7 +326,7 @@ export function GradebookGrid({
             ))}
             {/* Add Assignment column */}
             {canEdit && onAddAssignment && (
-              <th className="sticky top-0 z-10 bg-surface-secondary px-2 py-3 text-center border-r border-border-secondary min-w-16">
+              <th className="sticky top-0 z-10 bg-surface-secondary px-2 py-3 text-center border-e border-border-secondary min-w-16">
                 <button
                   type="button"
                   onClick={onAddAssignment}
@@ -354,7 +354,7 @@ export function GradebookGrid({
             return (
               <tr key={student.studentId} className="group hover:bg-surface-secondary/50 transition-colors">
                 {/* Student name */}
-                <td className="sticky left-0 z-10 bg-surface-primary px-4 py-2.5 border-r border-border-secondary">
+                <td className="sticky left-0 z-10 bg-surface-primary px-4 py-2.5 border-e border-border-secondary">
                   <div className="flex items-center gap-2.5">
                     <UserAvatar
                       userId={student.studentId}
@@ -393,7 +393,7 @@ export function GradebookGrid({
                     return (
                       <td
                         key={aName}
-                        className={`px-3 py-3 text-center border-r border-border-secondary ${
+                        className={`px-3 py-3 text-center border-e border-border-secondary ${
                           !grade
                             ? 'bg-surface-secondary/20 text-text-tertiary'
                             : 'text-text-tertiary'
@@ -434,7 +434,7 @@ export function GradebookGrid({
                   return (
                     <td
                       key={aName}
-                      className={`px-1 py-1 text-center border-r border-border-secondary ${getGradeBg(pct)} ${
+                      className={`px-1 py-1 text-center border-e border-border-secondary ${getGradeBg(pct)} ${
                         canEdit && !isFinal ? 'cursor-text' : ''
                       }`}
                       onClick={() =>
@@ -467,7 +467,7 @@ export function GradebookGrid({
                 })}
                 {/* Add Assignment spacer */}
                 {canEdit && onAddAssignment && (
-                  <td className="border-r border-border-secondary" />
+                  <td className="border-e border-border-secondary" />
                 )}
                 {/* Overall grade */}
                 {grade && grade.assignments?.some(a => a.earnedPoints !== undefined) ? (

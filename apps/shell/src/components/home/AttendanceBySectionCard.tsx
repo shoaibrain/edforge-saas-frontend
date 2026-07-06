@@ -55,7 +55,7 @@ function SectionSkeleton() {
             {['Section', 'Students', 'Recorded', 'Rate', 'Status'].map((h) => (
               <th
                 key={h}
-                className="text-left text-xs font-medium pb-2 px-2 text-[rgb(var(--text-tertiary))]"
+                className="text-start text-xs font-medium pb-2 px-2 text-[rgb(var(--text-tertiary))]"
                 scope="col"
                 style={{ borderBottom: '1px solid rgb(var(--border-primary) / 0.35)' }}
               >
@@ -179,7 +179,7 @@ export function AttendanceBySectionCard({
               <tr>
                 <th
                   scope="col"
-                  className="text-left text-xs font-medium pb-2 px-2 text-[rgb(var(--text-tertiary))]"
+                  className="text-start text-xs font-medium pb-2 px-2 text-[rgb(var(--text-tertiary))]"
                   style={{ borderBottom: '1px solid rgb(var(--border-primary) / 0.35)' }}
                 >
                   {t('homeV2.attendance.section')}
@@ -208,7 +208,7 @@ export function AttendanceBySectionCard({
                 </th>
                 <th
                   scope="col"
-                  className="text-right text-xs font-medium pb-2 px-2 text-[rgb(var(--text-tertiary))]"
+                  className="text-end text-xs font-medium pb-2 px-2 text-[rgb(var(--text-tertiary))]"
                   style={{ borderBottom: '1px solid rgb(var(--border-primary) / 0.35)', width: 90 }}
                 >
                   {t('homeV2.attendance.status')}
@@ -293,7 +293,7 @@ export function AttendanceBySectionCard({
                       )}
                     </td>
                     <td
-                      className="text-right py-2.5 px-2"
+                      className="text-end py-2.5 px-2"
                       style={{
                         borderBottom: i < sections.length - 1 ? '1px solid rgb(var(--border-primary) / 0.35)' : 'none',
                       }}

@@ -193,7 +193,7 @@ export function BulkExamStatusDrawer({
             }}
             aria-hidden="true"
           />
-          <div className="fixed inset-y-0 right-0 flex max-w-full pl-10">
+          <div className="fixed inset-y-0 right-0 flex max-w-full ps-10">
             <motion.div
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
@@ -201,7 +201,7 @@ export function BulkExamStatusDrawer({
               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
               className="w-screen max-w-xl h-full"
             >
-              <div className="flex h-full flex-col bg-surface-primary shadow-xl border-l border-border-secondary">
+              <div className="flex h-full flex-col bg-surface-primary shadow-xl border-s border-border-secondary">
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-border-secondary">
                   <div className="flex items-center gap-3 min-w-0">

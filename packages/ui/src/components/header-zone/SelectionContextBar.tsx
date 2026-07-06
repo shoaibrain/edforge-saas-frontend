@@ -96,7 +96,7 @@ export function SelectionContextBar({
       role="toolbar"
       aria-label={ariaLabel ?? 'Selection actions'}
       className={cn(
-        'flex min-h-9 items-center gap-3 rounded-lg border-l-2 border-l-[rgb(var(--border-focus))] bg-gradient-to-r from-[rgb(var(--state-success-bg)/0.35)] to-transparent px-3 py-1.5',
+        'flex min-h-9 items-center gap-3 rounded-lg border-s-2 border-s-[rgb(var(--border-focus))] bg-gradient-to-r from-[rgb(var(--state-success-bg)/0.35)] to-transparent px-3 py-1.5',
         className,
       )}
     >

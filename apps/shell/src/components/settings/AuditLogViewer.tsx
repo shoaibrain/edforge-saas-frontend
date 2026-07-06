@@ -157,7 +157,7 @@ export function AuditLogViewer({ schoolId }: AuditLogViewerProps) {
             <span className="text-xs text-[rgb(var(--text-tertiary))] tabular-nums">
               {n}
               {row.original.severity === 'high' && (
-                <AlertTriangle className="inline-block w-3.5 h-3.5 text-[rgb(var(--state-warning-fg))] ml-1 align-text-bottom" />
+                <AlertTriangle className="inline-block w-3.5 h-3.5 text-[rgb(var(--state-warning-fg))] ms-1 align-text-bottom" />
               )}
             </span>
           )
@@ -208,16 +208,16 @@ function AuditDiffPanel({ entry }: { entry: AuditLogEntry }) {
         <table className="w-full text-xs">
           <thead>
             <tr className="text-[rgb(var(--text-tertiary))]">
-              <th className="text-left py-1 pr-4 font-medium">Field</th>
-              <th className="text-left py-1 pr-4 font-medium">Old value</th>
-              <th className="text-left py-1 font-medium">New value</th>
+              <th className="text-start py-1 pe-4 font-medium">Field</th>
+              <th className="text-start py-1 pe-4 font-medium">Old value</th>
+              <th className="text-start py-1 font-medium">New value</th>
             </tr>
           </thead>
           <tbody>
             {changes.map((c, i) => (
               <tr key={`${entry.auditId}-${i}`} className="border-t border-[rgb(var(--border-primary))]">
-                <td className="py-1.5 pr-4 font-medium text-[rgb(var(--text-secondary))]">{c.field}</td>
-                <td className="py-1.5 pr-4 text-[rgb(var(--state-danger-fg))] line-through">
+                <td className="py-1.5 pe-4 font-medium text-[rgb(var(--text-secondary))]">{c.field}</td>
+                <td className="py-1.5 pe-4 text-[rgb(var(--state-danger-fg))] line-through">
                   {formatValue(c.oldValue)}
                 </td>
                 <td className="py-1.5 text-[rgb(var(--state-success-fg))]">

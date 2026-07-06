@@ -47,7 +47,7 @@ export function DataTableMoreFilters({
         <ListFilter className="h-3.5 w-3.5" />
         {label}
         {active ? (
-          <span className="ml-1 rounded-full bg-[var(--mint)] px-1.5 py-0.5 text-xs font-semibold tabular-nums text-[rgb(var(--text-on-accent))]">
+          <span className="ms-1 rounded-full bg-[var(--mint)] px-1.5 py-0.5 text-xs font-semibold tabular-nums text-[rgb(var(--text-on-accent))]">
             {activeCount}
           </span>
         ) : (

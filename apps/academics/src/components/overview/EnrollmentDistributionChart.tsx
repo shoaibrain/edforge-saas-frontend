@@ -100,7 +100,7 @@ export function EnrollmentDistributionChart({
           Enrollment by Grade Level
         </h3>
         {total > 0 && (
-          <span className="ml-auto text-xs text-text-tertiary">
+          <span className="ms-auto text-xs text-text-tertiary">
             {total.toLocaleString()} total
           </span>
         )}

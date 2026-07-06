@@ -199,16 +199,16 @@ function ReportCardDetail({
             {isDivisionCard(card) ? (
               <>
                 {card.percentage != null && (
-                  <div className="text-right">
+                  <div className="text-end">
                     <p className="text-xs text-text-tertiary">{t('examModule.resultCards.percentage')}</p>
                     <p className="text-lg font-semibold text-text-primary">{card.percentage.toFixed(1)}%</p>
                   </div>
                 )}
-                <div className="text-right">
+                <div className="text-end">
                   <p className="text-xs text-text-tertiary">{t('examModule.resultCards.division')}</p>
                   <p className="text-lg font-semibold text-text-primary">{card.division ?? '—'}</p>
                 </div>
-                <div className="text-right">
+                <div className="text-end">
                   <p className="text-xs text-text-tertiary">{t('examModule.resultCards.result')}</p>
                   <p
                     className={`text-lg font-semibold ${
@@ -220,18 +220,18 @@ function ReportCardDetail({
                     {card.result === 'pass' ? t('examModule.resultCards.passUpper') : t('examModule.resultCards.failUpper')}
                   </p>
                 </div>
-                <div className="text-right">
+                <div className="text-end">
                   <p className="text-xs text-text-tertiary">{t('examModule.resultCards.position')}</p>
                   <p className="text-lg font-semibold text-text-primary">{card.classRank ?? '—'}</p>
                 </div>
               </>
             ) : (
               <>
-                <div className="text-right">
+                <div className="text-end">
                   <p className="text-xs text-text-tertiary">{t('examModule.resultCards.termGpa')}</p>
                   <p className={`text-lg font-semibold ${gpaClass(card.termGpa)}`}>{card.termGpa.toFixed(2)}</p>
                 </div>
-                <div className="text-right">
+                <div className="text-end">
                   <p className="text-xs text-text-tertiary">{t('examModule.resultCards.overall')}</p>
                   <p className="text-lg font-semibold text-text-primary">{card.overallGrade}</p>
                 </div>
@@ -245,20 +245,20 @@ function ReportCardDetail({
         <div className="overflow-hidden rounded-xl border border-border-secondary">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-surface-secondary text-left text-text-tertiary">
+              <tr className="bg-surface-secondary text-start text-text-tertiary">
                 <th className="px-3 py-2 font-medium">{t('examModule.resultCards.subject')}</th>
                 {division ? (
                   <>
-                    <th className="px-3 py-2 font-medium text-right">{t('examModule.resultCards.marks')}</th>
-                    <th className="px-3 py-2 font-medium text-right">{t('examModule.resultCards.passMarksShort')}</th>
-                    <th className="px-3 py-2 font-medium text-right">H.M.</th>
+                    <th className="px-3 py-2 font-medium text-end">{t('examModule.resultCards.marks')}</th>
+                    <th className="px-3 py-2 font-medium text-end">{t('examModule.resultCards.passMarksShort')}</th>
+                    <th className="px-3 py-2 font-medium text-end">H.M.</th>
                     <th className="px-3 py-2 font-medium text-center">{t('examModule.resultCards.result')}</th>
                   </>
                 ) : (
                   <>
-                    <th className="px-3 py-2 font-medium text-right">{t('examModule.resultCards.score')}</th>
+                    <th className="px-3 py-2 font-medium text-end">{t('examModule.resultCards.score')}</th>
                     <th className="px-3 py-2 font-medium text-center">{t('examModule.resultCards.grade')}</th>
-                    <th className="px-3 py-2 font-medium text-right">GPA</th>
+                    <th className="px-3 py-2 font-medium text-end">GPA</th>
                     <th className="px-3 py-2 font-medium text-center">{t('examModule.resultCards.pass')}</th>
                   </>
                 )}
@@ -277,20 +277,20 @@ function ReportCardDetail({
                   </td>
                   {division ? (
                     <>
-                      <td className="px-3 py-2 text-right text-text-secondary">
+                      <td className="px-3 py-2 text-end text-text-secondary">
                         {cs.notGraded ? '—' : `${cs.rawScore} / ${cs.maxMarks}`}
                       </td>
-                      <td className="px-3 py-2 text-right text-text-tertiary">{cs.passMarks ?? '—'}</td>
-                      <td className="px-3 py-2 text-right text-text-tertiary">{cs.highestInClass ?? '—'}</td>
+                      <td className="px-3 py-2 text-end text-text-tertiary">{cs.passMarks ?? '—'}</td>
+                      <td className="px-3 py-2 text-end text-text-tertiary">{cs.highestInClass ?? '—'}</td>
                       <td className="px-3 py-2 text-center"><CoursePassCell cs={cs} division /></td>
                     </>
                   ) : (
                     <>
-                      <td className="px-3 py-2 text-right text-text-secondary">
+                      <td className="px-3 py-2 text-end text-text-secondary">
                         {cs.notGraded ? '—' : `${cs.rawScore} / ${cs.maxMarks}`}
                       </td>
                       <td className="px-3 py-2 text-center font-medium text-text-primary">{cs.grade}</td>
-                      <td className={`px-3 py-2 text-right ${gpaClass(cs.gpa)}`}>{cs.gpa.toFixed(2)}</td>
+                      <td className={`px-3 py-2 text-end ${gpaClass(cs.gpa)}`}>{cs.gpa.toFixed(2)}</td>
                       <td className="px-3 py-2 text-center"><CoursePassCell cs={cs} division={false} /></td>
                     </>
                   )}
@@ -298,7 +298,7 @@ function ReportCardDetail({
               ))}
               <tr className="bg-surface-secondary/60 font-medium">
                 <td className="px-3 py-2 text-text-primary">{t('examModule.resultCards.total')}</td>
-                <td className="px-3 py-2 text-right text-text-primary">
+                <td className="px-3 py-2 text-end text-text-primary">
                   {card.totalScore} / {card.totalMaxMarks}
                 </td>
                 <td colSpan={3} />
@@ -507,18 +507,18 @@ function ResultCardList({
       <div className="overflow-hidden rounded-xl border border-border-secondary">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-surface-secondary text-left text-text-tertiary">
+            <tr className="bg-surface-secondary text-start text-text-tertiary">
               <th className="px-3 py-2 font-medium">{t('examModule.resultCards.student')}</th>
-              <th className="px-3 py-2 font-medium text-right">{t('examModule.resultCards.total')}</th>
+              <th className="px-3 py-2 font-medium text-end">{t('examModule.resultCards.total')}</th>
               {division ? (
                 <>
-                  <th className="px-3 py-2 font-medium text-right">%</th>
+                  <th className="px-3 py-2 font-medium text-end">%</th>
                   <th className="px-3 py-2 font-medium text-center">{t('examModule.resultCards.division')}</th>
                   <th className="px-3 py-2 font-medium text-center">{t('examModule.resultCards.result')}</th>
                 </>
               ) : (
                 <>
-                  <th className="px-3 py-2 font-medium text-right">GPA</th>
+                  <th className="px-3 py-2 font-medium text-end">GPA</th>
                   <th className="px-3 py-2 font-medium text-center">{t('examModule.resultCards.grade')}</th>
                 </>
               )}
@@ -540,12 +540,12 @@ function ResultCardList({
                 className="bg-surface-primary hover:bg-surface-secondary/60 transition-colors cursor-pointer"
               >
                 <td className="px-3 py-2"><StudentCell card={card} /></td>
-                <td className="px-3 py-2 text-right text-text-secondary">
+                <td className="px-3 py-2 text-end text-text-secondary">
                   {card.totalScore}/{card.totalMaxMarks}
                 </td>
                 {division ? (
                   <>
-                    <td className="px-3 py-2 text-right text-text-secondary">
+                    <td className="px-3 py-2 text-end text-text-secondary">
                       {card.percentage != null ? `${card.percentage.toFixed(1)}%` : '—'}
                     </td>
                     <td className="px-3 py-2 text-center text-text-primary">{card.division ?? '—'}</td>
@@ -563,7 +563,7 @@ function ResultCardList({
                   </>
                 ) : (
                   <>
-                    <td className={`px-3 py-2 text-right ${gpaClass(card.termGpa)}`}>{card.termGpa.toFixed(2)}</td>
+                    <td className={`px-3 py-2 text-end ${gpaClass(card.termGpa)}`}>{card.termGpa.toFixed(2)}</td>
                     <td className="px-3 py-2 text-center font-medium text-text-primary">{card.overallGrade}</td>
                   </>
                 )}
@@ -639,7 +639,7 @@ export function ResultCardsDrawer({ open, onClose, exam }: ResultCardsDrawerProp
             }}
             aria-hidden="true"
           />
-          <div className="fixed inset-y-0 right-0 flex max-w-full pl-10">
+          <div className="fixed inset-y-0 right-0 flex max-w-full ps-10">
             <motion.div
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
@@ -647,7 +647,7 @@ export function ResultCardsDrawer({ open, onClose, exam }: ResultCardsDrawerProp
               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
               className="w-screen max-w-2xl h-full"
             >
-              <div className="flex h-full flex-col bg-surface-primary shadow-xl border-l border-border-secondary">
+              <div className="flex h-full flex-col bg-surface-primary shadow-xl border-s border-border-secondary">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-border-secondary">
                   <div className="flex items-center gap-3 min-w-0">
                     <div className="p-2 rounded-lg bg-gradient-to-br from-[rgb(var(--state-success-bg)/0.18)] to-[rgb(var(--state-success-bg)/0.10)] flex-shrink-0">

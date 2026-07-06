@@ -105,11 +105,11 @@ export const Field = forwardRef<HTMLDivElement, FieldProps>(
               >
                 {label}
                 {required ? (
-                  <span className="ml-1 text-[rgb(var(--state-danger-fg))]" aria-hidden="true">
+                  <span className="ms-1 text-[rgb(var(--state-danger-fg))]" aria-hidden="true">
                     *
                   </span>
                 ) : optionalText ? (
-                  <span className="ml-1 text-xs font-normal text-[rgb(var(--text-tertiary))]">
+                  <span className="ms-1 text-xs font-normal text-[rgb(var(--text-tertiary))]">
                     ({optionalText})
                   </span>
                 ) : null}

@@ -126,7 +126,7 @@ export function UseCasePanel({
             tabIndex={isActive ? 0 : -1}
             onClick={() => selectFeature(i)}
             onKeyDown={(e) => onKeyDown(e, i)}
-            className="pt-[20px] pb-[20px] pl-[24px] bg-transparent"
+            className="pt-[20px] pb-[20px] ps-[24px] bg-transparent"
             style={{
               display: 'block',
               textAlign: 'left',

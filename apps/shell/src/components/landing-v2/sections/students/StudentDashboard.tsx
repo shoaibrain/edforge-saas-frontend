@@ -8,7 +8,7 @@ import { Tag } from '@edforge/ui'
  */
 export function StudentDashboard() {
   return (
-    <div className="pt-[22px] pb-[22px] pl-[22px] pr-[22px] bg-[var(--lp-bg-elevated)]">
+    <div className="pt-[22px] pb-[22px] ps-[22px] pe-[22px] bg-[var(--lp-bg-elevated)]">
       <div
         className="mb-4"
         style={{
@@ -58,7 +58,7 @@ function FocusChart() {
   ]
   return (
     <div
-      className="pt-[14px] pb-[14px] pl-[14px] pr-[14px] mb-3"
+      className="pt-[14px] pb-[14px] ps-[14px] pe-[14px] mb-3"
       style={{
         border: '1px solid var(--lp-border)',
         borderRadius: 12,

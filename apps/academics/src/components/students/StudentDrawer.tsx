@@ -309,7 +309,7 @@ export function StudentDrawer({
           />
 
           {/* Slide-over panel */}
-          <div className="fixed inset-y-0 right-0 flex max-w-full pl-10">
+          <div className="fixed inset-y-0 right-0 flex max-w-full ps-10">
             <motion.div
               ref={panelRef}
               initial={{ x: '100%' }}
@@ -318,7 +318,7 @@ export function StudentDrawer({
               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
               className="w-screen max-w-2xl h-full"
             >
-              <div className="flex h-full flex-col bg-surface-primary shadow-xl border-l border-border-secondary">
+              <div className="flex h-full flex-col bg-surface-primary shadow-xl border-s border-border-secondary">
                 {/* Header — student identity */}
                 <div className="flex items-center justify-between px-6 py-4 border-b border-border-secondary">
                   <div className="flex items-center gap-3 min-w-0">
@@ -337,7 +337,7 @@ export function StudentDrawer({
                       >
                         {student.fullName}
                         {student.preferredName && (
-                          <span className="text-sm font-normal text-text-tertiary ml-1.5">
+                          <span className="text-sm font-normal text-text-tertiary ms-1.5">
                             &ldquo;{student.preferredName}&rdquo;
                           </span>
                         )}

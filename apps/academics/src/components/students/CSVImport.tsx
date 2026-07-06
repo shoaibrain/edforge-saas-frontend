@@ -579,7 +579,7 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                       {formatCount('studentsModule.csvImport.preview.invalidRows', invalidRows.length)}
                     </span>
                   </div>
-                  <ul className="space-y-0.5 ml-5" style={{ fontSize: 10, color: '#E24B4A' }}>
+                  <ul className="space-y-0.5 ms-5" style={{ fontSize: 10, color: '#E24B4A' }}>
                     {invalidRows.slice(0, 5).map((row) => (
                       <li key={row.rowNum}>
                         {t('studentsModule.csvImport.preview.rowError', {
@@ -610,13 +610,13 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                     style={{ background: 'rgb(var(--background-tertiary))' }}
                   >
                     <tr>
-                      <th className="px-3 py-2 text-left" style={{ fontSize: 10, fontWeight: 500, color: 'rgb(var(--text-tertiary))', textTransform: 'uppercase' }}>#</th>
+                      <th className="px-3 py-2 text-start" style={{ fontSize: 10, fontWeight: 500, color: 'rgb(var(--text-tertiary))', textTransform: 'uppercase' }}>#</th>
                       {parsedData.headers.slice(0, 5).map((h) => (
-                        <th key={h} className="px-3 py-2 text-left" style={{ fontSize: 10, fontWeight: 500, color: 'rgb(var(--text-tertiary))', textTransform: 'uppercase' }}>
+                        <th key={h} className="px-3 py-2 text-start" style={{ fontSize: 10, fontWeight: 500, color: 'rgb(var(--text-tertiary))', textTransform: 'uppercase' }}>
                           {h}
                         </th>
                       ))}
-                      <th className="px-3 py-2 text-left" style={{ fontSize: 10, fontWeight: 500, color: 'rgb(var(--text-tertiary))', textTransform: 'uppercase' }}>
+                      <th className="px-3 py-2 text-start" style={{ fontSize: 10, fontWeight: 500, color: 'rgb(var(--text-tertiary))', textTransform: 'uppercase' }}>
                         {t('studentsModule.csvImport.preview.status')}
                       </th>
                     </tr>
@@ -752,7 +752,7 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                       {t('studentsModule.csvImport.results.duplicatesTitle')}
                     </span>
                   </div>
-                  <ul className="space-y-0.5 ml-5" style={{ fontSize: 10, color: 'rgb(var(--text-secondary))' }}>
+                  <ul className="space-y-0.5 ms-5" style={{ fontSize: 10, color: 'rgb(var(--text-secondary))' }}>
                     {importResult.duplicates.slice(0, 10).map((d) => (
                       <li key={d.row}>
                         {t('studentsModule.csvImport.results.duplicateRow', {
@@ -784,7 +784,7 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                       {t('studentsModule.csvImport.results.errorsTitle')}
                     </span>
                   </div>
-                  <ul className="space-y-0.5 ml-5" style={{ fontSize: 10, color: '#E24B4A' }}>
+                  <ul className="space-y-0.5 ms-5" style={{ fontSize: 10, color: '#E24B4A' }}>
                     {importResult.errors.slice(0, 10).map((err, i) => (
                       <li key={i}>
                         {t('studentsModule.csvImport.results.errorRow', {
@@ -824,7 +824,7 @@ export function CSVImport({ onClose, onSuccess }: CSVImportProps) {
                 <button
                   type="button"
                   onClick={handleReset}
-                  className="transition-colors hover:opacity-80 text-left"
+                  className="transition-colors hover:opacity-80 text-start"
                   style={{ fontSize: 11, color: 'rgb(var(--text-tertiary))' }}
                 >
                   {t('studentsModule.csvImport.actions.uploadDifferent')}

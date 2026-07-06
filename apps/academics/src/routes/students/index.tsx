@@ -583,7 +583,7 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
             description={t('studentsModule.error.description')}
             action={
               <Button variant="outline" size="sm" onClick={() => refetch()}>
-                <RefreshCw className="w-4 h-4 mr-1.5" />
+                <RefreshCw className="w-4 h-4 me-1.5" />
                 {t('error.retry')}
               </Button>
             }
@@ -628,9 +628,9 @@ function StudentsContent({ schoolId }: { schoolId: string }) {
                       aria-label={t('studentsModule.actions.exportCsvAria')}
                     >
                       {overviewData.isExporting ? (
-                        <Loader2 className="w-3 h-3 animate-spin mr-1.5" />
+                        <Loader2 className="w-3 h-3 animate-spin me-1.5" />
                       ) : (
-                        <Download className="w-3 h-3 mr-1.5" />
+                        <Download className="w-3 h-3 me-1.5" />
                       )}
                       {t('curriculumModule.filters.exportCsv')}
                     </Button>

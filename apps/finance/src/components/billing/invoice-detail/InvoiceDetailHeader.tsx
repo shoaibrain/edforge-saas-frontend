@@ -94,7 +94,7 @@ export function InvoiceDetailHeader({
       <div className="flex flex-wrap items-center gap-2 print:hidden">
         {payable && (
           <Button variant="outline" onClick={onSendReminder}>
-            <Send className="mr-1.5 h-4 w-4" />
+            <Send className="me-1.5 h-4 w-4" />
             {t('invoiceDetail.actions.sendReminder')}
           </Button>
         )}
@@ -118,25 +118,25 @@ export function InvoiceDetailHeader({
           aria-label={t('actions.downloadPdf')}
         >
           {downloadInvoice.isPending ? (
-            <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+            <Loader2 className="me-1.5 h-4 w-4 animate-spin" />
           ) : (
-            <Download className="mr-1.5 h-4 w-4" />
+            <Download className="me-1.5 h-4 w-4" />
           )}
           {t('actions.downloadPdf')}
         </Button>
         {invoice.status === 'draft' && (
           <Button onClick={onIssue} disabled={issuePending}>
             {issuePending ? (
-              <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />
+              <Loader2 className="me-1.5 h-4 w-4 animate-spin" />
             ) : (
-              <Check className="mr-1.5 h-4 w-4" />
+              <Check className="me-1.5 h-4 w-4" />
             )}
             {t('invoiceDetail.actions.issueInvoice')}
           </Button>
         )}
         {payable && (
           <Button onClick={onRecordPayment}>
-            <Wallet className="mr-1.5 h-4 w-4" />
+            <Wallet className="me-1.5 h-4 w-4" />
             {t('recordPayment.title')}
           </Button>
         )}

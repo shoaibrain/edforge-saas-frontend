@@ -344,7 +344,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
             size="sm"
             onClick={() => setShowSessions(!showSessions)}
           >
-            <Layers className="w-4 h-4 mr-1.5" />
+            <Layers className="w-4 h-4 me-1.5" />
             {t('schoolCalendar.actions.sessions')}
           </Button>
           <Button
@@ -352,7 +352,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
             size="sm"
             onClick={() => setShowGenerator(true)}
           >
-            <Wand2 className="w-4 h-4 mr-1.5" />
+            <Wand2 className="w-4 h-4 me-1.5" />
             {t('schoolCalendar.actions.generate')}
           </Button>
         </div>
@@ -366,7 +366,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
           className="grid grid-cols-2 sm:grid-cols-4 gap-3"
         >
           {/* Academic Year Progress */}
-          <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-4 py-3 border-l-4 border-l-teal-500">
+          <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-4 py-3 border-s-4 border-s-teal-500">
             <div className="text-sm font-semibold text-[rgb(var(--text-primary))] truncate">{activeYear?.name || t('schoolCalendar.academicYearFallback')}</div>
             {stats.progressPercentage != null ? (
               <>
@@ -385,7 +385,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
           </div>
 
           {/* Instructional Days */}
-          <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-4 py-3 border-l-4 border-l-emerald-500">
+          <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-4 py-3 border-s-4 border-s-emerald-500">
             <div className="text-2xl font-bold text-[rgb(var(--state-success-fg))] ">{stats.instructionalDays ?? 0}</div>
             <div className="text-xs font-medium text-[rgb(var(--text-secondary))]">{t('schoolCalendar.stats.instructionalDays')}</div>
             {stats.instructionalDaysRemaining != null && (
@@ -396,7 +396,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
           </div>
 
           {/* Holidays */}
-          <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-4 py-3 border-l-4 border-l-red-500">
+          <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-4 py-3 border-s-4 border-s-red-500">
             <div className="text-2xl font-bold text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]">{stats.holidays ?? 0}</div>
             <div className="text-xs font-medium text-[rgb(var(--text-secondary))]">{t('schoolCalendar.stats.holidays')}</div>
             <div className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">
@@ -405,7 +405,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
           </div>
 
           {/* Non-Instructional */}
-          <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-4 py-3 border-l-4 border-l-slate-400">
+          <div className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-4 py-3 border-s-4 border-s-slate-400">
             <div className="text-2xl font-bold text-[rgb(var(--text-secondary))]">{stats.nonInstructionalDays ?? 0}</div>
             <div className="text-xs font-medium text-[rgb(var(--text-secondary))]">{t('schoolCalendar.stats.nonInstructional')}</div>
             {(stats.teacherOnlyDays ?? 0) > 0 && (
@@ -631,7 +631,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
               disabled={!editEventType || updateDate.isPending}
               isLoading={updateDate.isPending}
             >
-              <Save className="w-4 h-4 mr-1.5" />
+              <Save className="w-4 h-4 me-1.5" />
               {t('common.save')}
             </Button>
           </DrawerFooter>
@@ -680,7 +680,7 @@ export default function SchoolCalendarPage({ schoolId }: SchoolCalendarPageProps
                   disabled={generateCalendar.isPending}
                   isLoading={generateCalendar.isPending}
                 >
-                  <Wand2 className="w-4 h-4 mr-1.5" />
+                  <Wand2 className="w-4 h-4 me-1.5" />
                   {t('schoolCalendar.generate.title')}
                 </Button>
               </div>

@@ -820,9 +820,9 @@ function CancelInvoiceDialog({
             className="bg-[rgb(var(--action-danger-bg))] hover:brightness-95 text-[rgb(var(--action-primary-fg))]"
           >
             {isPending ? (
-              <Loader2 className="w-4 h-4 animate-spin mr-1.5" />
+              <Loader2 className="w-4 h-4 animate-spin me-1.5" />
             ) : (
-              <X className="w-4 h-4 mr-1.5" />
+              <X className="w-4 h-4 me-1.5" />
             )}
             {t('invoices.cancelInvoice')}
           </Button>
@@ -887,9 +887,9 @@ function BulkIssueConfirmModal({
           </Button>
           <Button onClick={onConfirm} disabled={isPending}>
             {isPending ? (
-              <Loader2 className="w-4 h-4 animate-spin mr-1.5" />
+              <Loader2 className="w-4 h-4 animate-spin me-1.5" />
             ) : (
-              <Check className="w-4 h-4 mr-1.5" />
+              <Check className="w-4 h-4 me-1.5" />
             )}
             {t('invoices.issueCountInvoices', { count })}
           </Button>
@@ -1125,7 +1125,7 @@ function GenerateInvoiceModal({
           </Button>
           <Button onClick={handleSubmit} disabled={generateMutation.isPending}>
             {generateMutation.isPending ? (
-              <Loader2 className="w-4 h-4 animate-spin mr-1.5" />
+              <Loader2 className="w-4 h-4 animate-spin me-1.5" />
             ) : null}
             {t('invoices.generateInvoice')}
           </Button>

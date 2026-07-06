@@ -137,7 +137,7 @@ export function AtRiskPanel({ alerts, trends, schoolId }: AtRiskPanelProps) {
                 <button
                   type="button"
                   onClick={() => setSelected({ studentId: a.studentId, studentName: a.studentName })}
-                  className="block truncate text-left text-sm font-medium text-[rgb(var(--text-primary))] hover:underline"
+                  className="block truncate text-start text-sm font-medium text-[rgb(var(--text-primary))] hover:underline"
                 >
                   {a.studentName}
                 </button>
@@ -155,15 +155,15 @@ export function AtRiskPanel({ alerts, trends, schoolId }: AtRiskPanelProps) {
                   showValue={false}
                 />
               </span>
-              <span className="hidden w-10 text-right text-2xs tabular-nums text-[rgb(var(--text-tertiary))] sm:inline">
+              <span className="hidden w-10 text-end text-2xs tabular-nums text-[rgb(var(--text-tertiary))] sm:inline">
                 {formatNumber(a.absentDays)}
                 <span className="text-[rgb(var(--text-disabled))]">/{formatNumber(a.totalDays)}</span>
               </span>
-              <span className={`w-16 text-right text-2xs font-semibold capitalize ${trendClass(a.trend)}`}>
+              <span className={`w-16 text-end text-2xs font-semibold capitalize ${trendClass(a.trend)}`}>
                 {t(`attendance.dashboard.trends.${a.trend}`)}
               </span>
               <span
-                className={`w-12 text-right text-sm font-bold tabular-nums ${
+                className={`w-12 text-end text-sm font-bold tabular-nums ${
                   a.attendanceRate < 70 ? 'text-[rgb(var(--state-danger-fg))]' : 'text-[rgb(var(--state-warning-fg))]'
                 }`}
               >

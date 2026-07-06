@@ -177,7 +177,7 @@ export function EditAssignmentModal({
                 className="flex-1 h-2 rounded-full appearance-none bg-[rgb(var(--border-primary))] accent-teal-500"
                 disabled={isSubmitting}
               />
-              <span className="text-sm font-mono font-medium text-text-primary w-12 text-right">
+              <span className="text-sm font-mono font-medium text-text-primary w-12 text-end">
                 {(fteValue ?? 1).toFixed(2)}
               </span>
             </div>
@@ -206,12 +206,12 @@ export function EditAssignmentModal({
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  <Loader2 className="w-4 h-4 me-2 animate-spin" />
                   {t('actions.saving')}
                 </>
               ) : (
                 <>
-                  <Save className="w-4 h-4 mr-2" />
+                  <Save className="w-4 h-4 me-2" />
                   {t('actions.saveChanges')}
                 </>
               )}

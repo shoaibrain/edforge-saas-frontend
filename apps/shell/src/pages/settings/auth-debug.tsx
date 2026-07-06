@@ -203,7 +203,7 @@ function TokenRawDisplay({ token }: { token: string }) {
       <div className="absolute top-2 right-2">
         <CopyButton text={token} label="Copy Token" />
       </div>
-      <pre className="p-4 pr-24 rounded-xl bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] text-xs font-mono text-[rgb(var(--text-secondary))] overflow-x-auto max-h-24 break-all whitespace-pre-wrap">
+      <pre className="p-4 pe-24 rounded-xl bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] text-xs font-mono text-[rgb(var(--text-secondary))] overflow-x-auto max-h-24 break-all whitespace-pre-wrap">
         {token}
       </pre>
     </div>
@@ -222,7 +222,7 @@ function JsonDisplay({ data }: { data: Record<string, unknown> | string }) {
       <div className="absolute top-2 right-2">
         <CopyButton text={text} />
       </div>
-      <pre className="p-4 pr-20 rounded-xl bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] text-xs font-mono text-[rgb(var(--text-secondary))] overflow-x-auto max-h-80 whitespace-pre-wrap">
+      <pre className="p-4 pe-20 rounded-xl bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] text-xs font-mono text-[rgb(var(--text-secondary))] overflow-x-auto max-h-80 whitespace-pre-wrap">
         {text}
       </pre>
     </div>
@@ -410,7 +410,7 @@ export default function AuthDebugPage() {
               disabled={isRefreshing}
             >
               <RefreshCw
-                className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`}
+                className={`w-4 h-4 me-2 ${isRefreshing ? 'animate-spin' : ''}`}
               />
               Refresh Session
             </Button>
@@ -456,7 +456,7 @@ export default function AuthDebugPage() {
                     <span>
                       {tenantName}
                       {tenantTier && (
-                        <span className="ml-2 text-xs text-[rgb(var(--text-tertiary))]">
+                        <span className="ms-2 text-xs text-[rgb(var(--text-tertiary))]">
                           ({tenantTier})
                         </span>
                       )}

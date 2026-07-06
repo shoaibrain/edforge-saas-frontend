@@ -80,7 +80,7 @@ export function TextareaField({
           )}
         >
           {label}
-          {required && <span className="text-rust-500 ml-0.5">*</span>}
+          {required && <span className="text-rust-500 ms-0.5">*</span>}
         </label>
       )}
 
@@ -129,7 +129,7 @@ export function TextareaField({
             'focus:outline-none',
             'disabled:cursor-not-allowed',
             resizeClass,
-            Icon && 'pl-10'
+            Icon && 'ps-10'
           )}
         />
 

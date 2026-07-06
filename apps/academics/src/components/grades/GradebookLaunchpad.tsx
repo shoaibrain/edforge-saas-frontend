@@ -187,7 +187,7 @@ export function GradebookLaunchpad({
         <button
           type="button"
           onClick={() => onEnterSection(resumeSection.sectionId)}
-          className="flex w-full items-center gap-4 rounded-xl border border-[rgb(var(--state-success-border))] bg-[rgb(var(--state-success-bg)/0.4)] px-4 py-3 text-left transition-colors hover:bg-[rgb(var(--state-success-bg)/0.6)]"
+          className="flex w-full items-center gap-4 rounded-xl border border-[rgb(var(--state-success-border))] bg-[rgb(var(--state-success-bg)/0.4)] px-4 py-3 text-start transition-colors hover:bg-[rgb(var(--state-success-bg)/0.6)]"
         >
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[rgb(var(--state-success-bg))] text-[rgb(var(--state-success-fg))]">
             <PlayCircle className="h-5 w-5" />
@@ -229,7 +229,7 @@ export function GradebookLaunchpad({
               key={s.sectionId}
               type="button"
               onClick={() => onEnterSection(s.sectionId)}
-              className="group flex flex-col overflow-hidden rounded-xl border border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-secondary))] text-left transition-colors hover:border-[rgb(var(--border-primary)/0.6)]"
+              className="group flex flex-col overflow-hidden rounded-xl border border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-secondary))] text-start transition-colors hover:border-[rgb(var(--border-primary)/0.6)]"
             >
               {/* 3px-ish status accent bar */}
               <span className={`h-1 w-full ${meta.bar}`} aria-hidden="true" />

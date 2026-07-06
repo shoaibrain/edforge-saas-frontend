@@ -297,18 +297,18 @@ export function CourseTable({
         cell: ({ row }) => {
           const { style } = formatCourseType(row.original.courseType)
           return (
-            <div className="text-right">
+            <div className="text-end">
               <span className="font-medium text-text-primary">
                 {row.original.credits}
               </span>
               {style === 'ap' && (
-                <sup className="text-4xs font-bold ml-[3px] text-[rgb(var(--accent-finance-text))]">AP</sup>
+                <sup className="text-4xs font-bold ms-[3px] text-[rgb(var(--accent-finance-text))]">AP</sup>
               )}
               {style === 'dual' && (
-                <sup className="text-4xs font-bold ml-[3px] text-[rgb(var(--accent-academics-text))]">DE</sup>
+                <sup className="text-4xs font-bold ms-[3px] text-[rgb(var(--accent-academics-text))]">DE</sup>
               )}
               {style === 'honors' && (
-                <sup className="text-4xs font-bold ml-[3px] text-[rgb(var(--accent-attendance-text))]">H</sup>
+                <sup className="text-4xs font-bold ms-[3px] text-[rgb(var(--accent-attendance-text))]">H</sup>
               )}
             </div>
           )

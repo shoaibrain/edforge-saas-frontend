@@ -276,7 +276,7 @@ export function BulkExportDrawerBase({
         disabled={kickoffPending || rows.length === 0}
         data-testid="bulk-pdf-export-start"
       >
-        <Download className="mr-1.5 h-4 w-4" />
+        <Download className="me-1.5 h-4 w-4" />
         {kickoffPending ? t(`${i18nRoot}.starting`) : t(`${i18nRoot}.startExport`)}
       </Button>
     </>
@@ -287,7 +287,7 @@ export function BulkExportDrawerBase({
   ) : succeeded ? (
     <>
       <Button variant="ghost" onClick={backToPreflight}>
-        <Undo2 className="mr-1.5 h-4 w-4" />
+        <Undo2 className="me-1.5 h-4 w-4" />
         {t('asyncJobs.pdfExportShared.exportAgain')}
       </Button>
       {/* H.3 P2: an all-skipped merged job completes with NO artifact —
@@ -298,7 +298,7 @@ export function BulkExportDrawerBase({
         </Button>
       ) : linkExpired || !downloadUrl ? (
         <Button onClick={() => void handleFreshLink()} disabled={refreshingLink}>
-          <RefreshCw className={refreshingLink ? 'mr-1.5 h-4 w-4 animate-spin' : 'mr-1.5 h-4 w-4'} />
+          <RefreshCw className={refreshingLink ? 'me-1.5 h-4 w-4 animate-spin' : 'me-1.5 h-4 w-4'} />
           {refreshingLink
             ? t('asyncJobs.pdfExportShared.gettingFreshLink')
             : t('asyncJobs.pdfExportShared.freshLink')}
@@ -324,7 +324,7 @@ export function BulkExportDrawerBase({
         {t('asyncJobs.common.close')}
       </Button>
       <Button onClick={backToPreflight}>
-        <RefreshCw className="mr-1.5 h-4 w-4" />
+        <RefreshCw className="me-1.5 h-4 w-4" />
         {t('asyncJobs.pdfExportShared.tryAgain')}
       </Button>
     </>

@@ -90,9 +90,9 @@ export function CancelInvoiceDialog({
             className="bg-[rgb(var(--action-danger-bg))] hover:brightness-95 text-[rgb(var(--action-primary-fg))]"
           >
             {isPending ? (
-              <Loader2 className="w-4 h-4 animate-spin mr-1.5" />
+              <Loader2 className="w-4 h-4 animate-spin me-1.5" />
             ) : (
-              <X className="w-4 h-4 mr-1.5" />
+              <X className="w-4 h-4 me-1.5" />
             )}
             {t('invoices.cancelInvoice')}
           </Button>

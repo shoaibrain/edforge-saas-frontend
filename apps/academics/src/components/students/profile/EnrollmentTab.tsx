@@ -107,12 +107,12 @@ function EnrollmentHistoryTable({ history }: { history: EnrollmentHistory[] }) {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border-secondary">
-              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">{t('tableHeaders.grade')}</th>
-              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">{t('tableHeaders.school')}</th>
-              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">{t('tableHeaders.academicYear')}</th>
-              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">{t('tableHeaders.entryDate')}</th>
-              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">{t('tableHeaders.exitDate')}</th>
-              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">{t('tableHeaders.status')}</th>
+              <th className="text-start py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">{t('tableHeaders.grade')}</th>
+              <th className="text-start py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">{t('tableHeaders.school')}</th>
+              <th className="text-start py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">{t('tableHeaders.academicYear')}</th>
+              <th className="text-start py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">{t('tableHeaders.entryDate')}</th>
+              <th className="text-start py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">{t('tableHeaders.exitDate')}</th>
+              <th className="text-start py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">{t('tableHeaders.status')}</th>
             </tr>
           </thead>
           <tbody>
@@ -178,7 +178,7 @@ export function EnrollmentTab({ student, onEnroll, onAddToSection }: EnrollmentT
         </p>
         {onEnroll && (
           <Button variant="outline" size="sm" onClick={onEnroll} className="mt-4">
-            <Plus className="w-4 h-4 mr-1.5" />
+            <Plus className="w-4 h-4 me-1.5" />
             {t('actions.schoolEnrollment')}
           </Button>
         )}
@@ -192,7 +192,7 @@ export function EnrollmentTab({ student, onEnroll, onAddToSection }: EnrollmentT
       <div className="flex items-center justify-end gap-2 mb-4">
         {onEnroll && (
           <Button variant="outline" size="sm" onClick={onEnroll}>
-            <Plus className="w-3.5 h-3.5 mr-1.5" />
+            <Plus className="w-3.5 h-3.5 me-1.5" />
             {t('actions.newSchoolEnrollment')}
           </Button>
         )}
@@ -213,7 +213,7 @@ export function EnrollmentTab({ student, onEnroll, onAddToSection }: EnrollmentT
                 </p>
               </div>
               <Button variant="outline" size="sm" onClick={onAddToSection}>
-                <BookOpen className="w-3.5 h-3.5 mr-1.5" />
+                <BookOpen className="w-3.5 h-3.5 me-1.5" />
                 {t('actions.addToSection')}
               </Button>
             </div>
@@ -227,7 +227,7 @@ export function EnrollmentTab({ student, onEnroll, onAddToSection }: EnrollmentT
           </p>
           {onEnroll && (
             <Button variant="outline" size="sm" onClick={onEnroll}>
-              <Plus className="w-3.5 h-3.5 mr-1.5" />
+              <Plus className="w-3.5 h-3.5 me-1.5" />
               {t('actions.enrollAtSchool')}
             </Button>
           )}

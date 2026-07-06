@@ -120,7 +120,7 @@ const GreetingHeader = forwardRef<HTMLDivElement, PageHeaderGreetingProps>(
           <p className="truncate text-xl font-semibold text-[rgb(var(--text-primary))]">
             {greeting}
             {wave ? (
-              <span className="ml-1.5 inline-block" role="img" aria-label="waving hand">
+              <span className="ms-1.5 inline-block" role="img" aria-label="waving hand">
                 👋
               </span>
             ) : null}

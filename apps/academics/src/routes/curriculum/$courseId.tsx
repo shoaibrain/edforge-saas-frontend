@@ -465,7 +465,7 @@ function SectionsTab({
             key={section.sectionId}
             type="button"
             onClick={() => onViewSection(section)}
-            className="w-full text-left rounded-xl border border-border-secondary p-4 hover:bg-surface-secondary/50 transition-colors"
+            className="w-full text-start rounded-xl border border-border-secondary p-4 hover:bg-surface-secondary/50 transition-colors"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3 min-w-0">

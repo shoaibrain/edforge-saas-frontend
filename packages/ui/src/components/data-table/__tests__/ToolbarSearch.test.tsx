@@ -41,10 +41,10 @@ describe('ToolbarSearch — no overlay construction (regression net)', () => {
   it('carries no compensating left padding on the input', () => {
     render(<Harness />)
     const input = screen.getByPlaceholderText('Search receipts or students…')
-    // pl-3 (12px) is the field's own inset — anything larger means the input is
+    // ps-3 (12px) is the field's own inset — anything larger means the input is
     // dodging an overlaid icon, i.e. the bug is back.
-    expect(input.className).toMatch(/(^|\s)pl-3(\s|$)/)
-    expect(input.className).not.toMatch(/pl-(7|8|9|10|11|12)/)
+    expect(input.className).toMatch(/(^|\s)ps-3(\s|$)/)
+    expect(input.className).not.toMatch(/ps-(7|8|9|10|11|12)/)
   })
 
   it('renders the icon slot AFTER the input (trailing), as a sibling button', () => {

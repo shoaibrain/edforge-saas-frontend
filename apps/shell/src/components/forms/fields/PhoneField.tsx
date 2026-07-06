@@ -88,7 +88,7 @@ export function PhoneField({
           )}
         >
           {label}
-          {required && <span className="text-rust-500 ml-0.5">*</span>}
+          {required && <span className="text-rust-500 ms-0.5">*</span>}
         </label>
       )}
 
@@ -110,7 +110,7 @@ export function PhoneField({
             type="button"
             onClick={() => !disabled && setShowCountryDropdown(!showCountryDropdown)}
             className={cn(
-              'flex items-center gap-1 pl-3 pr-2 py-2.5 border-r border-[rgb(var(--border-primary))]',
+              'flex items-center gap-1 ps-3 pe-2 py-2.5 border-e border-[rgb(var(--border-primary))]',
               'text-sm text-[rgb(var(--text-primary))]',
               'hover:bg-[rgb(var(--background-tertiary))] transition-colors',
               disabled && 'pointer-events-none'
@@ -124,7 +124,7 @@ export function PhoneField({
 
         {/* Phone Icon (when no country code) */}
         {!showCountryCode && (
-          <div className="pl-3 flex items-center text-[rgb(var(--text-tertiary))]">
+          <div className="ps-3 flex items-center text-[rgb(var(--text-tertiary))]">
             <Phone className="w-4 h-4" />
           </div>
         )}
@@ -158,7 +158,7 @@ export function PhoneField({
 
         {/* Error Icon */}
         {hasError && (
-          <div className="pr-3">
+          <div className="pe-3">
             <AlertCircle className="w-4 h-4 text-rust-500" />
           </div>
         )}
@@ -188,7 +188,7 @@ export function PhoneField({
                   setShowCountryDropdown(false)
                 }}
                 className={cn(
-                  'w-full flex items-center gap-3 px-3 py-2 text-sm text-left',
+                  'w-full flex items-center gap-3 px-3 py-2 text-sm text-start',
                   'transition-colors duration-150',
                   country.code === countryCode
                     ? 'bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))] '

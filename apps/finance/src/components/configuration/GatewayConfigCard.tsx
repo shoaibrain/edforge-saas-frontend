@@ -107,7 +107,7 @@ export function GatewayConfigCard({ gateway, config, onSave, isSaving }: Gateway
       <button
         type="button"
         onClick={() => credFields.length > 0 && setIsExpanded(!isExpanded)}
-        className="w-full flex items-center gap-3 p-4 text-left hover:bg-[rgb(var(--background-tertiary))] transition-colors"
+        className="w-full flex items-center gap-3 p-4 text-start hover:bg-[rgb(var(--background-tertiary))] transition-colors"
       >
         <div className={`p-2 rounded-lg ${isEnabled ? 'bg-[rgb(var(--state-info-bg)/0.18)] dark:bg-[rgb(var(--action-primary-bg))]/20' : 'bg-[rgb(var(--background-tertiary))]'}`}>
           <Icon className={`w-5 h-5 ${isEnabled ? 'text-[rgb(var(--state-info-fg))] ' : 'text-[rgb(var(--text-tertiary))]'}`} />
@@ -173,7 +173,7 @@ export function GatewayConfigCard({ gateway, config, onSave, isSaving }: Gateway
                   {...register(field.key)}
                   type={field.sensitive && !showSecrets[field.key] ? 'password' : 'text'}
                   autoComplete="off"
-                  className="w-full px-3 py-2 pr-10 rounded-lg border border-[rgb(var(--border-primary))]
+                  className="w-full px-3 py-2 pe-10 rounded-lg border border-[rgb(var(--border-primary))]
                     bg-[rgb(var(--background-primary))] text-sm text-[rgb(var(--text-primary))]
                     focus:outline-none focus:border-[rgb(var(--border-focus))] focus:ring-2 focus:ring-[rgb(var(--border-focus))]/20"
                   placeholder={field.sensitive ? '••••••••' : ''}

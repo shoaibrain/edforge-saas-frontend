@@ -150,7 +150,7 @@ export function Accordion({
                 aria-controls={panelId}
                 onClick={() => toggle(item.id)}
                 onKeyDown={(e) => onKeyDown(e, i)}
-                className={`${focusRing} flex items-center gap-5 w-full pt-[22px] pb-[22px] px-0 text-left font-[inherit] bg-transparent border-none cursor-pointer text-inherit`}
+                className={`${focusRing} flex items-center gap-5 w-full pt-[22px] pb-[22px] px-0 text-start font-[inherit] bg-transparent border-none cursor-pointer text-inherit`}
               >
                 <div
                   // allow-presentation-style: 17px editorial trigger size has no scale token; landing ink color
@@ -193,7 +193,7 @@ export function Accordion({
             >
               <div
                 // allow-presentation-style: 15px editorial panel size has no scale token; landing ink color
-                className="pt-0 pb-[22px] pl-0 pr-[60px] leading-relaxed"
+                className="pt-0 pb-[22px] ps-0 pe-[60px] leading-relaxed"
                 style={{
                   fontSize: 15,
                   color: 'var(--lp-ink-3, #3B4862)',

@@ -76,7 +76,7 @@ export function AddressArraySection({ name = 'addresses' }: AddressArraySectionP
           </button>
 
           {/* Row 1: Type + Street */}
-          <div className="grid grid-cols-3 gap-3 pr-8">
+          <div className="grid grid-cols-3 gap-3 pe-8">
             <SelectField
               name={`${name}.${index}.addressTypeDescriptor`}
               label={t('organization.form.type')}

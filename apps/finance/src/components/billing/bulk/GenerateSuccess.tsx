@@ -78,15 +78,15 @@ export function GenerateSuccess({ result, onReset, onClose }: GenerateSuccessPro
           disabled
           title={t('bulkGenerate.success.downloadAllTooltip')}
         >
-          <Download className="w-4 h-4 mr-1.5" />
+          <Download className="w-4 h-4 me-1.5" />
           {t('bulkGenerate.success.downloadAll')}
         </Button>
         <Button variant="outline" onClick={onReset}>
-          <RotateCcw className="w-4 h-4 mr-1.5" /> {t('bulkGenerate.success.newBatch')}
+          <RotateCcw className="w-4 h-4 me-1.5" /> {t('bulkGenerate.success.newBatch')}
         </Button>
         {onClose && (
           <Button onClick={onClose}>
-            <X className="w-4 h-4 mr-1.5" /> {t('actions.close')}
+            <X className="w-4 h-4 me-1.5" /> {t('actions.close')}
           </Button>
         )}
       </div>

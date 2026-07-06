@@ -164,7 +164,7 @@ export function GettingStartedGuide({
                     {item.completed ? (
                       <CheckCircle2 className="w-5 h-5 text-[#1D9E75]" />
                     ) : item.blocked ? (
-                      <Lock className="w-4 h-4 ml-[1.5px] text-[rgb(var(--text-disabled))]" />
+                      <Lock className="w-4 h-4 ms-[1.5px] text-[rgb(var(--text-disabled))]" />
                     ) : (
                       <Circle className={`w-5 h-5 ${isFirstIncomplete ? 'text-[#1D9E75]' : 'text-[rgb(var(--text-disabled))]'}`} />
                     )}

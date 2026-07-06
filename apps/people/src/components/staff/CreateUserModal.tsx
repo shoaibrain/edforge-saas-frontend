@@ -207,7 +207,7 @@ export function CreateUserModal({ open, onClose }: CreateUserModalProps) {
               {t('actions.cancel')}
             </Button>
             <Button type="submit" isLoading={isSubmitting}>
-              <UserPlus className="w-4 h-4 mr-2" />
+              <UserPlus className="w-4 h-4 me-2" />
               {t('quickAdd.createUser')}
             </Button>
           </ModalFooter>

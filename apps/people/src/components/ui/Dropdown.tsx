@@ -36,7 +36,7 @@ export function Dropdown({
     <Menu as="div" className={twMerge('relative', className)}>
       <MenuButton
         className={twMerge(
-          'flex items-center justify-between w-full px-3 py-2 text-sm font-medium text-left',
+          'flex items-center justify-between w-full px-3 py-2 text-sm font-medium text-start',
           'bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] rounded-lg shadow-sm',
           'hover:bg-[rgb(var(--background-tertiary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))] focus:ring-offset-1',
           'transition-colors duration-150',
@@ -46,7 +46,7 @@ export function Dropdown({
         <span className={selectedOption ? 'text-[rgb(var(--text-primary))]' : 'text-[rgb(var(--text-tertiary))]'}>
           {selectedOption?.label ?? placeholder}
         </span>
-        <ChevronDown className="w-4 h-4 text-[rgb(var(--text-tertiary))] ml-2" />
+        <ChevronDown className="w-4 h-4 text-[rgb(var(--text-tertiary))] ms-2" />
       </MenuButton>
 
       <Transition
@@ -72,9 +72,9 @@ export function Dropdown({
                     )}
                   >
                     {option.icon && (
-                      <span className="flex-shrink-0 mr-2.5">{option.icon}</span>
+                      <span className="flex-shrink-0 me-2.5">{option.icon}</span>
                     )}
-                    <div className="flex-1 text-left">
+                    <div className="flex-1 text-start">
                       <div className="font-medium">{option.label}</div>
                       {option.description && (
                         <div className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">
@@ -83,7 +83,7 @@ export function Dropdown({
                       )}
                     </div>
                     {showCheck && value === option.id && (
-                      <Check className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] ml-2" />
+                      <Check className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] ms-2" />
                     )}
                   </button>
                 )}

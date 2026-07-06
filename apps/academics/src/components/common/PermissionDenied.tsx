@@ -50,14 +50,14 @@ export function PermissionDenied({
               onClick={() => window.history.back()}
               className="w-full sm:w-auto"
             >
-              <ArrowLeft className="w-4 h-4 mr-2" />
+              <ArrowLeft className="w-4 h-4 me-2" />
               Go Back
             </Button>
           )}
 
           <Link to="/">
             <Button className="w-full sm:w-auto">
-              <Home className="w-4 h-4 mr-2" />
+              <Home className="w-4 h-4 me-2" />
               Go to Home
             </Button>
           </Link>

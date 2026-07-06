@@ -85,7 +85,7 @@ export function TeacherDetailDrawer({ member, onClose }: TeacherDetailDrawerProp
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="fixed right-0 top-0 bottom-0 z-50 w-full max-w-md bg-surface-primary border-l border-border-secondary shadow-xl overflow-y-auto"
+            className="fixed right-0 top-0 bottom-0 z-50 w-full max-w-md bg-surface-primary border-s border-border-secondary shadow-xl overflow-y-auto"
             role="dialog"
             aria-modal="true"
             aria-labelledby="staff-profile-title"

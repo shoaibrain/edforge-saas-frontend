@@ -83,7 +83,7 @@ export function PortalWeekTimetable({
 
           return (
             <div key={period.periodNumber} className="fp-tt-row">
-              <div className="fp-tt-time text-right pr-4">
+              <div className="fp-tt-time text-end pe-4">
                  {/* Only print time if it's the first period of that hour, or always */}
                  {formatHourLabel(hour)}
               </div>

@@ -111,7 +111,7 @@ function GradeComparisonCard({ gradeRates }: { gradeRates: GradeRateRow[] }) {
                     style={{ width: `${Math.max(0, Math.min(100, g.rate))}%` }}
                   />
                 </span>
-                <span className="w-10 shrink-0 text-right text-2xs font-semibold tabular-nums text-[rgb(var(--text-secondary))]">
+                <span className="w-10 shrink-0 text-end text-2xs font-semibold tabular-nums text-[rgb(var(--text-secondary))]">
                   {g.rate.toFixed(0)}%
                 </span>
               </div>

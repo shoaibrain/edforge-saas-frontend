@@ -78,14 +78,14 @@ export function FeeStructureList({
       {
         id: 'amount',
         accessorKey: 'amount',
-        header: () => <span className="block text-right">{t('feeStructure.amount')}</span>,
+        header: () => <span className="block text-end">{t('feeStructure.amount')}</span>,
         cell: ({ row }) => {
           const fee = row.original
           return (
-            <span className="block text-right font-medium text-[rgb(var(--text-primary))] tabular-nums">
+            <span className="block text-end font-medium text-[rgb(var(--text-primary))] tabular-nums">
               {format(fee.amount)}
               {fee.taxRate > 0 && (
-                <span className="text-xs text-[rgb(var(--text-tertiary))] ml-1">
+                <span className="text-xs text-[rgb(var(--text-tertiary))] ms-1">
                   +{fee.taxRate}% {fee.taxType}
                 </span>
               )}
@@ -124,7 +124,7 @@ export function FeeStructureList({
                   key={grade}
                   className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]"
                 >
-                  <GraduationCap className="w-2.5 h-2.5 mr-0.5" />
+                  <GraduationCap className="w-2.5 h-2.5 me-0.5" />
                   {grade}
                 </span>
               ))}

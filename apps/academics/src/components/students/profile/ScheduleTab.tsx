@@ -194,7 +194,7 @@ function ScheduleTable({
         <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2">
           <BookOpen className="w-4 h-4 text-[rgb(var(--state-info-fg))]" />
           {t('sections.currentClasses')}
-          <span className="text-xs text-text-tertiary font-normal ml-1">
+          <span className="text-xs text-text-tertiary font-normal ms-1">
             ({formatNumber(classrooms.length)})
           </span>
         </h3>
@@ -204,11 +204,11 @@ function ScheduleTable({
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border-secondary">
-              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide w-8">#</th>
-              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">{t('studentProfile.schedule.class')}</th>
-              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">{t('studentProfile.schedule.subject')}</th>
-              <th className="text-left py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">{t('common.teacher')}</th>
-              <th className="text-right py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide w-16"></th>
+              <th className="text-start py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide w-8">#</th>
+              <th className="text-start py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">{t('studentProfile.schedule.class')}</th>
+              <th className="text-start py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">{t('studentProfile.schedule.subject')}</th>
+              <th className="text-start py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide">{t('common.teacher')}</th>
+              <th className="text-end py-2.5 px-3 text-xs font-medium text-text-tertiary uppercase tracking-wide w-16"></th>
             </tr>
           </thead>
           <tbody>
@@ -243,7 +243,7 @@ function ScheduleTable({
                       '—'
                     )}
                   </td>
-                  <td className="py-3 px-3 text-right">
+                  <td className="py-3 px-3 text-end">
                     <button
                       type="button"
                       onClick={() => handleRemove(classroom)}
@@ -332,7 +332,7 @@ export function ScheduleTab({ student, onAddToSection }: ScheduleTabProps) {
         </p>
         {onAddToSection && student.currentEnrollment && (
           <Button variant="outline" size="sm" onClick={onAddToSection} className="mt-4">
-            <Plus className="w-4 h-4 mr-1.5" />
+            <Plus className="w-4 h-4 me-1.5" />
             {t('actions.addToSection')}
           </Button>
         )}
@@ -368,7 +368,7 @@ export function ScheduleTab({ student, onAddToSection }: ScheduleTabProps) {
         </div>
         {onAddToSection && student.currentEnrollment && (
           <Button variant="outline" size="sm" onClick={onAddToSection}>
-            <Plus className="w-3.5 h-3.5 mr-1.5" />
+            <Plus className="w-3.5 h-3.5 me-1.5" />
             {t('actions.addToSection')}
           </Button>
         )}
@@ -390,7 +390,7 @@ export function ScheduleTab({ student, onAddToSection }: ScheduleTabProps) {
             </p>
             {onAddToSection && student.currentEnrollment && (
               <Button variant="outline" size="sm" onClick={onAddToSection} className="mt-3">
-                <Plus className="w-3.5 h-3.5 mr-1.5" />
+                <Plus className="w-3.5 h-3.5 me-1.5" />
                 {t('actions.addToSection')}
               </Button>
             )}

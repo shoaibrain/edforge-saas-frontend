@@ -559,7 +559,7 @@ export default function WorkspaceSettingsPage() {
             {error instanceof Error ? error.message : t('workspace.error.loadDescription')}
           </p>
           <Button variant="outline" onClick={() => refetch()}>
-            <RefreshCw className="w-4 h-4 mr-2" />
+            <RefreshCw className="w-4 h-4 me-2" />
             {t('common.retry')}
           </Button>
         </div>

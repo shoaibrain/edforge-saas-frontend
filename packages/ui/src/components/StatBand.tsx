@@ -233,7 +233,7 @@ function Segment({ metric }: { metric: StatMetric }) {
         label={metric.pill.text}
       />
     ) : 'donut' in metric && metric.donut ? (
-      <span className="ml-auto">
+      <span className="ms-auto">
         <Ring percentage={metric.donut.pct} size={42} strokeWidth={4} color={accentColor(state)} />
       </span>
     ) : null
@@ -242,9 +242,9 @@ function Segment({ metric }: { metric: StatMetric }) {
 
   const outerClass = cn(
     // `ef-motion` lets the AnimatedIcon signature hover-replay (CSS-driven, reduced-motion safe).
-    'ef-motion group relative flex min-w-0 flex-col px-5 py-4 text-left',
+    'ef-motion group relative flex min-w-0 flex-col px-5 py-4 text-start',
     metric.primary ? 'flex-[1.28]' : 'flex-1',
-    'border-l border-[rgb(var(--border-primary)/0.15)] first:border-l-0',
+    'border-s border-[rgb(var(--border-primary)/0.15)] first:border-l-0',
     'transition-colors hover:bg-[rgb(var(--background-tertiary)/0.4)]',
     clickable && focusRing,
     clickable && metric.active && 'bg-[rgb(var(--mint-soft))] hover:bg-[rgb(var(--mint-soft))]',

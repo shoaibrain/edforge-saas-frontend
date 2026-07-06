@@ -316,7 +316,7 @@ function DeleteSchoolModal({ school, isOpen, onClose, onConfirm, isDeleting }: D
             disabled={!canDelete || isDeleting}
             isLoading={isDeleting}
           >
-            <Trash2 className="w-4 h-4 mr-1.5" />
+            <Trash2 className="w-4 h-4 me-1.5" />
             {t('schoolDetail.delete.title')}
           </Button>
         </div>
@@ -606,7 +606,7 @@ export default function SchoolDetailPage() {
                               disabled={statusMutation.isPending}
                               className={`flex items-center w-full px-3 py-2.5 text-sm ${action.color} ${active ? 'bg-[rgb(var(--background-secondary))]' : ''} disabled:opacity-50`}
                             >
-                              <Power className="w-4 h-4 mr-2.5" />
+                              <Power className="w-4 h-4 me-2.5" />
                               {t(action.labelKey)}
                             </button>
                           )}
@@ -622,7 +622,7 @@ export default function SchoolDetailPage() {
                               onClick={() => setShowDeleteModal(true)}
                               className={`flex items-center w-full px-3 py-2.5 text-sm text-[rgb(var(--state-danger-fg))] ${active ? 'bg-[rgb(var(--state-danger-bg)/0.18)] dark:bg-[rgb(var(--state-danger-bg)/0.18)]0/10' : ''}`}
                             >
-                              <Trash2 className="w-4 h-4 mr-2.5" />
+                              <Trash2 className="w-4 h-4 me-2.5" />
                               {displaySchool.status === 'setup' ? t('schoolDetail.delete.title') : t('schoolDetail.statusActions.deactivate')}
                             </button>
                           )}

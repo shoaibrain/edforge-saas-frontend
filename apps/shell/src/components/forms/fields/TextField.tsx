@@ -86,7 +86,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
             )}
           >
             {label}
-            {required && <span className="text-rust-500 ml-0.5">*</span>}
+            {required && <span className="text-rust-500 ms-0.5">*</span>}
           </label>
         )}
 
@@ -105,7 +105,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
         >
           {/* Prefix / Icon */}
           {(Icon || prefix) && (
-            <div className="pl-3 flex items-center text-[rgb(var(--text-tertiary))]">
+            <div className="ps-3 flex items-center text-[rgb(var(--text-tertiary))]">
               {Icon && <Icon className="w-4 h-4" />}
               {prefix}
             </div>
@@ -140,13 +140,13 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(
               'text-[rgb(var(--text-primary))] placeholder-[rgb(var(--text-tertiary))]',
               'focus:outline-none',
               'disabled:cursor-not-allowed',
-              Icon || prefix ? 'pl-2' : 'pl-3',
-              suffix || isValid || hasError ? 'pr-2' : 'pr-3'
+              Icon || prefix ? 'ps-2' : 'ps-3',
+              suffix || isValid || hasError ? 'pe-2' : 'pe-3'
             )}
           />
 
           {/* Suffix / Status Icons */}
-          <div className="pr-3 flex items-center gap-2">
+          <div className="pe-3 flex items-center gap-2">
             {suffix}
             {isValid && (
               <Check className="w-4 h-4 text-[rgb(var(--action-secondary-fg))]" />
