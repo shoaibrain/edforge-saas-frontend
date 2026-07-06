@@ -35,6 +35,7 @@ export {
 
 // Hooks
 export { useDataTable } from './hooks/useDataTable'
+export { useDataTableLabels } from './useDataTableLabels'
 export {
   readPersistedTableState,
   usePersistTableState,

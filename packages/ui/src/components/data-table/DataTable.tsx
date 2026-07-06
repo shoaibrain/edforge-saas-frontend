@@ -9,6 +9,7 @@ import { DataTableEmpty } from './DataTableEmpty'
 import { DataTablePagination } from './DataTablePagination'
 import { DataTableToolbar } from './DataTableToolbar'
 import { resolveDataTableLabels } from './labels'
+import { useDataTableLabels } from './useDataTableLabels'
 import type {
   DataTableColumnMeta,
   DataTableProps,
@@ -70,7 +71,9 @@ export function DataTable<TData>({
   className,
   maxHeight,
 }: DataTableProps<TData>) {
-  const resolvedLabels = resolveDataTableLabels(labels)
+  // i18n-translated labels are the default; an explicit `labels` prop overrides.
+  const i18nLabels = useDataTableLabels()
+  const resolvedLabels = resolveDataTableLabels({ ...i18nLabels, ...labels })
   // Resolve prototype-shaped aliases onto the canonical props.
   const resolvedFacets: FacetedFilterConfig[] | undefined =
     facets ?? facetedFilters
