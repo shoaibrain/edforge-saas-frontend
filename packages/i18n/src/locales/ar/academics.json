@@ -44,7 +44,7 @@
     "attendance": "الحضور",
     "classes": "فصول",
     "termGpa": "المصطلح GPA",
-    "cumGpa": "النُطَف المَنَويّة. GPA"
+    "cumGpa": "المعدل التراكمي GPA"
   },
   "sections": {
     "attendanceTrend": "اتجاه الحضور",
@@ -520,7 +520,7 @@
     },
     "status": {
       "present": {
-        "label": "الحاضر",
+        "label": "حاضر",
         "short": "P"
       },
       "absent": {
@@ -532,11 +532,11 @@
         "short": "T"
       },
       "excused": {
-        "label": "معذرة",
+        "label": "بعذر",
         "short": "E"
       },
       "remote": {
-        "label": "بعيد",
+        "label": "عن بُعد",
         "short": "R"
       },
       "half_day": {
@@ -544,7 +544,7 @@
         "short": "H"
       },
       "early_departure": {
-        "label": "قسم مبكر.",
+        "label": "مغادرة مبكرة",
         "short": "ED"
       }
     },

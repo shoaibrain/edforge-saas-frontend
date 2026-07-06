@@ -46,7 +46,7 @@
     "kpi": {
       "totalInvoiced": "إجمالي الفاتورة",
       "collected": "تم جمعها",
-      "outstanding": "متميز",
+      "outstanding": "المستحق",
       "overdue": "متأخر",
       "invoiceCount": "{{count}} الفواتير",
       "paymentCount": "{{count}} المدفوعات",
@@ -64,7 +64,7 @@
       "title": "أداء التجميع",
       "percentCollected": "{{rate}}% تم جمعها",
       "collected": "تم جمعها",
-      "outstanding": "متميز",
+      "outstanding": "المستحق",
       "overdue": "متأخر",
       "byFeeType": "حسب نوع الرسوم",
       "typeCount": "{{count}} النوع",
@@ -118,7 +118,7 @@
     "title": "الفواتير",
     "description": "عرض وإدارة فواتير الرسوم",
     "manageDescription": "إنشاء وإصدار وإدارة فواتير الطلاب.",
-    "outstanding": "متميز",
+    "outstanding": "المستحق",
     "paid": "مدفوع",
     "overdue": "متأخر",
     "all": "جميع الفواتير",
@@ -157,7 +157,7 @@
     "bulkIssueSuccessWithSkipped": "تم إصدار فاتورة {{count}}. {{skipped}} تم تخطيه.",
     "bulkIssueSuccessWithSkipped_plural": "تم إصدار الفواتير {{count}}. {{skipped}} تم تخطيه.",
     "bulkIssueFailed": "فشل في إصدار الفواتير",
-    "overdueByDays": "متأخرة بحلول {{count}}د",
+    "overdueByDays": "متأخرة بـ {{count, isolate}} يومًا",
     "overdueBanner": "{{count}} الفاتورة متأخرة - {{amount}} غير محصلة",
     "overdueBanner_plural": "{{count}} الفواتير المتأخرة - {{amount}} غير محصلة",
     "overdueBannerRate": "معدل التحصيل هو {{rate}}%.",
@@ -247,9 +247,9 @@
       "noPaymentsYet": "لا توجد مدفوعات حتى الآن",
       "invoiceCancelled": "تم إلغاء الفاتورة",
       "settledInFull": "استقر بالكامل",
-      "outstandingBalance": "الرصيد المتميز",
+      "outstandingBalance": "الرصيد المستحق",
       "dueDate": "تاريخ الاستحقاق",
-      "daysLate": "{{days}}د متأخرا"
+      "daysLate": "متأخر بـ {{days, isolate}} يومًا"
     },
     "lineItems": {
       "qtyAt": "{{quantity, isolate}} × {{amount, isolate}}"
@@ -618,7 +618,7 @@
       "phase1Tooltip": "أراضي الأسلاك المضادة مع تكامل المعاينة المجمعة ؛ يتبع تصفية الرقائق متابعة العلاقات العامة",
       "phase2Tooltip": "القادمة في المرحلة الثانية - تتطلب البيانات الديموغرافية للطلاب",
       "segments": {
-        "outstanding": "رصيد متميز",
+        "outstanding": "رصيد مستحق",
         "new": "قبولات جديدة",
         "not-billed-this-period": "لم يتم إصدار فاتورة لهذه الفترة بعد",
         "transport": "مستخدمي النقل",
@@ -1158,7 +1158,7 @@
     "pageTitle": "حسابات الطلاب",
     "description": "عرض حسابات فواتير الطلاب والفواتير والمدفوعات وسجل دفتر الأستاذ.",
     "selectSchool": "اختر مدرسة لعرض حسابات الطلاب.",
-    "balance": "الرصيد المتميز",
+    "balance": "الرصيد المستحق",
     "totalPaid": "إجمالي المبلغ المدفوع",
     "lastPayment": "الدفعة الأخيرة",
     "ledger": "دفتر الحسابات",
@@ -1172,7 +1172,7 @@
     },
     "summary": {
       "totalStudents": "إجمالي الطلاب",
-      "outstanding": "متميز",
+      "outstanding": "المستحق",
       "fullyPaid": "مدفوعة بالكامل",
       "withBalance": "مع الرصيد",
       "accounts": "{{count}} الحساب",
