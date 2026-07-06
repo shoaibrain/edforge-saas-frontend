@@ -16,6 +16,13 @@ import {
 
 type LocaleObject = Record<string, unknown>;
 
+const PLURAL_SUFFIX = /_(zero|one|two|few|many|other|plural)$/;
+
+/** Strip a trailing CLDR plural suffix so plural variants compare by base key. */
+function pluralBase(key: string): string {
+  return key.replace(PLURAL_SUFFIX, "");
+}
+
 function getKeys(obj: LocaleObject, prefix = ""): string[] {
   const keys: string[] = [];
 
@@ -82,12 +89,18 @@ describe("locale parity", () => {
 
       it("localized keys have corresponding English keys", () => {
         const enKeys = new Set(getKeys(resourceFor("en", namespace)));
+        // Plural-aware: a locale may carry more CLDR plural forms than English
+        // (Arabic has zero/one/two/few/many/other), so a `X_few` key is valid as
+        // long as English has the same base. Compare on the plural-stripped base.
+        const enBaseKeys = new Set([...enKeys].map(pluralBase));
 
         for (const language of SUPPORTED_LANGUAGES.filter(
           (language) => language !== "en",
         )) {
           const localizedKeys = getKeys(resourceFor(language, namespace));
-          const extra = localizedKeys.filter((key) => !enKeys.has(key));
+          const extra = localizedKeys.filter(
+            (key) => !enKeys.has(key) && !enBaseKeys.has(pluralBase(key)),
+          );
 
           expect(
             extra,

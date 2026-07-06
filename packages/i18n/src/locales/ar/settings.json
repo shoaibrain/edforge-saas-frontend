@@ -286,13 +286,13 @@
   },
   "common": {
     "cancel": "إلغاء",
-    "change": "يتغير",
-    "create": "يخلق",
-    "delete": "يمسح",
+    "change": "تغيير",
+    "create": "إنشاء",
+    "delete": "حذف",
     "edit": "تحرير",
     "retry": "أعد المحاولة",
-    "save": "يحفظ",
-    "close": "يغلق",
+    "save": "حفظ",
+    "close": "إغلاق",
     "update": "تحديث",
     "tryAgain": "حاول ثانية",
     "saveChanges": "حفظ التغييرات",
@@ -300,8 +300,8 @@
   },
   "schoolRooms": {
     "title": "الغرف والمواقع",
-    "summary": "{{count}} غرفة · {{active}} نشط",
-    "summary_plural": "{{count}} الغرف · {{active}} نشط",
+    "summary": "{{count, isolate}} غرفة · {{active, isolate}} نشط",
+    "summary_plural": "{{count, isolate}} الغرف · {{active, isolate}} نشط",
     "actions": {
       "add": "أضف غرفة"
     },
@@ -324,7 +324,7 @@
     "table": {
       "room": "غرفة",
       "building": "مبنى",
-      "type": "يكتب",
+      "type": "نوع",
       "floor": "أرضية",
       "capacity": "سعة",
       "status": "حالة",
@@ -465,7 +465,7 @@
       "inactiveBullet": "سيتم ضبط المدرسة على حالة غير نشطة",
       "operationsBullet": "سيتم تعليق العمليات الأكاديمية",
       "reactivateBullet": "يمكن إعادة تنشيطها من صفحة تفاصيل المدرسة",
-      "confirmTypePrefix": "يكتب",
+      "confirmTypePrefix": "نوع",
       "confirmTypeSuffix": "للتأكيد"
     },
     "accessDenied": {
@@ -608,7 +608,7 @@
     "noAcademicYear": "لم يتم العثور على العام الدراسي. يرجى إنشاء عام دراسي أولاً في علامة التبويب \"السنوات الأكاديمية\".",
     "actions": {
       "sessions": "الجلسات",
-      "generate": "يولد"
+      "generate": "توليد"
     },
     "toasts": {
       "generated": "تم إنشاء {{totalDays}} أيام ({{instructionalDays}} تعليمية)"
@@ -643,7 +643,7 @@
       "eventType": "نوع الحدث",
       "otherAdvanced": "أخرى (متقدمة)…",
       "rawEventType": "نوع الحدث الخام",
-      "selectPlaceholder": "يختار...",
+      "selectPlaceholder": "اختيار...",
       "description": "وصف",
       "descriptionPlaceholder": "وصف اختياري (على سبيل المثال، Dashain Holiday)",
       "bellSchedule": "جدول الجرس",
@@ -700,7 +700,7 @@
       "addSession": "إضافة جلسة",
       "applyTemplate": "تطبيق القالب",
       "createSession": "إنشاء جلسة",
-      "use": "يستخدم"
+      "use": "استخدام"
     },
     "toasts": {
       "currentSet": "تم تعيين العام الدراسي كما هو الحال",
@@ -799,7 +799,7 @@
       "summary": "الامتحان: {{range}}",
       "edit": "تحرير نافذة الامتحان",
       "set": "ضبط نافذة الامتحان",
-      "rangeHelp": "يجب أن تكون مواعيد الامتحانات ضمن نطاق الجلسة ({{start}} – {{end}}). يؤدي الحفظ التلقائي إلى إنشاء علامات برتقالية لنافذة الاختبار في التقويم.",
+      "rangeHelp": "يجب أن تكون مواعيد الامتحانات ضمن نطاق الجلسة ({{start, isolate}} – {{end, isolate}}). يؤدي الحفظ التلقائي إلى إنشاء علامات برتقالية لنافذة الاختبار في التقويم.",
       "startDate": "تاريخ بدء الامتحان",
       "endDate": "تاريخ انتهاء الامتحان",
       "saveDates": "حفظ مواعيد الامتحانات",
@@ -908,7 +908,7 @@
     },
     "badges": {
       "academic": "أكاديمي",
-      "default": "تقصير",
+      "default": "افتراضي",
       "inactive": "غير نشط"
     },
     "examples": {
@@ -1113,7 +1113,7 @@
       "stateEducationAgency": "وكالة التعليم الحكومية",
       "localEducationAgency": "وكالة التعليم المحلية",
       "educationServiceCenter": "مركز الخدمات التعليمية",
-      "district": "يصرف",
+      "district": "منطقة",
       "serviceCenter": "مركز الخدمة",
       "serviceCenters": "مراكز الخدمات التعليمية"
     },
@@ -1136,7 +1136,7 @@
     },
     "actions": {
       "cancel": "إلغاء",
-      "delete": "يمسح",
+      "delete": "حذف",
       "edit": "تحرير",
       "setUpSea": "إعداد SEA",
       "editSea": "تحرير SEA",
@@ -1246,7 +1246,7 @@
       "leaCategoryHelp": "تصنيف هذه المنطقة. المستقلة هي الأكثر شيوعًا في المناطق التعليمية القياسية.",
       "charterStatusHelp": "ينطبق فقط على المنظمات من نوع الميثاق.",
       "parentLeaHelp": "خياري. مطلوب فقط إذا كانت هذه المنطقة تقدم تقاريرها من خلال منطقة أخرى، مثل شبكات الميثاق.",
-      "select": "يختار...",
+      "select": "اختيار...",
       "none": "لا أحد",
       "categories": "فئات",
       "categoryHelp": "Ed-Fi واصف فئة المنظمة. يحدد نوع المنظمة التعليمية.",
@@ -1259,7 +1259,7 @@
       "noTelephones": "لم تتم إضافة أي أرقام هواتف.",
       "identificationCodes": "رموز التعريف",
       "noIdentificationCodes": "لم تتم إضافة أي رموز تعريف.",
-      "type": "يكتب",
+      "type": "نوع",
       "street": "شارع",
       "aptSuite": "شقة/جناح",
       "city": "مدينة",
@@ -1284,7 +1284,7 @@
       "new": "جديد",
       "Reopened": "أعيد فتحه",
       "Future": "مستقبل",
-      "setup": "يثبت",
+      "setup": "إعداد",
       "suspended": "مع وقف التنفيذ"
     },
     "descriptors": {
@@ -1359,7 +1359,7 @@
       "members": {
         "title": "الأعضاء ({{count}})",
         "addMember": "إضافة عضو",
-        "type": "يكتب",
+        "type": "نوع",
         "districtOption": "المنطقة (LEA)",
         "serviceCenterOption": "مركز الخدمة (ESC)",
         "organization": "منظمة",
@@ -1440,7 +1440,7 @@
         "staff": "طاقم عمل"
       },
       "actions": {
-        "copy": "ينسخ",
+        "copy": "نسخ",
         "copyAria": "انسخ JSON إلى الحافظة",
         "download": "تحميل",
         "downloadAria": "قم بتنزيل الملف JSON"

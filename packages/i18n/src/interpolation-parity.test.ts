@@ -9,7 +9,10 @@ import {
 
 type LocaleObject = Record<string, unknown>;
 
-const INTERPOLATION_PATTERN = /{{-?\s*([\w.]+)\s*}}/g;
+// Captures the variable name, tolerating an optional i18next format suffix such
+// as `{{amount, isolate}}` (the RTL bidi-isolation format) so annotated
+// placeholders still compare equal across locales.
+const INTERPOLATION_PATTERN = /{{-?\s*([\w.]+)(?:\s*,\s*[^}]+)?\s*}}/g;
 
 function getLeafKeys(obj: LocaleObject, prefix = ""): string[] {
   const keys: string[] = [];
