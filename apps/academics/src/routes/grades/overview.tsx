@@ -462,7 +462,7 @@ export function GradeOverview({ schoolId, academicYearId, policyWeights, onBack 
                     height={8}
                   />
                 </div>
-                <span className="w-20 text-right text-xs tabular-nums text-[rgb(var(--text-secondary))]">
+                <span className="w-20 text-end text-xs tabular-nums text-[rgb(var(--text-secondary))]">
                   {formatNumber(d.count)} · {d.pct}%
                 </span>
               </div>
@@ -480,24 +480,24 @@ export function GradeOverview({ schoolId, academicYearId, policyWeights, onBack 
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[rgb(var(--border-primary)/0.25)] text-left text-2xs uppercase tracking-wide text-[rgb(var(--text-tertiary))]">
+                <tr className="border-b border-[rgb(var(--border-primary)/0.25)] text-start text-2xs uppercase tracking-wide text-[rgb(var(--text-tertiary))]">
                   <th className="pb-2 font-medium">{t('gradesModule.overview.courses.course')}</th>
                   <th className="pb-2 text-center font-medium">{t('gradesModule.overview.courses.sections')}</th>
                   <th className="pb-2 text-center font-medium">{t('gradesModule.overview.courses.students')}</th>
-                  <th className="pb-2 text-right font-medium">{t('gradesModule.overview.courses.avg')}</th>
-                  <th className="pb-2 text-right font-medium">{t('gradesModule.overview.courses.gpa')}</th>
-                  <th className="pb-2 text-right font-medium">{t('gradesModule.overview.courses.pass')}</th>
+                  <th className="pb-2 text-end font-medium">{t('gradesModule.overview.courses.avg')}</th>
+                  <th className="pb-2 text-end font-medium">{t('gradesModule.overview.courses.gpa')}</th>
+                  <th className="pb-2 text-end font-medium">{t('gradesModule.overview.courses.pass')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[rgb(var(--border-primary)/0.15)]">
                 {sortedCourses.map((c) => (
                   <tr key={c.courseId}>
-                    <td className="py-2 pr-2 text-[rgb(var(--text-primary))]">{c.courseName}</td>
+                    <td className="py-2 pe-2 text-[rgb(var(--text-primary))]">{c.courseName}</td>
                     <td className="py-2 text-center tabular-nums text-[rgb(var(--text-secondary))]">{formatNumber(c.sectionCount)}</td>
                     <td className="py-2 text-center tabular-nums text-[rgb(var(--text-secondary))]">{formatNumber(c.studentCount)}</td>
-                    <td className={`py-2 text-right font-semibold tabular-nums ${toneText(c.avgGrade)}`}>{c.avgGrade.toFixed(1)}%</td>
-                    <td className="py-2 text-right tabular-nums text-[rgb(var(--text-secondary))]">{c.avgGpa.toFixed(2)}</td>
-                    <td className={`py-2 text-right font-semibold tabular-nums ${toneText(c.passRate)}`}>{c.passRate.toFixed(0)}%</td>
+                    <td className={`py-2 text-end font-semibold tabular-nums ${toneText(c.avgGrade)}`}>{c.avgGrade.toFixed(1)}%</td>
+                    <td className="py-2 text-end tabular-nums text-[rgb(var(--text-secondary))]">{c.avgGpa.toFixed(2)}</td>
+                    <td className={`py-2 text-end font-semibold tabular-nums ${toneText(c.passRate)}`}>{c.passRate.toFixed(0)}%</td>
                   </tr>
                 ))}
               </tbody>
@@ -597,7 +597,7 @@ export function GradeOverview({ schoolId, academicYearId, policyWeights, onBack 
                     <span className="min-w-0 flex-1 truncate text-sm text-[rgb(var(--text-primary))]">{s.studentName}</span>
                     <span className="hidden min-w-0 flex-1 truncate text-xs text-[rgb(var(--text-tertiary))] sm:block">{s.courseName}</span>
                     <StatusPill variant={pill.variant} label={pill.label} />
-                    <span className="w-20 text-right text-xs tabular-nums text-[rgb(var(--text-secondary))]">
+                    <span className="w-20 text-end text-xs tabular-nums text-[rgb(var(--text-secondary))]">
                       {s.tag === 'not-graded' ? '—' : `${s.numericGrade.toFixed(0)}% ${s.letterGrade ?? ''}`}
                     </span>
                   </div>

@@ -104,7 +104,7 @@ export function SectionsToRecord({
         <div className="flex flex-col">
           <span className="text-3xl font-bold leading-none tabular-nums text-[rgb(var(--text-primary))]">
             {formatNumber(summary.covWeightedPct)}
-            <span className="ml-0.5 text-lg font-semibold text-[rgb(var(--text-tertiary))]">%</span>
+            <span className="ms-0.5 text-lg font-semibold text-[rgb(var(--text-tertiary))]">%</span>
           </span>
           <span className="mt-1 whitespace-nowrap text-2xs text-[rgb(var(--text-tertiary))]">
             {t('attendance.dashboard.sections.coveredToday')}
@@ -131,14 +131,14 @@ export function SectionsToRecord({
 
         {/* Inline stats */}
         <div className="flex">
-          <div className="flex flex-col gap-0.5 pr-4">
+          <div className="flex flex-col gap-0.5 pe-4">
             <span className="text-lg font-bold leading-none tabular-nums text-[rgb(var(--text-primary))]">
               {formatNumber(summary.studentsRecorded)}
               <span className="text-sm font-medium text-[rgb(var(--text-tertiary))]">/{formatNumber(summary.studentsTotal)}</span>
             </span>
             <span className="text-2xs text-[rgb(var(--text-tertiary))]">{t('attendance.dashboard.sections.studentsCovered')}</span>
           </div>
-          <div className="flex flex-col gap-0.5 border-l border-[rgb(var(--border-primary)/0.3)] pl-4">
+          <div className="flex flex-col gap-0.5 border-s border-[rgb(var(--border-primary)/0.3)] ps-4">
             <span className="text-lg font-bold leading-none tabular-nums text-[rgb(var(--state-success-fg))]">
               {formatNumber(Math.round(summary.recordedRate))}%
             </span>

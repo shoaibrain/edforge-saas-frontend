@@ -44,10 +44,10 @@ export function AcademicYearLabel({ context }: AcademicYearLabelProps) {
           </>
         )}
         {isBetweenTerms && (
-          <span className="ml-1 opacity-70">(Break)</span>
+          <span className="ms-1 opacity-70">(Break)</span>
         )}
         {termProgressPercent != null && (
-          <span className="ml-0.5 opacity-70">&middot; {termProgressPercent}%</span>
+          <span className="ms-0.5 opacity-70">&middot; {termProgressPercent}%</span>
         )}
       </span>
     </span>

@@ -121,7 +121,7 @@ export function RecentInvoicesCard({
                 </div>
 
                 {/* Amount */}
-                <div className="text-right flex-shrink-0">
+                <div className="text-end flex-shrink-0">
                   <div className="text-xs font-semibold text-[rgb(var(--text-secondary))]">
                     {format(invoice.grandTotal, { decimals: 0 })}
                   </div>

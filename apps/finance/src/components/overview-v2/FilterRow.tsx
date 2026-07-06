@@ -165,7 +165,7 @@ export function FilterRow({
           </button>
         )}
 
-        <div className="ml-auto">
+        <div className="ms-auto">
           <button
             onClick={onExport}
             disabled={isExporting}

@@ -96,7 +96,7 @@ function StudentInvoiceList({
     return (
       <div className="flex items-center justify-center py-6">
         <Loader2 className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] animate-spin" />
-        <span className="ml-2 text-sm text-[rgb(var(--text-tertiary))]">
+        <span className="ms-2 text-sm text-[rgb(var(--text-tertiary))]">
           {t('recordPayment.loadingInvoices')}
         </span>
       </div>
@@ -129,7 +129,7 @@ function StudentInvoiceList({
                 `${invoice.invoiceNumber} - ${invoice.studentName}`,
               )
             }
-            className={`w-full text-left px-3 py-2.5 rounded-lg border transition-colors ${
+            className={`w-full text-start px-3 py-2.5 rounded-lg border transition-colors ${
               isSelected
                 ? 'border-[rgb(var(--border-focus))] bg-[rgb(var(--state-info-bg)/0.18)]  border-[rgb(var(--border-focus))]'
                 : 'border-[rgb(var(--border-primary))] hover:bg-[rgb(var(--background-secondary))]'
@@ -286,7 +286,7 @@ export default function RecordPaymentPage() {
             {t('recordPayment.successDescription')}
           </p>
           <Button onClick={handleRecordAnother}>
-            <RotateCcw className="w-4 h-4 mr-1.5" />
+            <RotateCcw className="w-4 h-4 me-1.5" />
             {t('recordPayment.recordAnother')}
           </Button>
         </div>
@@ -443,7 +443,7 @@ export default function RecordPaymentPage() {
             <div className="space-y-1.5">
               <div className="flex justify-between text-sm text-[rgb(var(--text-secondary))]">
                 <span>{t('invoices.invoiceNumber')}</span>
-                <span className="font-medium text-[rgb(var(--text-primary))] max-w-[60%] truncate text-right">
+                <span className="font-medium text-[rgb(var(--text-primary))] max-w-[60%] truncate text-end">
                   {invoiceLabel || invoiceId || '--'}
                 </span>
               </div>
@@ -482,9 +482,9 @@ export default function RecordPaymentPage() {
           className="w-full"
         >
           {recordMutation.isPending ? (
-            <Loader2 className="w-4 h-4 animate-spin mr-1.5" />
+            <Loader2 className="w-4 h-4 animate-spin me-1.5" />
           ) : (
-            <Banknote className="w-4 h-4 mr-1.5" />
+            <Banknote className="w-4 h-4 me-1.5" />
           )}
           {t('recordPayment.title')}
         </Button>

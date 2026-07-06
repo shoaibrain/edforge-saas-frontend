@@ -91,7 +91,7 @@ export function GuardianCell({ guardians }: { guardians?: GuardianDto[] }) {
           lastName: primary.lastName,
           relationship: relationshipLabel(primary.relationship, t),
         })}
-        className="flex items-center gap-2.5 min-w-0 text-left rounded-md focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))]"
+        className="flex items-center gap-2.5 min-w-0 text-start rounded-md focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus))]"
       >
         {/* Stacked avatars — primary leftmost and on top (descending z-index) */}
         <div className="flex -space-x-2 flex-shrink-0">

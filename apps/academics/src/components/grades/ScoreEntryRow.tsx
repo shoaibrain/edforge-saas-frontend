@@ -52,7 +52,7 @@ export function ScoreEntryRow({
           placeholder="—"
           aria-label={t('gradesModule.gradebook.scoreForStudent', { studentName })}
           aria-invalid={invalid || undefined}
-          className={`w-20 rounded-lg border bg-[rgb(var(--background-secondary))] px-2.5 py-1.5 text-sm tabular-nums text-right focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] disabled:opacity-50 ${
+          className={`w-20 rounded-lg border bg-[rgb(var(--background-secondary))] px-2.5 py-1.5 text-sm tabular-nums text-end focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] disabled:opacity-50 ${
             invalid
               ? 'border-[rgb(var(--state-danger-border))] text-[rgb(var(--state-danger-fg))]'
               : 'border-[rgb(var(--border-primary))] text-[rgb(var(--text-primary))]'

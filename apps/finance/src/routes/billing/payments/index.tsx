@@ -207,9 +207,9 @@ function VoidPaymentDialog({
             className="flex-1 py-2 rounded-xl bg-[rgb(var(--action-danger-bg))] text-[rgb(var(--action-primary-fg))] text-sm font-semibold hover:brightness-95 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isPending ? (
-              <Loader2 className="w-4 h-4 animate-spin inline mr-1.5" />
+              <Loader2 className="w-4 h-4 animate-spin inline me-1.5" />
             ) : (
-              <Ban className="w-4 h-4 inline mr-1.5" />
+              <Ban className="w-4 h-4 inline me-1.5" />
             )}
             {t('paymentsList.voidPayment')}
           </button>
@@ -420,7 +420,7 @@ function RefundPaymentDialog({
             className="flex-1 py-2 rounded-xl bg-[rgb(var(--state-warning-fg))] text-[rgb(var(--action-primary-fg))] text-sm font-semibold hover:brightness-95 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isPending ? (
-              <Loader2 className="w-4 h-4 animate-spin inline mr-1.5" />
+              <Loader2 className="w-4 h-4 animate-spin inline me-1.5" />
             ) : null}
             {parsedAmount > 0 && parsedAmount < payment.amount
               ? t('paymentsList.refundPartial')

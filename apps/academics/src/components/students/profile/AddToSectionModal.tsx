@@ -175,12 +175,12 @@ export function AddToSectionModal({
         >
           {enrollStudentMutation.isPending ? (
             <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              <Loader2 className="w-4 h-4 me-2 animate-spin" />
               {t('actions.adding')}
             </>
           ) : (
             <>
-              <BookOpen className="w-4 h-4 mr-2" />
+              <BookOpen className="w-4 h-4 me-2" />
               {t('actions.addToSection')}
             </>
           )}

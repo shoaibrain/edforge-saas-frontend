@@ -217,7 +217,7 @@ export function AddGuardianModal({
               type="tel"
               {...register('phone')}
               prefix={
-                <span className="border-r border-[rgb(var(--border-primary))] pr-2 text-[rgb(var(--text-secondary))]">
+                <span className="border-e border-[rgb(var(--border-primary))] pe-2 text-[rgb(var(--text-secondary))]">
                   {phoneFmt.dialCode}
                 </span>
               }
@@ -285,12 +285,12 @@ export function AddGuardianModal({
           >
             {isSubmitting ? (
               <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                <Loader2 className="w-4 h-4 me-2 animate-spin" />
                 {t('actions.adding')}
               </>
             ) : (
               <>
-                <Users className="w-4 h-4 mr-2" />
+                <Users className="w-4 h-4 me-2" />
                 {t('actions.addGuardian')}
               </>
             )}

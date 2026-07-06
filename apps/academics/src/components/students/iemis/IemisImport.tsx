@@ -693,7 +693,7 @@ function PreviewView({
                 <div className="mt-1 text-xs text-[rgb(var(--state-info-fg))] ">
                   <b>{eligibleAcademicYear.name}</b>
                   {eligibleAcademicYear.isCurrent && (
-                    <span className="ml-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-[rgb(var(--state-info-bg)/0.18)]  text-[rgb(var(--state-info-fg))] ">
+                    <span className="ms-1 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-[rgb(var(--state-info-bg)/0.18)]  text-[rgb(var(--state-info-fg))] ">
                       {t('iemisImport.enrollOption.current')}
                     </span>
                   )}

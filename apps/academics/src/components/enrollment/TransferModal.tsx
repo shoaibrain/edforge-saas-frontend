@@ -107,7 +107,7 @@ export function TransferModal({
           onClick={handleSubmit}
           disabled={transferMutation.isPending || !destinationSchoolId}
         >
-          {transferMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+          {transferMutation.isPending && <Loader2 className="w-4 h-4 me-2 animate-spin" />}
           Transfer Student
         </Button>
       </ModalFooter>

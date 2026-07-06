@@ -115,7 +115,7 @@ export function RosterToolbar({
 
       {/* Bulk actions — pushed to the right end of the same line */}
       {canBulk && (
-        <div className="ml-auto flex items-center gap-1.5">
+        <div className="ms-auto flex items-center gap-1.5">
           <button
             type="button"
             onClick={onMarkAllPresent}

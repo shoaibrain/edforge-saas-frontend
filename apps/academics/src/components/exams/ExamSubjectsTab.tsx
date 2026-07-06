@@ -356,7 +356,7 @@ export function ExamSubjectsTab({
                   value={c.fullMarks}
                   placeholder={t('examModule.subjects.fullPlaceholder')}
                   onChange={(e) => setComponent(i, { fullMarks: e.target.value })}
-                  className="w-20 rounded-lg border border-border-secondary bg-surface-primary px-2 py-1 text-sm text-text-primary text-right"
+                  className="w-20 rounded-lg border border-border-secondary bg-surface-primary px-2 py-1 text-sm text-text-primary text-end"
                   aria-label={t('examModule.subjects.componentFullAria', { index: formatNumber(i + 1) })}
                 />
                 <span className="text-text-tertiary text-xs">/ {t('examModule.subjects.passShort')}</span>
@@ -366,7 +366,7 @@ export function ExamSubjectsTab({
                   value={c.passMarks}
                   placeholder={t('examModule.subjects.passPlaceholder')}
                   onChange={(e) => setComponent(i, { passMarks: e.target.value })}
-                  className="w-20 rounded-lg border border-border-secondary bg-surface-primary px-2 py-1 text-sm text-text-primary text-right"
+                  className="w-20 rounded-lg border border-border-secondary bg-surface-primary px-2 py-1 text-sm text-text-primary text-end"
                   aria-label={t('examModule.subjects.componentPassAria', { index: formatNumber(i + 1) })}
                 />
                 <button

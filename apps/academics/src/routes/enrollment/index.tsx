@@ -325,7 +325,7 @@ export function EnrollmentModule() {
                       startDate={activeYearObj.startDate}
                       endDate={activeYearObj.endDate}
                     />
-                    <div className="ml-auto flex items-center gap-3 text-xs text-[rgb(var(--text-tertiary))]">
+                    <div className="ms-auto flex items-center gap-3 text-xs text-[rgb(var(--text-tertiary))]">
                       <span>
                         <strong className="text-[rgb(var(--text-primary))]">{summary?.totalEnrolled != null ? formatNumber(summary.totalEnrolled) : '--'}</strong> {t('enrollmentModule.summary.enrolled')}
                       </span>

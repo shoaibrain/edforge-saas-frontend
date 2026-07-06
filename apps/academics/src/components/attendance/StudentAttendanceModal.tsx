@@ -401,13 +401,13 @@ export function StudentAttendanceModal({
                             <table className="w-full text-sm">
                               <thead>
                                 <tr className="border-b border-border-secondary">
-                                  <th className="text-left py-1.5 pr-4 text-text-tertiary font-medium text-xs">
+                                  <th className="text-start py-1.5 pe-4 text-text-tertiary font-medium text-xs">
                                     {t('attendance.modal.date')}
                                   </th>
-                                  <th className="text-left py-1.5 px-4 text-text-tertiary font-medium text-xs">
+                                  <th className="text-start py-1.5 px-4 text-text-tertiary font-medium text-xs">
                                     {t('attendance.modal.status')}
                                   </th>
-                                  <th className="text-left py-1.5 pl-4 text-text-tertiary font-medium text-xs">
+                                  <th className="text-start py-1.5 ps-4 text-text-tertiary font-medium text-xs">
                                     {t('attendance.modal.notes')}
                                   </th>
                                 </tr>
@@ -420,7 +420,7 @@ export function StudentAttendanceModal({
                                       key={record.date}
                                       className="border-b border-border-secondary last:border-b-0"
                                     >
-                                      <td className="py-2 pr-4 text-text-primary text-xs">
+                                      <td className="py-2 pe-4 text-text-primary text-xs">
                                         {dateLabel}
                                       </td>
                                       <td className="py-2 px-4">
@@ -429,7 +429,7 @@ export function StudentAttendanceModal({
                                           variant="compact"
                                         />
                                       </td>
-                                      <td className="py-2 pl-4 text-text-secondary text-xs truncate max-w-40">
+                                      <td className="py-2 ps-4 text-text-secondary text-xs truncate max-w-40">
                                         {record.notes || '—'}
                                       </td>
                                     </tr>

@@ -296,7 +296,7 @@ function FeeRow({
               max={100}
               value={disc}
               onChange={(e) => setDisc(Number(e.target.value) || 0)}
-              className="w-12 bg-transparent text-xs text-right outline-none tabular-nums"
+              className="w-12 bg-transparent text-xs text-end outline-none tabular-nums"
             />
           </div>
         )}
@@ -384,7 +384,7 @@ function CustomLineItems({
           disabled={customLines.length >= 10}
           className="text-xs"
         >
-          <Plus className="w-3 h-3 mr-1" /> {t('bulkGenerate.step2.addLine')}
+          <Plus className="w-3 h-3 me-1" /> {t('bulkGenerate.step2.addLine')}
         </Button>
       </div>
       {customLines.length === 0 ? (
@@ -407,7 +407,7 @@ function CustomLineItems({
                 placeholder="0"
                 value={line.amount}
                 onChange={(e) => update(i, { amount: e.target.value })}
-                className="w-28 text-sm font-mono text-right bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] rounded px-2 py-1 outline-none focus:ring-2 focus:ring-[rgb(var(--accent-strong))] focus:border-transparent"
+                className="w-28 text-sm font-mono text-end bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] rounded px-2 py-1 outline-none focus:ring-2 focus:ring-[rgb(var(--accent-strong))] focus:border-transparent"
               />
               <button
                 type="button"

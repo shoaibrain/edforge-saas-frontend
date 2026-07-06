@@ -231,7 +231,7 @@ function SearchBar({ value, onChange }: { value: string; onChange: (v: string) =
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={t('bulkGenerate.step1.searchPlaceholder')}
-        className="w-full pl-9 pr-3 py-2 text-sm rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-strong))] focus:border-transparent"
+        className="w-full ps-9 pe-3 py-2 text-sm rounded-md border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--accent-strong))] focus:border-transparent"
       />
     </div>
   )
@@ -258,7 +258,7 @@ function SegmentChips({
   const { t } = useTranslation('payments')
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <span className={/* allow-arbitrary-spacing: dense bulk-wizard label; pre-token-sweep */ "text-[11px] font-medium uppercase tracking-wider text-[rgb(var(--text-tertiary))] mr-1"}>
+      <span className={/* allow-arbitrary-spacing: dense bulk-wizard label; pre-token-sweep */ "text-[11px] font-medium uppercase tracking-wider text-[rgb(var(--text-tertiary))] me-1"}>
         {t('bulkGenerate.step1.quickSegments')}
       </span>
       {SEGMENTS.map(seg => {
@@ -470,7 +470,7 @@ function StudentRow({
       }}
       className={[
         'flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-[rgb(var(--background-secondary))]',
-        compact ? 'pl-12' : '',
+        compact ? 'ps-12' : '',
         selected ? 'bg-[rgb(var(--accent-soft))]/30' : '',
       ].join(' ')}
     >

@@ -32,7 +32,7 @@ const AnimatedInput = React.forwardRef<HTMLInputElement, AnimatedInputProps>(
       <div className="space-y-1.5">
         <label className="block text-sm font-medium text-[rgb(var(--text-secondary))]">
           {label}
-          {required && <span className="text-rust-500 ml-0.5">*</span>}
+          {required && <span className="text-rust-500 ms-0.5">*</span>}
         </label>
         <Input
           ref={ref}
@@ -72,7 +72,7 @@ function AnimatedSelect({ label, error, required, options, value, onChange }: An
     <div className="space-y-1.5">
       <label className="block text-sm font-medium text-[rgb(var(--text-secondary))]">
         {label}
-        {required && <span className="text-rust-500 ml-0.5">*</span>}
+        {required && <span className="text-rust-500 ms-0.5">*</span>}
       </label>
       <Select
         options={selectableOptions}

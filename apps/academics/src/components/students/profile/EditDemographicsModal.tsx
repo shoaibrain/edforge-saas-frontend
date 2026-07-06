@@ -331,11 +331,11 @@ export function EditDemographicsModal({
           <Button type="submit" disabled={isSubmitting || !formState.isDirty}>
             {isSubmitting ? (
               <>
-                <Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> {t('actions.saving')}
+                <Loader2 className="w-4 h-4 me-1.5 animate-spin" /> {t('actions.saving')}
               </>
             ) : (
               <>
-                <Save className="w-4 h-4 mr-1.5" /> {t('actions.saveChanges')}
+                <Save className="w-4 h-4 me-1.5" /> {t('actions.saveChanges')}
               </>
             )}
           </Button>

@@ -154,7 +154,7 @@ export function InvoiceActivityTimeline({
                 <p className="text-sm font-medium text-[rgb(var(--text-primary))]">{titleOf(e)}</p>
                 {sub && <p className="mt-0.5 text-xs text-[rgb(var(--text-tertiary))]">{sub}</p>}
               </div>
-              <div className="whitespace-nowrap pt-1 text-right text-xs text-[rgb(var(--text-tertiary))]">
+              <div className="whitespace-nowrap pt-1 text-end text-xs text-[rgb(var(--text-tertiary))]">
                 {formatDate(e.at, settings)}
                 {bs && (
                   <span className="block font-mono text-2xs text-[rgb(var(--text-disabled))]">

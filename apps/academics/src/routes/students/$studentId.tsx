@@ -126,7 +126,7 @@ function ProfileErrorState({ onRetry }: { onRetry: () => void }) {
           {t('error.failedToLoadDescription')}
         </p>
         <Button onClick={onRetry} variant="outline">
-          <RefreshCw className="w-4 h-4 mr-2" />
+          <RefreshCw className="w-4 h-4 me-2" />
           {t('error.retry')}
         </Button>
       </div>

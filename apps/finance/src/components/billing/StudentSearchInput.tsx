@@ -71,7 +71,7 @@ export function StudentSearchInput({
       <div className="flex items-center gap-2 px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))]">
         <div className="flex-1 min-w-0">
           <span className="text-[rgb(var(--text-primary))] font-medium">{value.studentName}</span>
-          <span className="text-[rgb(var(--text-tertiary))] ml-2 text-xs">
+          <span className="text-[rgb(var(--text-tertiary))] ms-2 text-xs">
             <UuidBadge value={value.studentId} />
           </span>
         </div>
@@ -100,7 +100,7 @@ export function StudentSearchInput({
           }}
           onFocus={() => search.length >= 2 && setIsOpen(true)}
           placeholder={placeholder ?? t('studentSearch.placeholder')}
-          className="w-full pl-9 pr-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
+          className="w-full ps-9 pe-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
         />
       </div>
 
@@ -109,7 +109,7 @@ export function StudentSearchInput({
           {isLoading ? (
             <div className="flex items-center justify-center py-4">
               <Loader2 className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] animate-spin" />
-              <span className="ml-2 text-xs text-[rgb(var(--text-tertiary))]">{t('studentSearch.searching')}</span>
+              <span className="ms-2 text-xs text-[rgb(var(--text-tertiary))]">{t('studentSearch.searching')}</span>
             </div>
           ) : students.length === 0 ? (
             <div className="py-4 text-center text-xs text-[rgb(var(--text-tertiary))]">
@@ -122,7 +122,7 @@ export function StudentSearchInput({
                   key={student.studentId}
                   type="button"
                   onClick={() => handleSelect(student)}
-                  className="flex items-center gap-3 w-full px-3 py-2.5 text-left hover:bg-[rgb(var(--background-secondary))] transition-colors"
+                  className="flex items-center gap-3 w-full px-3 py-2.5 text-start hover:bg-[rgb(var(--background-secondary))] transition-colors"
                 >
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-medium text-[rgb(var(--text-primary))]">

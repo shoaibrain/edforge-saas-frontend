@@ -177,7 +177,7 @@ export function BulkAdjustBalanceDrawer({
             }}
             aria-hidden="true"
           />
-          <div className="fixed inset-y-0 right-0 flex max-w-full pl-10">
+          <div className="fixed inset-y-0 right-0 flex max-w-full ps-10">
             <motion.div
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
@@ -185,7 +185,7 @@ export function BulkAdjustBalanceDrawer({
               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
               className="w-screen max-w-xl h-full"
             >
-              <div className="flex h-full flex-col bg-[rgb(var(--background-primary))] shadow-xl border-l border-[rgb(var(--border-primary))]">
+              <div className="flex h-full flex-col bg-[rgb(var(--background-primary))] shadow-xl border-s border-[rgb(var(--border-primary))]">
                 <div className="flex items-center justify-between px-6 py-4 border-b border-[rgb(var(--border-primary))]">
                   <div className="flex items-center gap-3 min-w-0">
                     <div className="p-2 rounded-lg bg-[rgb(var(--state-warning-bg)/0.18)] flex-shrink-0">

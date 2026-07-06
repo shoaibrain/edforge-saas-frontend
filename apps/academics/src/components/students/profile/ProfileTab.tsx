@@ -237,7 +237,7 @@ export function ProfileTab({ student }: ProfileTabProps) {
                   <span>
                     <DateDisplay date={student.dateOfBirth} format="long" />
                     {age !== null && (
-                      <span className="text-text-tertiary ml-1">({t('ageLabel', { age })})</span>
+                      <span className="text-text-tertiary ms-1">({t('ageLabel', { age })})</span>
                     )}
                   </span>
                 ) : '••••••••'

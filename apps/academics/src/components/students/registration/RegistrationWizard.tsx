@@ -469,7 +469,7 @@ function ContextSidebar() {
                 <span className={`text-3xs ${progressLabelCls}`}>
                   {step.title}
                 </span>
-                <span className={`ml-auto text-4xs ${status === 'completed' ? 'text-[rgb(var(--accent-enrollment-text))]' : status === 'current' ? 'text-[rgb(var(--text-tertiary))]' : 'text-[rgb(var(--text-disabled))]'}`}>
+                <span className={`ms-auto text-4xs ${status === 'completed' ? 'text-[rgb(var(--accent-enrollment-text))]' : status === 'current' ? 'text-[rgb(var(--text-tertiary))]' : 'text-[rgb(var(--text-disabled))]'}`}>
                   {status === 'completed' ? t('enrollmentModule.wizard.sidebar.done') : status === 'current' ? t('enrollmentModule.wizard.sidebar.current') : ''}
                 </span>
               </div>

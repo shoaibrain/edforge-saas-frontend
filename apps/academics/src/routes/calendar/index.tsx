@@ -157,7 +157,7 @@ function AcademicYearCard({
             {startDate} — {endDate}
           </p>
         </div>
-        <div className="flex items-center gap-2 ml-3 flex-shrink-0">
+        <div className="flex items-center gap-2 ms-3 flex-shrink-0">
           <AcademicYearStatusBadge status={year.status} />
           {year.isCurrent && (
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-[rgb(var(--state-success-bg)/0.18)] dark:bg-[rgb(var(--state-success-fg)/0.2)] text-[rgb(var(--state-success-fg))] ">
@@ -177,7 +177,7 @@ function AcademicYearCard({
             disabled={isSettingCurrent}
             isLoading={isSettingCurrent}
           >
-            <Star className="w-3.5 h-3.5 mr-1.5" />
+            <Star className="w-3.5 h-3.5 me-1.5" />
             {t('calendarModule.actions.setCurrent')}
           </Button>
         )}
@@ -189,7 +189,7 @@ function AcademicYearCard({
             disabled={isUpdatingStatus}
             isLoading={isUpdatingStatus}
           >
-            <ChevronRight className="w-3.5 h-3.5 mr-1" />
+            <ChevronRight className="w-3.5 h-3.5 me-1" />
             {actionLabel}
           </Button>
         )}
@@ -284,7 +284,7 @@ function ErrorState({ onRetry }: { onRetry: () => void }) {
           {t('calendarModule.error.description')}
         </p>
         <Button onClick={onRetry} variant="outline">
-          <RefreshCw className="w-4 h-4 mr-2" />
+          <RefreshCw className="w-4 h-4 me-2" />
           {t('calendarModule.error.retry')}
         </Button>
       </div>

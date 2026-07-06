@@ -87,7 +87,7 @@ export function FeeStructureList({
         cell: ({ row }) => {
           const fee = row.original;
           return (
-            <div className="text-right flex flex-col gap-0.5">
+            <div className="text-end flex flex-col gap-0.5">
               <span className="text-sm font-semibold text-[rgb(var(--text-primary))] tabular-nums">
                 {formatCompact(fee.amount)}
               </span>

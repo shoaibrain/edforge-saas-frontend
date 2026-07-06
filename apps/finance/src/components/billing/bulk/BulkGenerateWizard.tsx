@@ -342,7 +342,7 @@ export function BulkGenerateWizard({
   if (studentsQuery.isLoading || feesQuery.isLoading || academicYearsQuery.isLoading) {
     return (
       <div className="flex items-center justify-center py-12 text-sm text-[rgb(var(--text-tertiary))]">
-        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+        <Loader2 className="w-4 h-4 me-2 animate-spin" />
         {t('bulkGenerate.loadingRoster')}
       </div>
     )
@@ -451,11 +451,11 @@ export function BulkGenerateWizard({
       <div className="flex items-center justify-between pt-4 border-t border-[rgb(var(--border-primary))]">
         {step === 0 ? (
           <Button variant="ghost" onClick={onCancel}>
-            <X className="w-4 h-4 mr-1" /> {t('actions.cancel')}
+            <X className="w-4 h-4 me-1" /> {t('actions.cancel')}
           </Button>
         ) : (
           <Button variant="outline" onClick={goBack}>
-            <ChevronLeft className="w-4 h-4 mr-1" /> {t('actions.back')}
+            <ChevronLeft className="w-4 h-4 me-1" /> {t('actions.back')}
           </Button>
         )}
 
@@ -471,7 +471,7 @@ export function BulkGenerateWizard({
           </span>
           {step < 3 ? (
             <Button onClick={goNext} disabled={!canAdvanceFromStep[step]}>
-              {t('actions.next')} <ChevronRight className="w-4 h-4 ml-1" />
+              {t('actions.next')} <ChevronRight className="w-4 h-4 ms-1" />
             </Button>
           ) : (
             <Button
@@ -486,12 +486,12 @@ export function BulkGenerateWizard({
             >
               {generateMutation.isPending ? (
                 <>
-                  <Loader2 className="w-4 h-4 mr-1 animate-spin" />
+                  <Loader2 className="w-4 h-4 me-1 animate-spin" />
                   {t('bulkGenerate.actions.generating')}
                 </>
               ) : (
                 <>
-                  <Sparkles className="w-4 h-4 mr-1" />
+                  <Sparkles className="w-4 h-4 me-1" />
                   {t('bulkGenerate.actions.generateInvoices')}
                 </>
               )}

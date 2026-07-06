@@ -95,7 +95,7 @@ export function DailySummary({ summary, isLoading }: DailySummaryProps) {
         </div>
       ))}
 
-      <div className="ml-auto flex items-center gap-4 text-sm">
+      <div className="ms-auto flex items-center gap-4 text-sm">
         <div
           className="flex items-center gap-1.5"
           title={t('attendance.grid.coverageTitle')}

@@ -250,7 +250,7 @@ export function ReportCardPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-surface-secondary print:bg-[rgb(var(--background-tertiary))]">
-                    <th className="px-4 py-3 text-left font-semibold text-text-primary print:text-[rgb(var(--text-primary))]">{t('gradesModule.reportCard.course')}</th>
+                    <th className="px-4 py-3 text-start font-semibold text-text-primary print:text-[rgb(var(--text-primary))]">{t('gradesModule.reportCard.course')}</th>
                     <th className="px-4 py-3 text-center font-medium text-text-secondary print:text-[rgb(var(--text-secondary))]">{t('gradesModule.reportCard.assignments')}</th>
                     <th className="px-4 py-3 text-center font-medium text-text-secondary print:text-[rgb(var(--text-secondary))]">{t('gradesModule.reportCard.numeric')}</th>
                     <th className="px-4 py-3 text-center font-medium text-text-secondary print:text-[rgb(var(--text-secondary))]">{t('gradesModule.reportCard.letter')}</th>

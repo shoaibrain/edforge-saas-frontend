@@ -31,7 +31,7 @@ export function InvoiceLineItemsCard({ invoice, format }: InvoiceLineItemsCardPr
     )
 
   const headerCell =
-    'px-4 py-2.5 text-left text-2xs font-medium uppercase tracking-wider text-[rgb(var(--text-tertiary))] bg-[rgb(var(--background-secondary))] border-b border-[rgb(var(--border-primary))] whitespace-nowrap'
+    'px-4 py-2.5 text-start text-2xs font-medium uppercase tracking-wider text-[rgb(var(--text-tertiary))] bg-[rgb(var(--background-secondary))] border-b border-[rgb(var(--border-primary))] whitespace-nowrap'
 
   return (
     <section className="overflow-hidden rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))]">
@@ -40,7 +40,7 @@ export function InvoiceLineItemsCard({ invoice, format }: InvoiceLineItemsCardPr
         <h2 className="text-sm font-semibold text-[rgb(var(--text-primary))]">
           {t('invoiceDetail.sections.lineItems')}
         </h2>
-        <span className="ml-auto font-mono text-xs text-[rgb(var(--text-tertiary))]">
+        <span className="ms-auto font-mono text-xs text-[rgb(var(--text-tertiary))]">
           {lineItems.length}
         </span>
       </div>
@@ -50,10 +50,10 @@ export function InvoiceLineItemsCard({ invoice, format }: InvoiceLineItemsCardPr
           <thead>
             <tr>
               <th className={headerCell}>{t('lineItems.description')}</th>
-              <th className={cn(headerCell, 'text-right')}>{t('lineItems.amount')}</th>
-              <th className={cn(headerCell, 'text-right')}>{t('lineItems.tax')}</th>
-              <th className={cn(headerCell, 'text-right')}>{t('lineItems.discount')}</th>
-              <th className={cn(headerCell, 'text-right')}>{t('lineItems.total')}</th>
+              <th className={cn(headerCell, 'text-end')}>{t('lineItems.amount')}</th>
+              <th className={cn(headerCell, 'text-end')}>{t('lineItems.tax')}</th>
+              <th className={cn(headerCell, 'text-end')}>{t('lineItems.discount')}</th>
+              <th className={cn(headerCell, 'text-end')}>{t('lineItems.total')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[rgb(var(--border-primary))]">
@@ -82,18 +82,18 @@ export function InvoiceLineItemsCard({ invoice, format }: InvoiceLineItemsCardPr
                       </span>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-right text-sm text-[rgb(var(--text-secondary))]">
+                  <td className="px-4 py-3 text-end text-sm text-[rgb(var(--text-secondary))]">
                     <span className="font-mono text-xs tabular-nums">
                       {format(item.amount * item.quantity)}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-right text-sm text-[rgb(var(--text-secondary))]">
+                  <td className="px-4 py-3 text-end text-sm text-[rgb(var(--text-secondary))]">
                     {dim(item.taxAmount || 0)}
                   </td>
-                  <td className="px-4 py-3 text-right text-sm text-[rgb(var(--text-secondary))]">
+                  <td className="px-4 py-3 text-end text-sm text-[rgb(var(--text-secondary))]">
                     {dim(item.discount || 0)}
                   </td>
-                  <td className="px-4 py-3 text-right text-sm font-semibold text-[rgb(var(--text-primary))]">
+                  <td className="px-4 py-3 text-end text-sm font-semibold text-[rgb(var(--text-primary))]">
                     <span className="font-mono text-xs tabular-nums">{format(item.total)}</span>
                   </td>
                 </tr>

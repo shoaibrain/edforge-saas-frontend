@@ -82,7 +82,7 @@ function AvailableStudentRow({
       type="button"
       onClick={onToggle}
       disabled={disabled}
-      className={`flex items-center gap-3 w-full px-4 py-3 text-left transition-colors ${
+      className={`flex items-center gap-3 w-full px-4 py-3 text-start transition-colors ${
         isSelected
           ? 'bg-[rgb(var(--state-info-bg)/0.18)]/50 dark:bg-[rgb(var(--state-info-bg)/0.18)]'
           : disabled
@@ -393,7 +393,7 @@ export function SectionRosterPage() {
                   value={searchTerm}
                   onChange={e => setSearchTerm(e.target.value)}
                   placeholder="Search students..."
-                  className="w-full pl-9 pr-3 py-2 text-sm bg-surface-primary border border-border-secondary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors"
+                  className="w-full ps-9 pe-3 py-2 text-sm bg-surface-primary border border-border-secondary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors"
                 />
               </div>
             </div>

@@ -436,7 +436,7 @@ function BarRow({
           className="h-full rounded transition-[width] duration-700 ease-out"
         />
       </div>
-      <span className="w-8 text-right text-xs text-[rgb(var(--text-tertiary))]">
+      <span className="w-8 text-end text-xs text-[rgb(var(--text-tertiary))]">
         {showCount ? value : `${pct}%`}
       </span>
     </div>

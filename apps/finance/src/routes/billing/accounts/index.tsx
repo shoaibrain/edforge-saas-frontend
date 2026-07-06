@@ -107,12 +107,12 @@ function LedgerTab({ schoolId, accountId }: { schoolId: string; accountId: strin
     <table className="w-full">
       <thead>
         <tr className="border-b border-[rgb(var(--border-primary))]">
-          <th className="text-left px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.date')}</th>
-          <th className="text-left px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.type')}</th>
-          <th className="text-left px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.description')}</th>
-          <th className="text-right px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.debit')}</th>
-          <th className="text-right px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.credit')}</th>
-          <th className="text-right px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.balance')}</th>
+          <th className="text-start px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.date')}</th>
+          <th className="text-start px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.type')}</th>
+          <th className="text-start px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.description')}</th>
+          <th className="text-end px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.debit')}</th>
+          <th className="text-end px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.credit')}</th>
+          <th className="text-end px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.balance')}</th>
         </tr>
       </thead>
       <tbody className="divide-y divide-[rgb(var(--border-primary))]">
@@ -127,13 +127,13 @@ function LedgerTab({ schoolId, accountId }: { schoolId: string; accountId: strin
             <td className="px-2 py-1.5 text-xs text-[rgb(var(--text-primary))]">
               {entry.description}
             </td>
-            <td className="px-2 py-1.5 text-xs text-right text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]">
+            <td className="px-2 py-1.5 text-xs text-end text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]">
               {entry.debit > 0 ? format(entry.debit) : ''}
             </td>
-            <td className="px-2 py-1.5 text-xs text-right text-[rgb(var(--state-success-fg))] ">
+            <td className="px-2 py-1.5 text-xs text-end text-[rgb(var(--state-success-fg))] ">
               {entry.credit > 0 ? format(entry.credit) : ''}
             </td>
-            <td className="px-2 py-1.5 text-xs text-right font-medium text-[rgb(var(--text-primary))]">
+            <td className="px-2 py-1.5 text-xs text-end font-medium text-[rgb(var(--text-primary))]">
               {format(entry.balance)}
             </td>
           </tr>
@@ -175,11 +175,11 @@ function InvoicesTab({ schoolId, studentId }: { schoolId: string; studentId: str
     <table className="w-full">
       <thead>
         <tr className="border-b border-[rgb(var(--border-primary))]">
-          <th className="text-left px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.invoiceNumber')}</th>
-          <th className="text-left px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.status')}</th>
-          <th className="text-right px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.total')}</th>
-          <th className="text-right px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.due')}</th>
-          <th className="text-left px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.dueDate')}</th>
+          <th className="text-start px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.invoiceNumber')}</th>
+          <th className="text-start px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.status')}</th>
+          <th className="text-end px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.total')}</th>
+          <th className="text-end px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.due')}</th>
+          <th className="text-start px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.dueDate')}</th>
         </tr>
       </thead>
       <tbody className="divide-y divide-[rgb(var(--border-primary))]">
@@ -193,10 +193,10 @@ function InvoicesTab({ schoolId, studentId }: { schoolId: string; studentId: str
               {invoice.invoiceNumber}
             </td>
             <td className="px-2 py-1.5"><FinanceStatusChip status={invoice.status} size="xs" /></td>
-            <td className="px-2 py-1.5 text-xs text-right text-[rgb(var(--text-primary))]">
+            <td className="px-2 py-1.5 text-xs text-end text-[rgb(var(--text-primary))]">
               {format(invoice.grandTotal)}
             </td>
-            <td className="px-2 py-1.5 text-xs text-right font-medium">
+            <td className="px-2 py-1.5 text-xs text-end font-medium">
               <span className={invoice.amountDue > 0 ? 'text-[rgb(var(--state-danger-fg))] dark:text-[rgb(var(--state-danger-fg))]' : 'text-[rgb(var(--state-success-fg))] '}>
                 {format(invoice.amountDue)}
               </span>
@@ -250,10 +250,10 @@ function PaymentsFromLedger({ schoolId, studentId }: { schoolId: string; student
     <table className="w-full">
       <thead>
         <tr className="border-b border-[rgb(var(--border-primary))]">
-          <th className="text-left px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.invoiceNumber')}</th>
-          <th className="text-right px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.amountPaid')}</th>
-          <th className="text-right px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.grandTotal')}</th>
-          <th className="text-left px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.status')}</th>
+          <th className="text-start px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.invoiceNumber')}</th>
+          <th className="text-end px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.amountPaid')}</th>
+          <th className="text-end px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.grandTotal')}</th>
+          <th className="text-start px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-tertiary))] uppercase">{t('studentAccount.columns.status')}</th>
         </tr>
       </thead>
       <tbody className="divide-y divide-[rgb(var(--border-primary))]">
@@ -262,10 +262,10 @@ function PaymentsFromLedger({ schoolId, studentId }: { schoolId: string; student
             <td className="px-2 py-1.5 text-xs font-medium text-[rgb(var(--text-primary))]">
               {inv.invoiceNumber}
             </td>
-            <td className="px-2 py-1.5 text-xs text-right text-[rgb(var(--state-success-fg))] ">
+            <td className="px-2 py-1.5 text-xs text-end text-[rgb(var(--state-success-fg))] ">
               {format(inv.amountPaid)}
             </td>
-            <td className="px-2 py-1.5 text-xs text-right text-[rgb(var(--text-secondary))]">
+            <td className="px-2 py-1.5 text-xs text-end text-[rgb(var(--text-secondary))]">
               {format(inv.grandTotal)}
             </td>
             <td className="px-2 py-1.5"><FinanceStatusChip status={inv.status} size="xs" /></td>
@@ -333,7 +333,7 @@ function OpeningBalanceCard({
           }`}>
             {format(remaining)}
             {settled > 0 && (
-              <span className="ml-2 text-xs font-normal text-[rgb(var(--text-tertiary))]">
+              <span className="ms-2 text-xs font-normal text-[rgb(var(--text-tertiary))]">
                 ({t('studentAccount.openingBalance.settled', { amount: format(settled) })})
               </span>
             )}

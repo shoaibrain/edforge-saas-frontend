@@ -382,12 +382,12 @@ export function EditStaffModal({ open, onClose, staff }: EditStaffModalProps) {
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  <Loader2 className="w-4 h-4 me-2 animate-spin" />
                   {t('actions.saving')}
                 </>
               ) : (
                 <>
-                  <Save className="w-4 h-4 mr-2" />
+                  <Save className="w-4 h-4 me-2" />
                   {t('actions.saveChanges')}
                 </>
               )}

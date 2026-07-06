@@ -81,7 +81,7 @@ export function AttendanceCommandBar({
         </span>
       )}
 
-      <div className="ml-auto flex items-center gap-2.5">
+      <div className="ms-auto flex items-center gap-2.5">
         <span
           className="inline-flex items-center gap-1.5 text-2xs font-medium text-[rgb(var(--text-tertiary))]"
           title={t('attendance.dashboard.commandBar.scopeTooltip')}

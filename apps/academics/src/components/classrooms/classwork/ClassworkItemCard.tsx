@@ -31,7 +31,7 @@ export function ClassworkItemCard({ item, onClick }: ClassworkItemCardProps) {
     <button
       type="button"
       onClick={() => onClick?.(item)}
-      className="flex items-center gap-3 px-4 py-3 w-full text-left bg-surface-primary rounded-lg border border-border-primary hover:border-border-secondary hover:shadow-sm transition-all cursor-pointer"
+      className="flex items-center gap-3 px-4 py-3 w-full text-start bg-surface-primary rounded-lg border border-border-primary hover:border-border-secondary hover:shadow-sm transition-all cursor-pointer"
       aria-label={t('classrooms.aria.openItem', { title: item.title })}
     >
       <div className={`p-2 rounded-full ${config.bg} flex-shrink-0`} aria-hidden="true">

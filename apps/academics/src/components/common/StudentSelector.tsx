@@ -129,7 +129,7 @@ export function StudentSelector({
               placeholder="Search by name or student number..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-sm bg-surface-primary border border-border-primary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors"
+              className="w-full ps-9 pe-3 py-2 text-sm bg-surface-primary border border-border-primary rounded-lg text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)] focus:border-[rgb(var(--border-focus))] transition-colors"
               autoFocus
             />
           </div>
@@ -162,7 +162,7 @@ export function StudentSelector({
                     type="button"
                     onClick={() => toggleStudent(student.studentId)}
                     disabled={disabled}
-                    className={`flex items-center gap-3 w-full px-4 py-3 text-left transition-colors ${
+                    className={`flex items-center gap-3 w-full px-4 py-3 text-start transition-colors ${
                       isSelected
                         ? 'bg-[rgb(var(--state-info-bg)/0.18)]/50'
                         : disabled

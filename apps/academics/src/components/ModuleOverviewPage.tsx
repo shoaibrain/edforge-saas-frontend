@@ -126,17 +126,17 @@ function WidgetVisibilityMenu({ widgets, onToggle, onReset }: WidgetVisibilityMe
                 >
                     <button
                         onClick={() => setShowWidgets(true)}
-                        className="w-full px-3 py-2 flex items-center gap-3 hover:bg-[rgb(var(--background-tertiary))] text-left text-sm text-[rgb(var(--text-primary))]"
+                        className="w-full px-3 py-2 flex items-center gap-3 hover:bg-[rgb(var(--background-tertiary))] text-start text-sm text-[rgb(var(--text-primary))]"
                         role="menuitem"
                     >
                         <Eye className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
                         <span>{t('moduleOverview.options.showHideWidgets')}</span>
-                        <span className="ml-auto text-[rgb(var(--text-tertiary))]">›</span>
+                        <span className="ms-auto text-[rgb(var(--text-tertiary))]">›</span>
                     </button>
                     <div className="my-1 border-t border-[rgb(var(--border-secondary))]" />
                     <button
                         onClick={() => { onReset(); setIsOpen(false) }}
-                        className="w-full px-3 py-2 flex items-center gap-3 text-left text-sm text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary))]"
+                        className="w-full px-3 py-2 flex items-center gap-3 text-start text-sm text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary))]"
                         role="menuitem"
                     >
                         <RotateCcw className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
@@ -154,7 +154,7 @@ function WidgetVisibilityMenu({ widgets, onToggle, onReset }: WidgetVisibilityMe
                 >
                     <button
                         onClick={() => setShowWidgets(false)}
-                        className="w-full px-3 py-2 flex items-center gap-2 hover:bg-[rgb(var(--background-tertiary))] text-left text-sm text-[rgb(var(--text-tertiary))] border-b border-[rgb(var(--border-secondary))] mb-1"
+                        className="w-full px-3 py-2 flex items-center gap-2 hover:bg-[rgb(var(--background-tertiary))] text-start text-sm text-[rgb(var(--text-tertiary))] border-b border-[rgb(var(--border-secondary))] mb-1"
                         role="menuitem"
                     >
                         <span>‹</span>
@@ -164,7 +164,7 @@ function WidgetVisibilityMenu({ widgets, onToggle, onReset }: WidgetVisibilityMe
                         <button
                             key={widget.id}
                             onClick={() => onToggle(widget.id)}
-                            className="w-full px-3 py-2 flex items-center gap-3 hover:bg-[rgb(var(--background-tertiary))] text-left text-sm"
+                            className="w-full px-3 py-2 flex items-center gap-3 hover:bg-[rgb(var(--background-tertiary))] text-start text-sm"
                             role="menuitemcheckbox"
                             aria-checked={widget.visible}
                         >
@@ -459,7 +459,7 @@ export function ModuleOverviewPage({
             <motion.header
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="pt-4 pr-12"
+                className="pt-4 pe-12"
             >
                 <div className="flex items-start gap-4">
                     <motion.div

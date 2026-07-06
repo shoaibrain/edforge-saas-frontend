@@ -302,15 +302,15 @@ function PerStudentRow({ inv }: { inv: ComputedInvoice }) {
                 <td className="px-3 py-1.5 text-[rgb(var(--text-secondary))]">
                   {line.name}
                   {line.isCustom && (
-                    <span className={/* allow-arbitrary-spacing: dense bulk-wizard chip; pre-token-sweep */ "ml-1.5 text-[10px] px-1 py-0 rounded bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-tertiary))]"}>
+                    <span className={/* allow-arbitrary-spacing: dense bulk-wizard chip; pre-token-sweep */ "ms-1.5 text-[10px] px-1 py-0 rounded bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-tertiary))]"}>
                       {t('bulkGenerate.step4.customBadge')}
                     </span>
                   )}
                 </td>
-                <td className="px-3 py-1.5 text-right font-mono text-[rgb(var(--text-secondary))]">
+                <td className="px-3 py-1.5 text-end font-mono text-[rgb(var(--text-secondary))]">
                   {formatCurrency(line.base)}
                   {line.discount > 0 && (
-                    <span className="ml-1.5 text-[rgb(var(--accent-strong))]">
+                    <span className="ms-1.5 text-[rgb(var(--accent-strong))]">
                       −{formatCurrency(line.discount)}
                     </span>
                   )}
@@ -321,7 +321,7 @@ function PerStudentRow({ inv }: { inv: ComputedInvoice }) {
               <td className="px-3 py-1.5 font-semibold text-[rgb(var(--text-primary))]">
                 {t('bulkGenerate.step4.invoiceTotal')}
               </td>
-              <td className="px-3 py-1.5 text-right font-mono font-semibold text-[rgb(var(--text-primary))]">
+              <td className="px-3 py-1.5 text-end font-mono font-semibold text-[rgb(var(--text-primary))]">
                 {formatCurrency(inv.total)}
               </td>
             </tr>

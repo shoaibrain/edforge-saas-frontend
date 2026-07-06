@@ -138,7 +138,7 @@ export function MySectionsWidget({ schoolId }: MySectionsWidgetProps) {
                 </div>
 
                 {/* Quick actions */}
-                <div className="flex items-center gap-1.5 ml-3 flex-shrink-0">
+                <div className="flex items-center gap-1.5 ms-3 flex-shrink-0">
                   <Link
                     to="/classrooms"
                     search={{ tab: 'attendance' }}

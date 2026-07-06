@@ -412,7 +412,7 @@ function CourseGradeCard({
       <button
         type="button"
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center gap-3 p-4 text-left hover:bg-surface-secondary/50 transition-colors"
+        className="w-full flex items-center gap-3 p-4 text-start hover:bg-surface-secondary/50 transition-colors"
       >
         {expanded
           ? <ChevronDown className="w-4 h-4 text-text-tertiary shrink-0" />
@@ -566,7 +566,7 @@ function CourseGradeCards({
       <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-4">
         <BarChart3 className="w-4 h-4 text-[rgb(var(--state-info-fg))]" />
         {tAcad('sections.coursePerformance')}
-        <span className="text-xs text-text-tertiary font-normal ml-1">({validGrades.length})</span>
+        <span className="text-xs text-text-tertiary font-normal ms-1">({validGrades.length})</span>
       </h3>
       <div className="space-y-2">
         {validGrades.map((g) => (
@@ -611,16 +611,16 @@ function ClassesList({ classrooms }: { classrooms: Classroom[] }) {
       <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-4">
         <BookOpen className="w-4 h-4 text-[rgb(var(--state-info-fg))]" />
         {tAcad('sections.currentClasses')}
-        <span className="text-xs text-text-tertiary font-normal ml-1">({classrooms.length})</span>
+        <span className="text-xs text-text-tertiary font-normal ms-1">({classrooms.length})</span>
       </h3>
       <div className="overflow-x-auto rounded-xl shadow-sm border border-[rgb(var(--border-primary)/0.6)] bg-surface-secondary">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-[rgb(var(--background-tertiary)/0.5)]">
-              <th className="text-left py-3 px-6 text-xs font-semibold text-text-tertiary uppercase tracking-wider w-12">{tAcad('tableHeaders.number')}</th>
-              <th className="text-left py-3 px-6 text-xs font-semibold text-text-tertiary uppercase tracking-wider">{tAcad('tableHeaders.class')}</th>
-              <th className="text-left py-3 px-6 text-xs font-semibold text-text-tertiary uppercase tracking-wider">{tAcad('tableHeaders.subject')}</th>
-              <th className="text-left py-3 px-6 text-xs font-semibold text-text-tertiary uppercase tracking-wider">{tAcad('tableHeaders.teacher')}</th>
+              <th className="text-start py-3 px-6 text-xs font-semibold text-text-tertiary uppercase tracking-wider w-12">{tAcad('tableHeaders.number')}</th>
+              <th className="text-start py-3 px-6 text-xs font-semibold text-text-tertiary uppercase tracking-wider">{tAcad('tableHeaders.class')}</th>
+              <th className="text-start py-3 px-6 text-xs font-semibold text-text-tertiary uppercase tracking-wider">{tAcad('tableHeaders.subject')}</th>
+              <th className="text-start py-3 px-6 text-xs font-semibold text-text-tertiary uppercase tracking-wider">{tAcad('tableHeaders.teacher')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border-secondary">

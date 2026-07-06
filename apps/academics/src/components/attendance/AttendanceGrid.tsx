@@ -551,7 +551,7 @@ export function AttendanceGrid({
           <div className="min-w-0 flex-1">
             <SortableHeader label={t('attendance.grid.name')} field="name" currentSort={sortKey} currentDir={sortDir} onSort={toggleSort} />
           </div>
-          <div className="pr-2">
+          <div className="pe-2">
             <SortableHeader label={t('attendance.grid.status')} field="status" currentSort={sortKey} currentDir={sortDir} onSort={toggleSort} />
           </div>
         </div>

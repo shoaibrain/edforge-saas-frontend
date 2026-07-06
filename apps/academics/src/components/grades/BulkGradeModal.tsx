@@ -266,9 +266,9 @@ export function BulkGradeModal({
           disabled={bulkMutation.isPending || !assignmentName.trim() || validEntries.length === 0}
         >
           {bulkMutation.isPending ? (
-            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            <Loader2 className="w-4 h-4 me-2 animate-spin" />
           ) : (
-            <Save className="w-4 h-4 mr-2" />
+            <Save className="w-4 h-4 me-2" />
           )}
           {formatCount('gradesModule.management.saveGrades', validEntries.length)}
         </Button>

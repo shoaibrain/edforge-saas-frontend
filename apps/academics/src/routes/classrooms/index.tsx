@@ -733,7 +733,7 @@ function GradebookTab() {
           </span>
         )}
 
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ms-auto flex items-center gap-2">
           {hasGradingPeriods && !selectedTermId && (
             <span className="text-xs text-caramel-300">{t('classrooms.gradebook.selectGradingPeriodPrompt')}</span>
           )}

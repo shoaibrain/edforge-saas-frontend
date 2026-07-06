@@ -217,7 +217,7 @@ export function AssignToSchoolModal({
                 className="flex-1 h-2 rounded-full appearance-none bg-[rgb(var(--border-primary))] accent-teal-500"
                 disabled={isSubmitting}
               />
-              <span className="text-sm font-mono font-medium text-[rgb(var(--text-primary))] w-12 text-right">
+              <span className="text-sm font-mono font-medium text-[rgb(var(--text-primary))] w-12 text-end">
                 {(fteValue ?? 1).toFixed(2)}
               </span>
             </div>

@@ -930,10 +930,10 @@ function OverviewTab({
                                 <table className="w-full">
                                     <thead>
                                         <tr className="bg-[rgb(var(--background-tertiary))]">
-                                            <th className="px-5 py-2.5 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">{t('detail.overview.table.course')}</th>
-                                            <th className="px-5 py-2.5 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">{t('detail.overview.table.enrolled')}</th>
-                                            <th className="px-5 py-2.5 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">{t('detail.overview.table.avgGrade')}</th>
-                                            <th className="px-5 py-2.5 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">{t('detail.overview.table.attendancePercent')}</th>
+                                            <th className="px-5 py-2.5 text-start text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">{t('detail.overview.table.course')}</th>
+                                            <th className="px-5 py-2.5 text-start text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">{t('detail.overview.table.enrolled')}</th>
+                                            <th className="px-5 py-2.5 text-start text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">{t('detail.overview.table.avgGrade')}</th>
+                                            <th className="px-5 py-2.5 text-start text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">{t('detail.overview.table.attendancePercent')}</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-[rgb(var(--border-secondary))]">
@@ -1179,7 +1179,7 @@ function AssignmentsTab({
                                             </span>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 ml-3">
+                                    <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 ms-3">
                                         <button
                                             onClick={() => setEditingAssignment(assignment)}
                                             className="p-1.5 rounded-md hover:bg-[rgb(var(--background-tertiary))] text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))] transition-colors"
@@ -1255,11 +1255,11 @@ function AssignmentsTab({
                                 <table className="w-full">
                                     <thead>
                                         <tr className="bg-[rgb(var(--background-tertiary))]">
-                                            <th className="px-3 py-2 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">{t('detail.overview.table.course')}</th>
-                                            <th className="px-3 py-2 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">{t('detail.overview.table.section')}</th>
-                                            <th className="px-3 py-2 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">{t('detail.overview.table.period')}</th>
-                                            <th className="px-3 py-2 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">{t('detail.overview.table.room')}</th>
-                                            <th className="px-3 py-2 text-left text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">{t('detail.overview.table.enrolled')}</th>
+                                            <th className="px-3 py-2 text-start text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">{t('detail.overview.table.course')}</th>
+                                            <th className="px-3 py-2 text-start text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">{t('detail.overview.table.section')}</th>
+                                            <th className="px-3 py-2 text-start text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">{t('detail.overview.table.period')}</th>
+                                            <th className="px-3 py-2 text-start text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">{t('detail.overview.table.room')}</th>
+                                            <th className="px-3 py-2 text-start text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">{t('detail.overview.table.enrolled')}</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-[rgb(var(--border-secondary))]">
@@ -1468,7 +1468,7 @@ function SecurityTab({
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="text-right">
+                                        <div className="text-end">
                                             <p className="text-xs text-[rgb(var(--text-tertiary))]">Last active</p>
                                             <p className="text-sm text-[rgb(var(--text-secondary))]">
                                                 {new Date(session.lastActivityAt).toLocaleString()}

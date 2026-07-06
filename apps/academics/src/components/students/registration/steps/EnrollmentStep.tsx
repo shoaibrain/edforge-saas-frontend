@@ -326,7 +326,7 @@ export function EnrollmentStep({
                   {t('enrollmentModule.step.settings.primarySchool')}
                 </label>
               </div>
-              <p className="text-3xs text-[rgb(var(--text-tertiary))] pl-1">
+              <p className="text-3xs text-[rgb(var(--text-tertiary))] ps-1">
                 {t('enrollmentModule.step.settings.primarySchoolHelp')}
               </p>
             </div>
@@ -353,7 +353,7 @@ export function EnrollmentStep({
                   {t('enrollmentModule.step.settings.repeatGrade')}
                 </label>
               </div>
-              <p className="text-3xs text-[rgb(var(--text-tertiary))] pl-1">
+              <p className="text-3xs text-[rgb(var(--text-tertiary))] ps-1">
                 {t('enrollmentModule.step.settings.repeatGradeHelp')}
               </p>
             </div>
