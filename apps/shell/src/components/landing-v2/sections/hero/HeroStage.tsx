@@ -2,7 +2,6 @@ import { useRef } from 'react'
 import { useReducedMotion } from '../../hooks/useReducedMotion'
 import { useHeroProgress } from './useHeroProgress'
 import { LaptopFrame } from './LaptopFrame'
-import { useReducedData } from '../../hooks/useReducedData'
 
 /**
  * HeroStage — solid primary-color band with a centered laptop device that
@@ -13,8 +12,10 @@ import { useReducedData } from '../../hooks/useReducedData'
 export function HeroStage() {
   const stageRef = useRef<HTMLDivElement>(null)
   const reducedMotion = useReducedMotion()
-  const reducedData = useReducedData()
-  const staticFallback = reducedMotion || reducedData
+  // Simplified hero: always show the calm static product poster. LaptopFrame's
+  // autoplay-video branch is retained (rendered when staticFallback is false)
+  // for a later iteration; reducedMotion still drives the scroll-zoom lock.
+  const staticFallback = true
 
   const { scale, translateY, gutter, bandRadius } = useHeroProgress(
     stageRef,

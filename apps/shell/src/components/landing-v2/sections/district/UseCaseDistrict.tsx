@@ -1,15 +1,13 @@
 import { UseCasePanel } from '../../components/UseCasePanel'
 import { USE_CASE_DISTRICT } from '../../landing.strings'
 import { resolveAssetUrl, LANDING_VIDEOS } from '../../config'
-import { useDashboardMode } from '../../hooks/useDashboardMode'
 import { DistrictDashboard } from './DistrictDashboard'
 
 /**
  * UseCaseDistrict — "Run your district from one calm dashboard" section.
- * Feature rail left, video right (crimson accent, primary brand color).
+ * Feature rail left, static product dashboard right (crimson accent).
  */
 export function UseCaseDistrict() {
-  const dashboardMode = useDashboardMode()
   return (
     <UseCasePanel
       sectionId={USE_CASE_DISTRICT.id}
@@ -26,7 +24,10 @@ export function UseCaseDistrict() {
       videoSrc={resolveAssetUrl(LANDING_VIDEOS.taskRouter)}
       videoLength={USE_CASE_DISTRICT.mediaLength}
       dashboardFallback={<DistrictDashboard />}
-      showMode={dashboardMode ? 'dashboard' : 'video'}
+      // Simplified landing: show the static product dashboard, not the demo
+      // video. Restore video later by setting showMode="video" (the video path
+      // in UseCasePanel/DemoVideo is retained, dormant).
+      showMode="dashboard"
     />
   )
 }

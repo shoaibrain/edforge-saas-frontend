@@ -1,7 +1,6 @@
 import { UseCasePanel } from '../../components/UseCasePanel'
 import { USE_CASE_TEACHERS } from '../../landing.strings'
 import { resolveAssetUrl, LANDING_VIDEOS } from '../../config'
-import { useDashboardMode } from '../../hooks/useDashboardMode'
 import { TeacherDashboard } from './TeacherDashboard'
 
 /**
@@ -10,7 +9,6 @@ import { TeacherDashboard } from './TeacherDashboard'
  * warm-cream background.
  */
 export function UseCaseTeachersParents() {
-  const dashboardMode = useDashboardMode()
   return (
     <UseCasePanel
       sectionId={USE_CASE_TEACHERS.id}
@@ -29,7 +27,10 @@ export function UseCaseTeachersParents() {
       videoLength={USE_CASE_TEACHERS.mediaLength}
       reverse
       dashboardFallback={<TeacherDashboard />}
-      showMode={dashboardMode ? 'dashboard' : 'video'}
+      // Simplified landing: show the static product dashboard, not the demo
+      // video. Restore video later by setting showMode="video" (the video path
+      // in UseCasePanel/DemoVideo is retained, dormant).
+      showMode="dashboard"
     />
   )
 }
