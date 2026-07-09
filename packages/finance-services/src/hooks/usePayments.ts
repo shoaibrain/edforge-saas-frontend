@@ -579,16 +579,17 @@ export function useSearchStudents(schoolId: string, search: string) {
 
 /**
  * Family-billing (FB) — resolve the family group a student belongs to (or
- * null when unaffiliated) plus the sibling set. Read-only; gated on the
- * studentId so a cleared selection doesn't fire a request. The schoolId is
- * carried only in the queryKey (natural invalidation on school switch); the
- * academics endpoint is not school-scoped.
+ * null when unaffiliated) plus the sibling set. Read-only; gated on BOTH
+ * schoolId and studentId — the academics endpoint REQUIRES ?schoolId= (400s
+ * without it), so firing before the active school resolves is a doomed request.
+ * schoolId is threaded to getStudentFamily and carried in the queryKey for
+ * natural invalidation on school switch.
  */
 export function useStudentFamily(schoolId: string, studentId: string | null) {
   return useQuery({
     queryKey: studentKeys.family(schoolId, studentId ?? ''),
-    queryFn: () => getStudentFamily(studentId!),
-    enabled: !!studentId,
+    queryFn: () => getStudentFamily(studentId!, schoolId),
+    enabled: !!schoolId && !!studentId,
     staleTime: 30 * 1000,
   })
 }

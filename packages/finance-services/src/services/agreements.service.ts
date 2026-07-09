@@ -55,9 +55,13 @@ export async function getAgreementVersions(
   schoolId: string,
   agreementId: string,
 ): Promise<AgreementVersion[]> {
-  return apiGet<AgreementVersion[]>(
+  // The backend wraps the version chain as `{ items: [...] }`
+  // (agreements.controller getVersionHistory), NOT a bare array. Unwrap to the
+  // array the UI iterates; tolerate a bare array too in case the contract shifts.
+  const res = await apiGet<{ items: AgreementVersion[] } | AgreementVersion[]>(
     `/finance/schools/${schoolId}/agreements/${agreementId}/versions`,
   )
+  return Array.isArray(res) ? res : (res?.items ?? [])
 }
 
 // ============================================================================

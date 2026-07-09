@@ -67,11 +67,11 @@ export function Step4Review({
   // undefined until the preview resolves or when the BE omits `perStudent`).
   const billingSourceByStudent = useMemo(() => {
     const map = new Map<string, BillingSource>()
-    for (const p of previewQuery.data?.perStudent ?? []) {
+    for (const p of previewQuery.data?.students ?? []) {
       map.set(p.studentId, p.billingSource)
     }
     return map
-  }, [previewQuery.data?.perStudent])
+  }, [previewQuery.data?.students])
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1fr,300px] gap-6">

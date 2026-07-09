@@ -45,10 +45,12 @@ function conflictKindFromError(err: unknown): ConflictKind {
 }
 
 function openInvoiceCountFromError(err: unknown): number {
-  const detail = (
-    err as { response?: { data?: { openInvoiceCount?: number } } } | undefined
-  )?.response?.data?.openInvoiceCount
-  return typeof detail === 'number' ? detail : 0
+  // Backend throws ConflictException({ code, message, conflicts }) — there is
+  // no `openInvoiceCount` field; the count is the length of `conflicts`.
+  const conflicts = (
+    err as { response?: { data?: { conflicts?: unknown } } } | undefined
+  )?.response?.data?.conflicts
+  return Array.isArray(conflicts) ? conflicts.length : 0
 }
 
 export default function AgreementDetailPage() {
@@ -475,7 +477,9 @@ function AgreementVersionsCard({
   settings: Parameters<typeof formatDateDual>[1]
   t: (k: string, o?: Record<string, unknown>) => string
 }) {
-  const sorted = [...versions].sort((a, b) => b.version - a.version)
+  const sorted = (Array.isArray(versions) ? [...versions] : []).sort(
+    (a, b) => b.version - a.version,
+  )
   return (
     <aside className="rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))] p-4">
       <h3 className="mb-3 text-sm font-semibold text-[rgb(var(--text-primary))]">

@@ -14,6 +14,7 @@
  */
 
 import { useState } from 'react'
+import { toast } from 'sonner'
 import {
   AlertTriangle,
   HeartHandshake,
@@ -56,6 +57,13 @@ export interface FamilyGroupPanelProps {
 }
 
 type LinkMode = 'existing' | 'create'
+
+/** True when the error is an HTTP 409 (one-family-per-student invariant). */
+function isConflict(err: unknown): boolean {
+  return (
+    (err as { response?: { status?: number } } | undefined)?.response?.status === 409
+  )
+}
 
 // ============================================================================
 // SIBLING ROW
@@ -166,6 +174,9 @@ function LinkFamilyModal({
       { familyId, data: { studentId } },
       {
         onSuccess: handleClose,
+        onError: (err) => {
+          if (isConflict(err)) toast.error(t('family.group.alreadyInFamily'))
+        },
         onSettled: () => setLinkingId(null),
       },
     )
@@ -183,10 +194,22 @@ function LinkFamilyModal({
         },
       },
       {
+        onError: (err) => {
+          if (isConflict(err)) toast.error(t('family.group.alreadyInFamily'))
+        },
         onSuccess: (family) =>
           addMember.mutate(
             { familyId: family.id, data: { studentId } },
-            { onSuccess: handleClose },
+            {
+              onSuccess: handleClose,
+              onError: (err) => {
+                // The family was created but linking failed — surface the
+                // orphaned family so the operator understands the state.
+                if (isConflict(err)) {
+                  toast.error(t('family.group.createdButLinkConflict'))
+                }
+              },
+            },
           ),
       },
     )
@@ -354,7 +377,7 @@ export function FamilyGroupPanel({ studentId, schoolId, canEdit = true }: Family
   const [linkOpen, setLinkOpen] = useState(false)
   const [unlinkOpen, setUnlinkOpen] = useState(false)
 
-  const { data, isLoading, isError, refetch } = useStudentFamily(studentId)
+  const { data, isLoading, isError, refetch } = useStudentFamily(studentId, schoolId ?? '')
   const family = data?.family ?? null
   const siblings = data?.siblings ?? []
 

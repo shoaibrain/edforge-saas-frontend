@@ -272,9 +272,10 @@ export interface BulkPreviewResponse {
   /**
    * Family-billing (FB) — per-student billing-source breakdown so the wizard
    * can flag which students in the batch will be priced via an agreement vs
-   * the standard catalog. Optional (best-effort BE-side).
+   * the standard catalog. Optional (best-effort BE-side). The backend emits
+   * this under the key `students` (invoices.controller.ts bulk-preview).
    */
-  perStudent?: Array<{
+  students?: Array<{
     studentId: string
     billingSource: 'standard' | 'agreement' | 'mixed'
     coveredFeeTypes?: string[]

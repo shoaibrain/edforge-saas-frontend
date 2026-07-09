@@ -39,9 +39,11 @@ const STUDENT = 'stu-1'
 describe('family service URLs', () => {
   beforeEach(() => vi.clearAllMocks())
 
-  it('getStudentFamily → GET /academics/students/:studentId/family', async () => {
-    await getStudentFamily(STUDENT)
-    expect(get).toHaveBeenCalledWith(`/academics/students/${STUDENT}/family`)
+  it('getStudentFamily → GET /academics/students/:studentId/family?schoolId=', async () => {
+    await getStudentFamily(STUDENT, SCHOOL)
+    expect(get).toHaveBeenCalledWith(`/academics/students/${STUDENT}/family`, {
+      schoolId: SCHOOL,
+    })
   })
 
   it('listFamilies → GET /academics/schools/:schoolId/families (no params → {})', async () => {
@@ -81,8 +83,8 @@ describe('family service URLs', () => {
     )
   })
 
-  it('updateFamily → PATCH .../families/:familyId with {version, ...}', async () => {
-    const body = { version: 3, name: 'Sharma-Thapa' }
+  it('updateFamily → PATCH .../families/:familyId with body', async () => {
+    const body = { name: 'Sharma-Thapa' }
     await updateFamily(SCHOOL, FAMILY, body)
     expect(patch).toHaveBeenCalledWith(
       `/academics/schools/${SCHOOL}/families/${FAMILY}`,

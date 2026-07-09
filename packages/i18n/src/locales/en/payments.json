@@ -160,6 +160,7 @@
     "feeStructuresRequired": "Fee Structures *",
     "generated": "Invoice generated successfully",
     "generateFailed": "Failed to generate invoice",
+    "listError": "Couldn't load invoices. Please try again.",
     "requiredFields": "Please fill all required fields",
     "issue": "Issue",
     "issueSuccess": "Invoice issued successfully",
@@ -184,8 +185,7 @@
     "billingSourceFilter": {
       "all": "All sources",
       "standard": "Standard",
-      "agreement": "Agreement",
-      "mixed": "Mixed"
+      "agreement": "Agreement"
     },
     "searchPlaceholder": "Search by invoice # or student...",
     "issueSelected": "Issue Selected ({{count}})",
@@ -1095,7 +1095,8 @@
         "noAllocation": "Enter an amount for at least one invoice.",
         "negativeAmount": "Amounts can't be negative.",
         "overAllocated": "An amount exceeds the invoice's balance due.",
-        "unknownInvoice": "An allocation references an invoice not in this family."
+        "unknownInvoice": "An allocation references an invoice not in this family.",
+        "minTwo": "Family payment needs at least 2 invoices — use single-invoice mode to pay one."
       }
     }
   },

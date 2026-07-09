@@ -47,10 +47,16 @@ export async function searchStudents(
  * Family-billing (FB) — resolve a student's family group (or null when the
  * student is unaffiliated) plus the sibling set. Cross-domain read against
  * the academics service, mirroring `searchStudents` above.
- * GET /academics/students/:studentId/family
+ *
+ * `schoolId` is REQUIRED by the backend (families.controller.ts throws
+ * BadRequestException('Missing required parameter: schoolId') without it).
+ * GET /academics/students/:studentId/family?schoolId=
  */
 export async function getStudentFamily(
   studentId: string,
+  schoolId: string,
 ): Promise<StudentFamily> {
-  return apiGet<StudentFamily>(`/academics/students/${studentId}/family`)
+  return apiGet<StudentFamily>(`/academics/students/${studentId}/family`, {
+    schoolId,
+  })
 }

@@ -3049,7 +3049,9 @@
       "unlinkConfirm": "Remove this student from {{name}}? The family and other siblings are not affected.",
       "siblingsTitle": "Siblings",
       "noSiblings": "No other students in this family yet.",
-      "you": "This student"
+      "you": "This student",
+      "alreadyInFamily": "This student already belongs to another family.",
+      "createdButLinkConflict": "The family was created, but this student already belongs to another family and couldn't be linked."
     }
   }
 }

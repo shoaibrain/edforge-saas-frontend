@@ -46,23 +46,27 @@ export const familyKeys = {
     [...familyKeys.lists(schoolId), params ?? {}] as const,
   members: (schoolId: string, familyId: string) =>
     [...familyKeys.all, 'members', schoolId, familyId] as const,
-  studentFamily: (studentId: string) =>
-    [...familyKeys.all, 'student', studentId] as const,
+  studentFamily: (studentId: string, schoolId: string) =>
+    [...familyKeys.all, 'student', studentId, schoolId] as const,
 }
 
 // ============================================================================
 // QUERIES
 // ============================================================================
 
-/** The family (and siblings) a student belongs to. */
+/**
+ * The family (and siblings) a student belongs to. The backend REQUIRES
+ * schoolId (400s without it), so the query stays gated on both ids.
+ */
 export function useStudentFamily(
   studentId: string,
+  schoolId: string,
   options: { enabled?: boolean } = {},
 ) {
   return useQuery<StudentFamily, Error>({
-    queryKey: familyKeys.studentFamily(studentId),
-    queryFn: () => getStudentFamily(studentId),
-    enabled: (options.enabled ?? true) && !!studentId,
+    queryKey: familyKeys.studentFamily(studentId, schoolId),
+    queryFn: () => getStudentFamily(studentId, schoolId),
+    enabled: (options.enabled ?? true) && !!studentId && !!schoolId,
     staleTime: 60 * 1000,
   })
 }
@@ -108,6 +112,8 @@ export function useCreateFamily(schoolId: string) {
       toast.success('Family created')
     },
     onError: (error) => {
+      // 409 (one-family-per-student) is owned by the caller's targeted handler.
+      if (parseApiError(error).statusCode === 409) return
       toast.error(parseApiError(error).message)
     },
   })
@@ -160,12 +166,14 @@ export function useAddFamilyMember(schoolId: string) {
         queryKey: familyKeys.members(schoolId, familyId),
       })
       queryClient.invalidateQueries({
-        queryKey: familyKeys.studentFamily(data.studentId),
+        queryKey: familyKeys.studentFamily(data.studentId, schoolId),
       })
       queryClient.invalidateQueries({ queryKey: familyKeys.lists(schoolId) })
       toast.success('Student added to family')
     },
     onError: (error) => {
+      // 409 (one-family-per-student) is owned by the caller's targeted handler.
+      if (parseApiError(error).statusCode === 409) return
       toast.error(parseApiError(error).message)
     },
   })
@@ -185,7 +193,7 @@ export function useRemoveFamilyMember(schoolId: string) {
         queryKey: familyKeys.members(schoolId, familyId),
       })
       queryClient.invalidateQueries({
-        queryKey: familyKeys.studentFamily(studentId),
+        queryKey: familyKeys.studentFamily(studentId, schoolId),
       })
       queryClient.invalidateQueries({ queryKey: familyKeys.lists(schoolId) })
       toast.success('Student removed from family')

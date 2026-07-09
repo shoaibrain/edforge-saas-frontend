@@ -18,12 +18,13 @@ describe('validateFamilyPayment', () => {
     expect(result).toEqual({ valid: true, errors: [] })
   })
 
-  it('accepts a single non-zero allocation with the other left at zero', () => {
+  it('rejects a single non-zero allocation — family mode needs ≥2 invoices', () => {
     const result = validateFamilyPayment(
       { 'inv-1': '2500', 'inv-2': '0' },
       OPEN_INVOICES,
     )
-    expect(result.valid).toBe(true)
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain('recordPayment.family.validation.minTwo')
   })
 
   it('rejects over-allocation beyond an invoice balance', () => {

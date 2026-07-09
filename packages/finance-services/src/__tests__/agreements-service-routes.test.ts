@@ -63,11 +63,30 @@ describe('agreements.service route shapes', () => {
   })
 
   it('getAgreementVersions → GET .../agreements/:id/versions', async () => {
-    mockApiGet.mockResolvedValueOnce([])
+    mockApiGet.mockResolvedValueOnce({ items: [] })
     await getAgreementVersions(SCHOOL, AGREEMENT)
     expect(mockApiGet).toHaveBeenCalledWith(
       `/finance/schools/${SCHOOL}/agreements/${AGREEMENT}/versions`,
     )
+  })
+
+  // Regression: the backend wraps versions as `{ items: [...] }`. The service
+  // MUST unwrap to a bare array — else the detail page's `[...versions]` throws
+  // "t is not iterable" (the wrapped-list-DTO trap).
+  it('getAgreementVersions unwraps the backend { items } envelope to a bare array', async () => {
+    const v1 = { version: 1 } as unknown
+    const v2 = { version: 2 } as unknown
+    mockApiGet.mockResolvedValueOnce({ items: [v1, v2] })
+    const result = await getAgreementVersions(SCHOOL, AGREEMENT)
+    expect(Array.isArray(result)).toBe(true)
+    expect(result).toEqual([v1, v2])
+  })
+
+  it('getAgreementVersions tolerates a bare-array response', async () => {
+    const v1 = { version: 1 } as unknown
+    mockApiGet.mockResolvedValueOnce([v1])
+    const result = await getAgreementVersions(SCHOOL, AGREEMENT)
+    expect(result).toEqual([v1])
   })
 
   it('createAgreement → POST /finance/schools/:schoolId/agreements with body', async () => {

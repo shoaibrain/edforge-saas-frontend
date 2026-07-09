@@ -2385,10 +2385,18 @@ export interface FamilyListResponse {
 
 /**
  * Get the family (and siblings) a student belongs to.
- * GET /academics/students/:studentId/family
+ *
+ * `schoolId` is REQUIRED by the backend (families.controller.ts throws
+ * BadRequestException('Missing required parameter: schoolId') without it).
+ * GET /academics/students/:studentId/family?schoolId=
  */
-export async function getStudentFamily(studentId: string): Promise<StudentFamily> {
-  return apiGet<StudentFamily>(`/academics/students/${studentId}/family`)
+export async function getStudentFamily(
+  studentId: string,
+  schoolId: string,
+): Promise<StudentFamily> {
+  return apiGet<StudentFamily>(`/academics/students/${studentId}/family`, {
+    schoolId,
+  })
 }
 
 /**
@@ -2437,8 +2445,7 @@ export async function createFamily(
 }
 
 /**
- * Update a family (optimistic-concurrency via `version`).
- * PATCH /academics/schools/:schoolId/families/:familyId
+ * Update a family. PATCH /academics/schools/:schoolId/families/:familyId
  */
 export async function updateFamily(
   schoolId: string,

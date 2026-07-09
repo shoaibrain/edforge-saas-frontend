@@ -32,7 +32,7 @@ export function validateFamilyPayment(
   const knownIds = new Set(openInvoices.map((inv) => inv.invoiceId))
   const dueById = new Map(openInvoices.map((inv) => [inv.invoiceId, inv.amountDue]))
 
-  let hasPositive = false
+  let positiveCount = 0
 
   for (const [invoiceId, raw] of Object.entries(allocations)) {
     const parsed = parseFloat(raw)
@@ -59,11 +59,16 @@ export function validateFamilyPayment(
       continue
     }
 
-    hasPositive = true
+    positiveCount += 1
   }
 
-  if (!hasPositive) {
+  if (positiveCount === 0) {
     errors.push(`${KEY_PREFIX}.noAllocation`)
+  } else if (positiveCount === 1) {
+    // The backend's recordManualPaymentSchema requires applications.min(2):
+    // family mode is for ≥2 invoices. Block the doomed single-allocation
+    // request here and steer the operator to single-invoice mode.
+    errors.push(`${KEY_PREFIX}.minTwo`)
   }
 
   return { valid: errors.length === 0, errors }

@@ -79,7 +79,6 @@ export interface CreateFamilyDto {
 }
 
 export interface UpdateFamilyDto {
-  version: number
   name?: string
   primaryContact?: FamilyPrimaryContact
   notes?: string

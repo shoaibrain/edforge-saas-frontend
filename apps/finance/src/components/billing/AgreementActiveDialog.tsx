@@ -27,7 +27,12 @@ import { FeeTypeChip } from '../shared'
 export interface AgreementActiveDialogProps {
   schoolId: string
   agreementId: string
-  existingInvoiceId: string
+  /**
+   * Present on the read-time 409; absent on the lock-backstop
+   * (concurrent-generate) 409. When absent, the "View existing invoice"
+   * link is hidden — the override action stays available either way.
+   */
+  existingInvoiceId?: string
   coveredFeeTypes: string[]
   /** Retry the generate with `overrideAgreement: true` (only wired when the operator can manage). */
   onOverride: () => void
@@ -108,15 +113,17 @@ export function AgreementActiveDialog({
             </div>
           )}
 
-          <Link
-            to="/invoices/$invoiceId"
-            params={{ invoiceId: existingInvoiceId }}
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-[rgb(var(--action-primary-bg))] hover:underline underline-offset-4"
-            onClick={onClose}
-          >
-            <ExternalLink className="h-3.5 w-3.5" />
-            {t('agreement.viewExistingInvoice')}
-          </Link>
+          {existingInvoiceId && (
+            <Link
+              to="/invoices/$invoiceId"
+              params={{ invoiceId: existingInvoiceId }}
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-[rgb(var(--action-primary-bg))] hover:underline underline-offset-4"
+              onClick={onClose}
+            >
+              <ExternalLink className="h-3.5 w-3.5" />
+              {t('agreement.viewExistingInvoice')}
+            </Link>
+          )}
         </div>
 
         {!canManage && (

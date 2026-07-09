@@ -79,7 +79,9 @@ interface AgreementActiveError {
   code: 'AGREEMENT_ACTIVE'
   message?: string
   agreementId: string
-  existingInvoiceId: string
+  // Optional: the read-time guard includes it; the lock-backstop
+  // (concurrent-generate) 409 omits it. Gate the dialog on agreementId only.
+  existingInvoiceId?: string
   coveredFeeTypes?: string[]
 }
 
@@ -87,7 +89,7 @@ function parseAgreementActive(err: unknown): AgreementActiveError | null {
   const resp = (err as { response?: { status?: number; data?: unknown } } | undefined)?.response
   if (resp?.status !== 409) return null
   const data = resp.data as Partial<AgreementActiveError> | undefined
-  if (data?.code !== 'AGREEMENT_ACTIVE' || !data.agreementId || !data.existingInvoiceId) return null
+  if (data?.code !== 'AGREEMENT_ACTIVE' || !data.agreementId) return null
   return {
     code: 'AGREEMENT_ACTIVE',
     message: data.message,
@@ -200,7 +202,7 @@ export default function InvoicesPage() {
       ...(statusFilter && { status: statusFilter as Invoice['status'] }),
       ...(gradeFilter && { gradeLevel: gradeFilter }),
       ...(billingSourceFilter && {
-        billingSource: billingSourceFilter as 'standard' | 'agreement' | 'mixed',
+        billingSource: billingSourceFilter as 'standard' | 'agreement',
       }),
     }),
     [statusFilter, gradeFilter, billingSourceFilter],
@@ -209,6 +211,7 @@ export default function InvoicesPage() {
   const {
     items: invoices,
     isLoading,
+    error: listError,
     hasMore,
     loadMore,
     isFetchingNextPage,
@@ -535,12 +538,13 @@ export default function InvoicesPage() {
     { label: t('status.cancelled'), value: 'cancelled' },
   ]
 
-  // FB-5.5 — billing-source facet options.
+  // FB-5.5 — billing-source facet options. An invoice HEADER is either
+  // agreement or standard — never 'mixed' (that classification only exists
+  // per-student in the bulk preview). The list endpoint 400s on 'mixed'.
   const BILLING_SOURCE_FILTER_OPTIONS = [
     { label: t('invoices.billingSourceFilter.all'), value: '' },
     { label: t('invoices.billingSourceFilter.standard'), value: 'standard' },
     { label: t('invoices.billingSourceFilter.agreement'), value: 'agreement' },
-    { label: t('invoices.billingSourceFilter.mixed'), value: 'mixed' },
   ]
 
 
@@ -668,6 +672,17 @@ export default function InvoicesPage() {
 
       {/* ---- StatBand — KPI summary (Overdue → critical pill) ---- */}
       <StatBand metrics={metrics} ariaLabel={t('invoices.kpi.region')} />
+
+      {/* List-query error — surfaced inline so an invalid filter / 5xx isn't
+          swallowed as a spurious empty state. */}
+      {listError && (
+        <div className="flex items-start gap-3 rounded-lg border border-[rgb(var(--state-danger-border))] bg-[rgb(var(--state-danger-bg)/0.14)] px-4 py-3">
+          <AlertTriangle className="w-5 h-5 flex-shrink-0 text-[rgb(var(--state-danger-fg))]" />
+          <p className="text-sm text-[rgb(var(--state-danger-fg))]">
+            {t('invoices.listError')}
+          </p>
+        </div>
+      )}
 
       {/* DataTable */}
       {Object.keys(rowSelection).some((id) => rowSelection[id]) && hasMore && (

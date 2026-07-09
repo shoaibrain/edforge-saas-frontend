@@ -40,11 +40,12 @@ describe('students.service route shapes', () => {
     })
   })
 
-  it('getStudentFamily → GET /academics/students/:studentId/family', async () => {
+  it('getStudentFamily → GET /academics/students/:studentId/family?schoolId=', async () => {
     mockApiGet.mockResolvedValue({ family: null, siblings: [] })
-    await getStudentFamily(STUDENT)
+    await getStudentFamily(STUDENT, SCHOOL)
     expect(mockApiGet).toHaveBeenCalledWith(
       `/academics/students/${STUDENT}/family`,
+      { schoolId: SCHOOL },
     )
   })
 })
