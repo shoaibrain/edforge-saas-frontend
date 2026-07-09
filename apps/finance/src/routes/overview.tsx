@@ -26,7 +26,7 @@ import {
 } from "@edforge/ui";
 import { useCurrency } from "@edforge/types/use-currency";
 import { useTranslation } from "@edforge/i18n";
-import { useFinanceSettings } from "../layouts/FinanceLayout";
+import { useFinanceSettings, useFinanceSettingsReady } from "../layouts/FinanceLayout";
 import { useAppStore } from "../stores/app.store";
 import { useFinanceOverviewV2 } from "../hooks/useFinanceOverviewV2";
 import { FilterRow } from "../components/overview-v2/FilterRow";
@@ -101,9 +101,13 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
   const data = useFinanceOverviewV2(schoolId);
   const { stagger, fadeInUp } = useMotionVariants();
   const settings = useFinanceSettings();
+  const settingsReady = useFinanceSettingsReady();
   const { formatCompact, formatShort } = useCurrency(settings, {
     platformLanguage: i18n.language,
   });
+  // Never paint real amounts in the SYSTEM_DEFAULTS currency while regional
+  // settings are still resolving — placeholder until they settle.
+  const money = (amount: number) => (settingsReady ? formatCompact(amount) : "—");
 
   const {
     kpi,
@@ -135,7 +139,7 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
   const metrics: StatMetric[] = [
     {
       label: t("overview.kpi.totalInvoiced"),
-      value: formatCompact(kpi.totalInvoiced),
+      value: money(kpi.totalInvoiced),
       iconSignature: "finance",
       state: "normal",
       primary: true,
@@ -143,14 +147,14 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
     },
     {
       label: t("overview.kpi.collected"),
-      value: formatCompact(kpi.totalCollected),
+      value: money(kpi.totalCollected),
       iconSignature: "finance",
       state: "normal",
       sub: t("overview.kpi.paymentCount", { count: kpi.currentMonthPaymentCount }),
     },
     {
       label: t("overview.kpi.outstanding"),
-      value: formatCompact(kpi.outstanding),
+      value: money(kpi.outstanding),
       iconSignature: "finance_receipt",
       state: "normal",
       sub: t("overview.kpi.awaiting", { count: kpi.outstandingInvoiceCount }),
@@ -158,14 +162,14 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
     kpi.overdue > 0
       ? {
           label: t("overview.kpi.overdue"),
-          value: formatCompact(kpi.overdue),
+          value: money(kpi.overdue),
           iconSignature: "atrisk",
           state: "critical",
           pill: { tone: "critical", text: t("overview.kpi.invoiceCount", { count: overdueCount }) },
         }
       : {
           label: t("overview.kpi.overdue"),
-          value: formatCompact(kpi.overdue),
+          value: money(kpi.overdue),
           iconSignature: "atrisk",
           state: "normal",
         },
@@ -200,7 +204,7 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
       domain: t("headerZone.domains.finance"),
       title: t("overview.alert.title", {
         count: overdueCount,
-        amount: formatShort(kpi.overdue),
+        amount: settingsReady ? formatShort(kpi.overdue) : "—",
       }),
       description,
       fix: {
