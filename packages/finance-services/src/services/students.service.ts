@@ -6,6 +6,7 @@
  */
 
 import { apiGet } from '@edforge/api-client'
+import type { StudentFamily } from '@edforge/types'
 
 // Minimal student search result (subset of full StudentResponseDto)
 export interface StudentSearchResult {
@@ -40,4 +41,16 @@ export async function searchStudents(
   )
   if (Array.isArray(response)) return response
   return response?.items ?? []
+}
+
+/**
+ * Family-billing (FB) — resolve a student's family group (or null when the
+ * student is unaffiliated) plus the sibling set. Cross-domain read against
+ * the academics service, mirroring `searchStudents` above.
+ * GET /academics/students/:studentId/family
+ */
+export async function getStudentFamily(
+  studentId: string,
+): Promise<StudentFamily> {
+  return apiGet<StudentFamily>(`/academics/students/${studentId}/family`)
 }

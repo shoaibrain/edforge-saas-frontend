@@ -51,7 +51,7 @@ import {
   exportPaymentsCsv,
   downloadReceiptPdf,
 } from '../services/payments.service'
-import { searchStudents } from '../services/students.service'
+import { searchStudents, getStudentFamily } from '../services/students.service'
 import { usePdfErrorToast } from './usePdfErrorToast'
 import {
   trackPdfDownloadStarted,
@@ -560,6 +560,9 @@ export const studentKeys = {
     [...studentKeys.all, 'search', schoolId, search] as const,
   enrolled: (schoolId: string) =>
     [...studentKeys.all, 'enrolled', schoolId] as const,
+  // Family-billing (FB) — student → family group resolution.
+  family: (schoolId: string, studentId: string) =>
+    [...studentKeys.all, 'studentFamily', schoolId, studentId] as const,
 }
 
 export function useSearchStudents(schoolId: string, search: string) {
@@ -568,6 +571,22 @@ export function useSearchStudents(schoolId: string, search: string) {
     queryFn: () => searchStudents(schoolId, search),
     enabled: !!schoolId && search.length >= 2,
     staleTime: 60 * 1000,
+  })
+}
+
+/**
+ * Family-billing (FB) — resolve the family group a student belongs to (or
+ * null when unaffiliated) plus the sibling set. Read-only; gated on the
+ * studentId so a cleared selection doesn't fire a request. The schoolId is
+ * carried only in the queryKey (natural invalidation on school switch); the
+ * academics endpoint is not school-scoped.
+ */
+export function useStudentFamily(schoolId: string, studentId: string | null) {
+  return useQuery({
+    queryKey: studentKeys.family(schoolId, studentId ?? ''),
+    queryFn: () => getStudentFamily(studentId!),
+    enabled: !!studentId,
+    staleTime: 30 * 1000,
   })
 }
 

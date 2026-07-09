@@ -1067,6 +1067,32 @@
       "doneVia": "{{method}} मार्फत भुक्तानी रेकर्ड भयो · {{date}}",
       "donePaidInFull": "यो बीजक अब पूर्ण रूपमा भुक्तानी भएको छ।",
       "doneRemains": "यस बीजकमा {{amount}} बाँकी छ।"
+    },
+    "family": {
+      "modeAria": "भुक्तानी मोड",
+      "modeSingle": "एकल बीजक",
+      "modeFamily": "परिवार भुक्तानी",
+      "loadingFamily": "परिवार समूह जाँच हुँदै...",
+      "noFamily": "यो विद्यार्थी कुनै परिवार समूहमा छैन — एकल बीजक मोड प्रयोग गर्नुहोस्, वा विद्यार्थी प्रोफाइलबाट परिवार सेटअप गर्नुहोस्।",
+      "noFamilyError": "यो विद्यार्थी कुनै परिवार समूहमा छैन।",
+      "noOpenInvoices": "यो परिवारको कुनै बाँकी बीजक छैन।",
+      "primaryContact": "मुख्य सम्पर्क: {{name}}",
+      "allocateHeader": "दाजुभाइ/दिदीबहिनीहरूमा बाँडफाँट *",
+      "allocationLabel": "{{invoice}} का लागि रकम",
+      "amountDue": "बाँकी {{amount}}",
+      "suggested": "· सुझाव {{amount}}",
+      "totalDue": "कुल बाँकी",
+      "allocatedTotal": "बाँडफाँट गरिएको कुल",
+      "previewTarget": "परिवार",
+      "previewInvoiceCount": "{{family}} · {{count}} बीजक",
+      "previewInvoiceCount_plural": "{{family}} · {{count}} बीजकहरू",
+      "recordFailed": "परिवार भुक्तानी रेकर्ड गर्न असफल भयो — प्रति-बीजक रकम जाँच गरी पुनः प्रयास गर्नुहोस्।",
+      "validation": {
+        "noAllocation": "कम्तीमा एउटा बीजकका लागि रकम प्रविष्ट गर्नुहोस्।",
+        "negativeAmount": "रकम ऋणात्मक हुन सक्दैन।",
+        "overAllocated": "कुनै रकम बीजकको बाँकी ब्यालेन्सभन्दा बढी छ।",
+        "unknownInvoice": "बाँडफाँटले यस परिवारमा नभएको बीजकलाई सन्दर्भ गर्छ।"
+      }
     }
   },
   "asyncJobs": {

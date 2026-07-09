@@ -1067,6 +1067,32 @@
       "doneVia": "Payment recorded via {{method}} · {{date}}",
       "donePaidInFull": "This invoice is now paid in full.",
       "doneRemains": "{{amount}} remains due on this invoice."
+    },
+    "family": {
+      "modeAria": "Payment mode",
+      "modeSingle": "Single invoice",
+      "modeFamily": "Family payment",
+      "loadingFamily": "Checking family group...",
+      "noFamily": "This student isn't in a family group — use Single invoice mode, or set up a family from the student profile.",
+      "noFamilyError": "This student isn't in a family group.",
+      "noOpenInvoices": "This family has no open invoices.",
+      "primaryContact": "Primary contact: {{name}}",
+      "allocateHeader": "Allocate across siblings *",
+      "allocationLabel": "Amount for {{invoice}}",
+      "amountDue": "Due {{amount}}",
+      "suggested": "· suggested {{amount}}",
+      "totalDue": "Total due",
+      "allocatedTotal": "Allocated total",
+      "previewTarget": "Family",
+      "previewInvoiceCount": "{{family}} · {{count}} invoice",
+      "previewInvoiceCount_plural": "{{family}} · {{count}} invoices",
+      "recordFailed": "Failed to record family payment — check the per-invoice amounts and try again.",
+      "validation": {
+        "noAllocation": "Enter an amount for at least one invoice.",
+        "negativeAmount": "Amounts can't be negative.",
+        "overAllocated": "An amount exceeds the invoice's balance due.",
+        "unknownInvoice": "An allocation references an invoice not in this family."
+      }
     }
   },
   "asyncJobs": {

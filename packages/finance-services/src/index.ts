@@ -79,6 +79,7 @@ export {
 
 export {
   searchStudents,
+  getStudentFamily,
 } from './services/students.service'
 export type { StudentSearchResult } from './services/students.service'
 
@@ -144,6 +145,7 @@ export {
   useDownloadInvoicePdf,
   studentKeys,
   useSearchStudents,
+  useStudentFamily,
   useEnrolledStudents,
 } from './hooks/usePayments'
 
