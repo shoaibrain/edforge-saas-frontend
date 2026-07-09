@@ -23,6 +23,7 @@ import {
 import { Button } from '@edforge/ui'
 import { useTranslation } from '@edforge/i18n'
 import type { StudentProfileResponseDto } from '@aibrains/shared-types'
+import { FamilyGroupPanel } from './FamilyGroupPanel'
 
 // ============================================================================
 // TYPES
@@ -30,6 +31,8 @@ import type { StudentProfileResponseDto } from '@aibrains/shared-types'
 
 export interface FamilyTabProps {
   student: StudentProfileResponseDto
+  /** Active school context — threads the family-group panel's schoolId-scoped mutations. */
+  schoolId?: string
   onAddGuardian?: () => void
   onEditGuardian?: (guardianId: string) => void
   onGrantPortalAccess?: (guardian: NonNullable<StudentProfileResponseDto['guardians']>[number]) => void
@@ -232,6 +235,7 @@ function EmergencyContactRow({ contact, index }: { contact: EmergencyContact; in
 
 export function FamilyTab({
   student,
+  schoolId,
   onAddGuardian,
   onEditGuardian,
   onGrantPortalAccess,
@@ -337,6 +341,13 @@ export function FamilyTab({
           </div>
         )}
       </section>
+
+      {/* Family Group (billing) Section — FB-1.8. Distinct from guardians above. */}
+      <FamilyGroupPanel
+        studentId={student.studentId}
+        schoolId={schoolId}
+        canEdit={canEdit}
+      />
     </div>
   )
 }

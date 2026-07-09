@@ -3020,6 +3020,34 @@
       "inGrade": "Grade {{grade}}",
       "notInFamily": "This student is not part of a family.",
       "viewFamily": "View family"
+    },
+    "group": {
+      "title": "Family group",
+      "notLinked": "This student is not linked to a family.",
+      "notLinkedDescription": "Link this student to a family to group siblings for consolidated billing.",
+      "linkAction": "Link to family",
+      "linkExisting": "Search existing",
+      "createNew": "Create new",
+      "searchPlaceholder": "Search families by name…",
+      "noMatches": "No families match that search.",
+      "searchHint": "Type at least two characters to search.",
+      "linkSelected": "Link",
+      "linking": "Linking…",
+      "createAndLink": "Create & link",
+      "creating": "Creating…",
+      "familyNameLabel": "Family name",
+      "familyNamePlaceholder": "e.g. Sharma",
+      "contactNameLabel": "Primary contact name",
+      "contactNamePlaceholder": "e.g. Ram Sharma",
+      "contactPhoneLabel": "Primary contact phone",
+      "contactPhonePlaceholder": "Optional",
+      "cancel": "Cancel",
+      "unlink": "Unlink",
+      "unlinkTitle": "Unlink from family?",
+      "unlinkConfirm": "Remove this student from {{name}}? The family and other siblings are not affected.",
+      "siblingsTitle": "Siblings",
+      "noSiblings": "No other students in this family yet.",
+      "you": "This student"
     }
   }
 }
