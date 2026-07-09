@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { broadcastSchoolChange } from '@edforge/config/school-context-channel'
+import { broadcastSchoolChange, resetSchoolContext } from '@edforge/config/school-context-channel'
 import { armSchoolTransitionErrorToast } from '../lib/query-client'
 
 // ============================================================================
@@ -100,9 +100,13 @@ export const useAppStore = create<AppStore>()(
 
       // Logout hygiene: reset school context so the next user (or next
       // login) resolves fresh instead of inheriting this session's school.
-      // Deliberately no broadcast — callers trigger a full reload.
+      // Deliberately no broadcast — callers trigger a full reload. The
+      // channel's retained payload is blanked too: the Amplify signedOut
+      // path does NOT reload, and the merge semantics would otherwise carry
+      // the previous tenant's settings into the next user's sync reads.
       clearSchoolContext: () => {
         clearSchoolSessionOwner()
+        resetSchoolContext()
         set({ activeSchoolId: null, activeSchoolStatus: null, isSchoolTransitioning: false })
       },
 

@@ -17,6 +17,7 @@ vi.mock('../../services/tenant.service', () => ({
     getSchools: vi.fn(),
     getCurrentAcademicYear: vi.fn(),
     getWorkspaceSettings: vi.fn(),
+    getMyWorkspaceSettings: vi.fn(),
     getSchoolConfiguration: vi.fn(),
   },
 }))
@@ -56,6 +57,7 @@ function mockServices({ defaultSchoolId }: { defaultSchoolId?: string } = {}) {
   vi.mocked(tenantService.getSchools).mockResolvedValue(SCHOOLS as never)
   vi.mocked(tenantService.getCurrentAcademicYear).mockResolvedValue(null as never)
   vi.mocked(tenantService.getWorkspaceSettings).mockResolvedValue({ regional: null } as never)
+  vi.mocked(tenantService.getMyWorkspaceSettings).mockResolvedValue({ regional: null } as never)
   vi.mocked(tenantService.getSchoolConfiguration).mockResolvedValue(null as never)
 }
 
@@ -77,11 +79,12 @@ function seedAuthenticatedUser() {
 }
 
 function Probe() {
-  const { activeSchoolId, isBootstrapping } = useShell()
+  const { activeSchoolId, isBootstrapping, resolvedSettings } = useShell()
   return (
     <div>
       <span data-testid="school">{activeSchoolId ?? 'none'}</span>
       <span data-testid="bootstrapping">{String(isBootstrapping)}</span>
+      <span data-testid="currency">{resolvedSettings.currency}</span>
     </div>
   )
 }
@@ -187,5 +190,70 @@ describe('active-school resolution at bootstrap', () => {
     await waitFor(() => {
       expect(localStorage.getItem(`edforge-active-school-${USER_ID}`)).toBe('s-gamma')
     })
+  })
+})
+
+describe('settings readiness in the bootstrap gate (currency-flash fix)', () => {
+  it('admin: gate holds until the workspace-settings query settles', async () => {
+    mockServices({ defaultSchoolId: 's-beta' })
+    let resolveSettings!: (v: unknown) => void
+    vi.mocked(tenantService.getWorkspaceSettings).mockImplementation(
+      () => new Promise((resolve) => { resolveSettings = resolve }) as never
+    )
+    renderShell()
+
+    // Everything else resolves, but settings are still pending — gate stays up
+    await waitFor(() => {
+      expect(screen.getByTestId('school').textContent).toBe('s-beta')
+    })
+    expect(screen.getByTestId('bootstrapping').textContent).toBe('true')
+
+    resolveSettings({ regional: { defaultCurrency: 'NPR' } })
+    await waitForResolution()
+    expect(screen.getByTestId('currency').textContent).toBe('NPR')
+  })
+
+  it('admin: a settings fetch error settles the gate (degrade to defaults, no hang)', async () => {
+    mockServices({ defaultSchoolId: 's-beta' })
+    vi.mocked(tenantService.getWorkspaceSettings).mockRejectedValue(new Error('500') as never)
+    renderShell()
+    await waitForResolution()
+    expect(screen.getByTestId('currency').textContent).toBe('USD')
+  })
+
+  it('non-admin: regional settings resolve via /tenants/my/settings (currency is not USD-forever)', async () => {
+    mockServices()
+    vi.mocked(tenantService.getCurrentUser).mockResolvedValue({
+      id: USER_ID,
+      email: 'parent@example.com',
+      displayName: 'Pat',
+      tenantId: 'tenant-1',
+      tenantName: 'Tenant One',
+      globalRole: 'StandardUser',
+      assignments: [{ schoolId: 's-alpha', schoolName: 'Alpha School', role: 'Parent' }],
+      createdAt: '',
+      updatedAt: '',
+    } as never)
+    vi.mocked(tenantService.getMyWorkspaceSettings).mockResolvedValue({
+      regional: { defaultCurrency: 'NPR', defaultLocale: 'ne-NP' },
+    } as never)
+    useAuthStore.setState({
+      user: {
+        id: USER_ID,
+        email: 'parent@example.com',
+        name: 'Pat Parent',
+        tenantId: 'tenant-1',
+        globalRole: 'StandardUser',
+        assignments: { 's-alpha': 'Parent' },
+      } as never,
+      isAuthenticated: true,
+      isLoading: false,
+      initializeAuth: async () => {},
+    } as never)
+
+    renderShell()
+    await waitForResolution()
+    expect(screen.getByTestId('currency').textContent).toBe('NPR')
+    expect(tenantService.getWorkspaceSettings).not.toHaveBeenCalled()
   })
 })
