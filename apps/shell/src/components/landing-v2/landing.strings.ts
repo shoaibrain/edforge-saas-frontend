@@ -206,7 +206,7 @@ export const PLATFORM_PILLARS = {
       id: 'api',
       title: 'Platform & API',
       description:
-        'SSO, webhooks, full REST and GraphQL APIs. Your data is yours. Export it, integrate it, extend it.',
+        'Built on the open Ed-Fi data model, so your data is yours — export it anytime in an open format. A public API, GraphQL, and SSO are on the roadmap.',
       colSpan: 6,
       visual: 'api',
     },
@@ -240,7 +240,7 @@ export const SECURITY_STRIP = {
     },
   ],
   frameworksLabel: 'Built to the standards that matter',
-  frameworks: ['FERPA', 'COPPA', 'GDPR', 'SOC 2', 'ISO 27001', 'SSDPC'],
+  frameworks: ['FERPA', 'COPPA', 'GDPR', 'SSDPC'],
   cta: 'Read our privacy promise',
   ctaHref: '/privacy',
 } as const
@@ -311,7 +311,7 @@ export const FAQ = {
     },
     {
       q: 'Does Edforge work with Google Workspace or Microsoft 365?',
-      a: 'Yes, natively. Single sign-on, calendar sync, assignments integration.',
+      a: 'Not yet. Single sign-on with Google Workspace and Microsoft 365, plus calendar and assignment sync, are on our near-term roadmap. Today Edforge runs as a standalone, secure platform.',
     },
     {
       q: 'What languages do families get messages in?',

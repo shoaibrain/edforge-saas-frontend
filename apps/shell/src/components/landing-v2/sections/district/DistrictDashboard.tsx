@@ -32,7 +32,7 @@ export function DistrictDashboard() {
           </div>
         </div>
         <div className="gap-1.5" style={{ display: 'flex' }}>
-          <Tag variant="ink">12 schools</Tag>
+          <Tag variant="ink">4 schools</Tag>
           <Tag variant="green" dot>
             Live
           </Tag>
@@ -72,14 +72,14 @@ type StatCardProps = {
 const STAT_CARDS: StatCardProps[] = [
   {
     label: 'Total students',
-    value: '45,231',
+    value: '4,120',
     delta: '+2.5%',
     accent: 'var(--lp-primary)',
     icon: 'core',
   },
   {
     label: 'Total staff',
-    value: '3,402',
+    value: '310',
     delta: '+1.2%',
     accent: 'var(--lp-teal)',
     icon: 'users',
