@@ -156,7 +156,23 @@ export interface VerifyPaymentResponse {
 // ============================================================================
 
 export interface RecordManualPaymentDto {
-  invoiceId: string
+  /**
+   * Single-target payment. Optional now that family-billing supports a
+   * multi-target `applications[]` alternative — exactly one of `invoiceId`
+   * or `applications` must be present (server-validated).
+   */
+  invoiceId?: string
+  /**
+   * Family-billing (FB) — multi-target application: split one payment across
+   * 2..20 distinct invoices (typically the open invoices of a family's
+   * students). Alternative to `invoiceId`; same /manual endpoint.
+   */
+  applications?: Array<{
+    invoiceId: string
+    amount: number
+  }>
+  /** Family the payment is applied against, when using `applications[]`. */
+  familyId?: string
   gateway: 'cash' | 'bank_transfer' | 'cheque'
   amount: number // NPR
   currency: string
@@ -249,6 +265,18 @@ export interface DashboardSummary {
     issuedDate: string
     createdAt: string
   }>
+  /**
+   * Family-billing (FB) — agreement-coverage rollup for the dashboard.
+   * Optional: absent until agreements exist for the school.
+   */
+  agreementCoverage?: {
+    studentsCovered: number
+    activeAgreements: number
+    invoicedViaAgreement: {
+      count: number
+      amount: number
+    }
+  }
 }
 
 // ============================================================================

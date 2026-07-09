@@ -147,7 +147,10 @@ export const ROLE_PERMISSIONS: PermissionMap = {
     guardians: ['view', 'create', 'edit', 'delete', 'manage'],
     parents: ['view', 'create', 'edit', 'delete', 'manage'],
     departments: ['view', 'create', 'edit', 'delete', 'manage'],
-    billing: ['view', 'approve'],
+    // Family-billing (FB) Slice 2 — mirrors backend DEFAULT_ROLE_PERMISSIONS:
+    // Principal has full billing (view/create/edit/delete/manage) so the
+    // agreements + override UI renders. `approve` retained from prior grant.
+    billing: ['view', 'create', 'edit', 'delete', 'manage', 'approve'],
     payroll: ['view', 'approve'],
     expenses: ['view', 'create', 'approve'],
     tuition: ['view', 'create', 'edit', 'manage'],
@@ -217,6 +220,10 @@ export const ROLE_PERMISSIONS: PermissionMap = {
     guardians: ['view', 'edit'],
     parents: ['view', 'edit'],
     departments: ['view', 'edit'],
+    // Family-billing (FB) Slice 2 — VicePrincipal was narrowed backend-side to
+    // view/create/edit (NO manage/delete). Mirror it so nav + create UI show
+    // but the manage-gated agreement-override actions stay hidden.
+    billing: ['view', 'create', 'edit'],
     staff: ['view'],
     'staff:assignments': ['view', 'create', 'edit'],
     hr: ['view'],
@@ -279,7 +286,10 @@ export const ROLE_PERMISSIONS: PermissionMap = {
     guardians: ['view'],
     parents: ['view'],
     departments: ['view'],
-    billing: ['view', 'create', 'edit', 'manage'],
+    // Family-billing (FB) Slice 2 — Accountant has full billing
+    // (view/create/edit/delete/manage) mirroring backend
+    // DEFAULT_ROLE_PERMISSIONS so agreements + override actions render.
+    billing: ['view', 'create', 'edit', 'delete', 'manage'],
     payroll: ['view', 'create', 'edit', 'manage'],
     expenses: ['view', 'create', 'edit', 'approve'],
     tuition: ['view', 'create', 'edit', 'manage'],
