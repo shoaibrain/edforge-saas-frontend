@@ -20,6 +20,7 @@ import type {
 } from '@edforge/types'
 import {
   getInvoice,
+  getInvoiceProvenance,
   generateInvoice,
   issueInvoice,
   cancelInvoice,
@@ -42,6 +43,7 @@ import {
   getInvoicePayments,
   getPaymentReceipt,
   recordManualPayment,
+  getFamilyOpenInvoices,
   voidPayment,
   createRefund,
   getDashboardSummary,
@@ -70,10 +72,17 @@ export const paymentKeys = {
     [...paymentKeys.invoices(schoolId), 'list', filters] as const,
   invoice: (schoolId: string, invoiceId: string) =>
     [...paymentKeys.invoices(schoolId), invoiceId] as const,
+  // Family-billing (FB) — per-invoice provenance (agreement/catalog/custom).
+  provenance: (schoolId: string, invoiceId: string) =>
+    [...paymentKeys.invoices(schoolId), invoiceId, 'provenance'] as const,
 
   // Payments (per invoice)
   invoicePayments: (schoolId: string, invoiceId: string) =>
     [...paymentKeys.all, 'history', schoolId, invoiceId] as const,
+
+  // Family-billing (FB) — open invoices across a family's students.
+  familyOpenInvoices: (schoolId: string, familyId: string) =>
+    [...paymentKeys.all, 'family-open-invoices', schoolId, familyId] as const,
 
   // Verification
   verify: (sessionId: string) => [...paymentKeys.all, 'verify', sessionId] as const,
@@ -132,15 +141,52 @@ export function useInvoice(schoolId: string, invoiceId: string) {
   })
 }
 
+/**
+ * Family-billing (FB) — per-line provenance for an invoice. Read-only;
+ * gated on both ids and cached with the same 30s stale window as the
+ * invoice detail it accompanies.
+ */
+export function useInvoiceProvenance(schoolId: string, invoiceId: string) {
+  return useQuery({
+    queryKey: paymentKeys.provenance(schoolId, invoiceId),
+    queryFn: () => getInvoiceProvenance(schoolId, invoiceId),
+    enabled: !!schoolId && !!invoiceId,
+    staleTime: 30 * 1000,
+  })
+}
+
 // ============================================================================
 // INVOICE MUTATIONS
 // ============================================================================
 
+/**
+ * Generate a single invoice.
+ *
+ * Family-billing (FB): the mutation input widens to
+ * `{ data, overrideAgreement? }`. When `overrideAgreement` is set the
+ * service posts `overrideAgreement: true`, bypassing the 409
+ * `AGREEMENT_ACTIVE` guard so the invoice bills from the fee catalog even
+ * when an active agreement covers the student. Legacy `mutate(dto)` callers
+ * are still accepted for backward compatibility.
+ */
 export function useGenerateInvoice(schoolId: string) {
   const queryClient = useQueryClient()
 
-  return useMutation({
-    mutationFn: (data: GenerateInvoiceDto) => generateInvoice(schoolId, data),
+  return useMutation<
+    Awaited<ReturnType<typeof generateInvoice>>,
+    Error,
+    { data: GenerateInvoiceDto; overrideAgreement?: boolean } | GenerateInvoiceDto
+  >({
+    mutationFn: (input) => {
+      const isWrapped = (
+        v: unknown,
+      ): v is { data: GenerateInvoiceDto; overrideAgreement?: boolean } =>
+        !!v && typeof v === 'object' && 'data' in (v as Record<string, unknown>)
+      const { data, overrideAgreement } = isWrapped(input)
+        ? { data: input.data, overrideAgreement: input.overrideAgreement }
+        : { data: input, overrideAgreement: undefined }
+      return generateInvoice(schoolId, data, { overrideAgreement })
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: paymentKeys.invoices(schoolId) })
       queryClient.invalidateQueries({ queryKey: paymentKeys.studentAccounts(schoolId) })
@@ -182,6 +228,23 @@ export function useInvoicePayments(schoolId: string, invoiceId: string) {
     queryKey: paymentKeys.invoicePayments(schoolId, invoiceId),
     queryFn: () => getInvoicePayments(schoolId, invoiceId),
     enabled: !!schoolId && !!invoiceId,
+    staleTime: 30 * 1000,
+  })
+}
+
+/**
+ * Family-billing (FB) — open invoices across every student of a family plus
+ * a suggested allocation, powering the multi-target manual-payment flow.
+ * Read-only; gated on both ids.
+ */
+export function useFamilyOpenInvoices(
+  schoolId: string,
+  familyId: string | null,
+) {
+  return useQuery({
+    queryKey: paymentKeys.familyOpenInvoices(schoolId, familyId ?? ''),
+    queryFn: () => getFamilyOpenInvoices(schoolId, familyId!),
+    enabled: !!schoolId && !!familyId,
     staleTime: 30 * 1000,
   })
 }

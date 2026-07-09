@@ -9,6 +9,7 @@
 export {
   getInvoices,
   getInvoice,
+  getInvoiceProvenance,
   generateInvoice,
   updateInvoice,
   issueInvoice,
@@ -46,6 +47,7 @@ export {
   getSchoolPayments,
   getPaymentReceipt,
   recordManualPayment,
+  getFamilyOpenInvoices,
   voidPayment,
   createRefund,
   getDashboardSummary,
@@ -53,6 +55,18 @@ export {
   exportPaymentsCsv,
   paymentsService,
 } from './services/payments.service'
+
+// Family-billing (FB) — agreements service
+export {
+  getAgreements,
+  getAgreement,
+  getAgreementVersions,
+  createAgreement,
+  activateAgreement,
+  cancelAgreement,
+  agreementsService,
+} from './services/agreements.service'
+export type { AgreementListParams } from './services/agreements.service'
 
 export {
   getFeeStructures,
@@ -102,10 +116,12 @@ export {
   useInvoices,
   useInvoicesInfinite,
   useInvoice,
+  useInvoiceProvenance,
   useGenerateInvoice,
   useIssueInvoice,
   useCancelInvoice,
   useInvoicePayments,
+  useFamilyOpenInvoices,
   useInitiatePayment,
   useVerifyPayment,
   usePaymentReceipt,
@@ -130,6 +146,17 @@ export {
   useSearchStudents,
   useEnrolledStudents,
 } from './hooks/usePayments'
+
+// Family-billing (FB) — agreements hooks
+export {
+  agreementKeys,
+  useAgreements,
+  useAgreement,
+  useAgreementVersions,
+  useCreateAgreement,
+  useActivateAgreement,
+  useCancelAgreement,
+} from './hooks/useAgreements'
 
 export {
   gatewayKeys,

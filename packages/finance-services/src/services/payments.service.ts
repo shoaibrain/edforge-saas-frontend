@@ -18,6 +18,7 @@ import type {
   CreateRefundDto,
   Refund,
   DashboardSummary,
+  FamilyOpenInvoicesResponse,
 } from '@edforge/types'
 import type { FinanceListQueryParams } from '../types/pagination'
 import type { FinancePaginatedResponse } from '../types/pagination'
@@ -114,6 +115,24 @@ export async function recordManualPayment(
   return apiPost<Payment, RecordManualPaymentDto>(
     `/finance/schools/${schoolId}/payments/manual`,
     data,
+  )
+}
+
+// ============================================================================
+// FAMILY OPEN INVOICES (family-billing — multi-target payment allocation)
+// ============================================================================
+
+/**
+ * Fetch every open invoice across a family's students plus a suggested
+ * allocation, for the multi-target manual-payment flow.
+ * GET /finance/schools/:schoolId/families/:familyId/open-invoices
+ */
+export async function getFamilyOpenInvoices(
+  schoolId: string,
+  familyId: string,
+): Promise<FamilyOpenInvoicesResponse> {
+  return apiGet<FamilyOpenInvoicesResponse>(
+    `/finance/schools/${schoolId}/families/${familyId}/open-invoices`,
   )
 }
 
@@ -227,6 +246,7 @@ export const paymentsService = {
   getSchoolPayments,
   getPaymentReceipt,
   recordManualPayment,
+  getFamilyOpenInvoices,
   voidPayment,
   createRefund,
   getDashboardSummary,
