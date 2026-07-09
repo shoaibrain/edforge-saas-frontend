@@ -25,6 +25,12 @@ import { Button } from '@edforge/ui'
 import { useTranslation } from '@edforge/i18n'
 import { usePermission } from '@edforge/abac'
 import { useCreateAgreement } from '@edforge/finance-services'
+import {
+  extractValidationErrors,
+  extractApiMessage,
+  type ApiValidationError,
+} from '../../../lib/api-validation-errors'
+import { useFinanceSettings } from '../../../layouts/FinanceLayout'
 import { Step1FamilyMembers } from './Step1FamilyMembers'
 import { Step2Terms } from './Step2Terms'
 import { Step3Review } from './Step3Review'
@@ -33,6 +39,7 @@ import {
   validateStep1,
   validateStep2,
   buildCreateDto,
+  pruneCells,
   type WizardStep,
   type WizardState,
 } from './wizard-types'
@@ -42,6 +49,15 @@ const STEP_LABEL_KEYS = [
   'agreement.wizard.steps.terms',
   'agreement.wizard.steps.review',
 ] as const
+
+// Where a backend-validation path root lives in the wizard, so a 400 can
+// send the operator back to the first offending step.
+const STEP0_FIELDS = new Set(['title', 'payer', 'studentIds', 'familyId'])
+
+function stepForValidationPath(path: string): WizardStep {
+  const root = path.split('.')[0]
+  return STEP0_FIELDS.has(root) ? 0 : 1
+}
 
 export interface AgreementCreateWizardProps {
   schoolId: string
@@ -56,14 +72,24 @@ export function AgreementCreateWizard({
 }: AgreementCreateWizardProps) {
   const { t } = useTranslation('payments')
   const canManage = usePermission('manage', 'billing', schoolId)
+  const settings = useFinanceSettings()
   const createMutation = useCreateAgreement(schoolId)
 
   const [step, setStep] = useState<WizardStep>(0)
   const [maxReached, setMaxReached] = useState<WizardStep>(0)
   const [state, setState] = useState<WizardState>(initialWizardState)
+  const [serverErrors, setServerErrors] = useState<ApiValidationError[]>([])
 
   const patch = (p: Partial<WizardState>) =>
-    setState((prev) => ({ ...prev, ...p }))
+    setState((prev) => {
+      const next = { ...prev, ...p }
+      // Member/fee-type changes re-key the per_student matrix: stale cells
+      // are pruned, new (member × feeType) pairs start empty.
+      if (p.members !== undefined || p.coveredFeeTypes !== undefined) {
+        next.cells = pruneCells(next.cells, next.members, next.coveredFeeTypes)
+      }
+      return next
+    })
 
   const step1 = useMemo(() => validateStep1(state), [state])
   const step2 = useMemo(() => validateStep2(state), [state])
@@ -89,17 +115,27 @@ export function AgreementCreateWizard({
 
   const submit = async () => {
     if (!step1.ok || !step2.ok || !canManage) return
+    setServerErrors([])
     try {
-      const created = await createMutation.mutateAsync(buildCreateDto(state))
+      const created = await createMutation.mutateAsync(
+        buildCreateDto(state, settings.currency),
+      )
       toast.success(t('agreement.created'))
       onComplete(created.id)
     } catch (err) {
-      const msg =
-        (err as { response?: { data?: { message?: string } } } | undefined)
-          ?.response?.data?.message ??
-        (err as Error | undefined)?.message ??
-        t('agreement.wizard.createFailed')
-      toast.error(msg)
+      const validationErrors = extractValidationErrors(err)
+      if (validationErrors.length > 0) {
+        // Jump to the first step a rejected field belongs to and surface the
+        // backend-authored messages inline.
+        const firstStep = validationErrors.reduce<WizardStep>(
+          (min, e) => Math.min(min, stepForValidationPath(e.path)) as WizardStep,
+          1,
+        )
+        setServerErrors(validationErrors)
+        setStep(firstStep)
+        return
+      }
+      toast.error(extractApiMessage(err) ?? t('agreement.wizard.createFailed'))
     }
   }
 
@@ -128,9 +164,10 @@ export function AgreementCreateWizard({
             billingFrequency={state.billingFrequency}
             totalAmount={state.totalAmount}
             allocation={state.allocation}
-            lines={state.lines}
+            cells={state.cells}
             effectiveFrom={state.effectiveFrom}
             effectiveTo={state.effectiveTo}
+            notes={state.notes}
             onChange={patch}
           />
         )}
@@ -138,12 +175,28 @@ export function AgreementCreateWizard({
       </div>
 
       {/* Inline validation for the active step */}
-      {currentErrors.length > 0 && (
-        <ul className="space-y-1 rounded-lg border border-[rgb(var(--state-warning-border))] bg-[rgb(var(--state-warning-bg)/0.12)] px-3 py-2 text-xs text-[rgb(var(--text-secondary))]">
-          {currentErrors.map((e) => (
-            <li key={e.key}>{t(e.key, e.params)}</li>
-          ))}
-        </ul>
+      {(currentErrors.length > 0 || serverErrors.length > 0) && (
+        <div className="space-y-2">
+          {serverErrors.length > 0 && (
+            <div className="rounded-lg border border-[rgb(var(--state-danger-border))] bg-[rgb(var(--state-danger-bg)/0.12)] px-3 py-2">
+              <p className="text-xs font-semibold text-[rgb(var(--state-danger-fg))]">
+                {t('agreement.wizard.serverValidation')}
+              </p>
+              <ul className="mt-1 space-y-1 text-xs text-[rgb(var(--text-secondary))]">
+                {serverErrors.map((e, i) => (
+                  <li key={`${e.path}-${i}`}>{e.message}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {currentErrors.length > 0 && (
+            <ul className="space-y-1 rounded-lg border border-[rgb(var(--state-warning-border))] bg-[rgb(var(--state-warning-bg)/0.12)] px-3 py-2 text-xs text-[rgb(var(--text-secondary))]">
+              {currentErrors.map((e) => (
+                <li key={e.key}>{t(e.key, e.params)}</li>
+              ))}
+            </ul>
+          )}
+        </div>
       )}
 
       {/* Footer */}

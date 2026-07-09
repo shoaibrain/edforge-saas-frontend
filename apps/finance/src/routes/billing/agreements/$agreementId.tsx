@@ -32,6 +32,8 @@ import { useAppStore } from '../../../stores/app.store'
 import { useFinanceSettings } from '../../../layouts/FinanceLayout'
 import { formatDateDual } from '../../../utils/format-date'
 import { FinanceStatusChip } from '../../../components/shared'
+import { feeTypeLabel } from '../../../components/shared/fee-types'
+import { extractApiMessage } from '../../../lib/api-validation-errors'
 
 type ConflictKind = 'openInvoices' | 'overlap' | null
 
@@ -44,13 +46,33 @@ function conflictKindFromError(err: unknown): ConflictKind {
   return null
 }
 
-function openInvoiceCountFromError(err: unknown): number {
-  // Backend throws ConflictException({ code, message, conflicts }) — there is
-  // no `openInvoiceCount` field; the count is the length of `conflicts`.
+/** One conflicting open invoice off the 409 CONFLICTING_OPEN_INVOICES body. */
+interface OpenInvoiceConflict {
+  invoiceId: string
+  invoiceNumber: string
+  grandTotal: number
+  matchedFeeTypes: string[]
+}
+
+function openInvoiceConflictsFromError(err: unknown): OpenInvoiceConflict[] {
+  // Backend throws ConflictException({ code, message, conflicts }) — the
+  // count is the length of `conflicts`; each entry identifies the invoice.
   const conflicts = (
     err as { response?: { data?: { conflicts?: unknown } } } | undefined
   )?.response?.data?.conflicts
-  return Array.isArray(conflicts) ? conflicts.length : 0
+  if (!Array.isArray(conflicts)) return []
+  return conflicts
+    .filter(
+      (c): c is Record<string, unknown> => !!c && typeof c === 'object',
+    )
+    .map((c) => ({
+      invoiceId: typeof c.invoiceId === 'string' ? c.invoiceId : '',
+      invoiceNumber: typeof c.invoiceNumber === 'string' ? c.invoiceNumber : '',
+      grandTotal: typeof c.grandTotal === 'number' ? c.grandTotal : 0,
+      matchedFeeTypes: Array.isArray(c.matchedFeeTypes)
+        ? c.matchedFeeTypes.map(String)
+        : [],
+    }))
 }
 
 export default function AgreementDetailPage() {
@@ -91,7 +113,7 @@ export default function AgreementDetailPage() {
       // errors toast + close.
       const kind = conflictKindFromError(err)
       if (kind) throw err
-      toast.error(t('agreement.activateDialog.failed'))
+      toast.error(extractApiMessage(err) ?? t('agreement.activateDialog.failed'))
       setShowActivate(false)
     }
   }
@@ -105,8 +127,8 @@ export default function AgreementDetailPage() {
       })
       toast.success(t('agreement.cancelDialog.success'))
       setShowCancel(false)
-    } catch {
-      toast.error(t('agreement.cancelDialog.failed'))
+    } catch (err) {
+      toast.error(extractApiMessage(err) ?? t('agreement.cancelDialog.failed'))
     }
   }
 
@@ -297,7 +319,9 @@ function AgreementSummaryCard({
         </Field>
         <Field label={t('agreement.coveredFeeTypes')}>
           <span className="text-[rgb(var(--text-primary))]">
-            {agreement.coveredFeeTypes.join(', ') || '—'}
+            {agreement.coveredFeeTypes
+              .map((ft) => feeTypeLabel(t, ft))
+              .join(', ') || '—'}
           </span>
         </Field>
         <Field label={t('agreement.students')}>
@@ -394,7 +418,7 @@ function AgreementTermsCard({
                   <UuidBadge value={line.studentId} />
                   {line.feeType && (
                     <span className="ml-2 text-xs text-[rgb(var(--text-tertiary))]">
-                      {line.feeType}
+                      {feeTypeLabel(t, line.feeType)}
                     </span>
                   )}
                 </span>
@@ -534,8 +558,12 @@ function ActivateAgreementDialog({
   onClose: () => void
 }) {
   const { t } = useTranslation('payments')
+  const settings = useFinanceSettings()
+  const { format } = useCurrency(settings)
   const [conflict, setConflict] = useState<ConflictKind>(null)
-  const [openInvoiceCount, setOpenInvoiceCount] = useState(0)
+  const [openInvoiceConflicts, setOpenInvoiceConflicts] = useState<
+    OpenInvoiceConflict[]
+  >([])
 
   const run = async (ack?: boolean) => {
     try {
@@ -544,7 +572,7 @@ function ActivateAgreementDialog({
       const kind = conflictKindFromError(err)
       setConflict(kind)
       if (kind === 'openInvoices') {
-        setOpenInvoiceCount(openInvoiceCountFromError(err))
+        setOpenInvoiceConflicts(openInvoiceConflictsFromError(err))
       }
     }
   }
@@ -570,7 +598,35 @@ function ActivateAgreementDialog({
 
       {conflict === 'openInvoices' && (
         <div className="mb-4 rounded-lg border border-[rgb(var(--state-warning-border))] bg-[rgb(var(--state-warning-bg)/0.14)] px-3 py-2 text-sm text-[rgb(var(--text-secondary))]">
-          {t('agreement.conflict.openInvoices', { count: openInvoiceCount })}
+          {t('agreement.conflict.openInvoices', {
+            count: openInvoiceConflicts.length,
+          })}
+          {openInvoiceConflicts.length > 0 && (
+            <ul className="mt-2 space-y-1 border-t border-[rgb(var(--state-warning-border)/0.4)] pt-2">
+              {openInvoiceConflicts.map((c, i) => (
+                <li
+                  key={c.invoiceId || i}
+                  className="flex items-center justify-between gap-3 text-xs"
+                >
+                  <span className="min-w-0 truncate">
+                    <span className="font-medium text-[rgb(var(--text-primary))]">
+                      {c.invoiceNumber}
+                    </span>
+                    {c.matchedFeeTypes.length > 0 && (
+                      <span className="ml-2 text-[rgb(var(--text-tertiary))]">
+                        {c.matchedFeeTypes
+                          .map((ft) => feeTypeLabel(t, ft))
+                          .join(', ')}
+                      </span>
+                    )}
+                  </span>
+                  <span className="flex-none font-medium text-[rgb(var(--text-primary))]">
+                    {format(c.grandTotal, { decimals: 0 })}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       )}
       {conflict === 'overlap' && (
@@ -644,6 +700,7 @@ function CancelAgreementDialog({
           value={reason}
           onChange={(e) => setReason(e.target.value)}
           placeholder={t('agreement.cancelDialog.reasonPlaceholder')}
+          maxLength={500}
           rows={3}
           className="w-full resize-none rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))] px-3 py-2 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
           autoFocus

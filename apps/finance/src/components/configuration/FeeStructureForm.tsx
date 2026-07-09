@@ -18,19 +18,15 @@ import { useState, useRef, useEffect, useCallback } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import type { FeeStructure, FeeType, FeeFrequency, TaxType } from '@edforge/types'
+import type { FeeStructure, FeeFrequency, TaxType } from '@edforge/types'
 import { Button, Select } from '@edforge/ui'
 import { useTranslation } from '@edforge/i18n'
 import { ChevronDown, X } from 'lucide-react'
+import { FEE_TYPES, feeTypeLabel } from '../shared/fee-types'
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
 /* ------------------------------------------------------------------ */
-
-const FEE_TYPES: FeeType[] = [
-  'tuition', 'admission', 'exam', 'transport', 'library',
-  'lab', 'hostel', 'uniform', 'miscellaneous', 'custom',
-]
 
 const FREQUENCIES: FeeFrequency[] = ['one_time', 'monthly', 'quarterly', 'annual']
 
@@ -123,8 +119,6 @@ export function FeeStructureForm({
 
   const validationError = (message?: string) =>
     message ? t(`feeStructure.validation.${message}`, { defaultValue: message }) : undefined
-  const feeTypeLabel = (feeType: FeeType) =>
-    t(`feeStructure.types.${feeType}`, { defaultValue: feeType })
   const frequencyLabel = (frequency: FeeFrequency) =>
     t(`feeStructure.frequencies.${frequency}`, { defaultValue: frequency })
   const taxTypeLabel = (taxType: TaxType) =>
@@ -263,7 +257,7 @@ export function FeeStructureForm({
                   <Select
                     value={field.value}
                     onChange={field.onChange}
-                    options={FEE_TYPES.map((ft) => ({ value: ft, label: feeTypeLabel(ft) }))}
+                    options={FEE_TYPES.map((ft) => ({ value: ft, label: feeTypeLabel(t, ft) }))}
                   />
                 )}
               />

@@ -1,22 +1,26 @@
 /**
  * Step 2 — Terms.
  *
- * Agreement type (fixed_total / per_student), covered fee types, billing
- * frequency, effective dates, and the per-member amounts. For fixed_total the
- * allocation sum is shown live against the total so the operator sees a
- * mismatch before the review step.
+ * Agreement type (fixed_total / per_student), covered fee types (multi-select
+ * over the backend feeTypeEnum — freeform entry is impossible), billing
+ * frequency, effective dates, notes, and the amounts. For fixed_total the
+ * allocation sum is shown live against the total; for per_student the editor
+ * is the full (member × covered feeType) matrix the backend F1 invariant
+ * requires.
  */
 
-import { useState } from 'react'
-import { X, Plus } from 'lucide-react'
 import { Select } from '@edforge/ui'
 import { useTranslation } from '@edforge/i18n'
 import { useCurrency } from '@edforge/types/use-currency'
-import type { AgreementType } from '@edforge/types'
+import type { AgreementType, FeeType, FeeFrequency } from '@edforge/types'
 import { useFinanceSettings } from '../../../layouts/FinanceLayout'
 import { UuidBadge } from '@edforge/archetype'
+import { FEE_TYPES, feeTypeLabel } from '../../shared/fee-types'
 import {
   BILLING_FREQUENCIES,
+  AMOUNT_SUM_TOLERANCE,
+  MAX_NOTES_LENGTH,
+  cellKey,
   parseAmount,
   type WizardMember,
 } from './wizard-types'
@@ -24,29 +28,35 @@ import {
 interface Step2Props {
   members: WizardMember[]
   agreementType: AgreementType
-  coveredFeeTypes: string[]
-  billingFrequency: string
+  coveredFeeTypes: FeeType[]
+  billingFrequency: FeeFrequency
   totalAmount: string
   allocation: Record<string, string>
-  lines: Record<string, { amount: string; feeType: string }>
+  cells: Record<string, string>
   effectiveFrom: string
   effectiveTo: string
+  notes: string
   onChange: (
     patch: Partial<{
       agreementType: AgreementType
-      coveredFeeTypes: string[]
-      billingFrequency: string
+      coveredFeeTypes: FeeType[]
+      billingFrequency: FeeFrequency
       totalAmount: string
       allocation: Record<string, string>
-      lines: Record<string, { amount: string; feeType: string }>
+      cells: Record<string, string>
       effectiveFrom: string
       effectiveTo: string
+      notes: string
     }>,
   ) => void
 }
 
 const inputClass =
   'w-full rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))] px-3 py-2 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]'
+// Amount inputs sit next to a flexible label column — fixed width, never
+// w-full, so the student/fee-type label cannot collapse under the input.
+const amountInputClass =
+  'w-32 flex-none rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))] px-3 py-2 text-sm text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]'
 const labelClass =
   'mb-1 block text-sm font-medium text-[rgb(var(--text-secondary))]'
 
@@ -57,51 +67,35 @@ export function Step2Terms({
   billingFrequency,
   totalAmount,
   allocation,
-  lines,
+  cells,
   effectiveFrom,
   effectiveTo,
+  notes,
   onChange,
 }: Step2Props) {
   const { t } = useTranslation('payments')
   const settings = useFinanceSettings()
   const { format } = useCurrency(settings)
-  const [feeTypeDraft, setFeeTypeDraft] = useState('')
 
-  const addFeeType = () => {
-    const v = feeTypeDraft.trim()
-    if (!v || coveredFeeTypes.includes(v)) {
-      setFeeTypeDraft('')
-      return
-    }
-    onChange({ coveredFeeTypes: [...coveredFeeTypes, v] })
-    setFeeTypeDraft('')
-  }
-  const removeFeeType = (v: string) =>
-    onChange({ coveredFeeTypes: coveredFeeTypes.filter((f) => f !== v) })
+  const toggleFeeType = (feeType: FeeType) =>
+    onChange({
+      coveredFeeTypes: coveredFeeTypes.includes(feeType)
+        ? coveredFeeTypes.filter((f) => f !== feeType)
+        : [...coveredFeeTypes, feeType],
+    })
 
   const setAllocation = (studentId: string, amount: string) =>
     onChange({ allocation: { ...allocation, [studentId]: amount } })
-  const setLine = (
-    studentId: string,
-    patch: Partial<{ amount: string; feeType: string }>,
-  ) =>
-    onChange({
-      lines: {
-        ...lines,
-        [studentId]: {
-          amount: lines[studentId]?.amount ?? '',
-          feeType: lines[studentId]?.feeType ?? '',
-          ...patch,
-        },
-      },
-    })
+  const setCell = (studentId: string, feeType: FeeType, amount: string) =>
+    onChange({ cells: { ...cells, [cellKey(studentId, feeType)]: amount } })
 
   const allocationSum = members.reduce(
     (acc, m) => acc + parseAmount(allocation[m.studentId]),
     0,
   )
   const total = parseAmount(totalAmount)
-  const mismatch = total > 0 && Math.abs(allocationSum - total) > 0.001
+  const mismatch =
+    total > 0 && Math.abs(allocationSum - total) > AMOUNT_SUM_TOLERANCE
 
   const typeOptions = [
     { value: 'fixed_total', label: t('agreement.type.fixed_total') },
@@ -136,59 +130,42 @@ export function Step2Terms({
             size="sm"
             options={freqOptions}
             value={billingFrequency}
-            onChange={(v) => onChange({ billingFrequency: v ?? 'monthly' })}
+            onChange={(v) =>
+              onChange({ billingFrequency: (v ?? 'monthly') as FeeFrequency })
+            }
           />
         </div>
       </div>
 
-      {/* Covered fee types */}
+      {/* Covered fee types — multi-select over the backend enum */}
       <div>
         <label className={labelClass}>
           {t('agreement.wizard.terms.coveredFeeTypes')}
         </label>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={feeTypeDraft}
-            onChange={(e) => setFeeTypeDraft(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault()
-                addFeeType()
-              }
-            }}
-            placeholder={t('agreement.wizard.terms.coveredFeeTypesPlaceholder')}
-            className={inputClass}
-          />
-          <button
-            type="button"
-            onClick={addFeeType}
-            className="flex items-center gap-1 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-3 py-2 text-sm text-[rgb(var(--text-primary))] hover:bg-[rgb(var(--background-tertiary))]"
-          >
-            <Plus className="h-4 w-4" />
-            {t('agreement.wizard.terms.addFeeType')}
-          </button>
-        </div>
-        {coveredFeeTypes.length > 0 && (
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {coveredFeeTypes.map((f) => (
-              <span
-                key={f}
-                className="inline-flex items-center gap-1 rounded-full bg-[rgb(var(--background-secondary))] px-2.5 py-1 text-xs text-[rgb(var(--text-secondary))]"
+        <p className="mb-2 text-xs text-[rgb(var(--text-tertiary))]">
+          {t('agreement.wizard.terms.coveredFeeTypesHint')}
+        </p>
+        <div className="flex flex-wrap gap-1.5">
+          {FEE_TYPES.map((feeType) => {
+            const selected = coveredFeeTypes.includes(feeType)
+            return (
+              <button
+                key={feeType}
+                type="button"
+                onClick={() => toggleFeeType(feeType)}
+                aria-pressed={selected}
+                className={[
+                  'rounded-full border px-2.5 py-1 text-xs transition-colors',
+                  selected
+                    ? 'border-[rgb(var(--accent-strong)/0.4)] bg-[rgb(var(--accent-soft))] font-medium text-[rgb(var(--accent-strong))]'
+                    : 'border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary))]',
+                ].join(' ')}
               >
-                {f}
-                <button
-                  type="button"
-                  onClick={() => removeFeeType(f)}
-                  className="text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))]"
-                  aria-label={t('agreement.wizard.family.remove')}
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </span>
-            ))}
-          </div>
-        )}
+                {feeTypeLabel(t, feeType)}
+              </button>
+            )
+          })}
+        </div>
       </div>
 
       {/* Amounts */}
@@ -200,7 +177,7 @@ export function Step2Terms({
             </label>
             <input
               type="number"
-              min="0"
+              min="0.01"
               step="0.01"
               value={totalAmount}
               onChange={(e) => onChange({ totalAmount: e.target.value })}
@@ -229,7 +206,7 @@ export function Step2Terms({
             <ul className="space-y-1.5">
               {members.map((m) => (
                 <li key={m.studentId} className="flex items-center gap-3">
-                  <div className="min-w-0 flex-1">
+                  <div className="min-w-32 flex-1">
                     <div className="truncate text-sm text-[rgb(var(--text-primary))]">
                       {m.studentName}
                     </div>
@@ -239,11 +216,11 @@ export function Step2Terms({
                   </div>
                   <input
                     type="number"
-                    min="0"
+                    min="0.01"
                     step="0.01"
                     value={allocation[m.studentId] ?? ''}
                     onChange={(e) => setAllocation(m.studentId, e.target.value)}
-                    className={`${inputClass} w-32`}
+                    className={amountInputClass}
                   />
                 </li>
               ))}
@@ -253,35 +230,55 @@ export function Step2Terms({
       ) : (
         <div>
           <span className={labelClass}>{t('agreement.wizard.terms.lines')}</span>
-          <ul className="mt-1 space-y-1.5">
-            {members.map((m) => (
-              <li key={m.studentId} className="flex items-center gap-3">
-                <div className="min-w-0 flex-1">
-                  <div className="truncate text-sm text-[rgb(var(--text-primary))]">
-                    {m.studentName}
+          <p className="mb-2 text-xs text-[rgb(var(--text-tertiary))]">
+            {t('agreement.wizard.terms.matrixHint')}
+          </p>
+          {coveredFeeTypes.length === 0 ? (
+            <p className="rounded-lg border border-dashed border-[rgb(var(--border-primary))] px-3 py-6 text-center text-xs text-[rgb(var(--text-tertiary))]">
+              {t('agreement.wizard.terms.selectFeeTypesFirst')}
+            </p>
+          ) : (
+            <ul className="space-y-2">
+              {members.map((m) => (
+                <li
+                  key={m.studentId}
+                  className="rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] p-3"
+                >
+                  <div className="mb-2 flex items-center justify-between gap-3">
+                    <span className="truncate text-sm font-medium text-[rgb(var(--text-primary))]">
+                      {m.studentName}
+                    </span>
+                    <span className="text-2xs text-[rgb(var(--text-tertiary))]">
+                      <UuidBadge value={m.studentId} />
+                    </span>
                   </div>
-                  <div className="text-2xs text-[rgb(var(--text-tertiary))]">
-                    <UuidBadge value={m.studentId} />
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    {coveredFeeTypes.map((feeType) => (
+                      <div
+                        key={feeType}
+                        className="flex items-center justify-between gap-3"
+                      >
+                        <span className="min-w-24 flex-1 truncate text-sm text-[rgb(var(--text-secondary))]">
+                          {feeTypeLabel(t, feeType)}
+                        </span>
+                        <input
+                          type="number"
+                          min="0.01"
+                          step="0.01"
+                          value={cells[cellKey(m.studentId, feeType)] ?? ''}
+                          onChange={(e) =>
+                            setCell(m.studentId, feeType, e.target.value)
+                          }
+                          aria-label={`${m.studentName} — ${feeTypeLabel(t, feeType)}`}
+                          className={amountInputClass}
+                        />
+                      </div>
+                    ))}
                   </div>
-                </div>
-                <input
-                  type="text"
-                  value={lines[m.studentId]?.feeType ?? ''}
-                  onChange={(e) => setLine(m.studentId, { feeType: e.target.value })}
-                  placeholder={t('agreement.wizard.terms.feeTypeOptional')}
-                  className={`${inputClass} w-40`}
-                />
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={lines[m.studentId]?.amount ?? ''}
-                  onChange={(e) => setLine(m.studentId, { amount: e.target.value })}
-                  className={`${inputClass} w-32`}
-                />
-              </li>
-            ))}
-          </ul>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       )}
 
@@ -309,6 +306,19 @@ export function Step2Terms({
             className={inputClass}
           />
         </div>
+      </div>
+
+      {/* Notes (optional, ≤500) */}
+      <div>
+        <label className={labelClass}>{t('agreement.wizard.terms.notes')}</label>
+        <textarea
+          value={notes}
+          onChange={(e) => onChange({ notes: e.target.value })}
+          placeholder={t('agreement.wizard.terms.notesPlaceholder')}
+          maxLength={MAX_NOTES_LENGTH}
+          rows={3}
+          className={`${inputClass} resize-none`}
+        />
       </div>
     </div>
   )

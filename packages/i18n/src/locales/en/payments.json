@@ -556,6 +556,7 @@
         "payerEmail": "Payer email",
         "familyId": "Family ID (optional)",
         "familyIdPlaceholder": "Link to a family record",
+        "familyIdHelp": "Internal family record id (UUID) — leave blank for a standalone agreement.",
         "members": "Members",
         "addStudent": "Add student",
         "noMembers": "No students added yet — add at least one.",
@@ -564,22 +565,23 @@
       "terms": {
         "agreementType": "Agreement type",
         "coveredFeeTypes": "Covered fee types",
-        "coveredFeeTypesPlaceholder": "e.g. tuition, transport",
-        "addFeeType": "Add fee type",
+        "coveredFeeTypesHint": "Fee types this agreement replaces — other fees bill normally.",
         "billingFrequency": "Billing frequency",
         "totalAmount": "Total amount",
         "allocation": "Allocation per student",
         "allocationHint": "Allocations must sum to the total amount.",
-        "lines": "Per-student lines",
+        "lines": "Per-student amounts",
+        "matrixHint": "Enter the negotiated per-term amount for every student and covered fee type.",
+        "selectFeeTypesFirst": "Select at least one covered fee type to enter amounts.",
         "effectiveFrom": "Effective from",
         "effectiveTo": "Effective to",
-        "feeTypeOptional": "Fee type (optional)"
+        "notes": "Notes (optional)",
+        "notesPlaceholder": "Internal notes about this agreement"
       },
       "frequency": {
         "monthly": "Monthly",
         "quarterly": "Quarterly",
-        "termly": "Termly",
-        "annually": "Annually",
+        "annual": "Annual",
         "one_time": "One-time"
       },
       "review": {
@@ -587,18 +589,26 @@
         "familySection": "Family & payer",
         "termsSection": "Terms",
         "membersSection": "Members",
+        "currency": "Currency",
         "createDraft": "Create draft"
       },
       "validation": {
         "titleRequired": "Title is required.",
+        "titleMax": "Title must be 160 characters or fewer.",
         "payerRequired": "Payer name is required.",
+        "payerNameMax": "Payer name must be 120 characters or fewer.",
+        "payerPhoneMax": "Payer phone must be 20 characters or fewer.",
+        "payerEmailInvalid": "Enter a valid payer email address.",
+        "familyIdInvalid": "Family ID must be a UUID.",
         "membersRequired": "Add at least one student.",
         "tooManyStudents": "An agreement covers at most 30 students.",
-        "feeTypesRequired": "Add at least one covered fee type.",
+        "feeTypesRequired": "Select at least one covered fee type.",
         "totalRequired": "Enter a total amount greater than zero.",
         "allocationSum": "Allocations sum to {{sum}} but the total is {{total}}.",
         "allocationCoverage": "Every member must have an allocation.",
-        "linesRequired": "Enter an amount for every member.",
+        "allocationPositive": "Every allocation must be greater than zero.",
+        "matrixRequired": "Enter an amount greater than zero for every student and covered fee type.",
+        "tooManyLines": "An agreement carries at most 300 amount lines (students × fee types).",
         "datesRequired": "Effective from and to dates are required.",
         "dateOrder": "The end date must be after the start date."
       },
@@ -607,6 +617,7 @@
         "back": "Back",
         "cancel": "Cancel"
       },
+      "serverValidation": "The server rejected the submission:",
       "createFailed": "Could not create agreement"
     }
   },

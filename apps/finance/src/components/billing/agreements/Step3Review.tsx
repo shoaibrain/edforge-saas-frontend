@@ -2,7 +2,9 @@
  * Step 3 — Review.
  *
  * Read-only summary of the wizard state before submit. Amounts are resolved
- * through the same currency formatter used across finance.
+ * through the same currency formatter used across finance; fee types and
+ * billing frequency render through the shared enum-label helpers so the
+ * review matches what the backend will store.
  */
 
 import { useTranslation } from '@edforge/i18n'
@@ -10,7 +12,8 @@ import { useCurrency } from '@edforge/types/use-currency'
 import { UuidBadge } from '@edforge/archetype'
 import { useFinanceSettings } from '../../../layouts/FinanceLayout'
 import { formatDateDual } from '../../../utils/format-date'
-import { parseAmount, type WizardState } from './wizard-types'
+import { feeTypeLabel } from '../../shared/fee-types'
+import { cellKey, parseAmount, type WizardState } from './wizard-types'
 
 export function Step3Review({ state }: { state: WizardState }) {
   const { t } = useTranslation('payments')
@@ -50,17 +53,22 @@ export function Step3Review({ state }: { state: WizardState }) {
             {t(`agreement.type.${state.agreementType}`)}
           </Item>
           <Item label={t('agreement.billingFrequency')}>
-            {t(`agreement.wizard.frequency.${state.billingFrequency}`, {
-              defaultValue: state.billingFrequency,
-            })}
+            {t(`agreement.wizard.frequency.${state.billingFrequency}`)}
+          </Item>
+          <Item label={t('agreement.wizard.review.currency')}>
+            {settings.currency}
           </Item>
           <Item label={t('agreement.coveredFeeTypes')}>
-            {state.coveredFeeTypes.join(', ') || '—'}
+            {state.coveredFeeTypes.map((ft) => feeTypeLabel(t, ft)).join(', ') ||
+              '—'}
           </Item>
           {state.agreementType === 'fixed_total' && (
             <Item label={t('agreement.detail.totalAmount')}>
               {format(parseAmount(state.totalAmount), { decimals: 0 })}
             </Item>
+          )}
+          {state.notes.trim() && (
+            <Item label={t('agreement.detail.notes')}>{state.notes.trim()}</Item>
           )}
         </dl>
       </Card>
@@ -68,35 +76,49 @@ export function Step3Review({ state }: { state: WizardState }) {
       <Card title={t('agreement.wizard.review.membersSection')}>
         <ul className="divide-y divide-[rgb(var(--border-primary))]">
           {state.members.map((m) => {
-            const amount =
+            const total =
               state.agreementType === 'fixed_total'
                 ? parseAmount(state.allocation[m.studentId])
-                : parseAmount(state.lines[m.studentId]?.amount)
-            const feeType =
-              state.agreementType === 'per_student'
-                ? state.lines[m.studentId]?.feeType
-                : undefined
+                : state.coveredFeeTypes.reduce(
+                    (acc, ft) =>
+                      acc + parseAmount(state.cells[cellKey(m.studentId, ft)]),
+                    0,
+                  )
             return (
-              <li
-                key={m.studentId}
-                className="flex items-center justify-between py-1.5 text-sm"
-              >
-                <div className="min-w-0">
-                  <span className="text-[rgb(var(--text-primary))]">
-                    {m.studentName}
-                  </span>
-                  {feeType && (
-                    <span className="ml-2 text-xs text-[rgb(var(--text-tertiary))]">
-                      {feeType}
+              <li key={m.studentId} className="py-1.5 text-sm">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <span className="text-[rgb(var(--text-primary))]">
+                      {m.studentName}
                     </span>
-                  )}
-                  <span className="ml-2 text-2xs text-[rgb(var(--text-tertiary))]">
-                    <UuidBadge value={m.studentId} />
+                    <span className="ml-2 text-2xs text-[rgb(var(--text-tertiary))]">
+                      <UuidBadge value={m.studentId} />
+                    </span>
+                  </div>
+                  <span className="flex-none font-medium text-[rgb(var(--text-primary))]">
+                    {format(total, { decimals: 0 })}
                   </span>
                 </div>
-                <span className="font-medium text-[rgb(var(--text-primary))]">
-                  {format(amount, { decimals: 0 })}
-                </span>
+                {state.agreementType === 'per_student' && (
+                  <ul className="mt-1 space-y-0.5">
+                    {state.coveredFeeTypes.map((ft) => (
+                      <li
+                        key={ft}
+                        className="flex items-center justify-between gap-3 text-xs text-[rgb(var(--text-tertiary))]"
+                      >
+                        <span className="min-w-0 truncate">
+                          {feeTypeLabel(t, ft)}
+                        </span>
+                        <span className="flex-none">
+                          {format(
+                            parseAmount(state.cells[cellKey(m.studentId, ft)]),
+                            { decimals: 0 },
+                          )}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </li>
             )
           })}

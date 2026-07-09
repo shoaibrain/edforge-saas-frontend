@@ -12,7 +12,13 @@ import { useTranslation } from '@edforge/i18n'
 import { useSearchStudents } from '@edforge/finance-services'
 import type { StudentSearchResult } from '@edforge/finance-services'
 import { UuidBadge } from '@edforge/archetype'
-import { MAX_AGREEMENT_STUDENTS, type WizardMember } from './wizard-types'
+import {
+  MAX_AGREEMENT_STUDENTS,
+  MAX_TITLE_LENGTH,
+  MAX_PAYER_NAME_LENGTH,
+  MAX_PAYER_PHONE_LENGTH,
+  type WizardMember,
+} from './wizard-types'
 
 interface Step1Props {
   schoolId: string
@@ -83,6 +89,7 @@ export function Step1FamilyMembers({
             value={title}
             onChange={(e) => onChange({ title: e.target.value })}
             placeholder={t('agreement.wizard.family.titlePlaceholder')}
+            maxLength={MAX_TITLE_LENGTH}
             className={inputClass}
           />
         </div>
@@ -95,6 +102,7 @@ export function Step1FamilyMembers({
             value={payerName}
             onChange={(e) => onChange({ payerName: e.target.value })}
             placeholder={t('agreement.wizard.family.payerNamePlaceholder')}
+            maxLength={MAX_PAYER_NAME_LENGTH}
             className={inputClass}
           />
         </div>
@@ -107,6 +115,7 @@ export function Step1FamilyMembers({
               type="tel"
               value={payerPhone}
               onChange={(e) => onChange({ payerPhone: e.target.value })}
+              maxLength={MAX_PAYER_PHONE_LENGTH}
               className={inputClass}
             />
           </div>
@@ -133,6 +142,9 @@ export function Step1FamilyMembers({
             placeholder={t('agreement.wizard.family.familyIdPlaceholder')}
             className={inputClass}
           />
+          <p className="mt-1 text-xs text-[rgb(var(--text-tertiary))]">
+            {t('agreement.wizard.family.familyIdHelp')}
+          </p>
         </div>
       </div>
 
