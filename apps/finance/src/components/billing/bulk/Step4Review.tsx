@@ -12,6 +12,7 @@ import type { UseQueryResult } from '@tanstack/react-query'
 import { useTranslation } from '@edforge/i18n'
 import { useCurrency } from '@edforge/types/use-currency'
 import { useFinanceSettings } from '../../../layouts/FinanceLayout'
+import { BillingSourceChip, type BillingSource } from '../../shared'
 import { computeBatch } from './compute'
 import type {
   ComputedInvoice,
@@ -61,6 +62,16 @@ export function Step4Review({
     () => [...new Set(students.map(s => s.currentGradeLevel))].sort(),
     [students],
   )
+
+  // FB-3.10 — per-student billing source from the server preview (best-effort;
+  // undefined until the preview resolves or when the BE omits `perStudent`).
+  const billingSourceByStudent = useMemo(() => {
+    const map = new Map<string, BillingSource>()
+    for (const p of previewQuery.data?.perStudent ?? []) {
+      map.set(p.studentId, p.billingSource)
+    }
+    return map
+  }, [previewQuery.data?.perStudent])
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1fr,300px] gap-6">
@@ -149,7 +160,11 @@ export function Step4Review({
             </div>
             <div className="space-y-1.5">
               {billableRows.map(inv => (
-                <PerStudentRow key={inv.studentId} inv={inv} />
+                <PerStudentRow
+                  key={inv.studentId}
+                  inv={inv}
+                  billingSource={billingSourceByStudent.get(inv.studentId)}
+                />
               ))}
               {billableRows.length === 0 && (
                 <div className="text-center py-6 text-sm text-[rgb(var(--text-tertiary))] border border-dashed border-[rgb(var(--border-primary))] rounded-md">
@@ -258,7 +273,13 @@ function fmtCounter(n: number | undefined): React.ReactNode {
 // Per-student row (expandable)
 // ---------------------------------------------------------------------------
 
-function PerStudentRow({ inv }: { inv: ComputedInvoice }) {
+function PerStudentRow({
+  inv,
+  billingSource,
+}: {
+  inv: ComputedInvoice
+  billingSource?: BillingSource
+}) {
   const { t } = useTranslation('payments')
   const settings = useFinanceSettings()
   const { format: formatCurrency } = useCurrency(settings)
@@ -287,6 +308,7 @@ function PerStudentRow({ inv }: { inv: ComputedInvoice }) {
             })}
           </div>
         </div>
+        {billingSource && <BillingSourceChip source={billingSource} />}
         <span className="text-sm font-mono font-semibold text-[rgb(var(--text-primary))] whitespace-nowrap">
           {formatCurrency(inv.total)}
         </span>

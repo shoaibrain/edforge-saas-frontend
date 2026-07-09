@@ -117,7 +117,12 @@
       "activeAgreements": "{{count}} active agreement",
       "activeAgreements_plural": "{{count}} active agreements",
       "invoicedViaAgreement": "{{count}} invoices · {{amount}} billed via agreements",
-      "none": "No active agreements"
+      "none": "No active agreements",
+      "studentsCoveredLabel": "Students covered",
+      "activeAgreementsLabel": "Active agreements",
+      "invoicedViaAgreementLabel": "Invoiced via agreement",
+      "invoicedCount": "{{count}} invoice",
+      "invoicedCount_plural": "{{count}} invoices"
     }
   },
   "invoices": {
@@ -175,6 +180,13 @@
     "loadedCount": "{{count}} loaded",
     "paidCount": "{{count}} paid",
     "loadedSelectionOnly": "Selection applies to loaded records only ({{count}} shown). Load more pages to include additional invoices.",
+    "billingSourceLabel": "Billing source",
+    "billingSourceFilter": {
+      "all": "All sources",
+      "standard": "Standard",
+      "agreement": "Agreement",
+      "mixed": "Mixed"
+    },
     "searchPlaceholder": "Search by invoice # or student...",
     "issueSelected": "Issue Selected ({{count}})",
     "sendReminder": "Send reminder",
@@ -298,7 +310,10 @@
       "discountFromRule": "Discount {{amount}} from rule {{name}}",
       "overrideBanner": "Fee structures were overridden for this invoice.",
       "overrideDetail": "Agreement {{title}} bypassed at {{date}} by {{operator}}.",
-      "empty": "No provenance recorded for this invoice."
+      "empty": "No provenance recorded for this invoice.",
+      "howCalculated": "How was this calculated?",
+      "overridesTitle": "Operator overrides",
+      "overrideRequested": "Requested fee structures: {{count}}"
     },
     "error": {
       "forbidden": "You don't have permission to view this invoice.",
@@ -418,6 +433,13 @@
     "overrideTitle": "Override active agreement",
     "overrideRequiresManage": "You need billing manage permission to override an active agreement.",
     "overrideConfirm": "This student is covered by agreement {{title}}. Billing from the catalog will override it. Continue?",
+    "overrideDescription": "An active agreement already covers this student for the requested fee types. Open the existing invoice, or override the agreement to bill from the fee catalog.",
+    "overrideGenerate": "Override & generate",
+    "overrideGenerating": "Overriding…",
+    "overrideSuccess": "Invoice generated with agreement overridden",
+    "overrideFailed": "Could not override the agreement",
+    "viewExistingInvoice": "View existing invoice",
+    "keepAgreement": "Keep agreement",
     "coveredFeeTypes": "Covered fee types",
     "activate": "Activate",
     "activating": "Activating…",

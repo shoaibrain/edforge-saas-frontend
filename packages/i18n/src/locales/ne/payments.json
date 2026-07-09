@@ -117,7 +117,12 @@
       "activeAgreements": "{{count}} सक्रिय सम्झौता",
       "activeAgreements_plural": "{{count}} सक्रिय सम्झौताहरू",
       "invoicedViaAgreement": "{{count}} बीजक · सम्झौताद्वारा {{amount}} बिल गरिएको",
-      "none": "कुनै सक्रिय सम्झौता छैन"
+      "none": "कुनै सक्रिय सम्झौता छैन",
+      "studentsCoveredLabel": "समेटिएका विद्यार्थी",
+      "activeAgreementsLabel": "सक्रिय सम्झौताहरू",
+      "invoicedViaAgreementLabel": "सम्झौताद्वारा बीजक",
+      "invoicedCount": "{{count}} बीजक",
+      "invoicedCount_plural": "{{count}} बीजकहरू"
     }
   },
   "invoices": {
@@ -175,6 +180,13 @@
     "loadedCount": "{{count}} लोड भएको",
     "paidCount": "{{count}} भुक्तानी भएको",
     "loadedSelectionOnly": "चयन लोड भएका रेकर्डहरूमा मात्र लागू हुन्छ ({{count}} देखाइएको)। थप बीजक समावेश गर्न थप पृष्ठहरू लोड गर्नुहोस्।",
+    "billingSourceLabel": "बिलिङ स्रोत",
+    "billingSourceFilter": {
+      "all": "सबै स्रोत",
+      "standard": "मानक",
+      "agreement": "सम्झौता",
+      "mixed": "मिश्रित"
+    },
     "searchPlaceholder": "बीजक नं. वा विद्यार्थीबाट खोज्नुहोस्...",
     "issueSelected": "चयनित जारी गर्नुहोस् ({{count}})",
     "sendReminder": "रिमाइन्डर पठाउनुहोस्",
@@ -298,7 +310,10 @@
       "discountFromRule": "नियम {{name}} बाट {{amount}} छुट",
       "overrideBanner": "यस बीजकका लागि शुल्क संरचनाहरू ओभरराइड गरियो।",
       "overrideDetail": "सम्झौता {{title}} {{date}} मा {{operator}} द्वारा बाइपास गरियो।",
-      "empty": "यस बीजकको कुनै स्रोत रेकर्ड छैन।"
+      "empty": "यस बीजकको कुनै स्रोत रेकर्ड छैन।",
+      "howCalculated": "यो कसरी गणना गरियो?",
+      "overridesTitle": "सञ्चालक ओभरराइडहरू",
+      "overrideRequested": "अनुरोध गरिएका शुल्क संरचनाहरू: {{count}}"
     },
     "error": {
       "forbidden": "तपाईंसँग यो बीजक हेर्ने अनुमति छैन।",
@@ -418,6 +433,13 @@
     "overrideTitle": "सक्रिय सम्झौता ओभरराइड गर्नुहोस्",
     "overrideRequiresManage": "सक्रिय सम्झौता ओभरराइड गर्न तपाईंलाई बिलिङ व्यवस्थापन अनुमति चाहिन्छ।",
     "overrideConfirm": "यो विद्यार्थी सम्झौता {{title}} अन्तर्गत छ। सूचीबाट बिलिङले यसलाई ओभरराइड गर्नेछ। जारी राख्ने?",
+    "overrideDescription": "सक्रिय सम्झौताले यो विद्यार्थीलाई अनुरोध गरिएका शुल्क प्रकारहरूका लागि पहिले नै समेट्छ। अवस्थित बीजक खोल्नुहोस्, वा शुल्क सूचीबाट बिल गर्न सम्झौता ओभरराइड गर्नुहोस्।",
+    "overrideGenerate": "ओभरराइड गरी सिर्जना गर्नुहोस्",
+    "overrideGenerating": "ओभरराइड गर्दै…",
+    "overrideSuccess": "सम्झौता ओभरराइड गरी बीजक सिर्जना गरियो",
+    "overrideFailed": "सम्झौता ओभरराइड गर्न सकिएन",
+    "viewExistingInvoice": "अवस्थित बीजक हेर्नुहोस्",
+    "keepAgreement": "सम्झौता राख्नुहोस्",
     "coveredFeeTypes": "समेटिएका शुल्क प्रकारहरू",
     "activate": "सक्रिय गर्नुहोस्",
     "activating": "सक्रिय गर्दै…",
