@@ -402,7 +402,10 @@
     "refunded": "Refunded",
     "partially_refunded": "Partially Refunded",
     "debit": "Debit",
-    "credit": "Credit"
+    "credit": "Credit",
+    "active": "Active",
+    "expired": "Expired",
+    "superseded": "Superseded"
   },
   "billingSource": {
     "standard": "Standard",
@@ -448,7 +451,141 @@
     "empty": "No agreements yet.",
     "created": "Agreement created",
     "activated": "Agreement activated",
-    "cancelled": "Agreement cancelled"
+    "cancelled": "Agreement cancelled",
+    "selectSchool": "Select a school to manage agreements.",
+    "list": {
+      "title": "Title",
+      "type": "Type",
+      "students": "Students",
+      "studentCount": "{{count}} student",
+      "studentCount_plural": "{{count}} students",
+      "effective": "Effective",
+      "coveredFeeTypes": "Fee types",
+      "searchPlaceholder": "Search agreements…",
+      "loadedCount": "{{count}} loaded",
+      "emptyDescription": "Create your first family-billing agreement to bundle billing across siblings."
+    },
+    "presets": {
+      "all": "All",
+      "draft": "Draft",
+      "active": "Active",
+      "cancelled": "Cancelled",
+      "expired": "Expired"
+    },
+    "stats": {
+      "total": "Agreements",
+      "active": "Active",
+      "draft": "Draft",
+      "students": "Students covered"
+    },
+    "detail": {
+      "back": "Back to agreements",
+      "terms": "Terms",
+      "totalAmount": "Total amount",
+      "allocation": "Allocation",
+      "perStudentLines": "Per-student lines",
+      "student": "Student",
+      "amount": "Amount",
+      "feeType": "Fee type",
+      "notes": "Notes",
+      "statusHistory": "Status history",
+      "noStatusHistory": "No status changes recorded yet.",
+      "transition": "{{from}} → {{to}}",
+      "versions": "Versions",
+      "noVersions": "No prior versions.",
+      "currentVersion": "Current",
+      "error": {
+        "forbidden": "You don't have permission to view this agreement.",
+        "notFound": "Agreement not found in this school."
+      }
+    },
+    "activateDialog": {
+      "title": "Activate agreement",
+      "description": "Activating starts billing under this agreement. Any prior active version is superseded.",
+      "confirm": "Activate",
+      "success": "Agreement activated",
+      "failed": "Could not activate agreement"
+    },
+    "cancelDialog": {
+      "title": "Cancel agreement",
+      "description": "Cancelling stops billing under this agreement. This cannot be undone.",
+      "reason": "Reason (optional)",
+      "reasonPlaceholder": "Why is this agreement being cancelled?",
+      "confirm": "Cancel agreement",
+      "keep": "Keep agreement",
+      "success": "Agreement cancelled",
+      "failed": "Could not cancel agreement"
+    },
+    "wizard": {
+      "title": "New agreement",
+      "description": "Bundle billing across a family or multiple students into one agreement.",
+      "steps": {
+        "family": "Family & members",
+        "terms": "Terms",
+        "review": "Review"
+      },
+      "family": {
+        "title": "Title",
+        "titlePlaceholder": "e.g. Sharma siblings 2083",
+        "payerName": "Payer name",
+        "payerNamePlaceholder": "Primary contact for billing",
+        "payerPhone": "Payer phone",
+        "payerEmail": "Payer email",
+        "familyId": "Family ID (optional)",
+        "familyIdPlaceholder": "Link to a family record",
+        "members": "Members",
+        "addStudent": "Add student",
+        "noMembers": "No students added yet — add at least one.",
+        "remove": "Remove"
+      },
+      "terms": {
+        "agreementType": "Agreement type",
+        "coveredFeeTypes": "Covered fee types",
+        "coveredFeeTypesPlaceholder": "e.g. tuition, transport",
+        "addFeeType": "Add fee type",
+        "billingFrequency": "Billing frequency",
+        "totalAmount": "Total amount",
+        "allocation": "Allocation per student",
+        "allocationHint": "Allocations must sum to the total amount.",
+        "lines": "Per-student lines",
+        "effectiveFrom": "Effective from",
+        "effectiveTo": "Effective to",
+        "feeTypeOptional": "Fee type (optional)"
+      },
+      "frequency": {
+        "monthly": "Monthly",
+        "quarterly": "Quarterly",
+        "termly": "Termly",
+        "annually": "Annually",
+        "one_time": "One-time"
+      },
+      "review": {
+        "title": "Review agreement",
+        "familySection": "Family & payer",
+        "termsSection": "Terms",
+        "membersSection": "Members",
+        "createDraft": "Create draft"
+      },
+      "validation": {
+        "titleRequired": "Title is required.",
+        "payerRequired": "Payer name is required.",
+        "membersRequired": "Add at least one student.",
+        "tooManyStudents": "An agreement covers at most 30 students.",
+        "feeTypesRequired": "Add at least one covered fee type.",
+        "totalRequired": "Enter a total amount greater than zero.",
+        "allocationSum": "Allocations sum to {{sum}} but the total is {{total}}.",
+        "allocationCoverage": "Every member must have an allocation.",
+        "linesRequired": "Enter an amount for every member.",
+        "datesRequired": "Effective from and to dates are required.",
+        "dateOrder": "The end date must be after the start date."
+      },
+      "footer": {
+        "next": "Next",
+        "back": "Back",
+        "cancel": "Cancel"
+      },
+      "createFailed": "Could not create agreement"
+    }
   },
   "feeStructure": {
     "kpi": {

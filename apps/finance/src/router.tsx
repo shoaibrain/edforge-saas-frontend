@@ -24,6 +24,9 @@ import FinanceReceiptPage from './routes/billing/payments/receipt'
 import StudentAccountsPage from './routes/billing/accounts/index'
 import FeeStructuresPage from './routes/configuration/fee-structures'
 import PaymentGatewaysPage from './routes/configuration/payment-gateways'
+import AgreementsListPage from './routes/billing/agreements/index'
+import AgreementDetailPage from './routes/billing/agreements/$agreementId'
+import CreateAgreementPage from './routes/billing/agreements/create'
 
 // ============================================================================
 // ROOT ROUTE
@@ -102,6 +105,29 @@ const accountsRoute = createRoute({
     component: StudentAccountsPage,
 })
 
+// Agreements List (FB-2.8)
+const agreementsRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/agreements',
+    component: AgreementsListPage,
+})
+
+// Create Agreement wizard (FB-2.9). MUST precede the $agreementId route so
+// /agreements/create matches the wizard, not the detail param (same ordering
+// trap as bulkGenerateRoute → invoiceDetailRoute).
+const createAgreementRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/agreements/create',
+    component: CreateAgreementPage,
+})
+
+// Agreement Detail (FB-2.8)
+const agreementDetailRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/agreements/$agreementId',
+    component: AgreementDetailPage,
+})
+
 // Configuration > Fee Structures
 const feeStructuresRoute = createRoute({
     getParentRoute: () => rootRoute,
@@ -168,6 +194,9 @@ const routeTree = rootRoute.addChildren([
     recordPaymentRoute,
     receiptRoute,
     accountsRoute,
+    createAgreementRoute,  // Must be before agreementDetailRoute so /agreements/create matches before /$agreementId
+    agreementsRoute,
+    agreementDetailRoute,
     feeStructuresRoute,
     paymentGatewaysRoute,
     // Legacy redirects
