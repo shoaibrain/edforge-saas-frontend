@@ -1004,6 +1004,7 @@
       },
       "searchPlaceholder": "ग्रेड नाम वा कोड खोज्नुहोस्…",
       "presets": {
+        "label": "देखाउनुहोस्",
         "all": "सबै",
         "withCourses": "पाठ्यक्रम भएका",
         "empty": "खाली"

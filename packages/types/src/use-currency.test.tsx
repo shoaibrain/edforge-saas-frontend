@@ -68,3 +68,19 @@ describe("useCurrency", () => {
     expect(result.current.format(12500)).toBe("NPR 12,500.00");
   });
 });
+
+describe("compact grouping is currency-driven (USD-flash symptom lock)", () => {
+  it("formats USD with western compact notation", () => {
+    const { result } = renderHook(() =>
+      useCurrency({ ...baseSettings, currency: "USD" }),
+    );
+    expect(result.current.formatCompact(1260000)).toBe("$1.3M");
+    expect(result.current.formatCompact(251800)).toBe("$251.8K");
+  });
+
+  it("formats NPR with south-asian lakh notation", () => {
+    const { result } = renderHook(() => useCurrency(baseSettings));
+    expect(result.current.formatCompact(1260000)).toBe("NPR 12.6L");
+    expect(result.current.formatCompact(251800)).toBe("NPR 2.5L");
+  });
+});
