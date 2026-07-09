@@ -190,6 +190,7 @@ export function useGenerateInvoice(schoolId: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: paymentKeys.invoices(schoolId) })
       queryClient.invalidateQueries({ queryKey: paymentKeys.studentAccounts(schoolId) })
+      queryClient.invalidateQueries({ queryKey: paymentKeys.dashboard(schoolId) })
     },
   })
 }
@@ -202,6 +203,7 @@ export function useIssueInvoice(schoolId: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: paymentKeys.invoices(schoolId) })
       queryClient.invalidateQueries({ queryKey: paymentKeys.studentAccounts(schoolId) })
+      queryClient.invalidateQueries({ queryKey: paymentKeys.dashboard(schoolId) })
     },
   })
 }
@@ -215,6 +217,7 @@ export function useCancelInvoice(schoolId: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: paymentKeys.invoices(schoolId) })
       queryClient.invalidateQueries({ queryKey: paymentKeys.studentAccounts(schoolId) })
+      queryClient.invalidateQueries({ queryKey: paymentKeys.dashboard(schoolId) })
     },
   })
 }

@@ -374,11 +374,16 @@ export default function RecordPaymentPage() {
       .map((inv) => {
         const parsed = parseFloat(allocations[inv.invoiceId] ?? '')
         const amt = Number.isFinite(parsed) && parsed > 0 ? parsed : 0
-        return { invoiceId: inv.invoiceId, amount: amt }
+        // Round to 2dp so a float-epsilon per-line value can't make the
+        // top-level total drift from the exact sum of the applications.
+        return { invoiceId: inv.invoiceId, amount: Math.round(amt * 100) / 100 }
       })
       .filter((a) => a.amount > 0)
 
-    const sumTotal = applications.reduce((s, a) => s + a.amount, 0)
+    // Derived from the already-rounded application amounts, then rounded again
+    // to swallow the accumulation epsilon — so `amount === sum(applications)`.
+    const sumTotal =
+      Math.round(applications.reduce((s, a) => s + a.amount, 0) * 100) / 100
 
     try {
       await recordMutation.mutateAsync({

@@ -311,6 +311,7 @@
       "overrideBanner": "Fee structures were overridden for this invoice.",
       "overrideDetail": "Agreement {{title}} bypassed at {{date}} by {{operator}}.",
       "empty": "No provenance recorded for this invoice.",
+      "error": "Couldn't load billing provenance. Please try again.",
       "howCalculated": "How was this calculated?",
       "overridesTitle": "Operator overrides",
       "overrideRequested": "Requested fee structures: {{count}}"
@@ -1079,6 +1080,9 @@
       "primaryContact": "Primary contact: {{name}}",
       "allocateHeader": "Allocate across siblings *",
       "allocationLabel": "Amount for {{invoice}}",
+      "allocation": {
+        "exceedsBalance": "Exceeds balance of {{balance}}"
+      },
       "amountDue": "Due {{amount}}",
       "suggested": "· suggested {{amount}}",
       "totalDue": "Total due",

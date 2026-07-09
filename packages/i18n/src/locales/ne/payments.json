@@ -311,6 +311,7 @@
       "overrideBanner": "यस बीजकका लागि शुल्क संरचनाहरू ओभरराइड गरियो।",
       "overrideDetail": "सम्झौता {{title}} {{date}} मा {{operator}} द्वारा बाइपास गरियो।",
       "empty": "यस बीजकको कुनै स्रोत रेकर्ड छैन।",
+      "error": "बिलिङ स्रोत लोड गर्न सकिएन। कृपया पुन: प्रयास गर्नुहोस्।",
       "howCalculated": "यो कसरी गणना गरियो?",
       "overridesTitle": "सञ्चालक ओभरराइडहरू",
       "overrideRequested": "अनुरोध गरिएका शुल्क संरचनाहरू: {{count}}"
@@ -1079,6 +1080,9 @@
       "primaryContact": "मुख्य सम्पर्क: {{name}}",
       "allocateHeader": "दाजुभाइ/दिदीबहिनीहरूमा बाँडफाँट *",
       "allocationLabel": "{{invoice}} का लागि रकम",
+      "allocation": {
+        "exceedsBalance": "{{balance}} को बाँकी रकम भन्दा बढी"
+      },
       "amountDue": "बाँकी {{amount}}",
       "suggested": "· सुझाव {{amount}}",
       "totalDue": "कुल बाँकी",

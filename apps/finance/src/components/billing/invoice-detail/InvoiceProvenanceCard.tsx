@@ -8,9 +8,10 @@
  *
  * Fetch gating: `useInvoiceProvenance` starts as soon as both ids are present,
  * so the fetching body (`<ProvenanceBody>`) is mounted ONLY while the
- * disclosure is expanded. Pure-standard invoices (no agreement) never mount the
- * card at all, so they never fetch. This keeps the invoice detail page cheap
- * for the common catalog-billed invoice.
+ * disclosure is expanded. The card ALWAYS renders (collapsed) — bypassed
+ * catalog invoices carry AGREEMENT_BYPASSED override rows that must be
+ * reachable — but no fetch fires until the operator opens it, keeping the
+ * invoice detail page cheap for the common catalog-billed invoice.
  *
  * Props mirror InvoiceLineItemsCard's `{ invoice, format }` convention, plus
  * `schoolId` for the provenance query.
@@ -40,11 +41,6 @@ const SOURCE_TO_BILLING: Record<ProvenanceLineSource, BillingSource | null> = {
 export function InvoiceProvenanceCard({ schoolId, invoice, format }: InvoiceProvenanceCardProps) {
   const { t } = useTranslation('payments')
   const [open, setOpen] = useState(false)
-
-  // Only render for agreement-priced invoices; pure-standard invoices carry no
-  // interesting provenance and shouldn't pay for the extra fetch.
-  const isAgreementPriced = invoice.feeOverrideMode === 'agreement' || !!invoice.agreementId
-  if (!isAgreementPriced) return null
 
   return (
     <section className="overflow-hidden rounded-xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))]">
@@ -78,7 +74,7 @@ function ProvenanceBody({
   format: (amount: number) => string
 }) {
   const { t } = useTranslation('payments')
-  const { data: provenance, isLoading, isError } = useInvoiceProvenance(schoolId, invoiceId)
+  const { data: provenance, isLoading, isError, refetch } = useInvoiceProvenance(schoolId, invoiceId)
 
   if (isLoading) {
     return (
@@ -90,7 +86,29 @@ function ProvenanceBody({
     )
   }
 
-  if (isError || !provenance) {
+  if (isError) {
+    return (
+      <div className="px-4 py-6 text-center">
+        <p className="text-sm text-[rgb(var(--state-danger-fg))]">
+          {t('invoiceDetail.provenance.error')}
+        </p>
+        <button
+          type="button"
+          onClick={() => void refetch()}
+          className="mt-3 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))] px-4 py-2 text-sm font-medium text-[rgb(var(--text-primary))] transition-colors hover:bg-[rgb(var(--background-tertiary))]"
+        >
+          {t('actions.retry')}
+        </button>
+      </div>
+    )
+  }
+
+  const lines = provenance?.lines ?? []
+  const overrides = provenance?.overrides ?? []
+
+  // Bypassed catalog invoices carry override rows with no priced provenance
+  // lines; only treat the card as truly empty when BOTH are absent.
+  if (lines.length === 0 && overrides.length === 0) {
     return (
       <p className="px-4 py-6 text-center text-sm text-[rgb(var(--text-tertiary))]">
         {t('invoiceDetail.provenance.empty')}
@@ -98,19 +116,13 @@ function ProvenanceBody({
     )
   }
 
-  const { lines, overrides } = provenance
-
   return (
     <div className="space-y-3 p-4">
       <p className="text-xs text-[rgb(var(--text-tertiary))]">
         {t('invoiceDetail.provenance.description')}
       </p>
 
-      {lines.length === 0 ? (
-        <p className="py-2 text-sm text-[rgb(var(--text-tertiary))]">
-          {t('invoiceDetail.provenance.empty')}
-        </p>
-      ) : (
+      {lines.length > 0 && (
         <ul className="space-y-2">
           {lines.map((line) => (
             <ProvenanceLineRow key={line.lineId} line={line} format={format} />
@@ -118,7 +130,7 @@ function ProvenanceBody({
         </ul>
       )}
 
-      {overrides && overrides.length > 0 && (
+      {overrides.length > 0 && (
         <div className="mt-3 space-y-2 rounded-lg border border-[rgb(var(--state-warning-border)/0.3)] bg-[rgb(var(--state-warning-bg)/0.25)] p-3">
           <div className="flex items-center gap-1.5 text-xs font-semibold text-[rgb(var(--text-primary))]">
             <ShieldAlert className="h-3.5 w-3.5 text-[rgb(var(--state-warning-fg))]" />

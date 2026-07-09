@@ -179,19 +179,19 @@ export default function AgreementsListPage() {
     },
     {
       label: t('agreement.stats.active'),
-      value: String(kpi.activeCount),
+      value: `${kpi.activeCount}${countSuffix}`,
       iconSignature: 'overview',
       state: 'normal',
     },
     {
       label: t('agreement.stats.draft'),
-      value: String(kpi.draftCount),
+      value: `${kpi.draftCount}${countSuffix}`,
       iconSignature: 'finance_receipt',
       state: 'normal',
     },
     {
       label: t('agreement.stats.students'),
-      value: String(kpi.studentsCovered),
+      value: `${kpi.studentsCovered}${countSuffix}`,
       iconSignature: 'fees',
       state: 'normal',
     },

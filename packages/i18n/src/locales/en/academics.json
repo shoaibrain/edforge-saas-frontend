@@ -3030,6 +3030,8 @@
       "createNew": "Create new",
       "searchPlaceholder": "Search families by name…",
       "noMatches": "No families match that search.",
+      "loadError": "Couldn't load this student's family group. Please try again.",
+      "searchError": "Couldn't search families. Please try again.",
       "searchHint": "Type at least two characters to search.",
       "linkSelected": "Link",
       "linking": "Linking…",

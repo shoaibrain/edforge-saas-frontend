@@ -115,4 +115,22 @@ describe('FamilyGroupPanel', () => {
     const { queryByText } = render(<FamilyGroupPanel studentId={SUBJECT} />)
     expect(queryByText('family.group.linkAction')).toBeNull()
   })
+
+  it('renders an error+retry state (NOT the Link CTA) when the family query errors', () => {
+    // On fetch error data is undefined; the panel must NOT fall through to the
+    // "not linked" empty state, which would falsely offer to link a NEW family
+    // and risk duplicate membership.
+    mockUseStudentFamily.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      refetch: vi.fn(),
+    })
+    const { getByText, queryByText } = render(
+      <FamilyGroupPanel studentId={SUBJECT} schoolId={SCHOOL} />,
+    )
+    expect(getByText('family.group.loadError')).toBeInTheDocument()
+    expect(queryByText('family.group.notLinked')).toBeNull()
+    expect(queryByText('family.group.linkAction')).toBeNull()
+  })
 })

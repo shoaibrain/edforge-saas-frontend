@@ -14,7 +14,16 @@
  */
 
 import { useState } from 'react'
-import { HeartHandshake, Link2, Loader2, Plus, Search, Unlink, Users2 } from 'lucide-react'
+import {
+  AlertTriangle,
+  HeartHandshake,
+  Link2,
+  Loader2,
+  Plus,
+  Search,
+  Unlink,
+  Users2,
+} from 'lucide-react'
 import {
   Button,
   Field,
@@ -131,6 +140,9 @@ function LinkFamilyModal({
   const createFamily = useCreateFamily(schoolId)
   const addMember = useAddFamilyMember(schoolId)
 
+  // The family row whose Link is in-flight — so only that row spins, not all.
+  const [linkingId, setLinkingId] = useState<string | null>(null)
+
   const busy = createFamily.isPending || addMember.isPending
 
   const reset = () => {
@@ -139,6 +151,7 @@ function LinkFamilyModal({
     setName('')
     setContactName('')
     setContactPhone('')
+    setLinkingId(null)
   }
 
   const handleClose = () => {
@@ -148,9 +161,13 @@ function LinkFamilyModal({
   }
 
   const linkExisting = (familyId: string) => {
+    setLinkingId(familyId)
     addMember.mutate(
       { familyId, data: { studentId } },
-      { onSuccess: handleClose },
+      {
+        onSuccess: handleClose,
+        onSettled: () => setLinkingId(null),
+      },
     )
   }
 
@@ -199,6 +216,15 @@ function LinkFamilyModal({
             />
             {!canSearch ? (
               <p className="text-sm text-text-tertiary py-2">{t('family.group.searchHint')}</p>
+            ) : families.isError ? (
+              <div className="flex items-center justify-between gap-3 py-2">
+                <p className="text-sm text-[rgb(var(--state-danger-fg))]">
+                  {t('family.group.searchError')}
+                </p>
+                <Button variant="outline" size="sm" onClick={() => void families.refetch()}>
+                  {t('error.retry')}
+                </Button>
+              </div>
             ) : families.data && families.data.items.length === 0 ? (
               <p className="text-sm text-text-tertiary py-2">{t('family.group.noMatches')}</p>
             ) : (
@@ -222,7 +248,7 @@ function LinkFamilyModal({
                       onClick={() => linkExisting(family.id)}
                       disabled={busy}
                     >
-                      {addMember.isPending ? (
+                      {linkingId === family.id ? (
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
                       ) : (
                         <Link2 className="w-3.5 h-3.5 mr-1" />
@@ -328,7 +354,7 @@ export function FamilyGroupPanel({ studentId, schoolId, canEdit = true }: Family
   const [linkOpen, setLinkOpen] = useState(false)
   const [unlinkOpen, setUnlinkOpen] = useState(false)
 
-  const { data, isLoading } = useStudentFamily(studentId)
+  const { data, isLoading, isError, refetch } = useStudentFamily(studentId)
   const family = data?.family ?? null
   const siblings = data?.siblings ?? []
 
@@ -361,6 +387,14 @@ export function FamilyGroupPanel({ studentId, schoolId, canEdit = true }: Family
         <div className="space-y-2">
           <div className="h-5 w-40 bg-surface-tertiary rounded animate-pulse" />
           <div className="h-4 w-28 bg-surface-tertiary rounded animate-pulse" />
+        </div>
+      ) : isError ? (
+        <div className="text-center py-8">
+          <AlertTriangle className="w-9 h-9 text-[rgb(var(--state-danger-fg))] mx-auto mb-3" />
+          <p className="text-text-secondary font-medium">{t('family.group.loadError')}</p>
+          <Button variant="outline" size="sm" onClick={() => void refetch()} className="mt-4">
+            {t('error.retry')}
+          </Button>
         </div>
       ) : !family ? (
         <div className="text-center py-8">

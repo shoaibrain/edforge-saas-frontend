@@ -104,10 +104,11 @@ export function FamilyAllocationList({
           </div>
           {group.invoices.map((inv) => {
             const suggested = suggestedById.get(inv.invoiceId)
+            const exceeds = parseAmount(allocations[inv.invoiceId]) > inv.amountDue
             return (
               <div
                 key={inv.invoiceId}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg border border-[rgb(var(--border-primary))]"
+                className="flex items-start gap-3 px-3 py-2.5 rounded-lg border border-[rgb(var(--border-primary))]"
               >
                 <div className="min-w-0 flex-1">
                   <div className="text-sm font-medium text-[rgb(var(--text-primary))] truncate">
@@ -142,8 +143,20 @@ export function FamilyAllocationList({
                     value={allocations[inv.invoiceId] ?? ''}
                     onChange={(e) => onChange(inv.invoiceId, e.target.value)}
                     placeholder="0.00"
-                    className="w-full px-2.5 py-1.5 text-sm text-right border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
+                    aria-invalid={exceeds}
+                    className={`w-full px-2.5 py-1.5 text-sm text-right border rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 ${
+                      exceeds
+                        ? 'border-[rgb(var(--state-danger-border))] focus:ring-[rgb(var(--state-danger-border)/0.35)]'
+                        : 'border-[rgb(var(--border-primary))] focus:ring-[rgb(var(--border-focus)/0.35)]'
+                    }`}
                   />
+                  {exceeds && (
+                    <p className="mt-1 text-2xs text-right text-[rgb(var(--state-danger-fg))]">
+                      {t('recordPayment.family.allocation.exceedsBalance', {
+                        balance: format(inv.amountDue),
+                      })}
+                    </p>
+                  )}
                 </div>
               </div>
             )
