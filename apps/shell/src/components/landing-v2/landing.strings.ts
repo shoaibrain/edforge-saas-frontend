@@ -42,7 +42,7 @@ export const USE_CASE_DISTRICT = {
   headingSerif: 'what matters',
   headingTail: ",\nnot what's loudest.",
   lede: "The World Bank's SABER framework identifies three traits shared by effective school management systems: a single source of truth, real-time visibility, and data that reaches the people making decisions. Edforge is built on all three — because operational clarity is how learning outcomes compound, year after year.",
-  mediaLength: '1:42',
+  mediaLength: '0:16',
   accent: 'var(--lp-primary)',
   features: [
     {
@@ -52,6 +52,7 @@ export const USE_CASE_DISTRICT = {
       titleSuffix: 'A .',
       description:
         'Student records, attendance, academics, staffing, and finance — one system, one schema, one login. The end of reconciling three tools that disagree with each other.',
+      // Chapter starts match the spliced district.mp4 (see scripts/record-landing.mjs)
       start: 0,
     },
     {
@@ -61,7 +62,7 @@ export const USE_CASE_DISTRICT = {
       titleSuffix: ' visibility.',
       description:
         "Trends visible while they're still addressable, not in next quarter's report. Leaders see a full-week attendance drop on Wednesday, not in a Friday summary email.",
-      start: 12,
+      start: 6,
     },
     {
       id: 'decisions',
@@ -70,7 +71,7 @@ export const USE_CASE_DISTRICT = {
       titleSuffix: ' that reach the classroom.',
       description:
         'Every insight pairs with a clear next step — a call, a meeting, a policy review. Clarity is only useful when it leads to action.',
-      start: 24,
+      start: 11,
     },
   ] satisfies UseCaseFeature[],
 } as const

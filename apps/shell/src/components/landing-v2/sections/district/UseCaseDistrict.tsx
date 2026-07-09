@@ -21,13 +21,10 @@ export function UseCaseDistrict() {
       lede={USE_CASE_DISTRICT.lede}
       accent="var(--lp-primary)"
       features={USE_CASE_DISTRICT.features}
-      videoSrc={resolveAssetUrl(LANDING_VIDEOS.taskRouter)}
+      videoSrc={resolveAssetUrl(LANDING_VIDEOS.district)}
       videoLength={USE_CASE_DISTRICT.mediaLength}
       dashboardFallback={<DistrictDashboard />}
-      // Simplified landing: show the static product dashboard, not the demo
-      // video. Restore video later by setting showMode="video" (the video path
-      // in UseCasePanel/DemoVideo is retained, dormant).
-      showMode="dashboard"
+      showMode="video"
     />
   )
 }
