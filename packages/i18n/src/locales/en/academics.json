@@ -2987,5 +2987,39 @@
       "stalledDescription": "This is unusual for a single school; it may have failed. Refresh to check the latest status.",
       "emptyReport": "This report has 0 students. Double-check the academic year before submitting."
     }
+  },
+  "family": {
+    "title": "Family",
+    "description": "Group siblings under one primary contact for consolidated billing.",
+    "primaryContact": "Primary contact",
+    "name": "Family name",
+    "notes": "Notes",
+    "members": "Members",
+    "memberCount": "{{count}} member",
+    "memberCount_plural": "{{count}} members",
+    "addMember": "Add student",
+    "removeMember": "Remove student",
+    "relationshipNote": "Relationship note",
+    "createFamily": "New family",
+    "editFamily": "Edit family",
+    "deleteFamily": "Remove family",
+    "deleteConfirm": "Remove family {{name}}? Students are unlinked but not deleted.",
+    "searchPlaceholder": "Search families by name…",
+    "noFamilies": "No families yet.",
+    "noFamiliesDescription": "Create a family to group siblings for consolidated billing.",
+    "created": "Family created",
+    "updated": "Family updated",
+    "deleted": "Family removed",
+    "memberAdded": "Student added to family",
+    "memberRemoved": "Student removed from family",
+    "siblings": {
+      "title": "Siblings",
+      "none": "No siblings on record.",
+      "count": "{{count}} sibling",
+      "count_plural": "{{count}} siblings",
+      "inGrade": "Grade {{grade}}",
+      "notInFamily": "This student is not part of a family.",
+      "viewFamily": "View family"
+    }
   }
 }

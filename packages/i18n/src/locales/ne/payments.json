@@ -109,6 +109,15 @@
       "today": "आज",
       "yesterday": "हिजो",
       "daysAgo": "{{count}} दिनअघि"
+    },
+    "agreementCoverage": {
+      "title": "सम्झौता कभरेज",
+      "studentsCovered": "{{count}} विद्यार्थी सम्झौताअन्तर्गत",
+      "studentsCovered_plural": "{{count}} विद्यार्थी सम्झौताअन्तर्गत",
+      "activeAgreements": "{{count}} सक्रिय सम्झौता",
+      "activeAgreements_plural": "{{count}} सक्रिय सम्झौताहरू",
+      "invoicedViaAgreement": "{{count}} बीजक · सम्झौताद्वारा {{amount}} बिल गरिएको",
+      "none": "कुनै सक्रिय सम्झौता छैन"
     }
   },
   "invoices": {
@@ -274,6 +283,23 @@
       "writtenOff": "अपलेखन गरियो",
       "by": "{{name}} द्वारा"
     },
+    "provenance": {
+      "title": "बिलिङ स्रोत",
+      "description": "यस बीजकको प्रत्येक लाइन कहाँबाट आयो।",
+      "source": {
+        "fee_structure": "शुल्क सूची",
+        "agreement": "सम्झौता",
+        "custom": "कस्टम लाइन"
+      },
+      "viaFeeStructure": "शुल्क संरचना {{name}} बाट",
+      "viaAgreement": "सम्झौता {{title}} (v{{version}}) बाट",
+      "suppressed": "यस सम्झौताले {{count}} सूची शुल्क दबायो",
+      "suppressed_plural": "यस सम्झौताले {{count}} सूची शुल्कहरू दबायो",
+      "discountFromRule": "नियम {{name}} बाट {{amount}} छुट",
+      "overrideBanner": "यस बीजकका लागि शुल्क संरचनाहरू ओभरराइड गरियो।",
+      "overrideDetail": "सम्झौता {{title}} {{date}} मा {{operator}} द्वारा बाइपास गरियो।",
+      "empty": "यस बीजकको कुनै स्रोत रेकर्ड छैन।"
+    },
     "error": {
       "forbidden": "तपाईंसँग यो बीजक हेर्ने अनुमति छैन।",
       "notFound": "यो बीजक फेला परेन। यो मेटाइएको हुन सक्छ।"
@@ -377,6 +403,52 @@
     "partially_refunded": "आंशिक फिर्ता",
     "debit": "डेबिट",
     "credit": "क्रेडिट"
+  },
+  "billingSource": {
+    "standard": "मानक",
+    "agreement": "सम्झौता",
+    "mixed": "मिश्रित"
+  },
+  "agreement": {
+    "title": "सम्झौताहरू",
+    "description": "परिवार र बहु-विद्यार्थी बिलिङ सम्झौताहरू।",
+    "overrideTitle": "सक्रिय सम्झौता ओभरराइड गर्नुहोस्",
+    "overrideRequiresManage": "सक्रिय सम्झौता ओभरराइड गर्न तपाईंलाई बिलिङ व्यवस्थापन अनुमति चाहिन्छ।",
+    "overrideConfirm": "यो विद्यार्थी सम्झौता {{title}} अन्तर्गत छ। सूचीबाट बिलिङले यसलाई ओभरराइड गर्नेछ। जारी राख्ने?",
+    "coveredFeeTypes": "समेटिएका शुल्क प्रकारहरू",
+    "activate": "सक्रिय गर्नुहोस्",
+    "activating": "सक्रिय गर्दै…",
+    "cancel": "सम्झौता रद्द गर्नुहोस्",
+    "cancelling": "रद्द गर्दै…",
+    "create": "नयाँ सम्झौता",
+    "edit": "सम्झौता सम्पादन गर्नुहोस्",
+    "version": "संस्करण {{version}}",
+    "versionHistory": "संस्करण इतिहास",
+    "payer": "भुक्तानीकर्ता",
+    "students": "विद्यार्थीहरू",
+    "effectivePeriod": "प्रभावकारी {{from}} – {{to}}",
+    "billingFrequency": "बिलिङ आवृत्ति",
+    "type": {
+      "fixed_total": "निश्चित कुल",
+      "per_student": "प्रति विद्यार्थी"
+    },
+    "status": {
+      "draft": "मस्यौदा",
+      "active": "सक्रिय",
+      "expired": "म्याद सकिएको",
+      "cancelled": "रद्द गरिएको",
+      "superseded": "प्रतिस्थापित"
+    },
+    "conflict": {
+      "openInvoices": "यो सक्रियता {{count}} खुला बीजकसँग बाझिन्छ। जारी राख्न स्वीकार गर्नुहोस्।",
+      "openInvoices_plural": "यो सक्रियता {{count}} खुला बीजकहरूसँग बाझिन्छ। जारी राख्न स्वीकार गर्नुहोस्।",
+      "acknowledge": "स्वीकार गरी सक्रिय गर्नुहोस्",
+      "overlap": "अर्को सक्रिय सम्झौताले पहिल्यै ओभरल्यापिङ विद्यार्थी वा शुल्क प्रकारहरू समेट्छ।"
+    },
+    "empty": "अहिलेसम्म कुनै सम्झौता छैन।",
+    "created": "सम्झौता सिर्जना गरियो",
+    "activated": "सम्झौता सक्रिय गरियो",
+    "cancelled": "सम्झौता रद्द गरियो"
   },
   "feeStructure": {
     "kpi": {

@@ -109,6 +109,15 @@
       "today": "Today",
       "yesterday": "Yesterday",
       "daysAgo": "{{count}} days ago"
+    },
+    "agreementCoverage": {
+      "title": "Agreement coverage",
+      "studentsCovered": "{{count}} student covered by agreements",
+      "studentsCovered_plural": "{{count}} students covered by agreements",
+      "activeAgreements": "{{count}} active agreement",
+      "activeAgreements_plural": "{{count}} active agreements",
+      "invoicedViaAgreement": "{{count}} invoices · {{amount}} billed via agreements",
+      "none": "No active agreements"
     }
   },
   "invoices": {
@@ -274,6 +283,23 @@
       "writtenOff": "Written off",
       "by": "by {{name}}"
     },
+    "provenance": {
+      "title": "Billing provenance",
+      "description": "Where each line on this invoice came from.",
+      "source": {
+        "fee_structure": "Fee catalog",
+        "agreement": "Agreement",
+        "custom": "Custom line"
+      },
+      "viaFeeStructure": "From fee structure {{name}}",
+      "viaAgreement": "From agreement {{title}} (v{{version}})",
+      "suppressed": "{{count}} catalog fee suppressed by this agreement",
+      "suppressed_plural": "{{count}} catalog fees suppressed by this agreement",
+      "discountFromRule": "Discount {{amount}} from rule {{name}}",
+      "overrideBanner": "Fee structures were overridden for this invoice.",
+      "overrideDetail": "Agreement {{title}} bypassed at {{date}} by {{operator}}.",
+      "empty": "No provenance recorded for this invoice."
+    },
     "error": {
       "forbidden": "You don't have permission to view this invoice.",
       "notFound": "We couldn't find this invoice. It may have been deleted."
@@ -377,6 +403,52 @@
     "partially_refunded": "Partially Refunded",
     "debit": "Debit",
     "credit": "Credit"
+  },
+  "billingSource": {
+    "standard": "Standard",
+    "agreement": "Agreement",
+    "mixed": "Mixed"
+  },
+  "agreement": {
+    "title": "Agreements",
+    "description": "Family and multi-student billing agreements.",
+    "overrideTitle": "Override active agreement",
+    "overrideRequiresManage": "You need billing manage permission to override an active agreement.",
+    "overrideConfirm": "This student is covered by agreement {{title}}. Billing from the catalog will override it. Continue?",
+    "coveredFeeTypes": "Covered fee types",
+    "activate": "Activate",
+    "activating": "Activating…",
+    "cancel": "Cancel agreement",
+    "cancelling": "Cancelling…",
+    "create": "New agreement",
+    "edit": "Edit agreement",
+    "version": "Version {{version}}",
+    "versionHistory": "Version history",
+    "payer": "Payer",
+    "students": "Students",
+    "effectivePeriod": "Effective {{from}} – {{to}}",
+    "billingFrequency": "Billing frequency",
+    "type": {
+      "fixed_total": "Fixed total",
+      "per_student": "Per student"
+    },
+    "status": {
+      "draft": "Draft",
+      "active": "Active",
+      "expired": "Expired",
+      "cancelled": "Cancelled",
+      "superseded": "Superseded"
+    },
+    "conflict": {
+      "openInvoices": "This activation conflicts with {{count}} open invoice. Acknowledge to proceed.",
+      "openInvoices_plural": "This activation conflicts with {{count}} open invoices. Acknowledge to proceed.",
+      "acknowledge": "Acknowledge and activate",
+      "overlap": "Another active agreement already covers overlapping students or fee types."
+    },
+    "empty": "No agreements yet.",
+    "created": "Agreement created",
+    "activated": "Agreement activated",
+    "cancelled": "Agreement cancelled"
   },
   "feeStructure": {
     "kpi": {
