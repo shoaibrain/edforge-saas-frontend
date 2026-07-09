@@ -67,6 +67,10 @@ import { BulkSendInvoiceReminderDrawer } from '../../../components/billing/BulkS
 import { BulkPdfExportDrawer } from '../../../components/billing/BulkPdfExportDrawer'
 import { AgreementActiveDialog } from '../../../components/billing/AgreementActiveDialog'
 import { FinanceStatusChip } from '../../../components/shared'
+import {
+  extractValidationErrors,
+  extractApiMessage,
+} from '../../../lib/api-validation-errors'
 
 /**
  * FB-3.10 — 409 `AGREEMENT_ACTIVE` body from the single-generate path. Emitted
@@ -1058,7 +1062,13 @@ function GenerateInvoiceModal({
         setAgreementConflict(conflict)
         return
       }
-      toast.error(t('invoices.generateFailed'))
+      // Surface the backend's own message (first Zod validation error, then
+      // the top-level message); the generic string is the last resort only.
+      toast.error(
+        extractValidationErrors(err)[0]?.message ??
+          extractApiMessage(err) ??
+          t('invoices.generateFailed'),
+      )
     }
   }
 
@@ -1176,6 +1186,7 @@ function GenerateInvoiceModal({
               type="text"
               value={billingPeriod}
               onChange={(e) => setBillingPeriod(e.target.value)}
+              maxLength={50}
               placeholder={t('invoices.billingPeriodPlaceholder')}
               className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))]"
             />
@@ -1190,6 +1201,7 @@ function GenerateInvoiceModal({
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={2}
+              maxLength={500}
               className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] resize-none"
             />
           </div>
@@ -1215,9 +1227,15 @@ function GenerateInvoiceModal({
           )}
         </div>
 
-        {/* Actions */}
+        {/* Actions — Cancel is gated while the mutation is pending (matching
+            the Escape-key gate above) so the modal can't be dismissed
+            mid-generate. */}
         <div className="flex justify-end gap-2 mt-6">
-          <Button variant="outline" onClick={onClose}>
+          <Button
+            variant="outline"
+            onClick={onClose}
+            disabled={generateMutation.isPending}
+          >
             {t('actions.cancel')}
           </Button>
           <Button onClick={handleSubmit} disabled={generateMutation.isPending}>

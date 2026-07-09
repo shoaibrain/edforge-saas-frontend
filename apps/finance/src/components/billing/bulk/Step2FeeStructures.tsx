@@ -1,15 +1,18 @@
 /**
- * Step2FeeStructures — pick fee structures + apply per-fee discount % +
- * add ad-hoc custom line items. Live rail shows the projected grand total
- * (computed client-side from the selected fees + custom lines + the
- * resolved recipient set).
+ * Step2FeeStructures — pick fee structures + add ad-hoc custom line items.
+ * Live rail shows the projected grand total (computed client-side from the
+ * selected fees + custom lines + the resolved recipient set).
+ *
+ * No per-fee discounts here: the backend's bulkGenerateInvoiceSchema has no
+ * discounts field, so bulk invoices always bill full price. Discounts are
+ * only available on the single-invoice generate path.
  *
  * Phase 1 honors fee.gradeLevels for coverage chips ("Applies to all 86" /
  * "62 of 86 · 24 skipped"). Other scope rules (transportOnly etc.) wait
  * for Phase 2.
  */
 
-import { Plus, X, Percent, Check, AlertTriangle, Ban, ChevronDown } from 'lucide-react'
+import { Plus, X, Check, AlertTriangle, Ban, ChevronDown, Info } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Button } from '@edforge/ui'
 import { useTranslation } from '@edforge/i18n'
@@ -101,18 +104,13 @@ export function Step2FeeStructures({
           <RailRow label={t('bulkGenerate.step2.students')} value={students.length} />
           <RailRow label={t('bulkGenerate.step2.feeStructures')} value={feeCount} />
           <RailRow label={t('bulkGenerate.step2.customLines')} value={customCount} />
-          <hr className="my-2 border-[rgb(var(--border-primary))]" />
-          <RailRow
-            label={t('bulkGenerate.step2.grossSubtotal')}
-            value={formatCurrency(batch.perStudent.reduce((s, p) => s + p.subtotal, 0))}
-            mono
-          />
-          <RailRow
-            label={t('bulkGenerate.step2.feeDiscounts')}
-            value={`−${formatCurrency(batch.perStudent.reduce((s, p) => s + p.discountTotal, 0))}`}
-            mono
-            tone="accent"
-          />
+        </div>
+
+        {/* Bulk generation bills full price — the backend's bulk schema has
+            no discounts field. Say so where operators would look for one. */}
+        <div className={/* allow-arbitrary-spacing: dense bulk-wizard note; pre-token-sweep */ "flex items-start gap-2 p-2 rounded bg-[rgb(var(--background-primary))] border border-[rgb(var(--border-primary))] text-[11px] text-[rgb(var(--text-secondary))]"}>
+          <Info className="w-3.5 h-3.5 text-[rgb(var(--text-tertiary))] flex-shrink-0 mt-0.5" />
+          <span>{t('bulkGenerate.step2.discountsNotApplied')}</span>
         </div>
 
         {batch.zeroCount > 0 && (
@@ -225,19 +223,13 @@ function FeeRow({
   const total = students.length
   const zero = total > 0 && cov === 0
   const full = total > 0 && cov === total
-  const disc = selectedFees[fee.id]?.discountPct ?? 0
 
   const toggle = () => {
     if (zero) return
     const next = { ...selectedFees }
     if (sel) delete next[fee.id]
-    else next[fee.id] = { discountPct: 0 }
+    else next[fee.id] = true
     setSelectedFees(next)
-  }
-
-  const setDisc = (n: number) => {
-    const v = Math.max(0, Math.min(100, n))
-    setSelectedFees({ ...selectedFees, [fee.id]: { discountPct: v } })
   }
 
   return (
@@ -280,26 +272,8 @@ function FeeRow({
           <CoverageChip full={full} zero={zero} cov={cov} total={total} />
         </div>
       </div>
-      <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-        <div className="text-sm font-mono text-[rgb(var(--text-secondary))] whitespace-nowrap">
-          {formatCurrency(fee.amount)}
-        </div>
-        {sel && (
-          <div
-            className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-primary))]"
-            title={t('bulkGenerate.step2.perFeeDiscount')}
-          >
-            <Percent className="w-3 h-3 text-[rgb(var(--text-tertiary))]" />
-            <input
-              type="number"
-              min={0}
-              max={100}
-              value={disc}
-              onChange={(e) => setDisc(Number(e.target.value) || 0)}
-              className="w-12 bg-transparent text-xs text-right outline-none tabular-nums"
-            />
-          </div>
-        )}
+      <div className="text-sm font-mono text-[rgb(var(--text-secondary))] whitespace-nowrap">
+        {formatCurrency(fee.amount)}
       </div>
     </div>
   )
@@ -400,6 +374,7 @@ function CustomLineItems({
                 placeholder={t('bulkGenerate.step2.customLinePlaceholder')}
                 value={line.name}
                 onChange={(e) => update(i, { name: e.target.value })}
+                maxLength={120}
                 className="flex-1 text-sm bg-transparent text-[rgb(var(--text-primary))] outline-none border-0 focus:outline-none"
               />
               <input
@@ -435,29 +410,11 @@ function formatFeeType(type: string, t: Translate): string {
 // Rail atom
 // ---------------------------------------------------------------------------
 
-function RailRow({
-  label,
-  value,
-  mono,
-  tone,
-}: {
-  label: string
-  value: string | number
-  mono?: boolean
-  tone?: 'accent'
-}) {
+function RailRow({ label, value }: { label: string; value: string | number }) {
   return (
     <div className="flex items-center justify-between">
       <span className="text-[rgb(var(--text-secondary))]">{label}</span>
-      <span
-        className={[
-          mono ? 'font-mono' : '',
-          tone === 'accent' ? 'text-[rgb(var(--accent-strong))]' : 'text-[rgb(var(--text-primary))]',
-          'tabular-nums',
-        ].join(' ')}
-      >
-        {value}
-      </span>
+      <span className="text-[rgb(var(--text-primary))] tabular-nums">{value}</span>
     </div>
   )
 }

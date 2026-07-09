@@ -144,6 +144,9 @@ function LinkFamilyModal({
   const [name, setName] = useState('')
   const [contactName, setContactName] = useState('')
   const [contactPhone, setContactPhone] = useState('')
+  // Set once createFamily succeeds — a retry after a failed addMember must
+  // NOT create a second family; it re-links against this id instead.
+  const [createdFamilyId, setCreatedFamilyId] = useState<string | null>(null)
 
   const createFamily = useCreateFamily(schoolId)
   const addMember = useAddFamilyMember(schoolId)
@@ -159,6 +162,7 @@ function LinkFamilyModal({
     setName('')
     setContactName('')
     setContactPhone('')
+    setCreatedFamilyId(null)
     setLinkingId(null)
   }
 
@@ -182,8 +186,30 @@ function LinkFamilyModal({
     )
   }
 
+  const linkCreatedFamily = (familyId: string) => {
+    addMember.mutate(
+      { familyId, data: { studentId } },
+      {
+        onSuccess: handleClose,
+        onError: (err) => {
+          // The family was created but linking failed — surface the
+          // orphaned family so the operator understands the state.
+          if (isConflict(err)) {
+            toast.error(t('family.group.createdButLinkConflict'))
+          }
+        },
+      },
+    )
+  }
+
   const createAndLink = () => {
     if (!name.trim() || !contactName.trim()) return
+    // Retry after a failed addMember: the family already exists — skip
+    // createFamily and just retry the link, or we'd duplicate the family.
+    if (createdFamilyId) {
+      linkCreatedFamily(createdFamilyId)
+      return
+    }
     createFamily.mutate(
       {
         schoolId,
@@ -197,20 +223,10 @@ function LinkFamilyModal({
         onError: (err) => {
           if (isConflict(err)) toast.error(t('family.group.alreadyInFamily'))
         },
-        onSuccess: (family) =>
-          addMember.mutate(
-            { familyId: family.id, data: { studentId } },
-            {
-              onSuccess: handleClose,
-              onError: (err) => {
-                // The family was created but linking failed — surface the
-                // orphaned family so the operator understands the state.
-                if (isConflict(err)) {
-                  toast.error(t('family.group.createdButLinkConflict'))
-                }
-              },
-            },
-          ),
+        onSuccess: (family) => {
+          setCreatedFamilyId(family.id)
+          linkCreatedFamily(family.id)
+        },
       },
     )
   }
@@ -285,11 +301,14 @@ function LinkFamilyModal({
           </div>
         ) : (
           <div className="space-y-3">
+            {/* Bounds mirror createFamilySchema: name ≤120,
+                primaryContact.name ≤120, phone ≤20. */}
             <Field label={t('family.group.familyNameLabel')}>
               <Input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder={t('family.group.familyNamePlaceholder')}
+                maxLength={120}
                 autoFocus
               />
             </Field>
@@ -298,6 +317,7 @@ function LinkFamilyModal({
                 value={contactName}
                 onChange={(e) => setContactName(e.target.value)}
                 placeholder={t('family.group.contactNamePlaceholder')}
+                maxLength={120}
               />
             </Field>
             <Field label={t('family.group.contactPhoneLabel')}>
@@ -305,6 +325,7 @@ function LinkFamilyModal({
                 value={contactPhone}
                 onChange={(e) => setContactPhone(e.target.value)}
                 placeholder={t('family.group.contactPhonePlaceholder')}
+                maxLength={20}
               />
             </Field>
           </div>

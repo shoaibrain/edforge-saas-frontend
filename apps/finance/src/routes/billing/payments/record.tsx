@@ -16,9 +16,11 @@ import {
   RotateCcw,
   FileText,
   Info,
+  AlertTriangle,
 } from 'lucide-react'
-import { useSearch } from '@tanstack/react-router'
+import { Link, useSearch } from '@tanstack/react-router'
 import { useTranslation } from '@edforge/i18n'
+import { UuidBadge } from '@edforge/archetype'
 import { useAppStore } from '../../../stores/app.store'
 import {
   useRecordManualPayment,
@@ -26,17 +28,28 @@ import {
   useStudentFamily,
   useFamilyOpenInvoices,
 } from '@edforge/finance-services'
-import { formatGatewayLabel, type Invoice } from '@edforge/types'
+import { formatGatewayLabel, type Invoice, type Payment } from '@edforge/types'
 import { useCurrency } from '@edforge/types/use-currency'
 import { useFinanceSettings } from '../../../layouts/FinanceLayout'
 import { formatDate } from '../../../utils/format-date'
 import { StudentSearchInput } from '../../../components/billing/StudentSearchInput'
 import { FamilyAllocationList } from '../../../components/billing/payments/FamilyAllocationList'
+import {
+  extractValidationErrors,
+  extractApiMessage,
+  type ApiValidationError,
+} from '../../../lib/api-validation-errors'
 import { validateFamilyPayment } from './validate-family-payment'
 
 type PaymentMode = 'single' | 'family'
 
 type PaymentMethod = 'cash' | 'bank_transfer' | 'cheque'
+
+// Mirrors recordManualPaymentSchema: amount .positive().max(10_000_000),
+// referenceNumber .max(100), notes .max(500).
+const MAX_PAYMENT_AMOUNT = 10_000_000
+const MAX_REFERENCE_LENGTH = 100
+const MAX_NOTES_LENGTH = 500
 
 function todayISO(): string {
   return new Date().toISOString().split('T')[0]
@@ -200,12 +213,17 @@ export default function RecordPaymentPage() {
   } | null>(null)
   const [invoiceId, setInvoiceId] = useState(searchParams.invoiceId ?? '')
   const [invoiceLabel, setInvoiceLabel] = useState('')
+  // Selected invoice's amountDue — drives the single-mode overpay warning.
+  const [invoiceAmountDue, setInvoiceAmountDue] = useState<number | null>(null)
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cash')
   const [amount, setAmount] = useState(searchParams.amount ?? '')
   const [referenceNumber, setReferenceNumber] = useState('')
   const [paidDate, setPaidDate] = useState(todayISO())
   const [notes, setNotes] = useState('')
-  const [success, setSuccess] = useState(false)
+  // Non-null = success screen; carries the created Payment for the summary.
+  const [successPayment, setSuccessPayment] = useState<Payment | null>(null)
+  // Backend 400 validation errors from the last failed submit, verbatim.
+  const [submitErrors, setSubmitErrors] = useState<ApiValidationError[]>([])
   // Family mode: invoiceId → raw amount input string.
   const [allocations, setAllocations] = useState<Record<string, string>>({})
 
@@ -284,8 +302,10 @@ export default function RecordPaymentPage() {
     setSelectedStudent(null)
     setInvoiceId('')
     setInvoiceLabel('')
+    setInvoiceAmountDue(null)
     setAmount('')
     setAllocations({})
+    setSubmitErrors([])
   }, [])
 
   const handleModeChange = useCallback(
@@ -307,8 +327,10 @@ export default function RecordPaymentPage() {
       // Reset invoice/allocation selection when student changes
       setInvoiceId('')
       setInvoiceLabel('')
+      setInvoiceAmountDue(null)
       setAmount('')
       setAllocations({})
+      setSubmitErrors([])
     },
     [],
   )
@@ -317,6 +339,7 @@ export default function RecordPaymentPage() {
     (id: string, amountDue: number, label: string) => {
       setInvoiceId(id)
       setInvoiceLabel(label)
+      setInvoiceAmountDue(amountDue)
       if (amountDue > 0) {
         setAmount(String(amountDue))
       }
@@ -333,25 +356,41 @@ export default function RecordPaymentPage() {
       toast.error(t('recordPayment.validAmountError'))
       return
     }
+    if (parsedAmount > MAX_PAYMENT_AMOUNT) {
+      toast.error(
+        t('recordPayment.amountTooLarge', {
+          max: formatCurr(MAX_PAYMENT_AMOUNT),
+        }),
+      )
+      return
+    }
     if ((paymentMethod === 'bank_transfer' || paymentMethod === 'cheque') && !referenceNumber.trim()) {
       toast.error(t('recordPayment.referenceRequired'))
       return
     }
 
+    setSubmitErrors([])
     try {
-      await recordMutation.mutateAsync({
+      // `currency` is intentionally omitted: the backend always inherits it
+      // from the invoice and rejects any mismatch (PAYMENT_CURRENCY_MISMATCH).
+      const payment = await recordMutation.mutateAsync({
         invoiceId: invoiceId.trim(),
         gateway: paymentMethod,
         amount: parsedAmount,
-        currency: settings.currency,
         referenceNumber: referenceNumber.trim() || undefined,
         notes: notes.trim() || undefined,
         paidDate: paidDate || undefined,
       })
       toast.success(t('recordPayment.recordSuccess'))
-      setSuccess(true)
-    } catch {
-      toast.error(t('recordPayment.recordFailed'))
+      setSuccessPayment(payment)
+    } catch (err) {
+      const validationErrors = extractValidationErrors(err)
+      setSubmitErrors(validationErrors)
+      toast.error(
+        validationErrors[0]?.message ??
+          extractApiMessage(err) ??
+          t('recordPayment.recordFailed'),
+      )
     }
   }
 
@@ -385,21 +424,28 @@ export default function RecordPaymentPage() {
     const sumTotal =
       Math.round(applications.reduce((s, a) => s + a.amount, 0) * 100) / 100
 
+    setSubmitErrors([])
     try {
-      await recordMutation.mutateAsync({
+      // `currency` omitted — inherited from the invoices server-side.
+      const payment = await recordMutation.mutateAsync({
         familyId: family.id,
         applications,
         gateway: paymentMethod,
         amount: sumTotal,
-        currency: settings.currency,
         referenceNumber: referenceNumber.trim() || undefined,
         notes: notes.trim() || undefined,
         paidDate: paidDate || undefined,
       })
       toast.success(t('recordPayment.recordSuccess'))
-      setSuccess(true)
-    } catch {
-      toast.error(t('recordPayment.family.recordFailed'))
+      setSuccessPayment(payment)
+    } catch (err) {
+      const validationErrors = extractValidationErrors(err)
+      setSubmitErrors(validationErrors)
+      toast.error(
+        validationErrors[0]?.message ??
+          extractApiMessage(err) ??
+          t('recordPayment.family.recordFailed'),
+      )
     }
   }
 
@@ -411,13 +457,15 @@ export default function RecordPaymentPage() {
     setSelectedStudent(null)
     setInvoiceId('')
     setInvoiceLabel('')
+    setInvoiceAmountDue(null)
     setPaymentMethod('cash')
     setAmount('')
     setReferenceNumber('')
     setPaidDate(todayISO())
     setNotes('')
     setAllocations({})
-    setSuccess(false)
+    setSubmitErrors([])
+    setSuccessPayment(null)
   }
 
   if (!schoolId) {
@@ -429,7 +477,7 @@ export default function RecordPaymentPage() {
   }
 
   // Success state
-  if (success) {
+  if (successPayment) {
     return (
       <div className="p-6 max-w-lg mx-auto">
         <div className="text-center py-16 space-y-4">
@@ -440,10 +488,44 @@ export default function RecordPaymentPage() {
           <p className="text-sm text-[rgb(var(--text-secondary))]">
             {t('recordPayment.successDescription')}
           </p>
-          <Button onClick={handleRecordAnother}>
-            <RotateCcw className="w-4 h-4 mr-1.5" />
-            {t('recordPayment.recordAnother')}
-          </Button>
+          <div className="space-y-1.5 text-sm">
+            {successPayment.receiptNumber && (
+              <div className="flex items-center justify-center gap-2 text-[rgb(var(--text-secondary))]">
+                <span>{t('recordPayment.successReceiptNumber')}</span>
+                <span className="font-mono font-medium text-[rgb(var(--text-primary))]">
+                  {successPayment.receiptNumber}
+                </span>
+              </div>
+            )}
+            <div className="flex items-center justify-center gap-2 text-[rgb(var(--text-secondary))]">
+              <span>{t('recordPayment.successPaymentId')}</span>
+              <UuidBadge value={successPayment.id} />
+            </div>
+          </div>
+          <div className="flex items-center justify-center gap-3 flex-wrap">
+            <Button onClick={handleRecordAnother}>
+              <RotateCcw className="w-4 h-4 mr-1.5" />
+              {t('recordPayment.recordAnother')}
+            </Button>
+            {successPayment.invoiceId ? (
+              <Link
+                to="/invoices/$invoiceId"
+                params={{ invoiceId: successPayment.invoiceId }}
+              >
+                <Button variant="outline">
+                  <FileText className="w-4 h-4 mr-1.5" />
+                  {t('recordPayment.viewInvoice')}
+                </Button>
+              </Link>
+            ) : (
+              <Link to="/invoices">
+                <Button variant="outline">
+                  <FileText className="w-4 h-4 mr-1.5" />
+                  {t('recordPayment.goToInvoices')}
+                </Button>
+              </Link>
+            )}
+          </div>
         </div>
       </div>
     )
@@ -605,9 +687,17 @@ export default function RecordPaymentPage() {
                 onChange={(e) => setAmount(e.target.value)}
                 placeholder="0.00"
                 min="0"
+                max={MAX_PAYMENT_AMOUNT}
                 step="0.01"
                 className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
               />
+              {invoiceAmountDue != null && parsedAmount > invoiceAmountDue && (
+                <p className="mt-1 text-xs text-[rgb(var(--state-warning-fg))]">
+                  {t('recordPayment.overpayWarning', {
+                    due: formatCurr(invoiceAmountDue),
+                  })}
+                </p>
+              )}
             </div>
           )}
 
@@ -621,6 +711,7 @@ export default function RecordPaymentPage() {
                 type="text"
                 value={referenceNumber}
                 onChange={(e) => setReferenceNumber(e.target.value)}
+                maxLength={MAX_REFERENCE_LENGTH}
                 placeholder={
                   paymentMethod === 'bank_transfer'
                     ? t('recordPayment.bankReferencePlaceholder')
@@ -653,6 +744,7 @@ export default function RecordPaymentPage() {
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
+              maxLength={MAX_NOTES_LENGTH}
               placeholder={t('recordPayment.notesPlaceholder')}
               className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] resize-none focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
             />
@@ -709,6 +801,21 @@ export default function RecordPaymentPage() {
                 <span>{formatCurr(previewAmount)}</span>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Backend validation errors from the last failed submit (verbatim) */}
+        {submitErrors.length > 0 && (
+          <div className="rounded-lg border border-[rgb(var(--state-danger-border)/0.4)] bg-[rgb(var(--state-danger-bg)/0.10)] p-3">
+            <div className="flex items-center gap-2 text-sm font-medium text-[rgb(var(--state-danger-fg))] mb-1.5">
+              <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+              {t('recordPayment.validationErrorsTitle')}
+            </div>
+            <ul className="space-y-1 pl-6 list-disc text-sm text-[rgb(var(--state-danger-fg))]">
+              {submitErrors.map((error, i) => (
+                <li key={`${error.path}-${i}`}>{error.message}</li>
+              ))}
+            </ul>
           </div>
         )}
 

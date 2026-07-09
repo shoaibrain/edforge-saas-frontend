@@ -175,7 +175,12 @@ export interface RecordManualPaymentDto {
   familyId?: string
   gateway: 'cash' | 'bank_transfer' | 'cheque'
   amount: number // NPR
-  currency: string
+  /**
+   * Optional — the backend always inherits currency from the referenced
+   * invoice(s) and rejects any mismatch (`PAYMENT_CURRENCY_MISMATCH`).
+   * Clients should omit it (mirrors `recordManualPaymentSchema`).
+   */
+  currency?: string
   referenceNumber?: string // Bank ref / cheque number
   notes?: string
   paidDate?: string // ISO date, defaults to today on server

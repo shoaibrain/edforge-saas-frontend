@@ -66,10 +66,6 @@ export function Step3InvoiceDetails({
         </select>
       </Field>
 
-      <Field label={t('bulkGenerate.step3.issueDate')}>
-        <DateInput value={details.issueDate} onChange={(v) => set('issueDate', v)} />
-      </Field>
-
       <Field label={t('bulkGenerate.step3.dueDate')}>
         <DateInput value={details.dueDate} onChange={(v) => set('dueDate', v)} />
       </Field>

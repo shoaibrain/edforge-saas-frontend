@@ -69,6 +69,35 @@ describe('validateFamilyPayment', () => {
     expect(result.errors).toContain('recordPayment.family.validation.negativeAmount')
   })
 
+  it('rejects more than 20 non-zero allocations — backend applications.max(20)', () => {
+    const manyInvoices: FamilyOpenInvoiceRow[] = Array.from(
+      { length: 21 },
+      (_, i) => ({ invoiceId: `inv-${i}`, amountDue: 1000 }),
+    )
+    const allocations = Object.fromEntries(
+      manyInvoices.map((inv) => [inv.invoiceId, '100']),
+    )
+    const result = validateFamilyPayment(allocations, manyInvoices)
+    expect(result.valid).toBe(false)
+    expect(result.errors).toContain(
+      'recordPayment.family.validation.maxApplications',
+    )
+  })
+
+  it('accepts exactly 20 non-zero allocations (backend ceiling inclusive)', () => {
+    const manyInvoices: FamilyOpenInvoiceRow[] = Array.from(
+      { length: 20 },
+      (_, i) => ({ invoiceId: `inv-${i}`, amountDue: 1000 }),
+    )
+    const allocations = Object.fromEntries(
+      manyInvoices.map((inv) => [inv.invoiceId, '100']),
+    )
+    expect(validateFamilyPayment(allocations, manyInvoices)).toEqual({
+      valid: true,
+      errors: [],
+    })
+  })
+
   it('treats a non-numeric amount as zero (no crash), yielding noAllocation', () => {
     const result = validateFamilyPayment(
       { 'inv-1': 'abc', 'inv-2': '' },

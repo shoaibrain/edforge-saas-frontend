@@ -13,6 +13,7 @@ import {
   useQueryClient,
 } from '@tanstack/react-query'
 import { toast } from 'sonner'
+import { useTranslation } from '@edforge/i18n'
 import type {
   StudentFamily,
   FamilyResponse,
@@ -105,11 +106,12 @@ export function useFamilyMembers(
 
 export function useCreateFamily(schoolId: string) {
   const queryClient = useQueryClient()
+  const { t } = useTranslation('academics')
   return useMutation<FamilyResponse, Error, CreateFamilyDto>({
     mutationFn: (data) => createFamily(schoolId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: familyKeys.lists(schoolId) })
-      toast.success('Family created')
+      toast.success(t('family.created'))
     },
     onError: (error) => {
       // 409 (one-family-per-student) is owned by the caller's targeted handler.
@@ -121,6 +123,7 @@ export function useCreateFamily(schoolId: string) {
 
 export function useUpdateFamily(schoolId: string) {
   const queryClient = useQueryClient()
+  const { t } = useTranslation('academics')
   return useMutation<
     FamilyResponse,
     Error,
@@ -130,7 +133,7 @@ export function useUpdateFamily(schoolId: string) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: familyKeys.lists(schoolId) })
       queryClient.invalidateQueries({ queryKey: familyKeys.all })
-      toast.success('Family updated')
+      toast.success(t('family.updated'))
     },
     onError: (error) => {
       toast.error(parseApiError(error).message)
@@ -140,11 +143,12 @@ export function useUpdateFamily(schoolId: string) {
 
 export function useDeactivateFamily(schoolId: string) {
   const queryClient = useQueryClient()
+  const { t } = useTranslation('academics')
   return useMutation<void, Error, string>({
     mutationFn: (familyId) => deactivateFamily(schoolId, familyId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: familyKeys.lists(schoolId) })
-      toast.success('Family removed')
+      toast.success(t('family.deleted'))
     },
     onError: (error) => {
       toast.error(parseApiError(error).message)
@@ -154,6 +158,7 @@ export function useDeactivateFamily(schoolId: string) {
 
 export function useAddFamilyMember(schoolId: string) {
   const queryClient = useQueryClient()
+  const { t } = useTranslation('academics')
   return useMutation<
     void,
     Error,
@@ -169,7 +174,7 @@ export function useAddFamilyMember(schoolId: string) {
         queryKey: familyKeys.studentFamily(data.studentId, schoolId),
       })
       queryClient.invalidateQueries({ queryKey: familyKeys.lists(schoolId) })
-      toast.success('Student added to family')
+      toast.success(t('family.memberAdded'))
     },
     onError: (error) => {
       // 409 (one-family-per-student) is owned by the caller's targeted handler.
@@ -181,6 +186,7 @@ export function useAddFamilyMember(schoolId: string) {
 
 export function useRemoveFamilyMember(schoolId: string) {
   const queryClient = useQueryClient()
+  const { t } = useTranslation('academics')
   return useMutation<
     void,
     Error,
@@ -196,7 +202,7 @@ export function useRemoveFamilyMember(schoolId: string) {
         queryKey: familyKeys.studentFamily(studentId, schoolId),
       })
       queryClient.invalidateQueries({ queryKey: familyKeys.lists(schoolId) })
-      toast.success('Student removed from family')
+      toast.success(t('family.memberRemoved'))
     },
     onError: (error) => {
       toast.error(parseApiError(error).message)

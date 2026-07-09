@@ -878,11 +878,9 @@
       "students": "Students",
       "feeStructures": "Fee structures",
       "customLines": "Custom lines",
-      "grossSubtotal": "Gross subtotal",
-      "feeDiscounts": "Fee discounts",
+      "discountsNotApplied": "Discounts are not applied in bulk generation — generate invoices individually to apply a discount.",
       "zeroTotalWarning": "{{count}} student's projected total is 0. Turn on Skip zero-total in Step 3 to exclude them.",
       "zeroTotalWarning_plural": "{{count}} students' projected total is 0. Turn on Skip zero-total in Step 3 to exclude them.",
-      "perFeeDiscount": "Per-fee discount %",
       "appliesToAll": "Applies to all {{count}}",
       "appliesToZero": "Applies to 0 - not selectable",
       "partialCoverage": "{{covered}} of {{total}} · {{skipped}} skipped",
@@ -906,7 +904,6 @@
         "third": "Third Term",
         "fourth": "Fourth Term"
       },
-      "issueDate": "Issue date",
       "dueDate": "Due date",
       "numberPreview": "Invoice number preview",
       "sequentialNumbers": "{{count}} sequential number",
@@ -917,7 +914,7 @@
       "reviewEveryInvoice": "Review every invoice before generating",
       "reviewEveryInvoiceHelp": "Show a per-student line-item preview on the next step.",
       "skipZeroTotal": "Skip students whose total comes to zero",
-      "skipZeroTotalHelp": "Do not issue zero-amount invoices (e.g. fully-discounted students)."
+      "skipZeroTotalHelp": "Do not issue zero-amount invoices."
     },
     "step4": {
       "verifyIntro": "Verify everything below. {{count}} invoice will be generated",
@@ -928,7 +925,7 @@
       "feeStructures": "Fee structures",
       "noFeesSelected": "No fees selected.",
       "period": "Period",
-      "issueDue": "Issue {{issueDate}} · Due {{dueDate}}",
+      "dueOn": "Due {{dueDate}}",
       "perStudentPreview": "Per-student preview",
       "tapToExpand": "tap a row to expand",
       "noBillableStudents": "No billable students.",
@@ -956,8 +953,10 @@
       "notice": "Guardians will be notified per their channel preferences.",
       "periodNotice": "For {{billingPeriod}}. Guardians will be notified per their channel preferences.",
       "invoices": "Invoices",
-      "totalBilled": "Total billed",
       "skipped": "Skipped",
+      "failed": "Failed",
+      "failuresTitle": "{{count}} invoice could not be generated",
+      "failuresTitle_plural": "{{count}} invoices could not be generated",
       "downloadAll": "Download all (PDF)",
       "downloadAllTooltip": "Bulk PDF download lands in a later sprint",
       "newBatch": "New batch"
@@ -1034,11 +1033,18 @@
     "dueDate": "Due {{date}}",
     "selectInvoiceError": "Please select an invoice",
     "validAmountError": "Please enter a valid amount",
+    "amountTooLarge": "Amount can't exceed {{max}}.",
+    "overpayWarning": "Exceeds this invoice's amount due ({{due}}). The remainder is applied to the student's outstanding opening balance; if there is none, the payment will be rejected.",
     "referenceRequired": "Reference number is required for bank transfer / cheque",
     "recordSuccess": "Payment recorded successfully",
     "recordFailed": "Failed to record payment",
+    "validationErrorsTitle": "The payment couldn't be recorded:",
     "successTitle": "Payment Recorded",
     "successDescription": "The manual payment has been recorded and the student account has been updated.",
+    "successReceiptNumber": "Receipt number:",
+    "successPaymentId": "Payment ID:",
+    "viewInvoice": "View invoice",
+    "goToInvoices": "Go to invoices",
     "recordAnother": "Record Another Payment",
     "studentRequired": "Student *",
     "studentSearchPlaceholder": "Search student by name...",
@@ -1107,7 +1113,8 @@
         "negativeAmount": "Amounts can't be negative.",
         "overAllocated": "An amount exceeds the invoice's balance due.",
         "unknownInvoice": "An allocation references an invoice not in this family.",
-        "minTwo": "Family payment needs at least 2 invoices — use single-invoice mode to pay one."
+        "minTwo": "Family payment needs at least 2 invoices — use single-invoice mode to pay one.",
+        "maxApplications": "A family payment can cover at most 20 invoices — split it into multiple payments."
       }
     }
   },

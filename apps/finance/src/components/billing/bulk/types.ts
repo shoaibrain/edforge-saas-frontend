@@ -68,12 +68,6 @@ export function emptySelection(): SelectionState {
 // Fee selection + custom lines (Step 2)
 // ---------------------------------------------------------------------------
 
-export interface SelectedFee {
-  /** Operator-supplied per-fee discount, 0–100. Converted to a flat NPR amount
-   *  per-student at submit (resolved against the fee's `amount`). */
-  discountPct: number
-}
-
 export interface CustomLine {
   /** Stable local ID for React keying; NOT sent to backend. */
   id: string
@@ -83,7 +77,12 @@ export interface CustomLine {
   amount: string
 }
 
-export type SelectedFeesMap = Record<string, SelectedFee>
+/**
+ * feeStructureId → selected marker. The backend's bulkGenerateInvoiceSchema
+ * carries no per-fee options (no discounts field — discounts apply only on
+ * the single-invoice generate path), so selection is a plain membership set.
+ */
+export type SelectedFeesMap = Record<string, true>
 
 // ---------------------------------------------------------------------------
 // Step 3 — invoice details
@@ -92,18 +91,16 @@ export type SelectedFeesMap = Record<string, SelectedFee>
 export interface WizardDetails {
   academicYear: string
   billingPeriod: string // operator-chosen, free-form (e.g. "First Term", "2026-04")
-  issueDate: string // YYYY-MM-DD
   dueDate: string // YYYY-MM-DD
   notes: string
-  /** When true, BE drops students whose projected total is 0 (e.g. all
-   *  selected fees zeroed out by discounts). Counted toward `skipped`. */
+  /** When true, BE drops students whose projected total is 0 (e.g. a
+   *  zero-amount fee structure). Counted toward `skipped`. */
   skipZeroTotal: boolean
   /** When true, Step 4 shows the per-student preview list. Pure UI toggle. */
   showPreview: boolean
 }
 
 export function defaultDetails(): WizardDetails {
-  const today = new Date().toISOString().slice(0, 10)
   // Default due-date = today + 30d
   const due = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
     .toISOString()
@@ -111,7 +108,6 @@ export function defaultDetails(): WizardDetails {
   return {
     academicYear: '',
     billingPeriod: '',
-    issueDate: today,
     dueDate: due,
     notes: '',
     skipZeroTotal: true,
@@ -129,7 +125,6 @@ export interface ComputedLine {
   name: string
   feeStructureId?: string // present for fee-structure lines; absent for custom
   base: number
-  discount: number
   total: number
   isCustom?: boolean
 }
@@ -140,7 +135,6 @@ export interface ComputedInvoice {
   gradeLevel: string
   lines: ComputedLine[]
   subtotal: number
-  discountTotal: number
   total: number
 }
 

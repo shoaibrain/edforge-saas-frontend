@@ -138,8 +138,7 @@ export function Step4Review({
             <div>
               {details.billingPeriod || '—'} · {details.academicYear}
               <div className={/* allow-arbitrary-spacing: dense bulk-wizard mono metadata; pre-token-sweep */ "text-[11px] text-[rgb(var(--text-tertiary))] font-mono whitespace-nowrap mt-0.5"}>
-                {t('bulkGenerate.step4.issueDue', {
-                  issueDate: details.issueDate || '—',
+                {t('bulkGenerate.step4.dueOn', {
                   dueDate: details.dueDate || '—',
                 })}
               </div>
@@ -322,7 +321,7 @@ function PerStudentRow({
             {inv.lines.map(line => (
               <tr key={line.key}>
                 <td className="px-3 py-1.5 text-[rgb(var(--text-secondary))]">
-                  {line.name}
+                  {line.name || t('bulkGenerate.step2.customLineFallback')}
                   {line.isCustom && (
                     <span className={/* allow-arbitrary-spacing: dense bulk-wizard chip; pre-token-sweep */ "ml-1.5 text-[10px] px-1 py-0 rounded bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-tertiary))]"}>
                       {t('bulkGenerate.step4.customBadge')}
@@ -331,11 +330,6 @@ function PerStudentRow({
                 </td>
                 <td className="px-3 py-1.5 text-right font-mono text-[rgb(var(--text-secondary))]">
                   {formatCurrency(line.base)}
-                  {line.discount > 0 && (
-                    <span className="ml-1.5 text-[rgb(var(--accent-strong))]">
-                      −{formatCurrency(line.discount)}
-                    </span>
-                  )}
                 </td>
               </tr>
             ))}
