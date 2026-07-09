@@ -46,9 +46,17 @@ export function getMFSharedConfig(_role: 'host' | 'remote'): MFSharedConfig {
     // (`_lastPayload` module-level variable). If not shared, each MFE bundles
     // its own copy of the singleton and the Shell's broadcasts never reach
     // the MFEs' copies → MFE forms see archetype=null → US-shape renders on
-    // PABSON tenants. This was the Sprint A.12/A.13 wiring root-cause bug
-    // discovered on the 2026-04-28 Vercel preview test.
-    '@edforge/config': { singleton: true, requiredVersion: '0.0.1', eager: true },
+    // PABSON tenants (Sprint A.12/A.13), and Finance first-paints USD before
+    // NPR settings arrive (2026-07-09 currency-flash bug).
+    //
+    // The key MUST be the trailing-slash PREFIX form: this package exports
+    // ONLY subpaths (no "." entry — see packages/config/package.json), and
+    // every consumer imports `@edforge/config/school-context-channel` etc.
+    // A bare share key matches only the exact request string, so the old
+    // `'@edforge/config'` entry never engaged and each container silently
+    // bundled its own copy. Prefix keys match all subpath requests.
+    // (requiredVersion is omitted — not meaningful for prefix shares.)
+    '@edforge/config/': { singleton: true, eager: true },
 
     // @edforge/forms — singleton because (a) useTenantContext is a React hook
     // that must share React state with @edforge/config's broadcast subscriber,

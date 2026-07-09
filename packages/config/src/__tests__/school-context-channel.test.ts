@@ -10,6 +10,7 @@ import {
   broadcastSchoolChange,
   onSchoolChange,
   getSchoolContext,
+  resetSchoolContext,
   type SchoolContextPayload,
 } from '../school-context-channel'
 
@@ -17,6 +18,9 @@ describe('school-context-channel', () => {
   let dispatchSpy: ReturnType<typeof vi.spyOn>
 
   beforeEach(() => {
+    // Broadcasts merge over the retained payload — isolate tests from each
+    // other's optional fields.
+    resetSchoolContext()
     dispatchSpy = vi.spyOn(window, 'dispatchEvent')
   })
 
@@ -193,6 +197,64 @@ describe('school-context-channel', () => {
         schoolId: null,
         schoolStatus: null,
       })
+    })
+  })
+
+  describe('merge semantics (2026-07-09 currency-flash fix)', () => {
+    const SETTINGS = {
+      currency: 'NPR',
+      timezone: 'Asia/Kathmandu',
+      dateFormat: 'YYYY-MM-DD',
+      timeFormat: '12h',
+      calendarSystem: 'bikram_sambat',
+      enableDualDateDisplay: true,
+      numberFormat: 'south_asian',
+      locale: 'ne-NP',
+      weekStartsOn: 'sunday',
+    } as const
+
+    it('resolvedSettings round-trips synchronously via getSchoolContext', () => {
+      broadcastSchoolChange('school-1', 'active', SETTINGS, 'tenant-1', 'PABSON', 'NPL')
+      expect(getSchoolContext().resolvedSettings).toEqual(SETTINGS)
+    })
+
+    it('a settings-less broadcast preserves prior settings/tenant/archetype/country', () => {
+      broadcastSchoolChange('school-1', 'active', SETTINGS, 'tenant-1', 'PABSON', 'NPL')
+      // e.g. app.store's setActiveSchoolStatus broadcasts schoolId+status only
+      broadcastSchoolChange('school-1', 'setup')
+
+      const ctx = getSchoolContext()
+      expect(ctx.schoolStatus).toBe('setup')
+      expect(ctx.resolvedSettings).toEqual(SETTINGS)
+      expect(ctx.tenantId).toBe('tenant-1')
+      expect(ctx.archetype).toBe('PABSON')
+      expect(ctx.country).toBe('NPL')
+    })
+
+    it('subscribers receive the merged payload, not the sparse call args', () => {
+      broadcastSchoolChange('school-1', 'active', SETTINGS, 'tenant-1', 'PABSON', 'NPL')
+      const callback = vi.fn()
+      const unsubscribe = onSchoolChange(callback)
+
+      broadcastSchoolChange('school-2', 'active')
+
+      expect(callback).toHaveBeenCalledWith(
+        expect.objectContaining({ schoolId: 'school-2', resolvedSettings: SETTINGS, archetype: 'PABSON' }),
+      )
+      unsubscribe()
+    })
+
+    it('schoolId and schoolStatus always take the new values', () => {
+      broadcastSchoolChange('school-1', 'active', SETTINGS)
+      broadcastSchoolChange('school-2', 'setup')
+      expect(getSchoolContext().schoolId).toBe('school-2')
+      expect(getSchoolContext().schoolStatus).toBe('setup')
+    })
+
+    it('resetSchoolContext blanks the retained payload (logout hygiene)', () => {
+      broadcastSchoolChange('school-1', 'active', SETTINGS, 'tenant-1', 'PABSON', 'NPL')
+      resetSchoolContext()
+      expect(getSchoolContext()).toEqual({ schoolId: null, schoolStatus: null })
     })
   })
 })
