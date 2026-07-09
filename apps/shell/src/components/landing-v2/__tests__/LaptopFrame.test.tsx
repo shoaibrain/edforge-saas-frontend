@@ -24,10 +24,10 @@ describe('LaptopFrame', () => {
     cleanup()
   })
 
-  it('renders a static poster (no <video>) when staticFallback is true', () => {
-    const { container, queryByRole } = render(<LaptopFrame staticFallback={true} />)
+  it('renders the static product dashboard (no <video>) when staticFallback is true', () => {
+    const { container, getByText } = render(<LaptopFrame staticFallback={true} />)
     expect(container.querySelector('video')).toBeNull()
-    expect(queryByRole('img', { name: /Edforge platform overview/i })).toBeInTheDocument()
+    expect(getByText('Sample data')).toBeInTheDocument()
     cleanup()
   })
 

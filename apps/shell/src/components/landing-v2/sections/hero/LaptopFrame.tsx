@@ -1,14 +1,16 @@
 import { resolveAssetUrl, LANDING_VIDEOS } from '../../config'
+import { HeroDashboard } from './HeroDashboard'
 
 type LaptopFrameProps = {
-  /** When true, render a static poster instead of an autoplay <video>. */
+  /** When true, render the static product dashboard instead of an autoplay <video>. */
   staticFallback: boolean
 }
 
 /**
  * LaptopFrame — dark chrome, camera notch, 16:10 screen holding the hero
- * video. When staticFallback is true (reduced-motion / reduced-data) the
- * video is replaced with a styled poster so no autoplay fires.
+ * media. When staticFallback is true the autoplay <video> is replaced with a
+ * static product-overview dashboard (HeroDashboard) so no autoplay fires. The
+ * <video> branch is retained for a later iteration.
  */
 export function LaptopFrame({ staticFallback }: LaptopFrameProps) {
   const videoUrl = resolveAssetUrl(LANDING_VIDEOS.platformOverview)
@@ -54,7 +56,7 @@ export function LaptopFrame({ staticFallback }: LaptopFrameProps) {
           position: 'relative',
         }}
       >
-        {staticFallback ? <StaticHeroPoster /> : <HeroVideo src={videoUrl} />}
+        {staticFallback ? <HeroDashboard /> : <HeroVideo src={videoUrl} />}
       </div>
     </div>
   )
@@ -72,41 +74,5 @@ function HeroVideo({ src }: { src: string }) {
       aria-label="Edforge platform overview, short ambient loop"
       style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover' }}
     />
-  )
-}
-
-/**
- * StaticHeroPoster — shown when reduced-motion/data prevents autoplay.
- * A calm, Breeze-palette gradient with a minimal mark stands in for the
- * video so hero still has visual weight. No motion, no network.
- */
-function StaticHeroPoster() {
-  return (
-    <div
-      role="img"
-      aria-label="Edforge platform overview"
-      // allow-presentation-style: decorative multi-stop gradient poster backdrop
-      style={{
-        width: '100%',
-        height: '100%',
-        background:
-          'linear-gradient(135deg, var(--lp-bg-warm) 0%, var(--lp-teal-soft) 50%, var(--lp-bg-elevated) 100%)',
-        display: 'grid',
-        placeItems: 'center',
-        color: 'var(--lp-ink)',
-      }}
-    >
-      <div
-        className="lp-serif"
-        // allow-presentation-style: fluid clamp() poster wordmark size
-        style={{
-          fontSize: 'clamp(28px, 3vw, 44px)',
-          color: 'var(--lp-primary)',
-          textAlign: 'center',
-        }}
-      >
-        Edforge
-      </div>
-    </div>
   )
 }
