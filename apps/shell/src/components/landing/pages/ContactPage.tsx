@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Mail, Twitter } from 'lucide-react'
+import { Mail } from 'lucide-react'
 
 export default function ContactPage() {
   useEffect(() => {
@@ -24,23 +24,6 @@ export default function ContactPage() {
                 <h3 className="font-semibold text-foreground mb-1">Email</h3>
                 <a href="mailto:shoaibrain@edforge.net" className="text-muted-foreground hover:text-primary transition-colors">
                   shoaibrain@edforge.net
-                </a>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4">
-              <div className="rounded-lg bg-primary/10 p-3">
-                <Twitter className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-foreground mb-1">Social</h3>
-                <a
-                  href="https://x.com/edforgedotnet"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                >
-                  @edforgedotnet
                 </a>
               </div>
             </div>
