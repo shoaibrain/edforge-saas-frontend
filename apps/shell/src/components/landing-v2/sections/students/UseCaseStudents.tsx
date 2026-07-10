@@ -1,16 +1,14 @@
 import { UseCasePanel } from '../../components/UseCasePanel'
 import { USE_CASE_STUDENTS } from '../../landing.strings'
 import { resolveAssetUrl, LANDING_VIDEOS } from '../../config'
-import { useDashboardMode } from '../../hooks/useDashboardMode'
 import { StudentDashboard } from './StudentDashboard'
 
 /**
  * UseCaseStudents — "A portal students actually want to open" section.
- * Feature rail left, video right. Navy accent for visual distinction from
- * District (crimson) and Teachers (teal).
+ * Feature rail left, static product dashboard right. Navy accent for visual
+ * distinction from District (crimson) and Teachers (teal).
  */
 export function UseCaseStudents() {
-  const dashboardMode = useDashboardMode()
   return (
     <UseCasePanel
       sectionId={USE_CASE_STUDENTS.id}
@@ -24,10 +22,10 @@ export function UseCaseStudents() {
       lede={USE_CASE_STUDENTS.lede}
       accent="var(--lp-ink)"
       features={USE_CASE_STUDENTS.features}
-      videoSrc={resolveAssetUrl(LANDING_VIDEOS.taskRouter)}
+      videoSrc={resolveAssetUrl(LANDING_VIDEOS.students)}
       videoLength={USE_CASE_STUDENTS.mediaLength}
       dashboardFallback={<StudentDashboard />}
-      showMode={dashboardMode ? 'dashboard' : 'video'}
+      showMode="video"
     />
   )
 }

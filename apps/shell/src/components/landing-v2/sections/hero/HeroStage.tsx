@@ -14,6 +14,8 @@ export function HeroStage() {
   const stageRef = useRef<HTMLDivElement>(null)
   const reducedMotion = useReducedMotion()
   const reducedData = useReducedData()
+  // Autoplay the real product-overview loop; reduced-motion/reduced-data users
+  // get the static HeroDashboard instead (no autoplay, no video fetch).
   const staticFallback = reducedMotion || reducedData
 
   const { scale, translateY, gutter, bandRadius } = useHeroProgress(

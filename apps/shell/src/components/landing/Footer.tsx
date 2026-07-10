@@ -69,7 +69,7 @@ export function Footer() {
             <p
               className="mt-1.5 text-sm text-[rgb(var(--text-tertiary))]"
             >
-              Everything your schools run on — in one place.
+              Student records, academics, and finance — in one place.
             </p>
           </div>
 
@@ -93,10 +93,10 @@ export function Footer() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-6">
             <p className="text-xs text-[rgb(var(--text-tertiary))]">
-              &copy; {new Date().getFullYear()} EdForge Technologies LLC
+              &copy; {new Date().getFullYear()} EdForge Technologies
             </p>
             <p className="text-xs text-[rgb(var(--text-tertiary))]">
-              FERPA Compliant&ensp;&middot;&ensp;COPPA Ready&ensp;&middot;&ensp;Ed-Fi Aligned
+              Privacy by design (FERPA / COPPA)&ensp;&middot;&ensp;Ed-Fi Aligned
             </p>
           </div>
 

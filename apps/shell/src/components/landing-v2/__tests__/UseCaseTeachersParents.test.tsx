@@ -17,9 +17,9 @@ describe('UseCaseTeachersParents', () => {
     const { getAllByRole } = render(<UseCaseTeachersParents />)
     const tabs = getAllByRole('tab')
     expect(tabs).toHaveLength(3)
-    expect(tabs[0].textContent).toMatch(/Every family, their own language/i)
+    expect(tabs[0].textContent).toMatch(/Classrooms at a glance/i)
     expect(tabs[1].textContent).toMatch(/record of a child/i)
-    expect(tabs[2].textContent).toMatch(/message that actually gets sent/i)
+    expect(tabs[2].textContent).toMatch(/Families, part of the record/i)
   })
 
   it('clicking a feature advances the active selection', () => {
@@ -28,6 +28,6 @@ describe('UseCaseTeachersParents', () => {
     fireEvent.click(tabs[2])
     expect(tabs[2].getAttribute('aria-selected')).toBe('true')
     // Title appears in both the tab and the DemoVideo caption
-    expect(getAllByText('The message that actually gets sent.').length).toBeGreaterThanOrEqual(1)
+    expect(getAllByText('Families, part of the record.').length).toBeGreaterThanOrEqual(1)
   })
 })

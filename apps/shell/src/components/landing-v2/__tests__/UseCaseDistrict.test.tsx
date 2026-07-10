@@ -9,7 +9,7 @@ describe('UseCaseDistrict', () => {
     const { getByRole, getByText } = render(<UseCaseDistrict />)
     const heading = getByRole('heading', { level: 2 })
     expect(heading.textContent).toMatch(/Lead from/i)
-    expect(getByText(/SABER framework/i)).toBeInTheDocument()
+    expect(getByText(/Effective school systems share three traits/i)).toBeInTheDocument()
   })
 
   it('renders 3 feature tabs with the School Leaders copy', () => {

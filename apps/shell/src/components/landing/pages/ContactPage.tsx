@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Mail, MapPin, Twitter } from 'lucide-react'
+import { Mail } from 'lucide-react'
 
 export default function ContactPage() {
   useEffect(() => {
@@ -27,42 +27,12 @@ export default function ContactPage() {
                 </a>
               </div>
             </div>
-
-            <div className="flex items-start gap-4">
-              <div className="rounded-lg bg-primary/10 p-3">
-                <MapPin className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-foreground mb-1">Address</h3>
-                <p className="text-muted-foreground">
-                  6600 McKinney Ranch Parkway<br />
-                  McKinney, TX 75070
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4">
-              <div className="rounded-lg bg-primary/10 p-3">
-                <Twitter className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-foreground mb-1">Social</h3>
-                <a
-                  href="https://x.com/edforgedotnet"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                >
-                  @edforgedotnet
-                </a>
-              </div>
-            </div>
           </div>
 
           <div className="rounded-2xl border border-border bg-card p-8">
-            <h3 className="text-lg font-semibold text-foreground mb-4">For Schools & Districts</h3>
+            <h3 className="text-lg font-semibold text-foreground mb-4">For Schools</h3>
             <p className="text-muted-foreground mb-6 leading-relaxed">
-              Interested in bringing EdForge to your school or district? Reach out to us and we'll schedule a
+              Interested in bringing EdForge to your school? Reach out to us and we'll schedule a
               personalized walkthrough of the platform.
             </p>
             <a

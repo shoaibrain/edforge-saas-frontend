@@ -14,16 +14,16 @@ describe('DistrictDashboard', () => {
   it('renders 3 stat cards with values + labels', () => {
     const { getByText } = render(<DistrictDashboard />)
     expect(getByText('Total students')).toBeInTheDocument()
-    expect(getByText('45,231')).toBeInTheDocument()
+    expect(getByText('4,120')).toBeInTheDocument()
     expect(getByText('Total staff')).toBeInTheDocument()
-    expect(getByText('3,402')).toBeInTheDocument()
+    expect(getByText('310')).toBeInTheDocument()
     expect(getByText('Avg attendance')).toBeInTheDocument()
     expect(getByText('94.2%')).toBeInTheDocument()
   })
 
   it('renders a status tag for 12 schools', () => {
     const { getByText } = render(<DistrictDashboard />)
-    expect(getByText('12 schools')).toBeInTheDocument()
+    expect(getByText('4 schools')).toBeInTheDocument()
     expect(getByText('Live')).toBeInTheDocument()
   })
 

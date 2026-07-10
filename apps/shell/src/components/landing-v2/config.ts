@@ -19,13 +19,16 @@ export function resolveAssetUrl(filename: string): string {
 }
 
 /**
- * Canonical asset filenames used across landing sections. Referenced by
- * Hero (platform-overview) and the three use-case DemoVideo mounts
- * (task-router for all three, seeked to per-section chapter ranges).
+ * Canonical asset filenames used across landing sections. All four are real
+ * product screen recordings captured via scripts/record-landing.mjs against a
+ * synthetic-data demo tenant: platform-overview is the hero laptop montage;
+ * district/teachers/students back the three use-case DemoVideo sections.
  */
 export const LANDING_VIDEOS = {
   platformOverview: 'platform-overview.mp4',
-  taskRouter: 'task-router.mp4',
+  district: 'district.mp4',
+  teachers: 'teachers.mp4',
+  students: 'students.mp4',
 } as const
 
 export type LandingVideoKey = keyof typeof LANDING_VIDEOS

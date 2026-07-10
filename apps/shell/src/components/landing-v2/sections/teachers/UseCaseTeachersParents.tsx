@@ -1,7 +1,6 @@
 import { UseCasePanel } from '../../components/UseCasePanel'
 import { USE_CASE_TEACHERS } from '../../landing.strings'
 import { resolveAssetUrl, LANDING_VIDEOS } from '../../config'
-import { useDashboardMode } from '../../hooks/useDashboardMode'
 import { TeacherDashboard } from './TeacherDashboard'
 
 /**
@@ -10,7 +9,6 @@ import { TeacherDashboard } from './TeacherDashboard'
  * warm-cream background.
  */
 export function UseCaseTeachersParents() {
-  const dashboardMode = useDashboardMode()
   return (
     <UseCasePanel
       sectionId={USE_CASE_TEACHERS.id}
@@ -25,11 +23,11 @@ export function UseCaseTeachersParents() {
       accent="var(--lp-teal)"
       background="var(--lp-bg-warm)"
       features={USE_CASE_TEACHERS.features}
-      videoSrc={resolveAssetUrl(LANDING_VIDEOS.taskRouter)}
+      videoSrc={resolveAssetUrl(LANDING_VIDEOS.teachers)}
       videoLength={USE_CASE_TEACHERS.mediaLength}
       reverse
       dashboardFallback={<TeacherDashboard />}
-      showMode={dashboardMode ? 'dashboard' : 'video'}
+      showMode="video"
     />
   )
 }

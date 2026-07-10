@@ -24,9 +24,9 @@ export default function TermsPage() {
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">Description of Service</h2>
             <p className="leading-relaxed">
-              EdForge provides a cloud-based Education Management Information System (EMIS) for K-12 schools
-              and districts. The platform includes student information management, academic tracking, human
-              resources tools, financial operations, and analytics.
+              EdForge provides a cloud-based Education Management Information System (EMIS) for schools.
+              The platform includes student information management, academics (enrollment, classrooms, exams,
+              and attendance), finance (fee structures, invoicing, and payments), and a staff directory.
             </p>
           </section>
 

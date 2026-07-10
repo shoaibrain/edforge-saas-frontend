@@ -14,7 +14,7 @@ export const HERO = {
   headingMid: ' schools teach better.\nWe built Edforge around ',
   headingSerif2: 'that idea',
   headingTail: '.',
-  lede: "One modern, secure platform for student records, school operations, family communication, and analytics — so the people running schools can spend their energy on the people they're running them for.",
+  lede: "One modern, secure platform for student records, school operations, finance, and analytics — so the people running schools can spend their energy on the people they're running them for.",
   scrollHint: 'See Edforge',
   ctaPrimary: 'See Edforge',
   ctaPrimaryHref: '#use-cases',
@@ -41,8 +41,8 @@ export const USE_CASE_DISTRICT = {
   headingLead: 'Lead from',
   headingSerif: 'what matters',
   headingTail: ",\nnot what's loudest.",
-  lede: "The World Bank's SABER framework identifies three traits shared by effective school management systems: a single source of truth, real-time visibility, and data that reaches the people making decisions. Edforge is built on all three — because operational clarity is how learning outcomes compound, year after year.",
-  mediaLength: '1:42',
+  lede: "Effective school systems share three traits: a single source of truth, real-time visibility, and data that reaches the people making decisions. Edforge is built on all three — because operational clarity is how learning outcomes compound, year after year.",
+  mediaLength: '0:21',
   accent: 'var(--lp-primary)',
   features: [
     {
@@ -52,6 +52,7 @@ export const USE_CASE_DISTRICT = {
       titleSuffix: 'A .',
       description:
         'Student records, attendance, academics, staffing, and finance — one system, one schema, one login. The end of reconciling three tools that disagree with each other.',
+      // Chapter starts match the spliced district.mp4 (see scripts/record-landing.mjs)
       start: 0,
     },
     {
@@ -61,7 +62,7 @@ export const USE_CASE_DISTRICT = {
       titleSuffix: ' visibility.',
       description:
         "Trends visible while they're still addressable, not in next quarter's report. Leaders see a full-week attendance drop on Wednesday, not in a Friday summary email.",
-      start: 12,
+      start: 7,
     },
     {
       id: 'decisions',
@@ -69,8 +70,8 @@ export const USE_CASE_DISTRICT = {
       highlight: 'Decisions',
       titleSuffix: ' that reach the classroom.',
       description:
-        'Every insight pairs with a clear next step — a call, a meeting, a policy review. Clarity is only useful when it leads to action.',
-      start: 24,
+        'Insights that prompt a next step — a call, a meeting, a policy review. Clarity is only useful when it leads to action.',
+      start: 14,
     },
   ] satisfies UseCaseFeature[],
 } as const
@@ -81,17 +82,17 @@ export const USE_CASE_TEACHERS = {
   headingLead: 'Between a teacher and a family,\nonly the',
   headingSerif: 'student',
   headingTail: ' should be in the way.',
-  lede: "For too long, schools and families have talked past each other — through folders that get lost, apps that nobody opens, portals that nobody remembers the password to. Edforge puts the conversation where it belongs: on the family's phone, in the family's language, with the teacher one tap away.",
-  mediaLength: '2:08',
+  lede: "Teachers shouldn't need five tools to know their classrooms — and families shouldn't be strangers to the record. Edforge keeps sections, attendance, and every child's history in one place, with guardians attached to every student from day one.",
+  mediaLength: '0:17',
   accent: 'var(--lp-teal)',
   features: [
     {
-      id: 'language',
-      title: 'Every family, their own language.',
-      highlight: 'Every family',
-      titleSuffix: ', their own language.',
+      id: 'classrooms',
+      title: 'Classrooms at a glance.',
+      highlight: 'Classrooms',
+      titleSuffix: ' at a glance.',
       description:
-        'Auto-translation covers 40+ languages in both directions. A family speaking Newari at home reads the teacher in Newari. The teacher reads the reply in English. The technology stays out of the way.',
+        'Every section a teacher runs — subject, roster, and seat utilization — in one view. No spreadsheets, no guessing.',
       start: 0,
     },
     {
@@ -100,17 +101,17 @@ export const USE_CASE_TEACHERS = {
       highlight: 'record',
       titleSuffix: "A  of a child's progress.",
       description:
-        'Grades, attendance, and teacher notes in one place that updates in real time — so a family asking "how\'s my kid doing?" gets a full answer, not just a report card four times a year.',
-      start: 15,
+        'Attendance trends, classes, and academic history in one profile — so a conversation about a student starts from the full picture, not a guess.',
+      start: 8,
     },
     {
-      id: 'message',
-      title: 'The message that actually gets sent.',
-      highlight: 'actually gets sent',
-      titleSuffix: 'The message that .',
+      id: 'family',
+      title: 'Families, part of the record.',
+      highlight: 'Families',
+      titleSuffix: ', part of the record.',
       description:
-        'Templates, tone presets, voice-to-text, translation — all built in so reaching home takes three taps, not thirty minutes. When contact is easy, contact happens.',
-      start: 30,
+        'Guardians, relationships, and pickup authorization attached to every student — who to reach is never a mystery.',
+      start: 14,
     },
   ] satisfies UseCaseFeature[],
 } as const
@@ -118,46 +119,46 @@ export const USE_CASE_TEACHERS = {
 export const USE_CASE_STUDENTS = {
   id: 'students',
   eyebrow: 'FOR STUDENTS',
-  headingLead: 'A school tool that respects\nthe student',
-  headingSerif: 'using it',
+  headingLead: 'Every student,',
+  headingSerif: 'fully seen',
   headingTail: '.',
-  lede: "Most school software was designed by enterprise software companies for compliance, not by anyone who's watched a teenager try to use it at 7 AM on a Tuesday. Edforge's student experience was built the other way around: start with the student, honor their time, and earn the tap.",
-  mediaLength: '1:26',
+  lede: "Behind every student is a record that tells their story — enrollment, attendance patterns, classes, and the people who care for them. Edforge keeps that story complete, current, and ready for the moment it's needed, from a parent meeting to a government report.",
+  mediaLength: '0:18',
   accent: 'var(--lp-blue)',
   features: [
     {
-      id: 'view',
-      title: 'Their learning, in their view.',
-      highlight: 'Their learning',
-      titleSuffix: ', in their view.',
+      id: 'trend',
+      title: 'Attendance, as a story.',
+      highlight: 'Attendance',
+      titleSuffix: ', as a story.',
       description:
-        "Grades, assignments, schedule, and progress — laid out the way a student actually thinks about them. Not as an administrator's filing system.",
+        "Per-student sparklines on the roster and day-by-day history on the profile — patterns surface while there's still time to act.",
       start: 0,
     },
     {
-      id: 'help',
-      title: 'Help that teaches, not solves.',
-      highlight: 'teaches',
-      titleSuffix: 'Help that , not solves.',
+      id: 'record',
+      title: 'One complete record.',
+      highlight: 'complete record',
+      titleSuffix: 'One .',
       description:
-        'When a student asks for help, the platform asks them better questions back. AI assistance that builds understanding, with a summary the teacher can see — and private details the student keeps.',
-      start: 12,
+        'Enrollment, demographics, classes, and guardians in one profile — IEMIS-ready for government reporting.',
+      start: 9,
     },
     {
-      id: 'safe',
-      title: 'Safe by default.',
-      highlight: 'Safe',
-      titleSuffix: ' by default.',
+      id: 'curriculum',
+      title: 'A curriculum, mapped.',
+      highlight: 'curriculum',
+      titleSuffix: 'A , mapped.',
       description:
-        "Messaging scoped to teachers and classmates in their own school. Clear reporting paths. Notifications that respect sleep. Nothing about the app should add to a young person's stress.",
-      start: 24,
+        'Courses tied to grade levels with clear credit structure — what every student is learning, organized and visible.',
+      start: 13,
     },
   ] satisfies UseCaseFeature[],
 } as const
 
 export const PLATFORM_PILLARS = {
   eyebrow: 'HOW IT ALL CONNECTS',
-  headingLead: 'Six modules. One data model.\nEvery decision',
+  headingLead: 'One data model.\nEvery decision',
   headingSerif: 'traceable to a student',
   headingTail: '.',
   lede: "Edforge is built on the Ed-Fi data standard — the same open specification used across the world's most data-mature education systems. Every module shares one schema, which means every question you ask connects cleanly back to the student it's about.",
@@ -166,7 +167,7 @@ export const PLATFORM_PILLARS = {
       id: 'core',
       title: 'Edforge Core',
       description:
-        'Enrollment, attendance, discipline, and demographics. The foundational record of every student, built to open standards.',
+        'Enrollment, attendance, guardians, and demographics. The foundational record of every student, built to open standards.',
       colSpan: 7,
       visual: 'core',
     },
@@ -182,7 +183,7 @@ export const PLATFORM_PILLARS = {
       id: 'finance',
       title: 'Finance',
       description:
-        'Budgets, fees, payroll, and vendor management. Every dollar traceable to the program it funded.',
+        "Fee structures, invoices, payments, and family billing. Every payment traceable to the student it's for.",
       colSpan: 5,
       visual: 'finance',
     },
@@ -190,7 +191,7 @@ export const PLATFORM_PILLARS = {
       id: 'chat',
       title: 'Communications',
       description:
-        'Real-time messaging with auto-translation in 40+ languages. Delivered to app, email, or SMS — whichever a family uses.',
+        'Family and staff communication built around the shared student record — announcements, notices, and delivery preferences, now in development.',
       colSpan: 7,
       visual: 'chat',
     },
@@ -198,7 +199,7 @@ export const PLATFORM_PILLARS = {
       id: 'calendar',
       title: 'Scheduling',
       description:
-        'Classes, teachers, rooms, and calendars that talk to each other across every school in the network.',
+        'Academic years, class sections, bell schedules, and school calendars — with Bikram Sambat and Gregorian dates side by side.',
       colSpan: 6,
       visual: 'calendar',
     },
@@ -206,7 +207,7 @@ export const PLATFORM_PILLARS = {
       id: 'api',
       title: 'Platform & API',
       description:
-        'SSO, webhooks, full REST and GraphQL APIs. Your data is yours. Export it, integrate it, extend it.',
+        'Built on the open Ed-Fi data model, so your data is never locked in — enrollment and finance records export to CSV today. A public API, GraphQL, and SSO are on the roadmap.',
       colSpan: 6,
       visual: 'api',
     },
@@ -224,23 +225,23 @@ export const SECURITY_STRIP = {
       icon: 'lock',
       title: 'Encrypted, always.',
       description:
-        'AES-256 at rest, TLS 1.3 in transit. Keys rotate automatically. Data is protected by design, not by exception.',
+        'AES-256 at rest, TLS in transit. Data is protected by design, not by exception.',
     },
     {
       icon: 'users',
       title: 'Least-privilege access.',
       description:
-        'Every teacher, family member, and administrator sees only what their role requires — with a full audit trail behind every record.',
+        'Every teacher, staff member, and administrator sees only what their role requires — with a full audit trail behind every record.',
     },
     {
       icon: 'privacy',
       title: 'Your data stays yours.',
       description:
-        "We don't sell it. We don't share it. We don't train AI on it. Your school can export everything, anytime, in an open format.",
+        "We don't sell it. We don't share it. We don't train AI on it. And your data is never locked in — it lives in the open Ed-Fi format, and we'll hand it all back whenever you ask.",
     },
   ],
   frameworksLabel: 'Built to the standards that matter',
-  frameworks: ['FERPA', 'COPPA', 'GDPR', 'SOC 2', 'ISO 27001', 'SSDPC'],
+  frameworks: ['FERPA', 'COPPA', 'GDPR'],
   cta: 'Read our privacy promise',
   ctaHref: '/privacy',
 } as const
@@ -295,27 +296,27 @@ export const FAQ = {
   items: [
     {
       q: 'What exactly is Edforge?',
-      a: 'A modern school management platform that brings student records, communications, finance, scheduling, and analytics into one system. Designed for schools and school networks that want a single source of truth instead of a patchwork of disconnected tools.',
+      a: 'A modern school management platform that brings student records, academics (enrollment, attendance, exams), finance, and analytics into one system — with family communications on the roadmap. Designed for schools and school networks that want a single source of truth instead of a patchwork of disconnected tools.',
     },
     {
       q: 'Who built Edforge? What stage is it at?',
-      a: "Edforge is an early-stage platform, designed and engineered by a small, focused team drawing on research from the World Bank's SABER framework, the EdTech Hub, the U.S. Department of Education, and the Ed-Fi standards community. We're building in the open, with pilot schools leading the way.",
+      a: "Edforge is an early-stage platform, designed and engineered by a small, focused team drawing on research from the World Bank's SABER framework, the EdTech Hub, the U.S. Department of Education, and the Ed-Fi standards community. We're building in the open, with a live pilot in Nepal leading the way.",
     },
     {
       q: 'Is Edforge ready to replace what we have today?',
-      a: "For the right schools, yes. We're currently onboarding early partner schools and building alongside them. If you're curious whether that describes your school, we'd love a conversation.",
+      a: "For the right schools, yes. We're live with our first pilot school and building alongside them — and we're looking for our next early partners. If you're curious whether that describes your school, we'd love a conversation.",
     },
     {
       q: 'How does Edforge handle student data privacy?',
-      a: 'Encrypted end-to-end. Role-based access with full audit logs. Built to FERPA, COPPA, and GDPR standards. We never sell, share, or train AI on student data.',
+      a: 'Encrypted at rest and in transit. Role-based access with full audit logs. Built to FERPA, COPPA, and GDPR standards. We never sell, share, or train AI on student data.',
     },
     {
       q: 'Does Edforge work with Google Workspace or Microsoft 365?',
-      a: 'Yes, natively. Single sign-on, calendar sync, assignments integration.',
+      a: 'Not yet. Single sign-on with Google Workspace and Microsoft 365, plus calendar and assignment sync, are on our near-term roadmap. Today Edforge runs as a standalone, secure platform.',
     },
     {
-      q: 'What languages do families get messages in?',
-      a: '40+ and growing. Auto-translation runs in both directions — teachers write in their language, families read in theirs.',
+      q: 'What languages does Edforge support?',
+      a: 'The interface is available in English and Nepali today, with more languages planned.',
     },
   ],
 } as const
@@ -332,18 +333,17 @@ export const FINAL_CTA = {
 
 export const FOOTER = {
   tagline:
-    'The modern EMIS platform for K-12 schools. Built by educators, engineers, and school operators.',
-  legalEntity: 'Edforge Technologies, Inc.',
-  copyright: '\u00A9 2026 Edforge Technologies, Inc. All rights reserved.',
+    'The modern EMIS platform for schools. Built with educators and school operators.',
+  legalEntity: 'Edforge Technologies',
+  copyright: '\u00A9 2026 Edforge Technologies. All rights reserved.',
   columns: [
     {
       heading: 'Product',
       items: [
-        { label: 'Edforge Core', href: '#' },
-        { label: 'Analytics', href: '#' },
-        { label: 'Finance', href: '#' },
-        { label: 'Communications', href: '#' },
-        { label: 'Platform & API', href: '#' },
+        { label: 'Edforge Core', href: '#platform' },
+        { label: 'Academics', href: '#platform' },
+        { label: 'Finance', href: '#platform' },
+        { label: 'Analytics', href: '#platform' },
       ],
     },
     {
@@ -352,25 +352,21 @@ export const FOOTER = {
         { label: 'School Leaders', href: '#use-cases' },
         { label: 'Teachers & Families', href: '#teachers-parents' },
         { label: 'Students', href: '#students' },
-        { label: 'Principals', href: '#' },
       ],
     },
     {
       heading: 'Resources',
       items: [
-        { label: 'Documentation', href: '#' },
-        { label: 'Security Center', href: '/security' },
+        { label: 'Security', href: '/security' },
         { label: 'Privacy', href: '/privacy' },
-        { label: 'Changelog', href: '#' },
+        { label: 'Terms', href: '/terms' },
       ],
     },
     {
       heading: 'Company',
       items: [
         { label: 'About', href: '/about' },
-        { label: 'Careers', href: '#' },
         { label: 'Contact', href: '/contact' },
-        { label: 'Press', href: '#' },
       ],
     },
   ],
