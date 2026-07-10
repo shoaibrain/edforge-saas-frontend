@@ -104,10 +104,10 @@ const KPIS: Kpi[] = [
     accent: 'var(--lp-violet)',
   },
   {
-    label: 'Messages',
-    value: '7',
-    caption: 'awaiting a reply',
-    icon: 'chat',
+    label: 'Exams',
+    value: '3',
+    caption: 'scheduled this week',
+    icon: 'clipboard',
     accent: 'var(--lp-blue)',
   },
 ]
@@ -248,7 +248,7 @@ function AttendanceChart() {
 function TodayList() {
   const items: Array<{ accent: string; title: string; meta: string }> = [
     { accent: 'var(--lp-primary)', title: 'Grade 8 unit exam', meta: '10:00 · Hall A' },
-    { accent: 'var(--lp-blue)', title: 'Fee reminders sent', meta: '24 families' },
+    { accent: 'var(--lp-blue)', title: 'Fee invoices issued', meta: '24 families' },
     { accent: 'var(--lp-green)', title: 'New enrollments', meta: '2 pending review' },
   ]
   return (

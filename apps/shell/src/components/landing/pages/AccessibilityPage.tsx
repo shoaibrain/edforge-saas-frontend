@@ -24,10 +24,10 @@ export default function AccessibilityPage() {
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">Our commitment</h2>
             <p className="leading-relaxed">
-              EdForge is designed so that every student, educator, and family member can use
-              the platform, regardless of ability. We test against WCAG 2.1 AA on every
-              release and continuously improve keyboard navigation, screen-reader support,
-              and color-contrast across the product.
+              EdForge is designed so that every school operator and educator can use
+              the platform, regardless of ability. We are working toward WCAG 2.1 AA
+              conformance and continuously improve keyboard navigation, screen-reader
+              support, and color-contrast across the product.
             </p>
           </section>
 
@@ -36,12 +36,12 @@ export default function AccessibilityPage() {
             <p className="leading-relaxed">
               If you encounter a barrier using EdForge, please write to{' '}
               <a
-                href="mailto:accessibility@edforge.app"
+                href="mailto:shoaibrain@edforge.net"
                 className="text-primary underline underline-offset-4"
               >
-                accessibility@edforge.app
+                shoaibrain@edforge.net
               </a>
-              . We aim to respond within two business days.
+              . We read every report and will respond as quickly as we can.
             </p>
           </section>
         </div>

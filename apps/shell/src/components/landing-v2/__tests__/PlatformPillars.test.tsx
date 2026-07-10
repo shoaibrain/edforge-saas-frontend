@@ -9,7 +9,7 @@ describe('PlatformPillars', () => {
   it('renders the section heading + eyebrow', () => {
     const { getByRole, getByText } = render(<PlatformPillars />)
     expect(getByRole('heading', { level: 2 }).textContent).toMatch(
-      /Six modules/i
+      /One data model/i
     )
     expect(getByText('HOW IT ALL CONNECTS')).toBeInTheDocument()
   })

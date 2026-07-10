@@ -9,7 +9,7 @@ export default function PrivacyPage() {
     <div className="pt-20 min-h-screen">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
         <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2 tracking-tight">Privacy Policy</h1>
-        <p className="text-sm text-muted-foreground mb-12">Last updated: February 2026</p>
+        <p className="text-sm text-muted-foreground mb-12">Last updated: July 2026</p>
 
         <div className="space-y-8 text-muted-foreground">
           <section>
@@ -41,26 +41,28 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold text-foreground mb-4">FERPA Compliance</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-4">FERPA (US Schools)</h2>
             <p className="leading-relaxed">
-              EdForge acts as a "school official" under FERPA. We access educational records solely to provide services
-              to schools and districts. We do not use student data for advertising or marketing purposes.
+              EdForge is designed to operate as a "school official" under FERPA for US schools. We access educational
+              records solely to provide services to the schools we work with. We do not use student data for advertising
+              or marketing purposes.
             </p>
           </section>
 
           <section>
-            <h2 className="text-2xl font-bold text-foreground mb-4">COPPA Compliance</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-4">COPPA (Children's Privacy)</h2>
             <p className="leading-relaxed">
-              For students under 13, schools provide the necessary consent on behalf of parents in accordance with COPPA
-              regulations. We do not collect personal information directly from children without school authorization.
+              Students do not interact with EdForge directly — all data is entered by authorized school staff, and we do
+              not collect personal information from children. Where COPPA applies to students under 13, EdForge is
+              designed so that schools provide the necessary consent on behalf of parents.
             </p>
           </section>
 
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">Data Security</h2>
             <p className="leading-relaxed">
-              We implement industry-standard security measures including encryption at rest and in transit,
-              role-based access controls, and regular security audits. See our{' '}
+              We implement industry-standard security measures including encryption at rest (AES-256) and in transit
+              (TLS), role-based least-privilege access controls, and audit logging on every write. See our{' '}
               <a href="/security" className="text-primary hover:underline">Security page</a> for more details.
             </p>
           </section>

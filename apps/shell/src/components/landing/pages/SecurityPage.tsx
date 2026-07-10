@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Shield, Lock, Eye, Server, CheckCircle } from 'lucide-react'
+import { Shield, Lock, Eye, Server } from 'lucide-react'
 
 export default function SecurityLandingPage() {
   useEffect(() => {
@@ -17,21 +17,21 @@ export default function SecurityLandingPage() {
 
         {/* Compliance badges */}
         <div className="mb-12 flex flex-wrap gap-4">
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[rgb(var(--state-success-bg)/0.18)] border border-[rgb(var(--state-success-border)/0.35)]">
-            <CheckCircle className="h-4 w-4 text-[rgb(var(--state-success-fg))]" />
-            <span className="text-sm font-medium text-[rgb(var(--state-success-fg))]">FERPA Compliant</span>
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[rgb(var(--state-info-bg)/0.18)] border border-[rgb(var(--state-info-border)/0.35)]">
+            <Shield className="h-4 w-4 text-[rgb(var(--state-info-fg))]" />
+            <span className="text-sm font-medium text-[rgb(var(--state-info-fg))]">FERPA by design</span>
           </div>
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[rgb(var(--state-success-bg)/0.18)] border border-[rgb(var(--state-success-border)/0.35)]">
-            <CheckCircle className="h-4 w-4 text-[rgb(var(--state-success-fg))]" />
-            <span className="text-sm font-medium text-[rgb(var(--state-success-fg))]">COPPA Ready</span>
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[rgb(var(--state-info-bg)/0.18)] border border-[rgb(var(--state-info-border)/0.35)]">
+            <Shield className="h-4 w-4 text-[rgb(var(--state-info-fg))]" />
+            <span className="text-sm font-medium text-[rgb(var(--state-info-fg))]">Designed for COPPA</span>
+          </div>
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[rgb(var(--state-info-bg)/0.18)] border border-[rgb(var(--state-info-border)/0.35)]">
+            <Shield className="h-4 w-4 text-[rgb(var(--state-info-fg))]" />
+            <span className="text-sm font-medium text-[rgb(var(--state-info-fg))]">GDPR by design</span>
           </div>
           <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[rgb(var(--state-info-bg)/0.18)] border border-[rgb(var(--state-info-border)/0.35)]">
             <Shield className="h-4 w-4 text-[rgb(var(--state-info-fg))]" />
             <span className="text-sm font-medium text-[rgb(var(--state-info-fg))]">SOC 2 Roadmap</span>
-          </div>
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-[rgb(var(--state-info-bg)/0.18)] border border-[rgb(var(--state-info-border)/0.35)]">
-            <CheckCircle className="h-4 w-4 text-[rgb(var(--state-info-fg))]" />
-            <span className="text-sm font-medium text-[rgb(var(--state-info-fg))]">GDPR Compatible</span>
           </div>
         </div>
 
@@ -43,8 +43,8 @@ export default function SecurityLandingPage() {
               </div>
               <h3 className="text-lg font-semibold text-foreground mb-2">Encryption</h3>
               <p className="text-muted-foreground text-sm leading-relaxed">
-                All data is encrypted at rest (AES-256) and in transit (TLS 1.3). Database backups
-                are encrypted and stored in geographically redundant locations.
+                All data is encrypted at rest (AES-256) and in transit (TLS). Database backups
+                are encrypted, with continuous point-in-time recovery enabled on every table.
               </p>
             </div>
 
@@ -55,7 +55,7 @@ export default function SecurityLandingPage() {
               <h3 className="text-lg font-semibold text-foreground mb-2">Access Control</h3>
               <p className="text-muted-foreground text-sm leading-relaxed">
                 Role-based and attribute-based access controls ensure users only see data they're
-                authorized to access. Multi-factor authentication is available for all accounts.
+                authorized to access. Every role is scoped to least-privilege permissions by default.
               </p>
             </div>
 
@@ -65,8 +65,8 @@ export default function SecurityLandingPage() {
               </div>
               <h3 className="text-lg font-semibold text-foreground mb-2">Audit Logging</h3>
               <p className="text-muted-foreground text-sm leading-relaxed">
-                Every data access and modification is logged with immutable audit trails.
-                Administrators can review who accessed what data and when.
+                Every data modification is recorded in an audit trail.
+                Administrators can review who changed what and when.
               </p>
             </div>
 
@@ -76,8 +76,8 @@ export default function SecurityLandingPage() {
               </div>
               <h3 className="text-lg font-semibold text-foreground mb-2">Infrastructure</h3>
               <p className="text-muted-foreground text-sm leading-relaxed">
-                Hosted on AWS with VPC isolation, security groups, and automated patching.
-                Regular penetration testing and vulnerability assessments are conducted.
+                Hosted on AWS with VPC isolation, security groups, and managed-service patching.
+                We welcome security reports through our responsible disclosure program below.
               </p>
             </div>
           </div>

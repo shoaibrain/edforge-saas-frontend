@@ -14,7 +14,7 @@ export const HERO = {
   headingMid: ' schools teach better.\nWe built Edforge around ',
   headingSerif2: 'that idea',
   headingTail: '.',
-  lede: "One modern, secure platform for student records, school operations, family communication, and analytics — so the people running schools can spend their energy on the people they're running them for.",
+  lede: "One modern, secure platform for student records, school operations, finance, and analytics — so the people running schools can spend their energy on the people they're running them for.",
   scrollHint: 'See Edforge',
   ctaPrimary: 'See Edforge',
   ctaPrimaryHref: '#use-cases',
@@ -41,7 +41,7 @@ export const USE_CASE_DISTRICT = {
   headingLead: 'Lead from',
   headingSerif: 'what matters',
   headingTail: ",\nnot what's loudest.",
-  lede: "The World Bank's SABER framework identifies three traits shared by effective school management systems: a single source of truth, real-time visibility, and data that reaches the people making decisions. Edforge is built on all three — because operational clarity is how learning outcomes compound, year after year.",
+  lede: "Effective school systems share three traits: a single source of truth, real-time visibility, and data that reaches the people making decisions. Edforge is built on all three — because operational clarity is how learning outcomes compound, year after year.",
   mediaLength: '0:21',
   accent: 'var(--lp-primary)',
   features: [
@@ -70,7 +70,7 @@ export const USE_CASE_DISTRICT = {
       highlight: 'Decisions',
       titleSuffix: ' that reach the classroom.',
       description:
-        'Every insight pairs with a clear next step — a call, a meeting, a policy review. Clarity is only useful when it leads to action.',
+        'Insights that prompt a next step — a call, a meeting, a policy review. Clarity is only useful when it leads to action.',
       start: 14,
     },
   ] satisfies UseCaseFeature[],
@@ -158,7 +158,7 @@ export const USE_CASE_STUDENTS = {
 
 export const PLATFORM_PILLARS = {
   eyebrow: 'HOW IT ALL CONNECTS',
-  headingLead: 'Six modules. One data model.\nEvery decision',
+  headingLead: 'One data model.\nEvery decision',
   headingSerif: 'traceable to a student',
   headingTail: '.',
   lede: "Edforge is built on the Ed-Fi data standard — the same open specification used across the world's most data-mature education systems. Every module shares one schema, which means every question you ask connects cleanly back to the student it's about.",
@@ -167,7 +167,7 @@ export const PLATFORM_PILLARS = {
       id: 'core',
       title: 'Edforge Core',
       description:
-        'Enrollment, attendance, discipline, and demographics. The foundational record of every student, built to open standards.',
+        'Enrollment, attendance, guardians, and demographics. The foundational record of every student, built to open standards.',
       colSpan: 7,
       visual: 'core',
     },
@@ -183,7 +183,7 @@ export const PLATFORM_PILLARS = {
       id: 'finance',
       title: 'Finance',
       description:
-        'Budgets, fees, payroll, and vendor management. Every dollar traceable to the program it funded.',
+        "Fee structures, invoices, payments, and family billing. Every payment traceable to the student it's for.",
       colSpan: 5,
       visual: 'finance',
     },
@@ -199,7 +199,7 @@ export const PLATFORM_PILLARS = {
       id: 'calendar',
       title: 'Scheduling',
       description:
-        'Classes, teachers, rooms, and calendars that talk to each other across every school in the network.',
+        'Academic years, class sections, bell schedules, and school calendars — with Bikram Sambat and Gregorian dates side by side.',
       colSpan: 6,
       visual: 'calendar',
     },
@@ -207,7 +207,7 @@ export const PLATFORM_PILLARS = {
       id: 'api',
       title: 'Platform & API',
       description:
-        'Built on the open Ed-Fi data model, so your data is yours — export it anytime in an open format. A public API, GraphQL, and SSO are on the roadmap.',
+        'Built on the open Ed-Fi data model, so your data is never locked in — enrollment and finance records export to CSV today. A public API, GraphQL, and SSO are on the roadmap.',
       colSpan: 6,
       visual: 'api',
     },
@@ -225,23 +225,23 @@ export const SECURITY_STRIP = {
       icon: 'lock',
       title: 'Encrypted, always.',
       description:
-        'AES-256 at rest, TLS 1.3 in transit. Keys rotate automatically. Data is protected by design, not by exception.',
+        'AES-256 at rest, TLS in transit. Data is protected by design, not by exception.',
     },
     {
       icon: 'users',
       title: 'Least-privilege access.',
       description:
-        'Every teacher, family member, and administrator sees only what their role requires — with a full audit trail behind every record.',
+        'Every teacher, staff member, and administrator sees only what their role requires — with a full audit trail behind every record.',
     },
     {
       icon: 'privacy',
       title: 'Your data stays yours.',
       description:
-        "We don't sell it. We don't share it. We don't train AI on it. Your school can export everything, anytime, in an open format.",
+        "We don't sell it. We don't share it. We don't train AI on it. And your data is never locked in — it lives in the open Ed-Fi format, and we'll hand it all back whenever you ask.",
     },
   ],
   frameworksLabel: 'Built to the standards that matter',
-  frameworks: ['FERPA', 'COPPA', 'GDPR', 'SSDPC'],
+  frameworks: ['FERPA', 'COPPA', 'GDPR'],
   cta: 'Read our privacy promise',
   ctaHref: '/privacy',
 } as const
@@ -296,19 +296,19 @@ export const FAQ = {
   items: [
     {
       q: 'What exactly is Edforge?',
-      a: 'A modern school management platform that brings student records, communications, finance, scheduling, and analytics into one system. Designed for schools and school networks that want a single source of truth instead of a patchwork of disconnected tools.',
+      a: 'A modern school management platform that brings student records, academics (enrollment, attendance, exams), finance, and analytics into one system — with family communications on the roadmap. Designed for schools and school networks that want a single source of truth instead of a patchwork of disconnected tools.',
     },
     {
       q: 'Who built Edforge? What stage is it at?',
-      a: "Edforge is an early-stage platform, designed and engineered by a small, focused team drawing on research from the World Bank's SABER framework, the EdTech Hub, the U.S. Department of Education, and the Ed-Fi standards community. We're building in the open, with pilot schools leading the way.",
+      a: "Edforge is an early-stage platform, designed and engineered by a small, focused team drawing on research from the World Bank's SABER framework, the EdTech Hub, the U.S. Department of Education, and the Ed-Fi standards community. We're building in the open, with a live pilot in Nepal leading the way.",
     },
     {
       q: 'Is Edforge ready to replace what we have today?',
-      a: "For the right schools, yes. We're currently onboarding early partner schools and building alongside them. If you're curious whether that describes your school, we'd love a conversation.",
+      a: "For the right schools, yes. We're live with our first pilot school and building alongside them — and we're looking for our next early partners. If you're curious whether that describes your school, we'd love a conversation.",
     },
     {
       q: 'How does Edforge handle student data privacy?',
-      a: 'Encrypted end-to-end. Role-based access with full audit logs. Built to FERPA, COPPA, and GDPR standards. We never sell, share, or train AI on student data.',
+      a: 'Encrypted at rest and in transit. Role-based access with full audit logs. Built to FERPA, COPPA, and GDPR standards. We never sell, share, or train AI on student data.',
     },
     {
       q: 'Does Edforge work with Google Workspace or Microsoft 365?',
@@ -333,18 +333,17 @@ export const FINAL_CTA = {
 
 export const FOOTER = {
   tagline:
-    'The modern EMIS platform for K-12 schools. Built by educators, engineers, and school operators.',
+    'The modern EMIS platform for schools. Built with educators and school operators.',
   legalEntity: 'Edforge Technologies',
   copyright: '\u00A9 2026 Edforge Technologies. All rights reserved.',
   columns: [
     {
       heading: 'Product',
       items: [
-        { label: 'Edforge Core', href: '#' },
-        { label: 'Analytics', href: '#' },
-        { label: 'Finance', href: '#' },
-        { label: 'Communications', href: '#' },
-        { label: 'Platform & API', href: '#' },
+        { label: 'Edforge Core', href: '#platform' },
+        { label: 'Academics', href: '#platform' },
+        { label: 'Finance', href: '#platform' },
+        { label: 'Analytics', href: '#platform' },
       ],
     },
     {
@@ -353,25 +352,21 @@ export const FOOTER = {
         { label: 'School Leaders', href: '#use-cases' },
         { label: 'Teachers & Families', href: '#teachers-parents' },
         { label: 'Students', href: '#students' },
-        { label: 'Principals', href: '#' },
       ],
     },
     {
       heading: 'Resources',
       items: [
-        { label: 'Documentation', href: '#' },
-        { label: 'Security Center', href: '/security' },
+        { label: 'Security', href: '/security' },
         { label: 'Privacy', href: '/privacy' },
-        { label: 'Changelog', href: '#' },
+        { label: 'Terms', href: '/terms' },
       ],
     },
     {
       heading: 'Company',
       items: [
         { label: 'About', href: '/about' },
-        { label: 'Careers', href: '#' },
         { label: 'Contact', href: '/contact' },
-        { label: 'Press', href: '#' },
       ],
     },
   ],

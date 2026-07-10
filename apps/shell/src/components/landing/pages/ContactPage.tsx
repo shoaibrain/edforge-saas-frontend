@@ -47,9 +47,9 @@ export default function ContactPage() {
           </div>
 
           <div className="rounded-2xl border border-border bg-card p-8">
-            <h3 className="text-lg font-semibold text-foreground mb-4">For Schools & Districts</h3>
+            <h3 className="text-lg font-semibold text-foreground mb-4">For Schools</h3>
             <p className="text-muted-foreground mb-6 leading-relaxed">
-              Interested in bringing EdForge to your school or district? Reach out to us and we'll schedule a
+              Interested in bringing EdForge to your school? Reach out to us and we'll schedule a
               personalized walkthrough of the platform.
             </p>
             <a

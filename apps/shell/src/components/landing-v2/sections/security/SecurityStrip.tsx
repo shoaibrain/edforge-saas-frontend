@@ -170,17 +170,10 @@ export function SecurityStrip() {
                 >
                   <span
                     aria-hidden
-                    className="bg-[rgba(123,224,183,0.18)] text-[#7BE0B7]"
-                    style={{
-                      width: 18,
-                      height: 18,
-                      borderRadius: 9,
-                      display: 'grid',
-                      placeItems: 'center',
-                    }}
-                  >
-                    <Icon name="check" size={11} strokeWidth={3} />
-                  </span>
+                    className="bg-[#7BE0B7]"
+                    // allow-presentation-style: small neutral accent dot (not a compliance checkmark)
+                    style={{ width: 6, height: 6, borderRadius: 3 }}
+                  />
                   {name}
                 </div>
               ))}
