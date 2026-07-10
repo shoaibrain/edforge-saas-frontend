@@ -23,14 +23,11 @@ export function UseCaseTeachersParents() {
       accent="var(--lp-teal)"
       background="var(--lp-bg-warm)"
       features={USE_CASE_TEACHERS.features}
-      videoSrc={resolveAssetUrl(LANDING_VIDEOS.taskRouter)}
+      videoSrc={resolveAssetUrl(LANDING_VIDEOS.teachers)}
       videoLength={USE_CASE_TEACHERS.mediaLength}
       reverse
       dashboardFallback={<TeacherDashboard />}
-      // Simplified landing: show the static product dashboard, not the demo
-      // video. Restore video later by setting showMode="video" (the video path
-      // in UseCasePanel/DemoVideo is retained, dormant).
-      showMode="dashboard"
+      showMode="video"
     />
   )
 }

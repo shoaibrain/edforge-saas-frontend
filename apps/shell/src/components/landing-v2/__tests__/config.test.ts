@@ -16,6 +16,7 @@ describe('resolveAssetUrl', () => {
       '/landing/platform-overview.mp4'
     )
     expect(resolveAssetUrl(LANDING_VIDEOS.district)).toBe('/landing/district.mp4')
-    expect(resolveAssetUrl(LANDING_VIDEOS.taskRouter)).toBe('/landing/task-router.mp4')
+    expect(resolveAssetUrl(LANDING_VIDEOS.teachers)).toBe('/landing/teachers.mp4')
+    expect(resolveAssetUrl(LANDING_VIDEOS.students)).toBe('/landing/students.mp4')
   })
 })

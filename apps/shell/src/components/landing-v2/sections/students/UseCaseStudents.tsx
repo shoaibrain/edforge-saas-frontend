@@ -22,13 +22,10 @@ export function UseCaseStudents() {
       lede={USE_CASE_STUDENTS.lede}
       accent="var(--lp-ink)"
       features={USE_CASE_STUDENTS.features}
-      videoSrc={resolveAssetUrl(LANDING_VIDEOS.taskRouter)}
+      videoSrc={resolveAssetUrl(LANDING_VIDEOS.students)}
       videoLength={USE_CASE_STUDENTS.mediaLength}
       dashboardFallback={<StudentDashboard />}
-      // Simplified landing: show the static product dashboard, not the demo
-      // video. Restore video later by setting showMode="video" (the video path
-      // in UseCasePanel/DemoVideo is retained, dormant).
-      showMode="dashboard"
+      showMode="video"
     />
   )
 }

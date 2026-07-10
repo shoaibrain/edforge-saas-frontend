@@ -220,7 +220,24 @@ function ffmpegCommand(videoPath, marks, outName) {
 
 /* ── Scene lists (English UI; shipped features only) ───────────────────── */
 
-/** Hero montage (~23s): quick cuts across the platform, ends where it starts. */
+/** Press-click at the current cursor position (shows the cursor press animation). */
+async function pressClick(page) {
+  await page.mouse.down()
+  await page.waitForTimeout(120)
+  await page.mouse.up()
+}
+
+/** Glide to a text target and click it (visible, natural click). */
+async function glideClick(page, re, ms = 900) {
+  const box = await glideToText(page, re, ms)
+  if (box) await pressClick(page)
+  return !!box
+}
+
+// Stable demo-student profile discovered during scouting (Aadesh Chaudhary).
+const PROFILE_PATH = process.env.PROFILE_PATH ?? '/academics/students/ea2dddb4-6d8c-47ef-9679-ff8387fa277d'
+
+/** Hero montage (~26s): quick cuts across the platform, ends where it starts. */
 const HERO_SCENES = [
   {
     name: 'home-kpis',
@@ -228,24 +245,26 @@ const HERO_SCENES = [
     settleText: /attendance trend/i,
     run: async (p) => {
       await glideToText(p, /students enrolled/i, 900, 0, 30)
-      await p.waitForTimeout(500)
-      await glideToText(p, /outstanding fees/i, 900, 0, 30)
-      await p.waitForTimeout(700)
+      await p.waitForTimeout(450)
+      await glideToText(p, /today's attendance/i, 700, 0, 30)
+      await p.waitForTimeout(450)
+      await glideToText(p, /outstanding fees/i, 700, 0, 30)
+      await p.waitForTimeout(600)
     },
   },
   {
     name: 'home-trend',
     settleText: /attendance trend/i,
     run: async (p) => {
-      await smoothScroll(p, 320, 900, 1)
-      await sweepBelowText(p, /attendance trend/i, { below: 150, ms: 2000 })
+      await smoothScroll(p, 300, 800, 1)
+      await sweepBelowText(p, /attendance trend/i, { below: 150, ms: 1900 })
       await p.waitForTimeout(500)
     },
   },
   {
     name: 'academics-overview',
     path: '/academics',
-    settleText: /attendance trend/i,
+    settleText: /at-risk students/i,
     run: async (p) => {
       await glideToText(p, /at-risk students/i, 900, 0, 20)
       await p.waitForTimeout(600)
@@ -254,24 +273,35 @@ const HERO_SCENES = [
     },
   },
   {
-    name: 'students-roster',
+    name: 'roster-drawer',
     path: '/academics/students',
     settleText: /govt\. reports/i,
     run: async (p) => {
-      await glideToText(p, /total enrolled/i, 700, 0, 20)
-      await p.waitForTimeout(400)
-      await smoothScroll(p, 380, 1600, 1)
-      await p.waitForTimeout(700)
+      await smoothScroll(p, 180, 900, 1)
+      await p.waitForTimeout(300)
+      await glideClick(p, /aadesh chaudhary/i, 900)
+      await p.waitForTimeout(1900) // drawer slides in + settles
+    },
+  },
+  {
+    name: 'curriculum',
+    path: '/academics/curriculum',
+    settleText: /total courses/i,
+    run: async (p) => {
+      await glideToText(p, /total courses/i, 800, 0, 20)
+      await p.waitForTimeout(500)
+      await smoothScroll(p, 300, 1400, 1)
+      await p.waitForTimeout(600)
     },
   },
   {
     name: 'finance-overview',
     path: '/finance',
-    settleText: /collection/i,
+    settleText: /collection performance/i,
     run: async (p) => {
-      await glideToText(p, /outstanding/i, 900, 0, 20)
+      await glideToText(p, /overdue/i, 900, 0, 20)
       await p.waitForTimeout(500)
-      await sweepBelowText(p, /collection/i, { below: 150, ms: 1600 })
+      await sweepBelowText(p, /collection performance/i, { below: 130, ms: 1600 })
       await p.waitForTimeout(400)
     },
   },
@@ -281,12 +311,12 @@ const HERO_SCENES = [
     settleText: /attendance trend/i,
     run: async (p) => {
       await glide(p, 800, 260, 700)
-      await p.waitForTimeout(1600)
+      await p.waitForTimeout(1500)
     },
   },
 ]
 
-/** District (~16s, 3 chapters): KPI band → at-risk visibility → actionable roster. */
+/** District (~17s, 3 chapters): KPI band → at-risk visibility → drill to a student. */
 const DISTRICT_SCENES = [
   {
     name: 'ch1-single-source',
@@ -304,7 +334,7 @@ const DISTRICT_SCENES = [
   {
     name: 'ch2-visibility',
     path: '/academics',
-    settleText: /attendance trend/i,
+    settleText: /at-risk students/i,
     run: async (p) => {
       await glideToText(p, /at-risk students/i, 900, 0, 20)
       await p.waitForTimeout(700)
@@ -317,10 +347,79 @@ const DISTRICT_SCENES = [
     path: '/academics/students',
     settleText: /govt\. reports/i,
     run: async (p) => {
-      await glideToText(p, /at risk/i, 800, 0, 20)
+      await smoothScroll(p, 200, 1000, 1)
+      await p.waitForTimeout(300)
+      await glideClick(p, /aadesh chaudhary/i, 900)
+      await p.waitForTimeout(2000) // drawer: leader drills into one child
+    },
+  },
+]
+
+/** Teachers & Families (~17s, 3 chapters): classrooms → child's record → family. */
+const TEACHERS_SCENES = [
+  {
+    name: 'ch1-classrooms',
+    path: '/academics/classrooms',
+    settleText: /total sections/i,
+    run: async (p) => {
+      await glideToText(p, /total sections/i, 800, 0, 20)
       await p.waitForTimeout(400)
-      await smoothScroll(p, 360, 1500, 1)
+      await smoothScroll(p, 260, 1300, 1)
       await p.waitForTimeout(800)
+    },
+  },
+  {
+    name: 'ch2-child-record',
+    path: PROFILE_PATH,
+    settleText: /attendance trend/i,
+    run: async (p) => {
+      await glideToText(p, /attendance/i, 800, 0, 20)
+      await p.waitForTimeout(500)
+      await sweepBelowText(p, /attendance trend/i, { below: 120, ms: 1700 })
+      await p.waitForTimeout(500)
+    },
+  },
+  {
+    name: 'ch3-family',
+    settleText: /attendance trend/i,
+    run: async (p) => {
+      const ok = await glideClick(p, /^family$/i, 800)
+      await p.waitForTimeout(ok ? 2300 : 1200) // family tab renders guardians
+    },
+  },
+]
+
+/** Students (~15s, 3 chapters): trend sparklines → one complete record → curriculum. */
+const STUDENTS_SCENES = [
+  {
+    name: 'ch1-sparklines',
+    path: '/academics/students',
+    settleText: /govt\. reports/i,
+    run: async (p) => {
+      await glideToText(p, /total enrolled/i, 700, 0, 20)
+      await p.waitForTimeout(300)
+      await smoothScroll(p, 340, 1700, 1)
+      await p.waitForTimeout(600)
+    },
+  },
+  {
+    name: 'ch2-record',
+    path: PROFILE_PATH,
+    settleText: /attendance trend/i,
+    run: async (p) => {
+      await sweepBelowText(p, /attendance trend/i, { below: 120, ms: 1800 })
+      await p.waitForTimeout(700)
+    },
+  },
+  {
+    name: 'ch3-curriculum',
+    path: '/academics/curriculum',
+    settleText: /total courses/i,
+    run: async (p) => {
+      await glideToText(p, /subject areas/i, 800, 0, 20)
+      await p.waitForTimeout(400)
+      await smoothScroll(p, 280, 1300, 1)
+      await p.waitForTimeout(600)
     },
   },
 ]
@@ -429,14 +528,17 @@ async function main() {
     return
   }
 
-  const results = {}
-  if (SET === 'hero' || SET === 'all') {
-    console.log('\n── shooting hero montage ──')
-    results.hero = await shoot(browser, 'hero', HERO_SCENES)
+  const CLIPS = {
+    hero: HERO_SCENES,
+    district: DISTRICT_SCENES,
+    teachers: TEACHERS_SCENES,
+    students: STUDENTS_SCENES,
   }
-  if (SET === 'district' || SET === 'all') {
-    console.log('\n── shooting district ──')
-    results.district = await shoot(browser, 'district', DISTRICT_SCENES)
+  const results = {}
+  for (const [clip, scenes] of Object.entries(CLIPS)) {
+    if (SET !== 'all' && SET !== clip) continue
+    console.log(`\n── shooting ${clip} ──`)
+    results[clip] = await shoot(browser, clip, scenes)
   }
   await browser.close()
 

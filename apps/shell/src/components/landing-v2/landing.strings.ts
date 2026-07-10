@@ -42,7 +42,7 @@ export const USE_CASE_DISTRICT = {
   headingSerif: 'what matters',
   headingTail: ",\nnot what's loudest.",
   lede: "The World Bank's SABER framework identifies three traits shared by effective school management systems: a single source of truth, real-time visibility, and data that reaches the people making decisions. Edforge is built on all three — because operational clarity is how learning outcomes compound, year after year.",
-  mediaLength: '0:16',
+  mediaLength: '0:21',
   accent: 'var(--lp-primary)',
   features: [
     {
@@ -62,7 +62,7 @@ export const USE_CASE_DISTRICT = {
       titleSuffix: ' visibility.',
       description:
         "Trends visible while they're still addressable, not in next quarter's report. Leaders see a full-week attendance drop on Wednesday, not in a Friday summary email.",
-      start: 6,
+      start: 7,
     },
     {
       id: 'decisions',
@@ -71,7 +71,7 @@ export const USE_CASE_DISTRICT = {
       titleSuffix: ' that reach the classroom.',
       description:
         'Every insight pairs with a clear next step — a call, a meeting, a policy review. Clarity is only useful when it leads to action.',
-      start: 11,
+      start: 14,
     },
   ] satisfies UseCaseFeature[],
 } as const
@@ -82,17 +82,17 @@ export const USE_CASE_TEACHERS = {
   headingLead: 'Between a teacher and a family,\nonly the',
   headingSerif: 'student',
   headingTail: ' should be in the way.',
-  lede: "For too long, schools and families have talked past each other — through folders that get lost, apps that nobody opens, portals that nobody remembers the password to. Edforge puts the conversation where it belongs: on the family's phone, in the family's language, with the teacher one tap away.",
-  mediaLength: '2:08',
+  lede: "Teachers shouldn't need five tools to know their classrooms — and families shouldn't be strangers to the record. Edforge keeps sections, attendance, and every child's history in one place, with guardians attached to every student from day one.",
+  mediaLength: '0:17',
   accent: 'var(--lp-teal)',
   features: [
     {
-      id: 'language',
-      title: 'Every family, their own language.',
-      highlight: 'Every family',
-      titleSuffix: ', their own language.',
+      id: 'classrooms',
+      title: 'Classrooms at a glance.',
+      highlight: 'Classrooms',
+      titleSuffix: ' at a glance.',
       description:
-        "The Edforge interface is available in English and Nepali today, with more languages planned — so families use the platform in the language they're comfortable in.",
+        'Every section a teacher runs — subject, roster, and seat utilization — in one view. No spreadsheets, no guessing.',
       start: 0,
     },
     {
@@ -101,17 +101,17 @@ export const USE_CASE_TEACHERS = {
       highlight: 'record',
       titleSuffix: "A  of a child's progress.",
       description:
-        'Grades, attendance, and teacher notes in one place that updates in real time — so a family asking "how\'s my kid doing?" gets a full answer, not just a report card four times a year.',
-      start: 15,
+        'Attendance trends, classes, and academic history in one profile — so a conversation about a student starts from the full picture, not a guess.',
+      start: 8,
     },
     {
-      id: 'message',
-      title: 'The message that actually gets sent.',
-      highlight: 'actually gets sent',
-      titleSuffix: 'The message that .',
+      id: 'family',
+      title: 'Families, part of the record.',
+      highlight: 'Families',
+      titleSuffix: ', part of the record.',
       description:
-        'Templates, tone presets, voice-to-text, translation — all built in so reaching home takes three taps, not thirty minutes. When contact is easy, contact happens.',
-      start: 30,
+        'Guardians, relationships, and pickup authorization attached to every student — who to reach is never a mystery.',
+      start: 14,
     },
   ] satisfies UseCaseFeature[],
 } as const
@@ -119,39 +119,39 @@ export const USE_CASE_TEACHERS = {
 export const USE_CASE_STUDENTS = {
   id: 'students',
   eyebrow: 'FOR STUDENTS',
-  headingLead: 'A school tool that respects\nthe student',
-  headingSerif: 'using it',
+  headingLead: 'Every student,',
+  headingSerif: 'fully seen',
   headingTail: '.',
-  lede: "Most school software was designed by enterprise software companies for compliance, not by anyone who's watched a teenager try to use it at 7 AM on a Tuesday. Edforge's student experience was built the other way around: start with the student, honor their time, and earn the tap.",
-  mediaLength: '1:26',
+  lede: "Behind every student is a record that tells their story — enrollment, attendance patterns, classes, and the people who care for them. Edforge keeps that story complete, current, and ready for the moment it's needed, from a parent meeting to a government report.",
+  mediaLength: '0:18',
   accent: 'var(--lp-blue)',
   features: [
     {
-      id: 'view',
-      title: 'Their learning, in their view.',
-      highlight: 'Their learning',
-      titleSuffix: ', in their view.',
+      id: 'trend',
+      title: 'Attendance, as a story.',
+      highlight: 'Attendance',
+      titleSuffix: ', as a story.',
       description:
-        "Grades, assignments, schedule, and progress — laid out the way a student actually thinks about them. Not as an administrator's filing system.",
+        "Per-student sparklines on the roster and day-by-day history on the profile — patterns surface while there's still time to act.",
       start: 0,
     },
     {
-      id: 'help',
-      title: 'Help that teaches, not solves.',
-      highlight: 'teaches',
-      titleSuffix: 'Help that , not solves.',
+      id: 'record',
+      title: 'One complete record.',
+      highlight: 'complete record',
+      titleSuffix: 'One .',
       description:
-        'When a student asks for help, the platform asks them better questions back. AI assistance that builds understanding, with a summary the teacher can see — and private details the student keeps.',
-      start: 12,
+        'Enrollment, demographics, classes, and guardians in one profile — IEMIS-ready for government reporting.',
+      start: 9,
     },
     {
-      id: 'safe',
-      title: 'Safe by default.',
-      highlight: 'Safe',
-      titleSuffix: ' by default.',
+      id: 'curriculum',
+      title: 'A curriculum, mapped.',
+      highlight: 'curriculum',
+      titleSuffix: 'A , mapped.',
       description:
-        "Messaging scoped to teachers and classmates in their own school. Clear reporting paths. Notifications that respect sleep. Nothing about the app should add to a young person's stress.",
-      start: 24,
+        'Courses tied to grade levels with clear credit structure — what every student is learning, organized and visible.',
+      start: 13,
     },
   ] satisfies UseCaseFeature[],
 } as const
