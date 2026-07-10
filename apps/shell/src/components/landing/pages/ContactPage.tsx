@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Mail, MapPin, Twitter } from 'lucide-react'
+import { Mail, Twitter } from 'lucide-react'
 
 export default function ContactPage() {
   useEffect(() => {
@@ -25,19 +25,6 @@ export default function ContactPage() {
                 <a href="mailto:shoaibrain@edforge.net" className="text-muted-foreground hover:text-primary transition-colors">
                   shoaibrain@edforge.net
                 </a>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4">
-              <div className="rounded-lg bg-primary/10 p-3">
-                <MapPin className="h-5 w-5 text-primary" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-foreground mb-1">Address</h3>
-                <p className="text-muted-foreground">
-                  6600 McKinney Ranch Parkway<br />
-                  McKinney, TX 75070
-                </p>
               </div>
             </div>
 

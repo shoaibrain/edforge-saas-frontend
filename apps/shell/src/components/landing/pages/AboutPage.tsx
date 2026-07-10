@@ -54,8 +54,7 @@ export default function AboutPage() {
           <section>
             <h2 className="text-xl font-bold text-foreground mb-4 sm:text-2xl">Contact</h2>
             <p className="text-muted-foreground leading-relaxed">
-              EdForge Technologies LLC<br />
-              6600 McKinney Ranch Parkway, McKinney, TX 75070<br />
+              EdForge Technologies<br />
               <a href="mailto:shoaibrain@edforge.net" className="text-primary hover:underline">shoaibrain@edforge.net</a>
             </p>
           </section>

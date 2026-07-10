@@ -92,7 +92,7 @@ export const USE_CASE_TEACHERS = {
       highlight: 'Every family',
       titleSuffix: ', their own language.',
       description:
-        'Auto-translation covers 40+ languages in both directions. A family speaking Newari at home reads the teacher in Newari. The teacher reads the reply in English. The technology stays out of the way.',
+        "The Edforge interface is available in English and Nepali today, with more languages planned — so families use the platform in the language they're comfortable in.",
       start: 0,
     },
     {
@@ -191,7 +191,7 @@ export const PLATFORM_PILLARS = {
       id: 'chat',
       title: 'Communications',
       description:
-        'Real-time messaging with auto-translation in 40+ languages. Delivered to app, email, or SMS — whichever a family uses.',
+        'Family and staff communication built around the shared student record — announcements, notices, and delivery preferences, now in development.',
       colSpan: 7,
       visual: 'chat',
     },
@@ -315,8 +315,8 @@ export const FAQ = {
       a: 'Not yet. Single sign-on with Google Workspace and Microsoft 365, plus calendar and assignment sync, are on our near-term roadmap. Today Edforge runs as a standalone, secure platform.',
     },
     {
-      q: 'What languages do families get messages in?',
-      a: '40+ and growing. Auto-translation runs in both directions — teachers write in their language, families read in theirs.',
+      q: 'What languages does Edforge support?',
+      a: 'The interface is available in English and Nepali today, with more languages planned.',
     },
   ],
 } as const
@@ -334,8 +334,8 @@ export const FINAL_CTA = {
 export const FOOTER = {
   tagline:
     'The modern EMIS platform for K-12 schools. Built by educators, engineers, and school operators.',
-  legalEntity: 'Edforge Technologies, Inc.',
-  copyright: '\u00A9 2026 Edforge Technologies, Inc. All rights reserved.',
+  legalEntity: 'Edforge Technologies',
+  copyright: '\u00A9 2026 Edforge Technologies. All rights reserved.',
   columns: [
     {
       heading: 'Product',

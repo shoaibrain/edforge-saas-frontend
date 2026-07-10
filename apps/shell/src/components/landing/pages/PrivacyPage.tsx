@@ -15,7 +15,7 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-2xl font-bold text-foreground mb-4">Overview</h2>
             <p className="leading-relaxed">
-              EdForge Technologies LLC ("EdForge", "we", "us") is committed to protecting the privacy of students,
+              EdForge Technologies ("EdForge", "we", "us") is committed to protecting the privacy of students,
               educators, parents, and all users of our platform. This Privacy Policy describes how we collect, use,
               and protect your personal information.
             </p>
