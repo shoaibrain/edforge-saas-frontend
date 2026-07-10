@@ -63,6 +63,7 @@ vi.mock('../../../../layouts/FinanceLayout', () => ({
     calendarSystem: 'gregorian',
     enableDualDateDisplay: false,
   }),
+  useFinanceSettingsReady: () => true,
 }))
 
 vi.mock('@tanstack/react-router', () => ({

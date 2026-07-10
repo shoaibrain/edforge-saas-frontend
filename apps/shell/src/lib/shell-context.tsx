@@ -226,17 +226,44 @@ export function ShellProvider({ children }: ShellProviderProps) {
   })
 
   // Fetch workspace settings for the tenant.
-  // This endpoint requires TenantAdmin role — non-admin users (Parent, Student)
-  // fall back to SYSTEM_DEFAULTS via useResolvedSettings, which is correct behavior.
-  // School-level configuration (fetched via a separate non-admin endpoint) provides
-  // school-specific overrides for currency, timezone, calendar system, etc.
-  const { data: workspaceSettingsData, isError: isWorkspaceSettingsError } = useQuery({
+  // The admin endpoint also carries lock/onboarding state used by settings UIs.
+  const isTenantAdmin = user?.globalRole === 'TenantAdmin'
+  const {
+    data: workspaceSettingsData,
+    isError: isWorkspaceSettingsError,
+    isSuccess: isWorkspaceSettingsSuccess,
+  } = useQuery({
     queryKey: ['workspaceSettings', user?.tenantId],
     queryFn: () => tenantService.getWorkspaceSettings(user!.tenantId),
-    enabled: isAuthenticated && !!user?.tenantId && user?.globalRole === 'TenantAdmin',
+    enabled: isAuthenticated && !!user?.tenantId && isTenantAdmin,
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
   })
+
+  // Non-admins can't call the admin endpoint, but regional display settings
+  // (currency, calendar, locale) must still resolve for them — otherwise
+  // parents/students render SYSTEM_DEFAULTS (USD) forever. The read-only
+  // /tenants/my/settings endpoint serves the same regional block to any
+  // authenticated tenant user.
+  const {
+    data: myRegionalSettingsData,
+    isError: isMyRegionalSettingsError,
+    isSuccess: isMyRegionalSettingsSuccess,
+  } = useQuery({
+    queryKey: ['myWorkspaceSettings', user?.tenantId],
+    queryFn: () => tenantService.getMyWorkspaceSettings(),
+    enabled: isAuthenticated && !!user?.tenantId && !isTenantAdmin,
+    retry: false,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  })
+
+  // The role-appropriate settings query has settled (success or error —
+  // errors degrade to defaults, they must not hold the gate).
+  const settingsSettled = !user?.tenantId
+    ? true
+    : isTenantAdmin
+      ? isWorkspaceSettingsSuccess || isWorkspaceSettingsError
+      : isMyRegionalSettingsSuccess || isMyRegionalSettingsError
 
   // Fetch school configuration when active school changes
   const { data: schoolConfigurationData } = useQuery({
@@ -254,7 +281,7 @@ export function ShellProvider({ children }: ShellProviderProps) {
   const effectiveTenant = tenant ?? null
   const effectiveSchools = schools ?? []
   const effectiveSchoolYear = schoolYear ?? null
-  const effectiveWorkspaceSettings = workspaceSettingsData?.regional ?? null
+  const effectiveWorkspaceSettings = workspaceSettingsData?.regional ?? myRegionalSettingsData?.regional ?? null
   const effectiveSchoolConfiguration = (schoolConfigurationData as SchoolConfiguration) ?? null
   const effectiveLockHolders = workspaceSettingsData?.lockHolders ?? []
 
@@ -456,6 +483,11 @@ export function ShellProvider({ children }: ShellProviderProps) {
   // A user with zero available schools is ready with activeSchoolId null.
   // The tenant query is retry:false, so errors settle isTenantLoading and
   // the gate never hangs on it (403 for non-admins is expected).
+  // settingsSettled: regional settings (currency/calendar/locale) have
+  // resolved before any page — or MFE — paints money. Guarantees the shell's
+  // settings-ful broadcast precedes every remote's synchronous
+  // getSchoolContext() read, so no surface first-paints in SYSTEM_DEFAULTS
+  // (USD). Settles on error too (retry:false) — never hangs the gate.
   const profileSettled = profileSynced || isUserProfileError
   const schoolResolved =
     !!activeSchoolId &&
@@ -465,7 +497,12 @@ export function ShellProvider({ children }: ShellProviderProps) {
   const isBootstrapping =
     isAuthLoading ||
     (isAuthenticated &&
-      (isUserProfileLoading || !profileSettled || isSchoolsLoading || isTenantLoading || schoolPending))
+      (isUserProfileLoading ||
+        !profileSettled ||
+        isSchoolsLoading ||
+        isTenantLoading ||
+        !settingsSettled ||
+        schoolPending))
 
   // ============================================================================
   // CONTEXT VALUES

@@ -9,7 +9,7 @@
  * MFE modules should only render their content.
  */
 
-import { Component, createContext, useContext, useEffect, useRef, useState } from 'react'
+import { Component, createContext, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode, ErrorInfo } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from '@edforge/i18n'
@@ -24,10 +24,28 @@ import { useAppStore } from '../stores/app.store'
 // FINANCE SETTINGS CONTEXT
 // ============================================================================
 
-const FinanceSettingsContext = createContext<ResolvedSettings>(SYSTEM_DEFAULTS)
+interface FinanceSettingsContextValue {
+  settings: ResolvedSettings
+  /**
+   * False while the settings are still the SYSTEM_DEFAULTS seed (no shell
+   * broadcast received yet and the fallback fetch hasn't settled). Money
+   * surfaces gate their formatting on this so real amounts never paint in
+   * the fallback currency (the USD→NPR flash).
+   */
+  isReady: boolean
+}
+
+const FinanceSettingsContext = createContext<FinanceSettingsContextValue>({
+  settings: SYSTEM_DEFAULTS,
+  isReady: false,
+})
 
 export function useFinanceSettings(): ResolvedSettings {
-  return useContext(FinanceSettingsContext)
+  return useContext(FinanceSettingsContext).settings
+}
+
+export function useFinanceSettingsReady(): boolean {
+  return useContext(FinanceSettingsContext).isReady
 }
 
 // ============================================================================
@@ -137,13 +155,21 @@ export function FinanceLayout({ children }: { children: ReactNode }) {
     }
     return SYSTEM_DEFAULTS
   })
+  // Real settings received (broadcast/sync read) or the fallback fetch has
+  // settled — money surfaces must not format amounts before this is true,
+  // or real numbers paint in the SYSTEM_DEFAULTS currency (the USD flash).
+  const [settingsReady, setSettingsReady] = useState<boolean>(
+    () => !!getSchoolContext().resolvedSettings
+  )
 
   // Sync school context and resolved settings from Shell broadcasts.
-  // Falls back to direct API fetch if broadcast hasn't arrived within 500ms.
+  // Falls back to a direct API fetch when the synchronous payload has no
+  // settings (standalone MFE dev, or shell broadcast not yet fired).
   useEffect(() => {
     const { setActiveSchoolId } = useAppStore.getState()
     const initial = getSchoolContext()
-    let fallbackTimer: ReturnType<typeof setTimeout> | null = null
+    let cancelled = false
+    let fallbackDone = false
 
     if (initial.schoolId) {
       setActiveSchoolId(initial.schoolId)
@@ -151,11 +177,12 @@ export function FinanceLayout({ children }: { children: ReactNode }) {
     }
     if (initial.resolvedSettings) {
       setSettings(initial.resolvedSettings)
+      setSettingsReady(true)
     } else {
-      // Shell broadcast hasn't arrived yet. After 500ms, fetch workspace
-      // settings directly via the read-only /tenants/my/settings endpoint
-      // (no tenantId needed in URL — derived from JWT by the backend).
-      fallbackTimer = setTimeout(async () => {
+      // Fetch immediately — the old 500ms grace period just widened the
+      // wrong-currency window; a broadcast that arrives first still wins
+      // (the listener below marks ready and this result is discarded).
+      const fetchFallback = async () => {
         try {
           const ws = await apiGet<{
             regional?: {
@@ -170,6 +197,7 @@ export function FinanceLayout({ children }: { children: ReactNode }) {
               defaultWeekStartsOn?: 'sunday' | 'monday'
             }
           }>('/tenants/my/settings')
+          if (cancelled || fallbackDone) return
           if (ws?.regional) {
             const r = ws.regional
             const resolved: ResolvedSettings = {
@@ -186,11 +214,15 @@ export function FinanceLayout({ children }: { children: ReactNode }) {
             setSettings(resolved)
           }
         } catch {
-          // Fallback silently to SYSTEM_DEFAULTS
+          // Degrade to SYSTEM_DEFAULTS — readiness still flips below so
+          // surfaces render (in defaults) rather than skeleton forever.
         } finally {
-          // settings state updated or kept at SYSTEM_DEFAULTS
+          if (!cancelled) {
+            setSettingsReady(true)
+          }
         }
-      }, 500)
+      }
+      void fetchFallback()
     }
 
     const unsubscribe = onSchoolChange(({ schoolId, resolvedSettings }) => {
@@ -201,10 +233,8 @@ export function FinanceLayout({ children }: { children: ReactNode }) {
 
       if (resolvedSettings) {
         setSettings(resolvedSettings)
-        if (fallbackTimer) {
-          clearTimeout(fallbackTimer)
-          fallbackTimer = null
-        }
+        setSettingsReady(true)
+        fallbackDone = true
       }
 
       // On school switch (not initial mount), redirect to module root
@@ -214,10 +244,15 @@ export function FinanceLayout({ children }: { children: ReactNode }) {
     })
 
     return () => {
+      cancelled = true
       unsubscribe()
-      if (fallbackTimer) clearTimeout(fallbackTimer)
     }
   }, [navigate])
+
+  const settingsValue = useMemo(
+    () => ({ settings, isReady: settingsReady }),
+    [settings, settingsReady]
+  )
 
   // Check if a school is available — no school means tenant hasn't set up org yet
   const { activeSchoolId } = useAppStore()
@@ -253,7 +288,7 @@ export function FinanceLayout({ children }: { children: ReactNode }) {
   // Shell's AppShell provides the layout (Header + Sidebar)
   // This module just renders its content, wrapped in an error boundary
   return (
-    <FinanceSettingsContext.Provider value={settings}>
+    <FinanceSettingsContext.Provider value={settingsValue}>
       <FinanceErrorBoundary
         copy={{
           title: t('financeLayout.error.title'),

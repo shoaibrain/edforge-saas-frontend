@@ -60,7 +60,7 @@ import {
 } from '@edforge/finance-services'
 import type { Invoice } from '@edforge/types'
 import { useCurrency } from '@edforge/types/use-currency'
-import { useFinanceSettings } from '../../../layouts/FinanceLayout'
+import { useFinanceSettings, useFinanceSettingsReady } from '../../../layouts/FinanceLayout'
 import { formatDateDual } from '../../../utils/format-date'
 import { StudentSearchInput } from '../../../components/billing/StudentSearchInput'
 import { BulkSendInvoiceReminderDrawer } from '../../../components/billing/BulkSendInvoiceReminderDrawer'
@@ -133,7 +133,11 @@ export default function InvoicesPage() {
   const navigate = useNavigate()
   const schoolId = useAppStore((s) => s.activeSchoolId)
   const settings = useFinanceSettings()
+  const settingsReady = useFinanceSettingsReady()
   const { format, formatCompact } = useCurrency(settings)
+  // Never paint real amounts in the SYSTEM_DEFAULTS currency while regional
+  // settings are still resolving — placeholder until they settle.
+  const money = (amount: number) => (settingsReady ? formatCompact(amount) : '—')
 
   const [statusFilter, setStatusFilter] = useState<InvoiceStatusFilter>('')
   // Sprint B.4 — grade filter routes the backend through GSI14.
@@ -414,7 +418,7 @@ export default function InvoicesPage() {
         domain: t('headerZone.domains.finance'),
         icon: <Clock className="h-4 w-4" aria-hidden="true" />,
         title: t('invoices.signals.overdueTitle', {
-          amount: formatCompact(kpi.overdue),
+          amount: money(kpi.overdue),
           count: kpi.overdueCount,
         }),
         description: t('invoices.signals.overdueSub'),
@@ -433,7 +437,7 @@ export default function InvoicesPage() {
       })
     }
     return list
-  }, [kpi, t, formatCompact])
+  }, [kpi, t, formatCompact, settingsReady])
 
   // ── ⑨ Selection Context Bar — state-aware money matrix (retires the pill).
   // Issue applies only to selected DRAFTS; Send reminder only to Overdue /
@@ -501,7 +505,7 @@ export default function InvoicesPage() {
   const metrics: StatMetric[] = [
     {
       label: t('overview.kpi.totalInvoiced'),
-      value: formatCompact(kpi.totalInvoiced),
+      value: money(kpi.totalInvoiced),
       iconSignature: 'finance',
       state: 'normal',
       primary: true,
@@ -509,14 +513,14 @@ export default function InvoicesPage() {
     },
     {
       label: t('overview.kpi.collected'),
-      value: formatCompact(kpi.totalCollected),
+      value: money(kpi.totalCollected),
       iconSignature: 'finance',
       state: 'normal',
       sub: t('invoices.paidCount', { count: kpi.paidCount }),
     },
     {
       label: t('overview.kpi.outstanding'),
-      value: formatCompact(kpi.outstanding),
+      value: money(kpi.outstanding),
       iconSignature: 'finance_receipt',
       state: 'normal',
       sub: t('invoices.loadedCount', { count: `${totalLoaded}${countSuffix}` }),
@@ -524,7 +528,7 @@ export default function InvoicesPage() {
     kpi.overdueCount > 0
       ? {
           label: t('overview.kpi.overdue'),
-          value: formatCompact(kpi.overdue),
+          value: money(kpi.overdue),
           iconSignature: 'atrisk',
           state: 'critical',
           pill: {
@@ -534,7 +538,7 @@ export default function InvoicesPage() {
         }
       : {
           label: t('overview.kpi.overdue'),
-          value: formatCompact(kpi.overdue),
+          value: money(kpi.overdue),
           iconSignature: 'atrisk',
           state: 'normal',
         },

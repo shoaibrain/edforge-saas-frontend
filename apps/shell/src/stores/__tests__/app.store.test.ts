@@ -5,6 +5,7 @@ vi.mock('../../lib/query-client', () => ({
 }))
 vi.mock('@edforge/config/school-context-channel', () => ({
   broadcastSchoolChange: vi.fn(),
+  resetSchoolContext: vi.fn(),
 }))
 
 import { useAppStore, getSchoolSessionOwner, setSchoolSessionOwner } from '../app.store'

@@ -92,15 +92,35 @@ export async function mockShellApi(page: Page, role: E2ERole): Promise<CapturedT
       json({
         onboardingCompletedAt: '2026-01-01T00:00:00.000Z',
         workspaceConfirmedAt: '2026-01-01T00:00:00.000Z',
+        // Field names match the backend WorkspaceSettings DTO —
+        // useResolvedSettings reads regional.default* (the previous
+        // currency/calendarSystem names were silently ignored).
         regional: {
-          currency: 'NPR',
-          timezone: 'Asia/Kathmandu',
-          calendarSystem: 'BS',
-          locale: 'ne-NP',
-          numberFormat: 'south-asian',
-          weekStart: 'sunday',
+          defaultCurrency: 'NPR',
+          defaultTimezone: 'Asia/Kathmandu',
+          defaultCalendarSystem: 'bikram_sambat',
+          defaultLocale: 'ne-NP',
+          defaultNumberFormat: 'south_asian',
+          defaultWeekStartsOn: 'sunday',
         },
         lockHolders: [],
+      }),
+    ),
+  )
+
+  // Read-only regional settings for any authenticated user — fetched by the
+  // shell for non-admin roles and by the finance MFE's settings fallback.
+  await page.route('**/api/tenants/my/settings**', (route) =>
+    route.fulfill(
+      json({
+        regional: {
+          defaultCurrency: 'NPR',
+          defaultTimezone: 'Asia/Kathmandu',
+          defaultCalendarSystem: 'bikram_sambat',
+          defaultLocale: 'ne-NP',
+          defaultNumberFormat: 'south_asian',
+          defaultWeekStartsOn: 'sunday',
+        },
       }),
     ),
   )

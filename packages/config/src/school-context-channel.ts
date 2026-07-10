@@ -47,6 +47,15 @@ const EVENT_NAME = 'edforge:school-changed'
 /**
  * Dispatch a school-change event that all MFE listeners will receive.
  * Called by the Shell's `setActiveSchoolId` action.
+ *
+ * Merge semantics: schoolId/schoolStatus always take the new values, but
+ * omitted optional fields (resolvedSettings, tenantId, archetype, country)
+ * retain the last-broadcast values instead of being blanked. The shell has
+ * two broadcast sources — the store actions (schoolId/status only) and the
+ * shell-context effect (full payload with settings) — and a store broadcast
+ * landing after the settings-ful one must not clobber the settings an MFE
+ * reads synchronously at mount. Settings therefore persist across a school
+ * switch until the shell's follow-up settings-ful broadcast lands.
  */
 export function broadcastSchoolChange(
   schoolId: string | null,
@@ -56,10 +65,17 @@ export function broadcastSchoolChange(
   archetype?: string | null,
   country?: string | null,
 ): void {
-  _lastPayload = { schoolId, schoolStatus, tenantId, resolvedSettings, archetype, country }
+  _lastPayload = {
+    schoolId,
+    schoolStatus,
+    tenantId: tenantId ?? _lastPayload.tenantId,
+    resolvedSettings: resolvedSettings ?? _lastPayload.resolvedSettings,
+    archetype: archetype ?? _lastPayload.archetype,
+    country: country ?? _lastPayload.country,
+  }
   window.dispatchEvent(
     new CustomEvent<SchoolContextPayload>(EVENT_NAME, {
-      detail: { schoolId, schoolStatus, tenantId, resolvedSettings, archetype, country },
+      detail: { ..._lastPayload },
     }),
   )
 }
@@ -87,6 +103,16 @@ let _lastPayload: SchoolContextPayload = { schoolId: null, schoolStatus: null }
  */
 export function getSchoolContext(): Readonly<SchoolContextPayload> {
   return _lastPayload
+}
+
+/**
+ * Blank the retained payload (no event dispatched). Called on logout so a
+ * signed-out-without-reload session (Amplify signedOut event) cannot leak
+ * the previous tenant's settings into the next user's synchronous reads.
+ * Also the test-isolation seam for the merge semantics above.
+ */
+export function resetSchoolContext(): void {
+  _lastPayload = { schoolId: null, schoolStatus: null }
 }
 
 // ============================================================================

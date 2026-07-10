@@ -309,6 +309,16 @@ export async function getWorkspaceSettings(tenantId: string): Promise<WorkspaceS
 }
 
 /**
+ * Get workspace settings for the current user's tenant (any authenticated
+ * user — the admin endpoint above requires TenantAdmin). Used to resolve
+ * regional display settings (currency, calendar, locale) for non-admins.
+ * GET /tenants/my/settings
+ */
+export async function getMyWorkspaceSettings(): Promise<WorkspaceSettings> {
+  return apiGet<WorkspaceSettings>('/tenants/my/settings')
+}
+
+/**
  * Update workspace settings
  * PATCH /tenants/{tenantId}/settings
  */
@@ -918,6 +928,7 @@ export const tenantService = {
 
   // Workspace Settings
   getWorkspaceSettings,
+  getMyWorkspaceSettings,
   updateWorkspaceSettings,
   confirmWorkspaceSettings,
   completeOnboarding,
