@@ -23,7 +23,6 @@ export function UseCaseStudents() {
       accent="var(--lp-ink)"
       features={USE_CASE_STUDENTS.features}
       videoSrc={resolveAssetUrl(LANDING_VIDEOS.students)}
-      videoLength={USE_CASE_STUDENTS.mediaLength}
       dashboardFallback={<StudentDashboard />}
       showMode="video"
     />

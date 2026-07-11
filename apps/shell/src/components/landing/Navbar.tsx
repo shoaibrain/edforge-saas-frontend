@@ -12,8 +12,6 @@ import {
   X,
   ArrowRight,
   Activity,
-  School,
-  BarChart3,
   Wallet,
   Shield,
   FileText,
@@ -58,15 +56,15 @@ const NAV_ITEMS: NavItem[] = [
       items: [
         {
           icon: Activity, iconBg: '#FFF7ED', iconColor: '#EA580C', title: 'EdForge Core',
-          description: 'Central nervous system for school ops.', href: '/about',
+          description: 'Student records, enrollment, and attendance in one place.', href: '/#platform',
         },
         {
-          icon: BarChart3, iconBg: '#ECFDF5', iconColor: '#059669', title: 'Analytics',
-          description: 'Real-time student performance insights.', href: '/about',
+          icon: GraduationCap, iconBg: '#ECFDF5', iconColor: '#059669', title: 'Academics',
+          description: 'Classrooms, curriculum, exams, and at-risk alerts.', href: '/#platform',
         },
         {
           icon: Wallet, iconBg: '#FFFBEB', iconColor: '#D97706', title: 'Finance',
-          description: 'Automated payroll and fee management.', href: '/about',
+          description: 'Fee structures, invoicing, payments, and family billing.', href: '/#platform',
         },
       ],
       footerItems: [
@@ -81,12 +79,11 @@ const NAV_ITEMS: NavItem[] = [
     type: 'mega_menu',
     dropdown: {
       layout: 'grid',
-      header: { title: 'Tailored for every stakeholder', description: 'Tools designed for the entire education ecosystem' },
+      header: { title: 'Built for the people running schools', description: 'See how EdForge works for each role' },
       items: [
-        { icon: School, iconBg: '#FFF7ED', iconColor: '#EA580C', title: 'For Schools', description: 'Enterprise-grade EMIS for K-12', href: '/about' },
-        { icon: Building2, iconBg: '#ECFDF5', iconColor: '#059669', title: 'For Districts', description: 'Multi-school management at scale', href: '/about' },
-        { icon: GraduationCap, iconBg: '#FFFBEB', iconColor: '#D97706', title: 'For Teachers', description: 'Streamline classroom operations', href: '/about' },
-        { icon: UserCircle, iconBg: '#F5F3FF', iconColor: '#7C3AED', title: 'For Parents', description: 'Stay connected with student progress', href: '/about' },
+        { icon: Building2, iconBg: '#FFF7ED', iconColor: '#EA580C', title: 'School Leaders', description: 'The whole school on one calm dashboard', href: '/#use-cases' },
+        { icon: GraduationCap, iconBg: '#ECFDF5', iconColor: '#059669', title: 'Teachers & Families', description: 'Classrooms, child records, and guardians', href: '/#teachers-parents' },
+        { icon: UserCircle, iconBg: '#F5F3FF', iconColor: '#7C3AED', title: 'Students', description: 'Every student, fully seen', href: '/#students' },
       ],
     },
   },
@@ -95,12 +92,12 @@ const NAV_ITEMS: NavItem[] = [
     type: 'mega_menu',
     dropdown: {
       layout: 'grid',
-      header: { title: 'Learn & Explore', description: 'Resources to help you get the most out of EdForge' },
+      header: { title: 'Learn & Explore', description: 'How EdForge handles data, privacy, and terms' },
       items: [
-        { icon: BookOpen, iconBg: '#ECFDF5', iconColor: '#059669', title: 'Documentation', description: 'Complete guides and docs', href: '/about' },
         { icon: Shield, iconBg: '#FFF7ED', iconColor: '#EA580C', title: 'Security', description: 'How we protect student data', href: '/security' },
         { icon: FileText, iconBg: '#FFFBEB', iconColor: '#D97706', title: 'Privacy Policy', description: 'Our data privacy commitment', href: '/privacy' },
-        { icon: LifeBuoy, iconBg: '#F5F3FF', iconColor: '#7C3AED', title: 'Support Center', description: 'Get expert help', href: '/contact' },
+        { icon: BookOpen, iconBg: '#ECFDF5', iconColor: '#059669', title: 'Terms', description: 'Terms of service', href: '/terms' },
+        { icon: LifeBuoy, iconBg: '#F5F3FF', iconColor: '#7C3AED', title: 'Contact', description: 'Questions, feedback, and demo access', href: '/contact' },
       ],
     },
   },
@@ -112,7 +109,7 @@ const NAV_ITEMS: NavItem[] = [
       header: { title: 'About EdForge', description: 'Learn about our mission and values' },
       items: [
         { icon: Info, iconBg: '#ECFDF5', iconColor: '#059669', title: 'About Us', description: 'Our mission and story', href: '/about' },
-        { icon: Mail, iconBg: '#FFF7ED', iconColor: '#EA580C', title: 'Contact', description: 'Get in touch with our team', href: '/contact' },
+        { icon: Mail, iconBg: '#FFF7ED', iconColor: '#EA580C', title: 'Contact', description: 'Get in touch', href: '/contact' },
         { icon: Shield, iconBg: '#FFFBEB', iconColor: '#D97706', title: 'Security', description: 'How we protect your data', href: '/security' },
         { icon: FileText, iconBg: '#F5F3FF', iconColor: '#7C3AED', title: 'Legal', description: 'Privacy & Terms', href: '/privacy' },
       ],

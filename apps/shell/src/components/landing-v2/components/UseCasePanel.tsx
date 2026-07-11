@@ -29,7 +29,6 @@ export type UseCasePanelProps = {
   background?: string
   features: readonly UseCaseFeature[]
   videoSrc: string
-  videoLength?: string
   /** When true, media sits on the left and features on the right. */
   reverse?: boolean
   /** Dashboard fallback shown when showMode is 'dashboard'. */
@@ -57,7 +56,6 @@ export function UseCasePanel({
   background = 'var(--lp-bg)',
   features,
   videoSrc,
-  videoLength,
   reverse = false,
   dashboardFallback,
   showMode = 'video',
@@ -195,8 +193,6 @@ export function UseCasePanel({
     >
       <DemoVideo
         accent={accent}
-        length={videoLength}
-        caption={features[active]?.title}
         src={videoSrc}
         chapters={chapters}
         activeChapter={active}
