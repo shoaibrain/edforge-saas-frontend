@@ -22,12 +22,8 @@ export type DemoVideoHandle = {
 }
 
 export type DemoVideoProps = {
-  /** CSS color value (hex or var(--lp-*)) driving caption dot + progress fill. */
+  /** CSS color value (hex or var(--lp-*)) driving the progress fill. */
   accent?: string
-  /** Display duration label, e.g. "1:42". */
-  length?: string
-  /** Small caption badge top-left. */
-  caption?: string
   /** Video source URL. */
   src: string
   /** Optional poster image URL shown before metadata loads. */
@@ -58,8 +54,6 @@ export const DemoVideo = forwardRef<DemoVideoHandle, DemoVideoProps>(
   function DemoVideo(
     {
       accent = 'var(--lp-primary)',
-      length = '',
-      caption,
       src,
       posterSrc,
       chapters,
@@ -183,7 +177,7 @@ export const DemoVideo = forwardRef<DemoVideoHandle, DemoVideoProps>(
           playsInline
           preload="metadata"
           onClick={toggle}
-          aria-label={caption ? `${caption} — demonstration loop` : 'Product demonstration loop'}
+          aria-label="Product demonstration loop"
           style={{
             display: 'block',
             width: '100%',
@@ -192,41 +186,6 @@ export const DemoVideo = forwardRef<DemoVideoHandle, DemoVideoProps>(
             cursor: 'pointer',
           }}
         />
-
-        {caption ? (
-          <div
-            // allow-presentation-style: glass caption badge, rgba tint + editorial 12.5px
-            style={{
-              position: 'absolute',
-              left: 14,
-              top: 14,
-              zIndex: 2,
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '7px 12px',
-              borderRadius: 999,
-              background: 'rgba(255,255,255,0.92)',
-              backdropFilter: 'blur(8px)',
-              fontSize: 12.5,
-              fontWeight: 600,
-              color: 'var(--lp-ink)',
-            }}
-          >
-            <span
-              aria-hidden
-              // allow-presentation-style: dynamic accent-driven dot fill + halo
-              style={{
-                width: 7,
-                height: 7,
-                borderRadius: 4,
-                background: accent,
-                boxShadow: `0 0 0 3px ${accent}33`,
-              }}
-            />
-            {caption}
-          </div>
-        ) : null}
 
         {/* Controls */}
         <div
@@ -325,19 +284,6 @@ export const DemoVideo = forwardRef<DemoVideoHandle, DemoVideoProps>(
                 pointerEvents: 'none',
               }}
             />
-          </div>
-
-          <div
-            className="lp-mono"
-            // allow-presentation-style: editorial 11px mono label, rgba over dark video
-            style={{
-              fontSize: 11,
-              color: 'rgba(255,255,255,0.9)',
-              letterSpacing: '0.04em',
-              flexShrink: 0,
-            }}
-          >
-            {length}
           </div>
         </div>
       </div>

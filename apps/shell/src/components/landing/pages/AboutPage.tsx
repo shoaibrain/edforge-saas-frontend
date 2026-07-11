@@ -55,7 +55,7 @@ export default function AboutPage() {
             <h2 className="text-xl font-bold text-foreground mb-4 sm:text-2xl">Contact</h2>
             <p className="text-muted-foreground leading-relaxed">
               EdForge Technologies<br />
-              <a href="mailto:shoaibrain@edforge.net" className="text-primary hover:underline">shoaibrain@edforge.net</a>
+              <a href="mailto:shoaib@edforge.app" className="text-primary hover:underline">shoaib@edforge.app</a>
             </p>
           </section>
         </div>

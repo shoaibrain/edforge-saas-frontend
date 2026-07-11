@@ -28,14 +28,6 @@ describe('DemoVideo', () => {
     cleanup()
   })
 
-  it('renders the caption badge when caption is provided', () => {
-    const { getByText } = render(
-      <DemoVideo src="/x.mp4" caption="Budget clarity, not spreadsheets" />
-    )
-    expect(getByText('Budget clarity, not spreadsheets')).toBeInTheDocument()
-    cleanup()
-  })
-
   it('renders a play/pause button with accessible label', () => {
     const { getByRole } = render(<DemoVideo src="/x.mp4" />)
     // Default state is "playing", so the button label should be "Pause..."
@@ -48,12 +40,6 @@ describe('DemoVideo', () => {
     const { getByRole } = render(<DemoVideo src="/x.mp4" />)
     const bar = getByRole('progressbar', { name: /video progress/i })
     expect(bar.getAttribute('aria-valuenow')).toBe('0')
-    cleanup()
-  })
-
-  it('renders duration label when `length` is provided', () => {
-    const { getByText } = render(<DemoVideo src="/x.mp4" length="1:42" />)
-    expect(getByText('1:42')).toBeInTheDocument()
     cleanup()
   })
 })

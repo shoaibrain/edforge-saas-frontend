@@ -86,8 +86,8 @@ export default function SecurityLandingPage() {
             <h2 className="text-xl font-bold text-foreground mb-4 sm:text-2xl">Responsible Disclosure</h2>
             <p className="text-muted-foreground leading-relaxed">
               If you discover a security vulnerability, please report it to{' '}
-              <a href="mailto:shoaibrain@edforge.net" className="text-primary hover:underline">
-                shoaibrain@edforge.net
+              <a href="mailto:shoaib@edforge.app" className="text-primary hover:underline">
+                shoaib@edforge.app
               </a>
               . We appreciate responsible disclosure and will respond promptly to all reports.
             </p>

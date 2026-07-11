@@ -71,7 +71,7 @@ export default function PrivacyPage() {
             <h2 className="text-2xl font-bold text-foreground mb-4">Contact</h2>
             <p className="leading-relaxed">
               For privacy-related inquiries, contact us at{' '}
-              <a href="mailto:shoaibrain@edforge.net" className="text-primary hover:underline">shoaibrain@edforge.net</a>.
+              <a href="mailto:shoaib@edforge.app" className="text-primary hover:underline">shoaib@edforge.app</a>.
             </p>
           </section>
         </div>

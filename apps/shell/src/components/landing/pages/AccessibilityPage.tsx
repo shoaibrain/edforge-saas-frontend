@@ -36,10 +36,10 @@ export default function AccessibilityPage() {
             <p className="leading-relaxed">
               If you encounter a barrier using EdForge, please write to{' '}
               <a
-                href="mailto:shoaibrain@edforge.net"
+                href="mailto:shoaib@edforge.app"
                 className="text-primary underline underline-offset-4"
               >
-                shoaibrain@edforge.net
+                shoaib@edforge.app
               </a>
               . We read every report and will respond as quickly as we can.
             </p>
