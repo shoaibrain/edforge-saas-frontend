@@ -145,7 +145,7 @@ export function Step2Terms({
         <p className="mb-2 text-xs text-[rgb(var(--text-tertiary))]">
           {t('agreement.wizard.terms.coveredFeeTypesHint')}
         </p>
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-1.5" data-testid="finance-wizard-feetypes">
           {FEE_TYPES.map((feeType) => {
             const selected = coveredFeeTypes.includes(feeType)
             return (

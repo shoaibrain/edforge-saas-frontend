@@ -79,14 +79,14 @@ export function AgreementCoverageCard({
   const content = isLoading ? (
     <CardSkeleton />
   ) : !coverage || coverage.activeAgreements === 0 ? (
-    <div className="flex flex-col items-center py-6">
+    <div className="flex flex-col items-center py-6" data-testid="finance-overview-coverage">
       <Handshake className="mb-2 h-8 w-8 opacity-40 text-[rgb(var(--text-tertiary))]" />
       <p className="text-xs font-medium text-[rgb(var(--text-tertiary))]">
         {t("overview.agreementCoverage.none")}
       </p>
     </div>
   ) : (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3" data-testid="finance-overview-coverage">
       <StatRow
         icon={Users}
         label={t("overview.agreementCoverage.studentsCoveredLabel")}
