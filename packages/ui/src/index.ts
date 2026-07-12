@@ -267,6 +267,7 @@ export {
 export { useCountUp, parseFormattedValue, formatAnimatedValue } from './hooks/useCountUp'
 export { useV2ChartColors } from './hooks/useV2ChartColors'
 export { useMediaQuery } from './hooks/useMediaQuery'
+export { useBreakpoint, useIsPhone, type Breakpoint } from './hooks/useBreakpoint'
 
 // V2 Shared Components
 export {

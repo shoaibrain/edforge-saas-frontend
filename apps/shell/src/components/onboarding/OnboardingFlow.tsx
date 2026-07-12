@@ -142,11 +142,11 @@ export function OnboardingFlow() {
   }
 
   return (
-    <div className="min-h-screen bg-[rgb(var(--background-primary))] relative overflow-hidden">
+    <div className="min-h-dvh bg-[rgb(var(--background-primary))] relative overflow-hidden">
       <OnboardingProgressBar progress={progress} />
       <OnboardingTopbar currentStep={currentStep} totalSteps={ONBOARDING_STEPS.length} />
 
-      <div className="pt-[54px] min-h-screen flex items-center justify-center px-4">
+      <div className="pt-[54px] min-h-dvh flex items-center justify-center px-4">
         <AnimatePresence mode="wait" custom={direction}>
           <motion.div
             key={currentStep}

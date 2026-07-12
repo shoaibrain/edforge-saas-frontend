@@ -7,10 +7,11 @@
  * `.is-active` on the focusable <a>) and sets the per-item `--accent`; CSS owns the
  * motion. Features ABAC permission filtering.
  *
- * Icon mapping is EXPLICIT (NAV_SIGNATURE): an item animates only when it has a
- * hand-picked signature glyph. Every other item renders its original Lucide glyph
- * unchanged (static, but still accent-tinted) — so the manifest's icon choice is
- * never silently swapped. Accent falls back to the module hue for unmapped items.
+ * Icon mapping is EXPLICIT (NAV_SIGNATURE, config/nav-accents.ts — shared with
+ * the mobile chrome): an item animates only when it has a hand-picked signature
+ * glyph. Every other item renders its original Lucide glyph unchanged (static,
+ * but still accent-tinted) — so the manifest's icon choice is never silently
+ * swapped. Accent falls back to the module hue for unmapped items.
  */
 
 import { useState, useEffect, useSyncExternalStore, type CSSProperties } from 'react'
@@ -21,83 +22,17 @@ import {
   ArrowLeft,
   type LucideIcon,
 } from 'lucide-react'
-import { AnimatedIcon, resolveAccent, type IconName, type AccentHue } from '@edforge/ui/motion'
+import { AnimatedIcon, resolveAccent, type IconName } from '@edforge/ui/motion'
 import { useAppStore } from '../../stores/app.store'
 import { useSidebarStore } from '../../stores/sidebar.store'
 import { SIDEBAR_NAV_ICON_SIZE, SIDEBAR_NAV_ICON_SIZE_COLLAPSED } from '../../config/ui-constants'
 import { useSidebarModule, useActiveNavItem } from '../../hooks/useSidebarModule'
 import { useSecureNavGroups } from '../../hooks/useSecureNavItems'
+import { NAV_SIGNATURE, navAccent } from '../../config/nav-accents'
 import type { NavItem, NavItemGroup, SidebarModule } from '../../config/sidebar-modules'
-import { Tooltip } from '@edforge/ui'
+import { Tooltip, useBreakpoint } from '@edforge/ui'
 import { useTranslation } from '@edforge/i18n'
 import { cn } from '../../lib/utils'
-
-// ============================================================================
-// SIGNATURE MAPPING — nav-item id → animated-glyph name
-// EXPLICIT and conservative: only items whose signature glyph is a clean match
-// for the manifest's icon are listed. Unlisted items keep their original Lucide
-// glyph (static). Adding a new animated item is a one-line entry here.
-// The accent hue per glyph lives in the motion registry (ICON_ACCENT).
-// ============================================================================
-
-const NAV_SIGNATURE: Record<string, IconName> = {
-  // primary modules
-  academics: 'academics',
-  people: 'people',
-  finance: 'finance',
-  settings: 'settings',
-  // module overviews (GalleryVerticalEnd)
-  'academics-home': 'overview',
-  'finance-home': 'overview',
-  'people-home': 'overview',
-  'analytics-overview': 'overview',
-  'analytics-dashboard': 'overview',
-  'settings-home': 'overview',
-  // people-shaped sub-items (UsersRound)
-  students: 'people',
-  'staff-directory': 'people',
-  'student-accounts': 'people',
-  // book-shaped (BookOpen ≈ academic-setup open book)
-  curriculum: 'academicsetup',
-  // grades (GraduationCap ≈ academics mortarboard)
-  'my-grades': 'academics',
-  'children-grades': 'academics',
-  // attendance (calendar + check)
-  'my-attendance': 'attendance',
-  'children-attendance': 'attendance',
-  // settings sub-nav
-  'my-account': 'account',
-  preferences: 'preferences',
-  security: 'security',
-  'workspace-settings': 'workspace',
-  organization: 'organization',
-  'rbac-security': 'rbac',
-  'auth-debug': 'authdebug',
-}
-
-// Accent hue per module — the fallback for items without their own signature, so
-// every item in a module shares a coherent tint. Mirrors the prototype's primary
-// nav hues (home emerald, academics violet, people amber, finance teal, settings blue).
-const MODULE_HUE: Record<SidebarModule, AccentHue> = {
-  home: 'emerald',
-  'home-student': 'emerald',
-  'home-parent': 'emerald',
-  'student-portal': 'emerald',
-  'parent-portal': 'emerald',
-  academics: 'violet',
-  finance: 'teal',
-  people: 'amber',
-  settings: 'blue',
-  analytics: 'sky',
-}
-
-/** Resolve the inline `--accent` value for a nav item (danger items go red). */
-function navAccent(item: NavItem, moduleId: SidebarModule): string {
-  if (item.variant === 'danger') return 'var(--color-danger)'
-  const sig = NAV_SIGNATURE[item.id]
-  if (sig) return resolveAccent(sig, {})
-  return resolveAccent(undefined, { accent: MODULE_HUE[moduleId] ?? 'emerald' })
-}
 
 // ============================================================================
 // NAV ICON — signature glyph (animated) or original Lucide glyph (static),
@@ -461,6 +396,7 @@ function HomeNavButton({
 // ============================================================================
 
 export function Sidebar() {
+  const bp = useBreakpoint()
   const collapsed = useAppStore((s) => s.sidebarCollapsed)
   const setModule = useSidebarStore((s) => s.setModule)
 
@@ -475,6 +411,11 @@ export function Sidebar() {
   useEffect(() => {
     setModule(moduleId)
   }, [moduleId, setModule])
+
+  // Desktop only — below 1024px the mobile chrome (tab bar / drawer / L2 row)
+  // owns navigation. Placed after all hooks so hook order is stable across
+  // breakpoint changes.
+  if (bp !== 'desktop') return null
 
   // Calculate cumulative index for stagger animation
   let itemIndex = 0
@@ -495,7 +436,7 @@ export function Sidebar() {
 
       {/* Navigation */}
       <nav
-        className="flex-1 overflow-y-auto overflow-x-hidden py-1"
+        className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain py-1"
         style={{ scrollbarWidth: 'thin', scrollbarColor: 'var(--shell-scroll-thumb) transparent' }}
         aria-label="Sidebar navigation"
       >

@@ -182,7 +182,7 @@ export function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[rgb(var(--background-primary))]">
+    <div className="min-h-dvh flex flex-col bg-[rgb(var(--background-primary))]">
       <div className="absolute top-4 right-4 z-10">
         <LanguageSwitcher variant="ghost" />
       </div>

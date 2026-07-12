@@ -254,7 +254,7 @@ export function SchoolSwitcher() {
   return (
     <Menu as="div" className="relative">
       <MenuButton
-        className="flex items-center gap-2 h-10 px-2 rounded-[10px] transition-colors flex-shrink-0 cursor-pointer hover:bg-[var(--shell-ni-hover)]"
+        className="shell-touch flex items-center gap-2 h-10 px-2 rounded-[10px] transition-colors flex-shrink-0 cursor-pointer hover:bg-[var(--shell-ni-hover)]"
       >
         <img
           src={getSchoolAvatar(activeSchool?.name || 'school', { size: 30 })}

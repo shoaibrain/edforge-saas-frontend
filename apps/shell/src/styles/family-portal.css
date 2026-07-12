@@ -51,7 +51,8 @@
 [data-family-portal] {
   background: var(--fp-paper);
   color: var(--fp-ink);
-  min-height: 100vh;
+  min-height: 100vh; /* fallback for browsers without dvh */
+  min-height: 100dvh;
 }
 [data-family-portal] * {
   box-sizing: border-box;

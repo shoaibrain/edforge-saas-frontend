@@ -44,7 +44,7 @@ export interface UseSidebarModuleReturn {
  * Custom hook to get current pathname with guaranteed reactivity.
  * Uses useSyncExternalStore to subscribe to router state changes.
  */
-function usePathname(): string {
+export function usePathname(): string {
   const router = useRouter()
   
   return useSyncExternalStore(
@@ -110,6 +110,24 @@ export function useSidebarModule(): UseSidebarModuleReturn {
 export function useIsInModule(targetModule: SidebarModule): boolean {
   const { moduleId } = useSidebarModule()
   return moduleId === targetModule
+}
+
+/**
+ * The user's role-home module — route-INDEPENDENT (unlike useSidebarModule,
+ * which tracks the current route). The mobile tab bar derives from this so
+ * tabs never change while navigating between modules.
+ */
+export function useRoleHomeModuleId(): SidebarModule {
+  const user = useAuthStore((s) => s.user)
+  const activeSchoolId = useAppStore((s) => s.activeSchoolId)
+
+  return useMemo(() => {
+    if (user && activeSchoolId) {
+      const schoolRole = user.assignments[activeSchoolId]
+      if (schoolRole) return getHomeModuleForSchoolRole(schoolRole)
+    }
+    return 'home'
+  }, [user, activeSchoolId])
 }
 
 /**
