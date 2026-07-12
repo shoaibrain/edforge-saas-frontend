@@ -22,6 +22,7 @@ import {
 import { toast } from 'sonner'
 import { Button } from '@edforge/ui'
 import { useAuthStore } from '@/stores/auth.store'
+import { useNavStore, type MobileNavVariant } from '@/stores/nav.store'
 import {
   getSession,
   refreshSession,
@@ -304,6 +305,57 @@ function TokenAnalysisCard({
 }
 
 // ============================================================================
+// DEVELOPER TOGGLES — mobile nav variant A/B (dev-only; English on purpose,
+// this page is developer tooling). Persists to localStorage `edforge-mobile-nav`.
+// ============================================================================
+
+const NAV_VARIANTS: { value: MobileNavVariant; label: string }[] = [
+  { value: 'tabs', label: 'Bottom tabs (default)' },
+  { value: 'drawer', label: 'Drawer' },
+]
+
+function MobileNavVariantCard() {
+  const variant = useNavStore((s) => s.variant)
+  const setVariant = useNavStore((s) => s.setVariant)
+
+  return (
+    <motion.div
+      variants={fadeInUp}
+      className="p-6 rounded-2xl border border-[rgb(var(--border-primary))] bg-[rgb(var(--background-secondary))]"
+    >
+      <h2 className="text-base font-semibold text-[rgb(var(--text-primary))] mb-1">
+        Mobile nav variant
+      </h2>
+      <p className="text-sm text-[rgb(var(--text-tertiary))] mb-4">
+        Phone chrome A/B (&lt; 640px): bottom tab bar vs. hamburger drawer.
+        Dev-only flag, stored in this browser.
+      </p>
+      <div
+        className="inline-flex items-center gap-1 p-1 bg-[rgb(var(--background-tertiary))] rounded-lg border border-[rgb(var(--border-primary))]"
+        role="radiogroup"
+        aria-label="Mobile nav variant"
+      >
+        {NAV_VARIANTS.map(({ value, label }) => (
+          <button
+            key={value}
+            role="radio"
+            aria-checked={variant === value}
+            onClick={() => setVariant(value)}
+            className={`px-3 py-1.5 rounded-md text-xs font-bold tracking-wider transition-colors duration-200 ${
+              variant === value
+                ? 'bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] shadow-sm'
+                : 'text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))]'
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+    </motion.div>
+  )
+}
+
+// ============================================================================
 // MAIN COMPONENT
 // ============================================================================
 
@@ -416,6 +468,9 @@ export default function AuthDebugPage() {
             </Button>
           }
         />
+
+        {/* Developer toggles */}
+        <MobileNavVariantCard />
 
         {/* User Profile & Token Info Cards */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

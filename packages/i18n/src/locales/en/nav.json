@@ -28,6 +28,13 @@
   "expandSidebar": "Expand sidebar",
   "collapseSidebar": "Collapse sidebar",
   "globalHeader": "Global header",
+  "moreTab": "More",
+  "back": "Back",
+  "mainNavigation": "Main navigation",
+  "openNavigation": "Open navigation menu",
+  "closeNavigation": "Close navigation menu",
+  "account": "Account",
+  "switchSchool": "Switch school",
   "security": "Security",
   "organization": "Organization",
   "workspace": "Workspace",
@@ -48,19 +55,16 @@
   "helpSupport": "Help & Support",
   "getHelp": "Get help with EdForge",
   "signOut": "Sign out",
-
   "sidebar": {
     "academics": "Academics",
     "people": "People",
     "finance": "Finance",
     "analytics": "Analytics",
     "settings": "Settings",
-
     "finance-home": "Overview",
     "invoices": "Invoices",
     "student-accounts": "Student Accounts",
     "payments": "Payments",
-
     "settings-home": "Overview",
     "my-account": "My Account",
     "preferences": "Preferences",
@@ -71,26 +75,21 @@
     "auth-debug": "Auth Debug",
     "fee-structures": "Fee Structures",
     "payment-gateways": "Payment Gateways",
-
     "academics-home": "Overview",
     "students": "Students",
     "classrooms": "Classrooms",
     "curriculum": "Curriculum",
     "exams": "Exams",
-
     "people-home": "Overview",
     "staff-directory": "Staff Directory",
     "hr-admin": "HR Admin",
-
     "analytics-overview": "Overview",
     "analytics-dashboard": "Adoption Dashboard",
-
     "my-grades": "My Grades",
     "my-attendance": "My Attendance",
     "my-schedule": "My Schedule",
     "my-assignments": "Assignments",
     "calendar": "School Calendar",
-
     "children-overview": "Overview",
     "children-grades": "Grades",
     "children-attendance": "Attendance",
@@ -100,7 +99,6 @@
     "view-attendance": "Attendance",
     "view-schedule": "Schedule"
   },
-
   "group": {
     "main": "MAIN",
     "academics": "MY ACADEMICS",
@@ -113,7 +111,6 @@
     "payments": "PAYMENTS",
     "school": "SCHOOL"
   },
-
   "module": {
     "home": "Home",
     "home-student": "My Portal",
@@ -126,7 +123,6 @@
     "student-portal": "Student Portal",
     "parent-portal": "Family Portal"
   },
-
   "breadcrumb": {
     "details": "Details",
     "studentDetails": "Student Details",

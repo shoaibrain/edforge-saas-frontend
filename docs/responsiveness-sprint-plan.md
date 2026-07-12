@@ -53,8 +53,12 @@ and (b) an opt-in horizontal-scroll/`minWidth` mode (the deferred
 
 - KPI `StatCard` grids: `grid-cols-2` → `lg:grid-cols-4` (verify all 4 MFEs).
 - `QuickDrawer`/`Drawer`: full-width sheet < `sm`; confirm focus-trap + scroll.
-- Shell sidebar: collapse to a hamburger/rail < `md`; verify the MFE content
-  pane reflows.
+- ~~Shell sidebar: collapse to a hamburger/rail < `md`~~ — **shipped** as the
+  P1 mobile chrome of the mobile-native shell plan: bottom tab bar < 640px
+  (RBAC-derived from `sidebar-modules.ts`, cap-5 + More sheet) and a nav
+  drawer at 640–1023px opened from the header hamburger. Sidebar renders
+  desktop-only (≥ 1024px). See `apps/shell/src/components/layout/MobileTabBar.tsx`
+  / `MobileNavDrawer.tsx` / `MobileL2Row.tsx` and `apps/shell/src/lib/mobile-nav.ts`.
 
 ## R4 — Verification gate
 

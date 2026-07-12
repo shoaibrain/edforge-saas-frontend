@@ -28,6 +28,13 @@
   "expandSidebar": "साइडबार विस्तार गर्नुहोस्",
   "collapseSidebar": "साइडबार खुम्च्याउनुहोस्",
   "globalHeader": "विश्वव्यापी शीर्षक पट्टी",
+  "moreTab": "थप",
+  "back": "पछाडि",
+  "mainNavigation": "मुख्य नेभिगेसन",
+  "openNavigation": "नेभिगेसन मेनु खोल्नुहोस्",
+  "closeNavigation": "नेभिगेसन मेनु बन्द गर्नुहोस्",
+  "account": "खाता",
+  "switchSchool": "विद्यालय परिवर्तन गर्नुहोस्",
   "security": "सुरक्षा",
   "organization": "संगठन",
   "workspace": "कार्यक्षेत्र",
@@ -48,19 +55,16 @@
   "helpSupport": "मद्दत र समर्थन",
   "getHelp": "EdForge सँग मद्दत पाउनुहोस्",
   "signOut": "साइन आउट",
-
   "sidebar": {
     "academics": "शैक्षिक",
     "people": "व्यक्तिहरू",
     "finance": "वित्त",
     "analytics": "विश्लेषण",
     "settings": "प्रणाली प्रशासन",
-
     "finance-home": "सिंहावलोकन",
     "invoices": "इनभ्वाइसहरू",
     "student-accounts": "विद्यार्थी खाताहरू",
     "payments": "भुक्तानीहरू",
-
     "settings-home": "सिंहावलोकन",
     "my-account": "मेरो खाता",
     "preferences": "प्राथमिकता र सूचनाहरू",
@@ -71,26 +75,21 @@
     "auth-debug": "प्रमाणीकरण डिबग",
     "fee-structures": "शुल्क संरचनाहरू",
     "payment-gateways": "भुक्तानी गेटवेहरू",
-
     "academics-home": "सिंहावलोकन",
     "students": "विद्यार्थीहरू",
     "classrooms": "कक्षाकोठा",
     "curriculum": "पाठ्यक्रम",
     "exams": "परीक्षाहरू",
-
     "people-home": "सिंहावलोकन",
     "staff-directory": "कर्मचारी निर्देशिका",
     "hr-admin": "एचआर प्रशासन",
-
     "analytics-overview": "सिंहावलोकन",
     "analytics-dashboard": "अपनाउने ड्यासबोर्ड",
-
     "my-grades": "मेरो ग्रेडहरू",
     "my-attendance": "मेरो उपस्थिति",
     "my-schedule": "मेरो तालिका",
     "my-assignments": "कार्यभारहरू",
     "calendar": "विद्यालय पात्रो",
-
     "children-overview": "सिंहावलोकन",
     "children-grades": "ग्रेडहरू",
     "children-attendance": "उपस्थिति",
@@ -100,7 +99,6 @@
     "view-attendance": "उपस्थिति",
     "view-schedule": "तालिका"
   },
-
   "group": {
     "main": "मुख्य",
     "academics": "मेरो शैक्षिक",
@@ -113,7 +111,6 @@
     "payments": "भुक्तानीहरू",
     "school": "विद्यालय"
   },
-
   "module": {
     "home": "गृहपृष्ठ",
     "home-student": "मेरो पोर्टल",
@@ -126,7 +123,6 @@
     "student-portal": "विद्यार्थी पोर्टल",
     "parent-portal": "पारिवारिक पोर्टल"
   },
-
   "breadcrumb": {
     "details": "विवरण",
     "studentDetails": "विद्यार्थी विवरण",
