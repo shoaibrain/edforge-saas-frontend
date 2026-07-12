@@ -259,6 +259,14 @@ export function LoginPage() {
                       )}
                     </button>
                   </form>
+
+                  {/* Request access — for visitors without an account */}
+                  <a
+                    href="mailto:shoaib@edforge.app?subject=EdForge%20Access%20Request"
+                    className="mt-3 w-full flex items-center justify-center gap-2 py-2.5 text-sm font-semibold rounded-xl transition-colors border border-[rgb(var(--border-primary)/0.5)] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary))]"
+                  >
+                    {t('requestAccess', 'Request access')}
+                  </a>
                 </motion.div>
               )}
               {view === 'force-new-password' && (
