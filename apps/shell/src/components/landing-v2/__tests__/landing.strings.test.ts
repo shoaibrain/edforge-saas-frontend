@@ -54,8 +54,8 @@ describe('landing.strings', () => {
     expect(STR.MIGRATION.steps).toHaveLength(4)
   })
 
-  it('Footer has 4 link columns and 4 legal links', () => {
-    expect(STR.FOOTER.columns).toHaveLength(4)
+  it('Footer has 3 link columns and 4 legal links', () => {
+    expect(STR.FOOTER.columns).toHaveLength(3)
     expect(STR.FOOTER.legalLinks).toHaveLength(4)
   })
 

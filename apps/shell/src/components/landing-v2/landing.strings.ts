@@ -359,13 +359,6 @@ export const FOOTER = {
         { label: 'Terms', href: '/terms' },
       ],
     },
-    {
-      heading: 'Company',
-      items: [
-        { label: 'About', href: '/about' },
-        { label: 'Contact', href: '/contact' },
-      ],
-    },
   ],
   legalLinks: [
     { label: 'Terms', href: '/terms' },
