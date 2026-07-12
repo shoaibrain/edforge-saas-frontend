@@ -1,5 +1,5 @@
-import { Fragment, useMemo } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { Fragment, useMemo, useState } from "react";
+import { Link, useNavigate } from "@tanstack/react-router";
 import {
   Menu,
   MenuButton,
@@ -7,93 +7,54 @@ import {
   MenuItem,
   Transition,
 } from "@headlessui/react";
-import { motion } from "framer-motion";
-import { User, Settings, LogOut, Sun, Moon, Languages } from "lucide-react";
+import { User, Settings, LogOut, ChevronLeft } from "lucide-react";
 import { useAuthStore } from "../../stores/auth.store";
-import { useThemeStore } from "../../stores/theme.store";
 import { useHomeStore } from "../../stores/home.store";
 import { useAppStore } from "../../stores/app.store";
-import { Avatar } from "@edforge/ui";
-import { AnimatedIcon } from "@edforge/ui/motion";
-import { normalizePlatformLanguage, useTranslation } from "@edforge/i18n";
+import { useNavStore } from "../../stores/nav.store";
+import { Avatar, useBreakpoint } from "@edforge/ui";
+import { useTranslation } from "@edforge/i18n";
 import { getGreeting } from "../../lib/greeting";
 import { adToBS, formatBSLong } from "@edforge/date-utils";
+import { deriveAppBarState } from "../../lib/mobile-nav";
+import { usePathname } from "../../hooks/useSidebarModule";
+import { useBreadcrumbTrail } from "../../hooks/useBreadcrumbTrail";
+import { useActiveSchool } from "../../hooks/useActiveSchool";
 
 import { Breadcrumbs } from "./Breadcrumbs";
 import { SchoolSwitcher } from "./SchoolSwitcher";
+import { AccountSheet } from "./AccountSheet";
+import { SchoolSheet } from "./SchoolSheet";
+import {
+  UserIdentityCard,
+  PreferencesRows,
+  UserMenuRowBody,
+} from "./UserMenuContent";
 
 // ============================================================================
-// LANGUAGE SLIDING TOGGLE
+// HAMBURGER BUTTON — desktop: collapses the sidebar; tablet / phone drawer
+// variant: opens the nav drawer (caller passes onPress + ariaLabel).
 // ============================================================================
 
-const LANG_OPTIONS = [
-  { code: "en", label: "EN", labelKey: "languageEnglish" },
-  { code: "ne", label: "NP", labelKey: "languageNepali" },
-] as const;
-
-function LanguageToggle() {
-  const { t: tNav, i18n } = useTranslation("nav");
-  const currentLang = normalizePlatformLanguage(i18n.language);
-
-  const handleSwitch = (code: string) => (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem("edforge-language", code);
-    }
-    i18n.changeLanguage(code);
-  };
-
-  return (
-    <div
-      className="flex items-center gap-1 p-1 bg-[rgb(var(--background-tertiary))] rounded-lg border border-[rgb(var(--border-primary))]"
-      role="radiogroup"
-      aria-label={tNav("language")}
-    >
-      {LANG_OPTIONS.map(({ code, label, labelKey }) => {
-        const isActive = currentLang === code;
-        return (
-          <button
-            key={code}
-            role="radio"
-            aria-checked={isActive}
-            aria-label={tNav(labelKey)}
-            onClick={handleSwitch(code)}
-            className={`relative px-3 py-1.5 rounded-md text-xs font-bold tracking-wider transition-colors duration-200 ${
-              isActive
-                ? "text-[rgb(var(--action-primary-fg))]"
-                : "text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))]"
-            }`}
-          >
-            {isActive && (
-              <motion.div
-                layoutId="lang-toggle-pill"
-                className="absolute inset-0 bg-[rgb(var(--action-primary-bg))]  rounded-md shadow-sm"
-                transition={{ type: "spring", stiffness: 500, damping: 30 }}
-              />
-            )}
-            <span className="relative z-10">{label}</span>
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
-// ============================================================================
-// HAMBURGER BUTTON
-// ============================================================================
-
-function HamburgerButton() {
+function HamburgerButton({
+  onPress,
+  ariaLabel,
+}: {
+  onPress?: () => void;
+  ariaLabel?: string;
+}) {
   const toggleSidebar = useAppStore((s) => s.toggleSidebar);
   const collapsed = useAppStore((s) => s.sidebarCollapsed);
   const { t: tNav } = useTranslation("nav");
 
+  const label =
+    ariaLabel ?? (collapsed ? tNav("expandSidebar") : tNav("collapseSidebar"));
+
   return (
     <button
-      onClick={toggleSidebar}
+      onClick={onPress ?? toggleSidebar}
       className="shell-touch w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-150 cursor-pointer hover:bg-[var(--shell-ni-hover)]"
-      aria-label={collapsed ? tNav("expandSidebar") : tNav("collapseSidebar")}
+      aria-label={label}
     >
       <div className="flex flex-col gap-1">
         <span
@@ -114,73 +75,11 @@ function HamburgerButton() {
 }
 
 // ============================================================================
-// APPEARANCE SLIDING TOGGLE — Light | Dark (mirrors LanguageToggle; lives in
-// the avatar menu's Preferences group, not the topbar)
+// BS · AD DATE DISPLAY — shared by the desktop greeting and the phone app bar
 // ============================================================================
 
-const THEME_OPTIONS = [
-  { code: "light", labelKey: "themeLight" },
-  { code: "dark", labelKey: "themeDark" },
-] as const;
-
-function AppearanceToggle() {
-  const { t: tNav } = useTranslation("nav");
-  const { resolvedTheme, setTheme } = useThemeStore();
-
-  const handleSwitch = (code: "light" | "dark") => (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setTheme(code);
-  };
-
-  return (
-    <div
-      className="flex items-center gap-1 p-1 bg-[rgb(var(--background-tertiary))] rounded-lg border border-[rgb(var(--border-primary))]"
-      role="radiogroup"
-      aria-label={tNav("appearance")}
-    >
-      {THEME_OPTIONS.map(({ code, labelKey }) => {
-        const isActive = resolvedTheme === code;
-        return (
-          <button
-            key={code}
-            role="radio"
-            aria-checked={isActive}
-            aria-label={tNav(labelKey)}
-            onClick={handleSwitch(code)}
-            className={`relative px-3 py-1.5 rounded-md text-xs font-bold tracking-wider transition-colors duration-200 ${
-              isActive
-                ? "text-[rgb(var(--action-primary-fg))]"
-                : "text-[rgb(var(--text-tertiary))] hover:text-[rgb(var(--text-primary))]"
-            }`}
-          >
-            {isActive && (
-              <motion.div
-                layoutId="appearance-toggle-pill"
-                className="absolute inset-0 bg-[rgb(var(--action-primary-bg))]  rounded-md shadow-sm"
-                transition={{ type: "spring", stiffness: 500, damping: 30 }}
-              />
-            )}
-            <span className="relative z-10">{tNav(labelKey)}</span>
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
-// ============================================================================
-// V2 HOME TOPBAR CENTER — Greeting + Date
-// ============================================================================
-
-function HomeTopbarCenter() {
-  const user = useAuthStore((s) => s.user);
-  const { t } = useTranslation("dashboard");
-
-  const firstName = user?.displayName || user?.name?.split(" ")[0];
-  const greeting = getGreeting(firstName, t);
-
-  const dateDisplay = useMemo(() => {
+function useBsAdDateDisplay(): string {
+  return useMemo(() => {
     const now = new Date();
 
     // BS date
@@ -203,6 +102,19 @@ function HomeTopbarCenter() {
     const parts = [bsPart, gregPart].filter(Boolean);
     return parts.join(" · ");
   }, []);
+}
+
+// ============================================================================
+// V2 HOME TOPBAR CENTER — Greeting + Date
+// ============================================================================
+
+function HomeTopbarCenter() {
+  const user = useAuthStore((s) => s.user);
+  const { t } = useTranslation("dashboard");
+
+  const firstName = user?.displayName || user?.name?.split(" ")[0];
+  const greeting = getGreeting(firstName, t);
+  const dateDisplay = useBsAdDateDisplay();
 
   return (
     <div className="flex items-center gap-0 min-w-0">
@@ -223,7 +135,8 @@ function HomeTopbarCenter() {
 }
 
 // ============================================================================
-// USER MENU — Avatar dropdown (theme picker removed, now in topbar pill)
+// USER MENU — Avatar dropdown (desktop/tablet). Content pieces are shared
+// with the phone AccountSheet via UserMenuContent.tsx.
 // ============================================================================
 
 function UserMenu() {
@@ -231,7 +144,6 @@ function UserMenu() {
   const logout = useAuthStore((s) => s.logout);
   const navigate = useNavigate();
   const { t: tNav } = useTranslation("nav");
-  const { resolvedTheme } = useThemeStore();
 
   if (!user) return null;
 
@@ -253,53 +165,14 @@ function UserMenu() {
         leaveTo="opacity-0 scale-95 translate-y-1"
       >
         <MenuItems className="absolute right-0 mt-2 w-72 origin-top-right rounded-2xl bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))] shadow-xl shadow-ink-500/10 dark:shadow-black/20 z-50 overflow-hidden">
-          {/* User Info */}
-          <div className="px-4 py-4 border-b border-[rgb(var(--border-secondary))] bg-[rgb(var(--background-tertiary))]">
-            <div className="flex items-center gap-3">
-              <Avatar name={user.name} size="lg" shape="rounded" />
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-[rgb(var(--text-primary))] truncate">
-                  {user.displayName || user.name}
-                </p>
-                <p className="text-xs text-[rgb(var(--text-tertiary))] truncate">
-                  {user.email}
-                </p>
-                <span className="inline-block mt-1.5 px-2 py-0.5 text-xs font-semibold rounded-full bg-[rgb(var(--state-info-bg)/0.18)] text-[rgb(var(--state-info-fg))]  ">
-                  {user.globalRole}
-                </span>
-              </div>
-            </div>
-          </div>
+          <UserIdentityCard user={user} />
 
           {/* Preferences — appearance + language, one consolidated group */}
           <div className="px-4 py-3 border-b border-[rgb(var(--border-secondary))]">
             <p className="px-1 mb-2 text-2xs font-bold uppercase tracking-wider text-[rgb(var(--text-tertiary))]">
               {tNav("preferences")}
             </p>
-            <div className="space-y-2.5">
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  {resolvedTheme === "dark" ? (
-                    <Moon className="w-4 h-4 flex-shrink-0 text-[rgb(var(--text-tertiary))]" />
-                  ) : (
-                    <Sun className="w-4 h-4 flex-shrink-0 text-[rgb(var(--text-tertiary))]" />
-                  )}
-                  <span className="text-sm font-medium text-[rgb(var(--text-secondary))]">
-                    {tNav("appearance")}
-                  </span>
-                </div>
-                <AppearanceToggle />
-              </div>
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <Languages className="w-4 h-4 flex-shrink-0 text-[rgb(var(--text-tertiary))]" />
-                  <span className="text-sm font-medium text-[rgb(var(--text-secondary))]">
-                    {tNav("language")}
-                  </span>
-                </div>
-                <LanguageToggle />
-              </div>
-            </div>
+            <PreferencesRows layout="inline" />
           </div>
 
           <div className="py-2">
@@ -311,17 +184,12 @@ function UserMenu() {
                   }
                   className={`ef-motion w-full flex items-center gap-3 px-4 py-3 transition-colors ${active ? "bg-[rgb(var(--background-tertiary))]" : ""}`}
                 >
-                  <div className="w-8 h-8 rounded-lg bg-[rgb(var(--background-tertiary))] flex items-center justify-center">
-                    <AnimatedIcon name="account" icon={User} size={16} applyAccent={false} className="text-[rgb(var(--text-secondary))]" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
-                      {tNav("myProfile")}
-                    </p>
-                    <p className="text-xs text-[rgb(var(--text-tertiary))]">
-                      {tNav("viewEditProfile")}
-                    </p>
-                  </div>
+                  <UserMenuRowBody
+                    icon={User}
+                    sigName="account"
+                    title={tNav("myProfile")}
+                    subtitle={tNav("viewEditProfile")}
+                  />
                 </button>
               )}
             </MenuItem>
@@ -333,17 +201,12 @@ function UserMenu() {
                   }
                   className={`ef-motion w-full flex items-center gap-3 px-4 py-3 transition-colors ${active ? "bg-[rgb(var(--background-tertiary))]" : ""}`}
                 >
-                  <div className="w-8 h-8 rounded-lg bg-[rgb(var(--background-tertiary))] flex items-center justify-center">
-                    <AnimatedIcon name="settings" icon={Settings} size={16} applyAccent={false} className="text-[rgb(var(--text-secondary))]" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-sm font-medium text-[rgb(var(--text-primary))]">
-                      {tNav("settings")}
-                    </p>
-                    <p className="text-xs text-[rgb(var(--text-tertiary))]">
-                      {tNav("managePreferences")}
-                    </p>
-                  </div>
+                  <UserMenuRowBody
+                    icon={Settings}
+                    sigName="settings"
+                    title={tNav("settings")}
+                    subtitle={tNav("managePreferences")}
+                  />
                 </button>
               )}
             </MenuItem>
@@ -356,12 +219,7 @@ function UserMenu() {
                   onClick={logout}
                   className={`ef-motion w-full flex items-center gap-3 px-4 py-3 transition-colors ${active ? "bg-rust-50 dark:bg-rust-900/20" : ""}`}
                 >
-                  <div className="w-8 h-8 rounded-lg bg-rust-100 dark:bg-rust-900/30 flex items-center justify-center">
-                    <AnimatedIcon icon={LogOut} size={16} applyAccent={false} className="text-rust-500" />
-                  </div>
-                  <span className="text-sm font-medium text-rust-600 dark:text-rust-400">
-                    {tNav("signOut")}
-                  </span>
+                  <UserMenuRowBody icon={LogOut} title={tNav("signOut")} danger />
                 </button>
               )}
             </MenuItem>
@@ -373,13 +231,132 @@ function UserMenu() {
 }
 
 // ============================================================================
-// MAIN HEADER COMPONENT — Shell V2 Three-Zone Layout
+// PHONE APP BAR (< 640px) — composition tracks route depth:
+// home → greeting + BS·AD date; module root → module title + school;
+// deeper → back chevron + page title + school. Right side: avatar (account
+// sheet). The notification bell mounts as a sibling before the avatar once a
+// notifications source exists.
+// ============================================================================
+
+function PhoneHomeTitle() {
+  const user = useAuthStore((s) => s.user);
+  const { t } = useTranslation("dashboard");
+  const firstName = user?.displayName || user?.name?.split(" ")[0];
+  const greeting = getGreeting(firstName, t);
+  const dateDisplay = useBsAdDateDisplay();
+
+  return (
+    <div className="min-w-0">
+      <p className="shell-appbar-title truncate">{greeting}</p>
+      <p className="shell-appbar-sub truncate">{dateDisplay}</p>
+    </div>
+  );
+}
+
+function PhoneAppBar() {
+  const pathname = usePathname();
+  const user = useAuthStore((s) => s.user);
+  const variant = useNavStore((s) => s.variant);
+  const openDrawer = useNavStore((s) => s.openDrawer);
+  const trail = useBreadcrumbTrail();
+  const { activeSchool, canSwitch } = useActiveSchool();
+  const { t: tNav } = useTranslation("nav");
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [schoolOpen, setSchoolOpen] = useState(false);
+
+  const appBar = deriveAppBarState(pathname);
+
+  const title =
+    appBar.kind === "module-root"
+      ? tNav(`module.${appBar.moduleId}`)
+      : appBar.kind === "subpage"
+        ? (trail[trail.length - 1]?.label ?? tNav(`module.${appBar.moduleId}`))
+        : "";
+
+  const schoolSubtitle =
+    activeSchool &&
+    (canSwitch ? (
+      <button
+        type="button"
+        onClick={() => setSchoolOpen(true)}
+        className="shell-appbar-sub truncate block max-w-full text-left"
+        aria-label={tNav("switchSchool")}
+      >
+        {activeSchool.name}
+      </button>
+    ) : (
+      <p className="shell-appbar-sub truncate">{activeSchool.name}</p>
+    ));
+
+  return (
+    <>
+      <header className="shell-appbar" aria-label={tNav("globalHeader")}>
+        {variant === "drawer" && (
+          <HamburgerButton onPress={openDrawer} ariaLabel={tNav("openNavigation")} />
+        )}
+
+        {appBar.kind === "subpage" && (
+          <Link
+            to={appBar.backTo}
+            aria-label={tNav("back")}
+            className="shell-touch flex items-center justify-center rounded-full flex-shrink-0 text-[color:var(--shell-text-2)]"
+          >
+            <ChevronLeft size={22} strokeWidth={2.25} />
+          </Link>
+        )}
+
+        <div className="flex-1 min-w-0 px-2">
+          {appBar.kind === "home" ? (
+            <PhoneHomeTitle />
+          ) : (
+            <div className="min-w-0">
+              <p className="shell-appbar-title truncate">{title}</p>
+              {schoolSubtitle}
+            </div>
+          )}
+        </div>
+
+        {/* Right zone — future notification bell mounts here, before the avatar */}
+        <div className="flex items-center gap-1 flex-shrink-0">
+          {user && (
+            <button
+              type="button"
+              onClick={() => setAccountOpen(true)}
+              aria-label={tNav("account")}
+              className="shell-touch flex items-center justify-center rounded-full"
+            >
+              <div className="w-8 h-8 rounded-full overflow-hidden">
+                <Avatar name={user.name} size="sm" shape="circle" />
+              </div>
+            </button>
+          )}
+        </div>
+      </header>
+
+      <AccountSheet open={accountOpen} onClose={() => setAccountOpen(false)} />
+      <SchoolSheet open={schoolOpen} onClose={() => setSchoolOpen(false)} />
+    </>
+  );
+}
+
+// ============================================================================
+// MAIN HEADER COMPONENT — phone renders the app bar; tablet keeps the
+// three-zone header with a content-sized left zone (no sidebar) and a
+// hamburger that opens the nav drawer; desktop is unchanged.
 // ============================================================================
 
 export function Header() {
+  const bp = useBreakpoint();
   const collapsed = useAppStore((s) => s.sidebarCollapsed);
   const isHomeV2 = useHomeStore((s) => s.isHomeV2Active);
+  const openDrawer = useNavStore((s) => s.openDrawer);
   const { t: tNav } = useTranslation("nav");
+
+  if (bp === "phone") {
+    return <PhoneAppBar />;
+  }
+
+  const isTablet = bp === "tablet";
 
   return (
     <header
@@ -387,13 +364,30 @@ export function Header() {
       style={{ transition: "background 0.3s" }}
       aria-label={tNav("globalHeader")}
     >
-      {/* LEFT ZONE: width tracks sidebar for visual alignment */}
+      {/* LEFT ZONE: width tracks the sidebar on desktop; content-sized on
+          tablet where the sidebar is hidden and the hamburger opens the
+          drawer instead */}
       <div
-        className={`flex items-center gap-1 flex-shrink-0 overflow-hidden pl-4 ${collapsed ? "w-[var(--shell-sidebar-w-collapsed)]" : "w-[var(--shell-sidebar-w)]"}`}
-        style={{ transition: "width var(--shell-transition)" }}
+        className={`flex items-center gap-1 flex-shrink-0 overflow-hidden pl-4 ${
+          isTablet
+            ? "w-auto"
+            : collapsed
+              ? "w-[var(--shell-sidebar-w-collapsed)]"
+              : "w-[var(--shell-sidebar-w)]"
+        }`}
+        style={isTablet ? undefined : { transition: "width var(--shell-transition)" }}
       >
-        <HamburgerButton />
-        {!collapsed && <SchoolSwitcher />}
+        {isTablet ? (
+          <>
+            <HamburgerButton onPress={openDrawer} ariaLabel={tNav("openNavigation")} />
+            <SchoolSwitcher />
+          </>
+        ) : (
+          <>
+            <HamburgerButton />
+            {!collapsed && <SchoolSwitcher />}
+          </>
+        )}
       </div>
 
       {/* CENTER ZONE: Greeting (home) or Breadcrumbs (modules) — flex:1 */}
