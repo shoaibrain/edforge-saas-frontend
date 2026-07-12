@@ -101,20 +101,22 @@ const NAV_ITEMS: NavItem[] = [
       ],
     },
   },
-  {
-    label: 'Company',
-    type: 'mega_menu',
-    dropdown: {
-      layout: 'grid',
-      header: { title: 'About EdForge', description: 'Learn about our mission and values' },
-      items: [
-        { icon: Info, iconBg: '#ECFDF5', iconColor: '#059669', title: 'About Us', description: 'Our mission and story', href: '/about' },
-        { icon: Mail, iconBg: '#FFF7ED', iconColor: '#EA580C', title: 'Contact', description: 'Get in touch', href: '/contact' },
-        { icon: Shield, iconBg: '#FFFBEB', iconColor: '#D97706', title: 'Security', description: 'How we protect your data', href: '/security' },
-        { icon: FileText, iconBg: '#F5F3FF', iconColor: '#7C3AED', title: 'Legal', description: 'Privacy & Terms', href: '/privacy' },
-      ],
-    },
-  },
+  // Company menu hidden for now (About/Contact/Security/Legal remain reachable
+  // via the Product/Resources menus and the footer). Uncomment to restore.
+  // {
+  //   label: 'Company',
+  //   type: 'mega_menu',
+  //   dropdown: {
+  //     layout: 'grid',
+  //     header: { title: 'About EdForge', description: 'Learn about our mission and values' },
+  //     items: [
+  //       { icon: Info, iconBg: '#ECFDF5', iconColor: '#059669', title: 'About Us', description: 'Our mission and story', href: '/about' },
+  //       { icon: Mail, iconBg: '#FFF7ED', iconColor: '#EA580C', title: 'Contact', description: 'Get in touch', href: '/contact' },
+  //       { icon: Shield, iconBg: '#FFFBEB', iconColor: '#D97706', title: 'Security', description: 'How we protect your data', href: '/security' },
+  //       { icon: FileText, iconBg: '#F5F3FF', iconColor: '#7C3AED', title: 'Legal', description: 'Privacy & Terms', href: '/privacy' },
+  //     ],
+  //   },
+  // },
 ]
 
 const MEGA_MENU_LABELS = NAV_ITEMS.filter((i) => i.type === 'mega_menu').map((i) => i.label)

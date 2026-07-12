@@ -15,9 +15,6 @@ export const HERO = {
   headingSerif2: 'that idea',
   headingTail: '.',
   lede: "One modern, secure platform for student records, school operations, finance, and analytics — so the people running schools can spend their energy on the people they're running them for.",
-  scrollHint: 'See Edforge',
-  ctaPrimary: 'See Edforge',
-  ctaPrimaryHref: '#use-cases',
   trustBadges: [
     'FERPA & COPPA by design',
     'Built with educators',
