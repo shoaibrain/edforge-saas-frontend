@@ -495,7 +495,7 @@ export function Sidebar() {
 
       {/* Navigation */}
       <nav
-        className="flex-1 overflow-y-auto overflow-x-hidden py-1"
+        className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain py-1"
         style={{ scrollbarWidth: 'thin', scrollbarColor: 'var(--shell-scroll-thumb) transparent' }}
         aria-label="Sidebar navigation"
       >

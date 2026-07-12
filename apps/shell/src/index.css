@@ -29,6 +29,13 @@
    in @edforge/theme now holds the warm/neutral palette platform-wide). */
 @import './styles/home-v2-animations.css';
 
+/* Mobile scroll hygiene — the shell owns its scroll containers; never let a
+   scroll chain reach the document (pull-to-refresh / rubber-banding on phone). */
+html,
+body {
+  overscroll-behavior-y: none;
+}
+
 /* Native form-input baseline — a low-specificity default for bare native
    <input>/<select>/<textarea> so they read consistently. @edforge/ui primitives
    and any utility/inline styling override this (higher specificity). Replaces
@@ -44,6 +51,17 @@ textarea {
   color: rgb(var(--text-primary));
   outline: none;
   transition: border-color 150ms ease;
+}
+
+/* Phone: iOS Safari zooms the page when a focused input's font-size is below
+   16px. Same selector list as the baseline above (equal specificity, later in
+   the file) so it wins only inside the media query — desktop stays 12px. */
+@media (max-width: 639.98px) {
+  input:not([type='checkbox']):not([type='radio']):not([type='file']):not([type='hidden']):not([type='range']):not([type='color']),
+  select,
+  textarea {
+    font-size: 16px;
+  }
 }
 input:not([type='checkbox']):not([type='radio']):not([type='file']):not([type='hidden']):not([type='range']):not([type='color']):focus,
 select:focus,
@@ -106,6 +124,14 @@ textarea::placeholder {
   --shell-topbar-h: 56px;
   --shell-transition: 220ms cubic-bezier(0.4, 0, 0.2, 1);
 
+  /* Device safe-area insets (0 on desktop; real values on notched phones once
+     viewport-fit=cover is set). Consumed by the mobile chrome (app bar, tab
+     bar, drawer). */
+  --shell-safe-top: env(safe-area-inset-top, 0px);
+  --shell-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --shell-safe-left: env(safe-area-inset-left, 0px);
+  --shell-safe-right: env(safe-area-inset-right, 0px);
+
   /* Nav item hover */
   --shell-ni-hover: rgba(0,0,0,0.06);
 
@@ -148,6 +174,15 @@ textarea::placeholder {
 
   /* Scrollbar */
   --shell-scroll-thumb: rgba(0,0,0,0.12);
+}
+
+/* Phone: minimum touch-target size for interactive shell chrome. Desktop keeps
+   the tighter visual metrics — the class only bites below 640px. */
+@media (max-width: 639.98px) {
+  .shell-touch {
+    min-width: 44px;
+    min-height: 44px;
+  }
 }
 
 .dark {

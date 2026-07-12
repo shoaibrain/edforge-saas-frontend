@@ -92,7 +92,7 @@ function HamburgerButton() {
   return (
     <button
       onClick={toggleSidebar}
-      className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-150 cursor-pointer hover:bg-[var(--shell-ni-hover)]"
+      className="shell-touch w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-150 cursor-pointer hover:bg-[var(--shell-ni-hover)]"
       aria-label={collapsed ? tNav("expandSidebar") : tNav("collapseSidebar")}
     >
       <div className="flex flex-col gap-1">
@@ -237,7 +237,7 @@ function UserMenu() {
 
   return (
     <Menu as="div" className="relative">
-      <MenuButton className="flex items-center rounded-full hover:ring-[rgb(var(--border-focus)/0.50)] transition-all duration-200 ml-1 flex-shrink-0">
+      <MenuButton className="shell-touch flex items-center justify-center rounded-full hover:ring-[rgb(var(--border-focus)/0.50)] transition-all duration-200 ml-1 flex-shrink-0">
         <div className="w-8 h-8 rounded-full overflow-hidden">
           <Avatar name={user.name} size="sm" shape="circle" />
         </div>

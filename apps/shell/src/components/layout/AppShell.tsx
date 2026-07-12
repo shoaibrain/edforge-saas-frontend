@@ -34,7 +34,7 @@ export function AppShell({ children }: AppShellProps) {
 
   return (
     <div
-      className="h-screen overflow-hidden bg-[var(--shell-page-bg)]"
+      className="h-dvh overflow-hidden bg-[var(--shell-page-bg)]"
       style={{ transition: 'background 0.3s' }}
     >
       {/* Skip link for keyboard/screen reader users */}
@@ -48,7 +48,7 @@ export function AppShell({ children }: AppShellProps) {
 
       {/* Right column: content card (below fixed header) */}
       <div
-        className={`flex flex-col h-screen pt-[var(--shell-topbar-h)] ${collapsed ? 'ml-[var(--shell-sidebar-w-collapsed)]' : 'ml-[var(--shell-sidebar-w)]'}`}
+        className={`flex flex-col h-dvh pt-[var(--shell-topbar-h)] ${collapsed ? 'ml-[var(--shell-sidebar-w-collapsed)]' : 'ml-[var(--shell-sidebar-w)]'}`}
         style={{ transition: 'margin-left var(--shell-transition)' }}
       >
         {/* Body wrap — padding creates the inset gap */}
@@ -58,7 +58,7 @@ export function AppShell({ children }: AppShellProps) {
             id="main-content"
             tabIndex={-1}
             aria-busy={isSchoolTransitioning || undefined}
-            className="h-full overflow-y-auto overflow-x-hidden outline-none bg-[var(--shell-cp-bg)] rounded-[var(--shell-cp-radius)] shadow-[var(--shell-cp-shadow)]"
+            className="h-full overflow-y-auto overflow-x-hidden overscroll-contain outline-none bg-[var(--shell-cp-bg)] rounded-[var(--shell-cp-radius)] shadow-[var(--shell-cp-shadow)]"
             style={{
               position: 'relative',  // LOAD-BEARING: drawer absolute positioning
               transition: 'background 0.3s, box-shadow 0.3s',
