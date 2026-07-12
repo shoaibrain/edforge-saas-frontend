@@ -127,7 +127,7 @@ function isInternalRoute(href: string): boolean {
 }
 
 function NavLink({ href, className, style, children, onClick }: { href: string; className?: string; style?: React.CSSProperties; children: React.ReactNode; onClick?: () => void }) {
-  const baseClasses = "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#F97316]"
+  const baseClasses = "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1D3557]"
   const finalClass = className ? `${className} ${baseClasses}` : baseClasses;
 
   if (isInternalRoute(href)) {
@@ -211,7 +211,7 @@ export function Navbar() {
       } : undefined}
     >
       <div className="max-w-7xl mx-auto px-6 md:px-8 h-full flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-3 group z-50 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#F97316] p-1 -ml-1">
+        <Link to="/" className="flex items-center gap-3 group z-50 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1D3557] p-1 -ml-1">
           <div className="relative w-10 h-10 flex items-center justify-center rounded-xl transition-transform duration-300 group-hover:scale-105 overflow-hidden">
             <img src="/logo.svg" alt="EdForge Logo" className="w-full h-full object-contain" />
           </div>
@@ -233,7 +233,7 @@ export function Navbar() {
                 left: indicatorStyle.left,
                 width: indicatorStyle.width,
                 opacity: indicatorStyle.opacity,
-                backgroundColor: 'rgba(249, 115, 22, 0.08)',
+                backgroundColor: 'rgba(29, 53, 87, 0.08)',
               }}
             />
 
@@ -265,7 +265,7 @@ export function Navbar() {
                       setHoveredItem(null)
                     }
                   }}
-                  className="px-4 py-2 flex items-center gap-1.5 text-sm font-medium transition-colors duration-200 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#F97316]"
+                  className="px-4 py-2 flex items-center gap-1.5 text-sm font-medium transition-colors duration-200 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1D3557]"
                   style={{
                     color: activeDropdown === item.label || hoveredItem === item.label
                       ? 'rgb(var(--text-primary))'
@@ -411,22 +411,32 @@ export function Navbar() {
         </div>
 
         {/* Right Section */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <Link
             to="/login"
-            className="hidden md:inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold transition-all hover:shadow-md hover:scale-[1.02] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#F97316] bg-[#F97316] text-[#FFFFFF]"
+            className="hidden md:inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold transition-colors hover:bg-[rgba(29,53,87,0.06)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1D3557] text-[rgb(var(--text-primary))]"
             style={{
               borderRadius: 'var(--lp-radius-pill)',
+              border: '1px solid rgba(29, 53, 87, 0.25)',
             }}
           >
             Sign In
           </Link>
+          <a
+            href="mailto:shoaib@edforge.app?subject=EdForge%20Demo%20Request"
+            className="hidden md:inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold transition-all hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1D3557] bg-[#1D3557] text-[#FFFFFF]"
+            style={{
+              borderRadius: 'var(--lp-radius-pill)',
+            }}
+          >
+            Request a demo
+          </a>
           {/* Mobile Toggle — 44x44px min touch target */}
           <button
             // allow-presentation-style: background toggles on mobileMenuOpen state
-            className="md:hidden min-w-11 min-h-11 flex items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#F97316] text-[rgb(var(--text-primary))]"
+            className="md:hidden min-w-11 min-h-11 flex items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1D3557] text-[rgb(var(--text-primary))]"
             style={{
-              backgroundColor: mobileMenuOpen ? 'rgba(249, 115, 22, 0.08)' : 'transparent',
+              backgroundColor: mobileMenuOpen ? 'rgba(29, 53, 87, 0.08)' : 'transparent',
             }}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
@@ -486,13 +496,24 @@ export function Navbar() {
           </div>
         </div>
 
-        {/* Sign In CTA — pinned at bottom, always visible */}
-        <div className="p-4" style={{ borderTop: '1px solid rgba(226, 232, 240, 0.8)' }}>
-          <Link
-            to="/login"
-            className="lp-nav-signin flex items-center justify-center w-full min-h-12 py-3 font-semibold transition-all hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#F97316] bg-[#F97316] text-[#FFFFFF]"
+        {/* CTAs — pinned at bottom, always visible */}
+        <div className="p-4 space-y-3" style={{ borderTop: '1px solid rgba(226, 232, 240, 0.8)' }}>
+          <a
+            href="mailto:shoaib@edforge.app?subject=EdForge%20Demo%20Request"
+            className="flex items-center justify-center w-full min-h-12 py-3 font-semibold transition-all hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1D3557] bg-[#1D3557] text-[#FFFFFF]"
             style={{
               borderRadius: 'var(--lp-radius-pill)',
+            }}
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Request a demo
+          </a>
+          <Link
+            to="/login"
+            className="lp-nav-signin flex items-center justify-center w-full min-h-12 py-3 font-semibold transition-colors hover:bg-[rgba(29,53,87,0.06)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1D3557] text-[rgb(var(--text-primary))]"
+            style={{
+              borderRadius: 'var(--lp-radius-pill)',
+              border: '1px solid rgba(29, 53, 87, 0.25)',
             }}
             onClick={() => setMobileMenuOpen(false)}
           >
