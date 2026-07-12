@@ -22,8 +22,8 @@ export default function ContactPage() {
               </div>
               <div>
                 <h3 className="font-semibold text-foreground mb-1">Email</h3>
-                <a href="mailto:shoaibrain@edforge.net" className="text-muted-foreground hover:text-primary transition-colors">
-                  shoaibrain@edforge.net
+                <a href="mailto:shoaib@edforge.app" className="text-muted-foreground hover:text-primary transition-colors">
+                  shoaib@edforge.app
                 </a>
               </div>
             </div>
@@ -36,7 +36,7 @@ export default function ContactPage() {
               personalized walkthrough of the platform.
             </p>
             <a
-              href="mailto:shoaibrain@edforge.net?subject=EdForge%20Demo%20Request"
+              href="mailto:shoaib@edforge.app?subject=EdForge%20Demo%20Request"
               className="inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
             >
               <Mail className="h-4 w-4" />

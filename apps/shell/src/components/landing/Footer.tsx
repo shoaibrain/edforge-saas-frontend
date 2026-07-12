@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { Twitter, Mail } from 'lucide-react'
+import { Mail } from 'lucide-react'
 import type React from 'react'
 
 function isInternalRoute(href: string): boolean {
@@ -38,8 +38,7 @@ const footerLinks = [
 ]
 
 const socialLinks = [
-  { icon: Twitter, href: 'https://x.com/edforgedotnet', label: 'Twitter' },
-  { icon: Mail, href: 'mailto:shoaibrain@edforge.net', label: 'Email' },
+  { icon: Mail, href: 'mailto:shoaib@edforge.app', label: 'Email' },
 ]
 
 export function Footer() {

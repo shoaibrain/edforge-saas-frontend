@@ -24,7 +24,6 @@ export function UseCaseTeachersParents() {
       background="var(--lp-bg-warm)"
       features={USE_CASE_TEACHERS.features}
       videoSrc={resolveAssetUrl(LANDING_VIDEOS.teachers)}
-      videoLength={USE_CASE_TEACHERS.mediaLength}
       reverse
       dashboardFallback={<TeacherDashboard />}
       showMode="video"

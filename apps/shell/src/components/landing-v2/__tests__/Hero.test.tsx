@@ -12,12 +12,12 @@ describe('Hero', () => {
     expect(h1.textContent).toMatch(/that idea/i)
   })
 
-  it('links the scroll-down chip to #stage', () => {
+  it('renders no scroll-down chip (removed as redundant)', () => {
     const { container } = render(<Hero />)
     const link = Array.from(container.querySelectorAll('a')).find((a) =>
       (a.textContent ?? '').includes('See Edforge')
     )
-    expect(link?.getAttribute('href')).toBe('#stage')
+    expect(link).toBeUndefined()
   })
 
   it('uses the hero-heading id for aria-labelledby linkage', () => {

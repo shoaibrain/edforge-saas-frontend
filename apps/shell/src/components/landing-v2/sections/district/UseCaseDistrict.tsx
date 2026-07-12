@@ -22,7 +22,6 @@ export function UseCaseDistrict() {
       accent="var(--lp-primary)"
       features={USE_CASE_DISTRICT.features}
       videoSrc={resolveAssetUrl(LANDING_VIDEOS.district)}
-      videoLength={USE_CASE_DISTRICT.mediaLength}
       dashboardFallback={<DistrictDashboard />}
       showMode="video"
     />

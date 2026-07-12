@@ -1,9 +1,8 @@
 import { HERO } from '../../landing.strings'
 import { Container } from '../../components/layout/Container'
-import { landingEvents } from '../../../../analytics/landing-events'
 
 /**
- * HeroCopy — h1 + lede + scroll-down chip link. Centered above the stage.
+ * HeroCopy — h1 + lede, centered above the stage.
  * Copy sourced from landing.strings.ts.
  */
 export function HeroCopy() {
@@ -57,26 +56,6 @@ export function HeroCopy() {
         >
           {HERO.lede}
         </p>
-        <a
-          href="#stage"
-          onClick={() => landingEvents.heroCtaClick('scroll_hint')}
-          // allow-presentation-style: editorial 13px scroll-hint chip
-          style={{
-            marginTop: 6,
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-            fontSize: 13,
-            fontWeight: 500,
-            color: 'var(--lp-primary)',
-            textDecoration: 'none',
-          }}
-        >
-          <span aria-hidden className="text-base">
-            ↓
-          </span>{' '}
-          {HERO.scrollHint}
-        </a>
       </div>
     </Container>
   )

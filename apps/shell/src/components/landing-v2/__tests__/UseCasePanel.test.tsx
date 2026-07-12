@@ -20,7 +20,6 @@ function renderPanel(overrides: Partial<React.ComponentProps<typeof UseCasePanel
       accent="var(--lp-primary)"
       features={FEATURES}
       videoSrc="/x.mp4"
-      videoLength="1:00"
       dashboardFallback={<div>dashboard</div>}
       {...overrides}
     />
