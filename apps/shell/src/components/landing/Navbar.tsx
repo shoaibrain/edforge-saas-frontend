@@ -423,13 +423,14 @@ export function Navbar() {
             Sign In
           </Link>
           <a
-            href="mailto:shoaib@edforge.app?subject=EdForge%20Demo%20Request"
-            className="hidden md:inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold transition-all hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1D3557] bg-[#1D3557] text-[#FFFFFF]"
+            href="mailto:shoaib@edforge.app?subject=EdForge%20Access%20Request"
+            className="hidden md:inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold transition-colors hover:bg-[rgba(29,53,87,0.06)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1D3557] text-[rgb(var(--text-primary))]"
             style={{
               borderRadius: 'var(--lp-radius-pill)',
+              border: '1px solid rgba(29, 53, 87, 0.25)',
             }}
           >
-            Request a demo
+            Get access
           </a>
           {/* Mobile Toggle — 44x44px min touch target */}
           <button
@@ -499,14 +500,15 @@ export function Navbar() {
         {/* CTAs — pinned at bottom, always visible */}
         <div className="p-4 space-y-3" style={{ borderTop: '1px solid rgba(226, 232, 240, 0.8)' }}>
           <a
-            href="mailto:shoaib@edforge.app?subject=EdForge%20Demo%20Request"
-            className="flex items-center justify-center w-full min-h-12 py-3 font-semibold transition-all hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1D3557] bg-[#1D3557] text-[#FFFFFF]"
+            href="mailto:shoaib@edforge.app?subject=EdForge%20Access%20Request"
+            className="flex items-center justify-center w-full min-h-12 py-3 font-semibold transition-colors hover:bg-[rgba(29,53,87,0.06)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1D3557] text-[rgb(var(--text-primary))]"
             style={{
               borderRadius: 'var(--lp-radius-pill)',
+              border: '1px solid rgba(29, 53, 87, 0.25)',
             }}
             onClick={() => setMobileMenuOpen(false)}
           >
-            Request a demo
+            Get access
           </a>
           <Link
             to="/login"
