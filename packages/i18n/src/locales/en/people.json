@@ -821,6 +821,16 @@
         "period": "Period",
         "room": "Room"
       }
+    },
+    "security": {
+      "terminateAll": "Terminate all sessions",
+      "terminateConfirmTitle": "Terminate all sessions?",
+      "terminateConfirmBody": "This signs {{name}} out of every device and revokes their tokens — they'll need to sign in again.",
+      "terminateConfirm": "Terminate",
+      "cancel": "Cancel",
+      "terminateSuccess": "Terminated {{count}} session.",
+      "terminateSuccess_plural": "Terminated {{count}} sessions.",
+      "terminateError": "Couldn't terminate sessions. Please try again."
     }
   },
   "error": {

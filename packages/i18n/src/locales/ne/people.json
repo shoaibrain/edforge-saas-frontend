@@ -821,6 +821,16 @@
         "period": "पिरियड",
         "room": "कोठा"
       }
+    },
+    "security": {
+      "terminateAll": "सबै सत्रहरू समाप्त गर्नुहोस्",
+      "terminateConfirmTitle": "सबै सत्रहरू समाप्त गर्ने?",
+      "terminateConfirmBody": "यसले {{name}} लाई सबै उपकरणहरूबाट साइन आउट गर्छ र तिनीहरूको टोकनहरू रद्द गर्छ — तिनीहरूले फेरि साइन इन गर्नुपर्नेछ।",
+      "terminateConfirm": "समाप्त गर्नुहोस्",
+      "cancel": "रद्द गर्नुहोस्",
+      "terminateSuccess": "{{count}} सत्र समाप्त गरियो।",
+      "terminateSuccess_plural": "{{count}} सत्रहरू समाप्त गरियो।",
+      "terminateError": "सत्रहरू समाप्त गर्न सकिएन। कृपया फेरि प्रयास गर्नुहोस्।"
     }
   },
   "error": {

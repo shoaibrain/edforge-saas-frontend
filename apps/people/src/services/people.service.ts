@@ -319,6 +319,18 @@ export async function getUserSessions(userId: string): Promise<SessionsResponse>
   return apiGet<SessionsResponse>(`/users/${userId}/security/sessions`)
 }
 
+/**
+ * Admin: terminate all of a user's sessions (Sprint 4 / S4.2).
+ * POST /sessions/user/:userId/revoke-all — the sessions-module admin surface,
+ * which (unlike the security surface) also kills the target's Cognito refresh
+ * tokens. TenantAdmin-only on the backend.
+ */
+export async function revokeUserSessions(
+  userId: string
+): Promise<{ revokedCount: number }> {
+  return apiPost<{ revokedCount: number }>(`/sessions/user/${userId}/revoke-all`, {})
+}
+
 // ============================================================================
 // EXPORTED SERVICE OBJECT
 // ============================================================================
@@ -336,4 +348,5 @@ export const peopleService = {
   // Security
   getUserSecurity,
   getUserSessions,
+  revokeUserSessions,
 }
