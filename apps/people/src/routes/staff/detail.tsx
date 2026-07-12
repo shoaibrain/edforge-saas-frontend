@@ -10,11 +10,12 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useParams, Link } from '@tanstack/react-router'
-import { useQuery, useQueries } from '@tanstack/react-query'
+import { useQuery, useQueries, useMutation, useQueryClient } from '@tanstack/react-query'
 import { motion, AnimatePresence } from 'framer-motion'
 import { toast } from 'sonner'
 import { useTranslation } from '@edforge/i18n'
-import { Tabs } from '@edforge/ui'
+import { usePermission } from '@edforge/abac'
+import { Tabs, Button } from '@edforge/ui'
 import { AnimatedIcon, type IconName } from '@edforge/ui/motion'
 import {
     User,
@@ -56,6 +57,7 @@ import { staffService } from '../../services/staff.service'
 import type { StaffResponseDto, StaffAssignmentResponseDto } from '@aibrains/shared-types'
 import { peopleService } from '../../services/people.service'
 import type { SecurityOverview, UserSession } from '../../services/people.service'
+import { Modal } from '../../components/ui'
 import {
     StaffStatusBadge,
     AssignToSchoolModal,
@@ -1306,15 +1308,20 @@ function AssignmentsTab({
     )
 }
 
-function SecurityTab({ 
-    security, 
+function SecurityTab({
+    security,
     sessions,
-    isLoading 
-}: { 
+    isLoading,
+    canTerminate,
+    onTerminateAll,
+}: {
     security?: SecurityOverview
     sessions?: UserSession[]
-    isLoading: boolean 
+    isLoading: boolean
+    canTerminate?: boolean
+    onTerminateAll?: () => void
 }) {
+    const { t } = useTranslation('people')
     return (
         <motion.div
             variants={staggerChildren}
@@ -1425,10 +1432,17 @@ function SecurityTab({
 
                     {/* Active Sessions */}
                     <motion.div variants={fadeInUp} className="bg-[rgb(var(--background-secondary))] rounded-xl border border-[rgb(var(--border-primary))] p-6">
-                        <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))] mb-4 flex items-center gap-2">
-                            <Monitor className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
-                            Active Sessions
-                        </h3>
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))] flex items-center gap-2">
+                                <Monitor className="w-4 h-4 text-[rgb(var(--text-tertiary))]" />
+                                Active Sessions
+                            </h3>
+                            {canTerminate && sessions && sessions.length > 0 && (
+                                <Button variant="danger" size="sm" onClick={onTerminateAll}>
+                                    {t('detail.security.terminateAll')}
+                                </Button>
+                            )}
+                        </div>
                         {sessions && sessions.length > 0 ? (
                             <div className="space-y-3">
                                 {sessions.map((session) => (
@@ -1546,6 +1560,22 @@ export default function StaffDetailPage() {
         queryKey: ['user', staff?.userId, 'sessions'],
         queryFn: () => peopleService.getUserSessions(staff!.userId!),
         enabled: activeTab === 'security' && !!staff?.userId,
+    })
+
+    // Sprint 4 (S4.6) — admin "Terminate all sessions". Gated on delete:staff,
+    // which is TenantAdmin-only (Principal has manage but not delete) — matching
+    // the backend's TenantAdmin requirement on /sessions/user/:id/revoke-all.
+    const queryClient = useQueryClient()
+    const canTerminateSessions = usePermission('delete', 'staff')
+    const [isTerminateModalOpen, setIsTerminateModalOpen] = useState(false)
+    const terminateSessionsMutation = useMutation({
+        mutationFn: () => peopleService.revokeUserSessions(staff!.userId!),
+        onSuccess: (res) => {
+            toast.success(t('detail.security.terminateSuccess', { count: res.revokedCount }))
+            queryClient.invalidateQueries({ queryKey: ['user', staff?.userId, 'sessions'] })
+            setIsTerminateModalOpen(false)
+        },
+        onError: () => toast.error(t('detail.security.terminateError')),
     })
 
     if (isLoadingStaff) {
@@ -1687,12 +1717,40 @@ export default function StaffDetailPage() {
                                     security={security}
                                     sessions={sessionsData?.sessions}
                                     isLoading={isLoadingSecurity || isLoadingSessions}
+                                    canTerminate={canTerminateSessions}
+                                    onTerminateAll={() => setIsTerminateModalOpen(true)}
                                 />
                             )}
                         </motion.div>
                     </AnimatePresence>
                 </div>
             </div>
+
+            {/* Terminate all sessions confirm (S4.6) */}
+            <Modal
+                open={isTerminateModalOpen}
+                onClose={() => setIsTerminateModalOpen(false)}
+                title={t('detail.security.terminateConfirmTitle')}
+                description={t('detail.security.terminateConfirmBody', { name: displayName })}
+                size="sm"
+            >
+                <div className="flex justify-end gap-2 mt-4">
+                    <Button
+                        variant="outline"
+                        onClick={() => setIsTerminateModalOpen(false)}
+                        disabled={terminateSessionsMutation.isPending}
+                    >
+                        {t('detail.security.cancel')}
+                    </Button>
+                    <Button
+                        variant="danger"
+                        onClick={() => terminateSessionsMutation.mutate()}
+                        disabled={terminateSessionsMutation.isPending}
+                    >
+                        {t('detail.security.terminateConfirm')}
+                    </Button>
+                </div>
+            </Modal>
 
             {/* Assign to School Modal */}
             <AssignToSchoolModal
