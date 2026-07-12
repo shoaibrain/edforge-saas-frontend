@@ -132,6 +132,18 @@ textarea::placeholder {
   --shell-safe-left: env(safe-area-inset-left, 0px);
   --shell-safe-right: env(safe-area-inset-right, 0px);
 
+  /* Mobile chrome metrics (phone app bar / bottom tab bar / L2 pill row /
+     nav drawer / bottom sheets) */
+  --shell-appbar-h: 52px;
+  --shell-tabbar-h: 60px;
+  --shell-l2-pill-h: 34px;
+  --shell-drawer-w: min(300px, 86vw);
+  --shell-nav-motion: 240ms cubic-bezier(0.32, 0.72, 0, 1);
+  --shell-glass-bg: color-mix(in srgb, var(--shell-page-bg) 88%, transparent);
+  --shell-scrim-bg: rgba(24, 22, 14, 0.34);
+  --shell-sheet-shadow: 0 -16px 48px rgba(55, 45, 20, 0.2);
+  --shell-drawer-shadow: 16px 0 48px rgba(55, 45, 20, 0.22);
+
   /* Nav item hover */
   --shell-ni-hover: rgba(0,0,0,0.06);
 
@@ -224,5 +236,223 @@ textarea::placeholder {
   --shell-theme-pill-bg: rgba(255,255,255,0.04);
 
   --shell-scroll-thumb: rgba(255,255,255,0.10);
+
+  /* Mobile chrome */
+  --shell-scrim-bg: rgba(0, 0, 0, 0.58);
+  --shell-sheet-shadow: 0 -16px 48px rgba(0, 0, 0, 0.6);
+  --shell-drawer-shadow: 16px 0 48px rgba(0, 0, 0, 0.6);
+}
+
+/* ============================================================================
+ * MOBILE CHROME — phone app bar, bottom tab bar, L2 pill row, nav drawer,
+ * bottom sheets. Metrics live in the --shell-* tokens above; colors come from
+ * the shell/theme tokens (never raw values in components). Rendered only
+ * below 1024px — desktop chrome is untouched.
+ * ============================================================================ */
+
+/* --- Phone app bar (replaces the desktop Header < 640px) --- */
+.shell-appbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 45;
+  display: flex;
+  align-items: center;
+  height: calc(var(--shell-appbar-h) + var(--shell-safe-top));
+  padding: var(--shell-safe-top) 8px 0;
+  background: var(--shell-glass-bg);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  backdrop-filter: blur(14px) saturate(160%);
+  border-bottom: 1px solid var(--shell-border-color);
+}
+.shell-appbar-title {
+  font-size: 15.5px;
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--shell-text-1);
+}
+.shell-appbar-sub {
+  font-size: 10.5px;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--shell-text-3);
+}
+
+/* --- Bottom tab bar (phone, tabs variant) --- */
+.shell-tabbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 45;
+  display: flex;
+  align-items: stretch;
+  height: calc(var(--shell-tabbar-h) + var(--shell-safe-bottom));
+  padding: 0 6px var(--shell-safe-bottom);
+  background: var(--shell-glass-bg);
+  -webkit-backdrop-filter: blur(16px) saturate(170%);
+  backdrop-filter: blur(16px) saturate(170%);
+  border-top: 1px solid var(--shell-border-color);
+}
+.shell-tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-width: 0;
+  color: var(--shell-text-3);
+}
+.shell-tab-pill {
+  width: 46px;
+  height: 27px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  transition: background var(--shell-nav-motion);
+}
+.shell-tab-label {
+  font-size: 10px;
+  font-weight: 650;
+  line-height: 1.2;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.shell-tab.is-active {
+  color: color-mix(in oklch, var(--accent) 92%, var(--shell-text-1));
+}
+.shell-tab.is-active .shell-tab-pill {
+  background: color-mix(in oklch, var(--accent) 16%, transparent);
+}
+
+/* --- L2 page-pill row (phone + tablet) --- */
+.shell-l2 {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px 10px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.shell-l2::-webkit-scrollbar {
+  display: none;
+}
+.shell-l2-pill {
+  position: relative;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: var(--shell-l2-pill-h);
+  padding: 0 13px;
+  border-radius: 999px;
+  border: 1px solid var(--shell-border-color);
+  background: var(--shell-cp-bg);
+  color: var(--shell-text-2);
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  scroll-snap-align: start;
+  transition: background 130ms ease, border-color 130ms ease, color 130ms ease;
+}
+/* Invisible vertical hit-area extension — the 34px pill keeps its visual
+   size but taps land on a ≥44px target. */
+.shell-l2-pill::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -5px;
+  bottom: -5px;
+}
+.shell-l2-pill.is-active {
+  background: color-mix(in oklch, var(--accent) 14%, var(--shell-cp-bg));
+  border-color: color-mix(in oklch, var(--accent) 40%, transparent);
+  color: color-mix(in oklch, var(--accent) 92%, var(--shell-text-1));
+}
+
+/* --- Nav drawer (tablet nav + phone variant B) --- */
+.shell-drawer {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  width: var(--shell-drawer-w);
+  padding-left: var(--shell-safe-left);
+  border-radius: 0 18px 18px 0;
+  background: var(--shell-cp-bg);
+  box-shadow: var(--shell-drawer-shadow);
+}
+
+/* --- Bottom sheet (chrome overlays: account, school, More) --- */
+.shell-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  max-height: 88dvh;
+  border-radius: 20px 20px 0 0;
+  background: var(--shell-cp-bg);
+  box-shadow: var(--shell-sheet-shadow);
+  padding-bottom: var(--shell-safe-bottom);
+}
+.shell-sheet-handle {
+  width: 40px;
+  height: 4.5px;
+  border-radius: 999px;
+  background: var(--shell-scroll-thumb);
+  margin: 8px auto 2px;
+  flex-shrink: 0;
+}
+
+/* --- Scrim + Headless UI Transition classes --- */
+.shell-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: var(--shell-scrim-bg);
+}
+.shell-fade {
+  transition: opacity 200ms ease;
+}
+.shell-fade-hidden {
+  opacity: 0;
+}
+.shell-fade-shown {
+  opacity: 1;
+}
+.shell-slide {
+  transition: transform var(--shell-nav-motion);
+}
+.shell-slide-bottom-hidden {
+  transform: translateY(100%);
+}
+.shell-slide-left-hidden {
+  transform: translateX(calc(-100% - 48px)); /* clear the drawer shadow too */
+}
+.shell-slide-shown {
+  transform: translateY(0) translateX(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shell-fade,
+  .shell-slide,
+  .shell-tab-pill,
+  .shell-l2-pill {
+    transition-duration: 0.01ms;
+  }
 }
 

@@ -1,15 +1,25 @@
 /**
  * Secure Navigation Items Hook
- * 
+ *
  * Filters navigation items based on ABAC permissions, tenant roles,
  * and school context requirements.
+ *
+ * The filter itself is pure (lib/nav-filter.ts) so non-hook callers — the
+ * mobile tab derivation, the nav drawer's module map, unit tests — run the
+ * exact same RBAC path as the rendered sidebar.
  */
 
 import { useMemo } from 'react'
 import { useAuthStore } from '../stores/auth.store'
 import { useAppStore } from '../stores/app.store'
-import { can } from '@edforge/abac'
+import {
+  filterNavItems,
+  filterNavGroups,
+  isNavItemVisible,
+} from '../lib/nav-filter'
 import type { NavItem, NavItemGroup } from '../config/sidebar-modules'
+
+export { filterNavItems, filterNavGroups, isNavItemVisible }
 
 /**
  * Hook to filter navigation items based on user permissions.
@@ -19,35 +29,10 @@ export function useSecureNavItems(items: NavItem[]): NavItem[] {
   const user = useAuthStore((s) => s.user)
   const activeSchoolId = useAppStore((s) => s.activeSchoolId)
 
-  return useMemo(() => {
-    if (!user) return []
-
-    return items.filter((item) => {
-      // Check ABAC permission
-      if (item.permission) {
-        const hasPermission = can(user, {
-          action: item.permission.action,
-          resource: item.permission.resource,
-          schoolId: activeSchoolId ?? undefined,
-        })
-        if (!hasPermission) return false
-      }
-
-      // Check tenant role visibility
-      if (item.tenantRoles && item.tenantRoles.length > 0) {
-        if (!item.tenantRoles.includes(user.globalRole)) {
-          return false
-        }
-      }
-
-      // Check school context requirement
-      if (item.requiresActiveSchool && !activeSchoolId) {
-        return false
-      }
-
-      return true
-    })
-  }, [items, user, activeSchoolId])
+  return useMemo(
+    () => filterNavItems(items, user, activeSchoolId),
+    [items, user, activeSchoolId]
+  )
 }
 
 /**
@@ -57,40 +42,10 @@ export function useSecureNavGroups(groups: NavItemGroup[]): NavItemGroup[] {
   const user = useAuthStore((s) => s.user)
   const activeSchoolId = useAppStore((s) => s.activeSchoolId)
 
-  return useMemo(() => {
-    if (!user) return []
-
-    return groups
-      .map((group) => ({
-        ...group,
-        items: group.items.filter((item) => {
-          // Check ABAC permission
-          if (item.permission) {
-            const hasPermission = can(user, {
-              action: item.permission.action,
-              resource: item.permission.resource,
-              schoolId: activeSchoolId ?? undefined,
-            })
-            if (!hasPermission) return false
-          }
-
-          // Check tenant role visibility
-          if (item.tenantRoles && item.tenantRoles.length > 0) {
-            if (!item.tenantRoles.includes(user.globalRole)) {
-              return false
-            }
-          }
-
-          // Check school context requirement
-          if (item.requiresActiveSchool && !activeSchoolId) {
-            return false
-          }
-
-          return true
-        }),
-      }))
-      .filter((group) => group.items.length > 0) // Remove empty groups
-  }, [groups, user, activeSchoolId])
+  return useMemo(
+    () => filterNavGroups(groups, user, activeSchoolId),
+    [groups, user, activeSchoolId]
+  )
 }
 
 /**
@@ -100,32 +55,8 @@ export function useCanSeeNavItem(item: NavItem): boolean {
   const user = useAuthStore((s) => s.user)
   const activeSchoolId = useAppStore((s) => s.activeSchoolId)
 
-  return useMemo(() => {
-    if (!user) return false
-
-    // Check ABAC permission
-    if (item.permission) {
-      const hasPermission = can(user, {
-        action: item.permission.action,
-        resource: item.permission.resource,
-        schoolId: activeSchoolId ?? undefined,
-      })
-      if (!hasPermission) return false
-    }
-
-    // Check tenant role visibility
-    if (item.tenantRoles && item.tenantRoles.length > 0) {
-      if (!item.tenantRoles.includes(user.globalRole)) {
-        return false
-      }
-    }
-
-    // Check school context requirement
-    if (item.requiresActiveSchool && !activeSchoolId) {
-      return false
-    }
-
-    return true
-  }, [item, user, activeSchoolId])
+  return useMemo(
+    () => (user ? isNavItemVisible(item, user, activeSchoolId) : false),
+    [item, user, activeSchoolId]
+  )
 }
-
