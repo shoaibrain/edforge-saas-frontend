@@ -124,7 +124,7 @@ export function UseCasePanel({
             tabIndex={isActive ? 0 : -1}
             onClick={() => selectFeature(i)}
             onKeyDown={(e) => onKeyDown(e, i)}
-            className="pt-[20px] pb-[20px] pl-[24px] bg-transparent"
+            className="pt-[20px] pb-[20px] pl-[24px] bg-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--lp-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--lp-bg)]"
             style={{
               display: 'block',
               textAlign: 'left',
@@ -148,34 +148,17 @@ export function UseCasePanel({
               {f.title}
             </div>
             {isActive ? (
-              <>
-                <div
-                  // allow-presentation-style: editorial 14.5px description copy
-                  style={{
-                    fontSize: 14.5,
-                    lineHeight: 1.6,
-                    color: 'var(--lp-ink-3)',
-                    marginBottom: 12,
-                    maxWidth: 440,
-                  }}
-                >
-                  {f.description}
-                </div>
-                <a
-                  href="#"
-                  // allow-presentation-style: editorial 13.5px link + dynamic accent color
-                  style={{
-                    fontSize: 13.5,
-                    fontWeight: 600,
-                    color: accent,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 4,
-                  }}
-                >
-                  Learn more →
-                </a>
-              </>
+              <div
+                // allow-presentation-style: editorial 14.5px description copy
+                style={{
+                  fontSize: 14.5,
+                  lineHeight: 1.6,
+                  color: 'var(--lp-ink-3)',
+                  maxWidth: 440,
+                }}
+              >
+                {f.description}
+              </div>
             ) : null}
           </button>
         )

@@ -142,6 +142,10 @@ html[data-surface="landing"] .lp-pillar-grid {
   grid-template-columns: repeat(12, 1fr);
   gap: 20px;
 }
+/* Card height floor lives here (not inline) so the ≤720px override below wins. */
+html[data-surface="landing"] .lp-pillar-grid .lp-pillar-card {
+  min-height: 380px;
+}
 @media (max-width: 720px) {
   html[data-surface="landing"] .lp-pillar-grid {
     grid-template-columns: 1fr;

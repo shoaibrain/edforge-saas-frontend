@@ -146,7 +146,57 @@ export function Navbar() {
 
   const navRef = useRef<HTMLDivElement>(null)
   const itemsRef = useRef<Record<string, HTMLDivElement | null>>({})
+  const triggerBtnRef = useRef<Record<string, HTMLButtonElement | null>>({})
+  const panelRef = useRef<Record<string, HTMLDivElement | null>>({})
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0, opacity: 0 })
+
+  // Keyboard support for the open mega-menu: arrows cycle its links,
+  // Home/End jump, Escape closes and returns focus to the trigger.
+  const panelLinks = (label: string) =>
+    Array.from(panelRef.current[label]?.querySelectorAll<HTMLAnchorElement>('a') ?? [])
+
+  const openDropdownWithFocus = (label: string) => {
+    setActiveDropdown(label)
+    setHoveredItem(label)
+    requestAnimationFrame(() => panelLinks(label)[0]?.focus())
+  }
+
+  const onPanelKeyDown = (e: React.KeyboardEvent) => {
+    if (!activeDropdown) return
+    const links = panelLinks(activeDropdown)
+    if (!links.length) return
+    const idx = links.indexOf(document.activeElement as HTMLAnchorElement)
+    const move = (next: number) => {
+      e.preventDefault()
+      links[(next + links.length) % links.length]?.focus()
+    }
+    switch (e.key) {
+      case 'ArrowDown':
+      case 'ArrowRight':
+        move(idx + 1)
+        break
+      case 'ArrowUp':
+      case 'ArrowLeft':
+        move(idx - 1)
+        break
+      case 'Home':
+        move(0)
+        break
+      case 'End':
+        move(links.length - 1)
+        break
+      case 'Escape': {
+        e.preventDefault()
+        const label = activeDropdown
+        setActiveDropdown(null)
+        setHoveredItem(null)
+        triggerBtnRef.current[label]?.focus()
+        break
+      }
+      default:
+        break
+    }
+  }
 
   // Scroll detection (throttled to rAF)
   useThrottledScroll(useCallback(() => {
@@ -249,6 +299,7 @@ export function Navbar() {
                 }}
               >
                 <button
+                  ref={(el) => { triggerBtnRef.current[item.label] = el }}
                   // allow-presentation-style: color toggles on active/hover state
                   aria-haspopup={item.type === 'mega_menu' ? 'true' : undefined}
                   aria-expanded={item.type === 'mega_menu' ? activeDropdown === item.label : undefined}
@@ -257,8 +308,11 @@ export function Navbar() {
                     if (item.type !== 'mega_menu') return
                     if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowDown') {
                       e.preventDefault()
-                      setActiveDropdown(activeDropdown === item.label ? null : item.label)
-                      setHoveredItem(item.label)
+                      if (activeDropdown === item.label && e.key !== 'ArrowDown') {
+                        setActiveDropdown(null)
+                      } else {
+                        openDropdownWithFocus(item.label)
+                      }
                     }
                     if (e.key === 'Escape') {
                       setActiveDropdown(null)
@@ -287,6 +341,7 @@ export function Navbar() {
           <div
             className="absolute top-full left-1/2 -translate-x-1/2 pt-4"
             onMouseLeave={() => { setActiveDropdown(null); setHoveredItem(null) }}
+            onKeyDown={onPanelKeyDown}
           >
             <div
               className={`relative backdrop-blur-xl border overflow-hidden transition-all duration-300 ease-out origin-top bg-[rgba(255,255,255,0.95)] border-[rgba(226,232,240,0.8)] shadow-[var(--lp-shadow-elevated)] ${showDropdown ? 'opacity-100 translate-y-0 scale-100 visible' : 'opacity-0 -translate-y-4 scale-95 invisible'
@@ -303,7 +358,18 @@ export function Navbar() {
                 style={{ width: `calc(${MEGA_MENU_LABELS.length} * min(900px, calc(100vw - 3rem)))`, transform: `translateX(calc(-${activeIndex} * min(900px, calc(100vw - 3rem))))` }}
               >
                 {NAV_ITEMS.filter((item) => item.type === 'mega_menu').map((item) => (
-                  <div key={item.label} className="h-full flex-shrink-0" style={{ width: 'min(900px, calc(100vw - 3rem))' }}>
+                  <div
+                    key={item.label}
+                    ref={(el) => { panelRef.current[item.label] = el }}
+                    aria-hidden={activeDropdown !== item.label}
+                    className="h-full flex-shrink-0"
+                    // allow-presentation-style: off-carousel panels are hidden from
+                    // tab order + AT while the container slides between menus
+                    style={{
+                      width: 'min(900px, calc(100vw - 3rem))',
+                      visibility: activeDropdown === item.label ? 'visible' : 'hidden',
+                    }}
+                  >
                     {item.dropdown?.layout === 'featured' ? (
                       <div className="flex flex-col h-full">
                         <div className="grid grid-cols-3 gap-4 p-6 flex-1">
@@ -467,7 +533,7 @@ export function Navbar() {
       <div className="flex flex-col" style={{ height: '100%' }}>
         {/* Scrollable nav links */}
         <div className="flex-1 overflow-y-auto overscroll-contain p-4" style={{ WebkitOverflowScrolling: 'touch' } as React.CSSProperties}>
-          <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-4">
             {NAV_ITEMS.filter((item) => item.type === 'mega_menu').map((item) => (
               <div key={item.label}>
                 <div
