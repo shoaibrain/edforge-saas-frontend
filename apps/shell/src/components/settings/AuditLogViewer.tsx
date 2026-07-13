@@ -89,6 +89,7 @@ export function AuditLogViewer({ schoolId }: AuditLogViewerProps) {
         id: 'changedAt',
         accessorKey: 'changedAt',
         header: 'When',
+        meta: { mobile: { area: 'trailing' } },
         cell: ({ row }) => (
           <span className="text-xs text-[rgb(var(--text-secondary))] tabular-nums">
             {new Date(row.original.changedAt).toLocaleString()}
@@ -101,6 +102,7 @@ export function AuditLogViewer({ schoolId }: AuditLogViewerProps) {
         id: 'action',
         accessorKey: 'action',
         header: 'Action',
+        meta: { mobile: { area: 'title' } },
         cell: ({ row }) => {
           const a = row.original.action
           const tone = ACTION_TONE[a] ?? ACTION_TONE.update
@@ -135,6 +137,7 @@ export function AuditLogViewer({ schoolId }: AuditLogViewerProps) {
         id: 'targetEntityId',
         accessorKey: 'targetEntityId',
         header: 'Entity ID',
+        meta: { mobile: { area: 'meta' } },
         cell: ({ row }) => <UuidBadge value={row.original.targetEntityId} />,
       },
       {

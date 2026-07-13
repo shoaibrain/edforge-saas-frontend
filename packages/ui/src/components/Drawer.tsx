@@ -51,6 +51,7 @@ import {
 } from '@headlessui/react'
 import { X } from 'lucide-react'
 import { cn, focusRingInset } from '../utils'
+import { useIsPhone } from '../hooks/useBreakpoint'
 
 // ============================================================================
 // TYPES
@@ -90,6 +91,13 @@ export interface DrawerProps {
    * @default false
    */
   closeDisabled?: boolean
+  /**
+   * Presentation override. By default the drawer slides in from the right on
+   * tablet/desktop and renders as a bottom sheet below 640px (the
+   * mobile-native pattern). Pass 'side' to force the right slide-over at
+   * every breakpoint, or 'sheet' to force the bottom sheet.
+   */
+  presentation?: 'side' | 'sheet'
   /** Additional className for the drawer panel */
   className?: string
 }
@@ -125,8 +133,11 @@ export function Drawer({
   showCloseButton = true,
   footer,
   closeDisabled = false,
+  presentation,
   className,
 }: DrawerProps) {
+  const isPhone = useIsPhone()
+  const asSheet = presentation ? presentation === 'sheet' : isPhone
   const handleClose = closeDisabled ? () => undefined : onClose
   return (
     <Transition show={open} as={Fragment}>
@@ -147,28 +158,35 @@ export function Drawer({
           />
         </TransitionChild>
 
-        {/* Drawer container — anchored to right */}
-        <div className="fixed inset-0 flex justify-end">
+        {/* Container — right-anchored slide-over, or bottom-sheet host */}
+        <div className={asSheet ? 'fixed inset-0' : 'fixed inset-0 flex justify-end'}>
           <TransitionChild
             as={Fragment}
-            enter="ease-enter duration-slow"
-            enterFrom="translate-x-full"
-            enterTo="translate-x-0"
-            leave="ease-exit duration-base"
-            leaveFrom="translate-x-0"
-            leaveTo="translate-x-full"
+            enter={asSheet ? 'ui-sheet-slide' : 'ease-enter duration-slow'}
+            enterFrom={asSheet ? 'ui-sheet-slide-hidden' : 'translate-x-full'}
+            enterTo={asSheet ? 'ui-sheet-slide-shown' : 'translate-x-0'}
+            leave={asSheet ? 'ui-sheet-slide' : 'ease-exit duration-base'}
+            leaveFrom={asSheet ? 'ui-sheet-slide-shown' : 'translate-x-0'}
+            leaveTo={asSheet ? 'ui-sheet-slide-hidden' : 'translate-x-full'}
           >
             <DialogPanel
+              data-presentation={asSheet ? 'sheet' : 'side'}
               className={cn(
-                'w-full',
-                sizeClasses[size],
-                'h-full flex flex-col',
-                'bg-surface-primary shadow-modal',
-                'border-l border-[rgb(var(--border-secondary)/0.5)]',
-                'transform transition-all',
+                asSheet
+                  ? 'ui-sheet w-full bg-surface-primary'
+                  : [
+                      'w-full',
+                      sizeClasses[size],
+                      'h-full flex flex-col',
+                      'bg-surface-primary shadow-modal',
+                      'border-l border-[rgb(var(--border-secondary)/0.5)]',
+                      'transform transition-all',
+                    ],
                 className
               )}
             >
+              {asSheet && <div className="ui-sheet-handle" aria-hidden="true" />}
+
               {/* Header */}
               <div className="flex items-start justify-between px-6 py-5 border-b border-[rgb(var(--border-secondary)/0.4)] flex-shrink-0">
                 <div className="flex items-center gap-3 min-w-0 pr-4">
@@ -204,7 +222,12 @@ export function Drawer({
               </div>
 
               {/* Scrollable content */}
-              <div className="flex-1 overflow-y-auto px-6 py-5">
+              <div
+                className={cn(
+                  'flex-1 overflow-y-auto px-6 py-5',
+                  asSheet && 'min-h-0 overscroll-contain'
+                )}
+              >
                 {children}
               </div>
 

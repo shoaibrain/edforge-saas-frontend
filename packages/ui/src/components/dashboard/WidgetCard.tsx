@@ -115,17 +115,17 @@ export function WidgetCard({
             <div className="mt-0.5 truncate text-xs text-[rgb(var(--text-tertiary))]">{subtitle}</div>
           ) : null}
         </div>
-        <div className="shrink-0">
+        <div className="shrink min-w-0">
           {link ? (
             <a
               href={link.href}
               className="inline-flex items-center gap-1 text-xs font-medium text-[rgb(var(--text-secondary))] transition-colors hover:text-[rgb(var(--text-primary))]"
             >
               {link.label}
-              <ArrowRight className="h-3.5 w-3.5" strokeWidth={2} aria-hidden="true" />
+              <ArrowRight className="h-3.5 w-3.5 flex-shrink-0" strokeWidth={2} aria-hidden="true" />
             </a>
           ) : metric ? (
-            <span className="whitespace-nowrap text-xs font-semibold tabular-nums text-[rgb(var(--text-secondary))]">
+            <span className="block truncate text-xs font-semibold tabular-nums text-[rgb(var(--text-secondary))]">
               {metric}
             </span>
           ) : null}

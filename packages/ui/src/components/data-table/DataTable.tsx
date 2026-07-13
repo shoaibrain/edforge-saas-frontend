@@ -2,6 +2,8 @@ import { type KeyboardEvent, type ReactNode } from 'react'
 import { flexRender } from '@tanstack/react-table'
 import type { Row } from '@tanstack/react-table'
 import { cn, focusRingInset } from '../../utils'
+import { useIsPhone } from '../../hooks/useBreakpoint'
+import { DataTableCardList } from './card-mode'
 import { useDataTable } from './hooks/useDataTable'
 import { DataTableColumnHeader } from './DataTableColumnHeader'
 import { DataTableSkeleton } from './DataTableSkeleton'
@@ -71,6 +73,9 @@ export function DataTable<TData>({
   maxHeight,
 }: DataTableProps<TData>) {
   const resolvedLabels = resolveDataTableLabels(labels)
+  // Phone (< 640px): the scroll area renders the card list instead of the
+  // <table>; toolbar, states, pagination and table state are shared.
+  const isPhone = useIsPhone()
   // Resolve prototype-shaped aliases onto the canonical props.
   const resolvedFacets: FacetedFilterConfig[] | undefined =
     facets ?? facetedFilters
@@ -256,6 +261,14 @@ export function DataTable<TData>({
             bare
             onClearFilters={isFiltered ? handleClearFilters : undefined}
             labels={resolvedLabels}
+          />
+        ) : isPhone ? (
+          <DataTableCardList
+            rows={table.getRowModel().rows}
+            onRowClick={onRowClick}
+            enableExpanding={enableExpanding}
+            renderSubComponent={renderSubComponent}
+            isFetching={isFetching}
           />
         ) : (
           <table className="w-full" role="grid" style={{ tableLayout: 'fixed' }}>

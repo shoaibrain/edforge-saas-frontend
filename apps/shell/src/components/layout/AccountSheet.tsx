@@ -7,9 +7,9 @@
 
 import { useNavigate } from '@tanstack/react-router'
 import { User, Settings, LogOut } from 'lucide-react'
+import { Sheet } from '@edforge/ui'
 import { useTranslation } from '@edforge/i18n'
 import { useAuthStore } from '../../stores/auth.store'
-import { MobileSheet } from './MobileSheet'
 import { UserIdentityCard, PreferencesRows, UserMenuRowBody } from './UserMenuContent'
 
 export function AccountSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
@@ -26,7 +26,7 @@ export function AccountSheet({ open, onClose }: { open: boolean; onClose: () => 
   }
 
   return (
-    <MobileSheet open={open} onClose={onClose} ariaLabel={tNav('account')}>
+    <Sheet open={open} onClose={onClose} ariaLabel={tNav('account')}>
       <UserIdentityCard user={user} />
 
       <div className="px-4 py-3 border-b border-[rgb(var(--border-secondary))]">
@@ -75,6 +75,6 @@ export function AccountSheet({ open, onClose }: { open: boolean; onClose: () => 
           <UserMenuRowBody icon={LogOut} title={tNav('signOut')} danger />
         </button>
       </div>
-    </MobileSheet>
+    </Sheet>
   )
 }

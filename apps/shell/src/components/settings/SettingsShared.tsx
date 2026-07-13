@@ -73,12 +73,15 @@ export function SettingsPageHeader({
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={springTransition}
-      className={cn('flex items-center justify-between', className)}
+      className={cn(
+        'flex flex-wrap items-center justify-between gap-x-4 gap-y-3',
+        className
+      )}
     >
-      <div className="flex items-center gap-2.5">
-        {Icon && <Icon className="w-5 h-5 text-[rgb(var(--text-tertiary))]" />}
-        <div className="flex items-baseline gap-3">
-          <h1 className="text-xl font-semibold text-[rgb(var(--text-primary))] tracking-tight">{title}</h1>
+      <div className="flex items-center gap-2.5 min-w-0">
+        {Icon && <Icon className="w-5 h-5 flex-shrink-0 text-[rgb(var(--text-tertiary))]" />}
+        <div className="flex items-baseline gap-3 min-w-0">
+          <h1 className="text-xl font-semibold text-[rgb(var(--text-primary))] tracking-tight truncate">{title}</h1>
           {description && (
             <span className="hidden sm:inline text-sm text-[rgb(var(--text-tertiary))]">{description}</span>
           )}
@@ -189,7 +192,7 @@ export function SettingsCard({
 }: SettingsCardProps) {
   return (
     <div className={cn(
-      'flex items-center justify-between p-4 rounded-xl',
+      'flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between p-4 rounded-xl',
       'bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))]',
       className
     )}>
@@ -736,10 +739,10 @@ export function SettingsFieldRow({ label, description, children, inline, classNa
   return (
     <div className={cn(
       'py-4 border-b border-[rgb(var(--border-tertiary))] last:border-b-0',
-      inline && 'flex items-center justify-between gap-4',
+      inline && 'flex flex-col gap-2 md:flex-row md:items-center md:justify-between md:gap-4',
       className
     )}>
-      <div className={inline ? 'flex-1' : 'mb-2'}>
+      <div className={inline ? 'md:flex-1' : 'mb-2'}>
         <label className="text-sm font-medium text-[rgb(var(--text-primary))]">{label}</label>
         {description && (
           <p className="text-xs text-[rgb(var(--text-tertiary))] mt-0.5">{description}</p>

@@ -29,6 +29,15 @@ export interface DataTableColumnMeta {
   className?: string
   /** Display label for a faceted filter option whose raw value is an id/enum. */
   facetLabelMap?: (value: unknown) => string
+  /**
+   * Phone card-mode placement (< 640px the table renders as a card list).
+   * Omit for the derived default: first visible data column → title, second →
+   * subtitle, right-aligned columns → trailing, the rest → meta; `select`/
+   * `expand` columns hide, the `actions` column becomes the card's kebab.
+   */
+  mobile?: {
+    area?: 'title' | 'subtitle' | 'trailing' | 'meta' | 'hidden'
+  }
 }
 
 // ============================================================================

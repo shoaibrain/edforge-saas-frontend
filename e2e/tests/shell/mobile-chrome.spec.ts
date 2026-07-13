@@ -105,3 +105,57 @@ test.describe('Mobile chrome — Teacher RBAC parity', () => {
     ).toHaveCount(0)
   })
 })
+
+test.describe('Mobile content pane — settings (P2–P4)', () => {
+  test.use({ role: 'TenantAdmin', viewport: PHONE })
+
+  test('organization page: header actions reachable, no horizontal overflow @smoke', async ({
+    page,
+  }) => {
+    await page.goto('/settings/organization')
+
+    // The action cluster wraps below the title instead of clipping off-screen
+    await expect(
+      page.getByRole('button', { name: /district/i }).first()
+    ).toBeVisible()
+
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - window.innerWidth
+    )
+    expect(overflow).toBeLessThanOrEqual(0)
+  })
+
+  test('RBAC security: panes stack vertically on phone @smoke', async ({ page }) => {
+    await page.goto('/settings/security-policies')
+
+    const rail = page.getByText('System Roles')
+    await expect(rail).toBeVisible()
+
+    // Roles rail sits ABOVE the matrix (stacked, not side-by-side)
+    const railBox = await rail.boundingBox()
+    const matrix = page.getByText('Resource', { exact: true })
+    await expect(matrix).toBeVisible()
+    const matrixBox = await matrix.boundingBox()
+    expect(railBox && matrixBox && matrixBox.y > railBox.y).toBeTruthy()
+
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - window.innerWidth
+    )
+    expect(overflow).toBeLessThanOrEqual(0)
+  })
+
+  test('user management renders the card list, row actions open @smoke', async ({
+    page,
+  }) => {
+    await page.goto('/settings/people')
+
+    // Phone: card list instead of the <table>
+    await expect(page.getByTestId('dt-card-list')).toBeVisible()
+    await expect(page.getByRole('grid')).toHaveCount(0)
+
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - window.innerWidth
+    )
+    expect(overflow).toBeLessThanOrEqual(0)
+  })
+})

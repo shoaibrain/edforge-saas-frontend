@@ -111,3 +111,48 @@
   color: #ae2012;
 }
 
+
+/* ============================================================================
+ * SHEET — bottom-sheet structure for phone presentations of overlays
+ * (Sheet primitive, Modal/Drawer sheet mode). Structure only: background
+ * comes from the component (bg-surface-primary) so a dialog never changes
+ * tone between presentations.
+ * ============================================================================ */
+
+.ui-sheet {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  max-height: 88dvh;
+  border-radius: 20px 20px 0 0;
+  box-shadow: var(--elevation-modal);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.ui-sheet-handle {
+  width: 40px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgb(var(--text-disabled));
+  margin: 8px auto 2px;
+  flex-shrink: 0;
+}
+
+.ui-sheet-slide {
+  transition: transform var(--motion-duration-slow) var(--motion-easing-enter);
+}
+.ui-sheet-slide-hidden {
+  transform: translateY(100%);
+}
+.ui-sheet-slide-shown {
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-sheet-slide {
+    transition-duration: 0.01ms;
+  }
+}

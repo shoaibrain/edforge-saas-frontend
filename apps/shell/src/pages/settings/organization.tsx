@@ -508,7 +508,7 @@ export default function OrganizationSettingsPage() {
           icon={Building2}
           action={
             canManage ? (
-              <div className="flex items-center gap-1 p-1 rounded-lg bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))]">
+              <div className="flex flex-wrap items-center gap-1 p-1 rounded-lg bg-[rgb(var(--background-secondary))] border border-[rgb(var(--border-primary))]">
                 {!sea ? (
                   <Button size="sm" variant="ghost" className="gap-1.5 rounded-md" onClick={seaModal.openCreate}>
                     <Landmark className="w-3.5 h-3.5" />

@@ -82,6 +82,18 @@ textarea::placeholder {
   outline-offset: -2px;
 }
 
+/* Touch devices: useRouteFocus programmatically focuses #main-content on
+   every route change, and Chrome's heuristic promotes that to :focus-visible
+   — painting the ring around the whole content card after an L2-pill tap.
+   Suppress it for coarse-pointer navigation ONLY on this element (focus still
+   moves for screen readers; interactive elements keep their rings for
+   external-keyboard phone users). */
+@media (hover: none) {
+  #main-content:focus-visible {
+    outline: none;
+  }
+}
+
 /* Landing V2 tokens are imported from @edforge/theme (packages/theme/src/index.css).
    They are scoped to html[data-surface="landing"] so they're inert unless LandingRoot mounts. */
 
@@ -141,7 +153,6 @@ textarea::placeholder {
   --shell-nav-motion: 240ms cubic-bezier(0.32, 0.72, 0, 1);
   --shell-glass-bg: color-mix(in srgb, var(--shell-page-bg) 88%, transparent);
   --shell-scrim-bg: rgba(24, 22, 14, 0.34);
-  --shell-sheet-shadow: 0 -16px 48px rgba(55, 45, 20, 0.2);
   --shell-drawer-shadow: 16px 0 48px rgba(55, 45, 20, 0.22);
 
   /* Nav item hover */
@@ -239,7 +250,6 @@ textarea::placeholder {
 
   /* Mobile chrome */
   --shell-scrim-bg: rgba(0, 0, 0, 0.58);
-  --shell-sheet-shadow: 0 -16px 48px rgba(0, 0, 0, 0.6);
   --shell-drawer-shadow: 16px 0 48px rgba(0, 0, 0, 0.6);
 }
 
@@ -394,29 +404,8 @@ textarea::placeholder {
   box-shadow: var(--shell-drawer-shadow);
 }
 
-/* --- Bottom sheet (chrome overlays: account, school, More) --- */
-.shell-sheet {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 50;
-  display: flex;
-  flex-direction: column;
-  max-height: 88dvh;
-  border-radius: 20px 20px 0 0;
-  background: var(--shell-cp-bg);
-  box-shadow: var(--shell-sheet-shadow);
-  padding-bottom: var(--shell-safe-bottom);
-}
-.shell-sheet-handle {
-  width: 40px;
-  height: 4.5px;
-  border-radius: 999px;
-  background: var(--shell-scroll-thumb);
-  margin: 8px auto 2px;
-  flex-shrink: 0;
-}
+/* Chrome bottom sheets use the packages/ui Sheet primitive (.ui-sheet in
+   @edforge/theme components.css). */
 
 /* --- Scrim + Headless UI Transition classes --- */
 .shell-scrim {

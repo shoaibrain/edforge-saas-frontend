@@ -2,18 +2,35 @@ import '@testing-library/jest-dom'
 import { server } from './mocks/server'
 
 if (typeof window !== 'undefined' && !window.matchMedia) {
+  // Width-aware stub: evaluates (min-width)/(max-width) queries against
+  // window.innerWidth (jsdom default 1024 → components render their
+  // desktop/tablet presentation unless a test installs its own mock).
+  // Every other query (prefers-*, hover, …) stays false, as before.
+  // Without this, useBreakpoint's min-width queries would all report false
+  // and every breakpoint-aware component would render its PHONE branch in
+  // unit tests.
   Object.defineProperty(window, 'matchMedia', {
     writable: true,
-    value: (query: string) => ({
-      matches: false,
-      media: query,
-      onchange: null,
-      addListener: () => undefined,
-      removeListener: () => undefined,
-      addEventListener: () => undefined,
-      removeEventListener: () => undefined,
-      dispatchEvent: () => false,
-    }),
+    value: (query: string) => {
+      const min = query.match(/\(min-width:\s*(\d+(?:\.\d+)?)px\)/)
+      const max = query.match(/\(max-width:\s*(\d+(?:\.\d+)?)px\)/)
+      let matches = false
+      if (min || max) {
+        matches =
+          (!min || window.innerWidth >= Number(min[1])) &&
+          (!max || window.innerWidth <= Number(max[1]))
+      }
+      return {
+        matches,
+        media: query,
+        onchange: null,
+        addListener: () => undefined,
+        removeListener: () => undefined,
+        addEventListener: () => undefined,
+        removeEventListener: () => undefined,
+        dispatchEvent: () => false,
+      }
+    },
   })
 }
 

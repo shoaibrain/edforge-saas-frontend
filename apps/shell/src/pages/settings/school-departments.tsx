@@ -389,6 +389,7 @@ export default function SchoolDepartmentsPage({ schoolId }: SchoolDepartmentsPag
       accessorKey: 'code',
       header: t('schoolDepartments.table.code'),
       size: 100,
+      meta: { mobile: { area: 'trailing' } },
       cell: ({ row }) => (
         <span className="font-mono text-sm text-[rgb(var(--text-secondary))]">{row.original.code}</span>
       ),
@@ -396,6 +397,7 @@ export default function SchoolDepartmentsPage({ schoolId }: SchoolDepartmentsPag
     {
       accessorKey: 'name',
       header: t('schoolDepartments.table.name'),
+      meta: { mobile: { area: 'title' } },
       cell: ({ row }) => {
         const dept = row.original
         return (

@@ -13,7 +13,7 @@ import { useMemo, useState, type CSSProperties } from 'react'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { Home, MoreHorizontal } from 'lucide-react'
 import { resolveAccent } from '@edforge/ui/motion'
-import { useBreakpoint } from '@edforge/ui'
+import { Sheet, useBreakpoint } from '@edforge/ui'
 import { useTranslation } from '@edforge/i18n'
 import { useAuthStore } from '../../stores/auth.store'
 import { useNavStore } from '../../stores/nav.store'
@@ -22,7 +22,6 @@ import { usePathname, useRoleHomeModuleId } from '../../hooks/useSidebarModule'
 import { deriveTabItems, matchActiveTab } from '../../lib/mobile-nav'
 import { navAccent } from '../../config/nav-accents'
 import { getModuleConfig, type NavItem } from '../../config/sidebar-modules'
-import { MobileSheet } from './MobileSheet'
 import { cn } from '../../lib/utils'
 
 function scrollContentToTop() {
@@ -137,7 +136,7 @@ export function MobileTabBar() {
         )}
       </nav>
 
-      <MobileSheet
+      <Sheet
         open={moreOpen}
         onClose={() => setMoreOpen(false)}
         ariaLabel={tNav('moreTab')}
@@ -172,7 +171,7 @@ export function MobileTabBar() {
             )
           })}
         </div>
-      </MobileSheet>
+      </Sheet>
     </>
   )
 }

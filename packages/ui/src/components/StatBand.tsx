@@ -243,7 +243,10 @@ function Segment({ metric }: { metric: StatMetric }) {
   const outerClass = cn(
     // `ef-motion` lets the AnimatedIcon signature hover-replay (CSS-driven, reduced-motion safe).
     'ef-motion group relative flex min-w-0 flex-col px-5 py-4 text-left',
-    metric.primary ? 'flex-[1.28]' : 'flex-1',
+    // Phone (< 640px): fixed-width snap-rail segments (w-59 = 236px); ≥ sm the
+    // hairline-divided flex band is restored exactly.
+    'w-59 flex-none snap-start sm:w-auto',
+    metric.primary ? 'sm:flex-[1.28]' : 'sm:flex-1',
     'border-l border-[rgb(var(--border-primary)/0.15)] first:border-l-0',
     'transition-colors hover:bg-[rgb(var(--background-tertiary)/0.4)]',
     clickable && focusRing,
@@ -347,6 +350,8 @@ export const StatBand = forwardRef<HTMLDivElement, StatBandProps>(
           'flex items-stretch overflow-hidden rounded-xl border',
           'border-[rgb(var(--border-primary)/0.35)] bg-[rgb(var(--background-secondary))]',
           'max-[980px]:overflow-x-auto',
+          // Phone: the band is a horizontal snap rail (page scrolls Y, band scrolls X)
+          'snap-x snap-proximity overscroll-x-contain sm:snap-none',
           className,
         )}
         {...props}

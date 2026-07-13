@@ -509,7 +509,7 @@ export default function AccountPage() {
                     name="address.country"
                     label={t('account.country')}
                     options={countryOptions}
-                    className="max-w-xs"
+                    className="w-full sm:max-w-xs"
                   />
                 </SectionCard>
               </motion.div>

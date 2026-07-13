@@ -6,7 +6,8 @@
  */
 
 import { Link } from '@tanstack/react-router'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
+import { useIsPhone } from '@edforge/ui'
 import {
   Users,
   Calendar,
@@ -45,6 +46,10 @@ export interface QuickAction {
     text: string
     border: string
   }
+  /** The role's lead action — filled bubble on the phone rail. */
+  primary?: boolean
+  /** Urgent signal dot on the phone bubble (e.g. overdue work behind it). */
+  urgency?: boolean
 }
 
 // ============================================================================
@@ -56,6 +61,7 @@ export interface QuickAction {
 const ADMIN_QUICK_ACTIONS: QuickAction[] = [
   {
     id: 'add-student',
+    primary: true,
     label: 'Add Student',
     description: 'Enroll new student',
     labelKey: 'quickAction.addStudent',
@@ -87,6 +93,7 @@ const ADMIN_QUICK_ACTIONS: QuickAction[] = [
 const TEACHER_QUICK_ACTIONS: QuickAction[] = [
   {
     id: 'my-classrooms',
+    primary: true,
     label: 'My Classrooms',
     description: 'View your classrooms',
     labelKey: 'quickAction.myClasses',
@@ -132,6 +139,7 @@ const TEACHER_QUICK_ACTIONS: QuickAction[] = [
 const STUDENT_QUICK_ACTIONS: QuickAction[] = [
   {
     id: 'my-grades',
+    primary: true,
     label: 'Grades',
     description: 'View performance',
     labelKey: 'quickAction.grades',
@@ -177,6 +185,7 @@ const STUDENT_QUICK_ACTIONS: QuickAction[] = [
 const PARENT_QUICK_ACTIONS: QuickAction[] = [
   {
     id: 'children-overview',
+    primary: true,
     label: 'Children',
     description: 'View progress',
     labelKey: 'quickAction.children',
@@ -237,6 +246,43 @@ export function getQuickActionsForRole(roleCategory: RoleCategory | null): Quick
 interface QuickActionCardProps {
   action: QuickAction
   index: number
+}
+
+// Phone presentation: icon-bubble snap rail (56px tinted bubbles, primary
+// filled with the action color, urgency signal dot, press scale feedback).
+function QuickActionBubble({ action }: { action: QuickAction }) {
+  const Icon = action.icon
+  const { t } = useTranslation('dashboard')
+  const reducedMotion = useReducedMotion()
+  const label = action.labelKey ? t(action.labelKey, { defaultValue: action.label }) : action.label
+
+  return (
+    <motion.div
+      whileTap={reducedMotion ? undefined : { scale: 0.93 }}
+      className="w-20 flex-none snap-start"
+    >
+      <Link to={action.href} className="flex flex-col items-center gap-1.5 py-1">
+        <span
+          className={`relative w-14 h-14 rounded-2xl flex items-center justify-center border ${
+            action.primary
+              ? 'bg-[rgb(var(--action-primary-bg))] text-[rgb(var(--action-primary-fg))] border-transparent shadow-md'
+              : `${action.color.bg} ${action.color.text} ${action.color.border}`
+          }`}
+        >
+          <Icon className="w-6 h-6" />
+          {action.urgency && (
+            <span
+              className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-[rgb(var(--state-danger-fg))] ring-2 ring-[rgb(var(--background-primary))]"
+              aria-hidden="true"
+            />
+          )}
+        </span>
+        <span className="max-w-full truncate text-2xs font-semibold leading-tight text-center text-[rgb(var(--text-secondary))]">
+          {label}
+        </span>
+      </Link>
+    </motion.div>
+  )
 }
 
 function QuickActionCard({ action }: QuickActionCardProps) {
@@ -312,6 +358,7 @@ export function QuickActionsWidget({
   const user = useAuthStore((s) => s.user)
   const activeSchoolId = useAppStore((s) => s.activeSchoolId)
   const { t } = useTranslation('dashboard')
+  const isPhone = useIsPhone()
 
   const roleCategory = getUserRoleCategory(user, activeSchoolId)
   const quickActions = actions || getQuickActionsForRole(roleCategory)
@@ -326,11 +373,19 @@ export function QuickActionsWidget({
       label={t('quickActions')}
       icon={CloudLightning}
     >
-      <div className={`grid ${gridCols} gap-4`}>
-        {quickActions.map((action, index) => (
-          <QuickActionCard key={action.id} action={action} index={index} />
-        ))}
-      </div>
+      {isPhone ? (
+        <div className="flex gap-2 overflow-x-auto snap-x snap-proximity overscroll-x-contain">
+          {quickActions.map((action) => (
+            <QuickActionBubble key={action.id} action={action} />
+          ))}
+        </div>
+      ) : (
+        <div className={`grid ${gridCols} gap-4`}>
+          {quickActions.map((action, index) => (
+            <QuickActionCard key={action.id} action={action} index={index} />
+          ))}
+        </div>
+      )}
     </WidgetSection>
   )
 }
