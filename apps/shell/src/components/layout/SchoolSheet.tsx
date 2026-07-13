@@ -12,7 +12,7 @@ import { useAppStore } from '../../stores/app.store'
 import { useShell } from '../../lib/shell-context'
 import { useActiveSchool } from '../../hooks/useActiveSchool'
 import { getSchoolAvatar } from '../../lib/avatar'
-import { MobileSheet } from './MobileSheet'
+import { Sheet } from '@edforge/ui'
 import { cn } from '../../lib/utils'
 
 export function SchoolSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
@@ -23,7 +23,7 @@ export function SchoolSheet({ open, onClose }: { open: boolean; onClose: () => v
   const { t: tNav } = useTranslation('nav')
 
   return (
-    <MobileSheet open={open} onClose={onClose} ariaLabel={tNav('switchSchool')}>
+    <Sheet open={open} onClose={onClose} ariaLabel={tNav('switchSchool')}>
       <div className="px-4 py-2.5">
         <span className="text-xs font-semibold text-[rgb(var(--text-tertiary))] uppercase tracking-wider">
           {isTenantAdmin ? 'All Schools' : 'Your Schools'}
@@ -85,6 +85,6 @@ export function SchoolSheet({ open, onClose }: { open: boolean; onClose: () => v
           )
         })}
       </div>
-    </MobileSheet>
+    </Sheet>
   )
 }

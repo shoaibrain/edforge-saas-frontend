@@ -63,6 +63,7 @@ import {
 } from '@headlessui/react'
 import { X } from 'lucide-react'
 import { cn, focusRingInset } from '../utils'
+import { useIsPhone } from '../hooks/useBreakpoint'
 
 // ============================================================================
 // TYPES
@@ -89,6 +90,14 @@ export interface ModalProps {
    * @default true
    */
   showCloseButton?: boolean
+  /**
+   * Presentation override. By default the modal renders centered on
+   * tablet/desktop and as a bottom sheet below 640px (the mobile-native
+   * pattern; grab handle, top radius, internal scroll). Pass 'center' to
+   * force the centered dialog at every breakpoint, or 'sheet' to force the
+   * bottom sheet.
+   */
+  presentation?: 'center' | 'sheet'
   /** Additional className for the dialog panel */
   className?: string
 }
@@ -125,8 +134,12 @@ export function Modal({
   children,
   size = 'md',
   showCloseButton = true,
+  presentation,
   className,
 }: ModalProps) {
+  const isPhone = useIsPhone()
+  const asSheet = presentation ? presentation === 'sheet' : isPhone
+
   return (
     <Transition show={open} as={Fragment}>
       <Dialog onClose={onClose} className="relative z-50">
@@ -146,29 +159,47 @@ export function Modal({
           />
         </TransitionChild>
 
-        {/* Full-screen container for centering */}
-        <div className="fixed inset-0 flex items-center justify-center p-4 overflow-y-auto">
+        {/* Container: centers the dialog, or hosts the bottom sheet */}
+        <div
+          className={
+            asSheet
+              ? 'fixed inset-0'
+              : 'fixed inset-0 flex items-center justify-center p-4 overflow-y-auto'
+          }
+        >
           <TransitionChild
             as={Fragment}
-            enter="ease-enter duration-base"
-            enterFrom="opacity-0 scale-95"
-            enterTo="opacity-100 scale-100"
-            leave="ease-exit duration-fast"
-            leaveFrom="opacity-100 scale-100"
-            leaveTo="opacity-0 scale-95"
+            enter={asSheet ? 'ui-sheet-slide' : 'ease-enter duration-base'}
+            enterFrom={asSheet ? 'ui-sheet-slide-hidden' : 'opacity-0 scale-95'}
+            enterTo={asSheet ? 'ui-sheet-slide-shown' : 'opacity-100 scale-100'}
+            leave={asSheet ? 'ui-sheet-slide' : 'ease-exit duration-fast'}
+            leaveFrom={asSheet ? 'ui-sheet-slide-shown' : 'opacity-100 scale-100'}
+            leaveTo={asSheet ? 'ui-sheet-slide-hidden' : 'opacity-0 scale-95'}
           >
             <DialogPanel
+              data-presentation={asSheet ? 'sheet' : 'center'}
               className={cn(
-                'w-full',
-                sizeClasses[size],
-                'bg-surface-primary rounded-xl shadow-modal',
-                'border border-border-secondary',
-                'transform transition-all',
+                asSheet
+                  ? 'ui-sheet w-full bg-surface-primary'
+                  : [
+                      'w-full',
+                      sizeClasses[size],
+                      'bg-surface-primary rounded-xl shadow-modal',
+                      'border border-border-secondary',
+                      'transform transition-all',
+                    ],
                 className
               )}
             >
+              {asSheet && <div className="ui-sheet-handle" aria-hidden="true" />}
+
               {/* Header */}
-              <div className="flex items-start justify-between px-6 pt-6 pb-4 border-b border-border-secondary">
+              <div
+                className={cn(
+                  'flex items-start justify-between px-6 pb-4 border-b border-border-secondary',
+                  asSheet ? 'pt-2 flex-shrink-0' : 'pt-6'
+                )}
+              >
                 <div>
                   <DialogTitle className="text-lg font-semibold text-text-primary">
                     {title}
@@ -197,7 +228,14 @@ export function Modal({
               </div>
 
               {/* Content */}
-              <div className="px-6 py-4">{children}</div>
+              <div
+                className={cn(
+                  'px-6 py-4',
+                  asSheet && 'flex-1 min-h-0 overflow-y-auto overscroll-contain'
+                )}
+              >
+                {children}
+              </div>
             </DialogPanel>
           </TransitionChild>
         </div>
