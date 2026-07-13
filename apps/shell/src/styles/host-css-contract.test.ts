@@ -52,6 +52,14 @@ const REQUIRED_CLASSES = [
   // Arbitrary grid templates used only inside remote apps (the "collapsed grid" regression)
   '.grid-cols-[2fr_1fr]',
   '.grid-cols-[1.6fr_1fr]',
+  // Mobile chrome/content surface (P2/P3): the ui Sheet structure classes come
+  // from @edforge/theme components.css; the StatBand phone rail relies on
+  // Tailwind emitting the dynamic-spacing width + snap utilities from the
+  // packages scan.
+  '.ui-sheet',
+  '.ui-sheet-handle',
+  '.w-59',
+  '.snap-start',
 ]
 
 describe('host CSS contract (production Tailwind pipeline)', () => {

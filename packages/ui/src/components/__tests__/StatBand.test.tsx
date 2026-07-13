@@ -162,6 +162,27 @@ describe('StatBand', () => {
     expect(onClick).toHaveBeenCalled()
   })
 
+  it('carries the phone snap-rail classes (fixed-width segments, snap container)', () => {
+    render(
+      <StatBand
+        metrics={[
+          { label: 'Enrolled', value: '255', primary: true },
+          { label: 'Sections', value: '12' },
+        ]}
+      />,
+    )
+    const band = screen.getByRole('group', { name: 'Key metrics' })
+    // Phone: horizontal snap rail; >= sm restored to the hairline flex band.
+    expect(band.className).toContain('snap-x')
+    expect(band.className).toContain('sm:snap-none')
+    const seg = screen.getByRole('status', { name: 'Sections: 12' })
+    expect(seg.className).toContain('w-59')
+    expect(seg.className).toContain('snap-start')
+    expect(seg.className).toContain('sm:flex-1')
+    const primary = screen.getByRole('status', { name: 'Enrolled: 255' })
+    expect(primary.className).toContain('sm:flex-[1.28]')
+  })
+
   it('warns at runtime if a metric is given more than one micro-viz', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     const bad = { label: 'X', value: '1', delta: { dir: 'up', val: '+1' }, pill: { tone: 'good', text: 'ok' } }
