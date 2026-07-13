@@ -259,6 +259,9 @@ export function AttentionCornerShade({ className }: { className?: string }) {
   const ctx = useAttentionContext('AttentionCornerShade')
   const { open, setOpen, pillRef, labels, visible } = ctx
   const reduce = useReducedMotion()
+  // Unification seam: this predates useBreakpoint (640/1024). Re-basing would
+  // flip tablet 640-767 from bottom-sheet to in-flow shade — revisit with the
+  // Academics mobile pass, not as a drive-by.
   const isMobile = useMediaQuery('(max-width: 767px)')
   const sheetRef = useRef<HTMLDivElement | null>(null)
   useFocusTrap(sheetRef, open && isMobile)

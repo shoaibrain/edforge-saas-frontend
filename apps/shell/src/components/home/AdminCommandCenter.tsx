@@ -201,7 +201,7 @@ export function AdminCommandCenter({ schoolId }: AdminCommandCenterProps) {
     if (availableSchools.length === 0 && gettingStarted.show) {
       return (
         <motion.div
-          className="flex flex-col gap-4 px-7 py-5 min-h-full bg-[rgb(var(--background-primary))]"
+          className="flex flex-col gap-4 px-4 py-4 sm:px-7 sm:py-5 min-h-full bg-[rgb(var(--background-primary))]"
           variants={staggerContainer}
           initial={prefersReducedMotion ? undefined : 'hidden'}
           animate="visible"
@@ -228,7 +228,7 @@ export function AdminCommandCenter({ schoolId }: AdminCommandCenterProps) {
 
   return (
     <motion.div
-      className="flex flex-col gap-4 px-7 py-5 min-h-full bg-[rgb(var(--background-primary))]"
+      className="flex flex-col gap-4 px-4 py-4 sm:px-7 sm:py-5 min-h-full bg-[rgb(var(--background-primary))]"
       variants={staggerContainer}
       initial={prefersReducedMotion ? undefined : 'hidden'}
       animate="visible"
