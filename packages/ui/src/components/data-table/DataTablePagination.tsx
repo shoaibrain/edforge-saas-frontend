@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import type { Table } from '@tanstack/react-table'
 import { cn, focusRingInset } from '../../utils'
+import { useIsPhone } from '../../hooks/useBreakpoint'
 import { DEFAULT_DATA_TABLE_LABELS } from './labels'
 import type { DataTableLabels, ServerPaginationConfig } from './types'
 
@@ -25,6 +26,9 @@ export function DataTablePagination<TData>({
   labels,
 }: DataTablePaginationProps<TData>) {
   const resolvedLabels = labels ?? DEFAULT_DATA_TABLE_LABELS
+  // Phone: "Showing X–Y of N" + Prev/Next only — page numbers and the
+  // page-size select retire; buttons get enlarged (≥44px) hit areas.
+  const isPhone = useIsPhone()
   const pageIndex = table.getState().pagination.pageIndex
   const pageSize = table.getState().pagination.pageSize
   const pageCount = table.getPageCount()
@@ -72,39 +76,45 @@ export function DataTablePagination<TData>({
         {resolvedLabels.paginationShowing(start, end, totalDisplay)}
       </span>
       <div className="flex items-center gap-1">
-        {/* Page size selector */}
-        <select
-          value={pageSize}
-          onChange={(e) => {
-            table.setPageSize(Number(e.target.value))
-            table.setPageIndex(0)
-          }}
-          className={cn(
-            'mr-3 px-2 py-1 text-xs border border-[rgb(var(--border-primary)/0.6)] rounded-md bg-[rgb(var(--background-primary))] text-[rgb(var(--text-secondary))]',
-            focusRingInset
-          )}
-        >
-          {pageSizeOptions.map((size) => (
-            <option key={size} value={size}>
-              {resolvedLabels.rowsPerPage(size)}
-            </option>
-          ))}
-        </select>
+        {/* Page size selector — desktop/tablet only */}
+        {!isPhone && (
+          <select
+            value={pageSize}
+            onChange={(e) => {
+              table.setPageSize(Number(e.target.value))
+              table.setPageIndex(0)
+            }}
+            className={cn(
+              'mr-3 px-2 py-1 text-xs border border-[rgb(var(--border-primary)/0.6)] rounded-md bg-[rgb(var(--background-primary))] text-[rgb(var(--text-secondary))]',
+              focusRingInset
+            )}
+          >
+            {pageSizeOptions.map((size) => (
+              <option key={size} value={size}>
+                {resolvedLabels.rowsPerPage(size)}
+              </option>
+            ))}
+          </select>
+        )}
 
         {/* Previous */}
         <button
           type="button"
           onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
-          className="px-2.5 py-1 text-xs font-medium rounded-md border border-[rgb(var(--border-primary)/0.6)] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary)/0.5)] hover:text-[rgb(var(--text-primary))] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className={cn(
+            'px-2.5 py-1 text-xs font-medium rounded-md border border-[rgb(var(--border-primary)/0.6)] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary)/0.5)] hover:text-[rgb(var(--text-primary))] disabled:opacity-40 disabled:cursor-not-allowed transition-colors',
+            isPhone && 'relative after:absolute after:-inset-2'
+          )}
         >
           {resolvedLabels.previousPage}
         </button>
 
-        {/* Page numbers — only in pure client-side mode. When server
-            pagination is active the total page count is unknown, so
-            numbered buttons would be misleading. */}
+        {/* Page numbers — only in pure client-side mode on desktop/tablet.
+            When server pagination is active the total page count is unknown,
+            so numbered buttons would be misleading; on phone they don't fit. */}
         {!serverPagination &&
+          !isPhone &&
           getPageNumbers(pageIndex, pageCount).map((page, i) =>
             page === 'ellipsis' ? (
               <span
@@ -135,7 +145,10 @@ export function DataTablePagination<TData>({
           type="button"
           onClick={handleNext}
           disabled={!canNext || serverPagination?.isFetching}
-          className="px-2.5 py-1 text-xs font-medium rounded-md border border-[rgb(var(--border-primary)/0.6)] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary)/0.5)] hover:text-[rgb(var(--text-primary))] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className={cn(
+            'px-2.5 py-1 text-xs font-medium rounded-md border border-[rgb(var(--border-primary)/0.6)] text-[rgb(var(--text-secondary))] hover:bg-[rgb(var(--background-tertiary)/0.5)] hover:text-[rgb(var(--text-primary))] disabled:opacity-40 disabled:cursor-not-allowed transition-colors',
+            isPhone && 'relative after:absolute after:-inset-2'
+          )}
         >
           {serverPagination?.isFetching
             ? resolvedLabels.loadingPage

@@ -532,6 +532,7 @@ export default function PeopleSettingsPage() {
       accessorKey: 'status',
       header: 'Status',
       size: 120,
+      meta: { mobile: { area: 'trailing' } },
       cell: ({ row }) => {
         const u = row.original
         const badge = getStatusBadge(u.status)

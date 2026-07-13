@@ -494,6 +494,7 @@ function UsersTab({ onAssign }: { onAssign: () => void }) {
         accessorKey: 'status',
         header: 'Status',
         size: 130,
+        meta: { mobile: { area: 'trailing' } },
         cell: ({ row }) => {
           const { label, tone } = statusMeta(row.original.status)
           return (
