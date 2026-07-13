@@ -82,6 +82,18 @@ textarea::placeholder {
   outline-offset: -2px;
 }
 
+/* Touch devices: useRouteFocus programmatically focuses #main-content on
+   every route change, and Chrome's heuristic promotes that to :focus-visible
+   — painting the ring around the whole content card after an L2-pill tap.
+   Suppress it for coarse-pointer navigation ONLY on this element (focus still
+   moves for screen readers; interactive elements keep their rings for
+   external-keyboard phone users). */
+@media (hover: none) {
+  #main-content:focus-visible {
+    outline: none;
+  }
+}
+
 /* Landing V2 tokens are imported from @edforge/theme (packages/theme/src/index.css).
    They are scoped to html[data-surface="landing"] so they're inert unless LandingRoot mounts. */
 

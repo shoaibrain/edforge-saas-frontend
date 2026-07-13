@@ -192,7 +192,7 @@ function WorkspaceSelect({
       value={value}
       onChange={(nextValue) => nextValue && onChange(nextValue)}
       disabled={disabled}
-      buttonClassName="min-w-52"
+      buttonClassName="w-full md:w-auto md:min-w-52"
       options={options.map((option) => ({
         value: option.value,
         label: option.offset

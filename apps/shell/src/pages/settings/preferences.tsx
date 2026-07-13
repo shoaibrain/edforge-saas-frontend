@@ -82,7 +82,7 @@ interface ThemeSelectorProps {
 
 function ThemeSelector({ value, onChange }: ThemeSelectorProps) {
   return (
-    <div className="grid grid-cols-3 gap-3">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
       {THEME_OPTIONS.map((option) => {
         const Icon = option.icon
         const isSelected = value === option.value
@@ -170,7 +170,7 @@ function SchoolSelector({ value, onChange, schools }: SchoolSelectorProps) {
   return (
     <Select
       aria-label="Default school"
-      className="min-w-52"
+      className="w-full md:w-auto md:min-w-52"
       placeholder="Select default school"
       value={value || null}
       onChange={(v) => onChange(v ?? '')}

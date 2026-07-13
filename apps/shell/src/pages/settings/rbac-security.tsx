@@ -135,7 +135,7 @@ function RoleRail({
   onSelect: (r: SchoolRole) => void
 }) {
   return (
-    <div className="flex w-80 shrink-0 flex-col overflow-hidden rounded-2xl border border-[rgb(var(--border-primary)/0.5)] bg-[rgb(var(--background-secondary))]">
+    <div className="flex w-full max-h-72 lg:max-h-none lg:w-80 shrink-0 flex-col overflow-hidden rounded-2xl border border-[rgb(var(--border-primary)/0.5)] bg-[rgb(var(--background-secondary))]">
       <div className="shrink-0 border-b border-[rgb(var(--border-primary)/0.4)] px-3 py-3">
         <span className="text-xs font-semibold uppercase tracking-wider text-[rgb(var(--text-tertiary))]">
           System Roles
@@ -307,9 +307,9 @@ function MatrixPanel({ role }: { role: SchoolRole }) {
                   {isOpen &&
                     category.resources.map((resource) => (
                       <tr key={resource} className="border-b border-[rgb(var(--border-primary)/0.2)] hover:bg-[rgb(var(--background-primary)/0.4)]">
-                        <td className="sticky left-0 z-10 bg-[rgb(var(--background-secondary))] px-4 py-2.5">
+                        <td className="sticky left-0 z-10 max-w-56 bg-[rgb(var(--background-secondary))] px-4 py-2.5">
                           <div className="flex items-center justify-between gap-2">
-                            <span className="font-medium text-[rgb(var(--text-primary))]">{resourceLabel(resource)}</span>
+                            <span className="font-medium text-[rgb(var(--text-primary))] truncate">{resourceLabel(resource)}</span>
                             <span className="text-xs tabular-nums text-[rgb(var(--text-tertiary))]">
                               {grantsForResource(role, resource)}/{MATRIX_ACTIONS.length}
                             </span>
@@ -335,7 +335,7 @@ function MatrixPanel({ role }: { role: SchoolRole }) {
 function RolesTab() {
   const [selected, setSelected] = useState<SchoolRole>('Principal')
   return (
-    <div className="flex h-full min-h-0 gap-4">
+    <div className="flex flex-col lg:flex-row h-full min-h-0 gap-4">
       <RoleRail selected={selected} onSelect={setSelected} />
       <MatrixPanel role={selected} />
     </div>
@@ -536,9 +536,9 @@ function UsersTab({ onAssign }: { onAssign: () => void }) {
   const roleDistMax = Math.max(counts.byRole.TenantAdmin, counts.byRole.StandardUser, 1)
 
   return (
-    <div className="flex h-full min-h-0 gap-4">
+    <div className="flex flex-col lg:flex-row h-full min-h-0 gap-4">
       {/* Left aside — summary + by-role filter */}
-      <aside className="flex w-64 shrink-0 flex-col gap-4 overflow-y-auto scrollbar-thin">
+      <aside className="flex w-full lg:w-64 shrink-0 flex-col gap-4 overflow-y-auto scrollbar-thin">
         <div className="rounded-2xl border border-[rgb(var(--border-primary)/0.5)] bg-[rgb(var(--background-secondary))] p-4">
           <div className="flex items-baseline gap-6">
             <div>
