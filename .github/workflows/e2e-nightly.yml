@@ -1,6 +1,6 @@
-name: E2E Nightly
+name: E2E Full Suite (Manual)
 
-# Full agent-generated regression suite, nightly + on demand.
+# Full agent-generated regression suite, run on demand.
 # See docs/testing/agent-e2e-guide.md ("Mocked vs live mode").
 #
 # Job 1 (full-mocked): every non-@seed spec against the production build with
@@ -13,8 +13,6 @@ name: E2E Nightly
 #   lands.
 
 on:
-  schedule:
-    - cron: '30 20 * * *' # 02:15 NPT
   workflow_dispatch:
 
 concurrency:

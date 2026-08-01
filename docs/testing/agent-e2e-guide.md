@@ -180,13 +180,14 @@ pnpm dev:mvp          # shell + MFEs
 
 | | Mocked (default) | Live non-prod tenant |
 |---|---|---|
-| Used by | PR smoke, full suite, agent exploration | nightly `live-tenant` job (opt-in) |
+| Used by | PR smoke, full suite, agent exploration | manual `deployed-frontend` job (opt-in) |
 | Auth | seeded cookies | real Cognito test users |
 | Finds | frontend regressions | integration bugs |
 | Requires | nothing | operator-provisioned E2E tenant |
 
-Live mode is scaffolded in `.github/workflows/e2e-nightly.yml` and activates
-when the operator sets the repo variable `EDFORGE_E2E_LIVE=true` plus secrets
+Live mode is scaffolded as a manually dispatched job in
+`.github/workflows/e2e-nightly.yml` and activates when the operator sets the
+repo variable `EDFORGE_E2E_LIVE=true` plus secrets
 `EDFORGE_E2E_BASE_URL`, `EDFORGE_E2E_USER_<ROLE>`, `EDFORGE_E2E_PASS_<ROLE>`
 (one Cognito user per school role in a dedicated non-prod tenant — provision
 via the backend's tenant pipeline; see `edforge/CLAUDE.md` provisioning

@@ -22,7 +22,7 @@ Per-module checklist (repeat for each):
 Plans: `specs/shell/` (landing, auth-session, home-dashboard, settings,
 rbac-sidebar). Tests: `e2e/tests/shell/` incl. the computed 10-role RBAC
 sidebar matrix. Foundation: role fixtures, network mock layer, MCP config,
-agent definitions, CI smoke + nightly.
+agent definitions, CI smoke + manual full suite.
 
 ## 2. Academics — IN PROGRESS (first module remote)
 
@@ -40,7 +40,7 @@ these specs need served remotes:
   proof the remote renders under the seeded-cookie + mock approach.
 - **CI:** `scripts/build-deploy.sh` (consolidated `output/` = shell + `/remotes/*`)
   served by `scripts/e2e/serve-output.mjs` (SPA fallback + static remotes). The
-  e2e-smoke + nightly jobs were switched to this so remote routes load.
+  e2e-smoke + manual full-suite jobs were switched to this so remote routes load.
 - The academics remote reads the active school from the `edforge-app` cookie
   (seeded by `seedRoleSession`) — no extra wiring needed.
 
@@ -135,7 +135,7 @@ fixtures enriched (Parent `childrenIds` linkage, per-child data mocks).
 ## After the sweep
 
 - Flip `e2e-smoke` to a required PR check (after a week of green).
-- Activate the nightly `live-tenant` job (operator provisions the E2E tenant;
+- Activate the manual `deployed-frontend` job (operator provisions the E2E tenant;
   see agent-e2e-guide.md "Mocked vs live mode").
-- Consider a healer-agent triage step on nightly failures (issue to file when
+- Consider a healer-agent triage step on full-suite failures (issue to file when
   the suite is big enough to flake).
