@@ -133,7 +133,7 @@ describe('Invoice list — per-row Download button (M1.6)', () => {
     expect(apiGetMock).toHaveBeenCalledTimes(1)
     expect(apiGetMock).toHaveBeenCalledWith(
       '/finance/schools/s/invoices/inv-2/pdf',
-      { responseType: 'blob' },
+      { responseType: 'blob', headers: { Accept: 'application/pdf' } },
     )
   })
 
@@ -195,17 +195,17 @@ describe('Invoice list — per-row Download button (M1.6)', () => {
     expect(apiGetMock).toHaveBeenNthCalledWith(
       1,
       '/finance/schools/s/invoices/inv-2/pdf',
-      { responseType: 'blob' },
+      { responseType: 'blob', headers: { Accept: 'application/pdf' } },
     )
     expect(apiGetMock).toHaveBeenNthCalledWith(
       2,
       '/finance/schools/s/invoices/inv-1/pdf',
-      { responseType: 'blob' },
+      { responseType: 'blob', headers: { Accept: 'application/pdf' } },
     )
     expect(apiGetMock).toHaveBeenNthCalledWith(
       3,
       '/finance/schools/s/invoices/inv-3/pdf',
-      { responseType: 'blob' },
+      { responseType: 'blob', headers: { Accept: 'application/pdf' } },
     )
   })
 })
