@@ -304,7 +304,7 @@ export async function downloadInvoicePdf(
   try {
     const response = await api.get(
       `/finance/schools/${schoolId}/invoices/${invoiceId}/pdf`,
-      { responseType: 'blob' },
+      { responseType: 'blob', headers: { Accept: 'application/pdf' } },
     )
     if (!response.data || !(response.data instanceof Blob)) {
       throw new Error('Server returned an invalid response for invoice PDF')

@@ -53,7 +53,7 @@ describe('downloadInvoicePdf', () => {
     expect(result).toBe(pdfBlob)
     expect(apiGetMock).toHaveBeenCalledWith(
       '/finance/schools/school-1/invoices/inv-1/pdf',
-      { responseType: 'blob' },
+      { responseType: 'blob', headers: { Accept: 'application/pdf' } },
     )
   })
 

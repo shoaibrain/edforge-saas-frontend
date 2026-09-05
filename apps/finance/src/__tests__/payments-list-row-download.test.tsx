@@ -133,7 +133,7 @@ describe('Payments list — per-row Download button (M1.5-FU.4)', () => {
     expect(apiGetMock).toHaveBeenCalledTimes(1)
     expect(apiGetMock).toHaveBeenCalledWith(
       '/finance/payments/pmt-2/receipt/pdf',
-      { params: { schoolId: 's' }, responseType: 'blob' },
+      { params: { schoolId: 's' }, responseType: 'blob', headers: { Accept: 'application/pdf' } },
     )
   })
 
@@ -195,17 +195,17 @@ describe('Payments list — per-row Download button (M1.5-FU.4)', () => {
     expect(apiGetMock).toHaveBeenNthCalledWith(
       1,
       '/finance/payments/pmt-2/receipt/pdf',
-      { params: { schoolId: 's' }, responseType: 'blob' },
+      { params: { schoolId: 's' }, responseType: 'blob', headers: { Accept: 'application/pdf' } },
     )
     expect(apiGetMock).toHaveBeenNthCalledWith(
       2,
       '/finance/payments/pmt-1/receipt/pdf',
-      { params: { schoolId: 's' }, responseType: 'blob' },
+      { params: { schoolId: 's' }, responseType: 'blob', headers: { Accept: 'application/pdf' } },
     )
     expect(apiGetMock).toHaveBeenNthCalledWith(
       3,
       '/finance/payments/pmt-3/receipt/pdf',
-      { params: { schoolId: 's' }, responseType: 'blob' },
+      { params: { schoolId: 's' }, responseType: 'blob', headers: { Accept: 'application/pdf' } },
     )
   })
 })

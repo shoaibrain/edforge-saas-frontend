@@ -133,7 +133,7 @@ describe('Invoice detail Download PDF button (M1.5)', () => {
 
     expect(apiGetMock).toHaveBeenCalledWith(
       '/finance/schools/school-uuid/invoices/inv-abc/pdf',
-      { responseType: 'blob' },
+      { responseType: 'blob', headers: { Accept: 'application/pdf' } },
     )
   })
 

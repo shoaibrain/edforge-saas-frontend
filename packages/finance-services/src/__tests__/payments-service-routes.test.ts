@@ -65,7 +65,7 @@ describe('payments.service route shapes', () => {
     await downloadReceiptPdf(PAYMENT, SCHOOL)
     expect(mockApi.get).toHaveBeenCalledWith(
       `/finance/payments/${PAYMENT}/receipt/pdf`,
-      { params: { schoolId: SCHOOL }, responseType: 'blob' },
+      { params: { schoolId: SCHOOL }, responseType: 'blob', headers: { Accept: 'application/pdf' } },
     )
   })
 
