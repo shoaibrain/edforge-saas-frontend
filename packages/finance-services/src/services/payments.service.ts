@@ -187,6 +187,7 @@ export async function downloadReceiptPdf(
     const response = await api.get(`/finance/payments/${paymentId}/receipt/pdf`, {
       params: { schoolId },
       responseType: 'blob',
+      headers: { Accept: 'application/pdf' },
     })
     if (!response.data || !(response.data instanceof Blob)) {
       throw new Error('Server returned an invalid response for receipt PDF')
