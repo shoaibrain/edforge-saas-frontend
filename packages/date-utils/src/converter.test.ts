@@ -184,3 +184,43 @@ describe('getDaysInBSMonth', () => {
     expect(getDaysInBSMonth(9999, 1)).toBe(30)
   })
 })
+
+/**
+ * Issue #349 — a full timestamp was passed through unchanged and then had
+ * `T12:00:00` appended, producing `2026-09-06T13:05:05.566ZT12:00:00`.
+ * `gregorianToBs` threw and the catch clamped to BS 2000/01/01, so an
+ * invoice created today rendered a Bikram Sambat date 83 years out beside a
+ * correct AD date. Seen in production on the invoice Activity panel and the
+ * agreement status-history timeline.
+ */
+describe('adToBS — timestamps resolve to their calendar day (#349)', () => {
+  it('converts an ISO timestamp to the same day as the date-only form', () => {
+    const fromDay = adToBS('2026-09-06')
+    const fromTimestamp = adToBS('2026-09-06T13:05:05.566Z')
+    expect(fromTimestamp).toEqual(fromDay)
+  })
+
+  it('no longer clamps a valid timestamp to the BS floor', () => {
+    const bs = adToBS('2026-09-06T13:05:05.566Z')
+    expect(bs).not.toEqual({ year: 2000, month: 1, day: 1 })
+    expect(bs.year).toBeGreaterThan(2080)
+  })
+
+  it('handles a timestamp with no milliseconds and no zone', () => {
+    expect(adToBS('2026-09-06T13:05:05')).toEqual(adToBS('2026-09-06'))
+  })
+
+  it('leaves date-only strings exactly as they were', () => {
+    expect(adToBS('2026-03-18')).toEqual(adToBS('2026-03-18'))
+    expect(adToBS('2026-03-18').year).toBeGreaterThan(2080)
+  })
+
+  it('still accepts a Date and agrees with its string form', () => {
+    const d = new Date(2026, 8, 6, 13, 5)
+    expect(adToBS(d)).toEqual(adToBS('2026-09-06'))
+  })
+
+  it('keeps the legacy clamp for genuinely unparseable input', () => {
+    expect(adToBS('not-a-date')).toEqual({ year: 2000, month: 1, day: 1 })
+  })
+})

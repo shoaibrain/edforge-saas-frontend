@@ -72,9 +72,28 @@ function safeGetBsMonthDays(year: number, month: number): number {
  * @param adDate - JavaScript Date object or ISO date string (YYYY-MM-DD)
  * @returns BSDate object { year, month, day }
  */
+/**
+ * The calendar day to convert, as `YYYY-MM-DD`.
+ *
+ * A caller may hand this a date-only string, a `Date`, or a full timestamp.
+ * The timestamp case used to be broken: the value was passed through
+ * unchanged and then had `T12:00:00` appended, producing nonsense like
+ * `2026-09-06T13:05:05.566ZT12:00:00`. `gregorianToBs` threw on it and the
+ * catch below clamped to BS 2000/01/01 — so an invoice created today showed
+ * a Bikram Sambat date 83 years out, beside a correct AD date. Timestamps
+ * now resolve to their LOCAL calendar day, which is the day the AD date
+ * rendered next to them shows.
+ */
+function toIsoDay(adDate: Date | string): string {
+  if (typeof adDate !== 'string') return dateToIsoLocal(adDate)
+  if (/^\d{4}-\d{2}-\d{2}$/.test(adDate)) return adDate
+  const parsed = new Date(adDate)
+  // Unparseable input keeps falling through to the clamp, as before.
+  return Number.isNaN(parsed.getTime()) ? adDate : dateToIsoLocal(parsed)
+}
+
 export function adToBS(adDate: Date | string): BSDate {
-  const isoString =
-    typeof adDate === 'string' ? adDate : dateToIsoLocal(adDate)
+  const isoString = toIsoDay(adDate)
 
   // `+ 'T12:00:00'` keeps the parsed Date safely mid-day in every real
   // timezone, so shared-types' local-component read returns the intended

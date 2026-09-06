@@ -108,10 +108,21 @@ export function formatRelativeDate(
   dateString: string,
   options: RelativeDateFormatOptions = {},
 ): string {
-  // Normalize: treat naive ISO strings (no timezone) as UTC
-  const normalized = /[Z+-]\d{0,2}:?\d{0,2}$/.test(dateString)
-    ? dateString
-    : dateString + "Z";
+  // A date-only value names a calendar day. It has no clock time, so it is
+  // parsed as LOCAL midnight and rendered without one (#349).
+  //
+  // Both halves used to be wrong. The zone test below is anchored on `T` now
+  // because `/[Z+-]\d{0,2}:?\d{0,2}$/` matched the date's own "-06", so
+  // "2026-09-06" was treated as already zoned, parsed as UTC midnight, and
+  // then read back through local getters: west of UTC that is the previous
+  // evening. A payment recorded today displayed as "Yesterday · 7:00 PM".
+  const isDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(dateString);
+  const hasZone = /T.*(?:Z|[+-]\d{2}:?\d{2})$/.test(dateString);
+  const normalized = isDateOnly
+    ? `${dateString}T00:00:00`
+    : hasZone
+      ? dateString
+      : dateString + "Z";
   const date = new Date(normalized);
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -131,14 +142,17 @@ export function formatRelativeDate(
     hour12: true,
   });
 
-  if (diffDays === 0) return `${options.today ?? "Today"} · ${time}`;
-  if (diffDays === 1) return `${options.yesterday ?? "Yesterday"} · ${time}`;
+  // A date-only value carries no time, so none is shown.
+  const withTime = (label: string) => (isDateOnly ? label : `${label} · ${time}`);
+
+  if (diffDays === 0) return withTime(options.today ?? "Today");
+  if (diffDays === 1) return withTime(options.yesterday ?? "Yesterday");
   if (diffDays < 7)
-    return `${options.daysAgo?.(diffDays) ?? `${diffDays} days ago`} · ${time}`;
+    return withTime(options.daysAgo?.(diffDays) ?? `${diffDays} days ago`);
 
   const monthDay = date.toLocaleDateString(locale, {
     month: "short",
     day: "numeric",
   });
-  return `${monthDay} · ${time}`;
+  return withTime(monthDay);
 }
