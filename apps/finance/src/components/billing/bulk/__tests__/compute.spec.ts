@@ -11,7 +11,6 @@ import {
   coverageOf,
   computeStudentInvoice,
   computeBatch,
-  resolveDiscounts,
   resolveCustomLineItems,
   buildNumberPreview,
 } from '../compute'
@@ -73,29 +72,21 @@ describe('coverageOf', () => {
 })
 
 describe('computeStudentInvoice', () => {
-  it('sums applicable fees - discounts; skips inapplicable fees', () => {
+  it('sums applicable fees at FULL price; skips inapplicable fees', () => {
     const tui = F({ id: 'tui', name: 'Tuition', amount: 1000 })
     const lab = F({ id: 'lab', name: 'Lab', amount: 200, gradeLevels: ['6'] })
-    const selected = { tui: { discountPct: 0 }, lab: { discountPct: 0 } }
+    const selected = { tui: true as const, lab: true as const }
     const inv = computeStudentInvoice(S('s1', '4'), [tui, lab], selected, [])
     expect(inv.lines).toHaveLength(1) // lab skipped
     expect(inv.lines[0].name).toBe('Tuition')
-    expect(inv.total).toBe(1000)
-  })
-
-  it('applies per-fee discount %; total = base - discount', () => {
-    const tui = F({ id: 'tui', name: 'Tuition', amount: 1000 })
-    const selected = { tui: { discountPct: 25 } } // 25% off
-    const inv = computeStudentInvoice(S('s1', '4'), [tui], selected, [])
     expect(inv.lines[0].base).toBe(1000)
-    expect(inv.lines[0].discount).toBe(250)
-    expect(inv.lines[0].total).toBe(750)
-    expect(inv.total).toBe(750)
+    expect(inv.lines[0].total).toBe(1000)
+    expect(inv.total).toBe(1000)
   })
 
   it('appends custom lines (isCustom:true) on top of fee-structure lines', () => {
     const tui = F({ id: 'tui', amount: 500 })
-    const selected = { tui: { discountPct: 0 } }
+    const selected = { tui: true as const }
     const customs = [
       { id: 'cl1', name: 'Annual picnic', amount: '300' },
       { id: 'cl2', name: 'Stationery', amount: '100' },
@@ -131,7 +122,7 @@ describe('computeStudentInvoice', () => {
 describe('computeBatch', () => {
   const tui = F({ id: 'tui', amount: 1000 })
   const lab = F({ id: 'lab', amount: 200, gradeLevels: ['5'] })
-  const selected = { tui: { discountPct: 0 }, lab: { discountPct: 0 } }
+  const selected = { tui: true as const, lab: true as const }
 
   it('rolls up per-student totals; gross + billable agree when no zeros', () => {
     const batch = computeBatch([S('a', '4'), S('b', '5')], [tui, lab], selected, [])
@@ -143,24 +134,24 @@ describe('computeBatch', () => {
     expect(batch.zeroCount).toBe(0)
   })
 
+  // A zero-amount fee structure is the remaining zero-total path now that
+  // bulk generation carries no discounts.
+  const freeTui = F({ id: 'freeTui', amount: 0 })
+  const zeroSelected = { freeTui: true as const, lab: true as const }
+
   it('skipZeroTotal:true excludes zero-total students from billableTotal/avg', () => {
-    // Both fees selected; tui zeroed by 100% discount. Lab only applies to
-    // grade 5, so student a (grade 4) has total 0; student b (grade 5)
-    // has lab=200 only.
-    const heavyAll = { tui: { discountPct: 100 }, lab: { discountPct: 0 } }
-    const batch = computeBatch([S('a', '4'), S('b', '5')], [tui, lab], heavyAll, [], {
+    const batch = computeBatch([S('a', '4'), S('b', '5')], [freeTui, lab], zeroSelected, [], {
       skipZeroTotal: true,
     })
-    // a: tui (1000-100%) = 0, lab inapplicable → ZERO
-    // b: tui (1000-100%) + lab (200, no discount) = 200 → BILLABLE
+    // a: freeTui (0), lab inapplicable → ZERO
+    // b: freeTui (0) + lab (200) = 200 → BILLABLE
     expect(batch.zeroCount).toBe(1)
     expect(batch.billableTotal).toBe(200)
     expect(batch.avgPerStudent).toBe(200) // 200/1 billable
   })
 
   it('skipZeroTotal:false (default) keeps zeros in billableTotal', () => {
-    const heavyAll = { tui: { discountPct: 100 }, lab: { discountPct: 0 } }
-    const batch = computeBatch([S('a', '4'), S('b', '5')], [tui, lab], heavyAll, [])
+    const batch = computeBatch([S('a', '4'), S('b', '5')], [freeTui, lab], zeroSelected, [])
     expect(batch.zeroCount).toBe(1)
     expect(batch.billableTotal).toBe(200) // a=0 + b=200
     // avg over 2 billable students = 100
@@ -168,46 +159,26 @@ describe('computeBatch', () => {
   })
 })
 
-describe('resolveDiscounts (BE submit shape)', () => {
-  it('emits one entry per selected fee with non-zero discountPct, resolved to flat NPR', () => {
-    const tui = F({ id: 'tui', amount: 1000 })
-    const lab = F({ id: 'lab', amount: 200 })
-    const selected = {
-      tui: { discountPct: 25 },
-      lab: { discountPct: 0 }, // zero → skipped
-    }
-    const res = resolveDiscounts([tui, lab], selected)
-    expect(res).toHaveLength(1)
-    expect(res[0]).toMatchObject({ feeStructureId: 'tui', amount: 250 })
-    expect(res[0].reason).toMatch(/25% bulk-batch discount/)
-  })
-
-  it('rounds discount to 2dp', () => {
-    const fee = F({ id: 'f', amount: 333 })
-    const res = resolveDiscounts([fee], { f: { discountPct: 10 } })
-    expect(res[0].amount).toBe(33.3) // 333 * 0.10 = 33.3
-  })
-
-  it('returns empty when no fees have a non-zero discount', () => {
-    const fee = F({ id: 'f', amount: 100 })
-    expect(resolveDiscounts([fee], { f: { discountPct: 0 } })).toEqual([])
-  })
-})
-
 describe('resolveCustomLineItems (BE submit shape)', () => {
   it('drops empty + NaN + negative; coerces amount to number', () => {
-    const out = resolveCustomLineItems([
-      { id: '1', name: '', amount: '' },
-      { id: '2', name: 'NaN test', amount: 'xyz' },
-      { id: '3', name: 'neg', amount: '-50' },
-      { id: '4', name: 'Annual picnic', amount: '500' },
-    ])
+    const out = resolveCustomLineItems(
+      [
+        { id: '1', name: '', amount: '' },
+        { id: '2', name: 'NaN test', amount: 'xyz' },
+        { id: '3', name: 'neg', amount: '-50' },
+        { id: '4', name: 'Annual picnic', amount: '500' },
+      ],
+      'Custom line item',
+    )
     expect(out).toEqual([{ name: 'Annual picnic', amount: 500 }])
   })
 
-  it('falls back to a default name when operator typed an amount but no name', () => {
-    const out = resolveCustomLineItems([{ id: '1', name: '', amount: '100' }])
-    expect(out).toEqual([{ name: 'Custom line item', amount: 100 }])
+  it('falls back to the provided (t()-resolved) name when operator typed an amount but no name', () => {
+    const out = resolveCustomLineItems(
+      [{ id: '1', name: '', amount: '100' }],
+      'अनुकूल लाइन आइटम',
+    )
+    expect(out).toEqual([{ name: 'अनुकूल लाइन आइटम', amount: 100 }])
   })
 
   it('hard-caps at 10 entries (BE mirror)', () => {
@@ -216,7 +187,7 @@ describe('resolveCustomLineItems (BE submit shape)', () => {
       name: `Item ${i}`,
       amount: '10',
     }))
-    expect(resolveCustomLineItems(many)).toHaveLength(10)
+    expect(resolveCustomLineItems(many, 'Custom line item')).toHaveLength(10)
   })
 })
 

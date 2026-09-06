@@ -32,6 +32,7 @@ import {
   InvoiceDetailAside,
   InvoiceDetailHeader,
   InvoiceLineItemsCard,
+  InvoiceProvenanceCard,
   InvoicePaymentsCard,
   InvoiceStateBanner,
   InvoiceSummaryBand,
@@ -160,6 +161,7 @@ export default function InvoiceDetailPage() {
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="min-w-0 space-y-4">
           <InvoiceLineItemsCard invoice={invoice} format={format} />
+          <InvoiceProvenanceCard schoolId={schoolId ?? ''} invoice={invoice} format={format} />
           <InvoicePaymentsCard
             invoice={invoice}
             payments={paymentsList}

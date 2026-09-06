@@ -65,7 +65,16 @@ import { formatDateDual } from '../../../utils/format-date'
 import { StudentSearchInput } from '../../../components/billing/StudentSearchInput'
 import { BulkSendInvoiceReminderDrawer } from '../../../components/billing/BulkSendInvoiceReminderDrawer'
 import { BulkPdfExportDrawer } from '../../../components/billing/BulkPdfExportDrawer'
+import { AgreementActiveDialog } from '../../../components/billing/AgreementActiveDialog'
 import { FinanceStatusChip } from '../../../components/shared'
+import {
+  extractValidationErrors,
+  extractApiMessage,
+} from '../../../lib/api-validation-errors'
+import {
+  parseAgreementActive,
+  type AgreementActiveError,
+} from '../../../lib/agreement-errors'
 
 type InvoiceStatusFilter = '' | 'draft' | 'issued' | 'partially_paid' | 'paid' | 'overdue' | 'cancelled'
 
@@ -142,6 +151,8 @@ export default function InvoicesPage() {
   const [statusFilter, setStatusFilter] = useState<InvoiceStatusFilter>('')
   // Sprint B.4 — grade filter routes the backend through GSI14.
   const [gradeFilter, setGradeFilter] = useState('')
+  // FB-5.5 — billing-source filter (standard / agreement / mixed).
+  const [billingSourceFilter, setBillingSourceFilter] = useState('')
   const [showGenerateForm, setShowGenerateForm] = useState(false)
 
   // Row selection state (controlled by DataTable)
@@ -167,13 +178,17 @@ export default function InvoicesPage() {
     () => ({
       ...(statusFilter && { status: statusFilter as Invoice['status'] }),
       ...(gradeFilter && { gradeLevel: gradeFilter }),
+      ...(billingSourceFilter && {
+        billingSource: billingSourceFilter as 'standard' | 'agreement',
+      }),
     }),
-    [statusFilter, gradeFilter],
+    [statusFilter, gradeFilter, billingSourceFilter],
   )
 
   const {
     items: invoices,
     isLoading,
+    error: listError,
     hasMore,
     loadMore,
     isFetchingNextPage,
@@ -500,6 +515,15 @@ export default function InvoicesPage() {
     { label: t('status.cancelled'), value: 'cancelled' },
   ]
 
+  // FB-5.5 — billing-source facet options. An invoice HEADER is either
+  // agreement or standard — never 'mixed' (that classification only exists
+  // per-student in the bulk preview). The list endpoint 400s on 'mixed'.
+  const BILLING_SOURCE_FILTER_OPTIONS = [
+    { label: t('invoices.billingSourceFilter.all'), value: '' },
+    { label: t('invoices.billingSourceFilter.standard'), value: 'standard' },
+    { label: t('invoices.billingSourceFilter.agreement'), value: 'agreement' },
+  ]
+
 
   // ── StatBand metrics (calm; attention only via state) ────────────────────
   const metrics: StatMetric[] = [
@@ -626,6 +650,17 @@ export default function InvoicesPage() {
       {/* ---- StatBand — KPI summary (Overdue → critical pill) ---- */}
       <StatBand metrics={metrics} ariaLabel={t('invoices.kpi.region')} />
 
+      {/* List-query error — surfaced inline so an invalid filter / 5xx isn't
+          swallowed as a spurious empty state. */}
+      {listError && (
+        <div className="flex items-start gap-3 rounded-lg border border-[rgb(var(--state-danger-border))] bg-[rgb(var(--state-danger-bg)/0.14)] px-4 py-3">
+          <AlertTriangle className="w-5 h-5 flex-shrink-0 text-[rgb(var(--state-danger-fg))]" />
+          <p className="text-sm text-[rgb(var(--state-danger-fg))]">
+            {t('invoices.listError')}
+          </p>
+        </div>
+      )}
+
       {/* DataTable */}
       {Object.keys(rowSelection).some((id) => rowSelection[id]) && hasMore && (
         <p className="text-xs text-[rgb(var(--text-tertiary))]">
@@ -661,14 +696,24 @@ export default function InvoicesPage() {
         activePreset={statusFilter}
         onPresetChange={(v) => setStatusFilter(v as InvoiceStatusFilter)}
         primaryFilter={
-          <Select
-            size="sm"
-            className="w-40"
-            value={gradeFilter}
-            onChange={(v) => setGradeFilter(v ?? '')}
-            options={gradeOptions}
-            buttonClassName="border-[rgb(var(--border-primary)/0.35)]"
-          />
+          <div className="flex items-center gap-2">
+            <Select
+              size="sm"
+              className="w-40"
+              value={gradeFilter}
+              onChange={(v) => setGradeFilter(v ?? '')}
+              options={gradeOptions}
+              buttonClassName="border-[rgb(var(--border-primary)/0.35)]"
+            />
+            <Select
+              size="sm"
+              className="w-40"
+              value={billingSourceFilter}
+              onChange={(v) => setBillingSourceFilter(v ?? '')}
+              options={BILLING_SOURCE_FILTER_OPTIONS}
+              buttonClassName="border-[rgb(var(--border-primary)/0.35)]"
+            />
+          </div>
         }
         selectionBar={selectionBar}
         exportOptions={{ filename: 'invoices', formats: ['csv'] }}
@@ -953,6 +998,8 @@ function GenerateInvoiceModal({
   }, [academicYears, academicYear])
   const [billingPeriod, setBillingPeriod] = useState('')
   const [notes, setNotes] = useState('')
+  // FB-3.10 — set when generate() returns 409 AGREEMENT_ACTIVE.
+  const [agreementConflict, setAgreementConflict] = useState<AgreementActiveError | null>(null)
 
   const selectedFeeStructures = feeStructures.filter((f: any) => selectedFees.includes(f.id))
   const subtotal = selectedFeeStructures.reduce((sum: number, f: any) => sum + (f.amount || 0), 0)
@@ -962,24 +1009,53 @@ function GenerateInvoiceModal({
   )
   const grandTotal = subtotal + taxTotal
 
+  const buildDto = () => ({
+    studentId: selectedStudent!.studentId,
+    feeStructureIds: selectedFees,
+    dueDate,
+    academicYear,
+    billingPeriod: billingPeriod || undefined,
+    notes: notes || undefined,
+  })
+
   const handleSubmit = async () => {
     if (!selectedStudent || selectedFees.length === 0 || !dueDate || !academicYear) {
       toast.error(t('invoices.requiredFields'))
       return
     }
     try {
-      await generateMutation.mutateAsync({
-        studentId: selectedStudent.studentId,
-        feeStructureIds: selectedFees,
-        dueDate,
-        academicYear,
-        billingPeriod: billingPeriod || undefined,
-        notes: notes || undefined,
-      })
+      await generateMutation.mutateAsync({ data: buildDto() })
       toast.success(t('invoices.generated'))
       onClose()
+    } catch (err) {
+      // FB-3.10 — an active agreement covers this student; surface the override
+      // dialog instead of a generic error toast.
+      const conflict = parseAgreementActive(err)
+      if (conflict) {
+        setAgreementConflict(conflict)
+        return
+      }
+      // Surface the backend's own message (first Zod validation error, then
+      // the top-level message); the generic string is the last resort only.
+      toast.error(
+        extractValidationErrors(err)[0]?.message ??
+          extractApiMessage(err) ??
+          t('invoices.generateFailed'),
+      )
+    }
+  }
+
+  // FB-3.10 — retry as standard (catalog) billing, bypassing the agreement.
+  // Requires billing:manage — the dialog only exposes this action to managers.
+  const handleOverride = async () => {
+    if (!selectedStudent) return
+    try {
+      await generateMutation.mutateAsync({ data: buildDto(), overrideAgreement: true })
+      toast.success(t('agreement.overrideSuccess'))
+      setAgreementConflict(null)
+      onClose()
     } catch {
-      toast.error(t('invoices.generateFailed'))
+      toast.error(t('agreement.overrideFailed'))
     }
   }
 
@@ -1083,6 +1159,7 @@ function GenerateInvoiceModal({
               type="text"
               value={billingPeriod}
               onChange={(e) => setBillingPeriod(e.target.value)}
+              maxLength={50}
               placeholder={t('invoices.billingPeriodPlaceholder')}
               className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))]"
             />
@@ -1097,6 +1174,7 @@ function GenerateInvoiceModal({
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={2}
+              maxLength={500}
               className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] resize-none"
             />
           </div>
@@ -1122,9 +1200,15 @@ function GenerateInvoiceModal({
           )}
         </div>
 
-        {/* Actions */}
+        {/* Actions — Cancel is gated while the mutation is pending (matching
+            the Escape-key gate above) so the modal can't be dismissed
+            mid-generate. */}
         <div className="flex justify-end gap-2 mt-6">
-          <Button variant="outline" onClick={onClose}>
+          <Button
+            variant="outline"
+            onClick={onClose}
+            disabled={generateMutation.isPending}
+          >
             {t('actions.cancel')}
           </Button>
           <Button onClick={handleSubmit} disabled={generateMutation.isPending}>
@@ -1135,6 +1219,21 @@ function GenerateInvoiceModal({
           </Button>
         </div>
       </motion.div>
+
+      {/* FB-3.10 — active-agreement conflict (409 AGREEMENT_ACTIVE) */}
+      <AnimatePresence>
+        {agreementConflict && (
+          <AgreementActiveDialog
+            schoolId={schoolId}
+            agreementId={agreementConflict.agreementId}
+            existingInvoiceId={agreementConflict.existingInvoiceId}
+            coveredFeeTypes={agreementConflict.coveredFeeTypes ?? []}
+            onOverride={handleOverride}
+            isOverriding={generateMutation.isPending}
+            onClose={() => setAgreementConflict(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   )
 }

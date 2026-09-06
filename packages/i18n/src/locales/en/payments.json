@@ -109,6 +109,20 @@
       "today": "Today",
       "yesterday": "Yesterday",
       "daysAgo": "{{count}} days ago"
+    },
+    "agreementCoverage": {
+      "title": "Agreement coverage",
+      "studentsCovered": "{{count}} student covered by agreements",
+      "studentsCovered_plural": "{{count}} students covered by agreements",
+      "activeAgreements": "{{count}} active agreement",
+      "activeAgreements_plural": "{{count}} active agreements",
+      "invoicedViaAgreement": "{{count}} invoices · {{amount}} billed via agreements",
+      "none": "No active agreements",
+      "studentsCoveredLabel": "Students covered",
+      "activeAgreementsLabel": "Active agreements",
+      "invoicedViaAgreementLabel": "Invoiced via agreement",
+      "invoicedCount": "{{count}} invoice",
+      "invoicedCount_plural": "{{count}} invoices"
     }
   },
   "invoices": {
@@ -146,6 +160,7 @@
     "feeStructuresRequired": "Fee Structures *",
     "generated": "Invoice generated successfully",
     "generateFailed": "Failed to generate invoice",
+    "listError": "Couldn't load invoices. Please try again.",
     "requiredFields": "Please fill all required fields",
     "issue": "Issue",
     "issueSuccess": "Invoice issued successfully",
@@ -166,6 +181,12 @@
     "loadedCount": "{{count}} loaded",
     "paidCount": "{{count}} paid",
     "loadedSelectionOnly": "Selection applies to loaded records only ({{count}} shown). Load more pages to include additional invoices.",
+    "billingSourceLabel": "Billing source",
+    "billingSourceFilter": {
+      "all": "All sources",
+      "standard": "Standard",
+      "agreement": "Agreement"
+    },
     "searchPlaceholder": "Search by invoice # or student...",
     "issueSelected": "Issue Selected ({{count}})",
     "sendReminder": "Send reminder",
@@ -274,6 +295,27 @@
       "writtenOff": "Written off",
       "by": "by {{name}}"
     },
+    "provenance": {
+      "title": "Billing provenance",
+      "description": "Where each line on this invoice came from.",
+      "source": {
+        "fee_structure": "Fee catalog",
+        "agreement": "Agreement",
+        "custom": "Custom line"
+      },
+      "viaFeeStructure": "From fee structure {{name}}",
+      "viaAgreement": "From agreement {{title}} (v{{version}})",
+      "suppressed": "{{count}} catalog fee suppressed by this agreement",
+      "suppressed_plural": "{{count}} catalog fees suppressed by this agreement",
+      "discountFromRule": "Discount {{amount}} from rule {{name}}",
+      "overrideBanner": "Fee structures were overridden for this invoice.",
+      "overrideDetail": "Agreement {{title}} bypassed at {{date}} by {{operator}}.",
+      "empty": "No provenance recorded for this invoice.",
+      "error": "Couldn't load billing provenance. Please try again.",
+      "howCalculated": "How was this calculated?",
+      "overridesTitle": "Operator overrides",
+      "overrideRequested": "Requested fee structures: {{count}}"
+    },
     "error": {
       "forbidden": "You don't have permission to view this invoice.",
       "notFound": "We couldn't find this invoice. It may have been deleted."
@@ -376,7 +418,209 @@
     "refunded": "Refunded",
     "partially_refunded": "Partially Refunded",
     "debit": "Debit",
-    "credit": "Credit"
+    "credit": "Credit",
+    "active": "Active",
+    "expired": "Expired",
+    "superseded": "Superseded"
+  },
+  "billingSource": {
+    "standard": "Standard",
+    "agreement": "Agreement",
+    "mixed": "Mixed"
+  },
+  "agreement": {
+    "title": "Agreements",
+    "description": "Family and multi-student billing agreements.",
+    "overrideTitle": "Override active agreement",
+    "overrideRequiresManage": "You need billing manage permission to override an active agreement.",
+    "overrideConfirm": "This student is covered by agreement {{title}}. Billing from the catalog will override it. Continue?",
+    "overrideDescription": "An active agreement already covers this student for the requested fee types. Open the existing invoice, or override the agreement to bill from the fee catalog.",
+    "overrideGenerate": "Override & generate",
+    "overrideGenerating": "Overriding…",
+    "overrideSuccess": "Invoice generated with agreement overridden",
+    "overrideFailed": "Could not override the agreement",
+    "viewExistingInvoice": "View existing invoice",
+    "keepAgreement": "Keep agreement",
+    "coveredFeeTypes": "Covered fee types",
+    "activate": "Activate",
+    "activating": "Activating…",
+    "cancel": "Cancel agreement",
+    "cancelling": "Cancelling…",
+    "create": "New agreement",
+    "edit": "Edit agreement",
+    "version": "Version {{version}}",
+    "versionHistory": "Version history",
+    "payer": "Payer",
+    "students": "Students",
+    "effectivePeriod": "Effective {{from}} – {{to}}",
+    "billingFrequency": "Billing frequency",
+    "type": {
+      "fixed_total": "Fixed total",
+      "per_student": "Per student"
+    },
+    "status": {
+      "draft": "Draft",
+      "active": "Active",
+      "expired": "Expired",
+      "cancelled": "Cancelled",
+      "superseded": "Superseded"
+    },
+    "conflict": {
+      "openInvoices": "This activation conflicts with {{count}} open invoice. Acknowledge to proceed.",
+      "openInvoices_plural": "This activation conflicts with {{count}} open invoices. Acknowledge to proceed.",
+      "acknowledge": "Acknowledge and activate",
+      "overlap": "Another active agreement already covers overlapping students or fee types."
+    },
+    "empty": "No agreements yet.",
+    "created": "Agreement created",
+    "activated": "Agreement activated",
+    "cancelled": "Agreement cancelled",
+    "selectSchool": "Select a school to manage agreements.",
+    "list": {
+      "title": "Title",
+      "type": "Type",
+      "students": "Students",
+      "studentCount": "{{count}} student",
+      "studentCount_plural": "{{count}} students",
+      "effective": "Effective",
+      "coveredFeeTypes": "Fee types",
+      "searchPlaceholder": "Search agreements…",
+      "loadedCount": "{{count}} loaded",
+      "emptyDescription": "Create your first family-billing agreement to bundle billing across siblings."
+    },
+    "presets": {
+      "all": "All",
+      "draft": "Draft",
+      "active": "Active",
+      "cancelled": "Cancelled",
+      "expired": "Expired"
+    },
+    "stats": {
+      "total": "Agreements",
+      "active": "Active",
+      "draft": "Draft",
+      "students": "Students covered"
+    },
+    "detail": {
+      "back": "Back to agreements",
+      "terms": "Terms",
+      "totalAmount": "Total amount",
+      "allocation": "Allocation",
+      "perStudentLines": "Per-student lines",
+      "student": "Student",
+      "amount": "Amount",
+      "feeType": "Fee type",
+      "notes": "Notes",
+      "statusHistory": "Status history",
+      "noStatusHistory": "No status changes recorded yet.",
+      "transition": "{{from}} → {{to}}",
+      "versions": "Versions",
+      "noVersions": "No prior versions.",
+      "currentVersion": "Current",
+      "error": {
+        "forbidden": "You don't have permission to view this agreement.",
+        "notFound": "Agreement not found in this school."
+      }
+    },
+    "activateDialog": {
+      "title": "Activate agreement",
+      "description": "Activating starts billing under this agreement. Any prior active version is superseded.",
+      "confirm": "Activate",
+      "success": "Agreement activated",
+      "failed": "Could not activate agreement"
+    },
+    "cancelDialog": {
+      "title": "Cancel agreement",
+      "description": "Cancelling stops billing under this agreement. This cannot be undone.",
+      "reason": "Reason (optional)",
+      "reasonPlaceholder": "Why is this agreement being cancelled?",
+      "confirm": "Cancel agreement",
+      "keep": "Keep agreement",
+      "success": "Agreement cancelled",
+      "failed": "Could not cancel agreement"
+    },
+    "wizard": {
+      "title": "New agreement",
+      "description": "Bundle billing across a family or multiple students into one agreement.",
+      "steps": {
+        "family": "Family & members",
+        "terms": "Terms",
+        "review": "Review"
+      },
+      "family": {
+        "title": "Title",
+        "titlePlaceholder": "e.g. Sharma siblings 2083",
+        "payerName": "Payer name",
+        "payerNamePlaceholder": "Primary contact for billing",
+        "payerPhone": "Payer phone",
+        "payerEmail": "Payer email",
+        "familyId": "Family ID (optional)",
+        "familyIdPlaceholder": "Link to a family record",
+        "familyIdHelp": "Internal family record id (UUID) — leave blank for a standalone agreement.",
+        "members": "Members",
+        "addStudent": "Add student",
+        "noMembers": "No students added yet — add at least one.",
+        "remove": "Remove"
+      },
+      "terms": {
+        "agreementType": "Agreement type",
+        "coveredFeeTypes": "Covered fee types",
+        "coveredFeeTypesHint": "Fee types this agreement replaces — other fees bill normally.",
+        "billingFrequency": "Billing frequency",
+        "totalAmount": "Total amount",
+        "allocation": "Allocation per student",
+        "allocationHint": "Allocations must sum to the total amount.",
+        "lines": "Per-student amounts",
+        "matrixHint": "Enter the negotiated per-term amount for every student and covered fee type.",
+        "selectFeeTypesFirst": "Select at least one covered fee type to enter amounts.",
+        "effectiveFrom": "Effective from",
+        "effectiveTo": "Effective to",
+        "notes": "Notes (optional)",
+        "notesPlaceholder": "Internal notes about this agreement"
+      },
+      "frequency": {
+        "monthly": "Monthly",
+        "quarterly": "Quarterly",
+        "annual": "Annual",
+        "one_time": "One-time"
+      },
+      "review": {
+        "title": "Review agreement",
+        "familySection": "Family & payer",
+        "termsSection": "Terms",
+        "membersSection": "Members",
+        "currency": "Currency",
+        "createDraft": "Create draft"
+      },
+      "validation": {
+        "titleRequired": "Title is required.",
+        "titleMax": "Title must be 160 characters or fewer.",
+        "payerRequired": "Payer name is required.",
+        "payerNameMax": "Payer name must be 120 characters or fewer.",
+        "payerPhoneMax": "Payer phone must be 20 characters or fewer.",
+        "payerEmailInvalid": "Enter a valid payer email address.",
+        "familyIdInvalid": "Family ID must be a UUID.",
+        "membersRequired": "Add at least one student.",
+        "tooManyStudents": "An agreement covers at most 30 students.",
+        "feeTypesRequired": "Select at least one covered fee type.",
+        "totalRequired": "Enter a total amount greater than zero.",
+        "allocationSum": "Allocations sum to {{sum}} but the total is {{total}}.",
+        "allocationCoverage": "Every member must have an allocation.",
+        "allocationPositive": "Every allocation must be greater than zero.",
+        "matrixRequired": "Enter an amount greater than zero for every student and covered fee type.",
+        "tooManyLines": "An agreement carries at most 300 amount lines (students × fee types).",
+        "datesRequired": "Effective from and to dates are required.",
+        "dateOrder": "The end date must be after the start date."
+      },
+      "footer": {
+        "next": "Next",
+        "back": "Back",
+        "cancel": "Cancel"
+      },
+      "serverValidation": "The server rejected the submission:",
+      "createFailed": "Could not create agreement",
+      "overlapConflict": "Another draft or active agreement already covers one of these students in this period."
+    }
   },
   "feeStructure": {
     "kpi": {
@@ -635,11 +879,9 @@
       "students": "Students",
       "feeStructures": "Fee structures",
       "customLines": "Custom lines",
-      "grossSubtotal": "Gross subtotal",
-      "feeDiscounts": "Fee discounts",
+      "discountsNotApplied": "Discounts are not applied in bulk generation — generate invoices individually to apply a discount.",
       "zeroTotalWarning": "{{count}} student's projected total is 0. Turn on Skip zero-total in Step 3 to exclude them.",
       "zeroTotalWarning_plural": "{{count}} students' projected total is 0. Turn on Skip zero-total in Step 3 to exclude them.",
-      "perFeeDiscount": "Per-fee discount %",
       "appliesToAll": "Applies to all {{count}}",
       "appliesToZero": "Applies to 0 - not selectable",
       "partialCoverage": "{{covered}} of {{total}} · {{skipped}} skipped",
@@ -663,7 +905,6 @@
         "third": "Third Term",
         "fourth": "Fourth Term"
       },
-      "issueDate": "Issue date",
       "dueDate": "Due date",
       "numberPreview": "Invoice number preview",
       "sequentialNumbers": "{{count}} sequential number",
@@ -674,7 +915,7 @@
       "reviewEveryInvoice": "Review every invoice before generating",
       "reviewEveryInvoiceHelp": "Show a per-student line-item preview on the next step.",
       "skipZeroTotal": "Skip students whose total comes to zero",
-      "skipZeroTotalHelp": "Do not issue zero-amount invoices (e.g. fully-discounted students)."
+      "skipZeroTotalHelp": "Do not issue zero-amount invoices."
     },
     "step4": {
       "verifyIntro": "Verify everything below. {{count}} invoice will be generated",
@@ -685,7 +926,7 @@
       "feeStructures": "Fee structures",
       "noFeesSelected": "No fees selected.",
       "period": "Period",
-      "issueDue": "Issue {{issueDate}} · Due {{dueDate}}",
+      "dueOn": "Due {{dueDate}}",
       "perStudentPreview": "Per-student preview",
       "tapToExpand": "tap a row to expand",
       "noBillableStudents": "No billable students.",
@@ -713,8 +954,10 @@
       "notice": "Guardians will be notified per their channel preferences.",
       "periodNotice": "For {{billingPeriod}}. Guardians will be notified per their channel preferences.",
       "invoices": "Invoices",
-      "totalBilled": "Total billed",
       "skipped": "Skipped",
+      "failed": "Failed",
+      "failuresTitle": "{{count}} invoice could not be generated",
+      "failuresTitle_plural": "{{count}} invoices could not be generated",
       "downloadAll": "Download all (PDF)",
       "downloadAllTooltip": "Bulk PDF download lands in a later sprint",
       "newBatch": "New batch"
@@ -791,11 +1034,18 @@
     "dueDate": "Due {{date}}",
     "selectInvoiceError": "Please select an invoice",
     "validAmountError": "Please enter a valid amount",
+    "amountTooLarge": "Amount can't exceed {{max}}.",
+    "overpayWarning": "Exceeds this invoice's amount due ({{due}}). The remainder is applied to the student's outstanding opening balance; if there is none, the payment will be rejected.",
     "referenceRequired": "Reference number is required for bank transfer / cheque",
     "recordSuccess": "Payment recorded successfully",
     "recordFailed": "Failed to record payment",
+    "validationErrorsTitle": "The payment couldn't be recorded:",
     "successTitle": "Payment Recorded",
     "successDescription": "The manual payment has been recorded and the student account has been updated.",
+    "successReceiptNumber": "Receipt number:",
+    "successPaymentId": "Payment ID:",
+    "viewInvoice": "View invoice",
+    "goToInvoices": "Go to invoices",
     "recordAnother": "Record Another Payment",
     "studentRequired": "Student *",
     "studentSearchPlaceholder": "Search student by name...",
@@ -836,6 +1086,37 @@
       "doneVia": "Payment recorded via {{method}} · {{date}}",
       "donePaidInFull": "This invoice is now paid in full.",
       "doneRemains": "{{amount}} remains due on this invoice."
+    },
+    "family": {
+      "modeAria": "Payment mode",
+      "modeSingle": "Single invoice",
+      "modeFamily": "Family payment",
+      "loadingFamily": "Checking family group...",
+      "noFamily": "This student isn't in a family group — use Single invoice mode, or set up a family from the student profile.",
+      "noFamilyError": "This student isn't in a family group.",
+      "noOpenInvoices": "This family has no open invoices.",
+      "primaryContact": "Primary contact: {{name}}",
+      "allocateHeader": "Allocate across siblings *",
+      "allocationLabel": "Amount for {{invoice}}",
+      "allocation": {
+        "exceedsBalance": "Exceeds balance of {{balance}}"
+      },
+      "amountDue": "Due {{amount}}",
+      "suggested": "· suggested {{amount}}",
+      "totalDue": "Total due",
+      "allocatedTotal": "Allocated total",
+      "previewTarget": "Family",
+      "previewInvoiceCount": "{{family}} · {{count}} invoice",
+      "previewInvoiceCount_plural": "{{family}} · {{count}} invoices",
+      "recordFailed": "Failed to record family payment — check the per-invoice amounts and try again.",
+      "validation": {
+        "noAllocation": "Enter an amount for at least one invoice.",
+        "negativeAmount": "Amounts can't be negative.",
+        "overAllocated": "An amount exceeds the invoice's balance due.",
+        "unknownInvoice": "An allocation references an invoice not in this family.",
+        "minTwo": "Family payment needs at least 2 invoices — use single-invoice mode to pay one.",
+        "maxApplications": "A family payment can cover at most 20 invoices — split it into multiple payments."
+      }
     }
   },
   "asyncJobs": {

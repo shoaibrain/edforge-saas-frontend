@@ -12,6 +12,7 @@ import type {
   UpdateInvoiceDto,
   StudentAccount,
   StudentLedgerEntry,
+  InvoiceProvenance,
 } from '@edforge/types'
 import type {
   FinanceListQueryParams,
@@ -46,17 +47,46 @@ export async function getInvoice(
   return apiGet<Invoice>(`/finance/schools/${schoolId}/invoices/${invoiceId}`)
 }
 
+/**
+ * Family-billing (FB) — per-line provenance for an invoice: whether each
+ * line came from the fee catalog, an agreement, or a custom line, plus any
+ * operator override that bypassed a fee structure at generate time.
+ * GET /finance/schools/:schoolId/invoices/:invoiceId/provenance
+ */
+export async function getInvoiceProvenance(
+  schoolId: string,
+  invoiceId: string,
+): Promise<InvoiceProvenance> {
+  return apiGet<InvoiceProvenance>(
+    `/finance/schools/${schoolId}/invoices/${invoiceId}/provenance`,
+  )
+}
+
 // ============================================================================
 // INVOICE MUTATIONS
 // ============================================================================
 
+/**
+ * Generate a single invoice.
+ *
+ * Family-billing (FB): when an active agreement already covers the student
+ * for the requested fee types, the backend rejects with
+ * 409 `AGREEMENT_ACTIVE` (body carries `agreementId`, `existingInvoiceId`,
+ * `coveredFeeTypes`). Pass `opts.overrideAgreement` to bypass the guard and
+ * bill from the fee catalog anyway — the service posts
+ * `{ ...data, overrideAgreement: true }` on the same route.
+ */
 export async function generateInvoice(
   schoolId: string,
   data: GenerateInvoiceDto,
+  opts?: { overrideAgreement?: boolean },
 ): Promise<Invoice> {
-  return apiPost<Invoice, GenerateInvoiceDto>(
+  const body = opts?.overrideAgreement
+    ? { ...data, overrideAgreement: true }
+    : data
+  return apiPost<Invoice, GenerateInvoiceDto & { overrideAgreement?: boolean }>(
     `/finance/schools/${schoolId}/invoices`,
-    data,
+    body,
   )
 }
 
@@ -239,6 +269,17 @@ export interface BulkPreviewResponse {
   studentsWithBalance?: number
   studentsNotBilledThisPeriod?: number
   studentsNewAdmission?: number
+  /**
+   * Family-billing (FB) — per-student billing-source breakdown so the wizard
+   * can flag which students in the batch will be priced via an agreement vs
+   * the standard catalog. Optional (best-effort BE-side). The backend emits
+   * this under the key `students` (invoices.controller.ts bulk-preview).
+   */
+  students?: Array<{
+    studentId: string
+    billingSource: 'standard' | 'agreement' | 'mixed'
+    coveredFeeTypes?: string[]
+  }>
 }
 
 /**
@@ -340,6 +381,7 @@ export async function downloadInvoicePdf(
 export const invoicesService = {
   getInvoices,
   getInvoice,
+  getInvoiceProvenance,
   generateInvoice,
   updateInvoice,
   issueInvoice,

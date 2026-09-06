@@ -79,10 +79,20 @@ export type PaymentStatus =
   | 'refunded'
   | 'partially_refunded'
 
+/** One allocation target on a recorded payment (response side). */
+export type PaymentApplication =
+  | { targetType: 'invoice'; invoiceId: string; amount: number }
+  | { targetType: 'opening_balance'; amount: number }
+
 export interface Payment {
   id: string
-  invoiceId: string
-  studentAccountId: string
+  /**
+   * `null` for multi-target family payments (`applications[]` carries the
+   * per-invoice breakdown instead); a string for single-invoice payments.
+   */
+  invoiceId: string | null
+  /** `null` for multi-target family payments, as `invoiceId`. */
+  studentAccountId: string | null
   schoolId: string
   amount: number // NPR
   currency: string
@@ -97,6 +107,10 @@ export interface Payment {
   refunds: Refund[]
   studentName?: string // Denormalized from invoice for display
   invoiceNumber?: string // Denormalized from invoice for display
+  /** Family the payment was applied against (multi-target payments). */
+  familyId?: string
+  /** Per-target breakdown; present on multi-target family payments. */
+  applications?: PaymentApplication[]
   createdAt: string
   updatedAt: string
 }
@@ -156,10 +170,31 @@ export interface VerifyPaymentResponse {
 // ============================================================================
 
 export interface RecordManualPaymentDto {
-  invoiceId: string
+  /**
+   * Single-target payment. Optional now that family-billing supports a
+   * multi-target `applications[]` alternative — exactly one of `invoiceId`
+   * or `applications` must be present (server-validated).
+   */
+  invoiceId?: string
+  /**
+   * Family-billing (FB) — multi-target application: split one payment across
+   * 2..20 distinct invoices (typically the open invoices of a family's
+   * students). Alternative to `invoiceId`; same /manual endpoint.
+   */
+  applications?: Array<{
+    invoiceId: string
+    amount: number
+  }>
+  /** Family the payment is applied against, when using `applications[]`. */
+  familyId?: string
   gateway: 'cash' | 'bank_transfer' | 'cheque'
   amount: number // NPR
-  currency: string
+  /**
+   * Optional — the backend always inherits currency from the referenced
+   * invoice(s) and rejects any mismatch (`PAYMENT_CURRENCY_MISMATCH`).
+   * Clients should omit it (mirrors `recordManualPaymentSchema`).
+   */
+  currency?: string
   referenceNumber?: string // Bank ref / cheque number
   notes?: string
   paidDate?: string // ISO date, defaults to today on server
@@ -249,6 +284,18 @@ export interface DashboardSummary {
     issuedDate: string
     createdAt: string
   }>
+  /**
+   * Family-billing (FB) — agreement-coverage rollup for the dashboard.
+   * Optional: absent until agreements exist for the school.
+   */
+  agreementCoverage?: {
+    studentsCovered: number
+    activeAgreements: number
+    invoicedViaAgreement: {
+      count: number
+      amount: number
+    }
+  }
 }
 
 // ============================================================================

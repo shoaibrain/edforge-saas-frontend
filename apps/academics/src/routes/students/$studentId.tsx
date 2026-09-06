@@ -277,6 +277,7 @@ export function StudentProfilePage() {
               {activeTab === 'family' && (
                 <FamilyTab
                   student={student}
+                  schoolId={schoolId || undefined}
                   onAddGuardian={canEdit ? actions.openAddGuardian : undefined}
                   onEditGuardian={canEdit ? actions.openEditGuardian : undefined}
                   onGrantPortalAccess={

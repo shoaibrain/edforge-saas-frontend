@@ -73,7 +73,7 @@ vi.mock('../Step2FeeStructures', () => ({
       <button
         type="button"
         data-testid="select-fee"
-        onClick={() => setSelectedFees({ 'fee-1': { discountPct: 0 } })}
+        onClick={() => setSelectedFees({ 'fee-1': true })}
       >
         Pick fee
       </button>

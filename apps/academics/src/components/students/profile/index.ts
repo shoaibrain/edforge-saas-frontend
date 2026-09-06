@@ -43,6 +43,11 @@ export {
 } from './FamilyTab'
 
 export {
+  FamilyGroupPanel,
+  type FamilyGroupPanelProps,
+} from './FamilyGroupPanel'
+
+export {
   ScheduleTab,
   ScheduleTabSkeleton,
   type ScheduleTabProps,

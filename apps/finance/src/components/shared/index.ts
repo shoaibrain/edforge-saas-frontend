@@ -7,6 +7,11 @@ export type { FinanceStatusChipProps } from './FinanceStatusChip'
 export { FeeTypeChip } from './FeeTypeChip'
 export type { FeeTypeChipProps } from './FeeTypeChip'
 
+export { FEE_TYPES, feeTypeLabel } from './fee-types'
+
+export { BillingSourceChip } from './BillingSourceChip'
+export type { BillingSourceChipProps, BillingSource } from './BillingSourceChip'
+
 export { FinanceFilterChips } from './FinanceFilterChips'
 export type { FinanceFilterChipsProps } from './FinanceFilterChips'
 

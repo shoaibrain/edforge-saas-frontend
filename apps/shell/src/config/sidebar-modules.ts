@@ -24,6 +24,7 @@ import {
   UsersRound,
   CreditCard,
   Wallet,
+  FileSignature,
   type LucideIcon,
   BrickWallShield,
   Calendars,
@@ -438,6 +439,7 @@ const financeModule: ModuleConfig = {
         { id: 'invoices', label: 'Invoices', icon: CreditCard, href: '/finance/invoices', permission: { action: 'view', resource: 'billing' }, requiresActiveSchool: true },
         { id: 'student-accounts', label: 'Student Accounts', icon: UsersRound, href: '/finance/accounts', permission: { action: 'view', resource: 'billing' }, requiresActiveSchool: true },
         { id: 'payments', label: 'Payments', icon: Wallet, href: '/finance/payments', permission: { action: 'view', resource: 'billing' }, requiresActiveSchool: true },
+        { id: 'agreements', label: 'Agreements', icon: FileSignature, href: '/finance/agreements', permission: { action: 'manage', resource: 'billing' }, requiresActiveSchool: true },
       ],
     },
     {

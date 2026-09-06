@@ -65,12 +65,7 @@ import {
   type WizardStep,
   type SelectionState,
 } from './types'
-import {
-  buildNumberPreview,
-  resolveDiscounts,
-  resolveCustomLineItems,
-  computeBatch,
-} from './compute'
+import { buildNumberPreview, resolveCustomLineItems } from './compute'
 
 type Translate = (key: string, options?: Record<string, unknown>) => string
 
@@ -239,21 +234,20 @@ export function BulkGenerateWizard({
    */
   const buildSubmitDto = (
     restrictToStudentIds?: string[],
-  ): BulkGenerateInvoiceDto & { discounts?: ReturnType<typeof resolveDiscounts> } => {
-    const dto: BulkGenerateInvoiceDto = {
-      selectionMode: 'students',
-      studentIds: restrictToStudentIds ?? [...selection.selectedIds],
-      feeStructureIds: Object.keys(selectedFees),
-      academicYear: details.academicYear,
-      billingPeriod: details.billingPeriod || undefined,
-      dueDate: details.dueDate,
-      notes: details.notes || undefined,
-      customLineItems: resolveCustomLineItems(customLines),
-      skipZeroTotal: details.skipZeroTotal,
-    }
-    const discounts = resolveDiscounts(fees, selectedFees)
-    return discounts.length > 0 ? { ...dto, discounts } : dto
-  }
+  ): BulkGenerateInvoiceDto => ({
+    selectionMode: 'students',
+    studentIds: restrictToStudentIds ?? [...selection.selectedIds],
+    feeStructureIds: Object.keys(selectedFees),
+    academicYear: details.academicYear,
+    billingPeriod: details.billingPeriod || undefined,
+    dueDate: details.dueDate,
+    notes: details.notes || undefined,
+    customLineItems: resolveCustomLineItems(
+      customLines,
+      t('bulkGenerate.step2.customLineFallback'),
+    ),
+    skipZeroTotal: details.skipZeroTotal,
+  })
 
   const handleSubmitResult = (response: BulkGenerateResult) => {
     if (response.mode === 'async') {
@@ -262,30 +256,17 @@ export function BulkGenerateWizard({
       setAsyncJobId(response.jobId)
       return
     }
-    // Sync path — unchanged behaviour from Sprint C.
-    const projection = computeBatch(
-      selectedStudents,
-      fees,
-      selectedFees,
-      customLines,
-      { skipZeroTotal: details.skipZeroTotal },
+    // Sync path — surface ONLY what the backend returned. Invoice numbers
+    // are assigned server-side and per-student errors come back in
+    // `errors[]`; nothing is fabricated client-side.
+    const errors = (response.errors ?? []).map(e =>
+      typeof e === 'string' ? { studentId: '', reason: e } : e,
     )
-    const billableRows = projection.perStudent.filter(p =>
-      details.skipZeroTotal ? p.total > 0 : true,
-    )
-    const invoices = billableRows.map((p, i) => ({
-      number: numberPreview.prefix + String(i + 1).padStart(4, '0'),
-      studentId: p.studentId,
-      studentName: p.studentName,
-      gradeLevel: p.gradeLevel,
-      total: p.total,
-    }))
     setResult({
-      count: response.generated,
+      generated: response.generated,
       skipped: response.skipped,
-      total: projection.billableTotal,
+      errors,
       billingPeriod: details.billingPeriod,
-      invoices,
     })
     toast.success(
       response.skipped > 0
@@ -311,8 +292,7 @@ export function BulkGenerateWizard({
   }
 
   const dispatchSubmit = (restrictToStudentIds?: string[]) => {
-    const dto = buildSubmitDto(restrictToStudentIds)
-    generateMutation.mutate(dto as BulkGenerateInvoiceDto, {
+    generateMutation.mutate(buildSubmitDto(restrictToStudentIds), {
       onSuccess: handleSubmitResult,
       onError: handleSubmitError,
     })

@@ -1,6 +1,8 @@
 export { InvoiceDetailHeader } from './InvoiceDetailHeader'
 export { InvoiceSummaryBand } from './InvoiceSummaryBand'
 export { InvoiceLineItemsCard } from './InvoiceLineItemsCard'
+export { InvoiceProvenanceCard } from './InvoiceProvenanceCard'
+export type { InvoiceProvenanceCardProps } from './InvoiceProvenanceCard'
 export { InvoicePaymentsCard } from './InvoicePaymentsCard'
 export { InvoiceDetailAside } from './InvoiceDetailAside'
 export { InvoiceActivityTimeline } from './InvoiceActivityTimeline'

@@ -35,6 +35,11 @@ const STATUS_TONE: Record<string, StatusTone> = {
   // Ledger entry types
   debit: 'danger',
   credit: 'success',
+
+  // Agreement statuses (draft/cancelled already covered above)
+  active: 'success',
+  expired: 'neutral',
+  superseded: 'neutral',
 }
 
 const STATUS_LABELS: Record<string, string> = {

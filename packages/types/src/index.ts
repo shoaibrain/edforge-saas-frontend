@@ -13,8 +13,11 @@ export * from './tenant'
 // Person types
 export * from './person'
 
-// Billing types (fee structures, invoices, student accounts)
+// Billing types (fee structures, invoices, student accounts, agreements)
 export * from './billing'
+
+// Family types (families, siblings, members, open-invoices)
+export * from './family'
 
 // Payment types (gateways, payments, receipts)
 export * from './payment'

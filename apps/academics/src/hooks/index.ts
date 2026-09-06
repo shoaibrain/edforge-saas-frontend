@@ -108,3 +108,14 @@ export {
   enrollmentKeys,
 } from './useEnrollments'
 export { useStudentProfileActions } from './useStudentProfileActions'
+export {
+  useStudentFamily,
+  useFamilies,
+  useFamilyMembers,
+  useCreateFamily,
+  useUpdateFamily,
+  useDeactivateFamily,
+  useAddFamilyMember,
+  useRemoveFamilyMember,
+  familyKeys,
+} from './useFamily'

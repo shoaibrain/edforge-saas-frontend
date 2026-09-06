@@ -32,6 +32,7 @@ import { useFinanceOverviewV2 } from "../hooks/useFinanceOverviewV2";
 import { FilterRow } from "../components/overview-v2/FilterRow";
 import { CollectionPerformanceCard } from "../components/overview-v2/CollectionPerformanceCard";
 import { BillingHealthCard } from "../components/overview-v2/BillingHealthCard";
+import { AgreementCoverageCard } from "../components/overview-v2/AgreementCoverageCard";
 import { RecentPaymentsCard } from "../components/overview-v2/RecentPaymentsCard";
 import { RecentInvoicesCard } from "../components/overview-v2/RecentInvoicesCard";
 import { localizeAgingBucketLabel } from "../components/overview-v2/aging-i18n";
@@ -127,6 +128,7 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
     clearFilters,
     hasActiveFilters,
     academicYears,
+    agreementCoverage,
     handleExportCSV,
     isExporting,
   } = data;
@@ -328,6 +330,17 @@ function FinanceOverviewContent({ schoolId }: { schoolId: string }) {
           <WidgetCard title={t("overview.recent.invoices")} iconSignature="finance_receipt" span={6}>
             <WidgetErrorBoundaryV2>
               <RecentInvoicesCard invoices={recentInvoices} isLoading={isLoading} bare />
+            </WidgetErrorBoundaryV2>
+          </WidgetCard>
+
+          {/* FB-5.5 — agreement-coverage rollup (renders empty-state until agreements exist) */}
+          <WidgetCard
+            title={t("overview.agreementCoverage.title")}
+            iconSignature="finance"
+            span={12}
+          >
+            <WidgetErrorBoundaryV2>
+              <AgreementCoverageCard coverage={agreementCoverage} isLoading={isLoading} bare />
             </WidgetErrorBoundaryV2>
           </WidgetCard>
         </WidgetGrid>

@@ -27,6 +27,7 @@ import {
   getSchoolPayments,
   getPaymentReceipt,
   recordManualPayment,
+  getFamilyOpenInvoices,
   voidPayment,
   createRefund,
   downloadReceiptPdf,
@@ -39,6 +40,7 @@ const mockApiPost = vi.mocked(apiPost)
 const SCHOOL = 'sch-1'
 const PAYMENT = 'pay-1'
 const INVOICE = 'inv-1'
+const FAMILY = 'fam-1'
 
 describe('payments.service route shapes', () => {
   beforeEach(() => {
@@ -58,6 +60,31 @@ describe('payments.service route shapes', () => {
     expect(mockApiPost).toHaveBeenCalledWith(
       `/finance/schools/${SCHOOL}/payments/manual`,
       {},
+    )
+  })
+
+  it('recordManualPayment → multi-target (applications[] + familyId) hits the SAME /manual route', async () => {
+    const body = {
+      applications: [
+        { invoiceId: 'inv-1', amount: 5000 },
+        { invoiceId: 'inv-2', amount: 3000 },
+      ],
+      familyId: FAMILY,
+      gateway: 'cash' as const,
+      amount: 8000,
+      currency: 'NPR',
+    }
+    await recordManualPayment(SCHOOL, body)
+    expect(mockApiPost).toHaveBeenCalledWith(
+      `/finance/schools/${SCHOOL}/payments/manual`,
+      body,
+    )
+  })
+
+  it('getFamilyOpenInvoices → GET /finance/schools/:schoolId/families/:familyId/open-invoices', async () => {
+    await getFamilyOpenInvoices(SCHOOL, FAMILY)
+    expect(mockApiGet).toHaveBeenCalledWith(
+      `/finance/schools/${SCHOOL}/families/${FAMILY}/open-invoices`,
     )
   })
 

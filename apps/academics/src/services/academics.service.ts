@@ -2359,6 +2359,146 @@ export async function publishResultCard(
 }
 
 // ============================================================================
+// FAMILY (family-billing — sibling grouping under a primary contact)
+// ============================================================================
+
+import type {
+  StudentFamily,
+  FamilyResponse,
+  FamilyMembersResponse,
+  CreateFamilyDto,
+  UpdateFamilyDto,
+  AddFamilyMemberDto,
+} from '@edforge/types'
+
+export interface FamilyListParams {
+  namePrefix?: string
+  limit?: number
+  cursor?: string
+}
+
+export interface FamilyListResponse {
+  items: FamilyResponse[]
+  hasMore: boolean
+  lastEvaluatedKey?: string
+}
+
+/**
+ * Get the family (and siblings) a student belongs to.
+ *
+ * `schoolId` is REQUIRED by the backend (families.controller.ts throws
+ * BadRequestException('Missing required parameter: schoolId') without it).
+ * GET /academics/students/:studentId/family?schoolId=
+ */
+export async function getStudentFamily(
+  studentId: string,
+  schoolId: string,
+): Promise<StudentFamily> {
+  return apiGet<StudentFamily>(`/academics/students/${studentId}/family`, {
+    schoolId,
+  })
+}
+
+/**
+ * List families for a school, optionally filtered by name prefix.
+ * GET /academics/schools/:schoolId/families
+ */
+export async function listFamilies(
+  schoolId: string,
+  params?: FamilyListParams,
+): Promise<FamilyListResponse> {
+  const queryParams: Record<string, unknown> = {}
+  if (params?.namePrefix) queryParams.namePrefix = params.namePrefix
+  if (params?.limit) queryParams.limit = params.limit
+  if (params?.cursor) queryParams.cursor = params.cursor
+  return apiGet<FamilyListResponse>(
+    `/academics/schools/${schoolId}/families`,
+    queryParams,
+  )
+}
+
+/**
+ * Get the members (students) of a family.
+ * GET /academics/schools/:schoolId/families/:familyId/members
+ */
+export async function getFamilyMembers(
+  schoolId: string,
+  familyId: string,
+): Promise<FamilyMembersResponse> {
+  return apiGet<FamilyMembersResponse>(
+    `/academics/schools/${schoolId}/families/${familyId}/members`,
+  )
+}
+
+/**
+ * Create a family.
+ * POST /academics/schools/:schoolId/families
+ */
+export async function createFamily(
+  schoolId: string,
+  data: CreateFamilyDto,
+): Promise<FamilyResponse> {
+  return apiPost<FamilyResponse>(
+    `/academics/schools/${schoolId}/families`,
+    data,
+  )
+}
+
+/**
+ * Update a family. PATCH /academics/schools/:schoolId/families/:familyId
+ */
+export async function updateFamily(
+  schoolId: string,
+  familyId: string,
+  data: UpdateFamilyDto,
+): Promise<FamilyResponse> {
+  return apiPatch<FamilyResponse>(
+    `/academics/schools/${schoolId}/families/${familyId}`,
+    data,
+  )
+}
+
+/**
+ * Soft-delete (deactivate) a family.
+ * DELETE /academics/schools/:schoolId/families/:familyId
+ */
+export async function deactivateFamily(
+  schoolId: string,
+  familyId: string,
+): Promise<void> {
+  return apiDelete(`/academics/schools/${schoolId}/families/${familyId}`)
+}
+
+/**
+ * Add a student to a family.
+ * POST /academics/schools/:schoolId/families/:familyId/members
+ */
+export async function addFamilyMember(
+  schoolId: string,
+  familyId: string,
+  data: AddFamilyMemberDto,
+): Promise<void> {
+  return apiPost(
+    `/academics/schools/${schoolId}/families/${familyId}/members`,
+    data,
+  )
+}
+
+/**
+ * Remove a student from a family.
+ * DELETE /academics/schools/:schoolId/families/:familyId/members/:studentId
+ */
+export async function removeFamilyMember(
+  schoolId: string,
+  familyId: string,
+  studentId: string,
+): Promise<void> {
+  return apiDelete(
+    `/academics/schools/${schoolId}/families/${familyId}/members/${studentId}`,
+  )
+}
+
+// ============================================================================
 // EXPORTED SERVICE OBJECT
 // ============================================================================
 
@@ -2454,6 +2594,15 @@ export const academicsService = {
   createParentAccount,
   createStudentAccount,
   linkGuardianToUser,
+  // Family (family-billing)
+  getStudentFamily,
+  listFamilies,
+  getFamilyMembers,
+  createFamily,
+  updateFamily,
+  deactivateFamily,
+  addFamilyMember,
+  removeFamilyMember,
   // Classwork (Sprint 3B)
   getClassworkItems,
   createClassworkItem,

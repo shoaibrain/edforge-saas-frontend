@@ -100,6 +100,9 @@ export interface FinanceV2Data {
   // Academic years for filter dropdown
   academicYears: string[]
 
+  // Family-billing (FB-5.5) — agreement-coverage rollup (null until agreements exist).
+  agreementCoverage: DashboardSummary['agreementCoverage'] | null
+
   // Export
   handleExportCSV: () => void
   isExporting: boolean
@@ -197,6 +200,7 @@ export function useFinanceOverviewV2(schoolId: string): FinanceV2Data {
     clearFilters: () => { setFromDate(''); setToDate(''); setAcademicYear('') },
     hasActiveFilters: !!(fromDate || toDate || academicYear),
     academicYears,
+    agreementCoverage: s?.agreementCoverage ?? null,
     handleExportCSV,
     isExporting: exportCsvMutation.isPending,
   }

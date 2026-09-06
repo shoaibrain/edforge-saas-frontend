@@ -6,27 +6,50 @@
  * Route: /finance/billing/payments/record
  */
 
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo, useEffect } from 'react'
 import { toast } from 'sonner'
-import { Button } from '@edforge/ui'
+import { Button, SegmentedControl } from '@edforge/ui'
 import {
   Loader2,
   Banknote,
   CheckCircle2,
   RotateCcw,
   FileText,
+  Info,
+  AlertTriangle,
 } from 'lucide-react'
-import { useSearch } from '@tanstack/react-router'
+import { Link, useSearch } from '@tanstack/react-router'
 import { useTranslation } from '@edforge/i18n'
+import { UuidBadge } from '@edforge/archetype'
 import { useAppStore } from '../../../stores/app.store'
-import { useRecordManualPayment, useInvoices } from '@edforge/finance-services'
-import { formatGatewayLabel, type Invoice } from '@edforge/types'
+import {
+  useRecordManualPayment,
+  useInvoices,
+  useStudentFamily,
+  useFamilyOpenInvoices,
+} from '@edforge/finance-services'
+import { formatGatewayLabel, type Invoice, type Payment } from '@edforge/types'
 import { useCurrency } from '@edforge/types/use-currency'
 import { useFinanceSettings } from '../../../layouts/FinanceLayout'
 import { formatDate } from '../../../utils/format-date'
 import { StudentSearchInput } from '../../../components/billing/StudentSearchInput'
+import { FamilyAllocationList } from '../../../components/billing/payments/FamilyAllocationList'
+import {
+  extractValidationErrors,
+  extractApiMessage,
+  type ApiValidationError,
+} from '../../../lib/api-validation-errors'
+import { validateFamilyPayment } from './validate-family-payment'
+
+type PaymentMode = 'single' | 'family'
 
 type PaymentMethod = 'cash' | 'bank_transfer' | 'cheque'
+
+// Mirrors recordManualPaymentSchema: amount .positive().max(10_000_000),
+// referenceNumber .max(100), notes .max(500).
+const MAX_PAYMENT_AMOUNT = 10_000_000
+const MAX_REFERENCE_LENGTH = 100
+const MAX_NOTES_LENGTH = 500
 
 function todayISO(): string {
   return new Date().toISOString().split('T')[0]
@@ -183,30 +206,131 @@ export default function RecordPaymentPage() {
     amount?: string
   }
 
+  const [mode, setMode] = useState<PaymentMode>('single')
   const [selectedStudent, setSelectedStudent] = useState<{
     studentId: string
     studentName: string
   } | null>(null)
   const [invoiceId, setInvoiceId] = useState(searchParams.invoiceId ?? '')
   const [invoiceLabel, setInvoiceLabel] = useState('')
+  // Selected invoice's amountDue — drives the single-mode overpay warning.
+  const [invoiceAmountDue, setInvoiceAmountDue] = useState<number | null>(null)
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cash')
   const [amount, setAmount] = useState(searchParams.amount ?? '')
   const [referenceNumber, setReferenceNumber] = useState('')
   const [paidDate, setPaidDate] = useState(todayISO())
   const [notes, setNotes] = useState('')
-  const [success, setSuccess] = useState(false)
+  // Non-null = success screen; carries the created Payment for the summary.
+  const [successPayment, setSuccessPayment] = useState<Payment | null>(null)
+  // Backend 400 validation errors from the last failed submit, verbatim.
+  const [submitErrors, setSubmitErrors] = useState<ApiValidationError[]>([])
+  // Family mode: invoiceId → raw amount input string.
+  const [allocations, setAllocations] = useState<Record<string, string>>({})
 
   const recordMutation = useRecordManualPayment(schoolId ?? '')
 
   const parsedAmount = parseFloat(amount) || 0
 
+  // ── Family mode data ─────────────────────────────────────────────────────
+  const familyStudentId = mode === 'family' ? selectedStudent?.studentId ?? null : null
+  const { data: studentFamily, isLoading: familyLoading } = useStudentFamily(
+    schoolId ?? '',
+    familyStudentId,
+  )
+  const family = studentFamily?.family ?? null
+  const { data: familyOpenInvoices, isLoading: openInvoicesLoading } =
+    useFamilyOpenInvoices(schoolId ?? '', mode === 'family' ? family?.id ?? null : null)
+
+  const openInvoices = useMemo(
+    () => familyOpenInvoices?.openInvoices ?? [],
+    [familyOpenInvoices],
+  )
+  const suggestedAllocation = useMemo(
+    () => familyOpenInvoices?.suggestedAllocation ?? [],
+    [familyOpenInvoices],
+  )
+
+  // Prefill allocations from the server's suggestion once the open-invoice
+  // set resolves for a freshly-picked family. Keyed on a stable signature so
+  // re-seeding only happens when the suggestion set itself changes (new family
+  // picked), never on every keystroke.
+  const suggestionSignature = useMemo(
+    () => suggestedAllocation.map((s) => `${s.invoiceId}:${s.amount}`).join('|'),
+    [suggestedAllocation],
+  )
+  useEffect(() => {
+    if (mode !== 'family' || openInvoices.length === 0) return
+    const suggestedById = new Map(
+      suggestedAllocation.map((s) => [s.invoiceId, s.amount]),
+    )
+    const next: Record<string, string> = {}
+    for (const inv of openInvoices) {
+      const suggested = suggestedById.get(inv.invoiceId)
+      next[inv.invoiceId] = suggested != null && suggested > 0 ? String(suggested) : ''
+    }
+    setAllocations(next)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [suggestionSignature, mode])
+
+  const familyAllocatedTotal = useMemo(
+    () =>
+      openInvoices.reduce((sum, inv) => {
+        const parsed = parseFloat(allocations[inv.invoiceId] ?? '')
+        return sum + (Number.isFinite(parsed) && parsed > 0 ? parsed : 0)
+      }, 0),
+    [openInvoices, allocations],
+  )
+
+  const familyInvoiceCount = useMemo(
+    () =>
+      openInvoices.filter((inv) => {
+        const parsed = parseFloat(allocations[inv.invoiceId] ?? '')
+        return Number.isFinite(parsed) && parsed > 0
+      }).length,
+    [openInvoices, allocations],
+  )
+
+  // Unified "amount to be recorded" — the single-invoice amount, or the
+  // derived allocation sum in family mode. Drives Preview + Submit gating.
+  const previewAmount = mode === 'family' ? familyAllocatedTotal : parsedAmount
+  const canSubmit =
+    mode === 'family'
+      ? !!family && familyAllocatedTotal > 0
+      : !!invoiceId.trim() && parsedAmount > 0
+
+  const resetSelection = useCallback(() => {
+    setSelectedStudent(null)
+    setInvoiceId('')
+    setInvoiceLabel('')
+    setInvoiceAmountDue(null)
+    setAmount('')
+    setAllocations({})
+    setSubmitErrors([])
+  }, [])
+
+  const handleModeChange = useCallback(
+    (next: string) => {
+      const nextMode = next === 'family' ? 'family' : 'single'
+      setMode(nextMode)
+      resetSelection()
+    },
+    [resetSelection],
+  )
+
+  const handleAllocationChange = useCallback((id: string, value: string) => {
+    setAllocations((prev) => ({ ...prev, [id]: value }))
+  }, [])
+
   const handleStudentChange = useCallback(
     (value: { studentId: string; studentName: string } | null) => {
       setSelectedStudent(value)
-      // Reset invoice selection when student changes
+      // Reset invoice/allocation selection when student changes
       setInvoiceId('')
       setInvoiceLabel('')
+      setInvoiceAmountDue(null)
       setAmount('')
+      setAllocations({})
+      setSubmitErrors([])
     },
     [],
   )
@@ -215,6 +339,7 @@ export default function RecordPaymentPage() {
     (id: string, amountDue: number, label: string) => {
       setInvoiceId(id)
       setInvoiceLabel(label)
+      setInvoiceAmountDue(amountDue)
       if (amountDue > 0) {
         setAmount(String(amountDue))
       }
@@ -222,7 +347,7 @@ export default function RecordPaymentPage() {
     [],
   )
 
-  const handleSubmit = async () => {
+  const handleSingleSubmit = async () => {
     if (!invoiceId.trim()) {
       toast.error(t('recordPayment.selectInvoiceError'))
       return
@@ -231,38 +356,116 @@ export default function RecordPaymentPage() {
       toast.error(t('recordPayment.validAmountError'))
       return
     }
+    if (parsedAmount > MAX_PAYMENT_AMOUNT) {
+      toast.error(
+        t('recordPayment.amountTooLarge', {
+          max: formatCurr(MAX_PAYMENT_AMOUNT),
+        }),
+      )
+      return
+    }
     if ((paymentMethod === 'bank_transfer' || paymentMethod === 'cheque') && !referenceNumber.trim()) {
       toast.error(t('recordPayment.referenceRequired'))
       return
     }
 
+    setSubmitErrors([])
     try {
-      await recordMutation.mutateAsync({
+      // `currency` is intentionally omitted: the backend always inherits it
+      // from the invoice and rejects any mismatch (PAYMENT_CURRENCY_MISMATCH).
+      const payment = await recordMutation.mutateAsync({
         invoiceId: invoiceId.trim(),
         gateway: paymentMethod,
         amount: parsedAmount,
-        currency: settings.currency,
         referenceNumber: referenceNumber.trim() || undefined,
         notes: notes.trim() || undefined,
         paidDate: paidDate || undefined,
       })
       toast.success(t('recordPayment.recordSuccess'))
-      setSuccess(true)
-    } catch {
-      toast.error(t('recordPayment.recordFailed'))
+      setSuccessPayment(payment)
+    } catch (err) {
+      const validationErrors = extractValidationErrors(err)
+      setSubmitErrors(validationErrors)
+      toast.error(
+        validationErrors[0]?.message ??
+          extractApiMessage(err) ??
+          t('recordPayment.recordFailed'),
+      )
     }
   }
 
+  const handleFamilySubmit = async () => {
+    if (!family) {
+      toast.error(t('recordPayment.family.noFamilyError'))
+      return
+    }
+    const validation = validateFamilyPayment(allocations, openInvoices)
+    if (!validation.valid) {
+      toast.error(t(validation.errors[0]))
+      return
+    }
+    if ((paymentMethod === 'bank_transfer' || paymentMethod === 'cheque') && !referenceNumber.trim()) {
+      toast.error(t('recordPayment.referenceRequired'))
+      return
+    }
+
+    const applications = openInvoices
+      .map((inv) => {
+        const parsed = parseFloat(allocations[inv.invoiceId] ?? '')
+        const amt = Number.isFinite(parsed) && parsed > 0 ? parsed : 0
+        // Round to 2dp so a float-epsilon per-line value can't make the
+        // top-level total drift from the exact sum of the applications.
+        return { invoiceId: inv.invoiceId, amount: Math.round(amt * 100) / 100 }
+      })
+      .filter((a) => a.amount > 0)
+
+    // Derived from the already-rounded application amounts, then rounded again
+    // to swallow the accumulation epsilon — so `amount === sum(applications)`.
+    const sumTotal =
+      Math.round(applications.reduce((s, a) => s + a.amount, 0) * 100) / 100
+
+    setSubmitErrors([])
+    try {
+      // `currency` omitted — inherited from the invoices server-side.
+      const payment = await recordMutation.mutateAsync({
+        familyId: family.id,
+        applications,
+        gateway: paymentMethod,
+        amount: sumTotal,
+        referenceNumber: referenceNumber.trim() || undefined,
+        notes: notes.trim() || undefined,
+        paidDate: paidDate || undefined,
+      })
+      toast.success(t('recordPayment.recordSuccess'))
+      setSuccessPayment(payment)
+    } catch (err) {
+      const validationErrors = extractValidationErrors(err)
+      setSubmitErrors(validationErrors)
+      toast.error(
+        validationErrors[0]?.message ??
+          extractApiMessage(err) ??
+          t('recordPayment.family.recordFailed'),
+      )
+    }
+  }
+
+  const handleSubmit = () =>
+    mode === 'family' ? handleFamilySubmit() : handleSingleSubmit()
+
   const handleRecordAnother = () => {
+    setMode('single')
     setSelectedStudent(null)
     setInvoiceId('')
     setInvoiceLabel('')
+    setInvoiceAmountDue(null)
     setPaymentMethod('cash')
     setAmount('')
     setReferenceNumber('')
     setPaidDate(todayISO())
     setNotes('')
-    setSuccess(false)
+    setAllocations({})
+    setSubmitErrors([])
+    setSuccessPayment(null)
   }
 
   if (!schoolId) {
@@ -274,7 +477,7 @@ export default function RecordPaymentPage() {
   }
 
   // Success state
-  if (success) {
+  if (successPayment) {
     return (
       <div className="p-6 max-w-lg mx-auto">
         <div className="text-center py-16 space-y-4">
@@ -285,10 +488,44 @@ export default function RecordPaymentPage() {
           <p className="text-sm text-[rgb(var(--text-secondary))]">
             {t('recordPayment.successDescription')}
           </p>
-          <Button onClick={handleRecordAnother}>
-            <RotateCcw className="w-4 h-4 mr-1.5" />
-            {t('recordPayment.recordAnother')}
-          </Button>
+          <div className="space-y-1.5 text-sm">
+            {successPayment.receiptNumber && (
+              <div className="flex items-center justify-center gap-2 text-[rgb(var(--text-secondary))]">
+                <span>{t('recordPayment.successReceiptNumber')}</span>
+                <span className="font-mono font-medium text-[rgb(var(--text-primary))]">
+                  {successPayment.receiptNumber}
+                </span>
+              </div>
+            )}
+            <div className="flex items-center justify-center gap-2 text-[rgb(var(--text-secondary))]">
+              <span>{t('recordPayment.successPaymentId')}</span>
+              <UuidBadge value={successPayment.id} />
+            </div>
+          </div>
+          <div className="flex items-center justify-center gap-3 flex-wrap">
+            <Button onClick={handleRecordAnother}>
+              <RotateCcw className="w-4 h-4 mr-1.5" />
+              {t('recordPayment.recordAnother')}
+            </Button>
+            {successPayment.invoiceId ? (
+              <Link
+                to="/invoices/$invoiceId"
+                params={{ invoiceId: successPayment.invoiceId }}
+              >
+                <Button variant="outline">
+                  <FileText className="w-4 h-4 mr-1.5" />
+                  {t('recordPayment.viewInvoice')}
+                </Button>
+              </Link>
+            ) : (
+              <Link to="/invoices">
+                <Button variant="outline">
+                  <FileText className="w-4 h-4 mr-1.5" />
+                  {t('recordPayment.goToInvoices')}
+                </Button>
+              </Link>
+            )}
+          </div>
         </div>
       </div>
     )
@@ -309,6 +546,19 @@ export default function RecordPaymentPage() {
 
         {/* Form */}
         <div className="space-y-5">
+          {/* Mode toggle: single invoice (default) vs family payment */}
+          <div>
+            <SegmentedControl
+              aria-label={t('recordPayment.family.modeAria')}
+              value={mode}
+              onChange={handleModeChange}
+              tabs={[
+                { id: 'single', label: t('recordPayment.family.modeSingle') },
+                { id: 'family', label: t('recordPayment.family.modeFamily') },
+              ]}
+            />
+          </div>
+
           {/* Step 1: Select Student */}
           <div>
             <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
@@ -322,8 +572,8 @@ export default function RecordPaymentPage() {
             />
           </div>
 
-          {/* Step 2: Select Invoice */}
-          {selectedStudent && (
+          {/* Step 2 (single mode): Select Invoice */}
+          {mode === 'single' && selectedStudent && (
             <div>
               <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
                 {t('recordPayment.invoiceRequired')}
@@ -334,6 +584,61 @@ export default function RecordPaymentPage() {
                 selectedInvoiceId={invoiceId}
                 onSelect={handleInvoiceSelect}
               />
+            </div>
+          )}
+
+          {/* Step 2 (family mode): resolve family → allocate across siblings */}
+          {mode === 'family' && selectedStudent && (
+            <div className="space-y-3">
+              {familyLoading ? (
+                <div className="flex items-center justify-center py-6">
+                  <Loader2 className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] animate-spin" />
+                  <span className="ml-2 text-sm text-[rgb(var(--text-tertiary))]">
+                    {t('recordPayment.family.loadingFamily')}
+                  </span>
+                </div>
+              ) : !family ? (
+                <div className="flex items-start gap-2.5 px-3 py-2.5 rounded-lg border border-[rgb(var(--border-primary))] bg-[rgb(var(--state-info-bg)/0.12)]">
+                  <Info className="w-4 h-4 mt-0.5 flex-shrink-0 text-[rgb(var(--state-info-fg))]" />
+                  <p className="text-sm text-[rgb(var(--text-secondary))]">
+                    {t('recordPayment.family.noFamily')}
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div>
+                    <div className="text-sm font-semibold text-[rgb(var(--text-primary))]">
+                      {family.name}
+                    </div>
+                    <div className="text-xs text-[rgb(var(--text-secondary))]">
+                      {t('recordPayment.family.primaryContact', {
+                        name: family.primaryContact.name,
+                      })}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
+                      {t('recordPayment.family.allocateHeader')}
+                    </label>
+                    {openInvoicesLoading ? (
+                      <div className="flex items-center justify-center py-6">
+                        <Loader2 className="w-4 h-4 text-[rgb(var(--action-secondary-fg))] animate-spin" />
+                        <span className="ml-2 text-sm text-[rgb(var(--text-tertiary))]">
+                          {t('recordPayment.loadingInvoices')}
+                        </span>
+                      </div>
+                    ) : (
+                      <FamilyAllocationList
+                        openInvoices={openInvoices}
+                        suggestedAllocation={suggestedAllocation}
+                        allocations={allocations}
+                        onChange={handleAllocationChange}
+                        format={formatCurr}
+                      />
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -370,21 +675,31 @@ export default function RecordPaymentPage() {
             </div>
           </div>
 
-          {/* Amount */}
-          <div>
-            <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
-              {t('recordPayment.amountRequired', { currency: settings.currency })}
-            </label>
-            <input
-              type="number"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              placeholder="0.00"
-              min="0"
-              step="0.01"
-              className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
-            />
-          </div>
+          {/* Amount (single mode only — family mode derives it from allocations) */}
+          {mode === 'single' && (
+            <div>
+              <label className="block text-sm font-medium text-[rgb(var(--text-secondary))] mb-1">
+                {t('recordPayment.amountRequired', { currency: settings.currency })}
+              </label>
+              <input
+                type="number"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                placeholder="0.00"
+                min="0"
+                max={MAX_PAYMENT_AMOUNT}
+                step="0.01"
+                className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
+              />
+              {invoiceAmountDue != null && parsedAmount > invoiceAmountDue && (
+                <p className="mt-1 text-xs text-[rgb(var(--state-warning-fg))]">
+                  {t('recordPayment.overpayWarning', {
+                    due: formatCurr(invoiceAmountDue),
+                  })}
+                </p>
+              )}
+            </div>
+          )}
 
           {/* Reference Number (for bank_transfer and cheque) */}
           {(paymentMethod === 'bank_transfer' || paymentMethod === 'cheque') && (
@@ -396,6 +711,7 @@ export default function RecordPaymentPage() {
                 type="text"
                 value={referenceNumber}
                 onChange={(e) => setReferenceNumber(e.target.value)}
+                maxLength={MAX_REFERENCE_LENGTH}
                 placeholder={
                   paymentMethod === 'bank_transfer'
                     ? t('recordPayment.bankReferencePlaceholder')
@@ -428,6 +744,7 @@ export default function RecordPaymentPage() {
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
+              maxLength={MAX_NOTES_LENGTH}
               placeholder={t('recordPayment.notesPlaceholder')}
               className="w-full px-3 py-2 text-sm border border-[rgb(var(--border-primary))] rounded-lg bg-[rgb(var(--background-primary))] text-[rgb(var(--text-primary))] resize-none focus:outline-none focus:ring-2 focus:ring-[rgb(var(--border-focus)/0.35)]"
             />
@@ -435,18 +752,30 @@ export default function RecordPaymentPage() {
         </div>
 
         {/* Preview */}
-        {parsedAmount > 0 && (
+        {previewAmount > 0 && (
           <div className="bg-[rgb(var(--background-secondary))] rounded-lg p-4 space-y-2">
             <h3 className="text-sm font-semibold text-[rgb(var(--text-primary))]">
               {t('recordPayment.preview')}
             </h3>
             <div className="space-y-1.5">
-              <div className="flex justify-between text-sm text-[rgb(var(--text-secondary))]">
-                <span>{t('invoices.invoiceNumber')}</span>
-                <span className="font-medium text-[rgb(var(--text-primary))] max-w-[60%] truncate text-right">
-                  {invoiceLabel || invoiceId || '--'}
-                </span>
-              </div>
+              {mode === 'family' ? (
+                <div className="flex justify-between text-sm text-[rgb(var(--text-secondary))]">
+                  <span>{t('recordPayment.family.previewTarget')}</span>
+                  <span className="font-medium text-[rgb(var(--text-primary))] max-w-[60%] truncate text-right">
+                    {t('recordPayment.family.previewInvoiceCount', {
+                      count: familyInvoiceCount,
+                      family: family?.name ?? '--',
+                    })}
+                  </span>
+                </div>
+              ) : (
+                <div className="flex justify-between text-sm text-[rgb(var(--text-secondary))]">
+                  <span>{t('invoices.invoiceNumber')}</span>
+                  <span className="font-medium text-[rgb(var(--text-primary))] max-w-[60%] truncate text-right">
+                    {invoiceLabel || invoiceId || '--'}
+                  </span>
+                </div>
+              )}
               <div className="flex justify-between text-sm text-[rgb(var(--text-secondary))]">
                 <span>{t('recordPayment.method')}</span>
                 <span className="font-medium text-[rgb(var(--text-primary))]">
@@ -469,16 +798,31 @@ export default function RecordPaymentPage() {
               </div>
               <div className="flex justify-between text-sm font-semibold text-[rgb(var(--text-primary))] border-t border-[rgb(var(--border-primary))] pt-2 mt-2">
                 <span>{t('lineItems.amount')}</span>
-                <span>{formatCurr(parsedAmount)}</span>
+                <span>{formatCurr(previewAmount)}</span>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Backend validation errors from the last failed submit (verbatim) */}
+        {submitErrors.length > 0 && (
+          <div className="rounded-lg border border-[rgb(var(--state-danger-border)/0.4)] bg-[rgb(var(--state-danger-bg)/0.10)] p-3">
+            <div className="flex items-center gap-2 text-sm font-medium text-[rgb(var(--state-danger-fg))] mb-1.5">
+              <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+              {t('recordPayment.validationErrorsTitle')}
+            </div>
+            <ul className="space-y-1 pl-6 list-disc text-sm text-[rgb(var(--state-danger-fg))]">
+              {submitErrors.map((error, i) => (
+                <li key={`${error.path}-${i}`}>{error.message}</li>
+              ))}
+            </ul>
           </div>
         )}
 
         {/* Submit */}
         <Button
           onClick={handleSubmit}
-          disabled={recordMutation.isPending || !invoiceId.trim() || parsedAmount <= 0}
+          disabled={recordMutation.isPending || !canSubmit}
           className="w-full"
         >
           {recordMutation.isPending ? (

@@ -3,18 +3,20 @@
  *
  * Pure functions over already-resolved students + selected fees +
  * customLines. Used by:
- *   - Step 2 live rail (grand total preview as operator picks fees +
- *     discounts).
+ *   - Step 2 live rail (grand total preview as operator picks fees).
  *   - Step 4 per-student preview (line-item breakdown rendered before
  *     commit).
  *   - skipZeroTotal client-side projection (matches the BE pre-filter so
  *     the operator-visible count and the actual generated count agree).
  *
+ * NO discounts: the backend's bulkGenerateInvoiceSchema carries no discounts
+ * field, so bulk invoices always bill full price. Discounts are only
+ * supported on the single-invoice generate path — the projection here must
+ * match what the BE actually bills.
+ *
  * Phase 1 simplifications (lift in Phase 2):
  *   - No per-grade fee bands. Today's FeeStructure has flat `amount`; the
  *     prototype's perGrade ranges don't exist server-side yet.
- *   - No scholarship / BPL auto-concession. Demographic fields not yet
- *     surfaced by academics. Operators apply discounts manually for now.
  *   - No fee-scope rules (transportOnly / boardersOnly / newAdmissionOnly).
  *     Coverage is determined by gradeLevels match alone.
  */
@@ -69,25 +71,19 @@ export function computeStudentInvoice(
 ): ComputedInvoice {
   const lines: ComputedLine[] = []
   let subtotal = 0
-  let discountTotal = 0
 
   for (const fee of fees) {
-    const cfg = selectedFees[fee.id]
-    if (!cfg) continue
+    if (!selectedFees[fee.id]) continue
     if (!feeApplies(fee, student)) continue
     const base = Number(fee.amount) || 0
-    const discount = Math.round(base * (cfg.discountPct || 0)) / 100
-    const total = base - discount
     lines.push({
       key: fee.id,
       name: fee.name,
       feeStructureId: fee.id,
       base,
-      discount,
-      total,
+      total: base,
     })
     subtotal += base
-    discountTotal += discount
   }
 
   for (const cli of customLines) {
@@ -95,26 +91,24 @@ export function computeStudentInvoice(
     if (!cli.name && !amt) continue
     if (Number.isNaN(amt)) continue
     if (amt < 0) continue
+    // Unnamed lines keep name '' here — renderers apply the t()'d fallback.
     lines.push({
       key: cli.id,
-      name: cli.name || 'Custom line item',
+      name: cli.name,
       base: amt,
-      discount: 0,
       total: amt,
       isCustom: true,
     })
     subtotal += amt
   }
 
-  const total = subtotal - discountTotal
   return {
     studentId: student.studentId,
     studentName: student.fullName,
     gradeLevel: student.currentGradeLevel,
     lines,
     subtotal,
-    discountTotal,
-    total,
+    total: subtotal,
   }
 }
 
@@ -159,50 +153,22 @@ export function computeBatch(
 }
 
 /**
- * Convert the operator-supplied per-fee discount % into the BE-expected
- * flat-amount discount array. Backend's `bulkGenerate.discounts[]` takes
- * { feeStructureId, amount } so we resolve per-fee here at submit time.
- *
- * Phase 1 uses a SINGLE batch-wide discount amount per fee (multiplied by
- * the fee's flat `amount`, NOT per-student — since fees are flat-amount
- * today). Phase 2 (per-grade bands + auto-concessions) will require a
- * per-student discount resolution; for now one entry per selected fee is
- * adequate.
- */
-export function resolveDiscounts(
-  fees: ReadonlyArray<FeeStructure>,
-  selectedFees: SelectedFeesMap,
-): Array<{ feeStructureId: string; amount: number; reason?: string }> {
-  const out: Array<{ feeStructureId: string; amount: number; reason?: string }> = []
-  for (const fee of fees) {
-    const cfg = selectedFees[fee.id]
-    if (!cfg || !cfg.discountPct || cfg.discountPct <= 0) continue
-    const base = Number(fee.amount) || 0
-    const amount = Math.round(base * cfg.discountPct) / 100
-    if (amount <= 0) continue
-    out.push({
-      feeStructureId: fee.id,
-      amount,
-      reason: `${cfg.discountPct}% bulk-batch discount`,
-    })
-  }
-  return out
-}
-
-/**
  * Normalise the operator's CustomLine[] (string amount, optional name) into
  * the BE-expected shape (number amount, required name, empty-rows dropped).
  * Backend caps at 10 entries; we mirror that here as defense-in-depth.
+ * `fallbackName` is the t()'d label for lines the operator left unnamed
+ * (customLineItemSchema requires name 1..120).
  */
 export function resolveCustomLineItems(
   customLines: ReadonlyArray<CustomLine>,
+  fallbackName: string,
 ): Array<{ name: string; amount: number }> {
   const out: Array<{ name: string; amount: number }> = []
   for (const cli of customLines) {
     const amt = Number(cli.amount)
     if (Number.isNaN(amt) || amt < 0) continue
     if (!cli.name && amt === 0) continue
-    out.push({ name: cli.name || 'Custom line item', amount: amt })
+    out.push({ name: cli.name || fallbackName, amount: amt })
     if (out.length >= 10) break
   }
   return out
