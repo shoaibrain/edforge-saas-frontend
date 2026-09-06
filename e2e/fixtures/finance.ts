@@ -10,8 +10,10 @@
  *   - GET .../agreements/:id/versions is WRAPPED `{ items: [...] }` (the
  *     "t is not iterable" regression) — this fixture never serves a bare array
  *   - detail/mutation responses are bare entities
- *   - 409 bodies carry `code` discriminators (CONFLICTING_OPEN_INVOICES,
- *     AGREEMENT_OVERLAP, AGREEMENT_ACTIVE)
+ *   - 409 bodies are the wire envelope the backend GlobalExceptionFilter
+ *     emits — `{ statusCode, errorCode: 'CONFLICT', code, message, ...payload,
+ *     timestamp, requestId, path }` — with the domain `code` discriminators
+ *     (CONFLICTING_OPEN_INVOICES, AGREEMENT_OVERLAP, AGREEMENT_ACTIVE)
  *   - 400 validation bodies follow the nestjs-zod shape
  *     `{ statusCode, errorCode, message, errors[], details.validationErrors[] }`
  *
@@ -29,6 +31,27 @@ const NOW = '2026-06-01T00:00:00.000Z'
 
 function json(body: unknown, status = 200) {
   return { status, contentType: 'application/json', body: JSON.stringify(body) }
+}
+
+/**
+ * A 409 exactly as the backend puts it on the wire: the filter envelope plus
+ * the domain `code` and payload the service threw. Never serve a bare
+ * `{ code, message }` — the FE must be proven against the real shape.
+ */
+function conflict409(code: string, message: string, payload: Dict = {}) {
+  return json(
+    {
+      statusCode: 409,
+      errorCode: 'CONFLICT',
+      code,
+      message,
+      ...payload,
+      timestamp: NOW,
+      requestId: 'e2e-request',
+      path: '/api/finance',
+    },
+    409,
+  )
 }
 
 type Dict = Record<string, unknown>
@@ -439,7 +462,7 @@ export async function mockFinanceApi(page: Page, opts: FinanceMockOptions = {}):
       // a loud failure in specs, not a silently-working mock.
       if (!url.searchParams.get('schoolId')) {
         return route.fulfill(
-          json({ statusCode: 400, message: 'Missing required parameter: schoolId' }, 400),
+          json({ statusCode: 400, errorCode: 'BAD_REQUEST', message: 'Missing required parameter: schoolId' }, 400),
         )
       }
       return route.fulfill(json(opts.studentFamilyBody ?? studentFamily()))
@@ -543,19 +566,17 @@ export async function mockFinanceApi(page: Page, opts: FinanceMockOptions = {}):
       const mode = opts.activateResponse ?? 'ok'
       if (mode === 'overlap') {
         return route.fulfill(
-          json({ code: 'AGREEMENT_OVERLAP', message: 'Another active agreement already covers overlapping students or fee types.' }, 409),
+          conflict409('AGREEMENT_OVERLAP', 'Another active agreement already covers overlapping students or fee types.', {
+            studentIds: ['stu-1'],
+            conflictingAgreementId: 'agr-9',
+          }),
         )
       }
       if (mode === 'conflict' && body.acknowledgeOpenInvoices !== true) {
         return route.fulfill(
-          json(
-            {
-              code: 'CONFLICTING_OPEN_INVOICES',
-              message: 'Open invoices conflict with this activation.',
-              conflicts: opts.activateConflicts ?? DEFAULT_CONFLICTS,
-            },
-            409,
-          ),
+          conflict409('CONFLICTING_OPEN_INVOICES', 'Open invoices conflict with this activation.', {
+            conflicts: opts.activateConflicts ?? DEFAULT_CONFLICTS,
+          }),
         )
       }
       return route.fulfill(
@@ -586,16 +607,11 @@ export async function mockFinanceApi(page: Page, opts: FinanceMockOptions = {}):
       const mode = opts.generateResponse ?? 'ok'
       if (mode !== 'ok' && body.overrideAgreement !== true) {
         return route.fulfill(
-          json(
-            {
-              code: 'AGREEMENT_ACTIVE',
-              message: 'An active agreement covers this student for the requested fee types.',
-              agreementId: 'agr-1',
-              coveredFeeTypes: ['tuition', 'exam'],
-              ...(mode === 'agreement_active' ? { existingInvoiceId: 'inv-1' } : {}),
-            },
-            409,
-          ),
+          conflict409('AGREEMENT_ACTIVE', 'An active agreement covers this student for the requested fee types.', {
+            agreementId: 'agr-1',
+            coveredFeeTypes: ['tuition', 'exam'],
+            ...(mode === 'agreement_active' ? { existingInvoiceId: 'inv-1' } : {}),
+          }),
         )
       }
       return route.fulfill(json(invoice({ id: 'inv-new', invoiceNumber: 'INV-2082-0099', status: 'draft', feeOverrideMode: 'catalog' }), 201))

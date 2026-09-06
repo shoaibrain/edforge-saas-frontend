@@ -250,10 +250,10 @@ export interface InvoiceFilterDto {
   gradeLevel?: string
   /**
    * Family-billing (FB) — filter by how invoices were priced.
-   * `standard` = fee-catalog only, `agreement` = agreement-priced,
-   * `mixed` = both sources on the same invoice.
+   * `standard` = fee-catalog only, `agreement` = agreement-priced. The
+   * backend accepts exactly these two values (anything else is a 400).
    */
-  billingSource?: 'standard' | 'agreement' | 'mixed'
+  billingSource?: 'standard' | 'agreement'
   /** Server-side cursor pagination — prefer over deprecated page/pageSize. */
   limit?: number
   cursor?: string

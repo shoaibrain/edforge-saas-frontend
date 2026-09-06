@@ -1,9 +1,15 @@
 /**
- * Mapper for nestjs-zod 400 validation bodies.
+ * Readers for the backend error envelope.
  *
- * The backend rejects invalid DTOs with:
- *   { statusCode: 400, message: 'Validation failed',
- *     errors: [{ path: (string|number)[], message, code }] }
+ * Every error crosses the wire through the backend's GlobalExceptionFilter as
+ *   { statusCode, errorCode, code?, message, errors?, details?, ...payload,
+ *     timestamp, requestId, path }
+ * where `code` is the domain error code the service threw (`AGREEMENT_ACTIVE`,
+ * `CONFLICTING_OPEN_INVOICES`, …) and `payload` is whatever it threw alongside
+ * (`agreementId`, `conflicts[]`, …). `errorCode` is only the HTTP status name
+ * (`CONFLICT`, `BAD_REQUEST`) — never branch on it.
+ *
+ * nestjs-zod 400s carry `errors: [{ path: (string|number)[], message, code }]`
  * mirrored under `details.validationErrors` with dotted path strings. The
  * messages are backend-authored, operator-readable strings (they carry the
  * cross-field invariant explanations), so callers surface them verbatim.
@@ -63,4 +69,15 @@ export function extractValidationErrors(err: unknown): ApiValidationError[] {
 export function extractApiMessage(err: unknown): string | null {
   const message = responseData(err)?.message
   return typeof message === 'string' && message.trim() !== '' ? message : null
+}
+
+/** The domain error `code` the service threw (e.g. `AGREEMENT_ACTIVE`). */
+export function extractApiErrorCode(err: unknown): string | null {
+  const code = (responseData(err) as { code?: unknown } | null)?.code
+  return typeof code === 'string' && code !== '' ? code : null
+}
+
+/** The whole error body, for callers that read the domain payload keys. */
+export function extractApiErrorBody(err: unknown): Record<string, unknown> | null {
+  return responseData(err) as Record<string, unknown> | null
 }

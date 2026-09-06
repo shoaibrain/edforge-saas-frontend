@@ -99,6 +99,8 @@ export interface AddFamilyMemberDto {
  * open invoice across the family's students plus a suggested allocation.
  */
 export interface FamilyOpenInvoicesResponse {
+  familyId: string
+  familyName: string
   students: Array<{
     studentId: string
     studentName: string
@@ -108,8 +110,11 @@ export interface FamilyOpenInvoicesResponse {
     invoiceNumber: string
     studentId: string
     studentName: string
+    gradeLevel?: string
+    status: string
     amountDue: number
     dueDate: string
+    currency: string
   }>
   totalDue: number
   suggestedAllocation: Array<{

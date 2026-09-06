@@ -79,10 +79,20 @@ export type PaymentStatus =
   | 'refunded'
   | 'partially_refunded'
 
+/** One allocation target on a recorded payment (response side). */
+export type PaymentApplication =
+  | { targetType: 'invoice'; invoiceId: string; amount: number }
+  | { targetType: 'opening_balance'; amount: number }
+
 export interface Payment {
   id: string
-  invoiceId: string
-  studentAccountId: string
+  /**
+   * `null` for multi-target family payments (`applications[]` carries the
+   * per-invoice breakdown instead); a string for single-invoice payments.
+   */
+  invoiceId: string | null
+  /** `null` for multi-target family payments, as `invoiceId`. */
+  studentAccountId: string | null
   schoolId: string
   amount: number // NPR
   currency: string
@@ -97,6 +107,10 @@ export interface Payment {
   refunds: Refund[]
   studentName?: string // Denormalized from invoice for display
   invoiceNumber?: string // Denormalized from invoice for display
+  /** Family the payment was applied against (multi-target payments). */
+  familyId?: string
+  /** Per-target breakdown; present on multi-target family payments. */
+  applications?: PaymentApplication[]
   createdAt: string
   updatedAt: string
 }

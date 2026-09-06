@@ -29,6 +29,7 @@ import {
   extractValidationErrors,
   extractApiMessage,
   type ApiValidationError,
+  extractApiErrorCode,
 } from '../../../lib/api-validation-errors'
 import { useFinanceSettings } from '../../../layouts/FinanceLayout'
 import { Step1FamilyMembers } from './Step1FamilyMembers'
@@ -133,6 +134,18 @@ export function AgreementCreateWizard({
         )
         setServerErrors(validationErrors)
         setStep(firstStep)
+        return
+      }
+      if (extractApiErrorCode(err) === 'AGREEMENT_OVERLAP') {
+        // Draft-create overlap: a member already has a draft/active agreement
+        // in this window. The backend message names the student, so it
+        // belongs on the members step alongside the translated explanation.
+        const backendMessage = extractApiMessage(err)
+        setServerErrors([
+          { path: 'studentIds', message: t('agreement.wizard.overlapConflict') },
+          ...(backendMessage ? [{ path: 'studentIds', message: backendMessage }] : []),
+        ])
+        setStep(0)
         return
       }
       toast.error(extractApiMessage(err) ?? t('agreement.wizard.createFailed'))

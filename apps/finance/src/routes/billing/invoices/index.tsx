@@ -71,37 +71,10 @@ import {
   extractValidationErrors,
   extractApiMessage,
 } from '../../../lib/api-validation-errors'
-
-/**
- * FB-3.10 — 409 `AGREEMENT_ACTIVE` body from the single-generate path. Emitted
- * ONLY by POST /finance/schools/:s/invoices when an active agreement covers the
- * student for the requested fee types. Bulk-generate records per-student
- * failures in its job result instead, so this dialog attaches to the single
- * modal only.
- */
-interface AgreementActiveError {
-  code: 'AGREEMENT_ACTIVE'
-  message?: string
-  agreementId: string
-  // Optional: the read-time guard includes it; the lock-backstop
-  // (concurrent-generate) 409 omits it. Gate the dialog on agreementId only.
-  existingInvoiceId?: string
-  coveredFeeTypes?: string[]
-}
-
-function parseAgreementActive(err: unknown): AgreementActiveError | null {
-  const resp = (err as { response?: { status?: number; data?: unknown } } | undefined)?.response
-  if (resp?.status !== 409) return null
-  const data = resp.data as Partial<AgreementActiveError> | undefined
-  if (data?.code !== 'AGREEMENT_ACTIVE' || !data.agreementId) return null
-  return {
-    code: 'AGREEMENT_ACTIVE',
-    message: data.message,
-    agreementId: data.agreementId,
-    existingInvoiceId: data.existingInvoiceId,
-    coveredFeeTypes: data.coveredFeeTypes ?? [],
-  }
-}
+import {
+  parseAgreementActive,
+  type AgreementActiveError,
+} from '../../../lib/agreement-errors'
 
 type InvoiceStatusFilter = '' | 'draft' | 'issued' | 'partially_paid' | 'paid' | 'overdue' | 'cancelled'
 

@@ -618,7 +618,8 @@
         "cancel": "Cancel"
       },
       "serverValidation": "The server rejected the submission:",
-      "createFailed": "Could not create agreement"
+      "createFailed": "Could not create agreement",
+      "overlapConflict": "Another draft or active agreement already covers one of these students in this period."
     }
   },
   "feeStructure": {

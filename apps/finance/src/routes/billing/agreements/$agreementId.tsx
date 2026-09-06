@@ -34,46 +34,12 @@ import { formatDateDual } from '../../../utils/format-date'
 import { FinanceStatusChip } from '../../../components/shared'
 import { feeTypeLabel } from '../../../components/shared/fee-types'
 import { extractApiMessage } from '../../../lib/api-validation-errors'
-
-type ConflictKind = 'openInvoices' | 'overlap' | null
-
-/** Read the backend error code off an axios-shaped mutation error. */
-function conflictKindFromError(err: unknown): ConflictKind {
-  const code = (err as { response?: { data?: { code?: string } } } | undefined)
-    ?.response?.data?.code
-  if (code === 'CONFLICTING_OPEN_INVOICES') return 'openInvoices'
-  if (code === 'AGREEMENT_OVERLAP') return 'overlap'
-  return null
-}
-
-/** One conflicting open invoice off the 409 CONFLICTING_OPEN_INVOICES body. */
-interface OpenInvoiceConflict {
-  invoiceId: string
-  invoiceNumber: string
-  grandTotal: number
-  matchedFeeTypes: string[]
-}
-
-function openInvoiceConflictsFromError(err: unknown): OpenInvoiceConflict[] {
-  // Backend throws ConflictException({ code, message, conflicts }) — the
-  // count is the length of `conflicts`; each entry identifies the invoice.
-  const conflicts = (
-    err as { response?: { data?: { conflicts?: unknown } } } | undefined
-  )?.response?.data?.conflicts
-  if (!Array.isArray(conflicts)) return []
-  return conflicts
-    .filter(
-      (c): c is Record<string, unknown> => !!c && typeof c === 'object',
-    )
-    .map((c) => ({
-      invoiceId: typeof c.invoiceId === 'string' ? c.invoiceId : '',
-      invoiceNumber: typeof c.invoiceNumber === 'string' ? c.invoiceNumber : '',
-      grandTotal: typeof c.grandTotal === 'number' ? c.grandTotal : 0,
-      matchedFeeTypes: Array.isArray(c.matchedFeeTypes)
-        ? c.matchedFeeTypes.map(String)
-        : [],
-    }))
-}
+import {
+  conflictKindFromError,
+  openInvoiceConflictsFromError,
+  type ConflictKind,
+  type OpenInvoiceConflict,
+} from '../../../lib/agreement-errors'
 
 export default function AgreementDetailPage() {
   const navigate = useNavigate()

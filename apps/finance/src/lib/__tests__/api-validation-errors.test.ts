@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest'
 import {
   extractValidationErrors,
   extractApiMessage,
+  extractApiErrorCode,
+  extractApiErrorBody,
 } from '../api-validation-errors'
 
 /**
@@ -96,5 +98,55 @@ describe('extractApiMessage', () => {
     expect(extractApiMessage(new Error('boom'))).toBeNull()
     expect(extractApiMessage(axiosError({ message: '' }))).toBeNull()
     expect(extractApiMessage(axiosError({ message: 42 }))).toBeNull()
+  })
+})
+
+/**
+ * A 409 exactly as the backend GlobalExceptionFilter emits it: envelope
+ * fields plus the domain `code` and payload the finance service threw.
+ */
+const WIRE_409_BODY = {
+  statusCode: 409,
+  errorCode: 'CONFLICT',
+  code: 'AGREEMENT_ACTIVE',
+  message: 'This agreement already priced an invoice this term.',
+  agreementId: 'agr-1',
+  existingInvoiceId: 'inv-1',
+  coveredFeeTypes: ['tuition'],
+  timestamp: '2026-09-06T00:00:00.000Z',
+  requestId: 'req-1',
+  path: '/finance/schools/s-1/invoices',
+}
+
+describe('extractApiErrorCode', () => {
+  it('reads the domain code off the wire envelope, not errorCode', () => {
+    const err = { response: { status: 409, data: WIRE_409_BODY } }
+    expect(extractApiErrorCode(err)).toBe('AGREEMENT_ACTIVE')
+  })
+
+  it('is null for a 400 validation body (no domain code)', () => {
+    const err = { response: { status: 400, data: LIVE_400_BODY } }
+    expect(extractApiErrorCode(err)).toBeNull()
+  })
+
+  it('is null for network and non-axios errors', () => {
+    expect(extractApiErrorCode(new Error('Network Error'))).toBeNull()
+    expect(extractApiErrorCode(undefined)).toBeNull()
+    expect(extractApiErrorCode({ response: { data: 'gateway timeout' } })).toBeNull()
+  })
+})
+
+describe('extractApiErrorBody', () => {
+  it('returns the full body so callers can read the payload keys', () => {
+    const err = { response: { status: 409, data: WIRE_409_BODY } }
+    const body = extractApiErrorBody(err)
+    expect(body?.agreementId).toBe('agr-1')
+    expect(body?.existingInvoiceId).toBe('inv-1')
+    expect(body?.coveredFeeTypes).toEqual(['tuition'])
+  })
+
+  it('is null when there is no object body', () => {
+    expect(extractApiErrorBody(new Error('boom'))).toBeNull()
+    expect(extractApiErrorBody({ response: { data: 'text' } })).toBeNull()
   })
 })
