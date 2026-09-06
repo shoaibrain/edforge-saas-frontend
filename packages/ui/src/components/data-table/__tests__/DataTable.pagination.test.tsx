@@ -269,3 +269,53 @@ describe('DataTable pagination — server-side', () => {
     cleanup()
   })
 })
+
+/**
+ * Issue #356 — pressing Next at the end of the loaded rows must reveal the
+ * next unseen row, not step over a block of them.
+ *
+ * The pre-existing auto-advance test above uses 20 rows at page size 20, so
+ * the last loaded page is exactly full and a plain `nextPage()` happens to be
+ * right. It stayed green while every short last page — the normal case, since
+ * the 50-row server page does not divide by the 20-row client page — skipped
+ * the rows that filled it out.
+ */
+describe('DataTable pagination — Next past the loaded rows skips nothing (#356)', () => {
+  it('lands on the page holding the first unseen row, not one page further', async () => {
+    const onLoadMore = vi.fn()
+    const props = (data: Row[], isFetching: boolean) => ({
+      columns,
+      data,
+      pagination: { pageSize: 20 },
+      serverPagination: { hasMore: true, isFetching, onLoadMore },
+    })
+
+    const { getByText, rerender, queryByText } = render(
+      <DataTable<Row> {...props(rows(50), false)} />,
+    )
+
+    // Walk to the third client page (41-50), the end of the loaded rows.
+    fireEvent.click(getByText('Next'))
+    expect(queryByText(/Showing 21-40 of 50\+/)).not.toBeNull()
+    fireEvent.click(getByText('Next'))
+    expect(queryByText(/Showing 41-50 of 50\+/)).not.toBeNull()
+
+    // The boundary click asks the server for more.
+    fireEvent.click(getByText('Next'))
+    expect(onLoadMore).toHaveBeenCalledTimes(1)
+
+    rerender(<DataTable<Row> {...props(rows(50), true)} />)
+    rerender(<DataTable<Row> {...props(rows(100), false)} />)
+
+    // Rows 41-50 were the short last page; the newly loaded rows fill it out
+    // to 41-60, so 51-60 are revealed without being stepped over.
+    await waitFor(() => {
+      expect(queryByText(/Showing 41-60 of 100\+/)).not.toBeNull()
+    })
+    // The regression this guards: advancing one page from a short page, which
+    // lands on 61-80 and steps over rows 51-60.
+    expect(queryByText(/Showing 61-80 of 100\+/)).toBeNull()
+    cleanup()
+  })
+
+})
