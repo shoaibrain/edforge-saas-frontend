@@ -36,12 +36,6 @@ import type {
  * Does this fee apply to this student? Phase 1: gradeLevels match only.
  * Empty gradeLevels[] on the fee structure means "applies to all grades".
  */
-/**
- * Name placeholder for the agreement replacement line. Renderers translate
- * it; keeping a key here avoids pulling i18n into a pure math module.
- */
-export const AGREEMENT_LINE_KEY = 'bulkGenerate.agreementLine'
-
 export function feeApplies(fee: FeeStructure, student: StudentSearchResult): boolean {
   if (!fee.gradeLevels || fee.gradeLevels.length === 0) return true
   return fee.gradeLevels.includes(student.currentGradeLevel)
@@ -118,8 +112,10 @@ export function computeStudentInvoice(
   const agreementAmount = Number(agreement?.agreementAmount) || 0
   if (suppressed.size > 0 && agreementAmount > 0) {
     lines.push({
+      // Renderers label this from `isAgreement`; this module stays free of
+      // i18n, and an untranslated key can never reach the screen.
       key: `agreement-${student.studentId}`,
-      name: AGREEMENT_LINE_KEY,
+      name: '',
       base: agreementAmount,
       total: agreementAmount,
       isAgreement: true,

@@ -946,6 +946,8 @@
       "lineItemCount": "{{count}} line item",
       "lineItemCount_plural": "{{count}} line items",
       "customBadge": "custom",
+      "agreementLine": "Family agreement",
+      "replacedBadge": "Replaced",
       "invoiceTotal": "Invoice total"
     },
     "success": {

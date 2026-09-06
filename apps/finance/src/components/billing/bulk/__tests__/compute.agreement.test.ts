@@ -79,4 +79,25 @@ describe('agreement-aware projection (#465)', () => {
     )
     expect(inv.total).toBe(13150)
   })
+  it('carries no i18n key on the agreement line — the renderer labels it', () => {
+    const inv = computeStudentInvoice(grade3, feesFixture, selected, [], {
+      suppressedFeeStructureIds: ['fee-g3'],
+      agreementAmount: 12000,
+    })
+    const agreementLine = inv.lines.find(l => l.isAgreement)
+    // A key in the data layer reached the screen verbatim once already.
+    expect(agreementLine?.name).toBe('')
+    expect(agreementLine?.name).not.toMatch(/bulkGenerate\./)
+  })
+
+  it('flags the replaced fee so the renderer can strike it through', () => {
+    const inv = computeStudentInvoice(grade3, feesFixture, selected, [], {
+      suppressedFeeStructureIds: ['fee-g3'],
+      agreementAmount: 12000,
+    })
+    const replaced = inv.lines.find(l => l.feeStructureId === 'fee-g3')
+    // base keeps the catalog price so the operator sees what was displaced;
+    // total is 0 so it contributes nothing.
+    expect(replaced).toMatchObject({ base: 18000, total: 0, isSuppressed: true })
+  })
 })
