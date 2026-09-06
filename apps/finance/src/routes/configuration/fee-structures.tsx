@@ -28,7 +28,8 @@ import { Button, PageHeader, StatBand, type StatMetric } from "@edforge/ui";
 import { Plus, AlertTriangle } from "lucide-react";
 import { useAppStore } from "../../stores/app.store";
 import {
-  useFeeStructures,
+  useFeeStructuresInfinite,
+  buildServerPaginationProps,
   useCreateFeeStructure,
   useUpdateFeeStructure,
   useDeleteFeeStructure,
@@ -143,11 +144,22 @@ export default function FeeStructuresPage() {
     "",
   );
 
+  // Issue #357 — useFeeStructuresInfinite already existed and had no caller,
+  // so this list stopped at the first server page of 50.
   const {
-    data: feeStructures,
+    items: feeStructures,
     isLoading,
-    isError,
-  } = useFeeStructures(schoolId ?? "");
+    error: listError,
+    hasMore,
+    loadMore,
+    isFetchingNextPage,
+  } = useFeeStructuresInfinite(schoolId ?? "");
+  const isError = !!listError;
+  const { serverPagination, isFetching } = buildServerPaginationProps({
+    hasMore,
+    loadMore,
+    isFetchingNextPage,
+  });
   const createMutation = useCreateFeeStructure(schoolId ?? "");
   const updateMutation = useUpdateFeeStructure(schoolId ?? "");
   const deleteMutation = useDeleteFeeStructure(schoolId ?? "");
@@ -389,6 +401,8 @@ export default function FeeStructuresPage() {
       <FeeStructureList
         feeStructures={filteredFeeStructures}
         isLoading={isLoading}
+        isFetching={isFetching}
+        serverPagination={serverPagination}
         onEdit={(fee) => setEditingFee(fee)}
         onDelete={(fee) => setDeletingFee(fee)}
       />

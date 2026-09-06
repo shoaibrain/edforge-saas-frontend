@@ -35,6 +35,7 @@ import {
   useStudentAccounts,
   useStudentLedger,
   useInvoices,
+  buildServerPaginationProps,
 } from '@edforge/finance-services'
 import type { StudentAccount, StudentLedgerEntry, Invoice } from '@edforge/types'
 import { useCurrency } from '@edforge/types/use-currency'
@@ -560,7 +561,26 @@ export default function StudentAccountsPage() {
   const { format, formatCompact } = useCurrency(settings)
   const columns = useMemo(() => buildColumns(format, settings, t), [format, settings, t])
 
-  const { data: accounts, isLoading } = useStudentAccounts(schoolId ?? '')
+  const {
+    data: accounts,
+    isLoading,
+    hasMore,
+    loadMore,
+    isFetchingNextPage,
+  } = useStudentAccounts(schoolId ?? '')
+
+  // Issue #357 — the hook has always been cursor-paginated; the page just
+  // never passed the controls on, so the table stopped at the first server
+  // page and stated that page's size as the total.
+  const { serverPagination, isFetching } = buildServerPaginationProps({
+    hasMore,
+    loadMore,
+    isFetchingNextPage,
+  })
+
+  // Counts below are computed over the rows loaded so far. While the server
+  // holds more, they are a lower bound and have to read as one.
+  const countSuffix = hasMore ? '+' : ''
 
   const accountList: StudentAccount[] = useMemo(() => accounts ?? [], [accounts])
 
@@ -629,7 +649,7 @@ export default function StudentAccountsPage() {
   const metrics: StatMetric[] = [
     {
       label: t('studentAccount.summary.totalStudents'),
-      value: String(kpi.totalStudents),
+      value: `${kpi.totalStudents}${countSuffix}`,
       iconSignature: 'students',
       state: 'normal',
       primary: true,
@@ -637,21 +657,21 @@ export default function StudentAccountsPage() {
     },
     {
       label: t('studentAccount.summary.outstanding'),
-      value: formatCompact(kpi.totalOutstanding),
+      value: `${formatCompact(kpi.totalOutstanding)}${countSuffix}`,
       iconSignature: 'finance_receipt',
       state: 'normal',
       sub: t('studentAccount.summary.withBalanceCount', { count: kpi.overdueCount }),
     },
     {
       label: t('studentAccount.summary.fullyPaid'),
-      value: String(kpi.fullyPaidCount),
+      value: `${kpi.fullyPaidCount}${countSuffix}`,
       iconSignature: 'finance',
       state: 'normal',
       sub: t('studentAccount.summary.noBalance'),
     },
     {
       label: t('studentAccount.summary.withBalance'),
-      value: String(kpi.overdueCount),
+      value: `${kpi.overdueCount}${countSuffix}`,
       iconSignature: 'atrisk',
       state: 'normal',
       sub: t('studentAccount.summary.withBalanceCount', { count: kpi.overdueCount }),
@@ -709,6 +729,8 @@ export default function StudentAccountsPage() {
         data={accountList}
         getRowId={(row) => row.id}
         isLoading={isLoading}
+        isFetching={isFetching}
+        serverPagination={serverPagination}
         tableId="finance.accounts"
         searchPlaceholder={t('studentAccount.searchPlaceholder')}
         enableSorting={true}
