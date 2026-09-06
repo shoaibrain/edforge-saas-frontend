@@ -14,6 +14,7 @@ import { useCurrency } from '@edforge/types/use-currency'
 import { useFinanceSettings } from '../../../layouts/FinanceLayout'
 import { BillingSourceChip, type BillingSource } from '../../shared'
 import { computeBatch } from './compute'
+import type { StudentAgreementPricing } from './types'
 import type {
   ComputedInvoice,
   CustomLine,
@@ -47,11 +48,32 @@ export function Step4Review({
   const { t } = useTranslation('payments')
   const settings = useFinanceSettings()
   const { format: formatCurrency } = useCurrency(settings)
+  // #465 — the server preview says what each student's agreement replaces
+  // and for how much. Without it the projection prices agreement-covered
+  // students at catalog rates and the operator confirms a total that will
+  // never be billed. Absent (preview still loading, or the backend omitted
+  // it) falls back to catalog pricing, which is the previous behaviour.
+  const agreementsByStudent = useMemo(() => {
+    const map: Record<string, StudentAgreementPricing> = {}
+    for (const p of previewQuery.data?.students ?? []) {
+      if (p.suppressedFeeStructureIds?.length || p.agreementAmount) {
+        map[p.studentId] = {
+          billingSource: p.billingSource,
+          suppressedFeeStructureIds: p.suppressedFeeStructureIds,
+          agreementAmount: p.agreementAmount,
+          agreementBlocked: p.agreementBlocked,
+        }
+      }
+    }
+    return map
+  }, [previewQuery.data?.students])
+
   const batch = useMemo(
     () => computeBatch(students, fees, selectedFees, customLines, {
       skipZeroTotal: details.skipZeroTotal,
+      agreements: agreementsByStudent,
     }),
-    [students, fees, selectedFees, customLines, details.skipZeroTotal],
+    [students, fees, selectedFees, customLines, details.skipZeroTotal, agreementsByStudent],
   )
   const billableRows = batch.perStudent.filter(p => details.skipZeroTotal ? p.total > 0 : true)
   const skippedZero = batch.zeroCount

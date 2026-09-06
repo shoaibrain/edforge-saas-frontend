@@ -127,6 +127,30 @@ export interface ComputedLine {
   base: number
   total: number
   isCustom?: boolean
+  /**
+   * This catalog fee is replaced by the student's billing agreement, so it
+   * contributes 0 to the total. Shown struck through rather than hidden, so
+   * the operator can see what the agreement displaced (#465).
+   */
+  isSuppressed?: boolean
+  /** The agreement's replacement line. */
+  isAgreement?: boolean
+}
+
+/**
+ * What a student's active agreement does to this batch, from bulk-preview.
+ * Absent for students with no agreement, and absent entirely when the
+ * preview has not loaded or the backend omitted it — in which case the
+ * projection falls back to catalog pricing, exactly as before (#465).
+ */
+export interface StudentAgreementPricing {
+  billingSource?: 'standard' | 'agreement' | 'mixed'
+  /** Requested fee structures the agreement replaces. */
+  suppressedFeeStructureIds?: string[]
+  /** What replaces them. */
+  agreementAmount?: number
+  /** The agreement already priced this term — generation will reject it. */
+  agreementBlocked?: boolean
 }
 
 export interface ComputedInvoice {
