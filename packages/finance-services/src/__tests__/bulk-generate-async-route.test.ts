@@ -83,11 +83,11 @@ describe('bulkGenerateInvoices — Sprint E.5 sync/async discrimination', () => 
       data: { generated: 0, skipped: 0, errors: [] },
     })
     await bulkGenerateInvoices(SCHOOL, baseDto)
-    expect(mockApiPostWithStatus).toHaveBeenCalledWith(
-      `/finance/schools/${SCHOOL}/invoices/bulk-generate`,
-      baseDto,
-      undefined,
-    )
+    const [url, body, config] = mockApiPostWithStatus.mock.calls[0]
+    expect(url).toBe(`/finance/schools/${SCHOOL}/invoices/bulk-generate`)
+    expect(body).toEqual(baseDto)
+    // The route is @Idempotent() server-side and 400s without this header (#347).
+    expect(config?.headers?.['Idempotency-Key']).toEqual(expect.any(String))
   })
 
   it('forwards ?async=true via axios params when options.async is set', async () => {
@@ -96,11 +96,11 @@ describe('bulkGenerateInvoices — Sprint E.5 sync/async discrimination', () => 
       data: { jobId: 'job-forced-async' },
     })
     await bulkGenerateInvoices(SCHOOL, baseDto, { async: true })
-    expect(mockApiPostWithStatus).toHaveBeenCalledWith(
-      `/finance/schools/${SCHOOL}/invoices/bulk-generate`,
-      baseDto,
-      { params: { async: true } },
-    )
+    const [url, body, config] = mockApiPostWithStatus.mock.calls[0]
+    expect(url).toBe(`/finance/schools/${SCHOOL}/invoices/bulk-generate`)
+    expect(body).toEqual(baseDto)
+    expect(config?.params).toEqual({ async: true })
+    expect(config?.headers?.['Idempotency-Key']).toEqual(expect.any(String))
   })
 
   it('omits the params config when options.async is omitted (no &async= noise)', async () => {
@@ -110,6 +110,8 @@ describe('bulkGenerateInvoices — Sprint E.5 sync/async discrimination', () => 
     })
     await bulkGenerateInvoices(SCHOOL, baseDto)
     const [, , config] = mockApiPostWithStatus.mock.calls[0]
-    expect(config).toBeUndefined()
+    // The config now always carries the required Idempotency-Key header, but
+    // still no `params` unless async was asked for.
+    expect(config?.params).toBeUndefined()
   })
 })
