@@ -343,14 +343,27 @@ function PerStudentRow({
             {inv.lines.map(line => (
               <tr key={line.key}>
                 <td className="px-3 py-1.5 text-[rgb(var(--text-secondary))]">
-                  {line.name || t('bulkGenerate.step2.customLineFallback')}
+                  {line.isAgreement
+                    ? t('bulkGenerate.step4.agreementLine')
+                    : line.name || t('bulkGenerate.step2.customLineFallback')}
+                  {line.isSuppressed && (
+                    <span className={/* allow-arbitrary-spacing: dense bulk-wizard chip; pre-token-sweep */ "ml-1.5 text-[10px] px-1 py-0 rounded bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-tertiary))]"}>
+                      {t('bulkGenerate.step4.replacedBadge')}
+                    </span>
+                  )}
                   {line.isCustom && (
                     <span className={/* allow-arbitrary-spacing: dense bulk-wizard chip; pre-token-sweep */ "ml-1.5 text-[10px] px-1 py-0 rounded bg-[rgb(var(--background-secondary))] text-[rgb(var(--text-tertiary))]"}>
                       {t('bulkGenerate.step4.customBadge')}
                     </span>
                   )}
                 </td>
-                <td className="px-3 py-1.5 text-right font-mono text-[rgb(var(--text-secondary))]">
+                <td
+                  className={
+                    line.isSuppressed
+                      ? 'px-3 py-1.5 text-right font-mono line-through text-[rgb(var(--text-disabled))]'
+                      : 'px-3 py-1.5 text-right font-mono text-[rgb(var(--text-secondary))]'
+                  }
+                >
                   {formatCurrency(line.base)}
                 </td>
               </tr>

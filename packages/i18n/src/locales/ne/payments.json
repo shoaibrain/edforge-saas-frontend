@@ -946,6 +946,8 @@
       "lineItemCount": "{{count}} लाइन आइटम",
       "lineItemCount_plural": "{{count}} लाइन आइटमहरू",
       "customBadge": "अनुकूल",
+      "agreementLine": "पारिवारिक सम्झौता",
+      "replacedBadge": "प्रतिस्थापित",
       "invoiceTotal": "बीजक जम्मा"
     },
     "success": {
