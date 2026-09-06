@@ -25,7 +25,7 @@
  * Renders one Step* component at a time + Stepper + nav footer.
  */
 
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   ChevronLeft,
@@ -291,11 +291,33 @@ export function BulkGenerateWizard({
     toast.error(msg)
   }
 
+  /**
+   * One `Idempotency-Key` per distinct submission.
+   *
+   * The server route is `@Idempotent()`: it requires the header and uses it
+   * to collapse a double submit. Minting a key per attempt would pass the
+   * header check while defeating that, so the key is cached against the
+   * payload — pressing Generate twice reuses it, while the retry-failed
+   * flow (a different, narrowed payload) correctly gets a new one.
+   */
+  const idempotencyRef = useRef<{ signature: string; key: string } | null>(null)
+  const idempotencyKeyFor = (dto: BulkGenerateInvoiceDto): string => {
+    const signature = JSON.stringify(dto)
+    if (idempotencyRef.current?.signature !== signature) {
+      idempotencyRef.current = { signature, key: crypto.randomUUID() }
+    }
+    return idempotencyRef.current.key
+  }
+
   const dispatchSubmit = (restrictToStudentIds?: string[]) => {
-    generateMutation.mutate(buildSubmitDto(restrictToStudentIds), {
-      onSuccess: handleSubmitResult,
-      onError: handleSubmitError,
-    })
+    const dto = buildSubmitDto(restrictToStudentIds)
+    generateMutation.mutate(
+      { data: dto, options: { idempotencyKey: idempotencyKeyFor(dto) } },
+      {
+        onSuccess: handleSubmitResult,
+        onError: handleSubmitError,
+      },
+    )
   }
 
   const submit = () => {
@@ -310,6 +332,7 @@ export function BulkGenerateWizard({
     setResult(null)
     setAsyncJobId(null)
     setToastedJobId(null)
+    idempotencyRef.current = null
     setStep(0)
     setMaxReached(0)
     setSelection(emptySelection())

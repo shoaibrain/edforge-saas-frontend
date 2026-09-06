@@ -187,6 +187,17 @@ export interface BulkGenerateOptions {
    * the configured threshold (>25 students → async).
    */
   async?: boolean
+  /**
+   * Value for the required `Idempotency-Key` header.
+   *
+   * The route is `@Idempotent()` on the server, which both REQUIRES the
+   * header (a request without it is rejected 400) and uses it to
+   * deduplicate a double submit. Callers should therefore keep one key for
+   * one submission and reuse it when retrying that same submission —
+   * minting a fresh key per attempt satisfies the header check but
+   * defeats the deduplication it exists for. Defaults to a new UUID.
+   */
+  idempotencyKey?: string
 }
 
 /**
@@ -232,7 +243,10 @@ export async function bulkGenerateInvoices(
   options: BulkGenerateOptions = {},
 ): Promise<BulkGenerateResult> {
   const url = `/finance/schools/${schoolId}/invoices/bulk-generate`
-  const config = options.async ? { params: { async: true } } : undefined
+  const config = {
+    headers: { 'Idempotency-Key': options.idempotencyKey ?? crypto.randomUUID() },
+    ...(options.async ? { params: { async: true } } : {}),
+  }
   const { status, data: body } = await apiPostWithStatus<
     BulkGenerateInvoiceResponse | { jobId: string },
     BulkGenerateInvoiceDto
