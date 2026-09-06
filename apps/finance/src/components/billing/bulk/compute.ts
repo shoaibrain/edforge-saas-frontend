@@ -28,6 +28,7 @@ import type {
   CustomLine,
   FeeStructure,
   SelectedFeesMap,
+  StudentAgreementPricing,
   StudentSearchResult,
 } from './types'
 
@@ -35,6 +36,12 @@ import type {
  * Does this fee apply to this student? Phase 1: gradeLevels match only.
  * Empty gradeLevels[] on the fee structure means "applies to all grades".
  */
+/**
+ * Name placeholder for the agreement replacement line. Renderers translate
+ * it; keeping a key here avoids pulling i18n into a pure math module.
+ */
+export const AGREEMENT_LINE_KEY = 'bulkGenerate.agreementLine'
+
 export function feeApplies(fee: FeeStructure, student: StudentSearchResult): boolean {
   if (!fee.gradeLevels || fee.gradeLevels.length === 0) return true
   return fee.gradeLevels.includes(student.currentGradeLevel)
@@ -68,14 +75,36 @@ export function computeStudentInvoice(
   fees: ReadonlyArray<FeeStructure>,
   selectedFees: SelectedFeesMap,
   customLines: ReadonlyArray<CustomLine>,
+  agreement?: StudentAgreementPricing,
 ): ComputedInvoice {
   const lines: ComputedLine[] = []
   let subtotal = 0
+
+  // #465 — an active agreement replaces the catalog fees it covers. Without
+  // this the wizard previewed agreement-covered students at catalog rates:
+  // a family on a NPR 20,000 agreement showed NPR 33,000, and the operator
+  // confirmed a number that would never be billed. `suppressedFeeStructureIds`
+  // and `agreementAmount` come from bulk-preview, which derives them from the
+  // same code the generate path bills with.
+  const suppressed = new Set(agreement?.suppressedFeeStructureIds ?? [])
 
   for (const fee of fees) {
     if (!selectedFees[fee.id]) continue
     if (!feeApplies(fee, student)) continue
     const base = Number(fee.amount) || 0
+    if (suppressed.has(fee.id)) {
+      // Kept visible, contributing nothing — the operator should see what
+      // the agreement displaced rather than wonder where the fee went.
+      lines.push({
+        key: fee.id,
+        name: fee.name,
+        feeStructureId: fee.id,
+        base,
+        total: 0,
+        isSuppressed: true,
+      })
+      continue
+    }
     lines.push({
       key: fee.id,
       name: fee.name,
@@ -84,6 +113,18 @@ export function computeStudentInvoice(
       total: base,
     })
     subtotal += base
+  }
+
+  const agreementAmount = Number(agreement?.agreementAmount) || 0
+  if (suppressed.size > 0 && agreementAmount > 0) {
+    lines.push({
+      key: `agreement-${student.studentId}`,
+      name: AGREEMENT_LINE_KEY,
+      base: agreementAmount,
+      total: agreementAmount,
+      isAgreement: true,
+    })
+    subtotal += agreementAmount
   }
 
   for (const cli of customLines) {
@@ -125,10 +166,14 @@ export function computeBatch(
   fees: ReadonlyArray<FeeStructure>,
   selectedFees: SelectedFeesMap,
   customLines: ReadonlyArray<CustomLine>,
-  options: { skipZeroTotal?: boolean } = {},
+  options: {
+    skipZeroTotal?: boolean
+    /** studentId → agreement projection from bulk-preview (#465). */
+    agreements?: Readonly<Record<string, StudentAgreementPricing>>
+  } = {},
 ): ComputedBatch {
   const perStudent = students.map(s =>
-    computeStudentInvoice(s, fees, selectedFees, customLines),
+    computeStudentInvoice(s, fees, selectedFees, customLines, options.agreements?.[s.studentId]),
   )
   let grossTotal = 0
   let billableTotal = 0

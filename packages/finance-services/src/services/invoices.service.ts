@@ -293,7 +293,19 @@ export interface BulkPreviewResponse {
     studentId: string
     billingSource: 'standard' | 'agreement' | 'mixed'
     coveredFeeTypes?: string[]
+    /**
+     * #465 — the requested fee structures this student's agreement replaces
+     * and what replaces them, so a batch totals as
+     *   catalog(requested NOT suppressed) + agreementAmount
+     * instead of pricing agreement-covered students at catalog rates.
+     */
+    suppressedFeeStructureIds?: string[]
+    agreementAmount?: number
+    /** The agreement already priced this term — generation will reject. */
+    agreementBlocked?: boolean
   }>
+  /** #465 — how many students are blocked by the once-per-term guard. */
+  agreementBlockedCount?: number
 }
 
 /**
