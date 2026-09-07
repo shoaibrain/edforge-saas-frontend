@@ -8,6 +8,7 @@
     "build": "turbo build",
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",
+    "lint:test-collection": "node scripts/check-uncollected-tests.mjs",
     "clean": "rm -rf node_modules **/*/node_modules **/*/.turbo **/*/dist **/*/.cache .turbo dist .cache pnpm-lock.yaml **/*/tsconfig.tsbuildinfo",
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
     "dev:shell": "turbo dev --filter=@edforge/shell",

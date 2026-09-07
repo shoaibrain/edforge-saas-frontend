@@ -56,6 +56,12 @@ jobs:
       - name: Lint
         run: pnpm turbo lint
 
+      # Issue #353 — a test file named *.spec.* under apps/ or packages/ is
+      # never collected by vitest and silently contributes nothing. Runs
+      # before the suite so the failure names the cause, not a coverage gap.
+      - name: Test collection guard
+        run: pnpm lint:test-collection
+
       - name: Unit tests
         run: pnpm vitest run
 

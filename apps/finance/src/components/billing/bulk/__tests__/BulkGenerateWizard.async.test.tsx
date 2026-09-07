@@ -406,11 +406,19 @@ describe('BulkGenerateWizard — Sprint E.5 async-submit branching', () => {
     fireEvent.click(screen.getByRole('button', { name: /Generate 150/ }))
 
     expect(generateMutate).toHaveBeenCalledTimes(1)
-    const [dto] = generateMutate.mock.calls[0]
+    // The wizard dispatches the wrapped `{ data, options }` form so the
+    // Idempotency-Key rides along (#347). This assertion read the unwrapped
+    // legacy shape and had been failing silently — the file was never
+    // collected by CI until #353.
+    const [payload] = generateMutate.mock.calls[0]
+    const dto = payload.data
     expect(dto.selectionMode).toBe('students')
     expect(dto.studentIds).toHaveLength(150)
     expect(dto.feeStructureIds).toEqual(['fee-1'])
     expect(dto.academicYear).toBe('2026-27')
+    // The confirmation path must carry the key too; it is the branch a
+    // double-press is most likely to take.
+    expect(payload.options?.idempotencyKey).toEqual(expect.any(String))
   })
 
   it('studentCount ≤ 100 submits inline (no confirmation modal)', () => {
