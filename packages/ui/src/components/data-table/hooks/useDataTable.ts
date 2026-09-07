@@ -190,6 +190,25 @@ export function useDataTable<TData>(
     ...(enableExpanding && { getRowCanExpand: () => true }),
     enableMultiRowSelection: true,
 
+    // Issue #356 — TanStack defaults autoResetPageIndex to true whenever a
+    // pagination row model is present, so appending rows to `data` snaps the
+    // operator back to page 1 through the very setter this hook uses to hold
+    // the page. On a server-paginated table that fires exactly when the next
+    // page lands: the operator presses Next at the end of the loaded rows and
+    // is returned to row 1. The reset is queued, so it also lands after the
+    // pagination bar has moved the page and silently undoes it.
+    //
+    // Verified in the browser rather than in jsdom: a row ticked before the
+    // boundary press was still selected afterwards, so neither the route nor
+    // the table had remounted and the page index had genuinely been reset.
+    // Under `rerender` in a test the queued reset does not fire, which is why
+    // no unit test caught this.
+    //
+    // Every reset we actually want is already explicit above — search and
+    // column filters both snap to page 0 — so the automatic one is redundant
+    // as well as wrong.
+    autoResetPageIndex: false,
+
     // Pagination defaults (used when state.pagination is absent)
     initialState: {
       pagination: {

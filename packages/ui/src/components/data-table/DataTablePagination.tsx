@@ -33,16 +33,34 @@ export function DataTablePagination<TData>({
   const start = loadedRows === 0 ? 0 : pageIndex * pageSize + 1
   const end = Math.min((pageIndex + 1) * pageSize, loadedRows)
 
-  // Track whether we just requested more server data so we can advance the
-  // page once the new rows land. Without this the user would have to click
-  // Next a second time after the fetch completes.
-  const pendingAdvance = useRef(false)
+  // Track the Next press that asked the server for more rows, so the page can
+  // move once they land. Without this the operator would have to press Next a
+  // second time after the fetch completes.
+  //
+  // `from` is the count of rows already shown at press time, so the row the
+  // operator has not seen yet is at index `from`. Landing on the page that
+  // holds it is correct whether the page they pressed from was full or short:
+  //
+  //   full  — 40 loaded, size 20, on 21-40 → from 40 → page 2 → 41-60
+  //   short — 50 loaded, size 20, on 41-50 → from 50 → page 2 → 41-60
+  //
+  // The short case is why this is not a plain `nextPage()`. Advancing one page
+  // from a short page lands on 61-80 and steps over rows 51-60 entirely, which
+  // no scroll or Prev press would reveal as missing.
+  //
+  // `loadedAt` gates the effect until the rows have actually arrived; the
+  // fetching flag alone can still read false on the render that schedules it.
+  const pendingAdvance = useRef<{ from: number; loadedAt: number } | null>(null)
   useEffect(() => {
-    if (pendingAdvance.current && !serverPagination?.isFetching && table.getCanNextPage()) {
-      pendingAdvance.current = false
-      table.nextPage()
+    const pending = pendingAdvance.current
+    if (!pending || serverPagination?.isFetching) return
+    if (loadedRows <= pending.loadedAt) return
+    pendingAdvance.current = null
+    const target = Math.floor(pending.from / pageSize)
+    if (target * pageSize < loadedRows) {
+      table.setPageIndex(target)
     }
-  }, [serverPagination?.isFetching, loadedRows, table])
+  }, [serverPagination?.isFetching, loadedRows, pageSize, table])
 
   const serverHasMore = serverPagination?.hasMore ?? false
   const canClientNext = table.getCanNextPage()
@@ -54,8 +72,8 @@ export function DataTablePagination<TData>({
       return
     }
     if (serverHasMore && serverPagination && !serverPagination.isFetching) {
-      // Schedule an auto-advance for when the fetched rows land.
-      pendingAdvance.current = true
+      // Schedule the move for when the fetched rows land.
+      pendingAdvance.current = { from: end, loadedAt: loadedRows }
       serverPagination.onLoadMore()
     }
   }
