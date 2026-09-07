@@ -45,6 +45,7 @@ import {
   useCreateRefund,
   useExportPaymentsCsv,
   useDownloadReceiptPdf,
+  buildServerPaginationProps,
 } from '@edforge/finance-services'
 import { useSchoolGradeOptions } from '../../../hooks/useSchoolGradeOptions'
 import { formatGatewayLabel } from '@edforge/types'
@@ -728,11 +729,29 @@ export default function PaymentsPage() {
     includeUnknownOption: true,
   })
 
-  const { data: payments, isLoading } = useSchoolPayments(schoolId ?? '', {
+  const {
+    data: payments,
+    isLoading,
+    hasMore,
+    loadMore,
+    isFetchingNextPage,
+  } = useSchoolPayments(schoolId ?? '', {
     ...(statusFilter && { status: statusFilter }),
     ...(gatewayFilter && { gateway: gatewayFilter }),
     ...(gradeFilter && { gradeLevel: gradeFilter }),
   })
+
+  // Issue #357 — the hook is cursor-paginated; the page never passed the
+  // controls on, so the table stopped at the first server page.
+  const { serverPagination, isFetching } = buildServerPaginationProps({
+    hasMore,
+    loadMore,
+    isFetchingNextPage,
+  })
+
+  // Counts below are computed over the rows loaded so far; while the server
+  // holds more they are a lower bound.
+  const countSuffix = hasMore ? '+' : ''
   const voidMutation = useVoidPayment(schoolId ?? '')
   const refundMutation = useCreateRefund(schoolId ?? '')
   const exportCsvMutation = useExportPaymentsCsv()
@@ -886,7 +905,7 @@ export default function PaymentsPage() {
   const metrics: StatMetric[] = [
     {
       label: t('overview.kpi.collected'),
-      value: formatCompact(kpi.totalCollected),
+      value: `${formatCompact(kpi.totalCollected)}${countSuffix}`,
       iconSignature: 'finance',
       state: 'normal',
       primary: true,
@@ -894,21 +913,21 @@ export default function PaymentsPage() {
     },
     {
       label: t('status.completed'),
-      value: String(kpi.completedCount),
+      value: `${kpi.completedCount}${countSuffix}`,
       iconSignature: 'finance_note',
       state: 'normal',
       sub: t('paymentsList.processed'),
     },
     {
       label: t('paymentsList.partialRefunds'),
-      value: String(kpi.partialRefundCount),
+      value: `${kpi.partialRefundCount}${countSuffix}`,
       iconSignature: 'finance_receipt',
       state: 'normal',
       sub: t('status.pending'),
     },
     {
       label: t('status.cancelled'),
-      value: String(kpi.cancelledCount),
+      value: `${kpi.cancelledCount}${countSuffix}`,
       iconSignature: 'atrisk',
       state: kpi.cancelledCount > 0 ? 'normal' : 'muted',
     },
@@ -979,6 +998,8 @@ export default function PaymentsPage() {
         data={paymentList}
         getRowId={(row) => row.id}
         isLoading={isLoading}
+        isFetching={isFetching}
+        serverPagination={serverPagination}
         tableId="finance.payments"
         enableSorting
         enableRowSelection={true}

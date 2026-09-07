@@ -17,7 +17,7 @@ import {
 } from "@edforge/ui";
 import { Pencil, Trash2, Layers } from "lucide-react";
 import { AnimatedIcon } from "@edforge/ui/motion";
-import { useMemo } from "react";
+import { useMemo, type ComponentProps } from "react";
 import { FeeTypeChip } from "../shared";
 
 interface FeeStructureListProps {
@@ -25,6 +25,12 @@ interface FeeStructureListProps {
   isLoading?: boolean;
   onEdit: (fee: FeeStructure) => void;
   onDelete: (fee: FeeStructure) => void;
+  /**
+   * Issue #357 — supplied by the page from the cursor hook. Optional so the
+   * component still renders standalone in tests and stories.
+   */
+  serverPagination?: ComponentProps<typeof TanstackDataTable>["serverPagination"];
+  isFetching?: boolean;
 }
 
 export function FeeStructureList({
@@ -32,6 +38,8 @@ export function FeeStructureList({
   isLoading,
   onEdit,
   onDelete,
+  serverPagination,
+  isFetching,
 }: FeeStructureListProps) {
   const settings = useFinanceSettings();
   const { t, i18n } = useTranslation("payments");
@@ -170,6 +178,8 @@ export function FeeStructureList({
       columns={columns}
       data={safeList}
       isLoading={isLoading}
+      isFetching={isFetching}
+      serverPagination={serverPagination}
       tableId="finance.fee-structures"
       enableSorting={true}
       pagination={{ pageSize: 10 }}
