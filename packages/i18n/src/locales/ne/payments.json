@@ -939,6 +939,8 @@
       "serverPreviewUnavailable": "सर्भर पूर्वावलोकन उपलब्ध छैन - सिर्जना अझै काम गर्छ, तर duplicate / segment काउन्ट देखाइने छैन।",
       "serverPreview": "सर्भर पूर्वावलोकन",
       "duplicateSkip": "दोहोरो छोड्ने",
+      "agreementBlocked": "सम्झौता पहिले नै बिल गरिएको",
+      "agreementBlockedBadge": "पहिले नै बिल गरिएको",
       "hasBalanceDue": "बाँकी रकम छ",
       "newAdmissions": "नयाँ भर्ना",
       "notBilledThisPeriod": "यो अवधिमा बीजक नभएको",

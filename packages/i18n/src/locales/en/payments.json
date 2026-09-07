@@ -939,6 +939,8 @@
       "serverPreviewUnavailable": "Server preview unavailable - generate will still work, but duplicate / segment counts will not be shown.",
       "serverPreview": "Server preview",
       "duplicateSkip": "Duplicate skip",
+      "agreementBlocked": "Agreement already billed",
+      "agreementBlockedBadge": "Already billed",
       "hasBalanceDue": "Has balance due",
       "newAdmissions": "New admissions",
       "notBilledThisPeriod": "Not billed this period",

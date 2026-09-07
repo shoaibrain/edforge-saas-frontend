@@ -7,7 +7,7 @@
  */
 
 import { useMemo, useState } from 'react'
-import { ChevronDown, Users, FileText, Calendar, Shield, AlertTriangle, Loader2, Info, UserPlus, AlertCircle } from 'lucide-react'
+import { ChevronDown, Users, FileText, Calendar, Shield, ShieldAlert, AlertTriangle, Loader2, Info, UserPlus, AlertCircle } from 'lucide-react'
 import type { UseQueryResult } from '@tanstack/react-query'
 import { useTranslation } from '@edforge/i18n'
 import { useCurrency } from '@edforge/types/use-currency'
@@ -185,6 +185,7 @@ export function Step4Review({
                   key={inv.studentId}
                   inv={inv}
                   billingSource={billingSourceByStudent.get(inv.studentId)}
+                  agreementBlocked={agreementsByStudent[inv.studentId]?.agreementBlocked}
                 />
               ))}
               {billableRows.length === 0 && (
@@ -267,6 +268,20 @@ function BulkPreviewBanner({
           <span className="text-[rgb(var(--text-tertiary))]">0</span>
         )}
       </PreviewRow>
+      {/*
+        #465 — the once-per-term agreement guard excludes these students from
+        the eligible count, but it is NOT a duplicate: the reason differs and
+        the server reports it separately. Without this row the operator reads
+        "Duplicate skip: 0" beside a footer offering to generate nothing, and
+        has no way to learn why.
+      */}
+      {(data.agreementBlockedCount ?? 0) > 0 && (
+        <PreviewRow icon={ShieldAlert} label={t('bulkGenerate.step4.agreementBlocked')}>
+          <span className="text-amber-700 dark:text-amber-200">
+            {data.agreementBlockedCount}
+          </span>
+        </PreviewRow>
+      )}
       <PreviewRow icon={AlertTriangle} label={t('bulkGenerate.step4.hasBalanceDue')}>
         {fmtCounter(data.studentsWithBalance)}
       </PreviewRow>
@@ -297,9 +312,12 @@ function fmtCounter(n: number | undefined): React.ReactNode {
 function PerStudentRow({
   inv,
   billingSource,
+  agreementBlocked,
 }: {
   inv: ComputedInvoice
   billingSource?: BillingSource
+  /** #465 — this student's agreement already priced an invoice this term. */
+  agreementBlocked?: boolean
 }) {
   const { t } = useTranslation('payments')
   const settings = useFinanceSettings()
@@ -329,6 +347,13 @@ function PerStudentRow({
             })}
           </div>
         </div>
+        {agreementBlocked && (
+          <span
+            className={/* allow-arbitrary-spacing: dense bulk-wizard badge; pre-token-sweep */ "text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-200 whitespace-nowrap"}
+          >
+            {t('bulkGenerate.step4.agreementBlockedBadge')}
+          </span>
+        )}
         {billingSource && <BillingSourceChip source={billingSource} />}
         <span className="text-sm font-mono font-semibold text-[rgb(var(--text-primary))] whitespace-nowrap">
           {formatCurrency(inv.total)}
