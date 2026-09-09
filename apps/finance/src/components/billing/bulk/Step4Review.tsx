@@ -7,7 +7,7 @@
  */
 
 import { useMemo, useState } from 'react'
-import { ChevronDown, Users, FileText, Calendar, Shield, ShieldAlert, AlertTriangle, Loader2, Info, UserPlus, AlertCircle } from 'lucide-react'
+import { ChevronDown, Users, FileText, FileX, Calendar, Shield, ShieldAlert, AlertTriangle, Loader2, Info, UserPlus, AlertCircle } from 'lucide-react'
 import type { UseQueryResult } from '@tanstack/react-query'
 import { useTranslation } from '@edforge/i18n'
 import { useCurrency } from '@edforge/types/use-currency'
@@ -56,7 +56,12 @@ export function Step4Review({
   const agreementsByStudent = useMemo(() => {
     const map: Record<string, StudentAgreementPricing> = {}
     for (const p of previewQuery.data?.students ?? []) {
-      if (p.suppressedFeeStructureIds?.length || p.agreementAmount) {
+      // `agreementBlocked` can arrive with neither suppression nor an amount:
+      // the once-per-term guard fires on the agreement having priced the term,
+      // not on the operator having picked a fee the agreement covers. Since
+      // #363 that flag removes the student from the batch, so it has to be
+      // enough on its own to land here.
+      if (p.suppressedFeeStructureIds?.length || p.agreementAmount || p.agreementBlocked) {
         map[p.studentId] = {
           billingSource: p.billingSource,
           suppressedFeeStructureIds: p.suppressedFeeStructureIds,
@@ -75,8 +80,50 @@ export function Step4Review({
     }),
     [students, fees, selectedFees, customLines, details.skipZeroTotal, agreementsByStudent],
   )
-  const billableRows = batch.perStudent.filter(p => details.skipZeroTotal ? p.total > 0 : true)
-  const skippedZero = batch.zeroCount
+  // #363 — the panel counted and priced every projected student while the
+  // wizard footer read the server's `eligibleCount`. The two had no reason to
+  // agree, and on the live batch they didn't: a NPR 20,000 total quoted from
+  // exactly the students the server rejects. Anything the server will not bill
+  // leaves the counted set here, so the panel and the footer describe the same
+  // batch by construction.
+  //
+  // The server's own two per-batch exclusions:
+  //
+  //  - `agreementBlocked` is per student and authoritative — use it directly.
+  //  - shoaibrain/edforge#477's no-applicable-fee skip is reported only as a
+  //    count, never as a list. The `who` therefore comes from the client's own
+  //    projection: `computeStudentInvoice` drops inapplicable fees through the
+  //    same grade rule the server applies, so a student left with no
+  //    fee-structure line is one of them. `noApplicableFeesCount` gates it —
+  //    the server stays the authority on WHETHER any exist, and against a
+  //    backend older than #477 (or one whose applicability pass degraded) the
+  //    client must not invent an exclusion the generate path won't make.
+  //
+  // `duplicateCount` is the remaining gap: the server excludes duplicates from
+  // `eligibleCount` but returns no per-student duplicate flag, so a batch with
+  // duplicates still over-counts here by that many.
+  const notBillable = useMemo(() => {
+    const serverSkipsInapplicable = (previewQuery.data?.noApplicableFeesCount ?? 0) > 0
+    return (inv: ComputedInvoice) =>
+      agreementsByStudent[inv.studentId]?.agreementBlocked === true ||
+      (serverSkipsInapplicable && !inv.lines.some(l => l.feeStructureId))
+  }, [previewQuery.data?.noApplicableFeesCount, agreementsByStudent])
+
+  const eligibleRows = batch.perStudent.filter(p => !notBillable(p))
+  const billableRows = eligibleRows.filter(p => details.skipZeroTotal ? p.total > 0 : true)
+  const billableTotal = billableRows.reduce((sum, p) => sum + p.total, 0)
+  // Only students the server still intends to bill can be "skipped — zero
+  // total"; the ones it already dropped are reported by their own reason row,
+  // so the counts partition the batch instead of describing it twice.
+  const skippedZero = eligibleRows.filter(p => p.total === 0).length
+
+  // Excluded students stay on screen: the per-student badge is the only place
+  // the reason is named for a specific name, and hiding them would trade one
+  // unexplained number for another.
+  const billableIds = new Set(billableRows.map(p => p.studentId))
+  const previewRows = batch.perStudent.filter(
+    p => billableIds.has(p.studentId) || agreementsByStudent[p.studentId]?.agreementBlocked,
+  )
 
   const selectedFeeObjs = fees.filter(f => selectedFees[f.id])
   const customCount = customLines.filter(l => l.name || l.amount).length
@@ -180,7 +227,7 @@ export function Step4Review({
               </span>
             </div>
             <div className="space-y-1.5">
-              {billableRows.map(inv => (
+              {previewRows.map(inv => (
                 <PerStudentRow
                   key={inv.studentId}
                   inv={inv}
@@ -188,7 +235,7 @@ export function Step4Review({
                   agreementBlocked={agreementsByStudent[inv.studentId]?.agreementBlocked}
                 />
               ))}
-              {billableRows.length === 0 && (
+              {previewRows.length === 0 && (
                 <div className="text-center py-6 text-sm text-[rgb(var(--text-tertiary))] border border-dashed border-[rgb(var(--border-primary))] rounded-md">
                   {t('bulkGenerate.step4.noBillableStudents')}
                   {skippedZero > 0 && ` ${t('bulkGenerate.step4.allProjectedZero')}`}
@@ -205,13 +252,13 @@ export function Step4Review({
           <Row label={t('bulkGenerate.step4.invoices')} value={billableRows.length} bold />
           <Row
             label={t('bulkGenerate.step4.avgPerStudent')}
-            value={formatCurrency(billableRows.length ? batch.billableTotal / billableRows.length : 0)}
+            value={formatCurrency(billableRows.length ? billableTotal / billableRows.length : 0)}
             mono
           />
           <hr className="border-[rgb(var(--accent-strong))]/30" />
           <Row
             label={t('bulkGenerate.step4.grandTotal')}
-            value={formatCurrency(batch.billableTotal)}
+            value={formatCurrency(billableTotal)}
             mono
             big
           />
@@ -279,6 +326,20 @@ function BulkPreviewBanner({
         <PreviewRow icon={ShieldAlert} label={t('bulkGenerate.step4.agreementBlocked')}>
           <span className="text-amber-700 dark:text-amber-200">
             {data.agreementBlockedCount}
+          </span>
+        </PreviewRow>
+      )}
+      {/*
+        shoaibrain/edforge#477 — a third, distinct reason a student leaves the
+        batch: their grade is outside every selected fee structure, so there is
+        nothing to bill them and generation skips them. Kept as its own row for
+        the same reason the agreement row is: an operator who reads it folded
+        into "Duplicate skip" learns the wrong thing about their selection.
+      */}
+      {(data.noApplicableFeesCount ?? 0) > 0 && (
+        <PreviewRow icon={FileX} label={t('bulkGenerate.step4.noApplicableFees')}>
+          <span className="text-amber-700 dark:text-amber-200">
+            {data.noApplicableFeesCount}
           </span>
         </PreviewRow>
       )}
