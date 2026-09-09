@@ -306,6 +306,13 @@ export interface BulkPreviewResponse {
   }>
   /** #465 — how many students are blocked by the once-per-term guard. */
   agreementBlockedCount?: number
+  /**
+   * shoaibrain/edforge#477 — how many students no requested fee structure
+   * applies to, because their grade is excluded from every one of them.
+   * Generation skips these rather than billing them, so they are outside
+   * `eligibleCount`. Optional: absent from a backend older than that fix.
+   */
+  noApplicableFeesCount?: number
 }
 
 /**
