@@ -941,6 +941,7 @@
       "duplicateSkip": "Duplicate skip",
       "agreementBlocked": "Agreement already billed",
       "agreementBlockedBadge": "Already billed",
+      "noApplicableFees": "No applicable fee",
       "hasBalanceDue": "Has balance due",
       "newAdmissions": "New admissions",
       "notBilledThisPeriod": "Not billed this period",
