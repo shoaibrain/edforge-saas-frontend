@@ -100,6 +100,21 @@ describe('cleanAddress — a locked country is not an address (#367)', () => {
     expect(out).toEqual({ country: 'NPL', street1: 'Tole 4' })
   })
 
+  it('also drops a country a GENERIC operator picked and nothing else', () => {
+    // Known, deliberate cost of not distinguishing the machine-written
+    // country from an operator-selected one. Pre-fix this surfaced as a
+    // street1 error; now the lone country is dropped silently.
+    //
+    // Accepted because a country with no other address field is not an
+    // address, and the backend refine would reject it anyway — so the
+    // alternatives are a confusing error or a 400. It is NOT the same as
+    // #368, where a complete Nepali address was lost. The clean fix is to
+    // pass down whether the country was derived (AddressFieldsNepal writes
+    // it with shouldDirty:false, so RHF can tell), which needs the archetype
+    // threaded into both this mapper and the step schema; filed separately.
+    expect(cleanAddress({ country: 'USA' })).toBeUndefined()
+  })
+
   it('treats a Nepal-only field as a real field', () => {
     // Anchoring on the legacy US keys alone would discard a Nepali address
     // that never has a `city` or `state`.
