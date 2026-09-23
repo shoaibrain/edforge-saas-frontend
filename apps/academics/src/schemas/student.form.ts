@@ -93,9 +93,21 @@ const addressSchema = z.object({
   state: z.string().max(100).optional().or(z.literal('')),
   zipCode: z.string().max(20).optional().or(z.literal('')),
   country: z.string().max(100).optional().or(z.literal('')),
+  // Nepal-shaped extension fields (Sprint A.1) — rendered by
+  // AddressFieldsNepal for PABSON tenants, mirrored from the shared
+  // `addressSchema` so the refine below can see them.
+  wardNumber: z.string().max(10).optional().or(z.literal('')),
+  municipality: z.string().max(100).optional().or(z.literal('')),
+  district: z.string().max(100).optional().or(z.literal('')),
+  province: z.string().max(100).optional().or(z.literal('')),
 }).refine(
   (data) => {
-    const hasAnyField = data.street2 || data.city || data.state || data.zipCode || data.country
+    // `country` is deliberately not an anchor: AddressFieldsNepal locks it
+    // to 'NPL' on mount, so counting it would make an address block the
+    // operator never touched demand a street line (#367).
+    const hasAnyField =
+      data.street2 || data.city || data.state || data.zipCode ||
+      data.wardNumber || data.municipality || data.district || data.province
     return !hasAnyField || (data.street1 && data.street1.length > 0)
   },
   { message: 'Street address is required when providing address details', path: ['street1'] }

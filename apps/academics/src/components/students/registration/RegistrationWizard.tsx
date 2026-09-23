@@ -68,7 +68,7 @@ import {
   ENROLLMENT_TYPE_DESCRIPTOR_MAP,
 } from '../../../schemas/edfi-descriptors'
 import type { CreateStudentDto, CreateEnrollmentDto } from '../../../services/academics.service'
-import type { GuardianFormData } from '../../../schemas/student.form'
+import { cleanAddress, cleanGuardians } from './payload'
 import { useAcademicsI18n } from '../../../lib/i18n'
 
 // ============================================================================
@@ -600,29 +600,10 @@ export function RegistrationWizard() {
   const createEnrollment = useCreateEnrollment()
   const [showCancelDialog, setShowCancelDialog] = useState(false)
 
-  const cleanAddress = useCallback(
-    (addr: Record<string, unknown> | undefined) => {
-      if (!addr) return undefined
-      const cleaned: Record<string, string | undefined> = {
-        street1: (addr.street1 as string) || (addr.street as string) || undefined,
-        street2: (addr.street2 as string) || undefined,
-        city: (addr.city as string) || undefined,
-        state: (addr.state as string) || undefined,
-        zipCode: (addr.zipCode as string) || (addr.postalCode as string) || undefined,
-        country: (addr.country as string) || undefined,
-      }
-      const result = Object.fromEntries(
-        Object.entries(cleaned).filter(([, v]) => v !== undefined && v !== '')
-      )
-      return Object.keys(result).length > 0 ? result : undefined
-    },
-    []
-  )
-
   const buildStudentPayload = useCallback(
     (data: Record<string, unknown>): CreateStudentDto => {
-      const guardians = (data.guardians as GuardianFormData[] | undefined)?.filter(
-        (g) => g.firstName && g.lastName
+      const guardians = cleanGuardians(
+        data.guardians as Array<Record<string, unknown>> | undefined
       )
 
       const rawContact = data.contactInfo as Record<string, unknown> | undefined
@@ -648,9 +629,7 @@ export function RegistrationWizard() {
         schoolId: schoolId || '',
         currentGradeLevel: data.currentGradeLevel as string,
         contactInfo: contactInfo as CreateStudentDto['contactInfo'],
-        guardians: guardians && guardians.length > 0
-          ? (guardians as CreateStudentDto['guardians'])
-          : undefined,
+        guardians: guardians as CreateStudentDto['guardians'],
         medicalInfo: data.medicalInfo as CreateStudentDto['medicalInfo'],
         ethnicity: (data.ethnicity as string) || undefined,
         primaryLanguage: (data.primaryLanguage as string) || undefined,
@@ -659,7 +638,7 @@ export function RegistrationWizard() {
         notes: (data.notes as string) || undefined,
       }
     },
-    [schoolId, cleanAddress]
+    [schoolId]
   )
 
   const buildEnrollmentPayload = useCallback(
