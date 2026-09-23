@@ -3,14 +3,16 @@ import { render, cleanup } from '@testing-library/react'
 import { DemoVideo } from '../components/DemoVideo'
 
 describe('DemoVideo', () => {
-  it('renders a <video> in video mode with correct autoplay attributes', () => {
+  it('renders a muted looping <video> without the autoplay attribute (plays on visibility)', () => {
     const { container } = render(
       <DemoVideo src="/landing/task-router.mp4" showMode="video" />
     )
     const video = container.querySelector('video')
     expect(video).not.toBeNull()
     expect(video?.muted).toBe(true)
-    expect(video?.autoplay).toBe(true)
+    // Playback starts via IntersectionObserver, not the autoplay attribute —
+    // below-the-fold videos must not all decode on page load.
+    expect(video?.autoplay).toBe(false)
     expect(video?.loop).toBe(true)
     expect(video?.playsInline).toBe(true)
     expect(video?.getAttribute('src')).toBe('/landing/task-router.mp4')
@@ -36,10 +38,11 @@ describe('DemoVideo', () => {
     cleanup()
   })
 
-  it('renders a progress bar with valuenow=0 before metadata loads', () => {
+  it('renders a keyboard-operable seek slider with valuenow=0 before metadata loads', () => {
     const { getByRole } = render(<DemoVideo src="/x.mp4" />)
-    const bar = getByRole('progressbar', { name: /video progress/i })
+    const bar = getByRole('slider', { name: /seek video/i })
     expect(bar.getAttribute('aria-valuenow')).toBe('0')
+    expect(bar.getAttribute('tabindex')).toBe('0')
     cleanup()
   })
 })

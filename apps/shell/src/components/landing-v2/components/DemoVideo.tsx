@@ -4,10 +4,30 @@ import {
   useImperativeHandle,
   useRef,
   useState,
+  type KeyboardEvent,
   type MouseEvent,
   type ReactNode,
 } from 'react'
 import { clampSeekTime, progressFraction, xToTime } from './videoMath'
+
+/** play() defensively: jsdom returns undefined, browsers a promise. */
+function safePlay(v: HTMLVideoElement, onPlaying: () => void) {
+  try {
+    const p = v.play()
+    if (p && typeof p.then === 'function') {
+      p.then(onPlaying).catch(() => {})
+    } else {
+      onPlaying()
+    }
+  } catch {
+    /* autoplay rejection — leave paused */
+  }
+}
+
+function formatTime(seconds: number): string {
+  const s = Math.max(0, Math.round(seconds))
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
+}
 
 export type DemoVideoChapter = {
   start: number
@@ -41,9 +61,12 @@ export type DemoVideoProps = {
 /**
  * DemoVideo — marketing-video player with chapter markers + imperative seek.
  *
- * Video mode: autoplay muted loop, always-visible controls, click-to-seek on
- * the progress bar. Chapter markers draw on the bar and update automatically
- * when `activeChapter` changes. Parent can also call the imperative
+ * Video mode: muted loop that plays only while in the viewport (an
+ * IntersectionObserver starts/pauses it, so below-the-fold videos don't all
+ * decode on page load; environments without IO fall back to playing
+ * immediately). Always-visible controls; the progress bar is click- AND
+ * keyboard-seekable (arrows ±5s, Home/End). Chapter markers draw on the bar
+ * and update when `activeChapter` changes; parents can call the imperative
  * `seekToChapter(i)` via ref.
  *
  * Dashboard mode: renders `children` instead. Used when (a) the user toggled
@@ -64,7 +87,9 @@ export const DemoVideo = forwardRef<DemoVideoHandle, DemoVideoProps>(
     ref
   ) {
     const videoRef = useRef<HTMLVideoElement>(null)
-    const [playing, setPlaying] = useState(true)
+    const containerRef = useRef<HTMLDivElement>(null)
+    const lastProgressAtRef = useRef(0)
+    const [playing, setPlaying] = useState(false)
     const [progress, setProgress] = useState(0)
     const [duration, setDuration] = useState(0)
 
@@ -76,7 +101,7 @@ export const DemoVideo = forwardRef<DemoVideoHandle, DemoVideoProps>(
           if (!v || !chapters || !chapters[index]) return
           try {
             v.currentTime = clampSeekTime(chapters[index].start, v.duration || 0)
-            void v.play().then(() => setPlaying(true)).catch(() => {})
+            safePlay(v, () => setPlaying(true))
           } catch {
             /* ignore seek failures (e.g. before metadata) */
           }
@@ -99,11 +124,18 @@ export const DemoVideo = forwardRef<DemoVideoHandle, DemoVideoProps>(
       }
     }, [activeChapter, chapters])
 
-    // Progress + duration tracking.
+    // Progress + duration tracking. timeupdate fires ~4-60x/sec per video;
+    // throttle the setState to 4Hz so four mounted players don't re-render
+    // the tree every frame.
     useEffect(() => {
       const v = videoRef.current
       if (!v) return
-      const onTime = () => setProgress(progressFraction(v.currentTime, v.duration))
+      const onTime = () => {
+        const now = Date.now()
+        if (now - lastProgressAtRef.current < 250) return
+        lastProgressAtRef.current = now
+        setProgress(progressFraction(v.currentTime, v.duration))
+      }
       const onMeta = () => setDuration(v.duration || 0)
       v.addEventListener('timeupdate', onTime)
       v.addEventListener('loadedmetadata', onMeta)
@@ -112,6 +144,31 @@ export const DemoVideo = forwardRef<DemoVideoHandle, DemoVideoProps>(
         v.removeEventListener('loadedmetadata', onMeta)
       }
     }, [])
+
+    // Play only while visible — spares decode/bandwidth for below-the-fold
+    // sections. No IntersectionObserver (jsdom, old browsers) → play at once.
+    useEffect(() => {
+      const v = videoRef.current
+      const el = containerRef.current
+      if (!v || !el || showMode !== 'video') return
+      if (typeof IntersectionObserver === 'undefined') {
+        safePlay(v, () => setPlaying(true))
+        return
+      }
+      const io = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            safePlay(v, () => setPlaying(true))
+          } else if (!v.paused) {
+            v.pause()
+            setPlaying(false)
+          }
+        },
+        { threshold: 0.25 }
+      )
+      io.observe(el)
+      return () => io.disconnect()
+    }, [showMode])
 
     if (showMode === 'dashboard') {
       return (
@@ -132,10 +189,21 @@ export const DemoVideo = forwardRef<DemoVideoHandle, DemoVideoProps>(
       const v = videoRef.current
       if (!v) return
       if (v.paused) {
-        void v.play().then(() => setPlaying(true)).catch(() => {})
+        safePlay(v, () => setPlaying(true))
       } else {
         v.pause()
         setPlaying(false)
+      }
+    }
+
+    const seekTo = (target: number) => {
+      const v = videoRef.current
+      if (!v) return
+      try {
+        v.currentTime = clampSeekTime(target, v.duration || 0)
+        setProgress(progressFraction(v.currentTime, v.duration))
+      } catch {
+        /* ignore */
       }
     }
 
@@ -143,21 +211,51 @@ export const DemoVideo = forwardRef<DemoVideoHandle, DemoVideoProps>(
       const v = videoRef.current
       if (!v) return
       const rect = e.currentTarget.getBoundingClientRect()
-      const target = xToTime({
-        clickX: e.clientX,
-        barLeft: rect.left,
-        barWidth: rect.width,
-        duration: v.duration || 0,
-      })
-      try {
-        v.currentTime = clampSeekTime(target, v.duration || 0)
-      } catch {
-        /* ignore */
+      seekTo(
+        xToTime({
+          clickX: e.clientX,
+          barLeft: rect.left,
+          barWidth: rect.width,
+          duration: v.duration || 0,
+        })
+      )
+    }
+
+    const onBarKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+      const v = videoRef.current
+      if (!v) return
+      switch (e.key) {
+        case 'ArrowRight':
+        case 'ArrowUp':
+          e.preventDefault()
+          seekTo(v.currentTime + 5)
+          break
+        case 'ArrowLeft':
+        case 'ArrowDown':
+          e.preventDefault()
+          seekTo(v.currentTime - 5)
+          break
+        case 'Home':
+          e.preventDefault()
+          seekTo(0)
+          break
+        case 'End':
+          e.preventDefault()
+          seekTo(v.duration || 0)
+          break
+        case ' ':
+        case 'Enter':
+          e.preventDefault()
+          toggle()
+          break
+        default:
+          break
       }
     }
 
     return (
       <div
+        ref={containerRef}
         className="bg-[#0F1A2E] shadow-[var(--lp-shadow-lg)]"
         style={{
           position: 'relative',
@@ -171,7 +269,6 @@ export const DemoVideo = forwardRef<DemoVideoHandle, DemoVideoProps>(
           ref={videoRef}
           src={src}
           poster={posterSrc}
-          autoPlay
           muted
           loop
           playsInline
@@ -236,11 +333,15 @@ export const DemoVideo = forwardRef<DemoVideoHandle, DemoVideoProps>(
 
           <div
             onClick={onBarClick}
-            role="progressbar"
-            aria-label="Video progress"
+            onKeyDown={onBarKeyDown}
+            role="slider"
+            tabIndex={0}
+            aria-label="Seek video"
             aria-valuemin={0}
             aria-valuemax={100}
             aria-valuenow={Math.round(progress * 100)}
+            aria-valuetext={`${formatTime(progress * duration)} of ${formatTime(duration)}`}
+            className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--border-focus))]"
             // allow-presentation-style: decorative rgba track over dark video
             style={{
               flex: 1,

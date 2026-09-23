@@ -65,7 +65,6 @@ export function PillarCard({
           ? '0 24px 48px -16px rgba(29,53,87,0.22)'
           : '0 2px 0 rgba(29,53,87,0.04)',
         display: 'block',
-        minHeight: 380,
       }}
     >
       <div

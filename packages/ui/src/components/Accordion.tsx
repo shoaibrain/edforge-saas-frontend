@@ -184,22 +184,26 @@ export function Accordion({
               role="region"
               id={panelId}
               aria-labelledby={triggerId}
-              hidden={!open}
+              aria-hidden={!open}
+              // Grid-rows collapse: unlike the display:none + max-height hack,
+              // this animates BOTH open and close to natural content height.
               style={{
-                maxHeight: open ? 400 : 0,
-                overflow: 'hidden',
-                transition: 'max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+                display: 'grid',
+                gridTemplateRows: open ? '1fr' : '0fr',
+                transition: 'grid-template-rows 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
               }}
             >
-              <div
-                // allow-presentation-style: 15px editorial panel size has no scale token; landing ink color
-                className="pt-0 pb-[22px] pl-0 pr-[60px] leading-relaxed"
-                style={{
-                  fontSize: 15,
-                  color: 'var(--lp-ink-3, #3B4862)',
-                }}
-              >
-                {item.panel}
+              <div style={{ overflow: 'hidden', minHeight: 0 }}>
+                <div
+                  // allow-presentation-style: 15px editorial panel size has no scale token; landing ink color
+                  className="pt-0 pb-[22px] pl-0 pr-4 md:pr-[60px] leading-relaxed"
+                  style={{
+                    fontSize: 15,
+                    color: 'var(--lp-ink-3, #3B4862)',
+                  }}
+                >
+                  {item.panel}
+                </div>
               </div>
             </div>
           </div>
