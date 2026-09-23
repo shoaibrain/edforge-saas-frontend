@@ -24,9 +24,24 @@
 import { describe, it, expect } from 'vitest'
 import { contactInfoStepSchema, defaultStudentFormData } from './student.form'
 
+type AddressBag = Record<string, string | undefined>
+
+interface ContactBag {
+  contactInfo: {
+    email?: string
+    phone?: string
+    phoneType?: string
+    address: AddressBag
+    mailingAddress: AddressBag
+    useMailingAddress?: boolean
+  }
+}
+
 /** The Contact-step slice of the wizard's initial data, unmodified. */
-function untouched() {
-  return { contactInfo: structuredClone(defaultStudentFormData.contactInfo) }
+function untouched(): ContactBag {
+  return {
+    contactInfo: structuredClone(defaultStudentFormData.contactInfo) as ContactBag['contactInfo'],
+  }
 }
 
 function errorPaths(data: unknown): string[] {
