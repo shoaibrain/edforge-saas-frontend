@@ -15,8 +15,9 @@
  */
 import { useState, useMemo, useCallback, Fragment } from 'react'
 import { Navigate, useNavigate, useSearch } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
-import { Shield, Users, Key, Check, UserPlus, ChevronDown, Copy } from 'lucide-react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { Shield, Users, Key, Check, UserPlus, ChevronDown, Copy, LogOut } from 'lucide-react'
+import { toast } from 'sonner'
 import {
   Avatar,
   TanstackDataTable,
@@ -25,6 +26,7 @@ import {
   AnimatedProgressBar,
   Button,
   DataTableRowActions,
+  Modal,
   cn,
 } from '@edforge/ui'
 import { can, ROLE_PERMISSIONS, type Action } from '@edforge/abac'
@@ -441,6 +443,24 @@ function UsersTab({ onAssign }: { onAssign: () => void }) {
 
   const allUsers = useMemo(() => data?.items ?? [], [data])
 
+  // Sprint 4 (S4.6) — admin "Terminate all sessions" from the user row.
+  // Gated on the current user being a TenantAdmin, matching the backend's
+  // requirement on POST /sessions/user/:id/revoke-all (the teeth surface).
+  const queryClient = useQueryClient()
+  const isTenantAdmin = useAuthStore((s) => s.user?.globalRole === 'TenantAdmin')
+  const [terminateTarget, setTerminateTarget] = useState<UserResponseDto | null>(null)
+  const terminateSessionsMutation = useMutation({
+    mutationFn: (userId: string) => usersService.revokeUserSessions(userId),
+    onSuccess: (res) => {
+      toast.success(
+        `Terminated ${res.revokedCount} session${res.revokedCount === 1 ? '' : 's'}`
+      )
+      queryClient.invalidateQueries({ queryKey: ['users', 'list'] })
+      setTerminateTarget(null)
+    },
+    onError: () => toast.error('Couldn’t terminate sessions. Please try again.'),
+  })
+
   const counts = useMemo(() => {
     const byRole = { TenantAdmin: 0, StandardUser: 0 }
     let active = 0
@@ -524,17 +544,27 @@ function UsersTab({ onAssign }: { onAssign: () => void }) {
                 icon: <Copy className="h-4 w-4" />,
                 onClick: (u) => navigator.clipboard?.writeText(u.email),
               },
+              ...(isTenantAdmin
+                ? [
+                    {
+                      label: 'Terminate all sessions',
+                      icon: <LogOut className="h-4 w-4" />,
+                      onClick: (u: UserResponseDto) => setTerminateTarget(u),
+                    },
+                  ]
+                : []),
             ]}
           />
         ),
       },
     ],
-    [],
+    [isTenantAdmin],
   )
 
   const roleDistMax = Math.max(counts.byRole.TenantAdmin, counts.byRole.StandardUser, 1)
 
   return (
+    <>
     <div className="flex h-full min-h-0 gap-4">
       {/* Left aside — summary + by-role filter */}
       <aside className="flex w-64 shrink-0 flex-col gap-4 overflow-y-auto scrollbar-thin">
@@ -608,6 +638,38 @@ function UsersTab({ onAssign }: { onAssign: () => void }) {
         />
       </div>
     </div>
+
+    {/* Terminate all sessions confirm (S4.6) */}
+    <Modal
+      open={!!terminateTarget}
+      onClose={() => setTerminateTarget(null)}
+      title="Terminate all sessions?"
+    >
+      <p className="text-sm text-[rgb(var(--text-secondary))]">
+        {terminateTarget
+          ? `This signs ${fullName(terminateTarget)} out of every device and revokes their tokens — they’ll need to sign in again.`
+          : ''}
+      </p>
+      <div className="flex justify-end gap-2 mt-6">
+        <Button
+          variant="outline"
+          onClick={() => setTerminateTarget(null)}
+          disabled={terminateSessionsMutation.isPending}
+        >
+          Cancel
+        </Button>
+        <Button
+          variant="danger"
+          onClick={() =>
+            terminateTarget && terminateSessionsMutation.mutate(terminateTarget.userId)
+          }
+          disabled={terminateSessionsMutation.isPending}
+        >
+          Terminate
+        </Button>
+      </div>
+    </Modal>
+    </>
   )
 }
 

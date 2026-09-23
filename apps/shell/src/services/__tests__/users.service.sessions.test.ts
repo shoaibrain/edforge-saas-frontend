@@ -22,6 +22,7 @@ import {
   registerSession,
   touchSession,
   revokeAllSessions,
+  revokeUserSessions,
   getActiveSessions,
   getLoginHistory,
 } from '../users.service'
@@ -30,6 +31,13 @@ const asMock = (fn: unknown) => fn as ReturnType<typeof vi.fn>
 
 describe('users.service — session write route shapes', () => {
   beforeEach(() => vi.clearAllMocks())
+
+  it('revokeUserSessions POSTs the admin teeth route /sessions/user/:id/revoke-all (S4.6)', async () => {
+    asMock(apiPost).mockResolvedValue({ revokedCount: 2 })
+    const res = await revokeUserSessions('user-9')
+    expect(apiPost).toHaveBeenCalledWith('/sessions/user/user-9/revoke-all', {})
+    expect(res.revokedCount).toBe(2)
+  })
 
   it('getActiveSessions unwraps the { sessions, total } response into an array', async () => {
     // Backend returns SecuritySessionsListDto, NOT a bare array. Returning the
