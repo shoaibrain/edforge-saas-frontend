@@ -101,6 +101,11 @@ export function RecordPaymentDrawer({
   const [note, setNote] = useState('')
   const [result, setResult] = useState<RecordedResult | null>(null)
 
+  // One key per drawer-open, deliberately REUSED across retries: a submit
+  // retried after a timeout is the case idempotency exists for, so minting a
+  // key per attempt would book a second payment however correct the server is.
+  const idempotencyKey = useRef<string | null>(null)
+
   // Reset ONLY when the drawer transitions closed→open (see file JSDoc).
   const wasOpen = useRef(false)
   useEffect(() => {
@@ -111,6 +116,7 @@ export function RecordPaymentDrawer({
       setPaidDate(localIsoToday())
       setNote('')
       setResult(null)
+      idempotencyKey.current = crypto.randomUUID()
     }
     wasOpen.current = open
   }, [open, due])
@@ -130,6 +136,7 @@ export function RecordPaymentDrawer({
   const submit = async () => {
     if (!valid || recordPayment.isPending) return
     dueAtSubmit.current = due
+    const key = (idempotencyKey.current ??= crypto.randomUUID())
     try {
       const payment: Payment = await recordPayment.mutateAsync({
         invoiceId: invoice.id,
@@ -139,7 +146,7 @@ export function RecordPaymentDrawer({
         referenceNumber: gateway === 'cash' ? undefined : reference.trim(),
         notes: note.trim() || undefined,
         paidDate,
-        idempotencyKey: crypto.randomUUID(),
+        idempotencyKey: key,
       })
       const recorded: RecordedResult = {
         amount,
