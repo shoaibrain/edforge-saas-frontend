@@ -32,7 +32,7 @@ import {
 import { UuidBadge } from '@edforge/archetype'
 import { useAppStore } from '../../../stores/app.store'
 import {
-  useStudentAccounts,
+  useAllStudentAccounts,
   useStudentLedger,
   useInvoices,
   buildServerPaginationProps,
@@ -561,13 +561,18 @@ export default function StudentAccountsPage() {
   const { format, formatCompact } = useCurrency(settings)
   const columns = useMemo(() => buildColumns(format, settings, t), [format, settings, t])
 
+  // Issue #374 — the tiles and the CSV both read whatever is loaded, so on
+  // first paint they described the first server page and called it the school.
+  // The exhaustive hook keeps pulling pages into the same cache entry the table
+  // reads, so both settle on the school-wide set; `isComplete` is what says so.
   const {
-    data: accounts,
+    items: accounts,
     isLoading,
     hasMore,
     loadMore,
     isFetchingNextPage,
-  } = useStudentAccounts(schoolId ?? '')
+    isComplete,
+  } = useAllStudentAccounts(schoolId ?? '')
 
   // Issue #357 — the hook has always been cursor-paginated; the page just
   // never passed the controls on, so the table stopped at the first server
@@ -754,7 +759,9 @@ export default function StudentAccountsPage() {
         ]}
         initialColumnVisibility={{ balanceBucket: false }}
         selectionBar={selectionBar}
-        exportOptions={{ filename: 'student-accounts', formats: ['csv'] }}
+        exportOptions={
+          isComplete ? { filename: 'student-accounts', formats: ['csv'] } : undefined
+        }
         renderSubComponent={({ row }) => (
           <AccountDetail account={row.original} schoolId={schoolId} />
         )}

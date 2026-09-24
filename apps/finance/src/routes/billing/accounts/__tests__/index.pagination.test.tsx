@@ -17,8 +17,11 @@ vi.mock('@edforge/finance-services', async (importOriginal) => {
   const actual = await importOriginal<typeof FinanceServices>()
   return {
     ...actual,
-    useStudentAccounts: () => ({
-      data: Array.from({ length: 20 }, (_, i) => ({
+    // #374 — the page reads the exhaustive variant now. Pinned mid-drain
+    // (hasMore true, cap not yet reached) so the assertions below still
+    // describe a list the server holds more of.
+    useAllStudentAccounts: () => ({
+      items: Array.from({ length: 20 }, (_, i) => ({
         id: `acc-${i}`,
         studentId: `s-${i}`,
         studentName: `Student ${i}`,
@@ -34,6 +37,8 @@ vi.mock('@edforge/finance-services', async (importOriginal) => {
       totalLoaded: 20,
       error: null,
       refetch: vi.fn(),
+      isComplete: false,
+      isDraining: true,
     }),
     useStudentLedger: () => ({ data: [], isLoading: false, isError: false }),
     useInvoices: () => ({ data: [], isLoading: false }),
