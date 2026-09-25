@@ -241,3 +241,7 @@ export { normalizeFinanceListResponse } from './utils/normalize-finance-list-res
 export { flattenFinancePages } from './utils/flatten-finance-pages'
 export { buildServerPaginationProps } from './utils/build-server-pagination-props'
 export type { FinanceServerPaginationConfig } from './utils/build-server-pagination-props'
+
+// Exhaustive student-accounts drain — school-wide aggregates and full exports
+export { useAllStudentAccounts } from './hooks/useStudentAccountsInfinite'
+export type { UseAllStudentAccountsResult } from './hooks/useStudentAccountsInfinite'
