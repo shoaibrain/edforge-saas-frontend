@@ -1935,7 +1935,7 @@ export async function createParentAccount(data: {
   studentId: string
   guardianId?: string
 }): Promise<{ userId: string; email: string; schoolRole: string }> {
-  return apiPost('/identity/users/parent-accounts', data)
+  return apiPost('/users/parent-accounts', data)
 }
 
 /**
@@ -1948,7 +1948,7 @@ export async function createStudentAccount(data: {
   schoolId: string
   studentId: string
 }): Promise<{ userId: string; email: string; schoolRole: string }> {
-  return apiPost('/identity/users/student-accounts', data)
+  return apiPost('/users/student-accounts', data)
 }
 
 /**

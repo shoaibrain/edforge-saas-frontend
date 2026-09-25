@@ -181,7 +181,10 @@ function GuardianRow({
                   {t('actions.editGuardian')}
                 </Button>
               )}
-              {onGrantAccess && !guardian.hasPortalAccess && guardian.email && (
+              {/* Not gated on hasPortalAccess: the flag can read true while the
+                  underlying user link is destroyed, and that is exactly the state
+                  the operator needs this control to repair. The grant is idempotent. */}
+              {onGrantAccess && guardian.email && (
                 <Button
                   variant="outline"
                   size="sm"
