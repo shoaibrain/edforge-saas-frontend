@@ -28,6 +28,7 @@
     "schoolEnrollment": "School Enrollment",
     "addToSection": "Add to Section",
     "addGuardian": "Add Guardian",
+    "saveGuardian": "Save Guardian",
     "enrollAtSchool": "Enroll at School",
     "newSchoolEnrollment": "New School Enrollment",
     "grantPortalAccess": "Grant Portal Access",
@@ -179,6 +180,8 @@
     "guardian": {
       "addTitle": "Add Guardian",
       "addDescription": "Add a parent or guardian to {{student}}'s profile",
+      "editTitle": "Edit Guardian",
+      "editDescription": "Update {{guardian}}'s contact details",
       "unsavedChangesConfirm": "You have unsaved changes. Are you sure you want to close?",
       "unsavedChanges": "You have unsaved changes",
       "firstName": "First Name",

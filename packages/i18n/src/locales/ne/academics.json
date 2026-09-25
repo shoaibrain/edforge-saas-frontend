@@ -28,6 +28,7 @@
     "schoolEnrollment": "विद्यालय भर्ना",
     "addToSection": "सेक्सनमा थप्नुहोस्",
     "addGuardian": "अभिभावक थप्नुहोस्",
+    "saveGuardian": "अभिभावक सुरक्षित गर्नुहोस्",
     "enrollAtSchool": "विद्यालयमा भर्ना गर्नुहोस्",
     "newSchoolEnrollment": "नयाँ विद्यालय भर्ना",
     "grantPortalAccess": "पोर्टल पहुँच प्रदान गर्नुहोस्",
@@ -179,6 +180,8 @@
     "guardian": {
       "addTitle": "Guardian थप्नुहोस्",
       "addDescription": "{{student}} को profile मा parent वा guardian थप्नुहोस्",
+      "editTitle": "अभिभावक सम्पादन गर्नुहोस्",
+      "editDescription": "{{guardian}} को सम्पर्क विवरण अद्यावधिक गर्नुहोस्",
       "unsavedChangesConfirm": "तपाईंसँग unsaved changes छन्। बन्द गर्न निश्चित हुनुहुन्छ?",
       "unsavedChanges": "तपाईंसँग unsaved changes छन्",
       "firstName": "पहिलो नाम",

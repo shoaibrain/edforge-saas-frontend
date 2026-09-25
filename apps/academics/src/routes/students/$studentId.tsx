@@ -44,6 +44,7 @@ import { EnrollExistingStudentModal } from '../../components/enrollment/EnrollEx
 import { EditStudentModal } from '../../components/students/EditStudentModal'
 import { AddToSectionModal } from '../../components/students/profile/AddToSectionModal'
 import { AddGuardianModal } from '../../components/students/profile/AddGuardianModal'
+import { EditGuardianModal } from '../../components/students/profile/EditGuardianModal'
 
 // ============================================================================
 // CONSTANTS
@@ -330,6 +331,12 @@ export function StudentProfilePage() {
             open={actions.addGuardianModalOpen}
             onClose={() => actions.setAddGuardianModalOpen(false)}
             student={student}
+          />
+          <EditGuardianModal
+            open={actions.editGuardianId !== null}
+            onClose={actions.closeEditGuardian}
+            student={student}
+            guardianId={actions.editGuardianId}
           />
         </>
       )}
